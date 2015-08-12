@@ -40,6 +40,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"columnName", "columnType", "length", "scale", "jdbcType" ,"autoincrement","nullable","javaType","propertyName","annotations"})
 public class Column implements ModelObject, Annotated {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

@@ -31,6 +31,7 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"subject","textBody","htmlBody","from"})
 @XmlRootElement
 public class Email {
     public static final String copyright =

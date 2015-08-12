@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,6 +39,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"enabled","selectionProviderName","foreignKeyName","displayModeName"})
 public class SelectionProviderReference {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

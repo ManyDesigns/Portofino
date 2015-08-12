@@ -28,10 +28,7 @@ import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"maxEventsPerCellInMonthView","estimateEventsPerPageInAgendaView"})
 public class CalendarConfiguration implements PageActionConfiguration {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

@@ -37,6 +37,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
+@XmlType(propOrder = {"name","toDatabase","references","hql", "sql"})
 public class DatabaseSelectionProvider implements ModelSelectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

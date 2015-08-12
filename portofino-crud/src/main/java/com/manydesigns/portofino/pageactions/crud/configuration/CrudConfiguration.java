@@ -19,7 +19,7 @@ import java.util.List;
 */
 
 @XmlRootElement(name = "configuration")
-@XmlType(name = "configuration")
+@XmlType(name = "configuration",propOrder = {"name", "searchTitle","createTitle","readTitle","editTitle","variable","largeResultSet","rowsPerPage","columns","properties"})
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration implements PageActionConfiguration, ConfigurationWithDefaults {
     public static final String copyright =

@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
 
 /*
@@ -37,6 +38,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
+@XmlType(propOrder = {"fromColumn","toColumn"})
 public class Reference implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

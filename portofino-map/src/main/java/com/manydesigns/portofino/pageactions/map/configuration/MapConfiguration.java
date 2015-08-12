@@ -25,10 +25,7 @@ import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -40,6 +37,7 @@ import java.math.BigInteger;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"latitude","longitude","zoom","geolocation"})
 public class MapConfiguration implements PageActionConfiguration {
     public static final String copyright = "Copyright (c) 2005-2015, ManyDesigns srl";
 

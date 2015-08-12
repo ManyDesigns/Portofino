@@ -44,7 +44,7 @@ import java.util.List;
 */
 
 @XmlRootElement(name = "configuration")
-@XmlType(name = "databaseConfiguration")
+@XmlType(name = "databaseConfiguration",propOrder = {"database","query","selectionProviders"})
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration extends com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration {
     public static final String copyright =

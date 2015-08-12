@@ -26,10 +26,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 
 /*
@@ -39,6 +36,7 @@ import java.text.MessageFormat;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
+@XmlType(propOrder = {"toTableName", "toSchema", "onUpdate", "onDelete"})
 public class ForeignKey extends DatabaseSelectionProvider
         implements HasReferences {
     public static final String copyright =

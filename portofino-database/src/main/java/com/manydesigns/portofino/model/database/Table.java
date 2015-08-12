@@ -40,6 +40,7 @@ import java.util.List;
 */
 @XmlRootElement(name = "table")
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"tableName", "entityName", "shortName", "javaClass","annotations","columns","foreignKeys","primaryKey","selectionProviders"})
 public class Table implements ModelObject, Annotated {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

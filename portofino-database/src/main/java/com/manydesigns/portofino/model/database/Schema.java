@@ -39,6 +39,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"catalog", "schemaName","immediateTables"})
 public class Schema implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

@@ -23,10 +23,7 @@ package com.manydesigns.portofino.pages;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.apache.commons.lang.StringUtils;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,6 +34,7 @@ import java.util.Set;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"accessLevel","name","permissions"})
 public class Group {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

@@ -20,10 +20,7 @@
 
 package com.manydesigns.mail.queue.model;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.*;
 import java.io.InputStream;
 
 /**
@@ -33,6 +30,7 @@ import java.io.InputStream;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"name","description","disposition","contentId","embedded","filePath"})
 public class Attachment {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

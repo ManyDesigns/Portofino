@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.*;
 */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.NONE)
+@XmlType(propOrder = {"title","description", "navigationRoot","id","layout","detailLayout","permissions"})
 public class Page {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

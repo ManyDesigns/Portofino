@@ -38,6 +38,7 @@ import java.util.List;
 */
 
 @XmlAccessorType(value = XmlAccessType.NONE)
+@XmlType(propOrder = {"enabled","name", "label","insertable","updatable","inSummary","searchable","annotations"})
 public class CrudProperty implements Annotated {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

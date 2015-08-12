@@ -29,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.MessageFormat;
@@ -40,6 +41,7 @@ import java.text.MessageFormat;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
+@XmlType(propOrder = {"driver", "url", "username", "password"})
 public class JdbcConnectionProvider extends ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
