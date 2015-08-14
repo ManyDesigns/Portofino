@@ -28,6 +28,7 @@ import com.manydesigns.portofino.actions.admin.database.TablesAction;
 import com.manydesigns.portofino.actions.admin.groovy.GroovyAdminAction;
 import com.manydesigns.portofino.actions.admin.mail.MailSettingsAction;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
+import com.manydesigns.portofino.actions.admin.info.InfoAction;
 import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
 import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
 import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
@@ -127,6 +128,10 @@ public class AdminModule implements Module {
 
         link = SimpleMenuAppender.link(
                 "configuration", "groovy", null, "groovy", GroovyAdminAction.URL_BINDING, 5.0);
+        adminMenu.menuAppenders.add(link);
+
+        link = SimpleMenuAppender.link(
+                "configuration", "info", null, "info", InfoAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
 
         //Security
