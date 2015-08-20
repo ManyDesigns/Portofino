@@ -32,75 +32,9 @@
     </jsp:include>
     <body>
     <div id="wrapper">
-    <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
-    <header class="navbar navbar-inverse navbar-static-top">
-        <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-
-            <stripes:link href="/" class="navbar-brand">
-                <img src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
-                <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
-            </stripes:link>
-        </div>
-
-            <nav id="header-menu" class="navbar-collapse collapse" role="navigation">
-            <ul class="nav navbar-nav navbar-right">
-                <%
-                    String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
-                    String actionPath = (String) request.getAttribute(ActionResolver.RESOLVED_ACTION);
-                %>
-                <shiro:user>
-                    <%
-                    Subject subject = SecurityUtils.getSubject();
-                    Object principal = subject.getPrincipal();
-                    String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
-                %>
-
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <em class="glyphicon glyphicon-user"></em>
-                        <%= prettyName %> <strong class="caret"></strong>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <%
-                            UrlBuilder changePasswordUrlBuilder = new UrlBuilder(request.getLocale(), loginPage, true);
-                            changePasswordUrlBuilder.addParameter("returnUrl", actionPath);
-                            changePasswordUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                            changePasswordUrlBuilder.addParameter("changePassword");
-                            String changePasswordUrl = Util.getAbsoluteUrl(changePasswordUrlBuilder.toString());
-                        %>
-                        <li>
-                            <a href="<%= changePasswordUrl %>">
-                                <fmt:message key="change.password" />
-                            </a>
-                        </li>
-
-                        <%
-                            UrlBuilder logoutUrlBuilder = new UrlBuilder(request.getLocale(), loginPage, true);
-                            logoutUrlBuilder.addParameter("returnUrl", actionPath);
-                            logoutUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                            logoutUrlBuilder.addParameter("logout");
-                            String logoutUrl = Util.getAbsoluteUrl(logoutUrlBuilder.toString());
-                        %>
-                        <li>
-                            <a href="<%= logoutUrl %>">
-                                <fmt:message key="log.out" />
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                </shiro:user>
-            </ul>
-        </nav>
-
-    </div>
-    </header>
+    <jsp:include page="/theme/header.jsp">
+        <jsp:param name="pageTitle" value="${pageTitle}" />
+    </jsp:include>
     <div id="content" class="container">
         <div class="row">
             <div class="col-md-2">

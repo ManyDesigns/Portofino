@@ -8,6 +8,7 @@
 %><%@ page import="com.manydesigns.portofino.security.AccessLevel"
 %><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
 %><%@ page import="net.sourceforge.stripes.util.UrlBuilder"
+%><%@ page import="org.apache.commons.lang.StringUtils"
 %><%@ page import="org.apache.shiro.SecurityUtils"
 %><%@ page import="org.apache.shiro.subject.Subject"
 %><%@ page import="java.io.Serializable"
@@ -18,8 +19,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><stripes:url var="profileUrl" value="/actions/profile"/>
-<jsp:useBean id="portofinoConfiguration" scope="application"
+%><jsp:useBean id="portofinoConfiguration" scope="application"
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
@@ -33,16 +33,17 @@
                 <span class="icon-bar"></span>
             </button>
             <stripes:link href="/" class="navbar-brand">
-                <img onerror="this.style.display='none'" src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
+                <% if(!StringUtils.isEmpty(portofinoConfiguration.getString(PortofinoProperties.APP_LOGO))) { %>
+                <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
+                <img src="${logoUrl}" width="32px" alt='<c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>' />
+                <% } %>
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
         </div>
         <nav id="header-menu" class="navbar-collapse collapse">
-            <c:if test="${not empty actionBean.pageInstance}">
-                <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
-                    <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
-                </form>
-            </c:if>
+            <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
+                <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
+            </form>
             <ul class="nav navbar-nav navbar-right">
                 <%
                     String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);

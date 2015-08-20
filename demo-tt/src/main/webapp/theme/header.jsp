@@ -1,14 +1,14 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
-<%@ page import="com.manydesigns.portofino.PortofinoProperties"%>
-<%@ page import="org.apache.shiro.SecurityUtils"%>
-<%@ page import="org.apache.shiro.subject.Subject"%>
-<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
-<%@ taglib prefix="mde" uri="/manydesigns-elements"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+%><%@ page import="com.manydesigns.portofino.PortofinoProperties"
+%><%@ page import="org.apache.shiro.SecurityUtils"
+%><%@ page import="org.apache.shiro.subject.Subject"
+%><%@ page import="org.apache.commons.lang.StringUtils"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
-<stripes:url var="profileUrl" value="/actions/profile"/>
 <jsp:useBean id="portofinoConfiguration" scope="application"
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
@@ -23,16 +23,17 @@
                 <span class="icon-bar"></span>
             </button>
             <stripes:link href="/" class="navbar-brand">
-                <img onerror="this.style.display='none'" src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
+                <% if(!StringUtils.isEmpty(portofinoConfiguration.getString(PortofinoProperties.APP_LOGO))) { %>
+                <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
+                <img src="${logoUrl}" width="32px" alt='<c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>' />
+                <% } %>
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
         </div>
         <nav id="header-menu" class="navbar-collapse collapse">
-            <c:if test="${not empty actionBean.pageInstance}">
-                <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
-                    <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
-                </form>
-            </c:if>
+            <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
+                <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
+            </form>
             <c:set var="actionPath" value="${actionBean.context.actionPath}"/>
             <ul class="nav navbar-nav navbar-right">
                 <shiro:user>
@@ -94,7 +95,7 @@
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <em class="glyphicon glyphicon-user"></em>
-                            <c:out value="${principal.first_name} ${principal.last_name}"/> <b class="caret"></b>
+                            <c:out value="${principal.first_name} ${principal.last_name}"/> <strong class="caret"></strong>
                         </a>
                         <ul class="dropdown-menu">
                             <li>
@@ -104,7 +105,6 @@
                             </li>
                             <li>
                                 <stripes:link href="/login">
-<%--                                    <stripes:link href="/actions/user/login">--%>
                                     <stripes:param name="logout"/>
                                     <stripes:param name="returnUrl" value="${actionPath}"/>
                                     <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
@@ -117,7 +117,6 @@
                 <shiro:guest>
                     <li>
                         <stripes:link href="/login">
-<%--                            <stripes:link href="/actions/user/login">--%>
                             <stripes:param name="returnUrl" value="${actionPath}"/>
                             <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
                             <fmt:message key="log.in" />

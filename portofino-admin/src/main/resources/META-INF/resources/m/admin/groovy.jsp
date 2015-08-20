@@ -17,7 +17,7 @@
             <p>
                 <fmt:message key="layouts.admin.groovy.text"/>
             </p>
-            <div class="form-group btn-group-lg">
+            <div class="form-group">
                 <portofino:buttons list="groovy" />
             </div>
         </stripes:form>

@@ -23,10 +23,9 @@
             </button>
 
             <stripes:link href="/" class="navbar-brand">
-                <img onerror="this.style.display='none'" src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
-            This is the default header. You should customize it including a /theme/header.jsp page in your application.
+            This is the default, empty header. You should customize it including a /theme/header.jsp page in your application. The Maven archetype creates one for you and the distribution you download from SourceForge includes the same one as well.
         </div>
 
     </div>
