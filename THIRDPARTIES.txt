@@ -71,7 +71,7 @@ License: Apache License v2.0
 
 Bootstrap DateTimePicker
 Site: https://github.com/eternicode/bootstrap-datepicker
-Files: Eonasdan-bootstrap-datetimepicker-4.7.14.jar
+Files: Eonasdan-bootstrap-datetimepicker-4.15.35.jar
 License: Apache License v2.0
 
 Bouncy Castle
