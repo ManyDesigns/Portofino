@@ -31,6 +31,7 @@ import java.lang.annotation.Annotation;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
+@Deprecated
 public class LabelI18NImpl implements LabelI18N {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

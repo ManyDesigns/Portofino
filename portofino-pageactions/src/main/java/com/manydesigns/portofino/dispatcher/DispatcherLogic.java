@@ -523,7 +523,7 @@ public class DispatcherLogic {
                 }
             }
             if(childPage == null) {
-                throw new PageNotActiveException();
+                throw new PageNotActiveException(childDirectory.getAbsolutePath());
             }
 
             Page page = DispatcherLogic.getPage(childDirectory);

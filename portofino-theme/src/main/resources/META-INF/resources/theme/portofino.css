@@ -1043,11 +1043,8 @@ Checkbox
     float: left;
 }
 
-/**radio****/
-/**/
-
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox] {
-    display: none;
+    opacity: 0;
 }
 
 .checkbox label:before {
@@ -1088,6 +1085,12 @@ Checkbox
     text-align: center;
     line-height: 15px;
 }
+
+.checkbox input[type=checkbox]:focus + label:before, .checkbox-inline input[type=checkbox]:focus + label:before {
+    border-color: #66afe9;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6)
+}
+
 .form-inline .checkbox label, .form-inline .radio label {
     padding-left: 10px;
 }

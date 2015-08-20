@@ -33,6 +33,7 @@ import java.lang.annotation.Target;
 */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
+@Deprecated
 public @interface LabelI18N {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"type","address"})
+@XmlType(propOrder = { "typeString", "address" })
 public class Recipient {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";

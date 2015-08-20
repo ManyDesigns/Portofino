@@ -185,7 +185,7 @@ public class DatabaseSyncer {
             if (pkSchemaName == null || pkTableName == null) {
                 logger.error("Null schema or table name: foreign key " +
                         "(schema: {}, table: {}, fk: {}) " +
-                        "references primary key (schema: {}, table{}). Skipping foreign key.",
+                        "references primary key (schema: {}, table: {}). Skipping foreign key.",
                         new Object[] {
                             targetFromTable.getSchemaName(),
                             targetFromTable.getTableName(),

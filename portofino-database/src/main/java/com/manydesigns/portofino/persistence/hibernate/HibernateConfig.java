@@ -780,6 +780,7 @@ public class HibernateConfig {
             } catch (Exception e) {
                 logger.error("Unsupported reference to columns outside the primary key, skipping relationship: " +
                         relationship.getName(), e);
+                return null;
             }
         }
         m2o.createForeignKey();

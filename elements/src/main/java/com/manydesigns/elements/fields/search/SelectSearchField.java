@@ -354,8 +354,6 @@ public class SelectSearchField extends AbstractSearchField {
     private void valueToXhtmlCheckbox(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
-
-
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
@@ -365,36 +363,25 @@ public class SelectSearchField extends AbstractSearchField {
             if(!option.getValue().active) {
                 continue;
             }
-
             xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " checkbox");
-
+            xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " checkbox");
             Object optionValue = option.getKey();
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
             String optionLabel = option.getValue().label;
             boolean checked =  ArrayUtils.contains(values, optionValue);
             String checkboxId = id + "_" + counter;
-
-            //xb.writeNbsp();
-            xb.writeInputCheckbox(checkboxId, inputName, optionStringValue, checked);
-            //xb.writeNbsp();
             xb.openElement("label");
-            //xb.addAttribute("class", "checkbox");
+            xb.addAttribute("class", "checkbox");
+            xb.writeInputCheckbox(checkboxId, inputName, optionStringValue, checked);
+            xb.openElement("label");
             xb.addAttribute("for", checkboxId);
-            //xb.writeNbsp();
-            //xb.write(optionLabel);
-
-            counter++;
-
-            //xb.openElement("span");
-            //xb.addAttribute("class", "checkbox-label");
             xb.write(optionLabel);
-            //xb.closeElement("span");
+            xb.closeElement("label");
             xb.closeElement("label");
             xb.closeElement("div");
+            counter++;
         }
-
     }
 
     private void valueToXhtmlMultipleSelection(XhtmlBuffer xb) {
