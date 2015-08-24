@@ -110,4 +110,8 @@ public @interface Button {
      */
     String group() default "";
 
+    /**
+     * Allows to specify the icon position (before text or not).
+     */
+    boolean iconBefore() default true;
 }
