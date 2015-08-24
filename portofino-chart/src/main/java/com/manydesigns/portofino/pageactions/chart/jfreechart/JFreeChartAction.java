@@ -148,7 +148,7 @@ public class JFreeChartAction extends AbstractPageAction {
             return forwardToPageActionError(e);
         }
 
-        return forwardTo("/m/chart/jfreechart/display.jsp");
+        return new ForwardResolution("/m/chart/jfreechart/display.jsp");
     }
 
     public void generateChart() {

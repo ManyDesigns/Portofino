@@ -54,8 +54,7 @@ public class TextConfiguration implements PageActionConfiguration {
     //**************************************************************************
 
     @XmlElementWrapper(name="attachments")
-    @XmlElement(name = "attachment",
-            type = Attachment.class)
+    @XmlElement(name = "attachment", type = Attachment.class)
     public List<Attachment> getAttachments() {
         return attachments;
     }

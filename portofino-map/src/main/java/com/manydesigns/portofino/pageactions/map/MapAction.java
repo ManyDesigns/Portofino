@@ -138,7 +138,7 @@ public class MapAction extends AbstractPageAction {
     }
 
     public Resolution mapView() {
-        return forwardTo("/m/map/map.jsp");
+        return new ForwardResolution("/m/map/map.jsp");
     }
 
     //--------------------------------------------------------------------------

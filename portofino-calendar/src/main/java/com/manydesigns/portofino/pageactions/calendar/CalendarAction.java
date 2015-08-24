@@ -154,7 +154,7 @@ public class CalendarAction extends AbstractPageAction {
             monthView.addEvent(event);
         }
         monthView.sortEvents();
-        return forwardTo("/m/calendar/calendar.jsp");
+        return new ForwardResolution("/m/calendar/calendar.jsp");
     }
 
     public Resolution agendaView() {
@@ -170,7 +170,7 @@ public class CalendarAction extends AbstractPageAction {
             }
         }
         agendaView.sortEvents();
-        return forwardTo("/m/calendar/calendar.jsp");
+        return new ForwardResolution("/m/calendar/calendar.jsp");
     }
 
     public Resolution nextMonth() {

@@ -549,10 +549,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     /**
-     * Returns a ForwardResolution to the given page, and sets up internal parameters that need to be propagated in case
-     * of embedding.
+     * Returns a ForwardResolution to the given page.
      * @param page the path to the page, from the root of the webapp.
      * @return a Resolution that forwards to the given page.
+     * @deprecated use simply new ForwardResolution(page) instead.
      */
     @Deprecated
     public Resolution forwardTo(String page) {

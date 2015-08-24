@@ -93,7 +93,7 @@ public class ChartJsAction extends AbstractPageAction {
         }
         List<Object[]> result = loadChartData();
         if(result == null) {
-            return forwardTo("/m/chart/chartjs/no-data-available.jsp");
+            return new ForwardResolution("/m/chart/chartjs/no-data-available.jsp");
         }
         if(chartConfiguration.getActualType().kind == 1) {
             JSONArray data = new JSONArray();
@@ -111,7 +111,7 @@ public class ChartJsAction extends AbstractPageAction {
             logger.error("Unsupported chart type: " + chartConfiguration.getActualType());
             return forwardToPageActionNotConfigured();
         }
-        return forwardTo("/m/chart/chartjs/display.jsp");
+        return new ForwardResolution("/m/chart/chartjs/display.jsp");
     }
 
     protected List<Object[]> loadChartData() {

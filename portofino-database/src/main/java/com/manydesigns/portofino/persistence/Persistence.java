@@ -60,7 +60,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -255,10 +256,8 @@ public class Persistence {
                         }
                     }
                     for(Table table : schema.getTables()) {
-                        if(!schema.getImmediateTables().contains(table)) {
-                            File tableFile = new File(schemaDir, table.getTableName() + ".table.xml");
-                            m.marshal(table, tableFile);
-                        }
+                        File tableFile = new File(schemaDir, table.getTableName() + ".table.xml");
+                        m.marshal(table, tableFile);
                     }
                 } else {
                     logger.debug("Schema directory {} does not exist", schemaDir);

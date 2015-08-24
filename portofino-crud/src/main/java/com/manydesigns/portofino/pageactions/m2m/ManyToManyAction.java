@@ -259,7 +259,7 @@ public class ManyToManyAction extends AbstractPageAction {
                         booleanRelation.put(o, !availableAssociations.contains(o));
                     }
                 }
-                return forwardTo("/m/crud/many2many/checkboxes.jsp");
+                return new ForwardResolution("/m/crud/many2many/checkboxes.jsp");
             default:
                 return forwardToPageActionNotConfigured();
         }

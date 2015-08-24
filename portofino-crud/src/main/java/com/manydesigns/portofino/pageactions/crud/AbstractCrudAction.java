@@ -952,7 +952,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Returns the Resolution used to show the Read page.
      */
     protected Resolution getReadView() {
-        return forwardTo("/m/crud/read.jsp");
+        return new ForwardResolution("/m/crud/read.jsp");
     }
 
     /**
@@ -966,7 +966,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Returns the Resolution used to show the Search page.
      */
     protected Resolution getSearchView() {
-        return forwardTo("/m/crud/search.jsp");
+        return new ForwardResolution("/m/crud/search.jsp");
     }
 
     /**

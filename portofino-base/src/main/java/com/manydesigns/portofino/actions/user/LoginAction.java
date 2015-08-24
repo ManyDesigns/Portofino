@@ -206,7 +206,7 @@ public abstract class LoginAction extends AbstractActionBean {
             logger.info("User {} login", ShiroUtils.getUserId(subject));
             Session session = subject.getSession(true);
             JSONStringer stringer = new JSONStringer();
-            stringer.object().key("portofinoSessionId").value((String) session.getId()).endObject();
+            stringer.object().key("portofinoSessionId").value(session.getId()).endObject();
             return stringer.toString();
         } catch (AuthenticationException e) {
             logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);

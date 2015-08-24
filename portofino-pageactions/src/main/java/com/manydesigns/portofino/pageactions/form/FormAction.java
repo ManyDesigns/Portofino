@@ -151,7 +151,7 @@ public abstract class FormAction extends AbstractPageAction {
     }
 
     protected Resolution getShowFormResolution() {
-        return forwardTo("/m/pageactions/pageactions/form/form.jsp");
+        return new ForwardResolution("/m/pageactions/pageactions/form/form.jsp");
     }
 
     /**

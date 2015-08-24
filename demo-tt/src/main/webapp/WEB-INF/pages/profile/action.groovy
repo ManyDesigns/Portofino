@@ -33,6 +33,7 @@ import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.blobs.BlobManager
+import net.sourceforge.stripes.action.ForwardResolution
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class Profile extends CustomAction {
@@ -76,7 +77,7 @@ public class Profile extends CustomAction {
                 build();
         loadUser();
         form.readFromObject(user);
-        return forwardTo("/jsp/profile/view.jsp");
+        return new ForwardResolution("/jsp/profile/view.jsp");
     }
 
     protected Map loadUser() {
@@ -112,7 +113,7 @@ public class Profile extends CustomAction {
     @Button(list = "view", order = 2D, type = Button.TYPE_SUCCESS, key = "update.your.data")
     public Resolution editData() {
         setupEditForm();
-        return forwardTo("/jsp/profile/update-data.jsp");
+        return new ForwardResolution("/jsp/profile/update-data.jsp");
     }
 
     protected def setupEditForm() {
@@ -131,7 +132,7 @@ public class Profile extends CustomAction {
     public Resolution changePhoto() {
         loadUser();
         setupPhotoForm();
-        return forwardTo("/jsp/profile/upload-photo.jsp");
+        return new ForwardResolution("/jsp/profile/upload-photo.jsp");
     }
 
     @RequiresAuthentication
@@ -236,7 +237,7 @@ public class Profile extends CustomAction {
             session.transaction.commit();
             return new RedirectResolution(context.actionPath);
         } else {
-            return forwardTo("/jsp/profile/update-data.jsp");
+            return new ForwardResolution("/jsp/profile/update-data.jsp");
         }
     }
 

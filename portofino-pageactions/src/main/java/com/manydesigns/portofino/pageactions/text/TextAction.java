@@ -136,7 +136,7 @@ public class TextAction extends AbstractPageAction {
         if (StringUtils.isEmpty(content)) {
             content = "<em>Empty content. To add content, configure this page.</em>";
         }
-        return forwardTo("/m/pageactions/text/read.jsp");
+        return new ForwardResolution("/m/pageactions/text/read.jsp");
     }
 
     /**

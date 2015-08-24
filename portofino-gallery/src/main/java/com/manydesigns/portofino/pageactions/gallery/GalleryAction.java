@@ -132,7 +132,7 @@ public class GalleryAction extends AbstractPageAction {
     }
 
     public Resolution galleryView() {
-        return forwardTo("/m/gallery/gallery.jsp");
+        return new ForwardResolution("/m/gallery/gallery.jsp");
     }
 
     //--------------------------------------------------------------------------

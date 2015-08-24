@@ -160,7 +160,7 @@ public abstract class TableFormAction extends AbstractPageAction {
     }
 
     protected Resolution getShowFormResolution() {
-        return forwardTo("/m/pageactions/pageactions/form/table-form.jsp");
+        return new ForwardResolution("/m/pageactions/pageactions/form/table-form.jsp");
     }
 
     /**
