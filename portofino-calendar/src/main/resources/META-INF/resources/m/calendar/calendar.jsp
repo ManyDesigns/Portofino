@@ -21,6 +21,10 @@
         ul.calendars div {
             height: 100%; width: 1em; display: inline-block;
         }
+
+        .event{ border-radius: 3px; font-size: smaller; }
+        .event a {color:white}
+
     </style>
     <div class="row">
         <div class="col-md-2 calendar-calendars">
