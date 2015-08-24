@@ -682,6 +682,53 @@ Wizard
     border-left: 14px solid #F3F4F5;
 }
 
+
+/* TODO merge */
+.wizard-header{
+    border-radius: 10px;
+    letter-spacing: 0.05em;
+}
+
+.wizard-header ul li .chevron {
+    position: absolute;
+    top: 0;
+    right: -14px;
+    display: block;
+    border: 24px solid transparent;
+    border-right: 0;
+    border-left: 14px solid #FFFFFF;
+}
+
+.wizard-header ul li.before {
+    color: transparent;
+    background-color: #50966f;
+}
+
+.wizard-header ul li.before .chevron:before {
+    border-left: 14px solid #50966f;
+}
+
+.wizard-header li{ width: 14% }
+.wizard-header li.active{ width: 40% }
+
+.wizard-header ul li.active {
+    background: none repeat scroll 0 0 #3a74ad;
+    color: #fff;
+}
+
+.wizard-header ul li {
+    background: none repeat scroll 0 0 #7fb0e0;
+    color: transparent;
+}
+
+.wizard-header ul li.active .chevron:before {
+    border-left: 14px solid #3a74ad;
+}
+
+.wizard-header ul li .chevron:before{
+    border-left: 14px solid #7fb0e0;
+}
+
 /* ============================================== */
 /* theme/templates/well-with-tabs/main.jsp        */
 /* ============================================== */
@@ -1043,6 +1090,13 @@ Checkbox
     float: left;
 }
 
+
+.radio input[type=radio],
+.checkbox  input[type=checkbox] {
+    display: none;
+}
+
+
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox] {
     opacity: 0;
 }
@@ -1091,7 +1145,7 @@ Checkbox
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6)
 }
 
-.form-inline .checkbox label, .form-inline .radio label {
+.form-inline .checkbox label{
     padding-left: 10px;
 }
 
@@ -1099,6 +1153,32 @@ Checkbox
     height: 100%;
 }
  /**/
+
+.radio label:before {
+    border-radius: 10px;
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 9px;
+    position: absolute;
+    left: 0;
+    bottom: 3px;
+    background-color: #fff;
+    border: 1px rgb(211, 211, 211) solid;
+}
+
+/*.radio input[type=radio]:checked + label:before {
+    content: "\2022";
+    color: #337AB7;
+    font-size: 34px;
+    text-align: center;
+    line-height: 17px;
+}*/
+
+.form-inline .radio label { padding-left: 17px; }
+.radio{ height: 100%; }
+.radio label{margin-left: 5px;}
 
 /***********************
 MENU MOBILE
