@@ -82,6 +82,10 @@ public class APIRoot {
 
         try {
             PageAction subpage = DispatcherLogic.getSubpage(configuration, pageInstance, pathFragment);
+            if(subpage == null) {
+                logger.error("Page not found: {}", pathFragment);
+                throw new WebApplicationException(404);
+            }
             subpage.setContext(context);
             Injections.inject(subpage, servletContext, request);
             return subpage;
