@@ -1,8 +1,6 @@
-package archetype
-
 import com.manydesigns.portofino.security.*
 
-@RequiresPermissions(level = AccessLevel.VIEW)
+
 class MyMap extends MapAction {
 
     //Automatically generated on Tue Aug 25 10:08:38 CEST 2015 by ManyDesigns Portofino

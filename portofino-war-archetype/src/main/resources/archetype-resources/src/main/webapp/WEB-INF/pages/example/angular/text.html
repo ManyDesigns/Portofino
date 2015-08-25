@@ -1,0 +1,86 @@
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.min.js"></script>
+
+<!-- controller -->
+<script>
+    angular.module('todoApp', [])
+            .controller('TodoListController', function () {
+                var todoList = this;
+                todoList.todos = [
+                    {text: 'Make the new Portofino presentation', done: true},
+                    {text: 'Have lunch with Margherita', done: false}
+                ];
+
+                todoList.addTodo = function () {
+                    todoList.todos.push({text: todoList.todoText, done: false});
+                    todoList.todoText = '';
+                };
+
+                todoList.removeTodo = function (objectToRemove) {
+                     todoList.todos = todoList.todos.filter(function (el) {
+                         return el.text != objectToRemove.text;
+                     });
+
+                }
+
+                todoList.remaining = function () {
+                    var count = 0;
+                    angular.forEach(todoList.todos, function (todo) {
+                        count += todo.done ? 0 : 1;
+                    });
+                    return count;
+                };
+
+
+            }).directive('ngEnter', function () {
+                return function (scope, element, attrs) {
+                    element.bind("keydown keypress", function (event) {
+                        if(event.which === 13) {
+                            scope.$apply(function (){
+                                scope.$eval(attrs.ngEnter);
+                            });
+
+                            event.preventDefault();
+                        }
+                    });
+                };
+    });
+</script>
+
+<style>
+    div.done-true {
+        text-decoration: line-through;
+    }
+</style>
+
+<i>In this exampe we use AngularJS for a customized page</i>
+<div ng-app="todoApp">
+    <div ng-controller="TodoListController as todoList">
+    <div class="form-group row">
+        <div class="col-md-7">
+            <input ng-model="todoList.todoText" type="text" class="form-control" id="todoText"
+                   placeholder="Insert a task..." ng-enter="todoList.addTodo()">
+        </div>
+        <div class="col-md-1"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true" ng-click="todoList.addTodo()"/></div>
+    </div>
+
+    <hr>
+    <strong>My tasks:</strong>
+
+
+        <div class="row " ng-repeat="todo in todoList.todos">
+            <div class="col-md-6 done-{{todo.done}}">
+                {{todo.text}}
+            </div>
+            <div class="col-md-1">
+                <span class="glyphicon glyphicon-remove-circle" aria-hidden="true" ng-click="todoList.removeTodo(todo)"/>
+            </div>
+            <div class="col-md-1">
+                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" ng-click="todo.done = true"/>
+            </div>
+        </div>
+        <br><i></i><span class="badge">{{todoList.remaining()}}</span> of <span class="badge">{{todoList.todos.length}}</span> remaining</span> </i>
+
+    </div>
+
+</div>
+
