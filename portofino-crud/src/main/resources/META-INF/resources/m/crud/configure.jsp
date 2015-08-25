@@ -26,7 +26,7 @@
                     <mde:write name="actionBean" property="propertiesTableForm"/>
                 </c:if>
                 <c:if test="${empty actionBean.propertiesTableForm}">
-                    <fmt:message key= "you.must.write.a.query.first" />
+                    <p><fmt:message key= "you.must.write.a.query.first" /></p>
                 </c:if>
             </fieldset>
             <c:if test="${not empty actionBean.propertiesTableForm}">
@@ -75,7 +75,7 @@
                         <mde:write name="actionBean" property="selectionProvidersForm"/>
                     </c:when>
                     <c:otherwise>
-                        <fmt:message key="none.available" />
+                        <p><fmt:message key="none.available" /></p>
                     </c:otherwise>
                 </c:choose>
             </fieldset>
