@@ -1097,7 +1097,16 @@ Checkbox
 
 .radio input[type=radio],
 .checkbox  input[type=checkbox] {
-    display: none;
+    /*display: none;  */
+    visibility: hidden;
+    position: absolute;
+}
+
+@media (min-width: 768px){
+.form-inline .checkbox input[type=checkbox], .form-inline .radio input[type=radio] {
+    position: absolute;
+    margin-left: 0;
+}
 }
 
 
@@ -1172,6 +1181,9 @@ Checkbox
     border: 1px rgb(211, 211, 211) solid;
 }
 
+.radio-inline {
+    padding-left: 5px; }
+
 /*.radio input[type=radio]:checked + label:before {
     content: "\2022";
     color: #337AB7;
@@ -1180,9 +1192,9 @@ Checkbox
     line-height: 17px;
 }*/
 
-.form-inline .radio label { padding-left: 17px; }
+.form-inline .radio label { padding-left: 20px; margin-left: 10px;}
 .radio{ height: 100%; }
-.radio label{ padding-left: 5px; }
+.radio label{ padding-left: 25px; }
 
 /***********************
 MENU MOBILE

@@ -14,11 +14,15 @@
     <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.groovy.GroovyAdminAction"
                       method="post">
-            <p>
-                <fmt:message key="layouts.admin.groovy.text"/>
-            </p>
-            <div class="form-group btn-group-lg">
-                <portofino:buttons list="groovy" />
+            <div class="jumbotron">
+                <p>
+                    <fmt:message key="layouts.admin.groovy.text"/>
+                </p>
+                <p>
+                <div class="form-group btn-group-lg">
+                    <portofino:buttons list="groovy" />
+                </div>
+                </p>
             </div>
         </stripes:form>
     </stripes:layout-component>
