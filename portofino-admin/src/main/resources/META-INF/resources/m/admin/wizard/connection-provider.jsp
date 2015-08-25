@@ -36,10 +36,10 @@
             <div id="connectionProviderTypeForm" class="radio">
 
                 <input id="jdbc_radio" type="radio" value="JDBC" name="connectionProviderType" <%= actionBean.isJdbc() ? "checked='checked'" : "" %>  />
-                <label class="radio" for="jdbc_radio" onchange="changeNewSPForm();">JDBC</label>
+                <label class="radio" for="jdbc_radio" onclick="changeNewSPForm();">JDBC</label>
 
                 <input id="jndi_radio" type="radio" value="JNDI" name="connectionProviderType" <%= actionBean.isJndi() ? "checked='checked'" : "" %>  />
-                <label class="radio" for="jndi_radio" onchange="changeNewSPForm();">JNDI</label>
+                <label class="radio" for="jndi_radio" onclick="changeNewSPForm();">JNDI</label>
 
             </div>
             <fieldset>

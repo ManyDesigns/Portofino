@@ -75,8 +75,7 @@ public class DatabaseSyncer {
             conn = connectionProvider.acquireConnection();
 
             logger.debug("Creating Liquibase connection");
-            DatabaseConnection liquibaseConnection =
-                    new JdbcConnection(conn);
+            DatabaseConnection liquibaseConnection = new JdbcConnection(conn);
 
             logger.debug("Retrieving source database");
             Database sourceDatabase =
@@ -418,9 +417,9 @@ public class DatabaseSyncer {
             logger.debug("Processing table: {}", tableName);
             Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, tableName);
             if(sourceTable == null) {
+                logger.debug("Added new table: {}", tableName);
                 sourceTable = new Table();
             }
-
             Table targetTable = new Table(targetSchema);
             targetSchema.getTables().add(targetTable);
 

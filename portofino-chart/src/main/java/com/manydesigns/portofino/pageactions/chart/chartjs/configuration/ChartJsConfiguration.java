@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.*;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"name","hql","toTableName", "toSchema", "onUpdate", "onDelete"})
+@XmlType(propOrder = {"name","type","database", "query"})
 public class ChartJsConfiguration implements PageActionConfiguration {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
