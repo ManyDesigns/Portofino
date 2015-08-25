@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Image gallery" description="" navigationRoot="INHERIT" id="2qjsipawa53qwe5jfxjovssxz">
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <permissions/>
+</page>
