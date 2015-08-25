@@ -4,6 +4,8 @@
         <childPages>
             <childPage showInNavigation="true" name="map"/>
             <childPage showInNavigation="true" name="gallery"/>
+            <childPage showInNavigation="true" name="angular"/>
+            <childPage showInNavigation="true" name="fancytree"/>
         </childPages>
     </layout>
     <detailLayout template="default">

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Fancytree and Ajax" description="Fancytree and Ajax" navigationRoot="INHERIT" id="3eq2bhl53wlgudfkxis42h537">
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <permissions/>
+</page>
