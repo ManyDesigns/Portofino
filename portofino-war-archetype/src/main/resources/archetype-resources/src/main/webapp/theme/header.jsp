@@ -19,11 +19,10 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:url var="profileUrl" value="/actions/profile"/>
-<jsp:useBean id="portofinoConfiguration" scope="application"
-             type="org.apache.commons.configuration.Configuration"/>
+<jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
-<header class="navbar navbar-inverse navbar-static-top">
+<header class="navbar navbar-inverse navbar-static-top" role="banner">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -33,17 +32,19 @@
                 <span class="icon-bar"></span>
             </button>
             <stripes:link href="/" class="navbar-brand">
-                <img onerror="this.style.display='none'" src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
+                <img  onerror="this.style.display='none'" src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
         </div>
-        <nav id="header-menu" class="navbar-collapse collapse">
+        <nav id="header-menu" class="navbar-collapse collapse" role="navigation">
             <c:if test="${not empty actionBean.pageInstance}">
                 <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
                     <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
                 </form>
             </c:if>
             <ul class="nav navbar-nav navbar-right">
+
+
                 <%
                     String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
                     String actionPath = actionBean.getContext().getActionPath();
@@ -54,10 +55,12 @@
                     Object principal = subject.getPrincipal();
                     String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
                 %>
+
+
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <em class="glyphicon glyphicon-user"></em>
-                        <%= prettyName %> <strong class="caret"></strong>
+                        <i class="glyphicon glyphicon-user"></i>
+                        <%= prettyName %> <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
                         <%
@@ -92,11 +95,11 @@
                             logoutUrlBuilder.addParameter("logout");
                             String logoutUrl = Util.getAbsoluteUrl(logoutUrlBuilder.toString());
                         %>
-                        <li>
+                        <!--<li>
                             <a href="<%= logoutUrl %>">
                                 <fmt:message key="log.out" />
                             </a>
-                        </li>
+                        </li> -->
                         <%
                             if(request.getAttribute("actionBean") instanceof PageAction) {
                                 PageAction pageAction = (PageAction) request.getAttribute("actionBean");
@@ -107,7 +110,7 @@
                         <li class="divider"></li>
                         <li>
                             <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actionPath}');">
-                                <em class="glyphicon glyphicon-file"></em> Edit layout
+                                <i class="glyphicon glyphicon-file"></i> Edit layout
                             </a>
                         </li>
                         <li>
@@ -117,7 +120,7 @@
                                 urlBuilder.setEvent("pageChildren");
                             %>
                             <a href="<%= request.getContextPath() + urlBuilder %>">
-                                <em class="glyphicon glyphicon-folder-open"></em> Page children
+                                <i class="glyphicon glyphicon-folder-open"></i> Page children
                             </a>
                         </li>
                         <li>
@@ -127,7 +130,7 @@
                                 urlBuilder.setEvent("newPage");
                             %>
                             <a href="<%= request.getContextPath() + urlBuilder %>">
-                                <em class="glyphicon glyphicon-plus"></em> Add new page
+                                <i class="glyphicon glyphicon-plus"></i> Add new page
                             </a>
                         </li>
                         <%
@@ -138,17 +141,17 @@
                         %>
                         <li>
                             <a href="javascript:portofino.confirmDeletePage<%= jsArgs %>">
-                                <em class="glyphicon glyphicon-minus"></em> Delete page
+                                <i class="glyphicon glyphicon-minus"></i> Delete page
                             </a>
                         </li>
                         <li>
                             <a href="javascript:portofino.showCopyPageDialog<%= jsArgs %>">
-                                <em class="glyphicon glyphicon-file"></em> Copy page
+                                <i class="glyphicon glyphicon-file"></i> Copy page
                             </a>
                         </li>
                         <li>
                             <a href="javascript:portofino.showMovePageDialog<%= jsArgs %>">
-                                <em class="glyphicon glyphicon-share"></em> Move page
+                                <i class="glyphicon glyphicon-share"></i> Move page
                             </a>
                         </li>
                         <%
@@ -161,12 +164,21 @@
                         %>
                         <li>
                             <a href="<%= request.getContextPath() + urlBuilder %>">
-                                <em class="glyphicon glyphicon-user"></em> Page permissions
+                                <i class="glyphicon glyphicon-user"></i> Page permissions
                             </a>
                         </li>
                         <% }}} %>
                     </ul>
                 </li>
+
+                     <jsp:include page="/theme/navigation-mobile.jsp" />
+
+
+                    <li>
+                        <a href="<%= logoutUrl %>">
+                                <fmt:message key="log.out" />
+                            </a>
+                    </li>
                 </shiro:user>
                 <shiro:guest>
                 <%
