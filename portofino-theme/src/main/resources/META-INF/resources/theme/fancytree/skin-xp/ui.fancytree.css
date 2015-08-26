@@ -1,24 +1,8 @@
 /*!
- * Fancytree "Vista" skin.
+ * Fancytree "XP" skin.
  *
  * DON'T EDIT THE CSS FILE DIRECTLY, since it is automatically generated from
  * the LESS templates.
- */
-/*
-both:
-   unselected background: #FCFCFC 'nearly white'
-   hover bar (unselected, inactive): #F8FCFE..#EFF9FE (border: #D8F0FA) 'very light blue'
-   active node: #F6FBFD..#D5EFFC (border: #99DEFD)  'light blue'
-   active node with hover: #F2F9FD..#C4E8FA (border: #B6E6FB)
-
-Tree view:
-   active node, tree inactive: #FAFAFB..#E5E5E5 (border: #D9D9D9) 'light gray, selected, but tree not active'
-
-List view:
-   selected bar: --> active bar
-   focus  bar: active + border 1px dotted #090402 (inside the blue border)
-
-   table left/right border: #EDEDED 'light gray'
  */
 /*******************************************************************************
  * Common Styles for Fancytree Skins.
@@ -41,7 +25,7 @@ ul.fancytree-container {
   padding: 3px;
   margin: 0;
   background-color: white;
-  border: 1px dotted gray;
+  /*border: 1px dotted gray;*/
   overflow: auto;
   min-height: 0%;
   position: relative;
@@ -130,7 +114,6 @@ span.fancytree-expander {
 }
 .fancytree-exp-n span.fancytree-expander,
 .fancytree-exp-nl span.fancytree-expander {
-  background-image: none;
   cursor: default;
 }
 .fancytree-exp-n span.fancytree-expander,
@@ -295,7 +278,7 @@ span.fancytree-icon {
 .fancytree-loading span.fancytree-expander:hover,
 .fancytree-statusnode-wait span.fancytree-icon,
 .fancytree-statusnode-wait span.fancytree-icon:hover {
-  background-image: url('data:image/gif;base64,R0lGODlhEAAQAPcAAEai/0+m/1is/12u/2Oy/2u1/3C3/3G4/3W6/3q8/3+//4HA/4XC/4nE/4/H/5LI/5XK/5vN/57O/6DP/6HQ/6TS/6/X/7DX/7HY/7bb/7rd/7ze/8Hg/8fj/8rl/83m/9Dn/9Lp/9bq/9jr/9rt/9/v/+Dv/+Hw/+Xy/+v1/+32//D3//L5//f7//j7//v9/0qk/06m/1Ko/1er/2Cw/2m0/2y2/3u9/32+/4jD/5bK/5jL/5/P/6HP/6PS/6fS/6nU/67X/7Ta/7nc/7zd/8Ph/8bj/8jk/8vl/9Pp/9fr/9rs/9zu/+j0/+72//T6/0ij/1Op/1uu/1yu/2Wy/2q0/2+3/3C4/3m8/3y9/4PB/4vE/4/G/6XS/6jU/67W/7HZ/7Xa/7vd/73e/8Lh/8nk/87m/9Hn/9Ho/9vt/97u/+Lx/+bz/+n0//H4//X6/1Gn/1Go/2Gx/36+/5PJ/5TJ/5nL/57P/7PZ/7TZ/8Xi/9Tq/9zt/+by/+r0/+73//P5//n8/0uk/1Wq/3K4/3e7/4bC/4vF/47G/5fK/77f/9Do/9ns/+Tx/+/3//L4//b6//r9/2Wx/2q1/4bD/6DQ/6fT/9Tp/+Lw/+jz//D4//j8/1qt/2mz/5rM/6bS/8Lg/8jj/97v/+r1/1Cn/1ar/2Cv/3O5/3++/53O/8Th/9Lo/9Xq/+z2/2Kw/2Sx/8Ti/4rF/7DY/1+v/4TB/7fb/+Ty/1+u/2Ox/4zG/6vU/7/f//r8/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/i1NYWRlIGJ5IEtyYXNpbWlyYSBOZWpjaGV2YSAod3d3LmxvYWRpbmZvLm5ldCkAIfkEAQoAMAAsAAAAABAAEAAABptAmFCI6mAsnNNwCUthGomDoYCQoJinyELRgDwUhAFCNFRJGg8P6/VSaQyCgxK2cURMTJioEIA0Jw8geUIZAQMkIhEVLIMwKgMAFx4SGS+NLwwCFR8UGo1CKSgsJBUYLZ9sMCsZF3iDLy2nMCEXGyp5bSqyLBwaHSguQi8sKigqlkIqHb4hJc4lJsdMLSQeHyEhIyXSgy2hxsFLQQAh+QQBCgAAACwAAAAAEAAQAAAHp4AAgoIoH0NCSCiDiwBORDo5Czg3C0BNjCg/Dw46PjwOBwcLS4MrQTs9ICwvL05FODU4igBGPECzi0s4NDyNQT5KjINDAzZMTEBCLMKCTQczQ0lBRcyDODI8SojVAC84MTxMQkVP1SgDMEJPRkS4jB8xM6RKRR/Lwi9HQYJPIB9KTV4MeuHiicBSSkAoYYKiiRMnKw4ucnFiyRKGKJyUq/aChUaDjAIBACH5BAEKAAAALAAAAAAQABAAAAeogACCgm1KZGRmbYOLAG5GXjoPXFsPYIqLbWE7XV1fXjtaWQ9qg25iXmBKby8AKmVcWFyXaBdil4tqWldejWNhpIyCZFZZa2tjZG/BgipYVWRpY2bLg1s0XWpGaNQAL1pTXW1maMrLbVZSYm9oZyrUYVFUpGxoaeWLZzQBOoJvamkm3OCSAsWKiUH+1rBp48bFCxVWaGxb9LBNGxVvVqUBFuzFizculgUCACH5BAEKAAEALAAAAAAQABAAAAi4AAMIFPiHxJEjJPwMXBgAEIg8XijcsUNhzB+GfzjkwYNnSB4KdRzcWTPwzZEhY/i8EfgmhJ0GdhQGIDFGz0WGJuoswBPgzQc9fRgOPDKnQR8/H0K4EErQQQKgIPgwFRioTgE8ffZInRqIztWCfAJN/TOnAAcXJvgAmjpEDgKSf9b4Ectwz5UBd6j68fNnaYBAfvIUEIAgKNU/gN4E+sNgAJw4BvYIfeMiUB8BAAbUMTz1TYU8YRcGBAAh+QQBCgAAACwAAAAAEAAQAAAItAABCBT4qJGIRY0cDVwIAJIIMnnyWABiwYjChY8WGVFExgjELjwsNBroQgSSD40gCXQIJFGXi41AiHjEEECjLg8UNWS06GLND4gSNXrEqESkmgQTGfrgqMRIpAAidVkwpKDPmpF44MgDqVGTo0gdHbqBJJIjR2BrkiG0YCSkRyprMsJBCMhASJEioczbZEihGoaeCtQrgwYOujRoLGBU08IgQYJkzKjBQ/DCSIzy8OgypATDgAAh+QQBCgAAACwAAAAAEAAQAAAIswABCBQIKRMfPmw0DVwIYBObEEiKjBEzJoTChZD4XArB0UyRMBfGtBm4CdOSJW02EeQjxkuYi38wYYLEEEAmDJWMNGyTsKbAS5Us/YHU5o9PgZos7QixSdPFo18eFNkESeXRTV+4FGlo1aemHVvM7ORzFMmCByOXHJgSoiafLTgwCOQjCYqkMCk3/SlCCQvagSEmBRh0gBLcAwe4kF2IaYekKVNoTMLiZWTNTSwtWRqDiWFAACH5BAEKAAIALAAAAAAQABAAAAi5AAUIFOhCBRs2o94MXCjghQpRI/YkQYJkj8KFL0atEcVRVJIOY0KtWKhi1Cg3LwS+YdNhCCg3Kt2oSMlQxZg8IGLSZChA1IU8Khru5PkmjxdRbtgE5TlwCAUknzgxGIoxDw8kQgAMGMVUgJtPnvaQGBAgT1cQDyhwhRCnUxKeazw5GCNwTQFOBsbMfLECyYMGPJYK2INgAAEFDyA0ULDA0xqGbHggKFDgQIIGF7jyfLGmw4ULHdgwDAgAIfkEAQoAAAAsAAAAABAAEAAACLcAAQgcqElTK00uBioUuKlVEzYnlixhk3BhC4MO2SxhtIrVCoWbNrnYNLAhKzMgWggMgqTiwhVIiiwBsKQUKTMLB7IhoqpVHhimmuQU2KJInhOpYtxwmdNMHlapZKAiORRAkSCshpQ61arqijxAJNoYMKTqEh95uvagUWjmQjZAUqkSyAZVDVRFWoXUBKLHjiAfBS5hcOqUg1Q+djh44IPNwiZAFtxAtSCHDiJdh55AkmeIGaEKAwIAIfkEAQoAAAAsAAAAABAAEAAACLcAAQgcGMgFJEiBBioEUEIJAINuRo36k1AhGldXVhSMyAaTCUgDMVWBMiWNQjeY0pRwIVBHAFdoFgKAxOgMG4avooSRKfCPmTOQNEi5MornwzNIRnWZQqkiTyVFSnRxtYWlUTMa0hSpkuWPUUgcNGDClMVKEaMmwohxA6CLFUolZI7ScCEmgFFcsnBB4nVmCTBeNLAVWCKvlh1dvnjRUSlMUYWjwDzYwuWBji6wBss1U6QImscDAwIAIfkEAQoAAQAsAAAAABAAEAAACLMAAwgUyEfWJxYDEw5sBGEAAAGNXkCCpDAAKwNw4AxgoEIii44LCwnolMfPC4EvVPgxKfDOgCusKr7ws0ZFABOF5IipKJAFHz4vOBSYY5NnAD4jVMgqAOGkUT5J/CxtajRAmiRr9CSIVbQiJFZI/DRyMAeJ0awfKMqaQ2dNRRV6xqQR6MdOLDusEAaAtGbMGCR6A6y54wDCpzxiZCnm0FWgijF3INyhcDhJYIV+wH5I0zhAQAAh+QQBCgAAACwAAAAAEAAQAAAItAABCBRYYkiqVLUYuRjIkE2qGjNkxBA0IwhDgYwU0JhVg1YCGjLMLBzYxFCNBEM0uXDBxkyLlQOBEFLA6CKAlZpaAGBjiBAZmwP//HFhJMGhP0AF/mHjopaCVCOBsmGjqZahLlFtsinxx4yhHZqSurDFaGkiREmS/rnESOeQB6nY2NR0CYRcAH+67AByaWSLlkj6DmQTJFWXWmSMkCFCBkRYhn+MBAESpBbitmpLJLlU4vHAgAAh+QQBCgAAACwAAAAAEAAQAAAIvQABCBS4ZpclS0PWDFwIoI0uHFVu3ZIiiY7ChWpyHTiAowGDK4MCVEEzsA0dLAw4OOHFq00YXFBwqREIBkeumQzN3DqQBkCmOgvKMByYpg0vAGZy7XAydCCvFgA45NLVdGCLFrw40PlytCoLJy0u7bAEtSkvJ21aOLF055JXNkYBwKoEJtPQFmvWMAWwIoyuIWrKunCSJo2Jrg2HXAjDwcwlNCDQpCk7kAWIXUN2wTKDZo2Lqk7YpFGTibLAgAA7');
+  background-image: url('data:image/gif;base64,R0lGODlhEAAQAKIFAAAAAAAApUJC/4SE/8bGxgAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgAFACwAAAAAEAAQAAADKli63K4hPBZLJWTWhZ0QU7d8YTadxTCgosqa6CM6c1Eztw3rJZ83v1gjAQAh+QQFCgAFACwBAAIACwAHAAADFFgqUhEOrqZiGaNqhbf/BUGA4QgmACH5BAUKAAUALAIAAQAMAAUAAAMTWKoi+2OUVkKAcllFyHtW92lBAgAh+QQFCgAFACwEAAEACwAIAAADFlg6o16EFFaEcPHZx1UInfOFZDeSXwIAIfkEBQoABQAsBwABAAcACwAAAxRIVMxaYzQWZxPCYstZ4F83BWFDJgAh+QQFCgAFACwKAAIABQAMAAADFEhUrPxjQPlqEeJhy0J4XhF2H5MAACH5BAUKAAUALAcABAAIAAsAAAMUWKpEu+3JOQa1cwqh+QrBF4LilAAAIfkEBQoABQAsBAAHAAsABwAAAxRYukvE0MFJyxjV4hCYEAtXiN+SAAAh+QQFCgAFACwCAAoADAAFAAADEhhR3ExEOQeZbGM4KUTJE9NNCQAh+QQFCgAFACwBAAcACwAIAAADFhhR3K0uSglnqbYI4QhpWzEMhSeNTQIAIfkEBQoABQAsAgAEAAcACwAAAxMYUczaMC4ZKxMiYjtG7AVBRGICACH5BAUKAAUALAEAAgAFAAwAAAMTWBqhxa8t6ZQQ7tY9husbQThiAgA7');
   background-position: 0px 0px;
 }
 /* Status node icons */
@@ -321,7 +304,7 @@ span.fancytree-title {
   min-height: 16px;
   padding: 0 3px 0 3px;
   margin: 0px 0 0 3px;
-  border: 1px solid transparent;
+  border: 0 solid transparent;
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
   -ms-border-radius: 0px;
@@ -503,25 +486,42 @@ ul.fancytree-ext-wide span.fancytree-node span.fancytree-title {
  * This section is automatically generated from the `ui-fancytree.less` template.
  ******************************************************************************/
 /*******************************************************************************
+ * Tree container
+ */
+ul.fancytree-container li {
+  background-image: url("vline.gif");
+  background-position: 0 0;
+}
+ul.fancytree-container li.fancytree-lastsib {
+  background-image: none;
+}
+ul.fancytree-no-connector > li {
+  background-image: none;
+}
+/*******************************************************************************
  * Node titles
  */
 span.fancytree-title {
-  border: 1px solid transparent;
+  border: 0 solid transparent;
 }
 span.fancytree-title:hover {
   background-color: #F2F7FD;
   border-color: #B8D6FB;
 }
 span.fancytree-focused span.fancytree-title {
+  outline: 1px dotted black;
   background-color: #EFEBDE;
-  outline: 1px dotted gray;
 }
-span.fancytree-selected span.fancytree-title {
+.fancytree-folder span.fancytree-title {
+  font-weight: bold;
+}
+.fancytree-selected span.fancytree-title {
+  color: green;
   font-style: italic;
 }
-span.fancytree-active span.fancytree-title {
-  border: 1px solid #99DEFD;
-  background-color: #D8F0FA;
+.fancytree-active span.fancytree-title {
+  background-color: #3169C6 !important;
+  color: white !important;
 }
 /*******************************************************************************
  * 'table' extension
@@ -537,13 +537,4 @@ table.fancytree-ext-table tbody tr.fancytree-active {
 }
 table.fancytree-ext-table tbody tr.fancytree-selected {
   background-color: #99FDDE;
-}
-/*******************************************************************************
- * 'columnview' extension
- */
-table.fancytree-ext-columnview span.fancytree-node.fancytree-expanded {
-  background-color: #ccc;
-}
-table.fancytree-ext-columnview span.fancytree-node.fancytree-active {
-  background-color: royalblue;
 }

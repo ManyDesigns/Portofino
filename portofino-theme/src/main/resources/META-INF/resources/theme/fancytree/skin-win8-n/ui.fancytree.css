@@ -1,5 +1,5 @@
 /*!
- * Fancytree "Win8" skin.
+ * Fancytree "win8" skin (highlighting the node span instead of title-only).
  *
  * DON'T EDIT THE CSS FILE DIRECTLY, since it is automatically generated from
  * the LESS templates.
@@ -25,7 +25,7 @@ ul.fancytree-container {
   padding: 3px;
   margin: 0;
   background-color: white;
-  border: 1px dotted gray;
+  /*border: 1px dotted gray;*/
   overflow: auto;
   min-height: 0%;
   position: relative;
@@ -83,7 +83,7 @@ span.fancytree-checkbox,
 span.fancytree-expander,
 span.fancytree-radio,
 span.fancytree-custom-icon {
-  margin-top: 2px;
+  margin-top: 0px;
 }
 /* Used by iconclass option */
 span.fancytree-custom-icon {
@@ -94,7 +94,7 @@ img.fancytree-icon {
   width: 16px;
   height: 16px;
   margin-left: 3px;
-  margin-top: 2px;
+  margin-top: 0px;
   vertical-align: top;
   border-style: none;
 }
@@ -294,15 +294,15 @@ span.fancytree-node {
   /* See #117 */
   display: inherit;
   width: 100%;
-  margin-top: 0px;
-  min-height: 20px;
+  margin-top: 1px;
+  min-height: 16px;
 }
 span.fancytree-title {
   color: #000000;
   cursor: pointer;
   display: inline-block;
   vertical-align: top;
-  min-height: 20px;
+  min-height: 16px;
   padding: 0 3px 0 3px;
   margin: 0px 0 0 3px;
   border: 1px solid transparent;
@@ -489,28 +489,30 @@ ul.fancytree-ext-wide span.fancytree-node span.fancytree-title {
 /*******************************************************************************
  * Node titles
  */
-.fancytree-plain span.fancytree-title {
+.fancytree-plain span.fancytree-node {
   border: 1px solid transparent;
 }
-.fancytree-plain.fancytree-container.fancytree-treefocus span.fancytree-focused span.fancytree-title {
-  border-color: #3399ff;
+.fancytree-plain span.fancytree-node:hover {
+  background-color: #E5F3FB;
+  border-color: #70C0E7;
 }
-.fancytree-plain span.fancytree-active span.fancytree-title,
-.fancytree-plain span.fancytree-selected span.fancytree-title {
-  background-color: #f7f7f7;
-  border-color: #dedede;
+.fancytree-plain.fancytree-container.fancytree-treefocus span.fancytree-node.fancytree-focused {
+  border-color: #3399FF;
 }
-.fancytree-plain span.fancytree-node span.fancytree-selected span.fancytree-title {
+.fancytree-plain span.fancytree-node.fancytree-active,
+.fancytree-plain span.fancytree-node.fancytree-selected {
+  background-color: #F7F7F7;
+  border-color: #DEDEDE;
+}
+.fancytree-plain.fancytree-container.fancytree-treefocus span.fancytree-node.fancytree-active,
+.fancytree-plain.fancytree-container.fancytree-treefocus span.fancytree-node.fancytree-selected,
+.fancytree-plain span.fancytree-node.fancytree-active:hover,
+.fancytree-plain span.fancytree-node.fancytree-selected:hover {
+  background-color: #CBE8F6;
+  border-color: #26A0DA;
+}
+.fancytree-plain .fancytree-node.fancytree-selected {
   font-style: italic;
-}
-.fancytree-plain span.fancytree-node:hover span.fancytree-title {
-  background-color: #eff9fe;
-  border-color: #70c0e7;
-}
-.fancytree-plain.fancytree-container.fancytree-treefocus span.fancytree-active span.fancytree-title,
-.fancytree-plain.fancytree-container.fancytree-treefocus span.fancytree-selected span.fancytree-title {
-  background-color: #cbe8f6;
-  border-color: #26a0da;
 }
 /*******************************************************************************
  * 'table' extension

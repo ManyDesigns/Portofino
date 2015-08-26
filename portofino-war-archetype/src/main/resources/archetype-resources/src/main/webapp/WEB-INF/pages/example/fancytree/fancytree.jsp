@@ -10,15 +10,15 @@
        <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js" type="text/javascript"></script>
         -->
-        <link href="<stripes:url value="/js/fancytree/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css"
+        <link href="<stripes:url value="/theme/fancytree/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css"
               class="skinswitcher">
 
-        <script src="<stripes:url value="/js/fancytree/src/jquery.fancytree.js"/>"       type="text/javascript"></script>
-        <script src="<stripes:url value="/js/fancytree/src/jquery.fancytree.dnd.js"/>"   type="text/javascript"></script>
-        <script src="<stripes:url value="/js/fancytree/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>
-        <script src="<stripes:url value="/js/fancytree/src/jquery.fancytree.glyph.js"/>" type="text/javascript"></script>
-        <script src="<stripes:url value="/js/fancytree/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
-        <script src="<stripes:url value="/js/fancytree/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.js"/>"       type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.dnd.js"/>"   type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.glyph.js"/>" type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
 
         <!-- (Irrelevant source removed.) -->
 
