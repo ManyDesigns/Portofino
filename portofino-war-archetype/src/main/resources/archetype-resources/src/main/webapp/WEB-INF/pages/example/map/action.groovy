@@ -1,5 +1,5 @@
 import com.manydesigns.portofino.security.*
-
+import com.manydesigns.portofino.pageactions.map.*
 
 class MyMap extends MapAction {
 
