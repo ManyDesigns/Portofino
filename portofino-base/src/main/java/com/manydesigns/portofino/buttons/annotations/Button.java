@@ -70,7 +70,8 @@ public @interface Button {
             ICON_LEFT= " glyphicon-chevron-left ",
             ICON_HOME= " glyphicon-home",
             ICON_SAVE= " glyphicon-floppy-disk",
-            ICON_DUPLICATE = " glyphicon-duplicate ";
+            ICON_DUPLICATE = " glyphicon-duplicate ",
+            ICON_FLASH = " glyphicon-flash ";
 
 
     /**

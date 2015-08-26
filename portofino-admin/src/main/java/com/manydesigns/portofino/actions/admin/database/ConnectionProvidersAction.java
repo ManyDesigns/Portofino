@@ -262,7 +262,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         }
     }
 
-    @Button(list = "connectionProviders-read", key = "test", order = 3)
+    @Button(list = "connectionProviders-read", key = "test", order = 3 , type = Button.TYPE_WARNING , icon = Button.ICON_FLASH )
     public Resolution test() {
         connectionProvider = persistence.getConnectionProvider(databaseName);
         connectionProvider.init(persistence.getDatabasePlatformsRegistry());
@@ -279,12 +279,12 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 .addParameter("databaseName", databaseName);
     }
 
-    @Button(list = "connectionProviders-search", key = "create.new", order = 1)
+    @Button(list = "connectionProviders-search", key = "create.new", order = 1 , type = Button.TYPE_SUCCESS , icon = Button.ICON_PLUS )
     public Resolution create() {
         return new RedirectResolution(ApplicationWizard.class);
     }
 
-    @Button(list = "connectionProviders-read", key = "edit", order = 2)
+    @Button(list = "connectionProviders-read", key = "edit", order = 2 )
     public Resolution edit() {
         connectionProvider = persistence.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
@@ -371,7 +371,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         return execute();
     }
 
-    @Button(list = "connectionProviders-read", key = "delete", order = 6)
+    @Button(list = "connectionProviders-read", key = "delete", order = 6 , type = Button.TYPE_DANGER, icon = Button.ICON_TRASH )
     public Resolution delete() {
         String[] databaseNames = new String[] {databaseName};
         try {
@@ -387,7 +387,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         return new RedirectResolution(this.getClass());
     }
 
-    @Button(list = "connectionProviders-search", key = "delete", order = 2)
+    @Button(list = "connectionProviders-search", key = "delete", order = 2 , type = Button.TYPE_DANGER, icon = Button.ICON_TRASH )
     public Resolution bulkDelete() {
         if(null!=selection && 0!=selection.length){
             try {
@@ -424,7 +424,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         }
     }
 
-    @Button(list = "connectionProviders-read", key = "synchronize", order = 4)
+    @Button(list = "connectionProviders-read", key = "synchronize", order = 4 , type = Button.TYPE_PRIMARY, icon = Button.ICON_RELOAD )
     public Resolution sync() {
         try {
             persistence.syncDataModel(databaseName);
@@ -442,7 +442,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 .addParameter("databaseName", databaseName);
     }
 
-    @Button(list = "connectionProviders-read", key = "run.wizard", order = 5)
+    @Button(list = "connectionProviders-read", key = "run.wizard", order = 5 , type = Button.TYPE_INFO)
     public Resolution runWizard() {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         return new RedirectResolution(ApplicationWizard.class)
@@ -452,8 +452,8 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     }
 
     @Buttons({
-        @Button(list = "connectionProviders-read", key = "return.to.list", order = 1),
-        @Button(list = "connectionProviders-select-type-content-buttons", key = "return.to.list", order = 1)
+        @Button(list = "connectionProviders-read", key = "return.to.list", order = 1 , icon = Button.ICON_LEFT),
+        @Button(list = "connectionProviders-select-type-content-buttons", key = "return.to.list", order = 1, icon = Button.ICON_LEFT)
     })
     public Resolution returnToList() {
         return new RedirectResolution(ConnectionProvidersAction.class);

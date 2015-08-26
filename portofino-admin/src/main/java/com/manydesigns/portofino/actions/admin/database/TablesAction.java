@@ -51,6 +51,7 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
+import groovy.json.JsonBuilder;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -60,10 +61,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBException;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -159,6 +162,73 @@ public class TablesAction extends AbstractActionBean {
         return new ForwardResolution("/m/admin/tables/list.jsp");
     }
 
+    public Resolution getTables() {
+        ArrayList<Map> treeTables = new  ArrayList<Map>();
+        //treeTables.add(createObject("test",true,true,true,"",null));
+
+        String lastDatabase = null;
+        String lastSchema = null;
+        Map schema =null;
+        Map database = null ;
+        List<Table> tables = getAllTables();
+        for(Table table : tables) {
+            logger.info(table.getActualEntityName());
+            if(table.getPrimaryKey() == null) {
+                continue;
+            }
+            if(table.getDatabaseName().equals(lastDatabase)) {
+                if(!table.getSchemaName().equals(lastSchema)) {
+                    lastSchema = table.getSchemaName();
+                    schema = createObject(table.getSchemaName(),false,true,false,null,null);
+                }
+            } else {
+                String changelogFileNameTemplate = "{0}-changelog.xml";
+                String changelogFileName = MessageFormat.format(
+                        changelogFileNameTemplate, table.getDatabaseName() + "-" + table.getSchemaName());
+                File changelogFile = new File(persistence.getAppDbsDir(), changelogFileName);
+                String schemaDescr = table.getSchemaName();
+                if(changelogFile.isFile()) {
+                    schemaDescr += " <img src='" + context.getRequest().getContextPath()+ "/m/admin/tables/liquibase_logo_small.gif' /> Liquibase";
+                }
+
+                lastSchema = table.getSchemaName();
+                 ArrayList<Map> schemas =  new  ArrayList<Map>();
+                 ArrayList<Map> cTables =  new  ArrayList<Map>();
+                schema = createObject(table.getSchemaName(),false,true,false,null,cTables);
+                schemas.add(schema);
+
+                lastDatabase = table.getDatabaseName();
+                database = createObject(table.getDatabaseName(),false,true,false,null,schemas);
+                treeTables.add(database);
+                /*
+              table.getDatabaseName()
+               schemaDescr */
+
+            }
+            String tableDescr = table.getTableName();
+            if(!table.getActualEntityName().equals(table.getTableName())) {
+                tableDescr += " (" + table.getActualEntityName() + ")";
+            }
+            String href = lastDatabase +"/"+ lastSchema +"/"+ table.getTableName();
+            ((List)schema.get("children")).add( createObject(tableDescr,false,false,false,href,null) );
+
+        }
+
+        return new StreamingResolution("text/json",new JsonBuilder(treeTables).toPrettyString());
+    }
+
+    private Map createObject(String title, boolean expanded, boolean folder, boolean lazy , String href , List children ){
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("title",title);
+        map.put("expanded",expanded);
+        map.put("folder",folder);
+        map.put("lazy",lazy);
+        map.put("href",href);
+        map.put("children",children);
+
+        return map;
+    }
+
     public Resolution editTable() {
         setupTableForm(Mode.EDIT);
         setupColumnsForm(Mode.EDIT);
@@ -217,7 +287,7 @@ public class TablesAction extends AbstractActionBean {
                 for(Table otherTable : table.getSchema().getTables()) {
                     for(ForeignKey fk : otherTable.getForeignKeys()) {
                         if(fk.getFromTable().equals(table) ||
-                           (!fk.getFromTable().equals(table) && fk.getToTable().equals(table))) {
+                                (!fk.getFromTable().equals(table) && fk.getToTable().equals(table))) {
                             for(Reference ref : fk.getReferences()) {
                                 Column fromColumn = ref.getActualFromColumn();
                                 Column toColumn = ref.getActualToColumn();
@@ -293,7 +363,7 @@ public class TablesAction extends AbstractActionBean {
                             Column fromColumn = ref.getActualFromColumn();
                             Column toColumn = ref.getActualToColumn();
                             if((fromColumn.equals(column) || toColumn.equals(column)) &&
-                                fromColumn.getActualJavaType() != toColumn.getActualJavaType()) {
+                                    fromColumn.getActualJavaType() != toColumn.getActualJavaType()) {
                                 Column otherColumn;
                                 if(fromColumn.equals(column)) {
                                     otherColumn = toColumn;
@@ -390,7 +460,7 @@ public class TablesAction extends AbstractActionBean {
                 .build();
         DatabaseSelectionProviderForm databaseSelectionProviderForm =
                 new DatabaseSelectionProviderForm(databaseSelectionProvider);
-                List<String> refCols = new ArrayList<String>();
+        List<String> refCols = new ArrayList<String>();
         for(Reference ref : databaseSelectionProvider.getReferences()) {
             refCols.add(ref.getFromColumn());
         }
@@ -414,9 +484,9 @@ public class TablesAction extends AbstractActionBean {
         if(dbSelectionProviderForm.validate()) {
             dbSelectionProviderForm.writeToObject(databaseSelectionProviderForm);
             if((!StringUtils.isEmpty(databaseSelectionProviderForm.getSql()) &&
-                !StringUtils.isEmpty(databaseSelectionProviderForm.getHql())) ||
-               (StringUtils.isEmpty(databaseSelectionProviderForm.getSql()) &&
-                StringUtils.isEmpty(databaseSelectionProviderForm.getHql()))) {
+                    !StringUtils.isEmpty(databaseSelectionProviderForm.getHql())) ||
+                    (StringUtils.isEmpty(databaseSelectionProviderForm.getSql()) &&
+                            StringUtils.isEmpty(databaseSelectionProviderForm.getHql()))) {
                 SessionMessages.addErrorMessage(
                         ElementsThreadLocals.getText("please.fill.exactly.one.of.the.fields.hql.sql"));
                 return doEditSelectionProvider(databaseSelectionProviderForm);
@@ -552,8 +622,8 @@ public class TablesAction extends AbstractActionBean {
             Field columnNameField = row.findFieldByPropertyName("columnName");
             columnNameField.setHref(
                     context.getRequest().getContextPath() +
-                    getActionPath() +
-                    "/" + column.getColumnName());
+                            getActionPath() +
+                            "/" + column.getColumnName());
         }
         columnsTableForm.readFromObject(decoratedColumns);
     }
@@ -590,8 +660,8 @@ public class TablesAction extends AbstractActionBean {
         columnForm = new FormBuilder(ColumnForm.class)
                 .configFieldSetNames("Properties", "Annotations")
                 .configFields(new String[] { "columnName", "propertyName", "javaType", "type",
-                                             "length", "scale", "reallyNullable", "reallyAutoincrement", "inPk" },
-                              getApplicableAnnotations(column.getActualJavaType()))
+                        "length", "scale", "reallyNullable", "reallyAutoincrement", "inPk" },
+                        getApplicableAnnotations(column.getActualJavaType()))
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
                 .configSelectionProvider(stringFormatSP, "stringFormat")
                 .configSelectionProvider(typeOfContentSP, "typeOfContent")
@@ -626,12 +696,12 @@ public class TablesAction extends AbstractActionBean {
             Class existingType = Class.forName(columnForm.getJavaType());
             if(!ArrayUtils.contains(javaTypes, existingType)) {
                 typesSP.appendRow(
-                new Object[] { columnForm.getColumnName(), type, null },
-                new String[] {
-                        columnForm.getColumnName(),
-                        type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
-                        getJavaTypeName(existingType)},
-                true);
+                        new Object[] { columnForm.getColumnName(), type, null },
+                        new String[] {
+                                columnForm.getColumnName(),
+                                type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
+                                getJavaTypeName(existingType)},
+                        true);
             }
         } catch (Exception e) {
             logger.debug("Invalid Java type", e);
@@ -660,7 +730,7 @@ public class TablesAction extends AbstractActionBean {
         Type type = null;
         for (Type candidate : types) {
             if (candidate.getJdbcType() == column.getJdbcType() &&
-                candidate.getTypeName().equalsIgnoreCase(column.getColumnType())) {
+                    candidate.getTypeName().equalsIgnoreCase(column.getColumnType())) {
                 type = candidate;
                 break;
             }
@@ -711,7 +781,7 @@ public class TablesAction extends AbstractActionBean {
             return new String[] { "fieldSize", "minValue", "maxValue", "decimalFormat" };
         } else if(String.class.equals(type)) {
             return new String[] { "fieldSize", "typeOfContent", "stringFormat", "regexp",
-                                  "highlightLinks", "fileBlob" };
+                    "highlightLinks", "fileBlob" };
         } else if(Date.class.isAssignableFrom(type)) {
             return new String[] { "fieldSize", "dateFormat" };
         }

@@ -88,6 +88,7 @@ public class ServletContextAction extends AbstractActionBean {
         builder.configMode(Mode.VIEW);
         form = builder.build();
         form.readFromObject(attributes);
+        form.setCondensed(true);
     }
 
     @Button(list = "modules", key = "return.to.pages", order = 2  , icon = Button.ICON_HOME)

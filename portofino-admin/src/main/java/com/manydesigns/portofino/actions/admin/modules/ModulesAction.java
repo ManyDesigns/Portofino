@@ -91,6 +91,7 @@ public class ModulesAction extends AbstractActionBean {
             modules.add(view);
         }
         form.readFromObject(modules);
+        form.setCondensed(true);
     }
 
     @Button(list = "modules", key = "return.to.pages", order = 2  , icon = Button.ICON_HOME)

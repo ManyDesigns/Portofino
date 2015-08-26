@@ -42,7 +42,7 @@
                             <c:out value="${group}"/>
                         </td>
                         <td>
-                            <select name="accessLevels[${group}]">
+                            <select class="form-control" name="accessLevels[${group}]">
                                 <option value="<%= AccessLevel.NONE.name() %>"
                                         <%
                                             if (AccessLevel.NONE.equals(localAccessLevel)) {
