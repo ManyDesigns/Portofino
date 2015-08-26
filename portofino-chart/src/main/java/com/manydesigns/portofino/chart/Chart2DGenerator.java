@@ -94,6 +94,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         // impostiamo il bordo invisibile
         // eventualmente e' il css a fornirne uno
         chart.setBorderVisible(borderVisible);
+        chart.setBorderPaint(Color.lightGray);
 
         // impostiamo il titolo
         TextTitle title = chart.getTitle();
