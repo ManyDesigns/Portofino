@@ -107,7 +107,23 @@ public class AdminModule implements Module {
         SimpleMenuAppender link;
 
         //General configuration
-        group = SimpleMenuAppender.group("configuration", null, "configuration", 1.0);
+        group = SimpleMenuAppender.group("info", null, "info", 1.0);
+        adminMenu.menuAppenders.add(group);
+
+        link = SimpleMenuAppender.link(
+                "info", "info", null, "info", InfoAction.URL_BINDING, 1.0);
+        adminMenu.menuAppenders.add(link);
+
+        link = SimpleMenuAppender.link(
+                "info", "modules", null, "modules", ModulesAction.URL_BINDING, 2.0);
+        adminMenu.menuAppenders.add(link);
+
+        link = SimpleMenuAppender.link(
+                "info", "servlet-context", null, "servlet.context", ServletContextAction.URL_BINDING, 3.0);
+        adminMenu.menuAppenders.add(link);
+
+        //General configuration
+        group = SimpleMenuAppender.group("configuration", null, "configuration", 2.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
@@ -115,27 +131,15 @@ public class AdminModule implements Module {
         adminMenu.menuAppenders.add(link);
 
         link = SimpleMenuAppender.link(
-                "configuration", "modules", null, "modules", ModulesAction.URL_BINDING, 2.0);
+                "configuration", "topLevelPages", null, "top.level.pages", RootChildrenAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
 
         link = SimpleMenuAppender.link(
-                "configuration", "servlet-context", null, "servlet.context", ServletContextAction.URL_BINDING, 3.0);
-        adminMenu.menuAppenders.add(link);
-
-        link = SimpleMenuAppender.link(
-                "configuration", "topLevelPages", null, "top.level.pages", RootChildrenAction.URL_BINDING, 4.0);
-        adminMenu.menuAppenders.add(link);
-
-        link = SimpleMenuAppender.link(
-                "configuration", "groovy", null, "groovy", GroovyAdminAction.URL_BINDING, 5.0);
-        adminMenu.menuAppenders.add(link);
-
-        link = SimpleMenuAppender.link(
-                "configuration", "info", null, "info", InfoAction.URL_BINDING, 2.0);
+                "configuration", "groovy", null, "groovy", GroovyAdminAction.URL_BINDING, 3.0);
         adminMenu.menuAppenders.add(link);
 
         //Security
-        group = SimpleMenuAppender.group("security", null, "security", 2.0);
+        group = SimpleMenuAppender.group("security", null, "security", 3.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
@@ -143,7 +147,7 @@ public class AdminModule implements Module {
         adminMenu.menuAppenders.add(link);
 
         //Database & modeling
-        group = SimpleMenuAppender.group("dataModeling", null, "data.modeling", 3.0);
+        group = SimpleMenuAppender.group("dataModeling", null, "data.modeling", 4.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
@@ -161,7 +165,7 @@ public class AdminModule implements Module {
         adminMenu.menuAppenders.add(link);
 
         //Mail
-        group = SimpleMenuAppender.group("mail", null, "mail", 4.0);
+        group = SimpleMenuAppender.group("mail", null, "mail", 5.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(

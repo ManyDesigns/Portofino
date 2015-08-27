@@ -361,8 +361,8 @@ public class HibernateConfig {
             }
         }
         if (hasErrors) {
-            // TODO PAOLO: se la PK non e' buona, tutta la tabella dovrebbe saltare
-            logger.error("Skipping primary key");
+            // TODO : se la PK non e' buona, tutta la tabella dovrebbe saltare
+            logger.error("Table "+name+": Skipping primary key");
             return;
         }
 
@@ -389,8 +389,8 @@ public class HibernateConfig {
         Column col = createColumn(mappings, tab, column);
 
         if (col == null) {
-            // TODO PAOLO: se la PK non e' buona, tutta la tabella dovrebbe saltare
-            logger.error("Skipping primary key");
+            // TODO : se la PK non e' buona, tutta la tabella dovrebbe saltare
+            logger.error("Skipping primary key "+pkName);
             return;
         }
 

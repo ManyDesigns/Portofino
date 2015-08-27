@@ -106,7 +106,7 @@
                 actualCssClass += cssClass;
             }
             buffer.addAttribute("class", actualCssClass);
-            if(hasIcon) {
+            if(hasIcon && theButton.iconBefore() ) {
                 buffer.openElement("em");
                 buffer.addAttribute("class", "glyphicon " + theButton.icon());
                 buffer.closeElement("em");
@@ -118,6 +118,11 @@
                 String value = (String) jspContext.getAttribute("__buttonValue");
                 jspContext.removeAttribute("__buttonValue");
                 buffer.write(value);
+            }
+            if(hasIcon && !theButton.iconBefore()) {
+                buffer.openElement("em");
+                buffer.addAttribute("class", "glyphicon " + theButton.icon());
+                buffer.closeElement("em");
             }
             buffer.closeElement("button");
             buffer.write(" ");

@@ -1,7 +1,3 @@
-<%@ page import="com.manydesigns.portofino.model.database.Table" %>
-<%@ page import="java.io.File" %>
-<%@ page import="java.text.MessageFormat" %>
-<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -11,87 +7,102 @@
 %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/m/admin/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.database.TablesAction"/>
-    <stripes:layout-component name="pageTitle">
-        Tables
-    </stripes:layout-component>
+    <stripes:layout-component name="pageTitle"> Tables </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:url var="treetablePath"
-                     value="/theme/jquery-treetable" />
+        <link href="<stripes:url value="/theme/fancytree/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css" class="skinswitcher">
 
-        <script type="text/javascript" src="${treetablePath}/jquery.treetable.js" >
-        </script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.js"/>"       type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.dnd.js"/>"   type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.glyph.js"/>" type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
+        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
 
+        <!-- (Irrelevant source removed.) -->
+
+        <style type="text/css">
+                /* Define custom width and alignment of table columns */
+            #treetable {
+                table-layout: fixed;
+            }
+            #treetable tr td:nth-of-type(1) {
+                text-align: right;
+            }
+            #treetable tr td:nth-of-type(2) {
+                text-align: center;
+            }
+            #treetable tr td:nth-of-type(3) {
+                min-width: 100px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        </style>
+
+        <!-- Add code to initialize the tree when the document is loaded: -->
         <script type="text/javascript">
-            $(function() {
-                $("#tables").treetable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
-                $("button[name=bulkDelete]").click(function() {
-                    return confirm('<fmt:message key="are.you.sure" />');
+            glyph_opts = {
+                map: {
+                    doc: "glyphicon glyphicon-file",
+                    docOpen: "glyphicon glyphicon-file",
+                    checkbox: "glyphicon glyphicon-unchecked",
+                    checkboxSelected: "glyphicon glyphicon-check",
+                    checkboxUnknown: "glyphicon glyphicon-share",
+                    dragHelper: "glyphicon glyphicon-play",
+                    dropMarker: "glyphicon glyphicon-arrow-right",
+                    error: "glyphicon glyphicon-warning-sign",
+                    expanderClosed: "glyphicon glyphicon-plus-sign",
+                    expanderLazy: "glyphicon glyphicon-plus-sign",  // glyphicon-expand
+                    expanderOpen: "glyphicon glyphicon-minus-sign",  // glyphicon-collapse-down
+                    folder: "glyphicon glyphicon-folder-close",
+                    folderOpen: "glyphicon glyphicon-folder-open",
+                    loading: "glyphicon glyphicon-refresh"
+                }
+            };
+            $(function(){
+                // Initialize Fancytree
+                $("#tree").fancytree({
+                    extensions: [ "edit", "glyph", "wide"],
+                    checkbox: false,
+                    glyph: glyph_opts,
+                    selectMode: 2,
+                    source: {url: "?getTables", debugDelay: 1000},
+                    toggleEffect: { effect: "drop", options: {direction: "down"}, duration: 400 },
+                    wide: {
+                        iconWidth: "1em",     // Adjust this if @fancy-icon-width != "16px"
+                        iconSpacing: "0.5em", // Adjust this if @fancy-icon-spacing != "3px"
+                        levelOfs: "1.5em"     // Adjust this if ul padding != "16px"
+                    },
+
+                    iconClass: function(event, data){
+                        // if( data.node.isFolder() ) {
+                        //   return "glyphicon glyphicon-book";
+                        // }
+                    },
+                    lazyLoad: function(event, data) {
+                        data.result = {url: "ajax-sub2.json", debugDelay: 1000};
+                    },
+                    activate: function(event, data) {
+                        var node = data.node;
+                        console.log(node.data.href);
+                        if( node.data.href ){
+                            window.open(node.data.href, node.data.target);
+
+                        }
+                    }
                 });
             });
         </script>
-        <table id="tables" style="width: auto;" class="table">
-            <thead>
-            <tr>
-                <th><fmt:message key="database/schema" /></th>
-                <th><fmt:message key="table.entity" /></th>
-            </tr>
-            </thead>
-            <tbody>
 
-            <%
-                String lastDatabase = null;
-                String lastSchema = null;
-                List<Table> tables = actionBean.getAllTables();
-                for(Table table : tables) {
-                    if(table.getPrimaryKey() == null) {
-                        continue;
-                    }
-                    if(table.getDatabaseName().equals(lastDatabase)) {
-                        if(!table.getSchemaName().equals(lastSchema)) {
-                            lastSchema = table.getSchemaName(); %>
-                            <tr data-tt-id="<%= lastDatabase + "---" + lastSchema %>"
-                                data-tt-parent-id="<%= lastDatabase %>">
-                                <td colspan="2"><%= table.getSchemaName() %></td>
-                            </tr><%
-                        }
-                    } else {
-                        String changelogFileNameTemplate = "{0}-changelog.xml";
-                        String changelogFileName =
-                            MessageFormat.format(
-                                changelogFileNameTemplate, table.getDatabaseName() + "-" + table.getSchemaName());
-                        File changelogFile = new File(actionBean.getPersistence().getAppDbsDir(), changelogFileName);
-                        String schemaDescr = table.getSchemaName();
-                        if(changelogFile.isFile()) {
-                            schemaDescr += " <img src='" + request.getContextPath() + "/m/admin/tables/liquibase_logo_small.gif' /> Liquibase";
-                        }
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong><fmt:message key="database/schema" />/<fmt:message key="table.entity" /></strong>
+            </div>
+            <div id="tree" class="panel-body fancytree-colorize-hover"></div>
+            <div class="panel-footer"></div>
+        </div>
 
-                        lastDatabase = table.getDatabaseName();
-                        lastSchema = table.getSchemaName(); %>
-                        <tr data-tt-id="<%= lastDatabase %>">
-                            <td colspan="2"><%= table.getDatabaseName() %></td>
-                        </tr>
-                        <tr data-tt-id="<%= lastDatabase + "---" + lastSchema %>"
-                            data-tt-parent-id="<%= lastDatabase %>">
-                            <td colspan="2"><%= schemaDescr %></td>
-                        </tr>
-                        <%
-                    }
-                    String tableDescr = table.getTableName();
-                    if(!table.getActualEntityName().equals(table.getTableName())) {
-                        tableDescr += " (" + table.getActualEntityName() + ")";
-                    }
-                    %>
-                    <tr data-tt-id="<%= lastDatabase + "---" + lastSchema + "---" + table.getTableName() %>"
-                        data-tt-parent-id="<%= lastDatabase + "---" + lastSchema %>">
-                        <td></td>
-                        <td><a href="<%= lastDatabase %>/<%= lastSchema %>/<%= table.getTableName() %>"
-                                ><%= tableDescr %></a></td>
-                    </tr><%
-                } %>
-            </tbody>
-        </table>
-        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.database.TablesAction"
-                      method="post">
+        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.database.TablesAction" method="post">
             <div class="form-group">
                 <portofino:buttons list="tables-list" />
             </div>

@@ -1,6 +1,7 @@
-package com.manydesigns.portofino.pageactions.gallery
+
 
 import com.manydesigns.portofino.security.*
+import com.manydesigns.portofino.pageactions.gallery.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyGallery extends GalleryAction {

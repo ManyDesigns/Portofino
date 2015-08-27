@@ -40,7 +40,7 @@
                 json = data;
 
                 for( var i in  data.markers){
-                    var popup = '<a target="_blank" href="'+ data.markers[i].url +'" <b> '+data.markers[i].title+'</b></a> <br> '+data.markers[i].description ;
+                    var popup = '<a target="_blank" href="'+ data.markers[i].url +'" <strong> '+data.markers[i].title+'</strong></a> <br> '+data.markers[i].description ;
                     L.marker([ data.markers[i].lat , data.markers[i].lon ]).addTo(map).bindPopup( popup );
                 }
 

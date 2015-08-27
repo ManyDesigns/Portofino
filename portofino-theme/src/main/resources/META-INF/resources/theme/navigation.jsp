@@ -2,6 +2,7 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page import="com.manydesigns.portofino.navigation.Navigation" %>
 <%@ page import="com.manydesigns.portofino.navigation.NavigationItem" %>
@@ -9,9 +10,13 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="org.apache.commons.codec.net.URLCodec" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration" />
 <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
+
 <%
     Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
     if(dispatch == null) {
@@ -48,15 +53,17 @@
     boolean first = true;
     int level = 0;
     String title = "";
-    %><div class="navigation"><%
+%><div class="navigation"><%
+    int cycle = 0;
     while (!navigationItems.isEmpty()) {
         NavigationItem nextNavigationItem = null;
         if(level >= startingLevel) {
             if (first) {
                 first = false;
-                %><ul class="nav nav-list portofino-sidenav"><% //Con classe "afflix" la navbar rimane sempre visibile, ma bisogna dare width assoluta (Responsive)
-            }
-            %><li class="nav-header"><%= title %></li><%
+%><ul class="nav nav-list portofino-sidenav"><% //Con classe "afflix" la navbar rimane sempre visibile, ma bisogna dare width assoluta (Responsive)
+}
+%><li class="nav-header"><%= title %></li><%
+
         }
         for (NavigationItem current : navigationItems) {
             XhtmlBuffer xb = new XhtmlBuffer(out);
@@ -65,9 +72,24 @@
                 if (current.isInPath()) {
                     xb.addAttribute("class", "active");
                     nextNavigationItem = current;
+                    xb.writeAnchor(request.getContextPath() + current.getPath(), current.getTitle());
+                    xb.closeElement("li");
+
+                    if (nextNavigationItem != null && level < maxLevel) {
+                        navigationItems = nextNavigationItem.getChildNavigationItems();
+                        for (NavigationItem curr : navigationItems) {
+                            xb.openElement("li");
+                            xb.addAttribute("class", "subpages");
+                            nextNavigationItem = curr;
+                            xb.writeAnchor(request.getContextPath() + curr.getPath(), curr.getTitle());
+                            xb.closeElement("li");
+                        }
+                    }
+                }else{
+                    nextNavigationItem = current;
+                    xb.writeAnchor(request.getContextPath() + current.getPath(), current.getTitle());
+                    xb.closeElement("li");
                 }
-                xb.writeAnchor(request.getContextPath() + current.getPath(), current.getTitle());
-                xb.closeElement("li");
             } else if (current.isInPath()) {
                 nextNavigationItem = current;
             }
@@ -80,7 +102,6 @@
         }
         level++;
     }
-    if(!first) {
-        %></ul><%
-    }
-%></div>
+%>
+
+</div>

@@ -317,16 +317,16 @@ public class SelectSearchField extends AbstractSearchField {
                                        String stringValue,
                                        boolean checked) {
 
-        xb.writeNbsp();
+        //xb.writeNbsp();
         xb.writeInputRadio(radioId, inputName, stringValue, checked);
-        xb.writeNbsp();
+        //xb.writeNbsp();
 
         xb.openElement("label");
         xb.addAttribute("class", "radio");
         xb.addAttribute("for", radioId);
-        xb.writeNbsp();
+       // xb.writeNbsp();
         xb.write(label);
-        xb.writeNbsp();
+        //xb.writeNbsp();
         xb.closeElement("label");
     }
 

@@ -7,6 +7,8 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
@@ -21,6 +23,12 @@ public class InfoAction extends AbstractActionBean {
     public static final String copyright = "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/admin/info";
+
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public final static Logger logger = LoggerFactory.getLogger(InfoAction.class);
 
     @DefaultHandler
     public Resolution execute() {

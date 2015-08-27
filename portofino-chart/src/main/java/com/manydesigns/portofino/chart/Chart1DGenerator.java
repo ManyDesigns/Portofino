@@ -82,6 +82,7 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         // eventualmente e' il css a fornirne uno
         // eventualmente e' il css a fornirne uno
         chart.setBorderVisible(isBorderVisible());
+        chart.setBorderPaint(Color.lightGray);
 
         // impostiamo il titolo
         TextTitle title = chart.getTitle();

@@ -23,7 +23,7 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
-<header class="navbar navbar-inverse navbar-static-top">
+<header class="navbar navbar-inverse navbar-static-top" role="banner">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -93,11 +93,6 @@
                             logoutUrlBuilder.addParameter("logout");
                             String logoutUrl = Util.getAbsoluteUrl(logoutUrlBuilder.toString());
                         %>
-                        <li>
-                            <a href="<%= logoutUrl %>">
-                                <fmt:message key="log.out" />
-                            </a>
-                        </li>
                         <%
                             if(request.getAttribute("actionBean") instanceof PageAction) {
                                 PageAction pageAction = (PageAction) request.getAttribute("actionBean");
@@ -167,6 +162,12 @@
                         </li>
                         <% }}} %>
                     </ul>
+                </li>
+                <jsp:include page="/theme/navigation-mobile.jsp" />
+                <li>
+                    <a href="<%= logoutUrl %>">
+                        <fmt:message key="log.out" />
+                    </a>
                 </li>
                 </shiro:user>
                 <shiro:guest>

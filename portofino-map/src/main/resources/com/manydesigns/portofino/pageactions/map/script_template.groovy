@@ -1,6 +1,5 @@
-package com.manydesigns.portofino.pageactions.map
-
 import com.manydesigns.portofino.security.*
+import com.manydesigns.portofino.pageactions.map.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyMap extends MapAction {

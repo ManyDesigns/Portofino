@@ -34,18 +34,13 @@
                 <fmt:message key="create.a.new.connection.choose.type" />
             </c:if>
             <div id="connectionProviderTypeForm" class="radio">
-                <label class="radio">
-                    <input id="jdbc_radio" type="radio" value="JDBC"
-                           name="connectionProviderType"
-                           <%= actionBean.isJdbc() ? "checked='checked'" : "" %>
-                           onchange="changeNewSPForm();" />
-                    JDBC</label>
-                <label class="radio">
-                    <input id="jndi_radio" type="radio" value="JNDI"
-                           name="connectionProviderType"
-                           <%= actionBean.isJndi() ? "checked='checked'" : "" %>
-                           onchange="changeNewSPForm();" />
-                    JNDI</label>
+
+                <input id="jdbc_radio" type="radio" value="JDBC" name="connectionProviderType" <%= actionBean.isJdbc() ? "checked='checked'" : "" %>  onchange="changeNewSPForm();"/>
+                <label class="radio " for="jdbc_radio" >JDBC</label>
+
+                <input id="jndi_radio" type="radio" value="JNDI" name="connectionProviderType" <%= actionBean.isJndi() ? "checked='checked'" : "" %>  onchange="changeNewSPForm();"/>
+                <label class="radio" for="jndi_radio" >JNDI</label>
+
             </div>
             <fieldset>
                 <legend>Connection parameters</legend>

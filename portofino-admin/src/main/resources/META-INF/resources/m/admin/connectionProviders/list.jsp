@@ -14,11 +14,12 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.database.ConnectionProvidersAction"
                       method="post" class="dont-prompt-on-page-abandon form-inline">
             <mde:write name="actionBean" property="tableForm"/>
-            <h4><fmt:message key="available.database.platforms"/></h4>
-            <mde:write name="actionBean" property="databasePlatformsTableForm"/>
             <div class="form-group">
                 <portofino:buttons list="connectionProviders-search" />
             </div>
+            <h4><fmt:message key="available.database.platforms"/></h4>
+            <mde:write name="actionBean" property="databasePlatformsTableForm"/>
+
             <script type="text/javascript">
                 $(function() {
                     $("button[name=bulkDelete]").click(function() {

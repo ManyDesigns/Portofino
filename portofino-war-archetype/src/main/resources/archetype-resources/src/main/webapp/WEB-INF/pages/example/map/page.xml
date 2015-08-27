@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Map" description="" navigationRoot="INHERIT" id="nyq6l4weq6h9yp1t4gdg4exum">
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <permissions/>
+</page>

@@ -70,7 +70,8 @@ public @interface Button {
             ICON_LEFT= " glyphicon-chevron-left ",
             ICON_HOME= " glyphicon-home",
             ICON_SAVE= " glyphicon-floppy-disk",
-            ICON_DUPLICATE = " glyphicon-duplicate ";
+            ICON_DUPLICATE = " glyphicon-duplicate ",
+            ICON_FLASH = " glyphicon-flash ";
 
 
     /**
@@ -110,4 +111,8 @@ public @interface Button {
      */
     String group() default "";
 
+    /**
+     * Allows to specify the icon position (before text or not).
+     */
+    boolean iconBefore() default true;
 }

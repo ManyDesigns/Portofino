@@ -89,10 +89,19 @@
         padding: 0 0 3px 10px; border: none; text-align: left;
     }
     .event {
+        border-radius: 3px;
+        font-size: smaller;
+        letter-spacing: 0.03em;
+        text-align: center;
         padding: 0 0 0 4px; white-space: nowrap; overflow: hidden;
     }
+    .event .more{
+        color: #a9a9a9;
+        text-shadow: 0px 0px 1px rgba(255,255,255,0.5);
+    }
     .event a {
-        color: #222222;
+        color: white;
+        text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
     }
     .outOfMonth {
         color: #BBBBBB;
@@ -315,6 +324,7 @@
         }
         if(dialogId != null) {
             xhtmlBuffer.openElement("a");
+            xhtmlBuffer.addAttribute("class", "more");
             xhtmlBuffer.addAttribute("href", "#");
             xhtmlBuffer.addAttribute("data-target", "#" + dialogId);
             xhtmlBuffer.addAttribute("data-toggle", "modal");

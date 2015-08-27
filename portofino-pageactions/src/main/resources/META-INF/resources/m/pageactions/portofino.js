@@ -289,10 +289,12 @@ portofino.enablePageActionDragAndDrop = function(button, originalPath) {
     var container = $(".content");
     container.prepend('\
         <form action="' + portofino.contextPath + '/actions/admin/page" method="post">\
-            Edit page layout: \
+            <div class="jumbotron" style="padding:36px;"><h1 style="font-size:36px" >Edit page layout:</h1><p> \
+            Just drag and drop dotted section.                                    </p><p> \
             <input type="hidden" name="originalPath" value="' + originalPath + '" />\
             <button name="updateLayout" type="submit" class="btn btn-primary">Save</button>\
             <button name="cancel" type="submit" class="btn btn-default">Cancel</button>\
+            </p>\
         </form>');
     container.find("button[name=updateLayout]").click(function() {
         var theButton = $(this);

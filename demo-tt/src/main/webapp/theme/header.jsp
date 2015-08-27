@@ -1,5 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ page import="com.manydesigns.portofino.PortofinoProperties"
+%><%@ page import="com.manydesigns.portofino.actions.admin.AdminAction"
+%><%@ page import="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
+%><%@ page import="com.manydesigns.portofino.dispatcher.PageAction"
+%><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
+%><%@ page import="com.manydesigns.portofino.security.AccessLevel"
+%><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
+%><%@ page import="net.sourceforge.stripes.util.UrlBuilder"
+%><%@ page import="org.apache.commons.lang.StringUtils"
 %><%@ page import="org.apache.shiro.SecurityUtils"
 %><%@ page import="org.apache.shiro.subject.Subject"
 %><%@ page import="org.apache.commons.lang.StringUtils"
@@ -40,7 +48,7 @@
                     <%
                         Subject subject = SecurityUtils.getSubject();
                         Object principal = subject.getPrincipal();
-                        pageContext.setAttribute("principal", principal);
+                        String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
                     %>
                     <shiro:hasRole name="administrators">
                         <li >
@@ -49,7 +57,7 @@
                             </stripes:link>
                         </li>
                         <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page <b class="caret"></b></a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page <strong class="caret"></strong></a>
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actionPath}');">
@@ -95,7 +103,7 @@
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <em class="glyphicon glyphicon-user"></em>
-                            <c:out value="${principal.first_name} ${principal.last_name}"/> <strong class="caret"></strong>
+                            <%= prettyName %> <strong class="caret"></strong>
                         </a>
                         <ul class="dropdown-menu">
                             <li>
