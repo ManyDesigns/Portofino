@@ -3,6 +3,7 @@
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
 <div class="dialog-move-page modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="spacer"></div>
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

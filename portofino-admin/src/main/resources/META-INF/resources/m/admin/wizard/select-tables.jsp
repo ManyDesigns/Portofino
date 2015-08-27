@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-%><%@ taglib prefix="mde" uri="/manydesigns-elements"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
+        %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+        %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+        %><%@ taglib prefix="mde" uri="/manydesigns-elements"
+        %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+        %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/m/admin/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
@@ -15,8 +15,7 @@
         <jsp:include page="wizard-content-header.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
-                      method="post">
+        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard" method="post">
             <style type="text/css">
                 ul li {
                     list-style-type: none;
@@ -24,31 +23,24 @@
                 #calendarField label.control-label {
                     width: auto;
                     float: left;
-                    padding-right: 30px;
+                    padding-left: 30px;
                 }
             </style>
             <p><fmt:message key="select.the.generation.strategy" /></p>
             <div class="form-group">
-                <div class="radio">
-                    <label for="generationStrategy_auto">
-                        <input class="radio" type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
-                               ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
-                        <fmt:message key="automatic" />
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="generationStrategy_manual">
-                        <input class="radio" type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
-                               ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
-                        <fmt:message key="manual.choose.which.pages.will.be.created" />
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="generationStrategy_no">
-                        <input class="radio" type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
-                               ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
-                        <fmt:message key="dont.generate.anything" />
-                    </label>
+                <div class=" radio">
+                    <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
+                        ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
+
+                    <label class="radio" for="generationStrategy_auto"> <fmt:message key="automatic" /></label>
+                    <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
+                        ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
+
+                    <label class="radio" for="generationStrategy_manual"><fmt:message key="manual.choose.which.pages.will.be.created" /></label>
+                    <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
+                        ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
+
+                    <label class="radio" for="generationStrategy_no"><fmt:message key="dont.generate.anything" /></label>
                 </div>
             </div>
             <div id="rootsFormContainer">

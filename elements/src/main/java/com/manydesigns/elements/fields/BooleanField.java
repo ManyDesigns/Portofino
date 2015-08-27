@@ -134,13 +134,12 @@ public class BooleanField extends AbstractField<Boolean> {
         if (required) {
             xb.openElement("div");
             xb.addAttribute("class", "checkbox");
-            xb.openElement("label");
+
             xb.writeInputCheckbox(id, inputName, TRUE_VALUE, BooleanUtils.isTrue(booleanValue), false, null);
             xb.openElement("label");
             xb.addAttribute("for", id);
             xb.closeElement("label");
             xb.writeInputHidden(checkInputName, CHECK_VALUE);
-            xb.closeElement("label");
             xb.closeElement("div");
         } else {
             xb.openElement("select");

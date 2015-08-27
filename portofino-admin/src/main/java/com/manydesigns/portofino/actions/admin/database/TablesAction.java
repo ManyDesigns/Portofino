@@ -164,7 +164,6 @@ public class TablesAction extends AbstractActionBean {
 
     public Resolution getTables() {
         ArrayList<Map> treeTables = new  ArrayList<Map>();
-        //treeTables.add(createObject("test",true,true,true,"",null));
 
         String lastDatabase = null;
         String lastSchema = null;
@@ -172,7 +171,6 @@ public class TablesAction extends AbstractActionBean {
         Map database = null ;
         List<Table> tables = getAllTables();
         for(Table table : tables) {
-            logger.info(table.getActualEntityName());
             if(table.getPrimaryKey() == null) {
                 continue;
             }

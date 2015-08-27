@@ -106,7 +106,7 @@ public class SettingsAction extends AbstractActionBean {
         form.readFromObject(settings);
     }
 
-    @Button(list = "settings", key = "update", order = 1, type = Button.TYPE_PRIMARY , icon = Button.ICON_SAVE )
+    @Button(list = "settings", key = "update", order = 1, type = Button.TYPE_PRIMARY )
     public Resolution update() {
         setupFormAndBean();
         form.readFromRequest(context.getRequest());
