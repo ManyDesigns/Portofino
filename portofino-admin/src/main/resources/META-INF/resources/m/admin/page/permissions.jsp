@@ -76,7 +76,7 @@
                                     <c:out value="${group}"/>
                                 </td>
                                 <td>
-                                    <select class="form-control"  name="accessLevels[${group}]"
+                                    <select class="form-control input-sm"  name="accessLevels[${group}]"
                                             <%
                                                 if(AccessLevel.DENY.equals(parentAccessLevel)) {
                                                     out.print("disabled='disabled'");
@@ -133,8 +133,9 @@
                                 </td>
                                 <c:forEach var="perm" items="<%= supportedPermissions %>">
                                     <td>
+                                        <div class="checkbox">
                                         <input type="checkbox" name="permissions[<%= groupId %>]"
-                                               value="${perm}"
+                                               value="${perm}" id="permissions[<%= groupId %>]_${perm}"
                                                <%
                                                    String testedPermission = (String) pageContext.getAttribute("perm");
                                                    Permissions testConf = new Permissions();
@@ -148,21 +149,24 @@
                                                        out.print("checked='checked'");
                                                    }
                                                %>/>
+                                        <label for="permissions[<%= groupId %>]_${perm}" ></label>
+                                        </div>
                                     </td>
                                 </c:forEach>
                             </tr>
                         </c:forEach>
                     </table>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 well">
                     <h4 style="margin-top: 0;"><fmt:message key="test.a.user" /></h4>
                     <label for="testUserIdSelect"><fmt:message key="select.a.user.and.view.its.permissions" /></label>
                     <c:if test="${actionBean.users != null}">
-                        <select name="testUserId" id="testUserIdSelect">
+                        <select class="form-control input-sm" name="testUserId" id="testUserIdSelect">
                             <c:forEach var="user" items="${actionBean.users}">
                                 <option value="${user.key}"
                                         <c:if test="${actionBean.testUserId eq user.key}">selected="selected"</c:if>
-                                        ><c:out value="${user.value}" /></option>
+                                        ><c:out value="${user.value}" />
+                                </option>
                             </c:forEach>
                         </select>
                     </c:if>
@@ -170,8 +174,9 @@
                         <input name="testUserId" id="testUserIdSelect" type="text" value="${actionBean.testUserId}" />
                     </c:if>
                     <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
+                    <br/>
                     <portofino:buttons list="testUserPermissions" cssClass=""/>
-                    <br /><br />
+                    <br/><br/>
                     <table id="userPermissionTestResults">
                         <c:if test="${not empty actionBean.testedAccessLevel}">
                             <tr>

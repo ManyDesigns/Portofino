@@ -280,6 +280,11 @@ public class ApplicationWizard extends AbstractPageAction {
         return configureConnectionProvider();
     }
 
+    @Button(list = "connection-provider", key = "return.to.pages", order = 0  , icon = Button.ICON_HOME)
+    public Resolution returnToPages() {
+        return new RedirectResolution("/");
+    }
+
     @Button(list = "connection-provider", key="next>>", order = 1, type = Button.TYPE_PRIMARY , icon = Button.ICON_RIGHT , iconBefore = false)
     public Resolution configureConnectionProvider() {
         buildCPForms();

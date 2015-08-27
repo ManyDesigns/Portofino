@@ -10,6 +10,7 @@
         <fmt:message key="info"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
+
         <div class="jumbotron">
             <div class="container">
                 <h1>Portofino <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/></h1>
@@ -24,7 +25,7 @@
                 <p>
                 <div class="btn-group" role="group" aria-label="...">
                     <a class="btn btn-success btn-lg"  target="_blank" href="http://portofino.manydesigns.com/en/support" role="button">
-                        <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>Get support
+                        <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Get support
                     </a>
 
                     <a class="btn btn-primary btn-lg" target="_blank" href="http://portofino.manydesigns.com/en/docs" role="button">

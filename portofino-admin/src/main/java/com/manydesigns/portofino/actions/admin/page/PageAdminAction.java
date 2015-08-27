@@ -845,7 +845,7 @@ public class PageAdminAction extends AbstractPageAction {
         return forwardToPagePermissions();
     }
 
-    @Button(list = "testUserPermissions", key = "test")
+    @Button(list = "testUserPermissions", key = "test" , icon = Button.ICON_FLASH , type= Button.TYPE_SUCCESS )
     public Resolution testUserPermissions() {
         if (!checkPermissionsOnTargetPage(getPageInstance(), AccessLevel.DEVELOP)) { //Altrimenti un utente può cambiare i propri permessi
             return new ForbiddenAccessResolution("You don't have permissions to do that");
