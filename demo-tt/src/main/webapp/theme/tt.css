@@ -63,42 +63,12 @@ footer {
     /* color: white; */
 }
 
-/* menu */
-.portofino-sidenav>li>a {
-    position: relative;
-    display: block;
-    padding: 2px 1px;
-}
-
 /* Angular brace */
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
 }
 
 .navbar{ box-shadow: 1px 0px 5px  #666666} /* TODO test */
-
-.portofino-sidenav>li.active {
-    border-left: 2px solid #2B5494;
-}
-.portofino-sidenav>li { padding-left: 5px; border-left: 1px solid #ffffff;}
-.portofino-sidenav>li:hover { border-left: 1px solid #2B5494;  }
-.portofino-sidenav>li.active:hover { border-left: 2px solid #2B5494;  }
-.portofino-sidenav>li.bookmark:hover {border-left: 1px solid #ffffff;}
-
-.portofino-sidenav>li>a:hover , .portofino-sidenav>li>a:focus  { background-color: white; }
-
-.portofino-sidenav>li.nav-header{
-    border: none;
-    text-align: right;
-    font-weight: bolder;
-    color: #2B5494;
-}
-.portofino-sidenav>li.nav-header:hover{ border: none; cursor: default;}
-
-li.active a{
-    font-weight: bolder;
-    color: #2B5494;
-}
 
 li.subpages a{
     /*font-size: smaller;*/
@@ -119,12 +89,6 @@ li.subpages{
 hr.nav-separator{
     margin-top: 0px;
     margin-bottom: 5px;
-}
-
-.portofino-sidenav>li>a {
-    position: relative;
-    display: block;
-    padding: 2px 1px;
 }
 
 /*   ------ */

@@ -864,6 +864,12 @@ Buttons
 Menu
 *******************************************************************************/
 
+.portofino-sidenav>li>a {
+    position: relative;
+    display: block;
+    padding: 2px 1px;
+}
+
 .portofino-sidenav>li.active {
     border-left: 2px solid #2B5494;
 }
@@ -906,12 +912,6 @@ li.subpages{
 hr.nav-separator{
     margin-top: 0px;
     margin-bottom: 5px;
-}
-
-.portofino-sidenav>li>a {
-    position: relative;
-    display: block;
-    padding: 2px 1px;
 }
 
 /*******************************************************************************
@@ -1094,27 +1094,21 @@ Checkbox
     float: left;
 }
 
-
-.radio input[type=radio],
-.checkbox  input[type=checkbox] {
-    /*display: none;  */
-    visibility: hidden;
-    position: absolute;
-}
-
 @media (min-width: 768px){
 .form-inline .checkbox input[type=checkbox], .form-inline .radio input[type=radio] {
-    position: absolute;
     margin-left: 0;
 }
 }
 
+.radio input[type=radio], .radio-inline input[type=radio] {
+    opacity: 0;
+}
 
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox] {
     opacity: 0;
 }
 
-.checkbox label:before {
+.checkbox label:before, .checkbox-inline label:before {
     content: "";
     display: inline-block;
     width: 18px;
@@ -1125,25 +1119,27 @@ Checkbox
     bottom: 3px;
     background-color: #fff;
     border: 1px rgb(211, 211, 211) solid;
+    border-radius: 3px;
 }
-.radio label:before {
-    border-radius: 10px;
-}
+
 .checkbox label {
    /* margin-bottom: 10px;  */
     margin-left: 5px;
 }
-.checkbox label:before {
-    border-radius: 3px;
-}
+
 .radio input[type=radio]:checked + label:before, .radio-inline input[type=radio]:checked + label:before {
-    content: "\2022";
+    content: "\25cf";
     color: #337AB7;
-    font-size: 34px;
+    font-size: 16px;
     text-align: center;
     line-height: 17px;
-
 }
+
+.radio input[type=radio]:focus + label:before, .radio-inline input[type=radio]:focus + label:before {
+    border-color: #66afe9;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6)
+}
+
 .checkbox input[type=checkbox]:checked + label:before, .checkbox-inline input[type=checkbox]:checked + label:before {
     content: "\2713";
     font-size: 15px;
@@ -1167,22 +1163,22 @@ Checkbox
 }
  /**/
 
-.radio label:before {
+.radio label:before, .radio-inline label:before {
     border-radius: 10px;
     content: "";
     display: inline-block;
     width: 18px;
     height: 18px;
     margin-right: 9px;
-    position: absolute;
     left: 0;
-    bottom: 3px;
+    margin-bottom: -3px;
     background-color: #fff;
     border: 1px rgb(211, 211, 211) solid;
 }
 
 .radio-inline {
-    padding-left: 5px; }
+    padding-left: 5px;
+}
 
 /*.radio input[type=radio]:checked + label:before {
     content: "\2022";
