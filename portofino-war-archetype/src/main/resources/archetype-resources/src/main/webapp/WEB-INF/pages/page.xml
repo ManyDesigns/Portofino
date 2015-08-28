@@ -5,7 +5,7 @@
     <layout>
         <childPages>
             <childPage name="welcome" showInNavigation="true"/>
-            <childPage name="example" showInNavigation="true"/>
+            <childPage name="examples" showInNavigation="true"/>
             <childPage name="login" showInNavigation="false"/>
         </childPages>
     </layout>

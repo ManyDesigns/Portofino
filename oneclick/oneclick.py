@@ -48,6 +48,7 @@ if(os.path.exists(tomcat_path)):
 os.system("unzip " + tomcat_zip + " -d " + base_path)
 
 shutil.rmtree(tomcat_path + "/webapps/ROOT")
+shutil.rmtree(tomcat_path + "/webapps/examples") #Conflicts with portofino /examples
 
 shutil.copy(portofino_path + "/COPYRIGHT.txt", base_path + "/COPYRIGHT.txt")
 shutil.copy(portofino_path + "/LICENSE.txt", base_path + "/LICENSE.txt")

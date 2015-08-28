@@ -24,14 +24,14 @@ import org.hibernate.criterion.*
 import com.manydesigns.portofino.pageactions.custom.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class FancyTreeExample extends CustomAction {
 
     //Automatically generated on Mon Aug 24 16:25:00 CEST 2015 by ManyDesigns Portofino
     //Write your code here
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/WEB-INF/pages/example/fancytree/fancytree.jsp";
+        String fwd = "/WEB-INF/pages/examples/fancytree/fancytree.jsp";
         return new ForwardResolution(fwd);
     }
 

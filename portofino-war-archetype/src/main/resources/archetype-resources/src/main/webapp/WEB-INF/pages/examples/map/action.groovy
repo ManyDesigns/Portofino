@@ -3,16 +3,8 @@ import com.manydesigns.portofino.pageactions.map.*
 
 class MyMap extends MapAction {
 
-    //Automatically generated on Tue Aug 25 10:08:38 CEST 2015 by ManyDesigns Portofino
-    //Example below. Adapt it to your needs.
-
     @Override
     void loadObjects() {
-        loadMarkers();
-    }
-
-    def loadMarkers() {
-
         Position markerPosition = new Position( new BigDecimal( 44.405650), new BigDecimal( 8.946256 ));
         map.addMarker( new Marker( "Genova", "ManyDesigns Office", markerPosition, "http://www.manydesigns.com"));
 
