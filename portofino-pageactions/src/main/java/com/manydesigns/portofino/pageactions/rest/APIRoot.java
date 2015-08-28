@@ -32,7 +32,7 @@ import java.io.File;
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Path(APIRoot.PATH_PREFIX)
+@Path("/")
 public class APIRoot {
 
     public static final String copyright =
@@ -60,7 +60,7 @@ public class APIRoot {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
 
-        String actionPath = "/" + uriInfo.getPath().substring(PATH_PREFIX.length());
+        String actionPath = "/" + uriInfo.getPath();
         if (request.getDispatcherType() == DispatcherType.REQUEST) {
             logger.debug("Starting page response timer");
             StopWatch stopWatch = new StopWatch();
