@@ -277,6 +277,14 @@
             <version>${logback.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Extra dependencies -->
+        <!-- jQuery.fancytree (for the example) -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>fancytree</artifactId>
+            <version>2.11.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

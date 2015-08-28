@@ -10,7 +10,6 @@ import org.hibernate.*
 import org.hibernate.criterion.*
 
 import com.manydesigns.portofino.pageactions.text.*
-import javax.swing.text.TextAction
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class Welcome extends TextAction {

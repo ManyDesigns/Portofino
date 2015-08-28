@@ -7,40 +7,17 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-       <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
-        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js" type="text/javascript"></script>
-        -->
-        <link href="<stripes:url value="/theme/fancytree/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css"
+        <link href="<stripes:url value="/webjars/fancytree/2.11.0/dist/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css"
               class="skinswitcher">
 
-        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.js"/>"       type="text/javascript"></script>
-        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.dnd.js"/>"   type="text/javascript"></script>
-        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>
-        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.glyph.js"/>" type="text/javascript"></script>
-        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
-        <script src="<stripes:url value="/theme/fancytree/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.js"/>"       type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.dnd.js"/>"   type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.glyph.js"/>" type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
 
         <!-- (Irrelevant source removed.) -->
-
-        <style type="text/css">
-                /* Define custom width and alignment of table columns */
-            #treetable {
-                table-layout: fixed;
-            }
-            #treetable tr td:nth-of-type(1) {
-                text-align: right;
-            }
-            #treetable tr td:nth-of-type(2) {
-                text-align: center;
-            }
-            #treetable tr td:nth-of-type(3) {
-                min-width: 100px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-        </style>
-
 
         <!-- Add code to initialize the tree when the document is loaded: -->
         <script type="text/javascript">
@@ -74,7 +51,7 @@
                     },
                     glyph: glyph_opts,
                     selectMode: 2,
-                    source: {url: "?ajaxSampleData", debugDelay: 1000},
+                    source: {url: "${actionBean.actionAPIPath}/data", debugDelay: 1000},
                     toggleEffect: { effect: "drop", options: {direction: "left"}, duration: 400 },
                     wide: {
                         iconWidth: "1em",     // Adjust this if @fancy-icon-width != "16px"
@@ -91,40 +68,12 @@
                         data.result = {url: "ajax-sub2.json", debugDelay: 1000};
                     }
                 });
-
-                $("#treetable").fancytree({
-                    extensions: ["dnd", "edit", "glyph", "table"],
-                    checkbox: true,
-                    dnd: {
-                        dragStart: function(node, data) { return true; },
-                        dragEnter: function(node, data) { return true; },
-                        dragDrop: function(node, data) { data.otherNode.copyTo(node, data.hitMode); }
-                    },
-                    glyph: glyph_opts,
-                    source: {url: "?ajaxSampleData", debugDelay: 1000},
-                    table: {
-                        checkboxColumnIdx: 1,
-                        nodeColumnIdx: 2
-                    },
-
-                    activate: function(event, data) {
-                    },
-                    lazyLoad: function(event, data) {
-                        data.result = {url: "ajax-sub2.json", debugDelay: 1000};
-                    },
-                    renderColumns: function(event, data) {
-                        var node = data.node,
-                                $tdList = $(node.tr).find(">td");
-                        $tdList.eq(0).text(node.getIndexHier());
-                        $tdList.eq(3).text(!!node.folder);
-                    }
-                });
             });
         </script>
 
 
-        <i>This is an example page in which we use <a href="https://github.com/mar10/fancytree">fancytree</a>
-            to show how it is possible to create json data in Portofino and use them in an Ajax call</i>
+        <em>This is an example page in which we use <a href="https://github.com/mar10/fancytree">fancytree</a>
+            to show how it is possible to create json data in Portofino and use them in an Ajax call</em>
 
         <div class="panel panel-default">
             <div class="panel-heading">
