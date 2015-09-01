@@ -109,7 +109,7 @@ public @interface Button {
      * The group this button belongs to. Buttons in the same group are rendered close together to separate them
      * from other groups.
      */
-    String group() default "";
+    String group() default "default-group";
 
     /**
      * Allows to specify the icon position (before text or not).

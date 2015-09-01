@@ -37,14 +37,17 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
+            ul.fancytree-ext-wide {
+                border: none;
+            }
         </style>
 
         <!-- Add code to initialize the tree when the document is loaded: -->
         <script type="text/javascript">
             glyph_opts = {
                 map: {
-                    doc: "glyphicon glyphicon-file",
-                    docOpen: "glyphicon glyphicon-file",
+                    doc: "glyphicon glyphicon-list-alt",
+                    docOpen: "glyphicon glyphicon-list-alt",
                     checkbox: "glyphicon glyphicon-unchecked",
                     checkboxSelected: "glyphicon glyphicon-check",
                     checkboxUnknown: "glyphicon glyphicon-share",

@@ -26,6 +26,7 @@ import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -130,10 +131,12 @@ public class MailSettingsAction extends AbstractActionBean {
         @FieldSet("General")
         @Label("Queue location")
         @FieldSize(100)
+        @CssClass(BootstrapSizes.FILL_ROW)
         public String queueLocation;
 
         @FieldSet("SMTP")
         @Label("Host")
+        @CssClass(BootstrapSizes.FILL_ROW)
         public String smtpHost;
 
         @FieldSet("SMTP")

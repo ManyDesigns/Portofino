@@ -26,6 +26,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -297,5 +298,18 @@ public class NumericField extends AbstractTextField<BigDecimal> {
 
     public void setPrecision(int precision) {
         this.precision = precision;
+    }
+
+    @Override
+    public void valueToXhtmlEdit(XhtmlBuffer xb) {
+
+        xb.writeInputNumber(id, inputName, stringValue, labelPlaceholder ? label : null,
+                EDITABLE_FIELD_CSS_CLASS, size, maxLength,this.maxValue,this.minValue,null);
+        if(mode.isBulk()) {
+            xb.writeJavaScript(
+                    "$(function() { " +
+                        "configureBulkEditTextField('" + id + "', '" + bulkCheckboxName + "'); " +
+                    "});");
+        }
     }
 }
