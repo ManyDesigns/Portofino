@@ -93,6 +93,7 @@ public class ConnectionProviderForm {
 
     @FieldSize(100)
     @Required
+    @CssClass(BootstrapSizes.FILL_ROW)
     @Label("connection URL")
     public String getUrl() {
         return jdbcConnectionProvider.getActualUrl();

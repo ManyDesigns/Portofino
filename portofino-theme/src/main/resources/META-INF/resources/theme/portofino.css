@@ -204,9 +204,9 @@ tbody div.form-control {
     padding: 0;
 }
 
-input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-size {
+/*input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-size {
     width: auto;
-}
+}*/
 
 fieldset.radio {
     margin-bottom: 0;
@@ -249,6 +249,30 @@ label.control-label:after {
     box-shadow: none;
 }
 
+
+.pager li>a, .pager li>span {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #FFF;
+    background: -webkit-linear-gradient(top, #222222 0%, #45484d 100%);
+    background: linear-gradient(to bottom, rgba(220, 220, 220, 0.18) 0%, rgba(255, 255, 255, 0.85) 100%);
+    border: 0px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+    letter-spacing: 0.05em;
+}
+
+.pager li>a, .pager li>span {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #FFF;
+    background: -webkit-linear-gradient(top, #222222 0%, #45484d 100%);
+    background: linear-gradient(to bottom, rgba(220, 220, 220, 0.18) 0%, rgba(255, 255, 255, 0.85) 100%);
+    border: 0px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+    letter-spacing: 0.05em;
+}
 /*******************************************************************************
 General
 *******************************************************************************/
@@ -283,14 +307,16 @@ Dialog (e.g., login)
 *******************************************************************************/
 
 body.dialog {
-    padding-top: 40px;
-    padding-bottom: 40px;
+    padding-top: 100px;
+    padding-bottom: 50px;
     background-color: #f5f5f5;
+    background: -webkit-linear-gradient(top, #FFFFFF 0%, #DADADA 100%);
+    background: linear-gradient(to bottom, #FFFFFF 0%, #DADADA 100%);
 }
 
 .dialog-container {
-    max-width: 400px;
-    padding: 19px 29px 29px;
+    max-width: 480px;
+    padding: 20px 35px 35px;
     margin: 0 auto 20px;
     background-color: #ffffff;
     border: 1px solid #e5e5e5;
@@ -300,6 +326,10 @@ body.dialog {
     -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
     -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
     box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+
+.dialog-container .pageHeader {
+    text-align: center;
 }
 
 .spacingTop {
@@ -492,7 +522,7 @@ table.treetable span.indenter a {
 }
 
 table.treetable {
-    border: 1px solid #888;
+    border: 0px solid #888;
     border-collapse: collapse;
     margin: .6em 0 1.8em 0;
     width: 100%;
@@ -504,7 +534,8 @@ table.treetable caption {
 }
 
 table.treetable thead {
-    background: #aaa url(jquery-treetable/images/bg-table-thead.png) repeat-x top left;
+    color: white;
+    background: #2B5494 url(jquery-treetable/images/bg-table-thead.png) repeat-x top left;
 }
 
 table.treetable thead tr th {
@@ -728,6 +759,14 @@ Wizard
 
 .wizard-header ul li .chevron:before{
     border-left: 14px solid #7fb0e0;
+}
+
+.wizard-header .badge {
+    background-color: rgba(109, 105, 105, 0.3);
+}
+
+.active .badge.alert-info {
+    display: none;
 }
 
 /* ============================================== */
@@ -1034,7 +1073,7 @@ Checkbox
 .squared-light {
     width: 15px;
     position: relative;
-    /*margin: 20px auto;*/
+    margin: auto auto;
 }
 
 .squared-light label {
@@ -1161,6 +1200,12 @@ Checkbox
 .checkbox {
     height: 100%;
 }
+
+.checkbox, .radio {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
  /**/
 
 .radio label:before, .radio-inline label:before {
@@ -1207,4 +1252,45 @@ MENU MOBILE
 .nav>li.mobile {
     display: block;
 }
+}
+
+/***********
+modal-dialog
+***********/
+
+.spacer {
+    height: 30%;
+}
+
+
+/***********
+TEST
+***********/
+
+th {
+    background: -webkit-linear-gradient(top, rgb(241, 241, 241) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.table thead>tr {
+    border:  1px solid #cccccc;
+    border-radius: 3px;
+}
+
+.search_form_toggle_link {
+    background: -webkit-linear-gradient(top, rgb(241, 241, 241) 0%, rgb(220, 220, 220) 100%);
+    padding: 6px 10px 7px 10px;
+    margin: 0px 0px 0px 0px;
+    border-radius: 0px 0px 5px 5px;
+    box-shadow: 1px 1px 2px gray;
+    position: relative;
+    top: -8px;
+    color: #4C4C4C;
+}
+
+.search_form_toggle_link:hover {
+    text-decoration: none;
+}
+
+.search_form_toggle_link:focus {
+    text-decoration: none;
 }

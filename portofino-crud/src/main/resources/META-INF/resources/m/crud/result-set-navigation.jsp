@@ -1,3 +1,6 @@
+<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
@@ -27,14 +30,25 @@
                 <li class="disabled"><a class="paginator-link">&lt;&lt;</a></li>
                 <li class="disabled"><a class="paginator-link">&lt;</a></li>
             </c:if>
+
+    <%
+        UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), actionBean.getContext().getActionPath(), false);
+        if(!StringUtils.isBlank(actionBean.getSearchString())) {
+            urlBuilder.addParameter(AbstractCrudAction.SEARCH_STRING_PARAM, actionBean.getSearchString());
+        }
+        urlBuilder.setEvent("returnToSearch");
+    %>
+
             <li class="active">
-                <a class="paginator-link">
+                <fmt:message key="return.to.search" var="s_title" />
+                <a class="paginator-link" href="<%= urlBuilder.toString() %>" title="${s_title}">
                     <fmt:message key="_.of._">
                         <fmt:param value="${resultSetNavigation.position + 1}" />
                         <fmt:param value="${resultSetNavigation.size}" />
                     </fmt:message>
                 </a>
             </li>
+
             <c:if test="${not empty resultSetNavigation.lastUrl}">
                 <li>
                     <fmt:message key="next" var="pg_title" />

@@ -114,6 +114,7 @@
 <div>
     <div class="pull-right" >
         <button type="submit" name="agendaView" class="btn btn-default btn-sm">
+            <span class="glyphicon glyphicon-book"></span>
             <fmt:message key="agenda" />
         </button>
     </div>
@@ -123,6 +124,7 @@
             boolean todayDisabled = monthInterval.contains(new DateTime());
         %>
         <button type="submit" name="today" class="btn btn-default btn-sm"<%= todayDisabled ? " disabled='true'" : "" %>>
+            <span class="glyphicon glyphicon-calendar"></span>
             <fmt:message key="current.month" />
         </button>
         <button type="submit" name="prevMonth" class="btn btn-default btn-sm">

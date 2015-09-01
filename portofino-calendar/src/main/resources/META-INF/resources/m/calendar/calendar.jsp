@@ -43,7 +43,7 @@
                 <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
                 <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
                 <input type="hidden" name="calendarViewType" value="<c:out value="${actionBean.calendarViewType}"/>"/>
-                <a class="calendar-legend-hide-link" data-hide="false" href="#"><fmt:message key="hide.calendars" /></a>
+                <a class="calendar-legend-hide-link" data-hide="false" href="#"><span id="glyphicon" class="glyphicon glyphicon-menu-left"></span><span id="hide_link_text"><fmt:message key="hide.calendars" /></span></a>
                 <jsp:include page="${actionBean.calendarViewType}.jsp" />
             </stripes:form>
         </div>
@@ -55,19 +55,26 @@
                 var hide = link.data("hide");
                 var calendarsDiv = $(".calendar-calendars");
                 var viewDiv = $(".calendar-view");
+                var gliph = $("#glyphicon");
+                var txt = $("#hide_link_text");
+
                 if (hide) {
                     calendarsDiv.insertBefore(viewDiv);
                     calendarsDiv.show();
                     viewDiv.removeClass("col-md-12");
                     viewDiv.addClass("col-md-10");
-                    link.text('<fmt:message key="hide.calendars" />');
+                    gliph.removeClass("glyphicon-menu-right");
+                    gliph.addClass("glyphicon-menu-left");
+                    txt.text('<fmt:message key="hide.calendars" />');
                     link.data("hide", false);
                 } else {
                     calendarsDiv.hide();
                     calendarsDiv.insertAfter(viewDiv);
                     viewDiv.removeClass("col-md-10");
                     viewDiv.addClass("col-md-12");
-                    link.text('<fmt:message key="show.calendars" />');
+                    gliph.removeClass("glyphicon-menu-left");
+                    gliph.addClass("glyphicon-menu-right");
+                    txt.text('<fmt:message key="show.calendars" />');
                     link.data("hide", true);
                 }
                 return false;

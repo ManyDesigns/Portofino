@@ -6,9 +6,19 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="com.manydesigns.portofino.PortofinoProperties" %>
+<jsp:useBean id="portofinoConfiguration" scope="application"
+             type="org.apache.commons.configuration.Configuration"/>
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
+        <p>
+        <% if(!StringUtils.isEmpty(portofinoConfiguration.getString(PortofinoProperties.APP_LOGO))) { %>
+            <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
+            <img class="loginLogo" src="${logoUrl}" width="32px" alt='<c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>' />
+        <% } %>
+        </p>
         <fmt:message key="login.to">
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
@@ -29,6 +39,7 @@
                     <fmt:message key='remember.me.on.this.computer'/>
                 </label>
             </div>
+            <br/>
             <button type="submit" name="login" class="btn btn-primary">
                 <fmt:message key="login" />
             </button>
