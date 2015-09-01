@@ -284,7 +284,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         return new RedirectResolution(ApplicationWizard.class);
     }
 
-    @Button(list = "connectionProviders-read", key = "edit", order = 2 )
+    @Button(list = "connectionProviders-read", key = "edit", order = 2 , icon = Button.ICON_EDIT , type = Button.TYPE_DEFAULT)
     public Resolution edit() {
         connectionProvider = persistence.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();

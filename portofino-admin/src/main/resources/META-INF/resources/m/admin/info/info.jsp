@@ -40,6 +40,7 @@
                         <span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Ticket Tracker
                     </a>
                 </div>
+                </p>
             </div>
         </div>
 

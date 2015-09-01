@@ -9,9 +9,6 @@
 /><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
-        <div class="pull-right">
-            <jsp:include page="/m/crud/return-to-parent.jsp" />
-        </div>
         <jsp:include page="/theme/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">

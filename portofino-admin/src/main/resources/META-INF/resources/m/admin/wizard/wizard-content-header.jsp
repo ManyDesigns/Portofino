@@ -13,7 +13,7 @@
             class="${status.first ? 'first' : ''}
                    ${status.index < actionBean.currentStepIndex ? 'before' : ''}
                    ${status.index eq actionBean.currentStepIndex ? 'active' : ''}">
-            <span class="badge ${status.index < actionBean.currentStepIndex ? 'alert-success' : 'alert-info'}"><c:out value="${step.number}" /></span>
+            <span class="badge ${ status.index < actionBean.currentStepIndex ? 'alert-success' : (status.index eq actionBean.currentStepIndex ?'alert-info':'')}"><c:out value="${step.number}" /></span>
             <c:if test="${status.index eq actionBean.currentStepIndex}">
                 <c:out value="${step.title}" />
             </c:if>
