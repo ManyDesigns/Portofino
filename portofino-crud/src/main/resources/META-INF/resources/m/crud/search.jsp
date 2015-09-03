@@ -21,14 +21,14 @@
             <c:if test="${not empty actionBean.searchForm}">
                 <c:if test="${actionBean.searchVisible}">
                     <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}" class="search_form_toggle_link" data-search-visible="true">
-                        <span><div style="display: inline;" class="glyphicon glyphicon-menu-up" aria-hidden="true"></div> <fmt:message key="hide.search<<" /></span>
-                        <span style="display: none;"><div style="display: inline;" class="glyphicon glyphicon-menu-down" aria-hidden="true"></div><fmt:message key="search>>" /></span>
+                        <span><div style="display: inline;" class="glyphicon glyphicon-menu-up" aria-hidden="true"></div> <fmt:message key="hide.search" /></span>
+                        <span style="display: none;"><div style="display: inline;" class="glyphicon glyphicon-menu-down" aria-hidden="true"></div> <fmt:message key="show.search" /></span>
                     </a>
                 </c:if>
                 <c:if test="${!actionBean.searchVisible}">
                     <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}?search=" class="search_form_toggle_link" data-search-visible="false">
-                        <span style="display: none;"><div style="display: inline;" class="glyphicon glyphicon-menu-up" aria-hidden="true"></div> <fmt:message key="hide.search<<" /></span>
-                        <span><div style="display: inline;" class="glyphicon glyphicon-menu-down" aria-hidden="true"></div><fmt:message key="search>>" /></span>
+                        <span style="display: none;"><div style="display: inline;" class="glyphicon glyphicon-menu-up" aria-hidden="true"></div> <fmt:message key="hide.search" /></span>
+                        <span><div style="display: inline;" class="glyphicon glyphicon-menu-down" aria-hidden="true"></div> <fmt:message key="show.search" /></span>
                     </a>
                 </c:if>
                 <div class="well search_form" <c:if test="${!actionBean.searchVisible}">style="display: none;"</c:if>>

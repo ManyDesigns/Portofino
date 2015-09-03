@@ -71,7 +71,8 @@ public @interface Button {
             ICON_HOME= " glyphicon-home",
             ICON_SAVE= " glyphicon-floppy-disk",
             ICON_DUPLICATE = " glyphicon-duplicate ",
-            ICON_FLASH = " glyphicon-flash ";
+            ICON_FLASH = " glyphicon-flash ",
+            ICON_GEAR = " glyphicon-cog ";
 
 
     /**
