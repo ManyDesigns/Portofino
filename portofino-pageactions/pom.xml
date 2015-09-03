@@ -79,6 +79,12 @@
             <artifactId>google-api-client-jackson2</artifactId>
             <version>1.20.0</version>
         </dependency>
+        <!-- javascript-detect-element-resize for Ace Editor -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>javascript-detect-element-resize</artifactId>
+        <version>0.5.3</version>
+</dependency>
     </dependencies>
     <build>
         <resources>

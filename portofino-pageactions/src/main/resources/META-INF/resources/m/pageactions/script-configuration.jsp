@@ -16,22 +16,53 @@
 <script src="<stripes:url value="/m/pageactions/ace/ace.js" />" type="text/javascript" charset="utf-8"></script>
 <script src="<stripes:url value="/m/pageactions/ace/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
 <script src="<stripes:url value="/m/pageactions/ace/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/m/pageactions/ace/ext-language_tools.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/m/pageactions/ace/ext-settings_menu.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/webjars/javascript-detect-element-resize/0.5.3/jquery.resize.js"/>"  type="text/javascript"></script>
 <script type="text/javascript">
+    var editor;
     $(function() {
         $("#scriptEditor").css('display', 'block');
 
-        var editor = ace.edit("scriptEditor");
+        editor = ace.edit("scriptEditor");
+        ace.require('ace/ext/settings_menu');
 
         var GroovyMode = require("ace/mode/groovy").Mode;
+        //editor.setTheme("ace/theme/tomorrow");
+
+        ace.require("ace/ext/language_tools");
+        ace.config.loadModule("ace/ext/language_tools", function() {
+            editor.setOptions({
+                enableBasicAutocompletion: true,
+                enableSnippets: true
+            });
+        });
+
+        editor.commands.addCommands([{
+            name: "showSettingsMenu",
+            bindKey: {win: "Ctrl-j", mac: "Command-j"},
+            exec: function(editor) {
+                ace.config.loadModule("ace/ext/settings_menu", function(module) {
+                    module.init(editor);
+                    editor.showSettingsMenu();
+                });
+            },
+            readOnly: true
+        }]);
+
         editor.getSession().setMode(new GroovyMode());
 
         var textarea = $("#scriptEditorTextArea");
-
         textarea.css('display', 'none');
 
         editor.getSession().setValue(textarea.val());
         $('button[name=updateConfiguration]').click(function() {
             textarea.val(editor.getSession().getValue());
+        });
+
+        $( "#scriptEditor" ).resize(function() {
+            console.log("INFO: Resizing Ace Editor");
+            editor.resize();
         });
     });
 </script>
@@ -39,9 +70,10 @@
 
 <fieldset id="scriptFieldset">
     <legend>Script</legend>
-    <textarea id="scriptEditorTextArea"
-              name="script" style="min-height: 20em; width: 100%;"
-            ><c:out value="${actionBean.script}" /></textarea>
-    <pre id="scriptEditor"></pre>
+    <textarea id="scriptEditorTextArea" name="script" style="min-height: 20em; width: 100%;" >
+        <c:out value="${actionBean.script}" />
+    </textarea>
+    <pre style="resize: both;" id="scriptEditor"></pre>
+
 </fieldset>
 <% } %>
