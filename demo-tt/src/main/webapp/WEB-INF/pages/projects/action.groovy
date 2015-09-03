@@ -202,7 +202,7 @@ class ProjectsCrudAction extends CrudAction {
     //**************************************************************************
 
 
-    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH)
     @Guard(test = "isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();

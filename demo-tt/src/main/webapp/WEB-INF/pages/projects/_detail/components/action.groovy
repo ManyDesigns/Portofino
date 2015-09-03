@@ -1,7 +1,5 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -40,7 +38,7 @@ class MyCrudAction extends CrudAction {
 
     @Override
     @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "glyphicon-plus white", group = "crud")
+            icon = "glyphicon-plus white")
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()    //To change body of overridden methods use File | Settings | File Templates.
@@ -89,7 +87,7 @@ class MyCrudAction extends CrudAction {
 
     @Override
     @Buttons([
-        @Button(list = "pageHeaderButtons", key = "edit.component.details", order = 1d, icon = "glyphicon-edit", group = "crud"),
+        @Button(list = "pageHeaderButtons", key = "edit.component.details", order = 1d, icon = "glyphicon-edit"),
         @Button(list = "crud-read-default-button", key = "search")
     ])
     @Guard(test="object != null && isManager()", type=GuardType.VISIBLE)
@@ -116,7 +114,7 @@ class MyCrudAction extends CrudAction {
     // Delete customizations
     //**************************************************************************
 
-    @Button(list = "pageHeaderButtons", key = "delete", order = 2d, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "pageHeaderButtons", key = "delete", order = 2d, icon = Button.ICON_TRASH)
     @Guard(test = "object != null && isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();

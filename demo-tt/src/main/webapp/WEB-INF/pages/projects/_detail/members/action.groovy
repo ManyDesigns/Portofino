@@ -52,7 +52,7 @@ class ProjectMembersAction extends CrudAction {
 
     @Override
     @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "glyphicon-plus white", group = "crud")
+            icon = "glyphicon-plus white")
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()
@@ -155,7 +155,7 @@ class ProjectMembersAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH)
     @Guard(test = "isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();
