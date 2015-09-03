@@ -909,15 +909,13 @@ Menu
     padding: 2px 1px;
 }
 
-.portofino-sidenav>li.active {
-    border-left: 2px solid #2B5494;
-}
-.portofino-sidenav>li { padding-left: 5px; border-left: 1px solid #ffffff;}
+.portofino-sidenav>li.active { border-left: 2px solid #2B5494; }
+.portofino-sidenav>li { padding-left: 5px; border-left: 1px solid transparent; }
 .portofino-sidenav>li:hover { border-left: 1px solid #2B5494;  }
 .portofino-sidenav>li.active:hover { border-left: 2px solid #2B5494;  }
-.portofino-sidenav>li.bookmark:hover {border-left: 1px solid #ffffff;}
-
+.portofino-sidenav>li.bookmark:hover { border-left: 1px solid #ffffff; }
 .portofino-sidenav>li>a:hover , .portofino-sidenav>li>a:focus  { background-color: white; }
+.portofino-sidenav>li.nav-header:hover{ border: none; cursor: default;}
 
 .portofino-sidenav>li.nav-header{
     border: none;
@@ -925,7 +923,6 @@ Menu
     font-weight: bolder;
     color: #2B5494;
 }
-.portofino-sidenav>li.nav-header:hover{ border: none; cursor: default;}
 
 li.active a{
     font-weight: bolder;
@@ -1260,10 +1257,7 @@ MENU MOBILE
 modal-dialog
 ***********/
 
-.spacer {
-    height: 30%;
-}
-
+.spacer { height: 30%; }
 
 /***********
 TEST

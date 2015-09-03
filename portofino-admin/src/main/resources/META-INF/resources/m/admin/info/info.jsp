@@ -19,7 +19,7 @@
                 </p>
 
                 <p>
-                    Among its features: content management, CRUD, database connectivity, calendars, charts, security and easy customization using Groovy.</p>
+                    Among its features: content management, CRUD, database connectivity, calendars, charts, security and easy customization using Groovy.
                 </p>
                 <br>
                 <p>
