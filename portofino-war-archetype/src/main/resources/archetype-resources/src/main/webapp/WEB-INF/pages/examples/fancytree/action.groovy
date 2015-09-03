@@ -15,7 +15,6 @@ import com.manydesigns.portofino.pageactions.*
 import com.manydesigns.portofino.security.*
 import com.manydesigns.portofino.shiro.*
 
-import groovy.json.*
 import net.sourceforge.stripes.action.*
 import org.apache.shiro.*
 import org.hibernate.*
@@ -55,8 +54,7 @@ class FancyTreeExample extends CustomAction {
         ob7.children = [ob8]
         ob8.children = [ob9]
         ob9.children = []
-        def result = [ob1]
-        new JsonBuilder(result).toPrettyString()
+        [ob1]
     }
 
     private Map createObject(String title, boolean expanded, boolean folder, boolean lazy){
