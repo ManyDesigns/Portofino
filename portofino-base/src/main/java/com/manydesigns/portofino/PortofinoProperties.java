@@ -40,6 +40,7 @@ public final class PortofinoProperties {
     public static final String BLOBS_DIR_PATH = "blobs.dir.path";
     public static final String APP_NAME = "app.name";
     public static final String APP_LOGO = "app.logo";
+    public static final String APP_VERSION = "app.version";
     public static final String LANDING_PAGE = "landing.page";
 
     //Server config

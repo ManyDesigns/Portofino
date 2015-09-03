@@ -32,10 +32,17 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <stripes:link href="/" class="navbar-brand">
+        <%
+        String landingPage = portofinoConfiguration.getString(PortofinoProperties.LANDING_PAGE);
+        String redirectURI = request.getContextPath();
+        if(landingPage != null) {
+            redirectURI += landingPage;
+        }
+        %>
+            <stripes:link href="<%= redirectURI %>" class="navbar-brand" title="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>">
                 <% if(!StringUtils.isEmpty(portofinoConfiguration.getString(PortofinoProperties.APP_LOGO))) { %>
-                <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
-                <img src="${logoUrl}" width="32px" alt='<c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>' />
+                    <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
+                    <img src="${logoUrl}" width="32px" alt="logo"/>
                 <% } %>
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
@@ -172,12 +179,11 @@
                 </shiro:user>
                 <shiro:guest>
                 <%
-                    UrlBuilder loginUrlBuilder =
-                            new UrlBuilder(request.getLocale(), loginPage, false);
+                    UrlBuilder loginUrlBuilder = new UrlBuilder(request.getLocale(), loginPage, false);
                     loginUrlBuilder.addParameter("returnUrl", actionPath);
                     loginUrlBuilder.addParameter("cancelReturnUrl", actionPath);
                     String loginUrl = Util.getAbsoluteUrl(loginUrlBuilder.toString());
-                    %>
+                %>
                     <li>
                         <a href="<%= loginUrl %>">
                             <fmt:message key="log.in" />
