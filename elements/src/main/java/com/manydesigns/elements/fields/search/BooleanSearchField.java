@@ -108,13 +108,13 @@ public class BooleanSearchField extends AbstractSearchField {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "form-group boolean-search-field ");
+        xb.addAttribute("class", "form-group boolean-search-field");
         xb.openElement("label");
         xb.addAttribute("class", ATTR_NAME_HTML_CLASS);
         xb.write(StringUtils.capitalize(label));
         xb.closeElement("label");
         xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS+" radio ");
 
         for (BooleanSearchValue current : BooleanSearchValue.values()) {
             // don't print null if the attribute is required
@@ -124,13 +124,14 @@ public class BooleanSearchField extends AbstractSearchField {
             String idStr = id + "_" + current.name();
             String stringValue = current.getStringValue();
             boolean checked = (value == current);
+            xb.writeInputRadio(idStr, inputName, stringValue, checked);
             xb.openElement("label");
-            xb.addAttribute("class", "checkbox");
+            //xb.addAttribute("class", "radio");
             xb.addAttribute("for", idStr);
             String label = getText(current.getLabelI18N());
             xb.write(label);
-            xb.writeNbsp();
-            xb.writeInputRadio(idStr, inputName, stringValue, checked);
+           // xb.writeNbsp();
+
             xb.closeElement("label");
             xb.write(" ");
         }
