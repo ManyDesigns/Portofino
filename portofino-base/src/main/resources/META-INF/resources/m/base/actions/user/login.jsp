@@ -13,12 +13,14 @@
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
-        <p>
+
         <% if(!StringUtils.isEmpty(portofinoConfiguration.getString(PortofinoProperties.APP_LOGO))) { %>
+         <p>
             <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
             <img class="loginLogo" src="${logoUrl}" width="32px" alt='<c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>' />
-        <% } %>
         </p>
+        <% } %>
+
         <fmt:message key="login.to">
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>

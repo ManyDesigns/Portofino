@@ -9,8 +9,8 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
 
-        <script type="text/javascript" src="<stripes:url value='/m/map/leaflet/leaflet.js' />" ></script>
-        <link rel="stylesheet" type="text/css" href="<stripes:url value='/m/map/leaflet/leaflet.css' />">
+        <link href="<stripes:url value="/webjars/leaflet/0.7.3/dist/leaflet.css"/>" rel="stylesheet" type="text/css" >
+        <script src="<stripes:url value="/webjars/leaflet/0.7.3/dist/leaflet.js"/>" type="text/javascript"></script>
 
         <div class="row-fluid">
             <div class="span12">
@@ -21,14 +21,25 @@
         <script>
             // create a map in the "map" div, set the view to a given place and zoom
             var map = L.map('map').setView([45, 9], 8);
-            var json = { geolocation:false , lat:45 , lon:8 , zoom:8 , markers:[] };
+            var json = { geolocation:false , lat:45 , lon:9 , zoom:8 , markers:[] };
 
-            function onLocationError(e) {
-                alert(e.message);
-                map.setView([json.lat,json.lon],json.zoom);
+            function showPosition(position) {
+                console.log("INFO: Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude);
+                map.setView([position.coords.latitude,position.coords.longitude]);
             }
 
-            map.on('locationerror', onLocationError);
+            function onLocationError(e) {
+                //alert(e.message);
+                console.log(e.message);
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    console.log("ERROR: Geolocation is not supported by this browser.");
+                    //map.setView([json.lat,json.lon],json.zoom);
+                }
+            }
+
 
             // add an OpenStreetMap tile layer
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -46,6 +57,7 @@
 
                 if( json.geolocation ){
                     map.locate({setView: true, maxZoom: json.zoom});
+                    map.on('locationerror', onLocationError);
                 }else{
                     map.setView([json.lat,json.lon],json.zoom);
                 }

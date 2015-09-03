@@ -71,7 +71,8 @@ public @interface Button {
             ICON_HOME= " glyphicon-home",
             ICON_SAVE= " glyphicon-floppy-disk",
             ICON_DUPLICATE = " glyphicon-duplicate ",
-            ICON_FLASH = " glyphicon-flash ";
+            ICON_FLASH = " glyphicon-flash ",
+            ICON_GEAR = " glyphicon-cog ";
 
 
     /**
@@ -109,7 +110,7 @@ public @interface Button {
      * The group this button belongs to. Buttons in the same group are rendered close together to separate them
      * from other groups.
      */
-    String group() default "";
+    String group() default "default-group";
 
     /**
      * Allows to specify the icon position (before text or not).

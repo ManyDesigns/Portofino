@@ -970,6 +970,8 @@ body {
 	margin:0;
 	padding:0;
 	height:100%;
+    letter-spacing: 0.02em;
+    color: #464646;
 }
 
 /*******************************************************************************
@@ -1293,4 +1295,16 @@ th {
 
 .search_form_toggle_link:focus {
     text-decoration: none;
+}
+
+div.form-control {background-color: transparent;}
+
+.form-inline .radio label {
+    padding-left: 5px;
+    margin-left: 5px;
+}
+
+.form-inline .checkbox label {
+    padding-left: 5px;
+    vertical-align: text-bottom;
 }

@@ -85,6 +85,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- javascript-detect-element-resize for Ace Editor -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>javascript-detect-element-resize</artifactId>
+        <version>0.5.3</version>
+</dependency>
     </dependencies>
     <build>
         <resources>

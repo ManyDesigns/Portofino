@@ -514,7 +514,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Button(list = "crud-search", key = "create.new", order = 1, type = Button.TYPE_SUCCESS,
-            icon = Button.ICON_PLUS + Button.ICON_WHITE, group = "crud")
+            icon = Button.ICON_PLUS + Button.ICON_WHITE)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
@@ -672,7 +672,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 "bulkDelete".equals(context.getEventName());
     }
 
-    @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT, group = "crud")
+    @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT)
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
@@ -738,7 +738,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Delete
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "delete", order = 2, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-read", key = "delete", order = 2, icon = Button.ICON_TRASH)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         if(deleteValidate(object)) {
@@ -758,7 +758,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getSuccessfulDeleteView();
     }
 
-    @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH)
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {

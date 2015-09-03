@@ -24,6 +24,11 @@
             <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>leaflet</artifactId>
+            <version>0.7.3</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>

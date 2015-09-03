@@ -59,7 +59,7 @@ class TicketAttachementsCrudAction extends CrudAction {
 
     @Override
     @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "glyphicon-plus white", group = "crud")
+            icon = "glyphicon-plus white")
     @Guard(test="canEditTicket()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()    //To change body of overridden methods use File | Settings | File Templates.
@@ -151,7 +151,7 @@ class TicketAttachementsCrudAction extends CrudAction {
     // Delete customizations
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH)
     @Guard(test = "canEditTicket()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();
@@ -185,7 +185,7 @@ class TicketAttachementsCrudAction extends CrudAction {
     // Bulk edit customizations
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "edit", order = 2d, icon = Button.ICON_EDIT, group = "crud")
+    @Button(list = "crud-search", key = "edit", order = 2d, icon = Button.ICON_EDIT)
     @Guard(test = "isBulkOperationsEnabled() && canEditTicket()", type = GuardType.VISIBLE)
     Resolution bulkEdit() {
         return super.bulkEdit()
@@ -201,7 +201,7 @@ class TicketAttachementsCrudAction extends CrudAction {
     // Bulk delete customizations
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "delete", order = 3d, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-search", key = "delete", order = 3d, icon = Button.ICON_TRASH)
     @Guard(test = "isBulkOperationsEnabled() && canEditTicket()", type = GuardType.VISIBLE)
     public Resolution bulkDelete() {
         return super.bulkDelete()

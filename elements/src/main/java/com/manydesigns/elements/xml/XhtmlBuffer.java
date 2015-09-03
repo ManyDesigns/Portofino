@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 
 /**
  * @author Paolo Predonzani - paolo.predonzani@manydesigns.com
@@ -292,6 +293,39 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         addAttribute("type", "text");
         addAttribute("name", name);
         addAttribute("value", value);
+        if(placeholder != null) {
+            addAttribute("placeholder", placeholder);
+        }
+        if (size != null) {
+            addAttribute("size", Integer.toString(size));
+            htmlClass = StringUtils.defaultString(htmlClass) + " mde-text-field-with-explicit-size";
+        }
+        addAttribute("class", htmlClass);
+        if (maxLength != null) {
+            addAttribute("maxlength", Integer.toString(maxLength));
+        }
+        closeElement("input");
+    }
+
+    public void writeInputNumber(@Nullable String id, @Nullable String name, String value,
+                               @Nullable String placeholder, String htmlClass, @Nullable Integer size,
+                               @Nullable Integer maxLength, @Nullable BigDecimal maxValue ,
+                               @Nullable BigDecimal minValue , @Nullable Integer step) {
+        openElement("input");
+        addAttribute("id", id);
+        addAttribute("type", "number");
+        addAttribute("name", name);
+        addAttribute("value", value);
+
+        if (minValue != null) {
+            addAttribute("min", minValue.toString());
+        }
+        if (maxValue != null) {
+            addAttribute("max", maxValue.toString());
+        }
+        if (step != null) {
+            addAttribute("step", Integer.toString(step));
+        }
         if(placeholder != null) {
             addAttribute("placeholder", placeholder);
         }
