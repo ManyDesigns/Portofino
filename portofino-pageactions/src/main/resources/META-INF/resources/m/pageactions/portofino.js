@@ -140,7 +140,7 @@ function setupRichTextEditors() {
                 }
             }, conf);
         } else if(console && console.error) {
-            console.error("CKEditor not loaded! Make sure that /theme/ckeditor/ckeditor.js and /theme/ckeditor/adapters/jquery.js are included in your page.");
+            console.error("CKEditor not loaded! Make sure that ckeditor.js and adapters/jquery.js are included in your page.");
         }
     });
 }

@@ -87,7 +87,6 @@
                     },
                     activate: function(event, data) {
                         var node = data.node;
-                        //console.log("<%= actionBean.getActionPath() %>/"+node.data.href);
                         if( node.data.href!=null ){
                             window.location.href="<%= actionBean.getActionPath()%>/"+node.data.href;
                         }
