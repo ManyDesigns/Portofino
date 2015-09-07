@@ -298,4 +298,17 @@ public class SecurityLogic {
         }
         return true;
     }
+
+    public static boolean hasPermissions
+            (Configuration conf, Method method, Class fallbackClass, PageInstance pageInstance, Subject subject) {
+        RequiresPermissions requiresPermissions =
+                    SecurityLogic.getRequiresPermissionsAnnotation(method, fallbackClass);
+        if(requiresPermissions != null) {
+            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
+            return SecurityLogic.hasPermissions
+                    (conf, permissions, subject, requiresPermissions);
+        } else {
+            return true;
+        }
+    }
 }

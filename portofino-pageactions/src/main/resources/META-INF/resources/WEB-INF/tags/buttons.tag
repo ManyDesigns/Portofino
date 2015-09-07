@@ -8,20 +8,15 @@
 %><%@ tag import="com.manydesigns.portofino.dispatcher.PageInstance"
 %><%@ tag import="com.manydesigns.portofino.logic.SecurityLogic"
 %><%@ tag import="com.manydesigns.portofino.modules.BaseModule"
-%><%@ tag import="com.manydesigns.portofino.pages.Permissions"
-%><%@ tag import="com.manydesigns.portofino.security.RequiresPermissions"
 %><%@ tag import="net.sourceforge.stripes.action.ActionBean"
 %><%@ tag import="org.apache.commons.configuration.Configuration"
 %><%@ tag import="org.apache.commons.lang.StringUtils"
 %><%@ tag import="org.apache.shiro.SecurityUtils"
 %><%@ tag import="org.apache.shiro.subject.Subject"
-%><%@ tag import="org.jetbrains.annotations.NotNull"
 %><%@ tag import="org.slf4j.Logger"
 %><%@ tag import="org.slf4j.LoggerFactory"
-%><%@ tag import="javax.servlet.jsp.jstl.fmt.LocalizationContext"
 %><%@ tag import="java.lang.reflect.Method"
 %><%@ tag import="java.util.List"
-%><%@ tag import="java.util.MissingResourceException"
 %><%@ attribute name="list" required="true"
 %><%@ attribute name="cssClass" required="false"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
@@ -52,7 +47,8 @@
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
-               ((currentPageInstance != null && !hasPermissions(configuration, button, currentPageInstance, subject)) ||
+               ((currentPageInstance != null && !SecurityLogic.hasPermissions(
+                       configuration, button.getMethod(), button.getFallbackClass(), currentPageInstance, subject)) ||
                 !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }
@@ -131,30 +127,5 @@
             buffer.closeElement("div");
             buffer.write(" ");
         }
-    }
-%><%!
-    protected static boolean hasPermissions
-            (Configuration conf, @NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
-        RequiresPermissions requiresPermissions =
-                    SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
-        if(requiresPermissions != null) {
-            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
-            return SecurityLogic.hasPermissions
-                    (conf, permissions, subject, requiresPermissions);
-        } else {
-            return true;
-        }
-    }
-
-    protected String getValue(ButtonInfo button, LocalizationContext localizationContext) {
-        String key = button.getButton().key();
-        if(!StringUtils.isEmpty(key)) {
-            try {
-                return localizationContext.getResourceBundle().getString(key);
-            } catch (MissingResourceException e) {
-                //ignore
-            }
-        }
-        return button.getMethod().getName();
     }
 %>

@@ -30,6 +30,7 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.buttons.annotations.Guards;
 import ognl.OgnlContext;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,8 +57,11 @@ public class ButtonsLogic {
         }
     }
 
-    public static List<ButtonInfo> getButtonsForClass
-            (Class<?> someClass, String list) {
+    public static List<ButtonInfo> getButtonsForClass(Class<?> someClass) {
+        return getButtonsForClass(someClass, null);
+    }
+
+    public static List<ButtonInfo> getButtonsForClass(Class<?> someClass, String list) {
         try {
             return classButtons.get(new MCKey(someClass, list));
         } catch (ExecutionException e) {
@@ -113,7 +117,7 @@ public class ButtonsLogic {
 
             MCKey mcKey = (MCKey) o;
 
-            if (!list.equals(mcKey.list)) return false;
+            if (!ObjectUtils.equals(list, mcKey.list)) return false;
             if (!theClass.equals(mcKey.theClass)) return false;
 
             return true;
@@ -122,7 +126,7 @@ public class ButtonsLogic {
         @Override
         public int hashCode() {
             int result = theClass.hashCode();
-            result = 31 * result + list.hashCode();
+            result = 31 * result + (list != null ? list.hashCode() : 0);
             return result;
         }
     }
@@ -140,13 +144,13 @@ public class ButtonsLogic {
 
     public static Button getButtonForMethod(Method method, String list) {
         Button button = method.getAnnotation(Button.class);
-        if(button != null && list.equals(button.list())) {
+        if(button != null && (list == null || list.equals(button.list()))) {
             return button;
         } else {
             Buttons buttons = method.getAnnotation(Buttons.class);
             if(buttons != null) {
                 for(Button b : buttons.value()) {
-                    if(list.equals(b.list())) {
+                    if(list == null || list.equals(b.list())) {
                         return b;
                     }
                 }

@@ -65,7 +65,6 @@ import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
-import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
@@ -74,13 +73,10 @@ import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -1317,10 +1313,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 Method handler = button.getMethod();
                 boolean isAdmin = SecurityLogic.isAdministrator(context.getRequest());
                 if(!isAdmin &&
-                        ((pageInstance != null && !hasPermissions(portofinoConfiguration, button, pageInstance, SecurityUtils.getSubject())) ||
+                        ((pageInstance != null && !SecurityLogic.hasPermissions(
+                                portofinoConfiguration, button.getMethod(), button.getFallbackClass(), pageInstance, SecurityUtils.getSubject())) ||
                                 !SecurityLogic.satisfiesRequiresAdministrator(context.getRequest(), this, handler))) {
-                    //selectable = true ;
-                    //break;
                     continue;
                 }
 
@@ -1340,19 +1335,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return selectable;
     }
 
-
-    protected static boolean hasPermissions
-            (Configuration conf, @NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
-        RequiresPermissions requiresPermissions =
-                    SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
-        if(requiresPermissions != null) {
-            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
-            return SecurityLogic.hasPermissions
-                    (conf, permissions, subject, requiresPermissions);
-        } else {
-            return true;
-        }
-    }
 
     protected TableFormBuilder createTableFormBuilder() {
         return new TableFormBuilder(classAccessor);
