@@ -74,7 +74,7 @@ public class ReloadModelAction extends AbstractActionBean {
         return new ForwardResolution("/m/admin/reload-model.jsp");
     }
 
-    @Button(list = "reload-model-bar", key = "return.to.pages", order = 1 , icon = Button.ICON_HOME)
+    @Button(list = "reload-model", key = "return.to.pages", order = 1 , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

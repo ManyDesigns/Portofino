@@ -19,7 +19,6 @@
                 <br/>
                 <div class="form-group btn-group-lg">
                     <portofino:buttons list="reload-model" />
-                    <portofino:buttons list="reload-model-bar" />
                 </div>
             </div>
         </stripes:form>

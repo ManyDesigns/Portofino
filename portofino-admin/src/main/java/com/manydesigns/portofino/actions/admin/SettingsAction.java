@@ -164,7 +164,6 @@ public class SettingsAction extends AbstractActionBean {
 
         @Required
         @Label("Application name")
-        @CssClass(BootstrapSizes.FILL_ROW)
         public String appName;
 
         @Label("Application logo")
