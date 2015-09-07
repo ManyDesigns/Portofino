@@ -76,5 +76,10 @@
             <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
             <version>4.15.35</version>
         </dependency>
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>bootstrap-fileinput</artifactId>
+        <version>4.2.0</version>
+        </dependency>
     </dependencies>
 </project>

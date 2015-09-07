@@ -1299,7 +1299,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(isTableFormSelectable());
+
+        tableForm.setSelectable(tableForm.getRows().length>0 && isTableFormSelectable()  );
         tableForm.setCondensed(true);
 
         return tableForm;
