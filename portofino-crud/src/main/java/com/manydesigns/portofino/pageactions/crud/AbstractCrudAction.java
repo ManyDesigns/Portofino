@@ -1681,12 +1681,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected void setupConfigurationForm(FormBuilder formBuilder) {
         DefaultSelectionProvider nColumnsSelectionProvider = new DefaultSelectionProvider("columns");
-        nColumnsSelectionProvider.setDisplayMode(DisplayMode.RADIO);
-        nColumnsSelectionProvider.appendRow(1, "1", true);
-        nColumnsSelectionProvider.appendRow(2, "2", true);
-        nColumnsSelectionProvider.appendRow(3, "3", true);
-        nColumnsSelectionProvider.appendRow(4, "4", true);
-        nColumnsSelectionProvider.appendRow(6, "6", true);
+        nColumnsSelectionProvider.setDisplayMode(DisplayMode.DROPDOWN);
+        nColumnsSelectionProvider.appendRow(1, "1 column", true);
+        nColumnsSelectionProvider.appendRow(2, "2 columns", true);
+        nColumnsSelectionProvider.appendRow(3, "3 columns", true);
+        nColumnsSelectionProvider.appendRow(4, "4 columns", true);
+        nColumnsSelectionProvider.appendRow(6, "6 columns", true);
         formBuilder.configSelectionProvider(nColumnsSelectionProvider, "columns");
     }
 

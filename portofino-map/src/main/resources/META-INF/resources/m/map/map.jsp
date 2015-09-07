@@ -24,19 +24,16 @@
             var json = { geolocation:false , lat:45 , lon:9 , zoom:8 , markers:[] };
 
             function showPosition(position) {
-                console.log("INFO: Latitude: " + position.coords.latitude + "<br>Longitude: " + position.coords.longitude);
                 map.setView([position.coords.latitude,position.coords.longitude]);
             }
 
             function onLocationError(e) {
-                //alert(e.message);
-                console.log(e.message);
-
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(showPosition);
                 } else {
-                    console.log("ERROR: Geolocation is not supported by this browser.");
-                    //map.setView([json.lat,json.lon],json.zoom);
+                    if(console && console.log) {
+                        console.log("ERROR: Geolocation is not supported by this browser.");
+                    }
                 }
             }
 
@@ -47,7 +44,6 @@
             }).addTo(map);
 
             $.get("?getJsonMarkers", function(data, status){
-                // console.log("Markers found: " + data.markers.length + "\nStatus: " + status);
                 json = data;
 
                 for( var i in  data.markers){

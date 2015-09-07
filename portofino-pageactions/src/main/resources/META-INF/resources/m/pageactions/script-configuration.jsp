@@ -13,11 +13,11 @@
     Configuration portofinoConfiguration = theActionBean.getPortofinoConfiguration();
     PageInstance pageInstance = theActionBean.getPageInstance();
     if(SecurityLogic.hasPermissions(portofinoConfiguration, pageInstance, subject, AccessLevel.DEVELOP)) { %>
-<script src="<stripes:url value="/m/pageactions/ace/ace.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/m/pageactions/ace/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/m/pageactions/ace/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/m/pageactions/ace/ext-language_tools.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/m/pageactions/ace/ext-settings_menu.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/webjars/ace/1.2.0/src-min/ace.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/webjars/ace/1.2.0/src-min/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/webjars/ace/1.2.0/src-min/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/webjars/ace/1.2.0/src-min/ext-language_tools.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/webjars/ace/1.2.0/src-min/ext-settings_menu.js" />" type="text/javascript" charset="utf-8"></script>
 <script src="<stripes:url value="/webjars/javascript-detect-element-resize/0.5.3/jquery.resize.js"/>"  type="text/javascript"></script>
 <script type="text/javascript">
     var editor;
@@ -61,7 +61,6 @@
         });
 
         $( "#scriptEditor" ).resize(function() {
-            console.log("INFO: Resizing Ace Editor");
             editor.resize();
         });
     });
@@ -70,9 +69,7 @@
 
 <fieldset id="scriptFieldset">
     <legend>Script</legend>
-    <textarea id="scriptEditorTextArea" name="script" style="min-height: 20em; width: 100%;" >
-        <c:out value="${actionBean.script}" />
-    </textarea>
+    <textarea id="scriptEditorTextArea" name="script" style="min-height: 20em; width: 100%;"><c:out value="${actionBean.script}" /></textarea>
     <pre style="resize: both;" id="scriptEditor"></pre>
 
 </fieldset>
