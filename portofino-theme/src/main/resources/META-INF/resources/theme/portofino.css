@@ -1220,7 +1220,7 @@ Checkbox
     display: inline-block;
     width: 18px;
     height: 18px;
-    margin-right: 9px;
+    margin-right: 5px;
     left: 0;
     margin-bottom: -3px;
     background-color: #fff;
@@ -1241,7 +1241,10 @@ Checkbox
 
 .form-inline .radio label { padding-left: 20px; margin-left: 10px;}
 .radio{ height: 100%; }
-.radio label{ padding-left: 25px; }
+.radio label {
+    padding-left: 0px;
+    margin-right: 15px;
+}
 
 /***********************
 MENU MOBILE

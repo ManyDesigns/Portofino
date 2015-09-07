@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.*;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"database","oneExpression","onePropertyName", "viewType", "query"})
+@XmlType(propOrder = {"database","oneExpression","onePropertyName", "viewType", "query" , "oneSelectionProvider" , "manySelectionProvider"})
 public class ManyToManyConfiguration implements PageActionConfiguration {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
