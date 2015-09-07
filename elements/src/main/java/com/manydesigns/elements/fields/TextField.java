@@ -48,6 +48,7 @@ public class TextField extends AbstractTextField<String> {
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
     protected boolean richText = false;
+    protected boolean code = false;
     protected Integer textAreaWidth;
     protected int textAreaMinRows = 4;
     protected String[] red;
@@ -84,7 +85,7 @@ public class TextField extends AbstractTextField<String> {
             multiline = richTextAnnotation.value();
             richText = richTextAnnotation.value();
             logger.debug("RichText annotation present with value: {}",
-                    multiline);
+                    richText);
         }
         
         if (accessor.isAnnotationPresent(Status.class)) {

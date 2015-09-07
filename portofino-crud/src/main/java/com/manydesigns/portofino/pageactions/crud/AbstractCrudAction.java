@@ -1295,7 +1295,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(isTableFormSelectable());
+        tableForm.setSelectable(tableForm.getRows().length > 0 && isTableFormSelectable());
         tableForm.setCondensed(true);
 
         return tableForm;
@@ -2069,15 +2069,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Resolution getAsJson() {
         if(object == null) {
-            Form form = new FormBuilder(AbstractCrudAction.class).
-                    configFields("searchString", "firstResult", "maxResults", "sortProperty", "sortDirection").
-                    build();
-            form.readFromRequest(context.getRequest());
-            form.writeToObject(this);
+            readSearchParamsFromRequest();
             return jsonSearchData();
         } else {
             return jsonReadData();
         }
+    }
+
+    protected void readSearchParamsFromRequest() {
+        Form form = new FormBuilder(AbstractCrudAction.class).
+                configFields("searchString", "firstResult", "maxResults", "sortProperty", "sortDirection").
+                build();
+        form.readFromRequest(context.getRequest());
+        form.writeToObject(this);
     }
 
     @POST

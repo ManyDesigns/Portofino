@@ -96,7 +96,7 @@
 
             buffer.addAttribute("type", "submit");
             String actualCssClass =
-                    "btn " +
+                    "btn btn-sm" +
                     theButton.type();
             if(cssClass != null) {
                 actualCssClass += cssClass;

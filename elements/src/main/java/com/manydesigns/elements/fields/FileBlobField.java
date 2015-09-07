@@ -176,15 +176,23 @@ public class FileBlobField extends AbstractField<Blob> implements MultipartReque
             xb.openElement("p");
             xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
             xb.addAttribute("id", id);
+            writeBlobFilenameAndSize(xb);
+            xb.closeElement("p");
+
+            /*xb.openElement("div");
+            writeBlobFilenameAndSize(xb);
+            xb.closeElement("div");*/
 
             xb.openElement("div");
-            writeBlobFilenameAndSize(xb);
-            xb.closeElement("div");
+            xb.addAttribute("class", "radio radio-inline");
 
             String radioId = id + UPLOAD_KEEP;
             String script = "var inptxt = this.ownerDocument.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=true;inptxt.value='';";
+            script+="$('#"+StringEscapeUtils.escapeJavaScript(innerId)+"').fileinput('disable');";
+             script+="$('#fileinput_"+StringEscapeUtils.escapeJavaScript(id)+"').hide();";
+
             printRadio(xb, radioId, "elements.field.upload.keep",
                     UPLOAD_KEEP, true, script);
 
@@ -192,33 +200,45 @@ public class FileBlobField extends AbstractField<Blob> implements MultipartReque
             script = "var inptxt = this.ownerDocument.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=false;inptxt.value='';";
-            printRadio(xb, radioId, "elements.field.upload.update",
-                    UPLOAD_MODIFY, false, script);
+
+            script+="$('#"+StringEscapeUtils.escapeJavaScript(innerId)+"').fileinput('enable');";
+             script+="$('#fileinput_"+StringEscapeUtils.escapeJavaScript(id)+"').show();";
+
+            printRadio(xb, radioId, "elements.field.upload.update",UPLOAD_MODIFY, false, script);
 
             if(!isRequired()) {
                 radioId = id + UPLOAD_DELETE;
                 script = "var inptxt = this.ownerDocument.getElementById('"
                         + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                         + "inptxt.disabled=true;inptxt.value='';";
+                script+="$('#"+StringEscapeUtils.escapeJavaScript(innerId)+"').fileinput('disable');";
+                script+="$('#fileinput_"+StringEscapeUtils.escapeJavaScript(id)+"').hide();";
                 printRadio(xb, radioId, "elements.field.upload.delete",
                         UPLOAD_DELETE, false, script);
             }
 
-            xb.writeInputFile(innerId, inputName, true);
-            xb.writeInputHidden(codeInputName, blob.getCode());
+            xb.closeElement("div");
 
-            xb.closeElement("p");
+            xb.openElement("div");
+            xb.addAttribute("class", "fileinput");
+            xb.addAttribute("style", "display:none");
+            xb.addAttribute("id","fileinput_"+id);
+            xb.writeInputFile(innerId, inputName , true);
+            xb.writeInputHidden(codeInputName, blob.getCode());
+            xb.closeElement("div");
+
+            /*xb.closeElement("p"); */
         }
     }
 
     protected void printRadio(XhtmlBuffer xb, String radioId, String labelKey,
                               String value, boolean checked, String script) {
-        xb.openElement("label");
-        xb.addAttribute("for", radioId);
-        xb.addAttribute("class", "radio");
         xb.writeInputRadio(radioId, operationInputName, value,
                 checked, false, script);
-        xb.writeNbsp();
+
+        xb.openElement("label");
+        xb.addAttribute("for", radioId);
+        //xb.addAttribute("class", "radio");
         xb.write(getText(labelKey));
         xb.closeElement("label");
     }

@@ -14,12 +14,11 @@
         <div class="jumbotron">
             <div class="container">
                 <h1>Portofino <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/></h1>
-                <p>Portofino is a free and open source web platform that helps developers create outstanding enterprise applications by addressing three specific needs:
-                    productivity, features and architecture.
-                </p>
-
                 <p>
-                    Among its features: content management, CRUD, database connectivity, calendars, charts, security and easy customization using Groovy.
+                </p>
+                    <fmt:message key="info.portofino.intro" />
+                <p>
+                    <fmt:message key="info.portofino.features" />
                 </p>
                 <br>
                 <p>

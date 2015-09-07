@@ -45,7 +45,7 @@
                     String id = RandomUtil.createRandomId();
                     buffer.openElement("div");
                     buffer.addAttribute("class", "checkbox");
-
+                    Object obj = entry.getKey();
                     buffer.openElement("input");
                     buffer.addAttribute("id", id);
                     buffer.addAttribute("type", "checkbox");
@@ -64,7 +64,7 @@
 
                     buffer.openElement("label");
                     buffer.addAttribute("for", id);
-                    Object obj = entry.getKey();
+
                     buffer.write(ShortNameUtils.getName(ca, obj));
                     buffer.closeElement("label");
 
@@ -76,7 +76,7 @@
                     }
                 }
             %>
-            <br /><br />
+            <br/>
             <portofino:buttons list="m2m-checkboxes-edit" />
         </stripes:form>
     </stripes:layout-component>

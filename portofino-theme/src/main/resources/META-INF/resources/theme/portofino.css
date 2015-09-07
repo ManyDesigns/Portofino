@@ -13,7 +13,7 @@ footer {
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe8e8e8', endColorstr='#fff5f5f5', GradientType=0);
 
     color: rgb(90, 90, 90);
-    font-size: smaller;
+    font-size: 11px;
     margin-top: 10px;
 
     width:100%;
@@ -185,11 +185,11 @@ Forms (Elements)
 }
 
 .well {
-    background-color: initial;
-    /* background-image: -webkit-linear-gradient(top,#e8e8e8 0,#f5f5f5 100%); */
-    background-image: -o-linear-gradient(top,#e8e8e8 0,#f5f5f5 100%);
-    background-image:-webkit-gradient(linear,left top,left bottom,from(rgba(245, 245, 245, 0.79)),to(rgba(255, 255, 255, 0.94)));
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe8e8e8', endColorstr='#fff5f5f5', GradientType=0);
+    background-color: #F9F9F9;
+    background-image: -webkit-linear-gradient(top,#F3F3F3 0,#FEFEFE 100%);
+    background-image: -o-linear-gradient(top,#F3F3F3 0,#FEFEFE 100%);
+    background-image:-webkit-gradient(linear,left top,left bottom,from(#F3F3F3),to(#FEFEFE));
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F3F3F3', endColorstr='#FEFEFE', GradientType=0);
     background-repeat: repeat-x;
     border-color: #dcdcdc;
     -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 1px 0 rgba(255,255,255,.1);
@@ -231,6 +231,14 @@ label.control-label:after {
     content: ":";
 }
 
+ .form-group.readonly {
+    margin-bottom: 2px;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
 .form-group.readwrite.required label.control-label:before {
     content: "* ";
 }
@@ -248,7 +256,6 @@ label.control-label:after {
     border: none;
     box-shadow: none;
 }
-
 
 .pager li>a, .pager li>span {
     display: inline-block;
@@ -466,7 +473,7 @@ Search form
 .searchform .control-label.input-group-addon {
     background: none;
     border: none;
-    color: #000000;
+    color: #333;
     font-weight: bold;
 }
 
@@ -478,7 +485,7 @@ Search form
 }
 
 .search_results th a {
-    color: #000000;
+    color: #333;
 }
 
 .search_results table {
@@ -986,8 +993,8 @@ Checkbox
     position: absolute;
     top: -22px;
     left: 0;
-    background: -webkit-linear-gradient(top, #222222 0%, #45484d 100%);
-    background: linear-gradient(to bottom, rgba(121, 121, 121, 0.18) 0%, rgba(102, 102, 102, 0.85) 100%);
+    background: -webkit-linear-gradient(top,rgb(255, 255, 255) 0%, rgba(239, 239, 239, 0.85) 100%);
+    background: linear-gradient(to bottom, rgb(255, 255, 255) 0%, rgba(239, 239, 239, 0.85) 100%);
     border-radius: 4px;
     box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.4);
 }
@@ -998,7 +1005,7 @@ Checkbox
     position: absolute;
     top: 5px;
     left: 5px;
-    border: 3px solid #fcfff4;
+    border: 3px solid #333333;
     border-top: none;
     border-right: none;
     background: transparent;
@@ -1007,9 +1014,9 @@ Checkbox
     -ms-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
-.squared-dark label:hover::after {
+/*.squared-dark label:hover::after {
     opacity: 0.3;
-}
+}*/
 .squared-dark input[type=checkbox] {
     visibility: hidden;
     position: absolute;
@@ -1056,9 +1063,9 @@ Checkbox
     transform: rotate(-45deg);
 }
 
-.squared-standard label:hover::after {
+/*.squared-standard label:hover::after {
     opacity: 0.5;
-}
+} */
 
 .squared-standard input[type=checkbox] {
     visibility: hidden;
@@ -1103,9 +1110,9 @@ Checkbox
     -ms-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
-.squared-light label:hover::after {
+/*.squared-light label:hover::after {
     opacity: 0.3;
-}
+}*/
 
 .squared-light input[type=checkbox] {
     visibility: hidden;
@@ -1213,7 +1220,7 @@ Checkbox
     display: inline-block;
     width: 18px;
     height: 18px;
-    margin-right: 9px;
+    margin-right: 5px;
     left: 0;
     margin-bottom: -3px;
     background-color: #fff;
@@ -1234,7 +1241,10 @@ Checkbox
 
 .form-inline .radio label { padding-left: 20px; margin-left: 10px;}
 .radio{ height: 100%; }
-.radio label{ padding-left: 25px; }
+.radio label {
+    padding-left: 0px;
+    margin-right: 15px;
+}
 
 /***********************
 MENU MOBILE
@@ -1257,30 +1267,76 @@ MENU MOBILE
 modal-dialog
 ***********/
 
-.spacer { height: 30%; }
+.spacer { height: 35%; }
 
+/**********
+file input
+*********/
+div.fileinput { margin-top: 10px; }
 /***********
 TEST
 ***********/
-
-th {
-    background: -webkit-linear-gradient(top, rgb(241, 241, 241) 0%, rgba(255, 255, 255, 0) 100%);
+ .table th {
+    background: -webkit-linear-gradient(top, rgb(241, 241, 241) 0%, rgba(241, 241, 241, 0.5) 100%);
+    background: linear-gradient(to bottom, rgb(241, 241, 241) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
-.table thead>tr {
-    border:  1px solid #cccccc;
-    border-radius: 3px;
+.table-condensed>tbody>tr>td, .table-condensed>tfoot>tr>td, .table-condensed>thead>tr>td{
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 13px;
+}
+
+.table-condensed>tbody>tr>th,  .table-condensed>tfoot>tr>th, .table-condensed>thead>tr>th {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.table th:first-child{ border-radius:6px 0 0 6px; }
+.table th:last-child{ border-radius:0 6px 6px 0; }
+.table-bordered th:last-child , .table-bordered th:first-child{ border-radius: 0px; }
+.table thead>tr { border:0px; }
+.table-bordered  thead>tr {
+    border-bottom:1px solid #dddddd;
+}
+
+.table>thead>tr>th {
+    border-bottom: 1px solid #ddd;
+}
+
+.table>tbody>tr>td, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td {
+    border-top: 0px;
+    border-bottom: 0px;
+}
+
+em.pull-right.glyphicon.glyphicon-chevron-up , em.pull-right.glyphicon.glyphicon-chevron-down {
+    margin-top: -2px;
+    margin-bottom: -2px;
+    margin-left: 1px;
+}
+
+label {
+    margin-bottom: 0px;
+}
+
+.table>thead>tr>th {
+    color: #333;
+    text-shadow: 1px 1px 0px #FFFFFF;
 }
 
 .search_form_toggle_link {
     background: -webkit-linear-gradient(top, rgb(241, 241, 241) 0%, rgb(220, 220, 220) 100%);
-    padding: 6px 10px 7px 10px;
+    background: linear-gradient(to bottom, rgb(241, 241, 241) 0%,  rgb(220, 220, 220) 100%);
+    padding: 4px 40px 5px 40px;
     margin: 0px 0px 0px 0px;
     border-radius: 0px 0px 5px 5px;
     box-shadow: 1px 1px 2px gray;
     position: relative;
-    top: -8px;
+    top: -12px;
+    left: 25px;
     color: #4C4C4C;
+    font-size: 12px;
+    background-color:#ddd;
 }
 
 .search_form_toggle_link:hover {
@@ -1301,4 +1357,9 @@ div.form-control {background-color: transparent;}
 .form-inline .checkbox label {
     padding-left: 5px;
     vertical-align: text-bottom;
+}
+
+select.form-control::-ms-expand {
+    border: none;
+    background: #fff;
 }

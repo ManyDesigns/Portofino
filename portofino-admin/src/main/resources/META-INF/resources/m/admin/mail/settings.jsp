@@ -11,9 +11,10 @@
         Mail settings
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <p>Note: you have to restart the application for these properties to have effect.</p>
-        <p>Be careful if you change the location of the mail queue while the system is enqueuing mails: you'll have to
-        manually move unsent mails to the new location as you restart the application.</p>
+
+        <div class="alert alert-info" role="alert"><p><fmt:message key="note.restart.application" /></p> </div>
+        <div class="alert alert-warning" role="alert"><p><fmt:message key="warning.change.mail.queue" /></p> </div>
+
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.mail.MailSettingsAction"
                       method="post" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
