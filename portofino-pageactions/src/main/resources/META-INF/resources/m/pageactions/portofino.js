@@ -250,7 +250,7 @@ portofino.setupRichTextEditors = function(config) {
         baseConfig.height =
                 windowHeight -
                 $("textarea.mde-form-rich-text").offset().top -
-                $("footer").height() -
+                $("footer").position().top -
                 350; //350 ~= toolbar 3 righe + footer + margine tolleranza
     }
 

@@ -8,27 +8,33 @@
              type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="resultSetNavigation" scope="request" value="${actionBean.resultSetNavigation}"/>
 <c:if test="${not empty resultSetNavigation}">
-    <nav style="text-align: center;">
-        <ul class="pager" style="display: inline; padding-right: 1em;">
+    <div class="pull-right">
+        <ul class="pager" style="display: inline;">
             <c:if test="${not empty resultSetNavigation.firstUrl}">
                 <li>
                     <fmt:message key="first" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.firstUrl}" title="${pg_title}"
                                   class="paginator-link">
-                        &lt;&lt;
+                       <span class="glyphicon glyphicon-menu-left"></span>
+                       <span class="glyphicon glyphicon-menu-left g_pag_left"></span>
                     </stripes:link>
                 </li>
                 <li>
                     <fmt:message key="previous" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.previousUrl}" title="${pg_title}"
                                   class="paginator-link">
-                        &lt;
+                        <span class="glyphicon glyphicon-menu-left"></span>
                     </stripes:link>
                 </li>
             </c:if>
             <c:if test="${empty resultSetNavigation.firstUrl}">
-                <li class="disabled"><a class="paginator-link">&lt;&lt;</a></li>
-                <li class="disabled"><a class="paginator-link">&lt;</a></li>
+                <li class="disabled">
+                    <a class="paginator-link">
+                        <span class="glyphicon glyphicon-menu-left"></span>
+                        <span class="glyphicon glyphicon-menu-left g_pag_left"> </span>
+                    </a>
+                </li>
+                <li class="disabled"><a class="paginator-link"><span class="glyphicon glyphicon-menu-left"></span></a></li>
             </c:if>
 
     <%
@@ -54,21 +60,27 @@
                     <fmt:message key="next" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.nextUrl}" title="${pg_title}"
                                   class="paginator-link">
-                        &gt;
+                       <span class="glyphicon glyphicon-menu-right"></span>
                     </stripes:link>
                 </li>
                 <li>
                     <fmt:message key="last" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.lastUrl}" title="${pg_title}"
                                   class="paginator-link">
-                        &gt;&gt;
+                        <span class="glyphicon glyphicon-menu-right g_pag_right"></span>
+                        <span class="glyphicon glyphicon-menu-right "></span>
                     </stripes:link>
                 </li>
             </c:if>
             <c:if test="${empty resultSetNavigation.lastUrl}">
-                <li class="disabled"><a class="paginator-link">&gt;</a></li>
-                <li class="disabled"><a class="paginator-link">&gt;&gt;</a></li>
+                <li class="disabled"><a class="paginator-link"><span class="glyphicon glyphicon-menu-right"></span> </a></li>
+                <li class="disabled">
+                    <a class="paginator-link">
+                        <span class="glyphicon glyphicon-menu-right g_pag_right"></span>
+                        <span class="glyphicon glyphicon-menu-right"></span>
+                    </a>
+                </li>
             </c:if>
         </ul>
-    </nav>
+        </div>
 </c:if>

@@ -260,25 +260,34 @@ label.control-label:after {
 .pager li>a, .pager li>span {
     display: inline-block;
     padding: 5px 10px;
-    background-color: #FFF;
-    background: -webkit-linear-gradient(top, #222222 0%, #45484d 100%);
-    background: linear-gradient(to bottom, rgba(220, 220, 220, 0.18) 0%, rgba(255, 255, 255, 0.85) 100%);
+    background-color: #F5F5F5;
     border: 0px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
     letter-spacing: 0.05em;
+    margin-left: -5px;
+    border-radius: 0px;
 }
 
-.pager li>a, .pager li>span {
-    display: inline-block;
-    padding: 5px 10px;
-    background-color: #FFF;
-    background: -webkit-linear-gradient(top, #222222 0%, #45484d 100%);
-    background: linear-gradient(to bottom, rgba(220, 220, 220, 0.18) 0%, rgba(255, 255, 255, 0.85) 100%);
-    border: 0px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
-    letter-spacing: 0.05em;
+.pager li:first-child>a {
+    border-radius: 4px 0px 0px 4px;
+}
+
+.pager li:last-child>a {
+    border-radius: 0px 4px 4px 0px;
+}
+
+.pager .disabled>a, .pager .disabled>a:focus, .pager .disabled>a:hover, .pager .disabled>span {
+    color: #ccc;
+    background-color: #F5F5F5;
+}
+
+.g_pag_left {
+    left: -12px;
+    margin-right: -12px;
+}
+
+.g_pag_right {
+    left: 12px;
+    margin-left: -12px;
 }
 /*******************************************************************************
 General
@@ -365,6 +374,7 @@ Breadcrumb
 
 .breadcrumb {
     margin-bottom: 5px;
+    padding: 5px 10px;
 }
 
 /*******************************************************************************
@@ -398,6 +408,10 @@ Content
 /*******************************************************************************
 PageActions
 *******************************************************************************/
+
+.pageTitle {
+    display: inline;
+}
 
 .pageHeader {
     margin-bottom: 12px;
@@ -651,6 +665,8 @@ Configuration
 #crudSelectionProvidersFieldset select, #crudSelectionProvidersFieldset input {
     width: auto;
 }
+
+input { min-width: 100px; }
 
 /*******************************************************************************
 Wizard
@@ -1139,6 +1155,10 @@ Checkbox
     float: left;
 }
 
+  .form-inline .radio input[type=radio] , .radio input[type=radio], .radio-inline input[type=radio]  {
+    position: absolute;
+  }
+
 @media (min-width: 768px){
 .form-inline .checkbox input[type=checkbox], .form-inline .radio input[type=radio] {
     margin-left: 0;
@@ -1160,8 +1180,8 @@ Checkbox
     height: 18px;
     margin-right: 9px;
     position: absolute;
-    left: 0;
-    bottom: 3px;
+    left: 10px;
+    bottom: 6px;
     background-color: #fff;
     border: 1px rgb(211, 211, 211) solid;
     border-radius: 3px;
@@ -1200,7 +1220,7 @@ Checkbox
 }
 
 .form-inline .checkbox label{
-    padding-left: 10px;
+    padding-left: 15px;
 }
 
 .checkbox {
@@ -1352,11 +1372,6 @@ div.form-control {background-color: transparent;}
 .form-inline .radio label {
     padding-left: 5px;
     margin-left: 5px;
-}
-
-.form-inline .checkbox label {
-    padding-left: 5px;
-    vertical-align: text-bottom;
 }
 
 select.form-control::-ms-expand {

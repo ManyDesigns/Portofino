@@ -28,13 +28,42 @@
         </script>
         <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data" class="form-horizontal">
             <!-- Content editor -->
-            <fieldset style="margin-bottom: 2em;">
-                <legend><fmt:message key="edit.content"/></legend>
-                <input type="text" name="title" value="<c:out value="${actionBean.title}"/>"
-                       class="form-control"/>
-                <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
-                <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
+            <fieldset class="mde-columns-1" style="margin-bottom: 2em;">
+                <legend><fmt:message key="edit.header"/></legend>
+
+
+                <div class="row">
+                    <div class="col-md-12 mde-colspan-1">
+                        <div class="form-group readwrite required">
+                            <label  class="control-label"><fmt:message key="title"/></label>
+                            <div class="input-container fill-row">
+                                <input type="text" name="title" value="<c:out value="${actionBean.title}"/>" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mde-colspan-1">
+                        <div class="form-group readwrite required">
+                            <label  class="control-label"><fmt:message key="description"/></label>
+                            <div class="input-container fill-row">
+                                <input type="text" name="title" value="<c:out value="${actionBean.description}"/>" class="form-control"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <legend><fmt:message key="edit.content"/></legend>
+
+                <div class="row">
+                    <div class="col-md-12 mde-colspan-1" >
+                        <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
+                        <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
+                    </div>
+                </div>
             </fieldset>
+
             <div class="form-group">
                 <div class="col-sm-12">
                     <portofino:buttons list="edit-content" />
