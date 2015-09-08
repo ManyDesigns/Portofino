@@ -23,5 +23,5 @@ It requires no installation, just unzip it. It is a bundle of Apache Tomcat, Por
 open source databases.
 
 This is the source code of the framework. If you want to build it, see
-https://tt.manydesigns.com/wiki/Edit.jsp?page=Building%20Portofino%20from%20source
+https://tt.manydesigns.com/wiki/Wiki.jsp?page=Building%20Portofino%20from%20source
 

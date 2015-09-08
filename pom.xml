@@ -89,7 +89,7 @@
         <hibernate.version>4.3.11.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
         <jasperreports.version>3.5.0</jasperreports.version>
-        <javassist.version>3.8.0.GA</javassist.version>
+        <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.0.1</javax.ws.rs.api.version>
         <jfreechart.version>1.0.12</jfreechart.version>
@@ -97,7 +97,7 @@
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.3</jsqlparser.version>
         <json.version>20140107</json.version>
-        <jsoup.version>1.7.1</jsoup.version>
+        <jsoup.version>1.8.3</jsoup.version>
         <jstl.version>1.1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>3.4.1</liquibase.version>
@@ -260,11 +260,15 @@
                         <configuration>
                             <links>
                                 <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
-                                <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
-                                <link>http://commons.apache.org/configuration/apidocs/</link>
+                                <link>https://stripesframework.ci.cloudbees.com/job/Stripes%201.6.0/javadoc/</link>
+                                <link>https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/</link>
                                 <link>http://docs.jboss.org/hibernate/orm/4.3/javadocs/</link>
                                 <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/api/</link>
-                                <link>http://tomcat.apache.org/tomcat-7.0-doc/servletapi/</link>
+                                <link>http://www.joda.org/joda-time/apidocs/</link>
+                                <link>https://docs.oracle.com/javaee/6/api/</link>
+                                <!-- Corresponding javadoc command line:
+                                -link http://shiro.apache.org/static/1.2.3/apidocs/ -link https://stripesframework.ci.cloudbees.com/job/Stripes%201.6.0/javadoc/ -link https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/ -link https://docs.jboss.org/hibernate/orm/4.3/javadocs/ -link http://docs.groovy-lang.org/latest/html/api/ -link http://www.joda.org/joda-time/apidocs/ -link http://docs.oracle.com/javase/6/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
+                                -->
                             </links>
                         </configuration>
                         <executions>
