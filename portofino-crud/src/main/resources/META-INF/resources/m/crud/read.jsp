@@ -10,6 +10,7 @@
     <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
         <jsp:include page="/theme/breadcrumbs.jsp" />
+        <jsp:include page="/m/crud/result-set-navigation.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.readTitle}"/>
@@ -31,7 +32,7 @@
                 });
             </script>
 
-            <jsp:include page="/m/crud/result-set-navigation.jsp" />
+
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

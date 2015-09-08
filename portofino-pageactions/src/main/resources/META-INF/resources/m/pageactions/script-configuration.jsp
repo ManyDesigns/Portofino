@@ -25,6 +25,7 @@
         $("#scriptEditor").css('display', 'block');
 
         editor = ace.edit("scriptEditor");
+        editor.$blockScrolling = Infinity ;
         ace.require('ace/ext/settings_menu');
 
         var GroovyMode = require("ace/mode/groovy").Mode;

@@ -371,14 +371,13 @@ public class SelectSearchField extends AbstractSearchField {
             String optionLabel = option.getValue().label;
             boolean checked =  ArrayUtils.contains(values, optionValue);
             String checkboxId = id + "_" + counter;
-            xb.openElement("label");
-            xb.addAttribute("class", "checkbox");
+
             xb.writeInputCheckbox(checkboxId, inputName, optionStringValue, checked);
             xb.openElement("label");
             xb.addAttribute("for", checkboxId);
             xb.write(optionLabel);
             xb.closeElement("label");
-            xb.closeElement("label");
+
             xb.closeElement("div");
             counter++;
         }

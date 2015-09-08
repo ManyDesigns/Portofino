@@ -9,6 +9,7 @@
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
+        <small><c:out value="${actionBean.pageInstance.page.description}"/></small>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>
