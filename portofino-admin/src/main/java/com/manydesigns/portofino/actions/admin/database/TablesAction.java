@@ -186,22 +186,18 @@ public class TablesAction extends AbstractActionBean {
                 File changelogFile = new File(persistence.getAppDbsDir(), changelogFileName);
                 String schemaDescr = table.getSchemaName();
                 if(changelogFile.isFile()) {
-                    schemaDescr += " <img src='" + context.getRequest().getContextPath()+ "/m/admin/tables/liquibase_logo_small.gif' /> Liquibase";
+                    schemaDescr += " <img height='15px' src='" + context.getRequest().getContextPath()+ "/m/admin/tables/liquibase_logo_small.gif' /> ";
                 }
 
                 lastSchema = table.getSchemaName();
-                 ArrayList<Map> schemas =  new  ArrayList<Map>();
-                 ArrayList<Map> cTables =  new  ArrayList<Map>();
-                schema = createObject(table.getSchemaName(),false,true,false,null,cTables);
+                ArrayList<Map> schemas =  new  ArrayList<Map>();
+                ArrayList<Map> cTables =  new  ArrayList<Map>();
+                schema = createObject(schemaDescr,false,true,false,null,cTables);
                 schemas.add(schema);
 
                 lastDatabase = table.getDatabaseName();
                 database = createObject(table.getDatabaseName(),false,true,false,null,schemas);
                 treeTables.add(database);
-                /*
-              table.getDatabaseName()
-               schemaDescr */
-
             }
             String tableDescr = table.getTableName();
             if(!table.getActualEntityName().equals(table.getTableName())) {
@@ -209,7 +205,6 @@ public class TablesAction extends AbstractActionBean {
             }
             String href = lastDatabase +"/"+ lastSchema +"/"+ table.getTableName();
             ((List)schema.get("children")).add( createObject(tableDescr,false,false,false,href,null) );
-
         }
 
         return new StreamingResolution("text/json",new JsonBuilder(treeTables).toPrettyString());

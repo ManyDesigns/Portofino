@@ -413,6 +413,10 @@ PageActions
     display: inline;
 }
 
+.nav-tabs {
+    margin-bottom: 12px;
+}
+
 .pageHeader {
     margin-bottom: 12px;
     margin-top: 10px;
@@ -666,7 +670,11 @@ Configuration
     width: auto;
 }
 
-input { min-width: 100px; }
+input { min-width: 150px; }
+
+#sortable li {
+    cursor: move;
+}
 
 /*******************************************************************************
 Wizard
@@ -812,6 +820,7 @@ CRUD
 /*******************************************************************************
 Typeahead
 *******************************************************************************/
+ .twitter-typeahead {    width: 100%;  display: block;  }
 
 .tt-hint {
   width: 396px;
@@ -945,6 +954,7 @@ Menu
     /*text-align: right;*/
     font-weight: bolder;
     color: #2B5494;
+    overflow: hidden;
 }
 
 li.active a{
@@ -1377,4 +1387,98 @@ div.form-control {background-color: transparent;}
 select.form-control::-ms-expand {
     border: none;
     background: #fff;
+}
+
+
+/*****************
+TEST MOBILE
+*****************/
+
+@media screen and (max-width: 768px) {
+    .checkbox label:before, .checkbox-inline label:before{
+        width: 30px  ;
+        height: 30px;
+        margin-top: 10px;
+        bottom: 10px;
+    }
+
+    .form-inline .checkbox label {
+        margin-bottom: 10px;
+    }
+
+    .checkbox input[type=checkbox]:checked + label:before, .checkbox-inline input[type=checkbox]:checked + label:before {
+        font-size: 25px;
+        line-height: 25px;
+    }
+
+    .input-container  .checkbox label:before {
+        bottom: 0px;
+    }
+
+    .form-horizontal .table .checkbox{
+        width: 30px;
+        margin-right: 5px;
+    }
+
+    .checkbox label:before, .checkbox-inline label:before{
+        bottom: 2px;
+    }
+}
+
+ @media (max-width: 991px) {
+     .form-horizontal.read fieldset{ }
+
+     .form-horizontal.read .row { }
+    .form-horizontal.read .control-label {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .form-horizontal.read .input-container {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+}
+
+
+ /*For smaller device, tab control should not appear*/
+@media (max-width: 767px) {
+   /* .nav-tabs > li {
+        float:none;
+        border:1px solid #dddddd;
+    }
+    .nav-tabs > li.active > a{
+        border:none;
+    }
+    .nav > li > a:hover, .nav > li > a:focus,
+    .nav > li > a:hover, .nav > li > a:focus,
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus
+     {
+        background:none;
+        border:none;
+    }
+    .nav > li.active {
+            background-color: #337ab7;
+            border-color: #337ab7;
+    }
+    .nav > li.active a{color: #fff; }
+     */
+
+    .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
+        padding: 5px;
+    }
+    .form-horizontal .control-label {
+        width: auto;
+    }
+
+        .form-group.readonly {
+        display: table;
+    }
+
+        .form-horizontal .control-label {
+        display: table-cell;
+    }
+
+        .form-horizontal .input-container {
+         width: auto;
+    }
 }
