@@ -1284,11 +1284,11 @@ MENU MOBILE
     display: none;
 }
 }
-.nav>li.mobile {
+.dropdown.mobile {
     display: none;
 }
 @media screen and (max-width: 768px) {
-.nav>li.mobile {
+.dropdown.mobile {
     display: block;
 }
 }

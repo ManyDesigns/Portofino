@@ -120,9 +120,15 @@ public class PageAdminAction extends AbstractPageAction {
     public Resolution prepare() {
         Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
         dispatch = dispatcher.getDispatch(originalPath);
-        pageInstance = dispatch.getLastPageInstance();
 
-        if(!SecurityLogic.hasPermissions(
+        try{
+            pageInstance = dispatch.getLastPageInstance();
+        }catch (Exception e){
+            logger.warn(e.getMessage());
+            return new ForbiddenAccessResolution();
+        }
+
+        if(pageInstance==null || !SecurityLogic.hasPermissions(
                 portofinoConfiguration, pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
             return new ForbiddenAccessResolution();
         } else {

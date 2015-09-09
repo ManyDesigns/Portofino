@@ -51,6 +51,8 @@
                                 <fmt:message key="administration" />
                             </stripes:link>
                         </li>
+
+                        <c:if test="${not actionBean.context.actionPath.equals('/actions/admin/page')}">
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page <strong class="caret"></strong></a>
                             <ul class="dropdown-menu">
@@ -94,6 +96,7 @@
                                 </li>
                             </ul>
                         </li>
+                        </c:if>
                     </shiro:hasRole>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">

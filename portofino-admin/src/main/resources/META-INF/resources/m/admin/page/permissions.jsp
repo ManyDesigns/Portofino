@@ -16,7 +16,7 @@
 %><%@ page import="java.util.Collections"
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/modal.jsp">
+/><stripes:layout-render name="/theme/templates/full-width/modal.jsp">
     <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
     </stripes:layout-component>
@@ -27,9 +27,15 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data">
+            <style type="text/css">
+                select.input-sm {
+                    min-width: 120px;
+                }
+            </style>
+
             <div class="row">
                 <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
-                <div class="col-md-9" style="margin-left: 0;">
+                <div class="col-md-9" style="margin-left: 0; overflow-x: scroll;">
                     <table class="table table-condensed">
                     <%
                         PageInstance currentPageInstance = actionBean.getPageInstance();
@@ -37,6 +43,7 @@
                         String[] supportedPermissions = actionBean.getSupportedPermissions();
                         if(supportedPermissions != null) {
                     %>
+                        <thead>
                         <tr>
                             <th rowspan="2"><fmt:message key="group" /></th>
                             <th rowspan="2"><fmt:message key="access.level" /></th>
@@ -53,6 +60,8 @@
                             <th><fmt:message key="access.level" /></th>
                         </tr>
                     <%  } %>
+                        </thead>
+                        <tbody>
                         <c:forEach var="group" items="${actionBean.groups}">
                             <tr>
                                 <%
@@ -155,6 +164,7 @@
                                 </c:forEach>
                             </tr>
                         </c:forEach>
+                        </tbody>
                     </table>
                 </div>
                 <div class="col-md-3 well">

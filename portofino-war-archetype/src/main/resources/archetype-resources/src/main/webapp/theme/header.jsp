@@ -101,12 +101,14 @@
                             String logoutUrl = Util.getAbsoluteUrl(logoutUrlBuilder.toString());
                         %>
                         <%
-                            if(request.getAttribute("actionBean") instanceof PageAction) {
+                            if(request.getAttribute("actionBean") instanceof PageAction && !actionBean.getContext().getActionPath().equals("/actions/admin/page") ) {
                                 PageAction pageAction = (PageAction) request.getAttribute("actionBean");
                                 if(pageAction.getPageInstance() != null &&
                                    SecurityLogic.hasPermissions(
                                            portofinoConfiguration, pageAction.getPageInstance(),
                                            subject, AccessLevel.EDIT)) {%>
+                        
+                        
                         <li class="divider"></li>
                         <li>
                             <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actionPath}');">
@@ -170,12 +172,13 @@
                         <% }}} %>
                     </ul>
                 </li>
-                <jsp:include page="/theme/navigation-mobile.jsp" />
+
                 <li>
                     <a href="<%= logoutUrl %>">
-                        <fmt:message key="log.out" />
+                        <span class="glyphicon glyphicon-log-out"></span> <fmt:message key="log.out" />
                     </a>
                 </li>
+                <jsp:include page="/theme/navigation-mobile.jsp" />
                 </shiro:user>
                 <shiro:guest>
                 <%
@@ -186,9 +189,10 @@
                 %>
                     <li>
                         <a href="<%= loginUrl %>">
-                            <fmt:message key="log.in" />
+                             <span class="glyphicon glyphicon-log-in"></span><fmt:message key="log.in" />
                         </a>
                     </li>
+                 <jsp:include page="/theme/navigation-mobile.jsp" />
                 </shiro:guest>
             </ul>
         </nav>

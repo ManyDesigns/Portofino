@@ -28,10 +28,13 @@
                     PageInstance currentPageInstance = actionBean.getPageInstance();
                     Page currentPage = currentPageInstance.getPage();
                 %>
+                <thead>
                 <tr>
                     <th><fmt:message key="group" /></th>
                     <th><fmt:message key="access.level" /></th>
                 </tr>
+                </thead>
+                <tbody>
                 <c:forEach var="group" items="${actionBean.groups}">
                     <tr>
                         <%
@@ -87,6 +90,7 @@
                         </td>
                     </tr>
                 </c:forEach>
+                </tbody>
             </table>
             <div class="form-group">
                 <portofino:buttons list="root-permissions" />

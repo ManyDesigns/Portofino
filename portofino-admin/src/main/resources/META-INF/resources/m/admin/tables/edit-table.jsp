@@ -110,7 +110,7 @@
                                 <c:forEach var="col" items="${actionBean.decoratedColumns}" varStatus="status">
                                     <li class="ui-state-default list-group-item" id="col_${status.index}">
                                         <c:out value="${col.columnName}" />
-                                        <input class="form-control" type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />
+                                        <input class="form-control input-sm" type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />
                                     </li>
                                 </c:forEach>
                             </ul>
@@ -141,10 +141,10 @@
                                     <tr>
                                         <td rowspan="${fn:length(fk.references)}"><c:out value="${fk.name}" /></td>
                                         <td rowspan="${fn:length(fk.references)}">
-                                            <input class="form-control" name="fkOnePropertyNames[${fk.name}]" type="text" value="${actionBean.fkOnePropertyNames[fk.name]}"/>
+                                            <input class="form-control input-sm" name="fkOnePropertyNames[${fk.name}]" type="text" value="${actionBean.fkOnePropertyNames[fk.name]}"/>
                                         </td>
                                         <td rowspan="${fn:length(fk.references)}">
-                                            <input class="form-control" name="fkManyPropertyNames[${fk.name}]" type="text" value="${actionBean.fkManyPropertyNames[fk.name]}"/>
+                                            <input class="form-control input-sm" name="fkManyPropertyNames[${fk.name}]" type="text" value="${actionBean.fkManyPropertyNames[fk.name]}"/>
                                         </td>
                                         <td>
                                             <a href="<stripes:url value="${actionBean.actionPath}/${fk.references[0].actualFromColumn.columnName}"/>">
