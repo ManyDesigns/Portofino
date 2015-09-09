@@ -30,7 +30,7 @@ class FancyTreeExample extends CustomAction {
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/WEB-INF/pages/examples/fancytree/fancytree.jsp";
+        String fwd = "/WEB-INF/pages/samples/fancytree/fancytree.jsp";
         return new ForwardResolution(fwd);
     }
 

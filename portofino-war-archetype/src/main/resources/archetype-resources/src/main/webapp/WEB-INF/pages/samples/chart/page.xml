@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Chart" description="Using Chartjs" navigationRoot="INHERIT" id="1smk4hra21zubcm26ulsi2hy3">
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <permissions/>
+</page>
