@@ -18,25 +18,7 @@
         <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
         <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
 
-        <!-- (Irrelevant source removed.) -->
-
         <style type="text/css">
-                /* Define custom width and alignment of table columns */
-            #treetable {
-                table-layout: fixed;
-            }
-            #treetable tr td:nth-of-type(1) {
-                text-align: right;
-            }
-            #treetable tr td:nth-of-type(2) {
-                text-align: center;
-            }
-            #treetable tr td:nth-of-type(3) {
-                min-width: 100px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
             ul.fancytree-ext-wide {
                 border: none;
             }
@@ -88,7 +70,7 @@
                     activate: function(event, data) {
                         var node = data.node;
                         if( node.data.href!=null ){
-                            window.location.href="<%= actionBean.getActionPath()%>/"+node.data.href;
+                            window.location.href="<stripes:url value='${actionBean.actionPath}/' />"+node.data.href;
                         }
                     }
                 });

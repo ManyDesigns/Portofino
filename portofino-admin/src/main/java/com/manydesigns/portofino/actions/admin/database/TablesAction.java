@@ -60,6 +60,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
@@ -167,19 +168,23 @@ public class TablesAction extends AbstractActionBean {
 
         String lastDatabase = null;
         String lastSchema = null;
-        Map schema =null;
-        Map database = null ;
+        Map schema = null;
+        Map database = null;
         List<Table> tables = getAllTables();
         for(Table table : tables) {
             if(table.getPrimaryKey() == null) {
                 continue;
             }
-            if(table.getDatabaseName().equals(lastDatabase)) {
-                if(!table.getSchemaName().equals(lastSchema)) {
-                    lastSchema = table.getSchemaName();
-                    schema = createObject(table.getSchemaName(),false,true,false,null,null);
-                }
-            } else {
+            if(!table.getDatabaseName().equals(lastDatabase)) {
+                lastDatabase = table.getDatabaseName();
+                database = createObject(table.getDatabaseName(),false,true,false, null, new ArrayList());
+                treeTables.add(database);
+                lastSchema = null;
+            }
+            if(!table.getSchemaName().equals(lastSchema)) {
+                lastSchema = table.getSchemaName();
+                schema = createObject(table.getSchemaName(), false, true, false, null, new ArrayList());
+
                 String changelogFileNameTemplate = "{0}-changelog.xml";
                 String changelogFileName = MessageFormat.format(
                         changelogFileNameTemplate, table.getDatabaseName() + "-" + table.getSchemaName());
@@ -190,14 +195,8 @@ public class TablesAction extends AbstractActionBean {
                 }
 
                 lastSchema = table.getSchemaName();
-                ArrayList<Map> schemas =  new  ArrayList<Map>();
-                ArrayList<Map> cTables =  new  ArrayList<Map>();
-                schema = createObject(schemaDescr,false,true,false,null,cTables);
-                schemas.add(schema);
-
-                lastDatabase = table.getDatabaseName();
-                database = createObject(table.getDatabaseName(),false,true,false,null,schemas);
-                treeTables.add(database);
+                schema = createObject(schemaDescr,false,true,false,null, new ArrayList());
+                ((List)database.get("children")).add(schema);
             }
             String tableDescr = table.getTableName();
             if(!table.getActualEntityName().equals(table.getTableName())) {
@@ -207,10 +206,12 @@ public class TablesAction extends AbstractActionBean {
             ((List)schema.get("children")).add( createObject(tableDescr,false,false,false,href,null) );
         }
 
-        return new StreamingResolution("text/json",new JsonBuilder(treeTables).toPrettyString());
+        return new StreamingResolution("text/json", new JsonBuilder(treeTables).toPrettyString());
     }
 
-    private Map createObject(String title, boolean expanded, boolean folder, boolean lazy , String href , List children ){
+    private Map createObject(
+            String title, boolean expanded, boolean folder, boolean lazy,
+            @Nullable String href, @Nullable List children) {
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("title",title);
         map.put("expanded",expanded);

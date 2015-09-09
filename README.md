@@ -10,7 +10,7 @@ application with a responsive web user interface, REST APIs, users and permissio
 which is easy to incrementally extend and customize, both graphically and in functionality (e.g., adding new buttons to
 existing pages).
 
-Portofino is based on popular and proved open source libraries such as Hibernate, Groovy, Apache Shiro, the Stripes web
+Portofino is based on popular and proven open source libraries such as Hibernate, Groovy, Apache Shiro, the Stripes web
 framework, Twitter Bootstrap, Jersey JAX-RS.
 
 The home of Portofino is http://portofino.manydesigns.com. There you can find the documentation, pointers to community
