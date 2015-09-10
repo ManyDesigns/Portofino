@@ -28,3 +28,17 @@
     </ul>
 </div>
 <div style="border-bottom: solid 1px #E5E5E5; margin-top: 10px; margin-bottom: 10px;"></div>
+<script type="text/javascript">
+    $(function() {
+        //Make btn-primary the default button in each form
+        $("form").each(function(_, form) {
+            form = $(form);
+            form.find("button.btn-primary").each(function(_, button) {
+                button = $(button).clone();
+                button.css("visibility", "hidden");
+                button.css("position", "fixed");
+                form.prepend(button);
+            });
+        });
+    });
+</script>

@@ -470,56 +470,25 @@ public class DatabaseSyncer {
             logger.debug("Merging column attributes and annotations");
             targetColumn.setAutoincrement(liquibaseColumn.isAutoIncrement());
             Integer jdbcType = liquibaseColumn.getType().getDataTypeId();
-            if(jdbcType == null && "Oracle".equals(connectionProvider.getDatabaseProductName())) {
+            String jdbcTypeName = liquibaseColumn.getType().getTypeName();
+            if("Oracle".equals(connectionProvider.getDatabaseProductName())) {
                 //Wait for a bugfix in Liquibase
-                String typeName = liquibaseColumn.getType().getTypeName();
-                if("CHAR".equals(typeName)) {
-                    jdbcType = 1;
-                } else if("VARCHAR2".equals(typeName)) {
-                    jdbcType = 12;
-                } else if("NUMBER".equals(typeName)) {
-                    jdbcType = 3;
-                } else if ("LONG".equals(typeName)) {
-                    jdbcType = -1;
-                } else if("DATE".equals(typeName)) {
+                if(jdbcType == null || jdbcType == Types.OTHER) {
+                    if(jdbcTypeName != null && jdbcTypeName.toUpperCase().startsWith("TIMESTAMP")) {
+                        jdbcType = Types.TIMESTAMP;
+                    }
+                } else if(jdbcType == Types.DATE) {
+                    boolean dateTypePresent = false;
                     for(Type type : connectionProvider.getTypes()) {
-                        if(type.getTypeName().equals(typeName)) {
-                            jdbcType = 91;
+                        if(type.getTypeName().equals("DATE")) {
+                            dateTypePresent = true;
                             break;
                         }
                     }
-                    if(jdbcType == null) {
+                    if(!dateTypePresent) {
                         //DATE type not present, map to TIMESTAMP
-                        jdbcType = 93;
+                        jdbcType = Types.TIMESTAMP;
                     }
-                } else if("RAW".equals(typeName)) {
-                    jdbcType = -3;
-                } else if("LONG RAW".equals(typeName)) {
-                    jdbcType = -4;
-                } else if("BLOB".equals(typeName)) {
-                    jdbcType = 2004;
-                } else if("CLOB".equals(typeName)) {
-                    jdbcType = 2005;
-                } else if("BFILE".equals(typeName)) {
-                    jdbcType = -13;
-                } else if("FLOAT".equals(typeName)) {
-                    jdbcType = 6;
-                } else if("TIMESTAMP(6)".equals(typeName)) {
-                    jdbcType = 93;
-                } else if("TIMESTAMP(6) WITH TIME ZONE".equals(typeName)) {
-                    jdbcType = -101;
-                } else if("TIMESTAMP(6) WITH LOCAL TIME ZONE".equals(typeName)) {
-                    jdbcType = -102;
-                } else if("INTERVAL YEAR(2) TO MONTH".equals(typeName)) {
-                    jdbcType = -103;
-                } else if("INTERVAL DAY(2) TO SECOND(6)".equals(typeName)) {
-                    jdbcType = -104;
-                } else if("BINARY_FLOAT".equals(typeName)) {
-                    jdbcType = 100;
-                } else if("BINARY_DOUBLE".equals(typeName)) {
-                    jdbcType = 101;
-                } else if("XMLTYPE".equals(typeName)) {
-                    jdbcType = 2009;
                 }
             }
             if(jdbcType == null) {
@@ -527,7 +496,7 @@ public class DatabaseSyncer {
             }
             if(jdbcType == Types.OTHER) {
                 logger.debug("jdbcType = OTHER, trying to determine more specific type from type name");
-                String jdbcTypeName = liquibaseColumn.getType().getTypeName();
+
                 try {
                     Field field = Types.class.getField(jdbcTypeName);
                     jdbcType = (Integer) field.get(null);
@@ -536,7 +505,7 @@ public class DatabaseSyncer {
                 }
             }
             targetColumn.setJdbcType(jdbcType);
-            targetColumn.setColumnType(liquibaseColumn.getType().getTypeName());
+            targetColumn.setColumnType(jdbcTypeName);
             targetColumn.setLength(liquibaseColumn.getType().getColumnSize());
             targetColumn.setNullable(liquibaseColumn.isNullable());
             targetColumn.setScale(liquibaseColumn.getType().getDecimalDigits());
