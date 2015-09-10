@@ -287,7 +287,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * @see #loadObjectByPrimaryKey(java.io.Serializable)
+     * {@link #loadObjectByPrimaryKey(java.io.Serializable))
      * @param identifier the object identifier in String form
      */
     protected void loadObject(String... identifier) {
@@ -499,7 +499,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     /**
      * Returns the JSoup whitelist used to clean user-provided HTML in rich-text fields.
-     * @return the default implementation returns the "basic" whitelist ({@see Whitelist#basic()}).
+     * @return the default implementation returns the "basic" whitelist ({@link Whitelist#basic()}).
      */
     protected Whitelist getWhitelist() {
         return Whitelist.basic();
@@ -1405,7 +1405,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void disableBlobFields() {
-        //Disable blob fields: we don't support them.
+        //Disable blob fields: we don't support them when bulk editing.
         for(FieldSet fieldSet : form) {
             for(FormElement element : fieldSet) {
                 if(element instanceof FileBlobField) {
@@ -2065,6 +2065,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // REST
     //--------------------------------------------------------------------------
 
+    /**
+     * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.2
+     * @return search results (/) or single object (/pk) as JSON (streamed using a Stripes Resolution).
+     */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Resolution getAsJson() {
@@ -2084,6 +2089,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.writeToObject(this);
     }
 
+    /**
+     * Handles object creation via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.2
+     * @return the created object as JSON (in a JAX-RS Response).
+     */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -2123,6 +2133,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Handles object update via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.2
+     * @return the updated object as JSON (in a JAX-RS Response).
+     */
     @PUT
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -2157,6 +2172,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Handles object deletion via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.2
+     */
     @DELETE
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public void httpDelete() throws Exception {
@@ -2177,6 +2196,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Returns a description of this CRUD's ClassAccessor.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.2
+     * @return the class accessor as JSON.
+     */
     @Path(":classAccessor")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
