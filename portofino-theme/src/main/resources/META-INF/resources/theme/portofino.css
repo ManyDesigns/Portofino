@@ -459,13 +459,6 @@ Search form
     display: none;
 }
 
-.form-inline .searchform div.form-control.checkbox,
-.form-inline .searchform div.form-control.radio,
-.form-inline .searchform div.form-control.multiple-select {
-    border: medium none;
-    box-shadow: none;
-}
-
 .form-inline .searchform div.form-control.multiple-select {
     height: auto;
 }
@@ -821,6 +814,10 @@ CRUD
 Typeahead
 *******************************************************************************/
  .twitter-typeahead {    width: 100%;  display: block;  }
+ @media (min-width: 768px){
+    .twitter-typeahead {  width: auto;  }
+ }
+
 
 .tt-hint {
   width: 396px;
@@ -1149,8 +1146,11 @@ Checkbox
     opacity: 1;
 }
 
-.form-inline .searchform div.form-control.checkbox, .form-inline .searchform div.form-control.radio, .form-inline .searchform div.form-control.multiple-select {
+.form-inline .searchform div.form-control.checkbox, .form-inline .searchform div.form-control.radio,
+.form-inline .searchform div.form-control.multiple-select , div.form-control.checkbox , div.form-control.radio{
     background-color: transparent;
+    border: medium none;
+    box-shadow: none;
 }
 
 .form-control.checkbox.squared-standard{
@@ -1229,8 +1229,9 @@ Checkbox
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6)
 }
 
+/*TODO */
 .form-inline .checkbox label{
-    padding-left: 15px;
+    padding-left: 5px;
 }
 
 .checkbox {
@@ -1422,6 +1423,10 @@ TEST MOBILE
 
     .checkbox label:before, .checkbox-inline label:before{
         bottom: 2px;
+    }
+
+    .form-inline .checkbox label{
+        padding-left: 20px;
     }
 }
 
