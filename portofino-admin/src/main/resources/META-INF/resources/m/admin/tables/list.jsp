@@ -1,10 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%><%@ taglib prefix="mde" uri="/manydesigns-elements"
-%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+        %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+        %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+        %><%@ taglib prefix="mde" uri="/manydesigns-elements"
+        %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+        %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/m/admin/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.database.TablesAction"/>
     <stripes:layout-component name="pageTitle"> Tables </stripes:layout-component>
@@ -12,13 +12,12 @@
         <link href="<stripes:url value="/webjars/fancytree/2.11.0/dist/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css" class="skinswitcher">
 
         <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.js"/>"       type="text/javascript"></script>
-        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.dnd.js"/>"   type="text/javascript"></script>
-        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>
+        <!--<script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.dnd.js"/>"   type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>  -->
         <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.glyph.js"/>" type="text/javascript"></script>
-        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
-        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
-
-        <!-- (Irrelevant source removed.) -->
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.filter.js"/>" type="text/javascript"></script>
+        <!--<script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.table.js"/>" type="text/javascript"></script>
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>-->
 
         <style type="text/css">
                 /* Define custom width and alignment of table columns */
@@ -37,9 +36,8 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
-            ul.fancytree-ext-wide {
-                border: none;
-            }
+            ul.fancytree-ext-wide { border: none; }
+            ul.fancytree-container { border: none; }
         </style>
 
         <!-- Add code to initialize the tree when the document is loaded: -->
@@ -65,16 +63,21 @@
             $(function(){
                 // Initialize Fancytree
                 $("#tree").fancytree({
-                    extensions: [ "edit", "glyph", "wide"],
+                    extensions: [ "filter", "glyph"],
+                    quicksearch: true,
                     checkbox: false,
                     glyph: glyph_opts,
                     selectMode: 2,
                     source: {url: "?getTables", debugDelay: 1000},
                     toggleEffect: { effect: "drop", options: {direction: "down"}, duration: 400 },
-                    wide: {
-                        iconWidth: "1em",     // Adjust this if @fancy-icon-width != "16px"
-                        iconSpacing: "0.5em", // Adjust this if @fancy-icon-spacing != "3px"
-                        levelOfs: "1.5em"     // Adjust this if ul padding != "16px"
+                    filter: {
+                        autoApply: true,  // Re-apply last filter if lazy data is loaded
+                        counter: false,  // Show a badge with number of matching child nodes near parent icons
+                        fuzzy: false,  // Match single characters in order, e.g. 'fb' will match 'FooBar'
+                        hideExpandedCounter: true,  // Hide counter badge, when parent is expanded
+                        highlight: true,  // Highlight matches by wrapping inside <mark> tags
+                        mode: "hide" , // Grayout unmatched nodes (pass "hide" to remove unmatched node instead)
+                        leavesOnly:true
                     },
 
                     iconClass: function(event, data){
@@ -92,15 +95,42 @@
                         }
                     }
                 });
+
+                var tree = $("#tree").fancytree("getTree");
+                $("input[name=search]").keyup(function(e){
+                    var n,
+                            opts = { autoExpand: true , leavesOnly: true },
+                            match = $(this).val();
+
+                    if(e && e.which === $.ui.keyCode.ESCAPE || $.trim(match) === ""){
+                        $("span#matches").text("");
+                        tree.clearFilter();
+                        return;
+                    }
+                        // Pass a string to perform case insensitive matching
+                        n = tree.filterNodes(match, opts);
+
+                    $("button#btnResetSearch").attr("disabled", false);
+                    $("span#matches").text("(" + n + " matches)");
+                }).focus();
             });
         </script>
 
         <div class="panel panel-default">
             <div class="panel-heading">
                 <strong><fmt:message key="database/schema" />/<fmt:message key="table.entity" /></strong>
+
+
+                    <label>Filter:</label>
+                    <input class="form-control inpu-sm" name="search" placeholder="Filter..." autocomplete="off">
+
+
             </div>
             <div id="tree" class="panel-body fancytree-colorize-hover"></div>
-            <div class="panel-footer"></div>
+            <div class="panel-footer">
+                <span class="badge" id="matches"></span>
+
+            </div>
         </div>
 
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.database.TablesAction" method="post">
