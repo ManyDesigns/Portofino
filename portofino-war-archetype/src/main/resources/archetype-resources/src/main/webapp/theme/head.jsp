@@ -33,7 +33,7 @@
 <script type="text/javascript" src="<stripes:url value='/webjars/bootstrap-fileinput/4.2.0/js/fileinput.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' />" ></script>
 <!-- Charts with chart.js -->
-<script type="text/javascript" src="<stripes:url value='/m/chart/chartjs/Chart.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/webjars/chartjs/1.0.2/Chart.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/m/chart/chartjs/chartjs-configuration.js' />" ></script>
 
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/portofino.css' />">
@@ -53,5 +53,5 @@
 <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
 <link rel="shortcut icon" type="image/png" href="${logoUrl}" />
 <% } %>
-<title><c:out value='<%= request.getParameter("pageTitle") %>' escapeXml="false" /></title>
+<title><c:out value='<%= request.getParameter("pageTitle") %>' escapeXml="false"  /></title>
 </head>

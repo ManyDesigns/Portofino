@@ -44,7 +44,7 @@
                 for(Map.Entry<Object, Boolean> entry : actionBean.getBooleanRelation().entrySet()) {
                     String id = RandomUtil.createRandomId();
                     buffer.openElement("div");
-                    buffer.addAttribute("class", "checkbox");
+                    buffer.addAttribute("class", "form-control checkbox");
                     Object obj = entry.getKey();
                     buffer.openElement("input");
                     buffer.addAttribute("id", id);

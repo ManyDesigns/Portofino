@@ -5,7 +5,7 @@
         /><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.page.title}"/>
-        <small><c:out value="${actionBean.page.description}"/></small>
+        (<c:out value="${actionBean.page.description}"/>)
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
 
@@ -17,7 +17,6 @@
                 font-family: tahoma , sans-serif ;
             }
         </style>
-
 
         <script type="text/javascript">
             var data_line = {

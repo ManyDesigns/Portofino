@@ -396,7 +396,7 @@ public class TextAction extends AbstractPageAction {
         }
     }
 
-    @Button(list = "manage-attachments-upload", key = "text.attachment.upload", order = 1)
+    @Button(list = "manage-attachments-upload", key = "text.attachment.upload", order = 1 , icon=Button.ICON_UPLOAD )
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     @RequiresAuthentication
     public Resolution uploadAttachment() {
@@ -562,7 +562,7 @@ public class TextAction extends AbstractPageAction {
         return cancel();
     }
 
-    @Button(list = "manage-attachments-delete", key = "delete", order = 1)
+    @Button(list = "manage-attachments-delete", key = "delete", order = 1 , icon = Button.ICON_TRASH )
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     @RequiresAuthentication
     public Resolution deleteAttachments() {
