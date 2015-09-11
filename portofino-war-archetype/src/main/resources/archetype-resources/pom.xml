@@ -232,6 +232,23 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- REST support through RestEasy. -->
+        <!--
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-resteasy</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        -->
+        <!-- If using RestEasy on a non-JBoss servlet container (e.g. on Tomcat) you need to uncomment this. -->
+        <!--
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-servlet-initializer</artifactId>
+            <version>${resteasy.version}</version>
+        </dependency>
+        -->
         <!-- Theme -->
         <dependency>
             <groupId>com.manydesigns</groupId>

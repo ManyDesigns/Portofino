@@ -67,10 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -229,15 +226,48 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * @return @see #consumePathFragment(String)
      */
     @Path("{pathFragment}")
-    public DispatchElement getSubResource(@PathParam("pathFragment") String pathFragment) {
+    public Object getSubResource(@PathParam("pathFragment") String pathFragment) {
         DispatchElement resource = consumePathFragment(pathFragment);
         if(resource != this) {
             if(context == null) {
                 setContext(pageInstance.getParent().getActionBean().getContext());
             }
-            preparePage();
+            Resolution resolution = preparePage();
+            if(resolution != null) {
+                return new TerminalResource(resolution);
+            }
         }
         return resource;
+    }
+
+    public static class TerminalResource {
+
+        private final Object result;
+
+        public TerminalResource(Object result) {
+            this.result = result;
+        }
+
+        @GET
+        public Object get() {
+            return result;
+        }
+
+        @POST
+        public Object post() {
+            return result;
+        }
+
+        @PUT
+        public Object put() {
+            return result;
+        }
+
+        @DELETE
+        public Object delete() {
+            return result;
+        }
+
     }
 
     public MultiMap initEmbeddedPageActions() {

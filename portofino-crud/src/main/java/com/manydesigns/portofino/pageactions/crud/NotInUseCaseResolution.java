@@ -28,13 +28,7 @@ public class NotInUseCaseResolution implements Resolution {
     @Override
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String msg = ElementsThreadLocals.getText("object.not.found._", key);
-        String contentType = response.getContentType();
-        if(contentType != null && contentType.contains("json")) {
-            response.sendError(404, msg);
-        } else {
-            //Assume HTML
-            SessionMessages.addWarningMessage(msg);
-            new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp").execute(request, response);
-        }
+        SessionMessages.addWarningMessage(msg);
+        new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp").execute(request, response);
     }
 }

@@ -1307,7 +1307,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(buttons == null) {
             logger.trace("buttons == null");
         } else {
-            logger.trace(" There are " + buttons.size() + " buttons");
+            logger.trace("There are " + buttons.size() + " buttons");
             for(ButtonInfo button : buttons) {
                 logger.trace("ButtonInfo: {}", button);
                 Method handler = button.getMethod();

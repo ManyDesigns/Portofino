@@ -16,13 +16,17 @@
     PageInstance invalidPage =
             (PageInstance) request.getAttribute(DispatcherLogic.INVALID_PAGE_INSTANCE);
 
-    if(PageActionLogic.isEmbedded(invalidPage.getActionBean())) {
+    if(invalidPage != null && PageActionLogic.isEmbedded(invalidPage.getActionBean())) {
         request.getRequestDispatcher("/m/pageactions/safemode/safemode.jsp").include(request, response);
         return;
     }
 
     Integer httpError = (Integer) request.getAttribute("http-error-code");
     response.setStatus(httpError != null ? httpError : 404);
+
+    if(invalidPage == null) {
+        return;
+    }
 
     if(!invalidPage.getParameters().isEmpty()) {
         logger.debug("Page instance with parameters failed, trying without parameters");

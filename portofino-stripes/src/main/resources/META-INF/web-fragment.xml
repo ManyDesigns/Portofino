@@ -5,7 +5,7 @@
         version="3.0">
     <name>stripes</name>
     <ordering>
-        <after><others /></after>
+        <after><name>pageactions</name></after>
     </ordering>
 
     <context-param>

@@ -9,7 +9,7 @@
     <display-name>ManyDesigns Portofino</display-name>
     <description>ManyDesigns Portofino</description>
 
-    <!-- Certain servlet 3.0 containers (e.g. Tomcat 7 before 7.0.33) have bugs in their handling of relative
+    <!-- Certain servlet 3.0 containers (e.g. Tomcat 7 before 7.0.33, Undertow) have bugs in their handling of relative
          module ordering. To work around those, short of updating the container, you can configure here
          the fragments to load. The following is the proper order of stock Portofino web fragments.
          Note that the "stripes" fragment must come after every fragment that defines a servlet filter.
@@ -21,6 +21,9 @@
         <name>pageactions</name>
         <name>database</name>
         <name>stripes</name>
+        <name>jersey</name>
+        - or, if using resteasy -
+        <name>resteasy</name>
     </absolute-ordering>
     -->
 

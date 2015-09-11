@@ -92,7 +92,12 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             return;
         }
         Object resource = uriInfo.getMatchedResources().get(0);
-        if(resourceInfo == null || resourceInfo.getResourceClass() == null) {
+        try {
+            if(resourceInfo == null || resourceInfo.getResourceClass() == null) {
+                return;
+            }
+        } catch (Exception e) {
+            logger.debug("Could not get resourceInfo (can happen under RestEasy)", e);
             return;
         }
         if(resource.getClass() != resourceInfo.getResourceClass()) {
