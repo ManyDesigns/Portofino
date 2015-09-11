@@ -1230,13 +1230,18 @@ Checkbox
 }
 
 /*TODO */
-.form-inline .checkbox label{
-    padding-left: 5px;
-}
+.form-inline .checkbox label{  padding-left: 5px; }
+.radio-inline { padding-left: 5px; }
 
 .checkbox {
     height: 100%;
+    margin-right: 5px;
 }
+
+ @media screen and (max-width: 768px) {
+     .checkbox { margin-right: 10px; }
+     .form-horizontal .checkbox, .form-horizontal .checkbox-inline { margin-top: 5px;}
+ }
 
 .checkbox, .radio {
     margin-top: 2px;
@@ -1256,10 +1261,6 @@ Checkbox
     margin-bottom: -3px;
     background-color: #fff;
     border: 1px rgb(211, 211, 211) solid;
-}
-
-.radio-inline {
-    padding-left: 5px;
 }
 
 /*.radio input[type=radio]:checked + label:before {
