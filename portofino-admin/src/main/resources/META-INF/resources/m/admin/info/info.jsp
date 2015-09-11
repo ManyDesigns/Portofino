@@ -14,14 +14,9 @@
         <div class="jumbotron">
             <div class="container">
                 <h1>Portofino <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/></h1>
-                <p>
-                </p>
-                    <fmt:message key="info.portofino.intro" />
-                <p>
-                    <fmt:message key="info.portofino.features" />
-                </p>
+                <p> <fmt:message key="info.portofino.intro" /> </p>
+                <p> <fmt:message key="info.portofino.features" /> </p>
                 <br>
-                <p>
                 <div class="btn-group" role="group" aria-label="...">
                     <a class="btn btn-success btn-lg"  target="_blank" href="http://portofino.manydesigns.com/en/support" role="button">
                         <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Get support
@@ -39,7 +34,6 @@
                         <span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Ticket Tracker
                     </a>
                 </div>
-                </p>
             </div>
         </div>
 
