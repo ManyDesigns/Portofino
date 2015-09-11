@@ -668,7 +668,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 "bulkDelete".equals(context.getEventName());
     }
 
-    @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT)
+    @Button(list = "crud-bulk", key = "edit", order = 2, icon = Button.ICON_EDIT)
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
@@ -754,7 +754,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getSuccessfulDeleteView();
     }
 
-    @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH)
+    @Button(list = "crud-bulk", key = "delete", order = 3, icon = Button.ICON_TRASH)
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
@@ -1302,7 +1302,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public Boolean isTableFormSelectable() {
-        List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass(getClass(), "crud-search");
+        List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass(getClass(), "crud-bulk");
         Boolean selectable = false ;
         if(buttons == null) {
             logger.trace("buttons == null");
@@ -1320,7 +1320,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
 
                 if( ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE)
-                        && !button.getButton().key().equals("create.new")
                         && ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED)
                         ) {
                     logger.trace("Visible " + button.getButton().key());

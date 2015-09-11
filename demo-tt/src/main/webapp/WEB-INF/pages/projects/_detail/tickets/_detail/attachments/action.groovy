@@ -185,13 +185,13 @@ class TicketAttachementsCrudAction extends CrudAction {
     // Bulk edit customizations
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "edit", order = 2d, icon = Button.ICON_EDIT)
+    @Button(list = "crud-bulk", key = "edit", order = 2d, icon = Button.ICON_EDIT)
     @Guard(test = "isBulkOperationsEnabled() && canEditTicket()", type = GuardType.VISIBLE)
     Resolution bulkEdit() {
         return super.bulkEdit()
     }
 
-    @Button(list = "crud-bulk-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
+    @Button(list = "crud-bulk", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
     @Guard(test = "canEditTicket()", type = GuardType.VISIBLE)
     Resolution bulkUpdate() {
         return super.bulkUpdate()
