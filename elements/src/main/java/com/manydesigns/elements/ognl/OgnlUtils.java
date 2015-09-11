@@ -21,13 +21,11 @@
 package com.manydesigns.elements.ognl;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import ognl.Ognl;
-import ognl.OgnlContext;
-import ognl.OgnlException;
-import ognl.TypeConverter;
+import ognl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /*
@@ -110,4 +108,24 @@ public class OgnlUtils {
             return null;
         }
     }
+
+    public static void clearCache() {
+        OgnlRuntime.clearCache();
+        clearOGNLCache("cacheGetMethod");
+        clearOGNLCache("cacheSetMethod");
+    }
+
+    protected static void clearOGNLCache(String fieldName) {
+        try {
+            Field field = OgnlRuntime.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Map ognlCache = (Map) field.get(null);
+            synchronized (ognlCache) {
+                ognlCache.clear();
+            }
+        } catch (Exception e) {
+            logger.warn("Could not clear OGNL cache " + fieldName, e);
+        }
+    }
+
 }

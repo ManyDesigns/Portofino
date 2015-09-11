@@ -28,12 +28,10 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data"
-                      class="form">
+                      class="form-horizontal">
             <mde:write name="actionBean" property="form" />
-            <div class="form-group">
-                <div class="col-md-offset-2 col-md-10">
-                    <portofino:buttons list="upload-photo" />
-                </div>
+            <div class="col-md-12">
+                <portofino:buttons list="upload-photo" />
             </div>
         </stripes:form>
     </stripes:layout-component>

@@ -79,7 +79,17 @@
         <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>bootstrap-fileinput</artifactId>
-        <version>4.2.0</version>
+            <version>4.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.webjars.bower</groupId>
+                    <artifactId>jquery</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.webjars.bower</groupId>
+                    <artifactId>bootstrap</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>

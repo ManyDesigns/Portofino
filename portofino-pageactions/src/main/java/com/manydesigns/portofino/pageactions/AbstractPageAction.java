@@ -510,7 +510,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.class.is.not.valid"));
             }
             if(this instanceof GroovyObject) {
-                //Attempt to remove old instance of custom action bean
+                logger.debug("Attempting to remove old instance of page action from Stripes caches");
                 //not guaranteed to work
                 try {
                     ModelActionResolver actionResolver =

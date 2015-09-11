@@ -122,8 +122,8 @@ public class WriteTag extends TagSupport {
             XhtmlBuffer xb = new XhtmlBuffer(out);
             xhtmlFragment.toXhtml(xb);
         } else {
-            logger.warn("Bean {} scope {} property {} not of type XhtmlFragment",
-                    new String[] {name, scope, property});
+            logger.warn("Bean {} scope {} property {} not of type XhtmlFragment: {}",
+                    new String[] {name, scope, property, bean != null ? bean.getClass().getName() : null});
         }
     }
 

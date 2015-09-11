@@ -29,9 +29,7 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" class="form-horizontal">
             <mde:write name="actionBean" property="form" />
-            <div class="form-group">
-                <portofino:buttons list="update-data" />
-            </div>
+            <portofino:buttons list="update-data" />
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>
