@@ -74,6 +74,16 @@ ul.infoMessages {
     background-image: url("SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
 }
 
+.alert { box-shadow: 0px 0px 5px rgba(129, 129, 129, 0.15); }
+.alert.alert-warning { box-shadow: 0px 0px 5px rgba(222, 222, 74, 0.15); }
+.alert.alert-danger  { box-shadow: 0px 0px 5px rgba(220, 66, 66, 0.15);  }
+
+.alert-success , .alert-danger  , .alert-info  , .alert-warning {
+    background-image: none;
+    filter: none;
+    border-color: transparent;
+}
+
 /*******************************************************************************
 Forms (Elements)
 *******************************************************************************/
@@ -1099,6 +1109,8 @@ Checkbox
     font-size: 16px;
     text-align: center;
     line-height: 17px;
+    font-family: initial;
+    border: 1px solid;
 }
 
 .radio input[type=radio]:focus + label:before, .radio-inline input[type=radio]:focus + label:before {
@@ -1164,18 +1176,11 @@ Checkbox
 /***********************
 MENU MOBILE
 ***********************/
+.dropdown.mobile { display: none; }
+
 @media screen and (max-width: 768px) {
-.navigation {
-    display: none;
-}
-}
-.dropdown.mobile {
-    display: none;
-}
-@media screen and (max-width: 768px) {
-.dropdown.mobile {
-    display: block;
-}
+    .navigation { display: none; }
+    .dropdown.mobile { display: block; }
 }
 
 /***********
@@ -1211,13 +1216,8 @@ TEST
 .table th:last-child{ border-radius:0 6px 6px 0; }
 .table-bordered th:last-child , .table-bordered th:first-child{ border-radius: 0px; }
 .table thead>tr { border:0px; }
-.table-bordered  thead>tr {
-    border-bottom:1px solid #dddddd;
-}
-
-.table>thead>tr>th {
-    border-bottom: 1px solid #ddd;
-}
+.table-bordered  thead>tr { border-bottom:1px solid #dddddd; }
+.table>thead>tr>th { border-bottom: 1px solid #ddd; }
 
 .table>tbody>tr>td, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td {
     border-top: 0px;
@@ -1230,9 +1230,7 @@ em.pull-right.glyphicon.glyphicon-chevron-up , em.pull-right.glyphicon.glyphicon
     margin-left: 1px;
 }
 
-label {
-    margin-bottom: 0px;
-}
+label { margin-bottom: 0px; }
 
 .table>thead>tr>th {
     color: #333;
@@ -1254,15 +1252,9 @@ label {
     background-color:#ddd;
 }
 
-.search_form_toggle_link:hover {
-    text-decoration: none;
-}
-
-.search_form_toggle_link:focus {
-    text-decoration: none;
-}
-
-div.form-control {background-color: transparent;}
+.search_form_toggle_link:hover { text-decoration: none; }
+.search_form_toggle_link:focus { text-decoration: none; }
+div.form-control { background-color: transparent; }
 
 .form-inline .radio label {
     padding-left: 5px;
@@ -1273,7 +1265,6 @@ select.form-control::-ms-expand {
     border: none;
     background: #fff;
 }
-
 
 /*****************
 TEST MOBILE
@@ -1314,10 +1305,10 @@ TEST MOBILE
     }
 }
 
- @media (max-width: 991px) {
-     .form-horizontal.read fieldset{ }
+@media (max-width: 991px) {
+    .form-horizontal.read fieldset{ }
 
-     .form-horizontal.read .row { }
+    .form-horizontal.read .row { }
     .form-horizontal.read .control-label {
         padding-left: 5px;
         padding-right: 5px;
@@ -1329,28 +1320,28 @@ TEST MOBILE
 }
 
 
- /*For smaller device, tab control should not appear*/
+/*For smaller device, tab control should not appear*/
 @media (max-width: 767px) {
-   /* .nav-tabs > li {
-        float:none;
-        border:1px solid #dddddd;
-    }
-    .nav-tabs > li.active > a{
-        border:none;
-    }
-    .nav > li > a:hover, .nav > li > a:focus,
-    .nav > li > a:hover, .nav > li > a:focus,
-    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus
-     {
-        background:none;
-        border:none;
-    }
-    .nav > li.active {
-            background-color: #337ab7;
-            border-color: #337ab7;
-    }
-    .nav > li.active a{color: #fff; }
-     */
+    /* .nav-tabs > li {
+       float:none;
+       border:1px solid #dddddd;
+   }
+   .nav-tabs > li.active > a{
+       border:none;
+   }
+   .nav > li > a:hover, .nav > li > a:focus,
+   .nav > li > a:hover, .nav > li > a:focus,
+   .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus
+    {
+       background:none;
+       border:none;
+   }
+   .nav > li.active {
+           background-color: #337ab7;
+           border-color: #337ab7;
+   }
+   .nav > li.active a{color: #fff; }
+    */
 
     .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
         padding: 5px;
@@ -1359,15 +1350,15 @@ TEST MOBILE
         width: auto;
     }
 
-        .form-group.readonly {
+    .form-group.readonly {
         display: table;
     }
 
-        .form-horizontal .control-label {
+    .form-horizontal .control-label {
         display: table-cell;
     }
 
-        .form-horizontal .input-container {
-         width: auto;
+    .form-horizontal .input-container {
+        width: auto;
     }
 }

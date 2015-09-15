@@ -16,7 +16,7 @@
         <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.edit.js"/>"  type="text/javascript"></script>  -->
         <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.glyph.js"/>" type="text/javascript"></script>
         <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.filter.js"/>" type="text/javascript"></script>
-        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>-->
+        <script src="<stripes:url value="/webjars/fancytree/2.11.0/dist/src/jquery.fancytree.wide.js"/>"  type="text/javascript"></script>
 
         <style type="text/css">
             ul.fancytree-ext-wide { border: none; }
@@ -103,16 +103,13 @@
             <div class="panel-heading">
                 <strong><fmt:message key="database/schema" />/<fmt:message key="table.entity" /></strong>
 
-
                     <label>Filter:</label>
                     <input class="form-control inpu-sm" name="search" placeholder="Filter..." autocomplete="off">
-
 
             </div>
             <div id="tree" class="panel-body fancytree-colorize-hover"></div>
             <div class="panel-footer">
                 <span class="badge" id="matches"></span>
-
             </div>
         </div>
 

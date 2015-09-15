@@ -171,7 +171,7 @@ public class TextField extends AbstractTextField<String> {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("p");
-        String cssClass = STATIC_VALUE_CSS_CLASS;
+        String cssClass = STATIC_VALUE_CSS_CLASS+" mode_text_view";
         if (ArrayUtils.contains(red, stringValue)) {
             cssClass += " status_red";
         } else if (ArrayUtils.contains(amber, stringValue)) {
@@ -186,10 +186,15 @@ public class TextField extends AbstractTextField<String> {
             xb.addAttribute("href", href);
             xb.addAttribute("alt", title);
         }
-        if(richText) {
-            xb.writeNoHtmlEscape(stringValue);
-        } else {
-            Util.writeFormattedText(xb, stringValue, href == null && highlightLinks);
+
+        if( StringUtils.trimToNull(stringValue)!=null ){
+            if(richText) {
+                xb.writeNoHtmlEscape(stringValue);
+            } else {
+                Util.writeFormattedText(xb, stringValue, href == null && highlightLinks);
+            }
+        }else{
+             xb.writeNoHtmlEscape("-");
         }
         if (href != null) {
             xb.closeElement("a");
