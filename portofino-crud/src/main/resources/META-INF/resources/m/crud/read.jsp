@@ -10,7 +10,14 @@
     <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
         <jsp:include page="/theme/breadcrumbs.jsp" />
-        <jsp:include page="/m/crud/result-set-navigation.jsp" />
+        <div class="pull-right">
+            <c:if test="${actionBean.crudConfiguration.largeResultSet}">
+                <jsp:include page="/m/crud/return-to-parent.jsp" />
+            </c:if>
+            <c:if test="${not actionBean.crudConfiguration.largeResultSet}">
+                <jsp:include page="/m/crud/result-set-navigation.jsp" />
+            </c:if>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.readTitle}"/>

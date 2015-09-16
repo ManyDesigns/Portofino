@@ -92,7 +92,9 @@
                             </a>
                         </li>
                         <%
-                            if(request.getAttribute("actionBean") instanceof PageAction && !actionBean.getContext().getActionPath().equals("/actions/admin/page") ) {
+                            }
+                            if(request.getAttribute("actionBean") instanceof PageAction &&
+                               !actionBean.getContext().getActionPath().equals("/actions/admin/page")) {
                                 PageAction pageAction = (PageAction) request.getAttribute("actionBean");
                                 if(pageAction.getPageInstance() != null &&
                                    SecurityLogic.hasPermissions(
@@ -142,7 +144,7 @@
                             if(SecurityLogic.hasPermissions(
                                     portofinoConfiguration, pageAction.getPageInstance(),
                                     subject, AccessLevel.DEVELOP)) {
-                                urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, true);
+                                UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, true);
                                 urlBuilder.addParameter("originalPath", pageAction.getContext().getActionPath());
                                 urlBuilder.setEvent("pagePermissions");
                         %>
