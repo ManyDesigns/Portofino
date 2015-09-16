@@ -4,7 +4,7 @@ import ch.qos.logback.classic.jul.LevelChangePropagator
 
 import static ch.qos.logback.classic.Level.*
 
-def defaultPattern = "%d %-5level %-40logger{40} %msg%n";
+def defaultPattern = "%d %-5level %-40logger{40} %X{userId} %X{req.requestURI} %msg%n";
 def appenders = [];
 
 //java.util.logging integration (for better performance)

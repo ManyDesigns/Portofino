@@ -79,6 +79,9 @@ public class ShiroInterceptor implements Interceptor {
         if(userId != null) { //Issue #755
             MDC.put("userId", userId.toString());
         }
+        if(context.getActionBeanContext() != null && context.getActionBeanContext().getRequest() != null) {
+            MDC.put("req.requestURI", context.getActionBeanContext().getRequest().getRequestURI());
+        }
 
         try {
             AUTH_CHECKER.assertAuthorized(context);

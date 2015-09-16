@@ -80,7 +80,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
 
-        publishUser();
+        fillMDC();
         checkAuthorizations(requestContext, resource);
         preparePage(requestContext, resource);
         runStripesInterceptors(requestContext, resource, true);
@@ -168,7 +168,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-    protected void publishUser() {
+    protected void fillMDC() {
         logger.debug("Retrieving user");
         Serializable userId = null;
         Subject subject = SecurityUtils.getSubject();
@@ -184,6 +184,9 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         MDC.clear();
         if(userId != null) { //Issue #755
             MDC.put("userId", userId.toString());
+        }
+        if(request != null) {
+            MDC.put("req.requestURI", request.getRequestURI());
         }
     }
 

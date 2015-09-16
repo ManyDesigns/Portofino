@@ -42,7 +42,7 @@
             <stripes:link href="<%= redirectURI %>" class="navbar-brand" title="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>">
                 <% if(!StringUtils.isEmpty(portofinoConfiguration.getString(PortofinoProperties.APP_LOGO))) { %>
                     <stripes:url var="logoUrl" value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) %>"/>
-                    <img src="${logoUrl}" width="32px" alt="logo"/>
+                    <img src="${logoUrl}" width="32px" alt='<c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>' />
                 <% } %>
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
@@ -92,15 +92,6 @@
                             </a>
                         </li>
                         <%
-                            }
-                            UrlBuilder logoutUrlBuilder =
-                                    new UrlBuilder(request.getLocale(), loginPage, true);
-                            logoutUrlBuilder.addParameter("returnUrl", actionPath);
-                            logoutUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                            logoutUrlBuilder.addParameter("logout");
-                            String logoutUrl = Util.getAbsoluteUrl(logoutUrlBuilder.toString());
-                        %>
-                        <%
                             if(request.getAttribute("actionBean") instanceof PageAction && !actionBean.getContext().getActionPath().equals("/actions/admin/page") ) {
                                 PageAction pageAction = (PageAction) request.getAttribute("actionBean");
                                 if(pageAction.getPageInstance() != null &&
@@ -116,24 +107,15 @@
                             </a>
                         </li>
                         <li>
-                            <%
-                                UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                urlBuilder.addParameter("originalPath", pageAction.getContext().getActionPath());
-                                urlBuilder.setEvent("pageChildren");
-                            %>
-                            <a href="<%= request.getContextPath() + urlBuilder %>">
+                            <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pageChildren">
+                                <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
                                 <em class="glyphicon glyphicon-folder-open"></em> Page children
-                            </a>
-                        </li>
+                            </stripes:link>                        </li>
                         <li>
-                            <%
-                                urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                urlBuilder.addParameter("originalPath", pageAction.getContext().getActionPath());
-                                urlBuilder.setEvent("newPage");
-                            %>
-                            <a href="<%= request.getContextPath() + urlBuilder %>">
+                            <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="newPage">
+                                <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
                                 <em class="glyphicon glyphicon-plus"></em> Add new page
-                            </a>
+                            </stripes:link>
                         </li>
                         <%
                             String jsArgs = "('" +
@@ -165,35 +147,33 @@
                                 urlBuilder.setEvent("pagePermissions");
                         %>
                         <li>
-                            <a href="<%= request.getContextPath() + urlBuilder %>">
+                            <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pagePermissions">
+                                <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
                                 <em class="glyphicon glyphicon-user"></em> Page permissions
-                            </a>
+                            </stripes:link>
                         </li>
                         <% }}} %>
                     </ul>
                 </li>
-
                 <li>
-                    <a href="<%= logoutUrl %>">
+                    <stripes:link href="<%= loginPage %>">
+                        <stripes:param name="logout"/>
+                        <stripes:param name="returnUrl" value="${actionBean.context.actionPath}"/>
+                        <stripes:param name="cancelReturnUrl" value="${actionBean.context.actionPath}"/>
                         <span class="glyphicon glyphicon-log-out"></span> <fmt:message key="log.out" />
-                    </a>
+                    </stripes:link>
                 </li>
-                <jsp:include page="/theme/navigation-mobile.jsp" />
                 </shiro:user>
                 <shiro:guest>
-                <%
-                    UrlBuilder loginUrlBuilder = new UrlBuilder(request.getLocale(), loginPage, false);
-                    loginUrlBuilder.addParameter("returnUrl", actionPath);
-                    loginUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                    String loginUrl = Util.getAbsoluteUrl(loginUrlBuilder.toString());
-                %>
                     <li>
-                        <a href="<%= loginUrl %>">
-                             <span class="glyphicon glyphicon-log-in"></span><fmt:message key="log.in" />
-                        </a>
+                        <stripes:link href="<%= loginPage %>">
+                            <stripes:param name="returnUrl" value="${actionPath}"/>
+                            <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
+                            <span class="glyphicon glyphicon-log-in"></span> <fmt:message key="log.in" />
+                        </stripes:link>
                     </li>
-                 <jsp:include page="/theme/navigation-mobile.jsp" />
                 </shiro:guest>
+                <jsp:include page="/theme/navigation-mobile.jsp" />
             </ul>
         </nav>
     </div>

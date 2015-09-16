@@ -31,8 +31,6 @@
                     return confirm ('<fmt:message key="are.you.sure" />');
                 });
             </script>
-
-
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

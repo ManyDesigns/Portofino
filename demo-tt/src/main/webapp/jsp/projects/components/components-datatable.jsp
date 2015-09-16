@@ -49,7 +49,6 @@
     </div>
     <div class="pull-left">
         <portofino:buttons list="crud-search" />
-        <portofino:buttons list="crud-bulk" />
     </div>
     <%
         Integer rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();

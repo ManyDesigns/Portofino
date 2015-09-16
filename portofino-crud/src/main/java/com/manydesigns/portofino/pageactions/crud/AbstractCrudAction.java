@@ -668,7 +668,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 "bulkDelete".equals(context.getEventName());
     }
 
-    @Button(list = "crud-bulk", key = "edit", order = 2, icon = Button.ICON_EDIT)
+    @Buttons({
+        @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT),
+        @Button(list = "crud-bulk", key = "edit", order = 2, icon = Button.ICON_EDIT)
+    })
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
@@ -754,7 +757,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getSuccessfulDeleteView();
     }
 
-    @Button(list = "crud-bulk", key = "delete", order = 3, icon = Button.ICON_TRASH)
+    @Buttons({
+        @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH),
+        @Button(list = "crud-bulk", key = "delete", order = 3, icon = Button.ICON_TRASH)
+    })
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
