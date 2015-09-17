@@ -29,7 +29,7 @@
                 <label>Add a comment:</label>
                 <textarea maxlength="4000" name="comment" class="form-control"></textarea>
                 <br/>
-                <div>
+                <div style="margin-bottom: 10px;">
                     <portofino:buttons list="activity"/>
                 </div>
             </stripes:form>

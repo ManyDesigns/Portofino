@@ -33,7 +33,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,12 +47,12 @@ public class TextField extends AbstractTextField<String> {
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
     protected boolean richText = false;
-    protected boolean code = false;
     protected Integer textAreaWidth;
     protected int textAreaMinRows = 4;
     protected String[] red;
     protected String[] amber;
     protected String[] green;
+    protected String noValueText = "-";
 
     //**************************************************************************
     // Costruttori
@@ -171,13 +170,16 @@ public class TextField extends AbstractTextField<String> {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("p");
-        String cssClass = STATIC_VALUE_CSS_CLASS+" mode_text_view";
+        String cssClass = STATIC_VALUE_CSS_CLASS;
         if (ArrayUtils.contains(red, stringValue)) {
             cssClass += " status_red";
         } else if (ArrayUtils.contains(amber, stringValue)) {
             cssClass += " status_amber";
         } else if (ArrayUtils.contains(green, stringValue)) {
             cssClass += " status_green";
+        }
+        if(StringUtils.isBlank(stringValue)) {
+            cssClass += " no-value";
         }
         xb.addAttribute("class", cssClass);
         xb.addAttribute("id", id);
@@ -186,15 +188,10 @@ public class TextField extends AbstractTextField<String> {
             xb.addAttribute("href", href);
             xb.addAttribute("alt", title);
         }
-
-        if( StringUtils.trimToNull(stringValue)!=null ){
-            if(richText) {
-                xb.writeNoHtmlEscape(stringValue);
-            } else {
-                Util.writeFormattedText(xb, stringValue, href == null && highlightLinks);
-            }
-        }else{
-             xb.writeNoHtmlEscape("-");
+        if(richText) {
+            xb.writeNoHtmlEscape(stringValue);
+        } else {
+            Util.writeFormattedText(xb, stringValue, href == null && highlightLinks);
         }
         if (href != null) {
             xb.closeElement("a");
@@ -283,6 +280,14 @@ public class TextField extends AbstractTextField<String> {
 
     public void setTextAreaMinRows(int textAreaMinRows) {
         this.textAreaMinRows = textAreaMinRows;
+    }
+
+    public String getNoValueText() {
+        return noValueText;
+    }
+
+    public void setNoValueText(String noValueText) {
+        this.noValueText = noValueText;
     }
 }
 

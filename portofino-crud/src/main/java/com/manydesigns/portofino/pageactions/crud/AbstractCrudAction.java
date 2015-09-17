@@ -1113,6 +1113,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .toString();
     }
 
+    /**
+     * Creates, configures and populates the form used to gather search parameters. If this page is embedded, the form's
+     * values are not read from the request to avoid having the embedding page influence this one.
+     */
     protected void setupSearchForm() {
         SearchFormBuilder searchFormBuilder = createSearchFormBuilder();
         searchForm = buildSearchForm(configureSearchFormBuilder(searchFormBuilder));
@@ -1123,6 +1127,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Populates the search form from request parameters.
+     * <ul>
+     *     <li>If <code>searchString</code> is blank, then the form is read from the request
+     *     (by {@link SearchForm#readFromRequest(javax.servlet.http.HttpServletRequest)}) and <code>searchString</code>
+     *     is generated accordingly.</li>
+     *     <li>Else, <code>searchString</code> is interpreted as a query string and the form is populated from it.</li>
+     * </ul>
+     */
     protected void readSearchFormFromRequest() {
         if (StringUtils.isBlank(searchString)) {
             searchForm.readFromRequest(context.getRequest());

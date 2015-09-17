@@ -245,10 +245,6 @@ public abstract class AbstractField<T> implements Field<T> {
             xb.addAttribute("for", id); //HTML5 validation
         }
         xb.addAttribute("class", FORM_LABEL_CSS_CLASS);
-        /*if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
-            xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
-        }*/
-
 
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             String cid = id+"_check";
