@@ -1,4 +1,24 @@
 /*******************************************************************************
+Page Body
+*******************************************************************************/
+#content {
+    padding-bottom: 50px; /* Height of the footer element */
+}
+
+#wrapper {
+    min-height: 100%;
+    position: relative;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    letter-spacing: 0.02em;
+    color: #333;
+}
+
+/*******************************************************************************
 Header / footer
 *******************************************************************************/
 
@@ -12,7 +32,7 @@ footer {
     background-image:-webkit-gradient(linear,left top,left bottom,from(rgba(245, 245, 245, 0.79)),to(rgba(255, 255, 255, 0.94)));
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe8e8e8', endColorstr='#fff5f5f5', GradientType=0);
 
-    color: rgb(90, 90, 90);
+    color: #5a5a5a;
     font-size: 11px;
     margin-top: 10px;
 
@@ -34,7 +54,7 @@ footer {
 }
 
 .contentFooter {
-    color: rgb(90, 90, 90);
+    color: #5a5a5a;
     text-rendering: optimizeLegibility;
     text-align: center;
     font-size: smaller;
@@ -105,6 +125,14 @@ Forms (Elements)
     .form-horizontal .input-container {
         float: left;
     }
+
+    .form-horizontal .mde-columns-6 .control-label {
+        float: none;
+    }
+
+    .form-horizontal .mde-columns-6 .input-container {
+        float: none;
+    }
 }
 
 /* 1-column form default */
@@ -114,8 +142,12 @@ Forms (Elements)
 
 @media (max-width: 991px) {
     /* 1-column form */
+    .form-horizontal .control-label {
+        width: inherit;
+    }
+
     .form-horizontal .input-container {
-        width: 83.33333333%;
+        width: 100%;
     }
 }
 
@@ -214,9 +246,9 @@ tbody div.form-control {
     padding: 0;
 }
 
-/*input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-size {
+input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-size {
     width: auto;
-}*/
+}
 
 fieldset.radio {
     margin-bottom: 0;
@@ -250,7 +282,7 @@ label.control-label:after {
 }
 
 .form-group.readwrite.required label.control-label:before {
-    content: "* ";
+    content: "*\a0 ";
 }
 
 .portofino-datatable {
@@ -507,7 +539,6 @@ Search form
     overflow-x: auto;
     overflow-y: hidden; /* Fixes a bug in Chrome */
     margin-bottom: 20px;
-    /*border-top: 1px solid #DDDDDD; */
 }
 
 .search_results th a {
@@ -643,7 +674,6 @@ Wizard
 .wizard-header ul li.before .chevron:before {
     border-left: 14px solid #F3F4F5;
 }
-
 
 /* TODO merge */
 .wizard-header{
@@ -887,27 +917,6 @@ hr.nav-separator{
 }
 
 /*******************************************************************************
-Page Body
-*******************************************************************************/
-#content {
-	padding-bottom:50px; /* Height of the footer element */
-}
-
-#wrapper {
-	min-height:100%;
-	position:relative;
-}
-
-html,
-body {
-	margin:0;
-	padding:0;
-	height:100%;
-    letter-spacing: 0.02em;
-    color: #333;
-}
-
-/*******************************************************************************
 Checkbox
 *******************************************************************************/
 .squared-dark {
@@ -943,9 +952,7 @@ Checkbox
     -ms-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
-/*.squared-dark label:hover::after {
-    opacity: 0.3;
-}*/
+
 .squared-dark input[type=checkbox] {
     visibility: hidden;
     position: absolute;
@@ -965,15 +972,10 @@ Checkbox
     width: 19px;
     height: 19px;
     cursor: pointer;
-    /*position: absolute;
-  top: 5px; */
     left: 0;
     border: 1px solid #ccc;
     background: #FFFFFF;
-    /* background: -webkit-linear-gradient(top, #fcfff4 0%, #ECECEC 40%, #BDBDBD 100%); */
-    /* background: linear-gradient(to bottom, #fcfff4 0%, #EAEAEA 40%, #C3C3C3 100%); */
     border-radius: 4px;
-    /* box-shadow: inset 0px 1px 1px white, 0px 1px 3px rgba(0, 0, 0, 0.5); */
 }
 .squared-standard label:after {
     content: '';
@@ -991,10 +993,6 @@ Checkbox
     -ms-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
-
-/*.squared-standard label:hover::after {
-    opacity: 0.5;
-} */
 
 .squared-standard input[type=checkbox] {
     visibility: hidden;
@@ -1015,7 +1013,6 @@ Checkbox
     width: 20px;
     height: 15px;
     cursor: pointer;
-    /*position: absolute; */
     top: 0;
     left: 0;
     background: -webkit-linear-gradient(top, #222222 0%, #45484d 100%);
@@ -1023,6 +1020,7 @@ Checkbox
     border-radius: 3px;
     box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.4);
 }
+
 .squared-light label:after {
     content: '';
     width: 9px;
@@ -1039,9 +1037,6 @@ Checkbox
     -ms-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
-/*.squared-light label:hover::after {
-    opacity: 0.3;
-}*/
 
 .squared-light input[type=checkbox] {
     visibility: hidden;
@@ -1071,9 +1066,9 @@ Checkbox
     float: left;
 }
 
-  .form-inline .radio input[type=radio] , .radio input[type=radio], .radio-inline input[type=radio]  {
+.form-inline .radio input[type=radio] , .radio input[type=radio], .radio-inline input[type=radio]  {
     position: absolute;
-  }
+}
 
 @media (min-width: 768px){
 .form-inline .checkbox input[type=checkbox], .form-inline .radio input[type=radio] {
@@ -1085,6 +1080,10 @@ Checkbox
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox] {
     opacity: 0;
     min-width: 0;
+}
+
+.checkbox label, .radio label {
+    padding-left: 12px;
 }
 
 .checkbox label:before, .checkbox-inline label:before {
@@ -1138,10 +1137,10 @@ Checkbox
     margin-right: 5px;
 }
 
- @media screen and (max-width: 768px) {
-     .checkbox { margin-right: 10px; }
-     .form-horizontal .checkbox, .form-horizontal .checkbox-inline { margin-top: 5px;}
- }
+@media screen and (max-width: 768px) {
+    .checkbox { margin-right: 10px; }
+    .form-horizontal .checkbox, .form-horizontal .checkbox-inline { margin-top: 5px;}
+}
 
 .checkbox, .radio {
     margin-top: 2px;
@@ -1319,27 +1318,6 @@ TEST MOBILE
 
 /*For smaller device, tab control should not appear*/
 @media (max-width: 767px) {
-    /* .nav-tabs > li {
-       float:none;
-       border:1px solid #dddddd;
-   }
-   .nav-tabs > li.active > a{
-       border:none;
-   }
-   .nav > li > a:hover, .nav > li > a:focus,
-   .nav > li > a:hover, .nav > li > a:focus,
-   .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus
-    {
-       background:none;
-       border:none;
-   }
-   .nav > li.active {
-           background-color: #337ab7;
-           border-color: #337ab7;
-   }
-   .nav > li.active a{color: #fff; }
-    */
-
     .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover {
         padding: 5px;
     }

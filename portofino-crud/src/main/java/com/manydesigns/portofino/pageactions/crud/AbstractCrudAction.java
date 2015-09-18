@@ -1380,6 +1380,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return tableFormBuilder;
     }
 
+    /**
+     * Creates and configures the {@link Form} used to display, edit and save a single object. As a side effect, assigns
+     * that form to the field {@link #form}.
+     * @param mode the {@link Mode} of the form.
+     */
     protected void setupForm(Mode mode) {
         FormBuilder formBuilder = createFormBuilder();
         configureFormBuilder(formBuilder, mode);

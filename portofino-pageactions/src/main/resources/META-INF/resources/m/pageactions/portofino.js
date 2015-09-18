@@ -212,7 +212,7 @@ function configureBulkEditTextField(id, checkboxName) {
 
 function configureBulkEditDateField(id, checkboxName) {
     configureBulkEditTextField(id, checkboxName);
-    $("#" + id).on("change.dp", function() {
+    $("#" + id).on("dp.change", function() {
         if($(this).val()) {
             $("input[name=" + checkboxName + "]").prop("checked", true);
         }

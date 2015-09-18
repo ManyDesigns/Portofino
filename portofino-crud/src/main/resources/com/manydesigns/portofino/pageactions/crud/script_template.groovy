@@ -1,5 +1,6 @@
 import javax.servlet.*
 
+import com.manydesigns.elements.forms.*
 import com.manydesigns.elements.messages.*
 import com.manydesigns.elements.reflection.*
 import com.manydesigns.portofino.*
