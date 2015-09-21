@@ -85,7 +85,7 @@
         <fop.version>1.0</fop.version>
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
         <groovy.version>2.4.4</groovy.version>
-        <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
+        <guava.version>18.0</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
         <jasperreports.version>3.5.0</jasperreports.version>

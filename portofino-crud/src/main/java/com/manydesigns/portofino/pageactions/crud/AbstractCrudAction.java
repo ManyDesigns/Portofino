@@ -308,6 +308,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return doSearch();
     }
 
+    /**
+     * Executes a search and forwards to the appropriate view.
+     * @return the result of {@link #getSearchView()}
+     */
     protected Resolution doSearch() {
         if(!isConfigured()) {
             logger.debug("Crud not correctly configured");
@@ -1090,12 +1094,18 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Computes the search URL from the current URL. In other words, it removes any /pk trailing path fragment from the
+     * URL used to access the page.
+     * @return the search URL.
+     */
     protected String calculateBaseSearchUrl() {
-        assert pk != null; //Ha senso solo in modalita' read/detail
         String baseUrl = Util.getAbsoluteUrl(context.getActionPath());
-        for(int i = 0; i < pk.length; i++) {
-            int lastSlashIndex = baseUrl.lastIndexOf('/');
-            baseUrl = baseUrl.substring(0, lastSlashIndex);
+        if(pk != null) {
+            for(int i = 0; i < pk.length; i++) {
+                int lastSlashIndex = baseUrl.lastIndexOf('/');
+                baseUrl = baseUrl.substring(0, lastSlashIndex);
+            }
         }
         return baseUrl;
     }
