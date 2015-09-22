@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2-SNAPSHOT</version>
+        <version>4.2</version>
     </parent>
     <artifactId>portofino-db2</artifactId>
     <packaging>jar</packaging>
