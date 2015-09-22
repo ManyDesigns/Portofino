@@ -1,16 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
-         pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
-<%@ taglib prefix="mde" uri="/manydesigns-elements"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"%>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="com.manydesigns.portofino.PortofinoProperties" %>
-<jsp:useBean id="portofinoConfiguration" scope="application"
-             type="org.apache.commons.configuration.Configuration"/>
-<stripes:layout-render name="/theme/templates/dialog/modal.jsp">
+         pageEncoding="UTF-8"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
+%><stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
 
     <stripes:layout-component name="pageTitle">
