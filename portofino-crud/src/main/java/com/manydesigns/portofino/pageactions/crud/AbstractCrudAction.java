@@ -38,7 +38,6 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
-import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
@@ -486,7 +485,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected void writeFormToObject() {
         form.writeToObject(object);
-        for(TextField textField : getEditableRichTextFields()) {
+        for(TextField textField : FormUtil.collectEditableRichTextFields(form)) {
             PropertyAccessor propertyAccessor = textField.getPropertyAccessor();
             String stringValue = textField.getStringValue();
             String cleanText;
@@ -2364,23 +2363,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return form != null && form.isMultipartRequest();
     }
 
+    @Deprecated
     public List<TextField> getEditableRichTextFields() {
-        List<TextField> richTextFields = new ArrayList<TextField>();
-        for(FieldSet fieldSet : form) {
-            for(FormElement field : fieldSet) {
-                if(field instanceof TextField &&
-                   ((TextField) field).isEnabled() &&
-                   !form.getMode().isView(((TextField) field).isInsertable(), ((TextField) field).isUpdatable()) &&
-                   ((TextField) field).isRichText()) {
-                    richTextFields.add(((TextField) field));
-                }
-            }
-        }
-        return richTextFields;
+        return FormUtil.collectEditableRichTextFields(form);
     }
 
     public boolean isFormWithRichTextFields() {
-        return !getEditableRichTextFields().isEmpty();
+        return !FormUtil.collectEditableRichTextFields(form).isEmpty();
     }
 
     public Form getCrudConfigurationForm() {

@@ -26,6 +26,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
@@ -167,6 +168,10 @@ public abstract class FormAction extends AbstractPageAction {
 
     public static interface ActionOnForm {
         Object invoke(Form form, Object object);
+    }
+
+    public boolean isFormWithRichTextFields() {
+        return !FormUtil.collectEditableRichTextFields(form).isEmpty();
     }
 
 }

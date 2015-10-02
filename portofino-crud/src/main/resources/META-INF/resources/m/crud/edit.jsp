@@ -12,16 +12,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <c:if test="${actionBean.formWithRichTextFields}">
-            <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/4.5.3/standard/ckeditor.js"/>"></script>
-            <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/4.5.3/standard/adapters/jquery.js"/>"></script>
-            <script type="text/javascript">
-                $(function() {
-                    portofino.setupRichTextEditors({
-                        toolbarCanCollapse: true,
-                        height: null
-                    });
-                });
-            </script>
+            <portofino:enable-ckeditor />
         </c:if>
         <c:if test="${actionBean.requiredFieldsPresent}">
             <p class="subtitle"><fmt:message key="fields.marked.with.a.star.are.required"/>.</p>

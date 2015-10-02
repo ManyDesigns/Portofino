@@ -12,6 +12,9 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
+        <c:if test="${actionBean.formWithRichTextFields}">
+            <portofino:enable-ckeditor />
+        </c:if>
         <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <mde:write name="actionBean" property="form"/>

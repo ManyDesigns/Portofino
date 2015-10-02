@@ -3,7 +3,7 @@
 %><%@ attribute name="returnUrl" required="false"
 %><%@ attribute name="cssClass" required="false"
 %><%@ attribute name="anchor" required="false" type="java.lang.Boolean"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ tag import="org.slf4j.LoggerFactory"

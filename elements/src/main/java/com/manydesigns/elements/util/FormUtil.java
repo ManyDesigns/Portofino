@@ -31,6 +31,7 @@ package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.json.JsonKeyValueAccessor;
@@ -141,5 +142,20 @@ public class FormUtil {
         };
         form.readFrom(kv);
         return form;
+    }
+
+    public static List<TextField> collectEditableRichTextFields(Form form) {
+        List<TextField> richTextFields = new ArrayList<TextField>();
+        for(FieldSet fieldSet : form) {
+            for(FormElement field : fieldSet) {
+                if(field instanceof TextField &&
+                   ((TextField) field).isEnabled() &&
+                   !form.getMode().isView(((TextField) field).isInsertable(), ((TextField) field).isUpdatable()) &&
+                   ((TextField) field).isRichText()) {
+                    richTextFields.add(((TextField) field));
+                }
+            }
+        }
+        return richTextFields;
     }
 }
