@@ -231,22 +231,22 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             Connection conn = connectionProvider.acquireConnection();
             logger.debug("Reading database metadata");
             DatabaseMetaData metadata = conn.getMetaData();
-            List<String> schemaNamesFromDb =
+            List<String[]> schemaNamesFromDb =
                     connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
             connectionProvider.releaseConnection(conn);
 
             List<Schema> selectedSchemas = connectionProvider.getDatabase().getSchemas();
 
             selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
-            for(String schemaName : schemaNamesFromDb) {
+            for(String[] schemaName : schemaNamesFromDb) {
                 boolean selected = false;
                 for(Schema schema : selectedSchemas) {
-                    if(schemaName.equalsIgnoreCase(schema.getSchemaName())) {
+                    if(schemaName[1].equalsIgnoreCase(schema.getSchemaName())) {
                         selected = true;
                         break;
                     }
                 }
-                SelectableSchema schema = new SelectableSchema(schemaName, selected);
+                SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], selected);
                 selectableSchemas.add(schema);
             }
             schemasForm = new TableFormBuilder(SelectableSchema.class)
@@ -327,6 +327,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 for(SelectableSchema schema : selectableSchemas) {
                     if(schema.selected && !selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
                         Schema modelSchema = new Schema();
+                        modelSchema.setCatalog(schema.catalogName);
                         modelSchema.setSchemaName(schema.schemaName);
                         modelSchema.setDatabase(database);
                         database.getSchemas().add(modelSchema);

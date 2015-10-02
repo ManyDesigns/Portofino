@@ -355,13 +355,13 @@ public class ApplicationWizard extends AbstractPageAction {
         Connection conn = connectionProvider.acquireConnection();
         logger.debug("Reading database metadata");
         DatabaseMetaData metadata = conn.getMetaData();
-        List<String> schemaNamesFromDb =
+        List<String[]> schemaNamesFromDb =
                 connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
         connectionProvider.releaseConnection(conn);
 
         selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
-        for(String schemaName : schemaNamesFromDb) {
-            SelectableSchema schema = new SelectableSchema(schemaName, schemaNamesFromDb.size() == 1);
+        for(String[] schemaName : schemaNamesFromDb) {
+            SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], schemaNamesFromDb.size() == 1);
             selectableSchemas.add(schema);
         }
         schemasForm = new TableFormBuilder(SelectableSchema.class)
@@ -433,6 +433,7 @@ public class ApplicationWizard extends AbstractPageAction {
             if(schema.selected) {
                 if(modelSchema == null) {
                     modelSchema = new Schema();
+                    modelSchema.setCatalog(schema.catalogName);
                     modelSchema.setSchemaName(schema.schemaName);
                     modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);

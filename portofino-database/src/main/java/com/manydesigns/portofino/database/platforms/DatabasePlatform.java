@@ -61,6 +61,6 @@ public interface DatabasePlatform {
     boolean isApplicable(ConnectionProvider connectionProvider);
     void shutdown(ConnectionProvider connectionProvider);
 
-    List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException;
+    List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException;
 
 }

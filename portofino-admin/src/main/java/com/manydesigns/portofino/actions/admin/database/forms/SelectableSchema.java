@@ -34,14 +34,15 @@ public class SelectableSchema {
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     @Updatable(false)
-    public String schemaName;
+    public final String catalogName;
+    @Updatable(false)
+    public final String schemaName;
     @Label("")
     public boolean selected;
 
-    public SelectableSchema(String schemaName, boolean selected) {
+    public SelectableSchema(String catalogName, String schemaName, boolean selected) {
+        this.catalogName = catalogName;
         this.schemaName = schemaName;
         this.selected = selected;
     }
-
-    public SelectableSchema() {}
 }

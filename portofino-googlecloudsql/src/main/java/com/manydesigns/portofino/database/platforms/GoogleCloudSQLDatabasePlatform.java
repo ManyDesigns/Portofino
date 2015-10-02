@@ -71,13 +71,13 @@ public class GoogleCloudSQLDatabasePlatform extends AbstractDatabasePlatform {
         return connectionProvider.getDatabaseProductName().contains("Google");
     }
 
-    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
+    public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
         ResultSet rs = databaseMetaData.getCatalogs();
-        List<String> schemaNames = new ArrayList<String>();
+        List<String[]> schemaNames = new ArrayList<String[]>();
         try {
             while(rs.next()) {
                 String schemaName = rs.getString(TABLE_CAT);
-                schemaNames.add(schemaName);
+                schemaNames.add(new String[] { null, schemaName });
             }
         } finally {
             DbUtils.closeQuietly(rs);

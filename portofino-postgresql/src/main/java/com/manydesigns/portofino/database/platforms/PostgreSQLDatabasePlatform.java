@@ -67,12 +67,12 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     }
 
     @Override
-    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
-        List<String> schemaNames = super.getSchemaNames(databaseMetaData);
-        Iterator<String> it = schemaNames.iterator();
+    public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
+        List<String[]> schemaNames = super.getSchemaNames(databaseMetaData);
+        Iterator<String[]> it = schemaNames.iterator();
         while (it.hasNext()) {
-            String next = it.next();
-            if("information_schema".equalsIgnoreCase(next) || next.startsWith("pg_")) {
+            String[] next = it.next();
+            if("information_schema".equalsIgnoreCase(next[1]) || next[1].startsWith("pg_")) {
                 it.remove();
             }
         }

@@ -112,11 +112,9 @@ public class DatabaseSyncer {
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
-                String catalog;
+                String catalog = null;
                 if(sourceSchema.getCatalog() != null) {
                     catalog = sourceSchema.getCatalog();
-                } else {
-                    catalog = liquibaseDatabase.getDefaultCatalogName();
                 }
                 SnapshotControl snapshotControl = new SnapshotControl(liquibaseDatabase);
                 DatabaseSnapshot snapshot =
@@ -414,7 +412,7 @@ public class DatabaseSyncer {
         logger.info("Synchronizing tables");
         for (liquibase.structure.core.Table liquibaseTable : databaseSnapshot.get(liquibase.structure.core.Table.class)) {
             String tableName = liquibaseTable.getName();
-            logger.debug("Processing table: {}", tableName);
+            logger.info("Processing table: {}", tableName);
             Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, tableName);
             if(sourceTable == null) {
                 logger.debug("Added new table: {}", tableName);

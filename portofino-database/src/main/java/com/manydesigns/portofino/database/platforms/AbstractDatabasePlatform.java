@@ -48,6 +48,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
     public final static String[] tableTypes = {"TABLE"};
     public static final String TABLE_CAT = "TABLE_CAT";
+    public static final String TABLE_CATALOG = "TABLE_CATALOG";
     public static final String TABLE_SCHEM = "TABLE_SCHEM";
     public static final String TABLE_NAME = "TABLE_NAME";
     public static final String COLUMN_NAME = "COLUMN_NAME";
@@ -128,17 +129,22 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Utility methods
     //**************************************************************************
 
-    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
+    public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
         ResultSet rs = databaseMetaData.getSchemas();
-        List<String> schemaNames = new ArrayList<String>();
+        List<String[]> schemaNames = new ArrayList<String[]>();
         try {
             while(rs.next()) {
                 String schemaName = rs.getString(TABLE_SCHEM);
-                schemaNames.add(schemaName);
+                String schemaCatalog = rs.getString(getCatalogColumnName());
+                schemaNames.add(new String[] { schemaCatalog, schemaName });
             }
         } finally {
             DbUtils.closeQuietly(rs);
         }
         return schemaNames;
+    }
+
+    protected String getCatalogColumnName() {
+        return TABLE_CATALOG;
     }
 }

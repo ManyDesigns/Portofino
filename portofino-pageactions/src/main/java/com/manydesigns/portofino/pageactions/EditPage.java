@@ -20,9 +20,11 @@
 
 package com.manydesigns.portofino.pageactions;
 
-import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.CssClass;
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.elements.util.BootstrapSizes;
-import com.manydesigns.portofino.pages.NavigationRoot;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -34,28 +36,28 @@ public class EditPage {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
-    @LabelI18N("id")
+    @Label("id")
     @Updatable(false)
     public String id;
 
-    @LabelI18N("title")
+    @Label("title")
     @Required
     @CssClass(BootstrapSizes.FILL_ROW)
     public String title;
 
-    @LabelI18N("description")
+    @Label("description")
     @CssClass(BootstrapSizes.FILL_ROW)
     public String description;
 
-    @LabelI18N("template")
+    @Label("template")
     @Required
     public String template;
 
-    @LabelI18N("detail.template")
+    @Label("detail.template")
     @Required
     public String detailTemplate;
 
-    @LabelI18N("apply.template.recursively")
+    @Label("apply.template.recursively")
     @Required
     public boolean applyTemplateRecursively;
 

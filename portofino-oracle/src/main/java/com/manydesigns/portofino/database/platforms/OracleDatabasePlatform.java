@@ -25,6 +25,7 @@ import org.hibernate.dialect.Oracle9iDialect;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 /*
@@ -66,10 +67,15 @@ public class OracleDatabasePlatform extends AbstractDatabasePlatform {
     }
 
     @Override
-    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
-        List<String> schemaNames = super.getSchemaNames(databaseMetaData);
-        schemaNames.remove("SYSTEM");
-        schemaNames.remove("SYS");
+    public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
+        List<String[]> schemaNames = super.getSchemaNames(databaseMetaData);
+        Iterator<String[]> it = schemaNames.iterator();
+        while (it.hasNext()) {
+            String[] schemaName = it.next();
+            if("SYS".equals(schemaName[1]) || "SYSTEM".equals(schemaName[1])) {
+                it.remove();
+            }
+        }
         return schemaNames;
     }
 }
