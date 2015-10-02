@@ -19,7 +19,7 @@ public class AbstractAnnotatedAccessor implements AnnotatedElement {
         this.annotations = new HashMap<Class, Annotation>();
     }
 
-        //**************************************************************************
+    //**************************************************************************
     // AnnotatedElement implementation
     //**************************************************************************
 

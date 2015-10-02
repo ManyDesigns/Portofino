@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.servlet.ServletConstants;
+import com.manydesigns.portofino.cache.ControlsCache;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -35,12 +36,15 @@ import javax.servlet.http.HttpServletResponse;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Intercepts(LifecycleStage.RequestInit)
+@Intercepts(LifecycleStage.BindingAndValidation)
 public class NoCacheInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public Resolution intercept(ExecutionContext context) throws Exception {
+        if(context.getHandler() != null && context.getHandler().isAnnotationPresent(ControlsCache.class)) {
+            return context.proceed();
+        }
         HttpServletResponse response = context.getActionBeanContext().getResponse();
         // Avoid caching of dynamic pages
         //HTTP 1.0

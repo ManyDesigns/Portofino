@@ -28,6 +28,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.cache.ControlsCache;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -474,6 +475,7 @@ public class TextAction extends AbstractPageAction {
         return streamAttachment(true);
     }
 
+    @ControlsCache
     protected Resolution streamAttachment(boolean isAttachment) {
         // find the attachment
         Attachment attachment =

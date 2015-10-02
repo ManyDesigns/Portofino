@@ -169,7 +169,7 @@ public class Type {
             case Types.BINARY:
                 return byte[].class;
             case Types.BLOB:
-                 return java.sql.Blob.class;
+                 return byte[].class;
             case Types.CLOB:
                 return String.class;
             case Types.LONGVARBINARY:

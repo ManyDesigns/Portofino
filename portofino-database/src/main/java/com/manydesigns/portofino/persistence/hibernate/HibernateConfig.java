@@ -935,7 +935,7 @@ public class HibernateConfig {
         } else if (javaType == BigInteger.class) {
             typeName = BigIntegerType.INSTANCE.getName();
         } else if (javaType == byte[].class) {
-            typeName = BlobType.INSTANCE.getName();
+            typeName = BinaryType.INSTANCE.getName();
         } else {
             typeName = null;
         }

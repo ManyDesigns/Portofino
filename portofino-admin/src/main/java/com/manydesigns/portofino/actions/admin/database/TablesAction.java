@@ -712,7 +712,11 @@ public class TablesAction extends AbstractActionBean {
     }
 
     protected String getJavaTypeName(Class javaType) {
-        if(javaType.getPackage().getName().startsWith("java.")) {
+        if(javaType.isArray()) {
+            return getJavaTypeName(javaType.getComponentType()) + "[]";
+        } else if(javaType.isPrimitive()) {
+            return javaType.getName();
+        } else if(javaType.getPackage().getName().startsWith("java.")) {
             return javaType.getSimpleName();
         } else {
             return javaType.getName();

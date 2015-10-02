@@ -459,6 +459,10 @@ public abstract class AbstractField<T> implements Field<T> {
     //**************************************************************************
 
     public void writeToObject(@NotNull Object obj, @Nullable Object value) {
+        writeToObject(accessor, obj, value);
+    }
+
+    protected void writeToObject(@NotNull PropertyAccessor accessor, @NotNull Object obj, @Nullable Object value) {
         if (mode.isView(insertable, updatable) || (mode.isBulk() && !bulkChecked)) {
             return;
         }

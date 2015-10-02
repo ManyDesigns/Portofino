@@ -30,6 +30,8 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ public class SearchFormBuilder extends AbstractFormBuilder {
     // Fields
     //**************************************************************************
 
+    private static final Logger logger = LoggerFactory.getLogger(SearchFormBuilder.class);
     protected List<PropertyAccessor> propertyAccessors;
 
     //**************************************************************************
@@ -158,7 +161,7 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             }
 
             if (field == null) {
-                logger.warn("Cannot instanciate field for property {}",
+                logger.warn("Cannot instantiate field for property {}",
                         propertyAccessor);
                 continue;
             }

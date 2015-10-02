@@ -120,6 +120,10 @@ public class Blob {
         return createTimestamp;
     }
 
+    public void setCreateTimestamp(DateTime createTimestamp) {
+        this.createTimestamp = createTimestamp;
+    }
+
     public String getContentType() {
         return contentType;
     }

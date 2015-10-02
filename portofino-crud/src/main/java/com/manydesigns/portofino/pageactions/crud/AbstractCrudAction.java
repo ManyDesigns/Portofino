@@ -27,10 +27,7 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobUtils;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.FileBlobField;
-import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.fields.TextField;
+import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -41,6 +38,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
+import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
@@ -54,6 +52,7 @@ import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
+import com.manydesigns.portofino.cache.ControlsCache;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -85,6 +84,7 @@ import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -1504,8 +1504,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected void refreshBlobDownloadHref() {
         for (FieldSet fieldSet : form) {
             for (Field field : fieldSet.fields()) {
-                if (field instanceof FileBlobField) {
-                    FileBlobField fileBlobField = (FileBlobField) field;
+                if (field instanceof AbstractBlobField) {
+                    AbstractBlobField fileBlobField = (AbstractBlobField) field;
                     Blob blob = fileBlobField.getValue();
                     if (blob != null) {
                         String url = getBlobDownloadUrl(fileBlobField);
@@ -1524,22 +1524,17 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             String baseUrl = null;
             while (fieldIterator.hasNext()) {
                 Field field = fieldIterator.next();
-                if (field instanceof FileBlobField) {
+                if (field instanceof AbstractBlobField) {
                     if(baseUrl == null) {
                         OgnlTextFormat hrefFormat = getReadURLFormat();
                         baseUrl = hrefFormat.format(obj);
                     }
 
-                    Blob blob = ((FileBlobField) field).getValue();
+                    Blob blob = ((AbstractBlobField) field).getValue();
                     if(blob != null) {
                         UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
                             .addParameter("downloadBlob", "")
-                            .addParameter("propertyName", field.getPropertyAccessor().getName())
-                            .addParameter("code", blob.getCode());
-                        // although unused, the code parameter makes the url change if the
-                        // blob changes. This way we can ask the browser to cache the url
-                        // indefinitely.
-
+                            .addParameter("propertyName", field.getPropertyAccessor().getName());
                         field.setHref(urlBuilder.toString());
                     }
                 }
@@ -1547,30 +1542,41 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public String getBlobDownloadUrl(FileBlobField field) {
+    public String getBlobDownloadUrl(AbstractBlobField field) {
         UrlBuilder urlBuilder = new UrlBuilder(
                 Locale.getDefault(), Util.getAbsoluteUrl(context.getActionPath()), false)
-                .addParameter("downloadBlob","")
-                .addParameter("propertyName", field.getPropertyAccessor().getName())
-                .addParameter("code", field.getValue().getCode());
-        // The code parameter must be kept. See note in refreshTableBlobDownloadHref
+                .addParameter("downloadBlob", "")
+                .addParameter("propertyName", field.getPropertyAccessor().getName());
         return urlBuilder.toString();
     }
 
+    @ControlsCache
     public Resolution downloadBlob() throws IOException, NoSuchFieldException {
-        PropertyAccessor propertyAccessor = classAccessor.getProperty(propertyName);
-        String code = (String) propertyAccessor.get(object);
-        if(StringUtils.isBlank(code)) {
-            return new ErrorResolution(404, "No blob was found");
-        }
+        setupForm(Mode.VIEW);
+        form.readFromObject(object);
         BlobManager blobManager = getBlobManager();
-        Blob blob = new Blob(code);
-        blobManager.loadMetadata(blob);
+        AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
+        Blob blob = field.getValue();
+        if(blob.getInputStream() == null) {
+            blobManager.loadMetadata(blob);
+        }
         long contentLength = blob.getSize();
         String contentType = blob.getContentType();
         String fileName = blob.getFilename();
         long lastModified = blob.getCreateTimestamp().getMillis();
-        InputStream inputStream = blobManager.openStream(blob);
+        HttpServletRequest request = context.getRequest();
+        if(request.getHeader("If-Modified-Since") != null) {
+            long ifModifiedSince = request.getDateHeader("If-Modified-Since");
+            if(ifModifiedSince >= lastModified) {
+                return new ErrorResolution(304); //Not modified
+            }
+        }
+        InputStream inputStream;
+        if(blob.getInputStream() == null) {
+            inputStream = blobManager.openStream(blob);
+        } else {
+            inputStream = blob.getInputStream();
+        }
         return new StreamingResolution(contentType, inputStream)
                 .setFilename(fileName)
                 .setLength(contentLength)
