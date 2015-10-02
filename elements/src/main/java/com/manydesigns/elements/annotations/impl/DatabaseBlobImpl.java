@@ -21,7 +21,6 @@
 package com.manydesigns.elements.annotations.impl;
 
 import com.manydesigns.elements.annotations.DatabaseBlob;
-import com.manydesigns.elements.annotations.FileBlob;
 
 import java.lang.annotation.Annotation;
 
@@ -38,10 +37,12 @@ public class DatabaseBlobImpl implements DatabaseBlob {
 
     private final String contentTypeProperty;
     private final String fileNameProperty;
+    private final String timestampProperty;
 
-    public DatabaseBlobImpl(String contentTypeProperty, String fileNameProperty) {
+    public DatabaseBlobImpl(String contentTypeProperty, String fileNameProperty, String timestampProperty) {
         this.contentTypeProperty = contentTypeProperty;
         this.fileNameProperty = fileNameProperty;
+        this.timestampProperty = timestampProperty;
     }
 
     public Class<? extends Annotation> annotationType() {
@@ -56,5 +57,10 @@ public class DatabaseBlobImpl implements DatabaseBlob {
     @Override
     public String fileNameProperty() {
         return fileNameProperty;
+    }
+
+    @Override
+    public String timestampProperty() {
+        return timestampProperty;
     }
 }

@@ -21,6 +21,7 @@
 package com.manydesigns.elements.ognl;
 
 import ognl.TypeConverter;
+import org.joda.time.DateTime;
 
 import java.lang.reflect.Member;
 import java.sql.Time;
@@ -48,9 +49,10 @@ public class CustomTypeConverter implements TypeConverter {
         if ((toType == Boolean.class || toType == Boolean.TYPE) && (value instanceof String)) {
             String thisValue = (String) value;
             return Boolean.valueOf(thisValue);
-        } else if ((toType == Timestamp.class) && (value instanceof Date)) {
-            Date thisValue = (Date) value;
-            return new Timestamp(thisValue.getTime());
+        } else if (toType == Date.class) {
+            if(value instanceof DateTime) {
+                return new Date(((DateTime) value).getMillis());
+            }
         } else if (toType == Timestamp.class) {
             if(value instanceof String) {
                 try {
@@ -60,6 +62,8 @@ public class CustomTypeConverter implements TypeConverter {
                 }
             } else if(value instanceof Date) {
                 return new Timestamp(((Date) value).getTime());
+            } else if(value instanceof DateTime) {
+                return new Timestamp(((DateTime) value).getMillis());
             }
         } else if (toType == java.sql.Date.class) {
             if (value instanceof String) {
@@ -70,10 +74,16 @@ public class CustomTypeConverter implements TypeConverter {
                 }
             } else if(value instanceof Date) {
                 return new java.sql.Date(((Date) value).getTime());
+            } else if(value instanceof DateTime) {
+                return new java.sql.Date(((DateTime) value).getMillis());
             }
         } else if ((toType == Time.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
             return new Time(thisValue.getTime());
+        } else if (toType == DateTime.class) {
+             if(value instanceof Date) {
+                return new DateTime(((Date) value).getTime());
+            }
         } else if (toType.isEnum() && value instanceof String){
             return Enum.valueOf(toType, (String) value);
         } else if (toType == Class.class && value instanceof String) {

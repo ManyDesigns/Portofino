@@ -89,18 +89,18 @@ public class OgnlUtils {
     }
 
     public static String convertValueToString(Object value) {
-        return (String) convertValue(value, String.class);
+        return convertValue(value, String.class);
     }
 
-    public static Object convertValue(Object value, Class toType) {
+    public static <T> T convertValue(Object value, Class<T> toType) {
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         TypeConverter typeConverter = ognlContext.getTypeConverter();
 
-        return typeConverter.convertValue(
+        return (T) typeConverter.convertValue(
                 ognlContext, null, null, null, value, toType);
     }
 
-    public static Object convertValueQuietly(Object value, Class toType) {
+    public static <T> T convertValueQuietly(Object value, Class<T> toType) {
         try {
             return convertValue(value, toType);
         } catch (Throwable e) {

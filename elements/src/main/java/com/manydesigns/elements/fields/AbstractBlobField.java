@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -306,6 +307,7 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
         blob.setInputStream(fileBean.getInputStream());
         blob.setFilename(fileBean.getFileName());
         blob.setContentType(fileBean.getContentType());
+        blob.setCreateTimestamp(new DateTime());
         blob.setPropertiesLoaded(true);
     }
 

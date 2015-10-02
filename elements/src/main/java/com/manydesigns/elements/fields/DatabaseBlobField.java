@@ -23,6 +23,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DatabaseBlob;
 import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
@@ -52,6 +53,7 @@ public class DatabaseBlobField extends AbstractBlobField {
 
     protected final PropertyAccessor contentTypeAccessor;
     protected final PropertyAccessor fileNameAccessor;
+    protected final PropertyAccessor timestampAccessor;
 
     public DatabaseBlobField(
             @NotNull ClassAccessor classAccessor, @NotNull PropertyAccessor accessor, @NotNull Mode mode,
@@ -67,6 +69,11 @@ public class DatabaseBlobField extends AbstractBlobField {
             this.fileNameAccessor = classAccessor.getProperty(databaseBlob.fileNameProperty());
         } else {
             this.fileNameAccessor = null;
+        }
+        if(databaseBlob != null && !StringUtils.isEmpty(databaseBlob.timestampProperty())) {
+            this.timestampAccessor = classAccessor.getProperty(databaseBlob.timestampProperty());
+        } else {
+            this.timestampAccessor = null;
         }
     }
 
@@ -97,8 +104,12 @@ public class DatabaseBlobField extends AbstractBlobField {
                 } else {
                     blob.setContentType("application/octet-stream");
                 }
-                //TODO
-                blob.setCreateTimestamp(new DateTime());
+                if(timestampAccessor != null) {
+                    DateTime dt = OgnlUtils.convertValue(timestampAccessor.get(obj), DateTime.class);
+                    blob.setCreateTimestamp(dt);
+                } else {
+                    blob.setCreateTimestamp(new DateTime());
+                }
             }
         }
     }
@@ -111,12 +122,18 @@ public class DatabaseBlobField extends AbstractBlobField {
             try {
                 IOUtils.copyLarge(blob.getInputStream(), baos);
                 writeToObject(obj, baos.toByteArray());
-                //TODO
                 if(fileNameAccessor != null) {
                     writeToObject(fileNameAccessor, obj, blob.getFilename());
                 }
                 if(contentTypeAccessor != null) {
                     writeToObject(contentTypeAccessor, obj, blob.getContentType());
+                }
+                if(timestampAccessor != null) {
+                    Object ts = OgnlUtils.convertValue(blob.getCreateTimestamp(), timestampAccessor.getType());
+                    if(ts == null) {
+                        ts = OgnlUtils.convertValue(new DateTime(), timestampAccessor.getType());
+                    }
+                    writeToObject(timestampAccessor, obj, ts);
                 }
             } catch (IOException e) {
                 logger.error("Could not save blob", e);

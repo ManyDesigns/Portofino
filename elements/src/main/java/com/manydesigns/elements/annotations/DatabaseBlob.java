@@ -39,5 +39,6 @@ public @interface DatabaseBlob {
 
     String contentTypeProperty() default "";
     String fileNameProperty() default "";
+    String timestampProperty() default "";
 
 }
