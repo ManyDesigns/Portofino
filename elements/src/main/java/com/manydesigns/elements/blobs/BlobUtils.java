@@ -1,9 +1,7 @@
 package com.manydesigns.elements.blobs;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.fields.AbstractBlobField;
-import com.manydesigns.elements.fields.DatabaseBlobField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.TableForm;
@@ -49,7 +47,7 @@ public abstract class BlobUtils {
     public static void loadBlob(FormElement field, BlobManager blobManager, boolean loadContents) {
         if(AbstractBlobField.class.isInstance(field)) {
             AbstractBlobField blobField = AbstractBlobField.class.cast(field);
-            blobField.loadBlob(blobManager);
+            blobField.loadBlob(blobManager, loadContents);
         }
     }
 
