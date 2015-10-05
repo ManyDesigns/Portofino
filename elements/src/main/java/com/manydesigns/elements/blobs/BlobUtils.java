@@ -2,7 +2,8 @@ package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.FormElement;
-import com.manydesigns.elements.fields.FileBlobField;
+import com.manydesigns.elements.fields.AbstractBlobField;
+import com.manydesigns.elements.fields.DatabaseBlobField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.TableForm;
@@ -46,23 +47,9 @@ public abstract class BlobUtils {
     }
 
     public static void loadBlob(FormElement field, BlobManager blobManager, boolean loadContents) {
-        if(FileBlobField.class.isInstance(field)) {
-            FileBlobField fbf = FileBlobField.class.cast(field);
-            Blob blob = fbf.getValue();
-            if(blob != null) {
-                try {
-                    if(!blob.isPropertiesLoaded()) {
-                        blobManager.loadMetadata(blob);
-                    }
-                    if(loadContents) {
-                        blobManager.openStream(blob);
-                    }
-                    fbf.setBlobError(null);
-                } catch (Exception e) {
-                    logger.debug("Could not load blob with code " + blob.getCode() + " from BlobManager " + blobManager, e);
-                    fbf.setBlobError(ElementsThreadLocals.getText("elements.error.field.fileblob.cannotLoad"));
-                }
-            }
+        if(AbstractBlobField.class.isInstance(field)) {
+            AbstractBlobField blobField = AbstractBlobField.class.cast(field);
+            blobField.loadBlob(blobManager);
         }
     }
 
@@ -74,10 +61,10 @@ public abstract class BlobUtils {
 
     public static void saveBlobs(FieldSet fieldSet, BlobManager blobManager) throws IOException {
         for(FormElement field : fieldSet) {
-            if(FileBlobField.class.isInstance(field)) {
-                FileBlobField fbf = FileBlobField.class.cast(field);
-                Blob blob = fbf.getValue();
-                if(blob != null && blob.getInputStream() != null) {
+            if(AbstractBlobField.class.isInstance(field)) {
+                AbstractBlobField blobField = AbstractBlobField.class.cast(field);
+                Blob blob = blobField.getValue();
+                if(blob != null && blob.getCode() != null && blob.getInputStream() != null) {
                     blobManager.save(blob);
                 }
             }

@@ -23,6 +23,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DatabaseBlob;
 import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -106,7 +107,7 @@ public class DatabaseBlobField extends AbstractBlobField {
                 }
                 if(timestampAccessor != null) {
                     DateTime dt = OgnlUtils.convertValue(timestampAccessor.get(obj), DateTime.class);
-                    blob.setCreateTimestamp(dt);
+                    blob.setCreateTimestamp(dt != null ? dt : new DateTime());
                 } else {
                     blob.setCreateTimestamp(new DateTime());
                 }
@@ -139,6 +140,15 @@ public class DatabaseBlobField extends AbstractBlobField {
                 logger.error("Could not save blob", e);
                 blobError = getText("elements.error.field.databaseblob.couldntSaveBlob");
             }
+        }
+    }
+
+    protected void loadBlob(BlobManager blobManager, boolean loadContents, Blob blob) throws IOException {
+        if(!blob.isPropertiesLoaded()) {
+            blobManager.loadMetadata(blob);
+        }
+        if(loadContents || blob.getInputStream() == null) {
+            blobManager.openStream(blob);
         }
     }
 

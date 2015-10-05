@@ -21,15 +21,13 @@
 package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.fields.DatabaseBlobField;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-
-import java.sql.Blob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,6 +39,8 @@ public class DatabaseBlobFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseBlobFieldHelper.class);
+
     public Field tryToInstantiateField(ClassAccessor classAccessor,
                                        PropertyAccessor propertyAccessor,
                                        Mode mode,
@@ -49,7 +49,8 @@ public class DatabaseBlobFieldHelper implements FieldHelper {
             try {
                 return new DatabaseBlobField(classAccessor, propertyAccessor, mode, prefix);
             } catch (NoSuchFieldException e) {
-                throw new RuntimeException(e);
+                logger.error("Could not instantiate DatabaseBlobField", e);
+                return null;
             }
         }
         return null;

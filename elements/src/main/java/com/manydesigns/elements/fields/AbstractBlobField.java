@@ -20,12 +20,13 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
-import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.controller.StripesRequestWrapper;
@@ -37,7 +38,6 @@ import org.joda.time.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.concurrent.Callable;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -356,4 +356,25 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
         this.blobError = blobError;
     }
 
+    public void loadBlob(BlobManager blobManager, boolean loadContents) {
+        Blob blob = getValue();
+        if(blob != null && blob.getCode() != null) {
+            try {
+                loadBlob(blobManager, loadContents, blob);
+                setBlobError(null);
+            } catch (Exception e) {
+                logger.debug("Could not load blob with code " + blob.getCode() + " from BlobManager " + blobManager, e);
+                setBlobError(ElementsThreadLocals.getText("elements.error.field.fileblob.cannotLoad"));
+            }
+        }
+    }
+
+    protected void loadBlob(BlobManager blobManager, boolean loadContents, Blob blob) throws IOException {
+        if(!blob.isPropertiesLoaded()) {
+            blobManager.loadMetadata(blob);
+        }
+        if(loadContents) {
+            blobManager.openStream(blob);
+        }
+    }
 }
