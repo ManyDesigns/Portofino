@@ -62,11 +62,16 @@ public class ColumnForm extends Column {
 
     protected String dateFormat;
 
+    protected String databaseBlobFileNameProperty;
+    protected String databaseBlobContentTypeProperty;
+    protected String databaseBlobTimestampProperty;
+
     public static final String[] KNOWN_ANNOTATIONS = {
             FieldSize.class.getName(), MaxLength.class.getName(), Multiline.class.getName(), RichText.class.getName(),
             Email.class.getName(), CAP.class.getName(), CodiceFiscale.class.getName(), PartitaIva.class.getName(),
             Password.class.getName(), Phone.class.getName(),
-            HighlightLinks.class.getName(), RegExp.class.getName(), FileBlob.class.getName(),
+            HighlightLinks.class.getName(), RegExp.class.getName(),
+            DatabaseBlob.class.getName(), FileBlob.class.getName(),
             MinDecimalValue.class.getName(), MinIntValue.class.getName(), MaxDecimalValue.class.getName(),
             MaxIntValue.class.getName(), DecimalFormat.class.getName(), DateFormat.class.getName()
     };
@@ -126,6 +131,13 @@ public class ColumnForm extends Column {
         RegExp regexpAnn = columnAccessor.getAnnotation(RegExp.class);
         if(regexpAnn != null) {
             regexp = regexpAnn.value();
+        }
+
+        DatabaseBlob databaseBlobAnn = columnAccessor.getAnnotation(DatabaseBlob.class);
+        if(databaseBlobAnn != null) {
+            databaseBlobFileNameProperty = databaseBlobAnn.fileNameProperty();
+            databaseBlobContentTypeProperty = databaseBlobAnn.contentTypeProperty();
+            databaseBlobTimestampProperty = databaseBlobAnn.timestampProperty();
         }
 
         FileBlob fileBlobAnn = columnAccessor.getAnnotation(FileBlob.class);
@@ -201,6 +213,15 @@ public class ColumnForm extends Column {
             Annotation ann = new Annotation(column, RegExp.class.getName());
             ann.getValues().add(regexp);
             ann.getValues().add("elements.error.field.regexp.format"); //Default error message
+            column.getAnnotations().add(ann);
+        }
+        if(!StringUtils.isEmpty(databaseBlobContentTypeProperty) ||
+           !StringUtils.isEmpty(databaseBlobFileNameProperty) ||
+           !StringUtils.isEmpty(databaseBlobTimestampProperty)) {
+            Annotation ann = new Annotation(column, DatabaseBlob.class.getName());
+            ann.getValues().add(databaseBlobContentTypeProperty);
+            ann.getValues().add(databaseBlobFileNameProperty);
+            ann.getValues().add(databaseBlobTimestampProperty);
             column.getAnnotations().add(ann);
         }
         if(fileBlob) {
@@ -414,6 +435,33 @@ public class ColumnForm extends Column {
 
     public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
+    }
+
+    @Label("file.name.property")
+    public String getDatabaseBlobFileNameProperty() {
+        return databaseBlobFileNameProperty;
+    }
+
+    public void setDatabaseBlobFileNameProperty(String databaseBlobFileNameProperty) {
+        this.databaseBlobFileNameProperty = databaseBlobFileNameProperty;
+    }
+
+    @Label("content.type.property")
+    public String getDatabaseBlobContentTypeProperty() {
+        return databaseBlobContentTypeProperty;
+    }
+
+    public void setDatabaseBlobContentTypeProperty(String databaseBlobContentTypeProperty) {
+        this.databaseBlobContentTypeProperty = databaseBlobContentTypeProperty;
+    }
+
+    @Label("timestamp.property")
+    public String getDatabaseBlobTimestampProperty() {
+        return databaseBlobTimestampProperty;
+    }
+
+    public void setDatabaseBlobTimestampProperty(String databaseBlobTimestampProperty) {
+        this.databaseBlobTimestampProperty = databaseBlobTimestampProperty;
     }
 
     @Override

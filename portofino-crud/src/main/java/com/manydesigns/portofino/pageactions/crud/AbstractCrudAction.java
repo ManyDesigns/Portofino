@@ -334,6 +334,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Executes a search and returns the results table. This method is supposed to be called via AJAX, as it does not
+     * return a complete page, but only a fragment.
+     * @return the result of {@link #getSearchResultsPageView()}
+     */
     public Resolution getSearchResultsPage() {
         if(!isConfigured()) {
             logger.debug("Crud not correctly configured");

@@ -782,6 +782,10 @@ public class TablesAction extends AbstractActionBean {
                     "highlightLinks", "fileBlob" };
         } else if(Date.class.isAssignableFrom(type)) {
             return new String[] { "fieldSize", "dateFormat" };
+        } else if(byte[].class.isAssignableFrom(type)) {
+            return new String[] {
+                    "databaseBlobContentTypeProperty", "databaseBlobFileNameProperty", "databaseBlobTimestampProperty"
+            };
         }
         return new String[0];
     }
