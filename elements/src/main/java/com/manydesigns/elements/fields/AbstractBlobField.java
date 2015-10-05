@@ -360,7 +360,7 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
         Blob blob = getValue();
         if(blob != null && blob.getCode() != null) {
             try {
-                loadBlob(blobManager, loadContents, blob);
+                loadBlob(blobManager, blob, loadContents);
                 setBlobError(null);
             } catch (Exception e) {
                 logger.debug("Could not load blob with code " + blob.getCode() + " from BlobManager " + blobManager, e);
@@ -369,7 +369,7 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
         }
     }
 
-    protected void loadBlob(BlobManager blobManager, boolean loadContents, Blob blob) throws IOException {
+    protected void loadBlob(BlobManager blobManager, Blob blob, boolean loadContents) throws IOException {
         if(!blob.isPropertiesLoaded()) {
             blobManager.loadMetadata(blob);
         }

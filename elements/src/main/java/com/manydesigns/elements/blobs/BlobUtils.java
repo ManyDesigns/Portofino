@@ -5,8 +5,6 @@ import com.manydesigns.elements.fields.AbstractBlobField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.TableForm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -17,8 +15,6 @@ import java.io.IOException;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public abstract class BlobUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(BlobUtils.class);
 
     public static void loadBlobs(Form form, BlobManager blobManager, boolean loadContents) {
         for(FieldSet fieldSet : form) {

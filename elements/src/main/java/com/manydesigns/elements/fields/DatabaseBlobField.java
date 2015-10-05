@@ -143,7 +143,8 @@ public class DatabaseBlobField extends AbstractBlobField {
         }
     }
 
-    protected void loadBlob(BlobManager blobManager, boolean loadContents, Blob blob) throws IOException {
+    @Override
+    protected void loadBlob(BlobManager blobManager, Blob blob, boolean loadContents) throws IOException {
         if(!blob.isPropertiesLoaded()) {
             blobManager.loadMetadata(blob);
         }
