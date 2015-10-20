@@ -50,6 +50,11 @@ public class DateField extends AbstractDateField<Date> {
     }
 
     @Override
+    protected Date toDate(@NotNull Number millisSince1970) {
+        return new Date(millisSince1970.longValue());
+    }
+
+    @Override
     protected Date toDate(@NotNull DateTime dateTime) {
         return dateTime.toDate();
     }

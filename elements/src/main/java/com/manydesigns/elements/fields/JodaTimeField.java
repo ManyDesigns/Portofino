@@ -52,6 +52,11 @@ public class JodaTimeField extends AbstractDateField<DateTime> {
     }
 
     @Override
+    protected DateTime toDate(@NotNull Number millisSince1970) {
+        return new DateTime(millisSince1970.longValue());
+    }
+
+    @Override
     protected DateTime toDate(@NotNull DateTime dateTime) {
         return dateTime;
     }

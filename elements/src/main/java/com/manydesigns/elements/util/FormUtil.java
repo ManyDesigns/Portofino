@@ -35,6 +35,7 @@ import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.json.JsonKeyValueAccessor;
+import org.apache.commons.lang.ObjectUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -42,6 +43,7 @@ import org.json.JSONWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -65,12 +67,15 @@ public class FormUtil {
     public static void fieldsToJson(JSONStringer js, Collection<Field> fields) throws JSONException {
         for (Field field : fields) {
             Object value = field.getValue();
+            if(value instanceof Date) {
+                value = ((Date) value).getTime();
+            }
             String displayValue = field.getDisplayValue();
             String href = field.getHref();
             List<String> errors = field.getErrors();
             js.key(field.getPropertyAccessor().getName());
             JSONWriter json = js.object().key(JSON_VALUE).value(value);
-            if(displayValue != null) {
+            if(displayValue != null && !ObjectUtils.equals(displayValue, value)) {
                 json.key("displayValue").value(displayValue);
             }
             if(href != null) {

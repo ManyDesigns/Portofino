@@ -313,8 +313,12 @@ public abstract class AbstractField<T> implements Field<T> {
         if(value instanceof String) {
             setStringValue((String) value);
         } else {
-            setValue((T) value);
+            setValue(maybeConvertValue(value));
         }
+    }
+
+    protected T maybeConvertValue(Object value) {
+        return (T) value;
     }
 
     @Override
