@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -137,6 +139,17 @@ public class CrudPropertyAccessor
             return annotation;
         }
         return nestedAccessor.getAnnotation(annotationClass);
+    }
+
+    @Override
+    public Annotation[] getAnnotations() {
+        List<Annotation> allAnnotations = new ArrayList<Annotation>(annotations.values());
+        for(Annotation nestedAnnotation : nestedAccessor.getAnnotations()) {
+            if(!annotations.containsKey(nestedAnnotation.annotationType())) {
+                allAnnotations.add(nestedAnnotation);
+            }
+        }
+        return allAnnotations.toArray(new Annotation[allAnnotations.size()]);
     }
 
     public Object get(Object obj) {
