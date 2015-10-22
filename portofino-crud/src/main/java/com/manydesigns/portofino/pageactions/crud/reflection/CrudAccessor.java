@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,7 +50,7 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
     //**************************************************************************
 
     protected final CrudConfiguration crudConfiguration;
-    protected final ClassAccessor tableAccessor;
+    protected final ClassAccessor nestedAccessor;
     protected final CrudPropertyAccessor[] propertyAccessors;
     protected final CrudPropertyAccessor[] keyPropertyAccessors;
 
@@ -59,12 +61,12 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
     // Constructors
     //**************************************************************************
 
-    public CrudAccessor(@NotNull final CrudConfiguration crudConfiguration, @NotNull ClassAccessor tableAccessor) {
+    public CrudAccessor(@NotNull final CrudConfiguration crudConfiguration, @NotNull ClassAccessor nestedAccessor) {
         super(null);
         this.crudConfiguration = crudConfiguration;
-        this.tableAccessor = tableAccessor;
-        PropertyAccessor[] columnAccessors = tableAccessor.getProperties();
-        PropertyAccessor[] keyColumnAccessors = tableAccessor.getKeyProperties();
+        this.nestedAccessor = nestedAccessor;
+        PropertyAccessor[] columnAccessors = nestedAccessor.getProperties();
+        PropertyAccessor[] keyColumnAccessors = nestedAccessor.getKeyProperties();
 
         propertyAccessors =
                 new CrudPropertyAccessor[columnAccessors.length];
@@ -146,7 +148,7 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
 
     @Override
     public Class<?> getType() {
-        return tableAccessor.getType();
+        return nestedAccessor.getType();
     }
 
     public CrudPropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
@@ -169,7 +171,7 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
     }
 
     public Object newInstance() {
-        return tableAccessor.newInstance();
+        return nestedAccessor.newInstance();
     }
 
     @Override
@@ -178,7 +180,18 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
         if (annotation != null) {
             return annotation;
         }
-        return tableAccessor.getAnnotation(annotationClass);
+        return nestedAccessor.getAnnotation(annotationClass);
+    }
+
+    @Override
+    public Annotation[] getAnnotations() {
+        List<Annotation> allAnnotations = new ArrayList<Annotation>(annotations.values());
+        for(Annotation nestedAnnotation : nestedAccessor.getAnnotations()) {
+            if(!annotations.containsKey(nestedAnnotation.annotationType())) {
+                allAnnotations.add(nestedAnnotation);
+            }
+        }
+        return allAnnotations.toArray(new Annotation[allAnnotations.size()]);
     }
 
     //**************************************************************************
