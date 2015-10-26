@@ -1080,6 +1080,8 @@ Checkbox
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox] {
     opacity: 0;
     min-width: 0;
+    margin-left: 0px;
+    z-index: 1000;
 }
 
 .checkbox label, .radio label {

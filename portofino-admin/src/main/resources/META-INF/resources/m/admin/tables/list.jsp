@@ -7,7 +7,9 @@
         %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><stripes:layout-render name="/m/admin/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.database.TablesAction"/>
-    <stripes:layout-component name="pageTitle"> Tables </stripes:layout-component>
+    <stripes:layout-component name="pageTitle">
+        <fmt:message key="tables"/>
+    </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <link href="<stripes:url value="/webjars/fancytree/2.11.0/dist/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css" class="skinswitcher">
 
@@ -102,10 +104,8 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <strong><fmt:message key="database/schema" />/<fmt:message key="table.entity" /></strong>
-
-                    <label>Filter:</label>
-                    <input class="form-control inpu-sm" name="search" placeholder="Filter..." autocomplete="off">
-
+                    <label><fmt:message key="filter"/></label>
+                    <input class="form-control inpu-sm" name="search" placeholder="<fmt:message key="filter"/>..." autocomplete="off">
             </div>
             <div id="tree" class="panel-body fancytree-colorize-hover"></div>
             <div class="panel-footer">
