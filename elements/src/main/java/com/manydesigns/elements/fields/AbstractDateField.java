@@ -21,6 +21,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -35,7 +36,6 @@ import org.joda.time.format.DateTimeFormatter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
-import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -139,6 +139,10 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
                 dateValue = (T) value;
             }
         }
+        updateStringValue();
+    }
+
+    protected void updateStringValue() {
         if (dateValue == null) {
             stringValue = null;
         } else {
@@ -206,6 +210,12 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
             return toDate((Number) value);
         }
         return super.maybeConvertValue(value);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void readFrom(KeyValueAccessor keyValueAccessor) {
+        super.readFrom(keyValueAccessor);
+        updateStringValue();
     }
 
     protected abstract T toDate(@NotNull Number millisSince1970);

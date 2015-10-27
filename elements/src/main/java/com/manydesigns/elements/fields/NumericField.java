@@ -22,6 +22,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.ognl.OgnlUtils;
@@ -201,10 +202,13 @@ public class NumericField extends AbstractTextField<BigDecimal> {
             decimalValue = null;
         } else {
             Object value = accessor.get(obj);
-            decimalValue = (BigDecimal)
-                    OgnlUtils.convertValue(value, BigDecimal.class);
+            decimalValue = OgnlUtils.convertValue(value, BigDecimal.class);
         }
 
+        updateStringValue();
+    }
+
+    protected void updateStringValue() {
         if (decimalValue == null) {
             stringValue = null;
         } else {
@@ -242,6 +246,12 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         } catch (Throwable e) {
             logger.debug("Decimal parse error", e);
         }
+    }
+
+    @Override
+    public void readFrom(KeyValueAccessor keyValueAccessor) {
+        super.readFrom(keyValueAccessor);
+        updateStringValue();
     }
 
     @Override

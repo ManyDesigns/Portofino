@@ -662,4 +662,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
         return result;
     }
+
+    @Path(":configuration")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public Object getConfiguration() {
+        return pageInstance.getConfiguration();
+    }
 }
