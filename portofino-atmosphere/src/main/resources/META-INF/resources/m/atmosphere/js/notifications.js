@@ -1,3 +1,9 @@
+/*
+<script type="text/javascript" src="<stripes:url value='/webjars/atmosphere/2.2.7/atmosphere.min.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/js/atmosphere/notifications.js' />" ></script>
+ */
+
+
 var portofino = portofino || {};
 
 portofino.notifications = {
