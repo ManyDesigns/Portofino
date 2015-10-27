@@ -54,7 +54,7 @@
                     glyph: glyph_opts,
                     selectMode: 2,
                     source: {url: "?getTables", debugDelay: 1000},
-                    toggleEffect: { effect: "drop", options: {direction: "down"}, duration: 400 },
+                    toggleEffect: { effect: "drop", options: {direction: "down"}, duration: 200 },
                     filter: {
                         autoApply: true,  // Re-apply last filter if lazy data is loaded
                         counter: false,  // Show a badge with number of matching child nodes near parent icons
@@ -82,6 +82,19 @@
                 });
 
                 var tree = $("#tree").fancytree("getTree");
+
+               $("#expand").click(function(e){
+                tree.visit(function(node){
+                     node.setExpanded(true);
+                 });
+               });
+
+                $("#collapse").click(function(e){
+                tree.visit(function(node){
+                     node.setExpanded(false);
+                 });
+               });
+
                 $("input[name=search]").keyup(function(e){
                     var n,
                             opts = { autoExpand: true , leavesOnly: true },
@@ -103,9 +116,19 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <strong><fmt:message key="database/schema" />/<fmt:message key="table.entity" /></strong>
-                    <label><fmt:message key="filter"/></label>
-                    <input class="form-control inpu-sm" name="search" placeholder="<fmt:message key="filter"/>..." autocomplete="off">
+                <strong><fmt:message key="database/schema" />/<fmt:message key="table.entity" /></strong> <br>
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control inpu-sm" name="search" placeholder="<fmt:message key="filter"/>..." autocomplete="off">
+                    </div>
+
+                    <div class="col-md-4">
+                        <button id="expand" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-collapse-down"></span> Expand</button>
+                        <button id="collapse" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-collapse-up"></span> Collapse</button>
+                    </div>
+                </div>
+
             </div>
             <div id="tree" class="panel-body fancytree-colorize-hover"></div>
             <div class="panel-footer">
