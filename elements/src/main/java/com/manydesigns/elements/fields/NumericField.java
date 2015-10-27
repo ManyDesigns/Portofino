@@ -244,6 +244,23 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         }
     }
 
+    @Override
+    protected BigDecimal maybeConvertValue(Object value) {
+        return OgnlUtils.convertValue(value, BigDecimal.class);
+    }
+
+    @Override
+    public void valueToXhtmlEdit(XhtmlBuffer xb) {
+        xb.writeInputNumber(id, inputName, stringValue, labelPlaceholder ? label : null,
+                EDITABLE_FIELD_CSS_CLASS, size, maxLength,this.maxValue,this.minValue,null);
+        if(mode.isBulk()) {
+            xb.writeJavaScript(
+                    "$(function() { " +
+                        "configureBulkEditTextField('" + id + "', '" + bulkCheckboxName + "'); " +
+                    "});");
+        }
+    }
+
     //**************************************************************************
     // Getter/setter
     //**************************************************************************
@@ -300,16 +317,4 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         this.precision = precision;
     }
 
-    @Override
-    public void valueToXhtmlEdit(XhtmlBuffer xb) {
-
-        xb.writeInputNumber(id, inputName, stringValue, labelPlaceholder ? label : null,
-                EDITABLE_FIELD_CSS_CLASS, size, maxLength,this.maxValue,this.minValue,null);
-        if(mode.isBulk()) {
-            xb.writeJavaScript(
-                    "$(function() { " +
-                        "configureBulkEditTextField('" + id + "', '" + bulkCheckboxName + "'); " +
-                    "});");
-        }
-    }
 }
