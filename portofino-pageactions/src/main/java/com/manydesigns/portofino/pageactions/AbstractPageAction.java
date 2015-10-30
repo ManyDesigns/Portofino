@@ -40,6 +40,8 @@ import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.navigation.Navigation;
+import com.manydesigns.portofino.navigation.NavigationItem;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pageactions.rest.APIRoot;
 import com.manydesigns.portofino.pages.ChildPage;
@@ -238,6 +240,18 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
         }
         return resource;
+    }
+    
+    @Path(":pages")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public NavigationItem getPages() {
+        String actionPath = getContext().getActionPath();
+        actionPath = actionPath.substring(0, actionPath.length() - "/:pages".length());
+        Dispatch dispatch = DispatcherUtil.get(getContext().getRequest()).getDispatch(actionPath);
+        return new Navigation(
+                portofinoConfiguration, dispatch, SecurityUtils.getSubject(), false).
+                getRootNavigationItem();
     }
 
     public static class TerminalResource {

@@ -2,16 +2,21 @@ package com.manydesigns.portofino.pageactions.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.stripes.ElementsActionBeanContext;
+import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.navigation.Navigation;
+import com.manydesigns.portofino.navigation.NavigationItem;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +24,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
@@ -94,4 +97,20 @@ public class APIRoot {
             throw new WebApplicationException(404);
         }
     }
+    
+    @Path(":pages")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public NavigationItem getPages() {
+        Configuration configuration = (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+        String landingPage = configuration.getString(PortofinoProperties.LANDING_PAGE);
+        if(landingPage != null) {
+            return new Navigation(
+                    configuration, DispatcherUtil.get(request).getDispatch(landingPage), SecurityUtils.getSubject(), false).
+                    getRootNavigationItem();
+        } else {
+            return null;
+        }
+    }
+    
 }
