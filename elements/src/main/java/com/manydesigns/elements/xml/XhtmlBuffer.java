@@ -313,7 +313,7 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
                                @Nullable BigDecimal minValue , @Nullable Integer step) {
         openElement("input");
         addAttribute("id", id);
-        addAttribute("type", "number");
+        addAttribute("type", "text");
         addAttribute("name", name);
         addAttribute("value", value);
 
