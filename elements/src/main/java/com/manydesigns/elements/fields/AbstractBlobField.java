@@ -311,7 +311,7 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
         blob.setPropertiesLoaded(true);
     }
 
-    protected abstract String generateNewCode();
+    public abstract String generateNewCode();
 
     public boolean validate() {
         if (mode.isView(insertable, updatable) || (mode.isBulk() && !bulkChecked)) {

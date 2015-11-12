@@ -154,7 +154,7 @@ public class DatabaseBlobField extends AbstractBlobField {
     }
 
     @Override
-    protected String generateNewCode() {
+    public String generateNewCode() {
         return RandomUtil.createRandomId(25);
     }
 

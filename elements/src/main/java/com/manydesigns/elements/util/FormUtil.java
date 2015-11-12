@@ -30,6 +30,7 @@
 package com.manydesigns.elements.util;
 
 import com.manydesigns.elements.FormElement;
+import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
@@ -57,6 +58,7 @@ public class FormUtil {
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String JSON_VALUE = "value";
+    public static final String JSON_TYPE = "type";
 
     /**
      * Writes a collection of fields as properties of a JSON object.
@@ -74,7 +76,19 @@ public class FormUtil {
             String href = field.getHref();
             List<String> errors = field.getErrors();
             js.key(field.getPropertyAccessor().getName());
-            JSONWriter json = js.object().key(JSON_VALUE).value(value);
+            JSONWriter json = js.object().key(JSON_VALUE);
+            if(value instanceof Blob) {
+                json.object();
+                Blob blob = (Blob) value;
+                json.key(JSON_TYPE).value(Blob.class.getName());
+                json.key("code").value(blob.getCode());
+                json.key("filename").value(blob.getFilename());
+                json.key("contentType").value(blob.getContentType());
+                json.key("size").value(blob.getSize());
+                json.endObject();
+            } else {
+                json.value(value);
+            }
             if(displayValue != null && !ObjectUtils.equals(displayValue, value)) {
                 json.key("displayValue").value(displayValue);
             }
@@ -129,7 +143,12 @@ public class FormUtil {
             public Object get(String name) {
                 Object o = super.get(name);
                 if(o instanceof JSONObject) {
-                    return new JsonKeyValueAccessor((JSONObject) o).get(JSON_VALUE);
+                    JSONObject subObj = (JSONObject) o;
+                    if(subObj.has(JSON_TYPE)) {
+                        return null; //TODO
+                    } else {
+                        return new JsonKeyValueAccessor(subObj).get(JSON_VALUE);
+                    }
                 } else {
                     return o;
                 }

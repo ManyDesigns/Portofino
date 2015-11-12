@@ -84,7 +84,7 @@ public class FileBlobField extends AbstractBlobField {
         }
     }
 
-    protected String generateNewCode() {
+    public String generateNewCode() {
         try {
             return blobCodeGenerator.call();
         } catch (Exception e) {

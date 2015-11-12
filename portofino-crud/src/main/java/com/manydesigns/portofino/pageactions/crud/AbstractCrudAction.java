@@ -75,6 +75,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.SecurityUtils;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -170,11 +171,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public String[] pk;
     public String propertyName;
     public String[] selection;
+    @QueryParam("searchString")
     public String searchString;
     public String successReturnUrl;
+    @QueryParam("firstResult")
     public Integer firstResult;
+    @QueryParam("maxResults")
     public Integer maxResults;
+    @QueryParam("sortProperty")
     public String sortProperty;
+    @QueryParam("sortDirection")
     public String sortDirection;
     public boolean searchVisible;
 
@@ -477,7 +483,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         String jsonText = FormUtil.writeToJson(form);
         return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
-
     //**************************************************************************
     // Form handling
     //**************************************************************************
@@ -1556,6 +1561,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @ControlsCache
     public Resolution downloadBlob() throws IOException, NoSuchFieldException {
+        return downloadBlob(propertyName);
+    }
+
+    @GET
+    @Path(":blob/{propertyName}")
+    public Resolution downloadBlob(@PathParam("propertyName") String propertyName) throws IOException, NoSuchFieldException {
+        if(object == null) {
+            return new ErrorResolution(Response.Status.BAD_REQUEST.getStatusCode(), "Object can not be null (this method can only be called with /objectKey)");
+        }
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         BlobManager blobManager = getBlobManager();
@@ -1585,6 +1599,73 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .setFilename(fileName)
                 .setLength(contentLength)
                 .setLastModified(lastModified);
+    }
+
+    @PUT
+    @Path(":blob/{propertyName}")
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
+    public Response uploadBlob(
+            @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename)
+            throws IOException, NoSuchFieldException {
+        if(object == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
+        }
+        setupForm(Mode.EDIT);
+        form.readFromObject(object);
+        AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
+        if(!field.isUpdatable()) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Property not writable").build();
+        }
+
+        Blob blob = new Blob(field.generateNewCode());
+        blob.setFilename(filename);
+        blob.setSize(context.getRequest().getContentLength());
+        blob.setContentType(context.getRequest().getContentType());
+        blob.setCharacterEncoding(context.getRequest().getCharacterEncoding());
+        blob.setCreateTimestamp(new DateTime());
+        blob.setInputStream(context.getRequest().getInputStream());
+        Blob oldBlob = field.getValue();
+        field.setValue(blob);
+        field.writeToObject(object);
+        if(!field.isSaveBlobOnObject()) {
+            BlobManager blobManager = getBlobManager();
+            blobManager.save(blob);
+            if(oldBlob != null) {
+                try {
+                    blobManager.delete(oldBlob);
+                } catch (IOException e) {
+                    logger.warn("Could not delete old blob (code: " + oldBlob.getCode() + ")", e);
+                }
+            }
+        }
+        commitTransaction();
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path(":blob/{propertyName}")
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
+    public Response deleteBlob(
+            @PathParam("propertyName") String propertyName)
+            throws IOException, NoSuchFieldException {
+        if(object == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
+        }
+        setupForm(Mode.EDIT);
+        form.readFromObject(object);
+        AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
+        if(!field.isUpdatable() || field.isRequired()) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Property not writable").build();
+        }
+        Blob blob = field.getValue();
+        field.setValue(null);
+        field.writeToObject(object);
+        if(!field.isSaveBlobOnObject() && blob != null) {
+            BlobManager blobManager = getBlobManager();
+            blobManager.delete(blob);
+        }
+        commitTransaction();
+        return Response.ok().build();
     }
 
     protected BlobManager getBlobManager() {
@@ -2117,19 +2198,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Resolution getAsJson() {
         if(object == null) {
-            readSearchParamsFromRequest();
             return jsonSearchData();
         } else {
             return jsonReadData();
         }
-    }
-
-    protected void readSearchParamsFromRequest() {
-        Form form = new FormBuilder(AbstractCrudAction.class).
-                configFields("searchString", "firstResult", "maxResults", "sortProperty", "sortDirection").
-                build();
-        form.readFromRequest(context.getRequest());
-        form.writeToObject(this);
     }
 
     /**
@@ -2143,7 +2215,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     public Response httpPostJson(String jsonObject) throws Throwable {
         if(object != null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /pk instead").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
         }
         setupForm(Mode.CREATE);
         object = (T) classAccessor.newInstance();
@@ -2223,7 +2295,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public void httpDelete() throws Exception {
         if(object == null) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /pk path parameter").build());
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /objectKey path parameter").build());
         }
         if(deleteValidate(object)) {
             try {
