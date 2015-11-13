@@ -69,6 +69,8 @@ import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.controller.StripesRequestWrapper;
+import net.sourceforge.stripes.exception.StripesServletException;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -87,6 +89,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +97,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
@@ -522,25 +526,25 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Create/Save
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "create.new", order = 1, type = Button.TYPE_SUCCESS,
-            icon = Button.ICON_PLUS + Button.ICON_WHITE)
-    @RequiresPermissions(permissions = PERMISSION_CREATE)
-    public Resolution create() {
+    protected void preCreate() {
         setupForm(Mode.CREATE);
         object = (T) classAccessor.newInstance();
         createSetup(object);
         form.readFromObject(object);
+    }
 
+    @Button(list = "crud-search", key = "create.new", order = 1, type = Button.TYPE_SUCCESS,
+            icon = Button.ICON_PLUS + Button.ICON_WHITE)
+    @RequiresPermissions(permissions = PERMISSION_CREATE)
+    public Resolution create() {
+        preCreate();
         return getCreateView();
     }
 
     @Button(list = "crud-create", key = "save", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution save() {
-        setupForm(Mode.CREATE);
-        object = (T) classAccessor.newInstance();
-        createSetup(object);
-        form.readFromObject(object);
+        preCreate();
         form.readFromRequest(context.getRequest());
         BlobUtils.loadBlobs(form, getTemporaryBlobManager(), false);
         if (form.validate()) {
@@ -592,6 +596,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Edit/Update
     //**************************************************************************
 
+    protected void preEdit() {
+        setupForm(Mode.EDIT);
+        editSetup(object);
+        form.readFromObject(object);
+    }
+
     @Buttons({
         @Button(list = "crud-read", key = "edit", order = 1 , icon = Button.ICON_EDIT + Button.ICON_WHITE,
                 group = "crud", type = Button.TYPE_SUCCESS),
@@ -599,9 +609,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     })
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
-        setupForm(Mode.EDIT);
-        editSetup(object);
-        form.readFromObject(object);
+        preEdit();
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         return getEditView();
     }
@@ -609,9 +617,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution update() {
-        setupForm(Mode.EDIT);
-        editSetup(object);
-        form.readFromObject(object);
+        preEdit();
         List<Blob> blobsBefore = getBlobsFromForm();
         form.readFromRequest(context.getRequest());
         BlobUtils.loadBlobs(form, getBlobManager(), false);
@@ -2217,10 +2223,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
         }
-        setupForm(Mode.CREATE);
-        object = (T) classAccessor.newInstance();
-        createSetup(object);
-        form.readFromObject(object);
+        preCreate();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
             writeFormToObject();
@@ -2232,20 +2235,71 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
-                    throw e;
+                    return Response.serverError().entity(e).build();
                 }
-                form.readFromObject(object); //Re-read so that the full object is returned
-                OgnlTextFormat textFormat = getReadURLFormat();
-                return Response.status(Response.Status.CREATED).
-                        entity(form).
-                        location(new URI(textFormat.format(object))).
-                        build();
+                return objectCreated();
             } else {
                 return Response.serverError().entity(form).build();
             }
         } else {
             return Response.serverError().entity(form).build();
         }
+    }
+
+    /**
+     * Handles object creation with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.3
+     * @return the created object as JSON (in a JAX-RS Response).
+     */
+    @POST
+    @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response httpPostMultipart() throws Throwable {
+        if(object != null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
+        }
+        preCreate();
+        readFormFromMultipartRequest();
+        if (form.validate()) {
+            writeFormToObject();
+            if(createValidate(object)) {
+                try {
+                    doSave(object);
+                    createPostProcess(object);
+                    BlobUtils.saveBlobs(form, getBlobManager());
+                    commitTransaction();
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    return Response.serverError().entity(e).build();
+                }
+                return objectCreated();
+            } else {
+                return Response.serverError().entity(form).build();
+            }
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    protected void readFormFromMultipartRequest() throws StripesServletException {
+        HttpServletRequest request = context.getRequest();
+        try {
+            request = StripesRequestWrapper.findStripesWrapper(request);
+        } catch (IllegalStateException e) {
+            request = new StripesRequestWrapper(request);
+        }
+        form.readFromRequest(request);
+    }
+
+    protected Response objectCreated() throws URISyntaxException {
+        form.readFromObject(object); //Re-read so that the full object is returned
+        OgnlTextFormat textFormat = getReadURLFormat();
+        return Response.status(Response.Status.CREATED).
+                entity(form).
+                location(new URI(textFormat.format(object))).
+                build();
     }
 
     /**
@@ -2261,9 +2315,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
-        setupForm(Mode.EDIT);
-        editSetup(object);
-        form.readFromObject(object);
+        preEdit();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
             writeFormToObject();
@@ -2275,10 +2327,61 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
-                    throw e;
+                    return Response.serverError().entity(e).build();
                 }
                 form.readFromObject(object); //Re-read so that the full object is returned
                 return Response.ok(form).build();
+            } else {
+                return Response.serverError().entity(form).build();
+            }
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    /**
+     * Handles object update with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.2
+     * @return the updated object as JSON (in a JAX-RS Response).
+     */
+    @PUT
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public Response httpPutMultipart() throws Throwable {
+        if(object == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
+        }
+        preEdit();
+        List<Blob> blobsBefore = getBlobsFromForm();
+        readFormFromMultipartRequest();
+        if (form.validate()) {
+            writeFormToObject();
+            if(editValidate(object)) {
+                try {
+                    doUpdate(object);
+                    editPostProcess(object);
+                    commitTransaction();
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    return Response.serverError().entity(e).build();
+                }
+                boolean blobSaved = true;
+                try {
+                    List<Blob> blobsAfter = getBlobsFromForm();
+                    deleteOldBlobs(blobsBefore, blobsAfter);
+                    persistNewBlobs(blobsBefore, blobsAfter);
+                } catch (IOException e) {
+                    logger.warn("Could not save blobs", e);
+                    blobSaved = false;
+                }
+                form.readFromObject(object); //Re-read so that the full object is returned
+                Response.ResponseBuilder responseBuilder = Response.ok(form);
+                if(!blobSaved) {
+                    responseBuilder.header("X-Portofino-Blob-Warning", "Not all blobs were saved. See application logs.");
+                }
+                return responseBuilder.build();
             } else {
                 return Response.serverError().entity(form).build();
             }
