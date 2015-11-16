@@ -207,10 +207,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //--------------------------------------------------------------------------
 
     protected SelectionProviderSupport selectionProviderSupport;
-    
+
     protected String relName;
+    @DefaultValue("0")
+    @PathParam("selectionProviderIndex")
     protected int selectionProviderIndex;
-    protected String selectFieldMode;
+    @QueryParam("selectionProviderIndex")
     protected String labelSearch;
 
     //--------------------------------------------------------------------------
@@ -1975,23 +1977,23 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     //**************************************************************************
-    // Ajax
+    // Selection providers
     //**************************************************************************
 
     public Resolution jsonSelectFieldOptions() {
-        return jsonOptions(prefix, true);
+        return jsonOptions(relName, prefix, true);
     }
 
     public Resolution jsonSelectFieldSearchOptions() {
-        return jsonOptions(searchPrefix, true);
+        return jsonOptions(relName, searchPrefix, true);
     }
 
     public Resolution jsonAutocompleteOptions() {
-        return jsonOptions(prefix, false);
+        return jsonOptions(relName, prefix, false);
     }
 
     public Resolution jsonAutocompleteSearchOptions() {
-        return jsonOptions(searchPrefix, false);
+        return jsonOptions(relName, searchPrefix, false);
     }
 
     /**
@@ -2003,18 +2005,24 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * this parameter; for autocomplete fields, you would likely pass false.
      * @return a Resolution to produce the JSON.
      */
-    protected Resolution jsonOptions(String prefix, boolean includeSelectPrompt) {
+    @GET
+    @Path(":selectionProvider/{selectionProviderName}{separator : /?}{selectionProviderIndex : (\\d*)}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Resolution jsonOptions(
+            @PathParam("selectionProviderName") String selectionProviderName,
+            @QueryParam("prefix") String prefix,
+            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
-            if (selectionProvider.getName().equals(relName)) {
+            if (selectionProvider.getName().equals(selectionProviderName)) {
                 crudSelectionProvider = current;
                 break;
             }
         }
         if (crudSelectionProvider == null) {
-            return new ErrorResolution(500);
+            return new ErrorResolution(404);
         }
 
         SelectionProvider selectionProvider =
@@ -2041,6 +2049,23 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         logger.debug("jsonOptions: {}", text);
         return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, text);
+    }
+
+    @GET
+    @Path(":selectionProviders")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<String, List<String>> selectionProviders() {
+        Map<String, List<String>> result = new HashMap<String, List<String>>();
+        // setup option providers
+        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+            SelectionProvider selectionProvider = current.getSelectionProvider();
+            if(selectionProvider == null) {
+                continue;
+            }
+            String[] fieldNames = current.getFieldNames();
+            result.put(selectionProvider.getName(), Arrays.asList(fieldNames));
+        }
+        return result;
     }
 
     //--------------------------------------------------------------------------
@@ -2647,14 +2672,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public void setSelectionProviderIndex(int selectionProviderIndex) {
         this.selectionProviderIndex = selectionProviderIndex;
-    }
-
-    public String getSelectFieldMode() {
-        return selectFieldMode;
-    }
-
-    public void setSelectFieldMode(String selectFieldMode) {
-        this.selectFieldMode = selectFieldMode;
     }
 
     public String getLabelSearch() {
