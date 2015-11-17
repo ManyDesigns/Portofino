@@ -2054,8 +2054,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @GET
     @Path(":selectionProviders")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, List<String>> selectionProviders() {
-        Map<String, List<String>> result = new HashMap<String, List<String>>();
+    @SuppressWarnings("unchecked")
+    public List selectionProviders() {
+        List result = new ArrayList();
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -2063,7 +2064,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
-            result.put(selectionProvider.getName(), Arrays.asList(fieldNames));
+            Map description = new HashMap();
+            description.put("name", selectionProvider.getName());
+            description.put("fieldNames", Arrays.asList(fieldNames));
+            description.put("displayMode", selectionProvider.getDisplayMode());
+            description.put("searchDisplayMode", selectionProvider.getSearchDisplayMode());
+            result.add(description);
         }
         return result;
     }
@@ -2237,14 +2243,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     /**
      * Handles object creation via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param jsonObject the object (in serialized JSON form)
      * @since 4.2
      * @return the created object as JSON (in a JAX-RS Response).
+     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response httpPostJson(String jsonObject) throws Throwable {
+    public Response httpPostJson(String jsonObject) throws Exception {
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
         }
@@ -2275,12 +2283,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Handles object creation with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.3
      * @return the created object as JSON (in a JAX-RS Response).
+     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug. 
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response httpPostMultipart() throws Throwable {
+    public Response httpPostMultipart() throws Exception {
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
         }
@@ -2329,14 +2338,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     /**
      * Handles object update via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param jsonObject the object (in serialized JSON form)
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
+     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @PUT
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response httpPutJson(String jsonObject) throws Throwable {
+    public Response httpPutJson(String jsonObject) throws Exception {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
