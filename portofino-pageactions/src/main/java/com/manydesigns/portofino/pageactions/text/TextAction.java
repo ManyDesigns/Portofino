@@ -54,6 +54,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +143,18 @@ public class TextAction extends AbstractPageAction {
             content = "<em>Empty content. To add content, configure this page.</em>";
         }
         return new ForwardResolution("/m/pageactions/text/read.jsp");
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response downloadContent() {
+        try {
+            loadContent();
+            return Response.ok(content).build();
+        } catch (IOException e) {
+            logger.error("Could not load content", e);
+            return Response.serverError().entity(e).build();
+        }
     }
 
     /**

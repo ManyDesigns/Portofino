@@ -87,6 +87,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -2337,7 +2338,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void readFormFromMultipartRequest() throws StripesServletException {
-        HttpServletRequest request = context.getRequest();
+        HttpServletRequest request = new HttpServletRequestWrapper(context.getRequest()) {
+            public String getMethod() {
+                return "POST"; //In order to fool Stripes into constructing a multipart wrapper anyway
+            }
+        };
         try {
             request = StripesRequestWrapper.findStripesWrapper(request);
         } catch (IllegalStateException e) {
