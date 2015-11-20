@@ -175,16 +175,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public String[] pk;
     public String propertyName;
     public String[] selection;
-    @QueryParam("searchString")
     public String searchString;
     public String successReturnUrl;
-    @QueryParam("firstResult")
     public Integer firstResult;
-    @QueryParam("maxResults")
     public Integer maxResults;
-    @QueryParam("sortProperty")
     public String sortProperty;
-    @QueryParam("sortDirection")
     public String sortDirection;
     public boolean searchVisible;
 
@@ -1010,20 +1005,35 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Setup
     //--------------------------------------------------------------------------
 
-    public Resolution preparePage() {
+    @Override
+    protected boolean acceptsPathParameter() {
+        return (classAccessor != null &&
+                pageInstance.getParameters().size() < classAccessor.getKeyProperties().length);
+    }
+
+    @Override
+    public void setPageInstance(PageInstance pageInstance) {
+        super.setPageInstance(pageInstance);
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
         if (crudConfiguration == null) {
             logger.warn("Crud is not configured: " + pageInstance.getPath());
-            return null;
+            return;
         }
 
         ClassAccessor innerAccessor = prepare(pageInstance);
         if (innerAccessor == null) {
-            return null;
+            return;
         }
         classAccessor = new CrudAccessor(crudConfiguration, innerAccessor);
         pkHelper = new PkHelper(classAccessor);
+    }
+
+    @Override
+    public Resolution preparePage() {
+        if(pkHelper == null) {
+            return null;
+        }
 
         List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
@@ -2228,13 +2238,22 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     /**
      * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param searchString the search string
      * @since 4.2
      * @return search results (/) or single object (/pk) as JSON (streamed using a Stripes Resolution).
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Resolution getAsJson() {
+    public Resolution getAsJson(
+            @QueryParam("searchString") String searchString,
+            @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults,
+            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection) {
         if(object == null) {
+            this.searchString = searchString;
+            this.firstResult = firstResult;
+            this.maxResults = maxResults;
+            this.sortProperty = sortProperty;
+            this.sortDirection = sortDirection;
             return jsonSearchData();
         } else {
             return jsonReadData();

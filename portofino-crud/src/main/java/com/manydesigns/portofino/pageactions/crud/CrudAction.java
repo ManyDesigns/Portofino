@@ -202,6 +202,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Before
     public void prepare() {
+        session = persistence.getSession(getCrudConfiguration().getDatabase());
         if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
             selectionProviderSupport = createSelectionProviderSupport();
             selectionProviderSupport.setup();
@@ -245,7 +246,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
             return null;
         }
 
-        session = persistence.getSession(getCrudConfiguration().getDatabase());
         return new TableAccessor(baseTable);
     }
 

@@ -214,12 +214,16 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
             Injections.inject(subpage, request.getServletContext(), request);
             return subpage;
-        } else if(PageActionLogic.supportsDetail(getClass())) {
+        } else if(acceptsPathParameter()) {
             pageInstance.getParameters().add(pathFragment);
             return this;
         } else {
             return null;
         }
+    }
+
+    protected boolean acceptsPathParameter() {
+        return PageActionLogic.supportsDetail(getClass());
     }
 
     /**

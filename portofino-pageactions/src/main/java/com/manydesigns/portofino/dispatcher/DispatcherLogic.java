@@ -491,9 +491,8 @@ public class DispatcherLogic {
         return action;
     }
 
-    public static void configurePageAction(PageAction pageAction)
+    public static void configurePageAction(PageAction pageAction, PageInstance pageInstance)
             throws JAXBException, IOException {
-        PageInstance pageInstance = pageAction.getPageInstance();
         if(pageInstance.getConfiguration() != null) {
             logger.debug("Page instance {} is already configured");
             return;
@@ -501,12 +500,12 @@ public class DispatcherLogic {
         File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
         Class<?> configurationClass = PageActionLogic.getConfigurationClass(pageAction.getClass());
         try {
-            Object configuration =
-                    getConfiguration(configurationFile, configurationClass);
+            Object configuration = getConfiguration(configurationFile, configurationClass);
             pageInstance.setConfiguration(configuration);
         } catch (Throwable t) {
             logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
         }
+        pageAction.setPageInstance(pageInstance);
     }
 
     public static PageAction getSubpage(
@@ -534,8 +533,7 @@ public class DispatcherLogic {
                 PageInstance pageInstance =
                     new PageInstance(parentPageInstance, childDirectory, page, actionClass);
                 pageInstance.setActionBean(pageAction);
-                pageAction.setPageInstance(pageInstance);
-                configurePageAction(pageAction);
+                configurePageAction(pageAction, pageInstance);
                 return pageAction;
             } catch (Exception e) {
                 throw new PageNotActiveException(e);
