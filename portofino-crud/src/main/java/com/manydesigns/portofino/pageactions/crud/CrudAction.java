@@ -202,8 +202,8 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Before
     public void prepare() {
-        session = persistence.getSession(getCrudConfiguration().getDatabase());
         if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
+            session = persistence.getSession(getCrudConfiguration().getDatabase());
             selectionProviderSupport = createSelectionProviderSupport();
             selectionProviderSupport.setup();
         }

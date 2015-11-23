@@ -64,8 +64,8 @@ public class Dispatcher {
      * @return the dispatch. If no dispatch can be constructed, this method returns null.
      */
     public Dispatch getDispatch(String path) {
-        if(path.endsWith(".jsp")) {
-            logger.debug("Path is a JSP page ({}), not dispatching.", path);
+        if(!isPotentialPagePath(path)) {
+            logger.debug("Path is certainly not a page ({}), not dispatching to save time.", path);
             return null;
         }
 
@@ -134,6 +134,13 @@ public class Dispatcher {
         dispatch = new Dispatch(pagePath.toArray(new PageInstance[pagePath.size()]));
         cache.put(path, dispatch);
         return dispatch;
+    }
+
+    protected boolean isPotentialPagePath(String path) {
+        return !(
+                ((path.startsWith("/webjars/") || path.startsWith("/theme/") || path.startsWith("/m/")) &&
+                 (path.endsWith(".js") || path.endsWith(".css") || path.endsWith(".html"))) ||
+                path.endsWith(".jsp"));
     }
 
     protected static String normalizePath(String originalPath) {

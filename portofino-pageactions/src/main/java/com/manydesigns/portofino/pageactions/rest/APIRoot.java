@@ -49,9 +49,6 @@ public class APIRoot {
     protected ServletContext servletContext;
 
     @Context
-    protected HttpServletRequest request;
-
-    @Context
     protected HttpServletResponse response;
 
     @Context
@@ -62,6 +59,7 @@ public class APIRoot {
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
+        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
 
         String actionPath = "/" + uriInfo.getPath();
         if (request.getDispatcherType() == DispatcherType.REQUEST) {
@@ -105,6 +103,7 @@ public class APIRoot {
         Configuration configuration = (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         String landingPage = configuration.getString(PortofinoProperties.LANDING_PAGE);
         if(landingPage != null) {
+            HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
             return new Navigation(
                     configuration, DispatcherUtil.get(request).getDispatch(landingPage), SecurityUtils.getSubject(), false).
                     getRootNavigationItem();

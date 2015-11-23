@@ -61,9 +61,6 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     protected ResourceInfo resourceInfo;
 
     @Context
-    protected HttpServletRequest request;
-
-    @Context
     protected HttpServletResponse response;
 
     @Override
@@ -130,6 +127,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     protected void preparePage(ContainerRequestContext requestContext, Object resource) {
         if(resource instanceof PageAction) {
             PageAction pageAction = (PageAction) resource;
+            HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
             request.setAttribute(StripesConstants.REQ_ATTR_ACTION_BEAN, pageAction);
             if(!pageAction.getPageInstance().isPrepared()) {
                 ElementsActionBeanContext context = new ElementsActionBeanContext();
@@ -185,6 +183,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         if(userId != null) { //Issue #755
             MDC.put("userId", userId.toString());
         }
+        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         if(request != null) {
             MDC.put("req.requestURI", request.getRequestURI());
         }

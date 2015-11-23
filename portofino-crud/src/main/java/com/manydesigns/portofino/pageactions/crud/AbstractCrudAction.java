@@ -77,7 +77,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.SecurityUtils;
-import org.glassfish.hk2.api.ProxyCtl;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -2340,9 +2339,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected void readFormFromMultipartRequest() throws StripesServletException {
         HttpServletRequest request = context.getRequest();
-        if(request instanceof ProxyCtl) { //Jersey proxy workaround
-            request = (HttpServletRequest) ((ProxyCtl) request).__make();
-        }
+        logger.error("request" + request + " - " + Arrays.asList(request.getClass().getInterfaces()));
         if(!"POST".equals(request.getMethod())) {
             //If method is POST, StripesFilter should have already built a multipart wrapper
             request = new HttpServletRequestWrapper(context.getRequest()) {
@@ -2350,6 +2347,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     return "POST"; //In order to fool Stripes into constructing a multipart wrapper anyway
                 }
             };
+            request = new StripesRequestWrapper(request);
+        } else try {
+            request = StripesRequestWrapper.findStripesWrapper(request);
+        } catch (IllegalStateException e) {
             request = new StripesRequestWrapper(request);
         }
         form.readFromRequest(request);

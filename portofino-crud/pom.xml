@@ -42,13 +42,6 @@
             <version>${jsoup.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Jersey workaround -->
-        <dependency>
-            <groupId>org.glassfish.hk2</groupId>
-            <artifactId>hk2-api</artifactId>
-            <version>2.4.0-b10</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- To avoid Groovy compilation error in IDEA -->
         <dependency>
             <groupId>org.slf4j</groupId>

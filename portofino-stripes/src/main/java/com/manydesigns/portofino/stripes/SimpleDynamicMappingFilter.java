@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.stripes;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.controller.DispatcherServlet;
 import net.sourceforge.stripes.controller.DynamicMappingFilter;
@@ -53,6 +54,8 @@ public class SimpleDynamicMappingFilter extends DynamicMappingFilter {
         String uri = HttpUtil.getRequestedPath((HttpServletRequest) request);
         Class<? extends ActionBean> beanType = getStripesFilter()
                 .getInstanceConfiguration().getActionResolver().getActionBeanType(uri);
+        //Ensure that the request is the one wrapped by Stripes (for REST)
+        ElementsThreadLocals.setHttpServletRequest((HttpServletRequest) request);
         if(beanType != null) {
             stripesDispatcher.service(request, response);
         } else {
