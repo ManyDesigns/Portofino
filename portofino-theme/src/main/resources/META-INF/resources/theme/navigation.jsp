@@ -54,7 +54,6 @@
     int level = 0;
     String title = "";
 %><div class="navigation"><%
-    int cycle = 0;
     while (!navigationItems.isEmpty()) {
         NavigationItem nextNavigationItem = null;
         if(level >= startingLevel) {
@@ -103,5 +102,5 @@
         level++;
     }
 %>
-
+</ul>
 </div>

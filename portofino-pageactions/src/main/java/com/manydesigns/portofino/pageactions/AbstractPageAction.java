@@ -250,9 +250,16 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public NavigationItem getPages() {
-        String actionPath = getContext().getActionPath();
-        actionPath = actionPath.substring(0, actionPath.length() - "/:pages".length());
-        Dispatch dispatch = DispatcherUtil.get(getContext().getRequest()).getDispatch(actionPath);
+        List<PageInstance> pageInstancePath = new ArrayList<PageInstance>();
+        PageInstance current = pageInstance;
+        while (current != null) {
+            pageInstancePath.add(0, current);
+            current = current.getParent();
+        }
+        //TODO |dispatch is not cached in REST calls, so we have to build it from actual page instances
+        //TODO |to avoid building it from scratch and losing potential modifications to page instances title and
+        //TODO |description done by pages in the path.
+        Dispatch dispatch = new Dispatch(pageInstancePath.toArray(new PageInstance[pageInstancePath.size()]));
         return new Navigation(
                 portofinoConfiguration, dispatch, SecurityUtils.getSubject(), false).
                 getRootNavigationItem();
