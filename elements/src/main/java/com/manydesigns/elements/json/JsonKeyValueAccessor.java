@@ -31,4 +31,11 @@ public class JsonKeyValueAccessor implements KeyValueAccessor {
     public void set(String name, Object value) {
         jsonObject.put(name, value);
     }
+
+    @Override
+    public boolean has(String name) {
+        return jsonObject.has(name);
+    }
+
+
 }

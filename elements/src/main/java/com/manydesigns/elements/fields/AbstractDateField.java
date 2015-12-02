@@ -209,7 +209,7 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
         if(value instanceof Number) {
             return toDate((Number) value);
         }
-        return super.maybeConvertValue(value);    //To change body of overridden methods use File | Settings | File Templates.
+        return super.maybeConvertValue(value);
     }
 
     @Override

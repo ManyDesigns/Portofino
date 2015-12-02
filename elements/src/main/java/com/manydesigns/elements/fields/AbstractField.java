@@ -309,6 +309,9 @@ public abstract class AbstractField<T> implements Field<T> {
         if (mode.isView(insertable, updatable)) {
             return;
         }
+        if(!keyValueAccessor.has(accessor.getName())) {
+            return;
+        }
         Object value = keyValueAccessor.get(accessor.getName());
         if(value instanceof String) {
             setStringValue((String) value);

@@ -1,7 +1,5 @@
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.xml.XhtmlFragment;
-
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -14,5 +12,5 @@ public interface KeyValueAccessor {
 
     Object get(String name);
     void set(String name, Object value);
-
+    boolean has(String name);
 }

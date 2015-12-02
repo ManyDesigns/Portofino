@@ -21,6 +21,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.blobs.Blob;
@@ -173,10 +174,6 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
             writeBlobFilenameAndSize(xb);
             xb.closeElement("p");
 
-            /*xb.openElement("div");
-            writeBlobFilenameAndSize(xb);
-            xb.closeElement("div");*/
-
             xb.openElement("div");
             xb.addAttribute("class", "radio radio-inline");
 
@@ -220,8 +217,6 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
             xb.writeInputFile(innerId, inputName , true);
             xb.writeInputHidden(codeInputName, blob.getCode());
             xb.closeElement("div");
-
-            /*xb.closeElement("p"); */
         }
     }
 
@@ -232,7 +227,6 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
 
         xb.openElement("label");
         xb.addAttribute("for", radioId);
-        //xb.addAttribute("class", "radio");
         xb.write(getText(labelKey));
         xb.closeElement("label");
     }
