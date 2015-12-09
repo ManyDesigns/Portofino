@@ -209,12 +209,16 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      */
     @Override
     public DispatchElement consumePathFragment(String pathFragment) {
-        PageAction subpage = DispatcherLogic.getSubpage(portofinoConfiguration, pageInstance, pathFragment);
-        if(subpage != null) {
-            HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-            Injections.inject(subpage, request.getServletContext(), request);
-            return subpage;
-        } else if(acceptsPathParameter()) {
+        boolean acceptsPathParameter = acceptsPathParameter();
+        if(!acceptsPathParameter || pageInstance.getParameters().isEmpty()) {
+            PageAction subpage = DispatcherLogic.getSubpage(portofinoConfiguration, pageInstance, pathFragment);
+            if (subpage != null) {
+                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+                Injections.inject(subpage, request.getServletContext(), request);
+                return subpage;
+            }
+        }
+        if(acceptsPathParameter) {
             pageInstance.getParameters().add(pathFragment);
             return this;
         } else {
