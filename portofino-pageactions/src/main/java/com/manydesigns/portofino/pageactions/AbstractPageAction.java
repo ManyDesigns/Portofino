@@ -29,6 +29,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
@@ -65,6 +66,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -697,5 +699,22 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Object getConfiguration() {
         return pageInstance.getConfiguration();
+    }
+
+    /**
+     * Returns a description of this PageAction's type.
+     * @since 4.3
+     * @return the page type as JSON.
+     */
+    @Path(":pageType")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public String getPageType() {
+        JSONStringer js = new JSONStringer();
+        js.object();
+        js.key("javaClass").value(pageInstance.getActionClass().getSuperclass().getName());
+        js.key("groovyClass").value(pageInstance.getActionClass().getName());
+        js.endObject();
+        return js.toString();
     }
 }

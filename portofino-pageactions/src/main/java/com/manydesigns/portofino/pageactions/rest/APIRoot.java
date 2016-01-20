@@ -17,6 +17,7 @@ import ognl.OgnlContext;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.shiro.SecurityUtils;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,6 +111,23 @@ public class APIRoot {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Returns a description of this APIRoot's type.
+     * @since 4.3
+     * @return the page type as JSON.
+     */
+    @Path(":pageType")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public String describeClassAccessor() {
+        JSONStringer js = new JSONStringer();
+        js.object();
+        js.key("javaClass").value(APIRoot.class.getName());
+        js.key("groovyClass").value("");
+        js.endObject();
+        return js.toString();
     }
     
 }
