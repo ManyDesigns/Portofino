@@ -205,10 +205,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected SelectionProviderSupport selectionProviderSupport;
 
     protected String relName;
-    @DefaultValue("0")
-    @PathParam("selectionProviderIndex")
     protected int selectionProviderIndex;
-    @QueryParam("selectionProviderIndex")
     protected String labelSearch;
 
     //--------------------------------------------------------------------------
@@ -1594,6 +1591,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         BlobManager blobManager = getBlobManager();
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
         Blob blob = field.getValue();
+        if(blob == null) {
+            return new ErrorResolution(404);
+        }
         if(blob.getInputStream() == null) {
             blobManager.loadMetadata(blob);
         }

@@ -37,10 +37,7 @@ import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.stripes.ResolverUtil;
 import groovy.util.GroovyScriptEngine;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,6 +135,22 @@ public class PortofinoListener
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
                 BaseModule.ELEMENTS_CONFIGURATION, elementsConfiguration);
+
+        String applicationDirectoryPath = servletContext.getInitParameter("portofino.application.directory");
+        if(applicationDirectoryPath != null) try {
+            applicationDirectoryPath = (String) PropertyConverter.interpolate(applicationDirectoryPath, new BaseConfiguration());
+            applicationDirectory = new File(applicationDirectoryPath);
+            if(!applicationDirectory.isDirectory()) {
+                logger.error("Configured application directory " + applicationDirectoryPath + " is not a directory");
+                applicationDirectory = null;
+            }
+        } catch (Exception e) {
+            logger.error("Configured application directory " + applicationDirectoryPath + " is not valid", e);
+        }
+        if(applicationDirectory == null) {
+            applicationDirectory = new File(serverInfo.getRealPath(), "WEB-INF");
+        }
+        logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());
 
         try {
             loadConfiguration();
@@ -294,9 +307,6 @@ public class PortofinoListener
     //**************************************************************************
 
     protected void loadConfiguration() throws ConfigurationException {
-        applicationDirectory = new File(serverInfo.getRealPath(), "WEB-INF");
-        logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());
-
         File configurationFile = new File(applicationDirectory, "portofino.properties");
         configuration =  new PropertiesConfiguration(configurationFile);
 

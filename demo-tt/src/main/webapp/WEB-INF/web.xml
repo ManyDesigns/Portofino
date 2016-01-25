@@ -20,4 +20,10 @@
         <param-name>LocalePicker.Locales</param-name>
         <param-value>en</param-value>
     </context-param>
+    <!-- Here you can change where the Portofino app lives. The default is ${serverInfo:realPath}/WEB-INF
+    <context-param>
+        <param-name>portofino.application.path</param-name>
+        <param-value>${serverInfo:realPath}/WEB-INF</param-value>
+    </context-param>
+    -->
 </web-app>
