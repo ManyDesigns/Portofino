@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.navigation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,6 +37,7 @@ public class NavigationItem {
     protected final String title;
     protected final String description;
     protected final String path;
+    protected final List<String> parameters;
     protected final boolean inPath;
     protected final boolean selected;
     protected final boolean ghost;
@@ -43,10 +45,11 @@ public class NavigationItem {
     protected final List<NavigationItem> childNavigationItems;
 
     public NavigationItem(
-            String title, String description, String path, boolean inPath, boolean selected, boolean ghost) {
+            String title, String description, String path, List<String> parameters, boolean inPath, boolean selected, boolean ghost) {
         this.title = title;
         this.description = description;
         this.path = path;
+        this.parameters = parameters != null ? Collections.unmodifiableList(parameters) : null;
         this.inPath = inPath;
         this.selected = selected;
         this.ghost = ghost;
@@ -67,6 +70,10 @@ public class NavigationItem {
 
     public String getPath() {
         return path;
+    }
+
+    public List<String> getParameters() {
+        return parameters;
     }
 
     public boolean isInPath() {
