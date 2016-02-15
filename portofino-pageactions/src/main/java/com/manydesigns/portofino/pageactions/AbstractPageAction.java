@@ -29,7 +29,6 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.MimeTypes;
-import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
@@ -66,7 +65,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -702,19 +700,18 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     /**
-     * Returns a description of this PageAction's type.
+     * Returns a description of this PageAction.
      * @since 4.3
-     * @return the page type as JSON.
+     * @return the page's description as JSON.
      */
-    @Path(":pageType")
+    @Path(":page")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public String getPageType() {
-        JSONStringer js = new JSONStringer();
-        js.object();
-        js.key("javaClass").value(pageInstance.getActionClass().getSuperclass().getName());
-        js.key("groovyClass").value(pageInstance.getActionClass().getName());
-        js.endObject();
-        return js.toString();
+    public Map<String, Object> getPageDescription() {
+        Map<String, Object> description = new HashMap<String, Object>();
+        description.put("javaClass", pageInstance.getActionClass().getSuperclass().getName());
+        description.put("groovyClass", pageInstance.getActionClass().getName());
+        description.put("page", pageInstance.getPage());
+        return description;
     }
 }

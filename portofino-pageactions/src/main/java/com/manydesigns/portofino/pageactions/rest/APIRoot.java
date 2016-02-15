@@ -17,7 +17,6 @@ import ognl.OgnlContext;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.shiro.SecurityUtils;
-import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +28,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -114,20 +115,19 @@ public class APIRoot {
     }
 
     /**
-     * Returns a description of this APIRoot's type.
+     * Returns a fixed description simulating AbstractPageAction#getPageDescription.
      * @since 4.3
-     * @return the page type as JSON.
+     * @return the description as JSON.
      */
-    @Path(":pageType")
+    @Path(":page")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public String describeClassAccessor() {
-        JSONStringer js = new JSONStringer();
-        js.object();
-        js.key("javaClass").value(APIRoot.class.getName());
-        js.key("groovyClass").value("");
-        js.endObject();
-        return js.toString();
+    public Map<String, Object> describeClassAccessor() {
+        Map<String, Object> description = new HashMap<String, Object>();
+        description.put("javaClass", APIRoot.class.getName());
+        description.put("groovyClass", null);
+        description.put("page", new Page());
+        return description;
     }
     
 }
