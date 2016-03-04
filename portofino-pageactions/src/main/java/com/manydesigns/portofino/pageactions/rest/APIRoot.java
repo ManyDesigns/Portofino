@@ -63,7 +63,10 @@ public class APIRoot {
         ognlContext.put("securityUtils", new SecurityUtilsBean());
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
 
-        String actionPath = "/" + uriInfo.getPath();
+        String actionPath = uriInfo.getPath();
+        if(!actionPath.startsWith("/")) {
+            actionPath = "/" + actionPath;
+        }
         if (request.getDispatcherType() == DispatcherType.REQUEST) {
             logger.debug("Starting page response timer");
             StopWatch stopWatch = new StopWatch();
