@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.m2m;
 
+import com.google.api.client.json.Json;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
@@ -28,20 +29,21 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.DisplayMode;
-import com.manydesigns.elements.options.SearchDisplayMode;
-import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.options.*;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.DatabaseModule;
@@ -59,15 +61,26 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
+import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.shiro.SecurityUtils;
 import org.hibernate.Session;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -563,5 +576,219 @@ public class ManyToManyAction extends AbstractPageAction {
 
     public SelectField getOneSelectField() {
         return oneSelectField;
+    }
+
+        //--------------------------------------------------------------------------
+    // REST
+    //--------------------------------------------------------------------------
+
+    /**
+     * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @since 4.2
+     * @return search results (/) or single object (/pk) as JSON (streamed using a Stripes Resolution).
+     */
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public Resolution getAsJson() {
+        return jsonKeys();
+    }
+
+    @GET
+    @Path(":availableAssociations/{key}")
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public Resolution selectionProviders(@PathParam("key") String key) {
+        try{
+            onePk=Long.parseLong(key);
+        }catch (Exception e){
+             onePk=key;
+        }
+
+        return jsonAssociations();
+    }
+
+    /**
+     * Handles object creation via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param jsonObject the object (in serialized JSON form)
+     * @since 4.2
+     * @return the created object as JSON (in a JAX-RS Response).
+     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
+     */
+    @POST
+    @RequiresPermissions(permissions = ManyToManyAction.PERMISSION_UPDATE)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    public Response httpPostJson(String jsonObject) throws Exception {
+        JSONObject obj = new JSONObject(jsonObject);
+
+        if( onePk==null ){
+            onePk = Long.parseLong( obj.keySet().toArray()[0].toString() ); //TODO
+        }
+        JSONArray selectedKeysJson = obj.getJSONArray(onePk.toString());
+
+        for( int i=0; i<selectedKeysJson.length();i++ ){
+            selectedPrimaryKeys.add(selectedKeysJson.get(i).toString());
+        }
+
+        logger.debug(jsonObject);
+
+         if(!correctlyConfigured) {
+            return Response.serverError().entity(configurationForm).build();
+        }
+        try {
+            loadAssociations();
+        } catch (Exception e) {
+            logger.error("Could not load associations", e);
+            return Response.serverError().entity(e).build();
+        }
+        PkHelper pkHelper = new PkHelper(manyTableAccessor);
+        //TODO chiave multipla
+        String onePropertyName = m2mConfiguration.getActualOnePropertyName();
+        PropertyAccessor onePropertyAccessor = relationTableAccessor.getProperty(onePropertyName);
+        //TODO chiave multipla
+        String manyPropertyName = m2mConfiguration.getManySelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
+        PropertyAccessor manyPropertyAccessor = relationTableAccessor.getProperty(manyPropertyName);
+        PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
+        //TODO handle manyKeyProperties.length > 1
+        PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
+        for(String pkString : selectedPrimaryKeys) {
+            Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
+            Object pk = manyPkAccessor.get(pkObject);
+            if(!isExistingAssociation(manyPropertyAccessor, pk)) {
+                Object newRelation = saveNewRelation(pk, onePropertyAccessor, manyPropertyAccessor);
+                existingAssociations.add(newRelation);
+            }
+        }
+        Iterator it = existingAssociations.iterator();
+        while(it.hasNext()) {
+            Object o = it.next();
+            //TODO handle manyKeyProperties.length > 1
+            Object pkObject = manyPropertyAccessor.get(o);
+            String pkString =
+                    (String) OgnlUtils.convertValue(pkObject, String.class);
+            if(!selectedPrimaryKeys.contains(pkString)) {
+                deleteRelation(o);
+                it.remove();
+            }
+        }
+        session.getTransaction().commit();
+        return objectCreated();
+    }
+
+    protected Response objectCreated() throws URISyntaxException {
+        return Response.status(Response.Status.CREATED). build();
+    }
+
+    public Resolution jsonKeys() throws JSONException {
+        if(!correctlyConfigured) {
+            return forwardToPageActionNotConfigured();
+        }
+
+        JSONArray keys = new JSONArray();
+        if( onePk==null ){
+            Map<Object,SelectionModel.Option> map = oneSelectField.getOptions();
+            for(Object key : map.keySet()) {
+                //logger.info( map.get(key).label);
+                onePk=map.get(key).value;
+                if(onePk != null) {
+                    JSONObject jsonKey = new JSONObject();
+                    jsonKey.put("key",onePk.toString());
+                    jsonKey.put("label",map.get(key).label);
+                    keys.put(jsonKey);
+                }
+            }
+        }else{
+            JSONObject jsonKey = new JSONObject();
+            jsonKey.put("key",onePk.toString());
+            jsonKey.put("label","");
+            keys.put(jsonKey);
+        }
+
+        JSONObject response = new JSONObject();
+        response.put("keys",keys);
+
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, response.toString(2));
+    }
+
+    public Resolution jsonAssociations() throws JSONException {
+        JSONObject response = new JSONObject();
+        JSONArray enumList = new JSONArray();
+        JSONObject model = new JSONObject();
+        JSONObject titleMap = new JSONObject();
+        JSONArray trueRelations = new JSONArray();
+        JSONArray form = new JSONArray();
+        JSONObject schema = new JSONObject();
+
+        if(onePk != null) {
+            try {
+                loadAssociations();
+                if(potentiallyAvailableAssociations == null && onePk != null) {
+                    return forwardToPageActionNotConfigured(); //TODO
+                }
+            } catch (NoSuchFieldException e) {
+                return forwardToPageActionNotConfigured();
+            }
+
+            booleanRelation = new LinkedHashMap<Object, Boolean>();
+            if(potentiallyAvailableAssociations != null) {
+                for(Object o : potentiallyAvailableAssociations) {
+                    booleanRelation.put(o, !availableAssociations.contains(o));
+                    //TODO use only this "for" loop
+                }
+            }else{
+                logger.warn("potentiallyAvailableAssociations is empty");
+            }
+
+            ClassAccessor ca = getManyTableAccessor();
+            PkHelper pkHelper = new PkHelper(ca);
+
+            for(Map.Entry<Object, Boolean> entry : booleanRelation.entrySet()) {
+                Object obj = entry.getKey();
+                String pk = StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
+                enumList.put(pk);
+                titleMap.put(pk,ShortNameUtils.getName(ca, obj));
+                StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
+
+                if(entry.getValue()) {
+                    trueRelations.put(pk);
+                }
+            }
+
+            model.put(onePk.toString(),trueRelations);
+
+            JSONObject items = new JSONObject();
+            items.put("type","string");
+            items.put("enum",enumList);
+
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("type","array");
+            jsonObject.put("title","");
+            jsonObject.put("items",items);
+
+            JSONObject properties = new JSONObject();
+            properties.put(onePk.toString(),jsonObject);
+
+            schema.put("type","object");
+            schema.put("title","Many to many");
+            schema.put("properties",properties);
+
+            JSONObject checkboxes = new JSONObject();
+            checkboxes.put("key",onePk.toString());
+            checkboxes.put("titleMap",titleMap);
+            checkboxes.put("notitle",true);
+            form.put(checkboxes);
+        }
+
+        if(!SecurityLogic.hasPermissions(
+                getPortofinoConfiguration(),
+                getPageInstance(), SecurityUtils.getSubject(),
+                AccessLevel.VIEW, ManyToManyAction.PERMISSION_UPDATE)) {
+            schema.put("readonly",true);
+        }
+
+        response.put("model",model);
+        response.put("schema",schema);
+        response.put("form",form);
+
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, response.toString(2));
     }
 }
