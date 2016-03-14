@@ -268,51 +268,53 @@ public class Persistence {
     }
 
     public synchronized void initModel() {
-        if (setups != null) {
-            logger.info("Cleaning up old setups");
-            for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
-                String databaseName = current.getKey();
-                logger.info("Cleaning up old setup for: {}", databaseName);
-                HibernateDatabaseSetup hibernateDatabaseSetup = current.getValue();
-                try {
-                    SessionFactory sessionFactory = hibernateDatabaseSetup.getSessionFactory();
-                    sessionFactory.close();
-                } catch (Throwable t) {
-                    logger.warn("Cannot close session factory for: " + databaseName, t);
-                }
+        logger.info("Cleaning up old setups");
+        for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
+            String databaseName = current.getKey();
+            logger.info("Cleaning up old setup for: {}", databaseName);
+            HibernateDatabaseSetup hibernateDatabaseSetup = current.getValue();
+            try {
+                SessionFactory sessionFactory = hibernateDatabaseSetup.getSessionFactory();
+                sessionFactory.close();
+            } catch (Throwable t) {
+                logger.warn("Cannot close session factory for: " + databaseName, t);
             }
         }
 
         setups.clear();
         model.init();
         for (Database database : model.getDatabases()) {
-            ConnectionProvider connectionProvider = database.getConnectionProvider();
-            connectionProvider.init(databasePlatformsRegistry);
-            if (connectionProvider.getStatus()
-                    .equals(ConnectionProvider.STATUS_CONNECTED)) {
-                HibernateConfig builder =
-                        new HibernateConfig(connectionProvider, configuration);
-                String trueString = database.getTrueString();
-                if(trueString != null) {
-                    builder.setTrueString(
-                            "null".equalsIgnoreCase(trueString) ? null : trueString);
-                }
-                String falseString = database.getFalseString();
-                if(falseString != null) {
-                    builder.setFalseString(
-                            "null".equalsIgnoreCase(falseString) ? null : falseString);
-                }
-                Configuration configuration =
-                        builder.buildSessionFactory(database);
-                StandardServiceRegistryBuilder registryBuilder =
-                        new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-                SessionFactory sessionFactory = configuration.buildSessionFactory(registryBuilder.build());
+            try {
+                ConnectionProvider connectionProvider = database.getConnectionProvider();
+                connectionProvider.init(databasePlatformsRegistry);
+                if (connectionProvider.getStatus()
+                        .equals(ConnectionProvider.STATUS_CONNECTED)) {
+                    HibernateConfig builder =
+                            new HibernateConfig(connectionProvider, configuration);
+                    String trueString = database.getTrueString();
+                    if (trueString != null) {
+                        builder.setTrueString(
+                                "null".equalsIgnoreCase(trueString) ? null : trueString);
+                    }
+                    String falseString = database.getFalseString();
+                    if (falseString != null) {
+                        builder.setFalseString(
+                                "null".equalsIgnoreCase(falseString) ? null : falseString);
+                    }
+                    Configuration configuration =
+                            builder.buildSessionFactory(database);
+                    StandardServiceRegistryBuilder registryBuilder =
+                            new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+                    SessionFactory sessionFactory = configuration.buildSessionFactory(registryBuilder.build());
 
-                HibernateDatabaseSetup setup =
-                        new HibernateDatabaseSetup(
-                                configuration, sessionFactory);
-                String databaseName = database.getDatabaseName();
-                setups.put(databaseName, setup);
+                    HibernateDatabaseSetup setup =
+                            new HibernateDatabaseSetup(
+                                    configuration, sessionFactory);
+                    String databaseName = database.getDatabaseName();
+                    setups.put(databaseName, setup);
+                }
+            } catch (Exception e) {
+                logger.error("Could not create connection provider for " + database);
             }
         }
 

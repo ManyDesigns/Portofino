@@ -46,7 +46,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public abstract class AbstractField<T> implements Field<T> {
-    public static final String copyright =
+    public static final String COPYRIGHT =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String INPUT_CONTAINER_CSS_CLASS = "input-container";
@@ -75,7 +75,8 @@ public abstract class AbstractField<T> implements Field<T> {
     protected boolean forceNewRow = false;
     protected int colSpan = 1;
     protected String help;
-    protected @NotNull String fieldCssClass;
+    @NotNull
+    protected String fieldCssClass;
 
     protected List<String> errors = new ArrayList<String>();
 
