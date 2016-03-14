@@ -583,9 +583,9 @@ public class ManyToManyAction extends AbstractPageAction {
     //--------------------------------------------------------------------------
 
     /**
-     * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
-     * @since 4.2
-     * @return search results (/) or single object (/pk) as JSON (streamed using a Stripes Resolution).
+     * Handles available keys via REST.
+     * @since 4.3
+     * @return key set results (key,label) as JSON (streamed using a Stripes Resolution).
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -593,23 +593,40 @@ public class ManyToManyAction extends AbstractPageAction {
         return jsonKeys();
     }
 
+     /**
+     * Handles available associations for given key
+     * @param key the key string
+     * @since 4.3
+     * @return available associatos set results as JSON (streamed using a Stripes Resolution).
+     */
     @GET
     @Path(":availableAssociations/{key}")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Resolution selectionProviders(@PathParam("key") String key) {
         try{
-            onePk=Long.parseLong(key);
+            loadOnePk(key);
         }catch (Exception e){
-             onePk=key;
+            logger.error("Cannot get key "+key ,e);
         }
-
         return jsonAssociations();
     }
 
+    protected void loadOnePk(Object key) throws Exception{
+        TableAccessor tableAccessor = new TableAccessor(m2mConfiguration.getActualRelationTable());
+        PropertyAccessor onePkAccessor = tableAccessor.getProperty(m2mConfiguration.getActualOnePropertyName());
+
+        if(onePkAccessor == null) {
+            logger.warn("Not a property: {}", m2mConfiguration.getActualOnePropertyName());
+        }
+
+        Class type = onePkAccessor.getType();
+        onePk = OgnlUtils.convertValue(key,type);
+    }
+
     /**
-     * Handles object creation via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles object creation via REST.
      * @param jsonObject the object (in serialized JSON form)
-     * @since 4.2
+     * @since 4.3
      * @return the created object as JSON (in a JAX-RS Response).
      * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
@@ -619,55 +636,60 @@ public class ManyToManyAction extends AbstractPageAction {
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     public Response httpPostJson(String jsonObject) throws Exception {
         JSONObject obj = new JSONObject(jsonObject);
-
-        if( onePk==null ){
-            onePk = Long.parseLong( obj.keySet().toArray()[0].toString() ); //TODO
-        }
-        JSONArray selectedKeysJson = obj.getJSONArray(onePk.toString());
-
-        for( int i=0; i<selectedKeysJson.length();i++ ){
-            selectedPrimaryKeys.add(selectedKeysJson.get(i).toString());
-        }
-
         logger.debug(jsonObject);
 
-         if(!correctlyConfigured) {
+        if(!correctlyConfigured) {
             return Response.serverError().entity(configurationForm).build();
         }
-        try {
-            loadAssociations();
-        } catch (Exception e) {
-            logger.error("Could not load associations", e);
-            return Response.serverError().entity(e).build();
-        }
-        PkHelper pkHelper = new PkHelper(manyTableAccessor);
-        //TODO chiave multipla
-        String onePropertyName = m2mConfiguration.getActualOnePropertyName();
-        PropertyAccessor onePropertyAccessor = relationTableAccessor.getProperty(onePropertyName);
-        //TODO chiave multipla
-        String manyPropertyName = m2mConfiguration.getManySelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
-        PropertyAccessor manyPropertyAccessor = relationTableAccessor.getProperty(manyPropertyName);
-        PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
-        //TODO handle manyKeyProperties.length > 1
-        PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
-        for(String pkString : selectedPrimaryKeys) {
-            Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
-            Object pk = manyPkAccessor.get(pkObject);
-            if(!isExistingAssociation(manyPropertyAccessor, pk)) {
-                Object newRelation = saveNewRelation(pk, onePropertyAccessor, manyPropertyAccessor);
-                existingAssociations.add(newRelation);
+
+        for( Object key : obj.keySet() ){
+            try{
+                loadOnePk(key);
+            }catch (Exception e){
+                logger.error("Cannot get key "+key ,e);
             }
-        }
-        Iterator it = existingAssociations.iterator();
-        while(it.hasNext()) {
-            Object o = it.next();
+
+            JSONArray selectedKeysJson = obj.getJSONArray(onePk.toString());
+
+            for( int i=0; i<selectedKeysJson.length();i++ ){
+                selectedPrimaryKeys.add(selectedKeysJson.get(i).toString());
+            }
+
+            try {
+                loadAssociations();
+            } catch (Exception e) {
+                logger.error("Could not load associations", e);
+                return Response.serverError().entity(e).build();
+            }
+
+            PkHelper pkHelper = new PkHelper(manyTableAccessor);
+            //TODO chiave multipla
+            String onePropertyName = m2mConfiguration.getActualOnePropertyName();
+            PropertyAccessor onePropertyAccessor = relationTableAccessor.getProperty(onePropertyName);
+            //TODO chiave multipla
+            String manyPropertyName = m2mConfiguration.getManySelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
+            PropertyAccessor manyPropertyAccessor = relationTableAccessor.getProperty(manyPropertyName);
+            PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
             //TODO handle manyKeyProperties.length > 1
-            Object pkObject = manyPropertyAccessor.get(o);
-            String pkString =
-                    (String) OgnlUtils.convertValue(pkObject, String.class);
-            if(!selectedPrimaryKeys.contains(pkString)) {
-                deleteRelation(o);
-                it.remove();
+            PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
+            for(String pkString : selectedPrimaryKeys) {
+                Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
+                Object pk = manyPkAccessor.get(pkObject);
+                if(!isExistingAssociation(manyPropertyAccessor, pk)) {
+                    Object newRelation = saveNewRelation(pk, onePropertyAccessor, manyPropertyAccessor);
+                    existingAssociations.add(newRelation);
+                }
+            }
+            Iterator it = existingAssociations.iterator();
+            while(it.hasNext()) {
+                Object o = it.next();
+                //TODO handle manyKeyProperties.length > 1
+                Object pkObject = manyPropertyAccessor.get(o);
+                String pkString = (String) OgnlUtils.convertValue(pkObject, String.class);
+                if(!selectedPrimaryKeys.contains(pkString)) {
+                    deleteRelation(o);
+                    it.remove();
+                }
             }
         }
         session.getTransaction().commit();
@@ -722,7 +744,7 @@ public class ManyToManyAction extends AbstractPageAction {
             try {
                 loadAssociations();
                 if(potentiallyAvailableAssociations == null && onePk != null) {
-                    return forwardToPageActionNotConfigured(); //TODO
+                    return forwardToPageActionNotConfigured();
                 }
             } catch (NoSuchFieldException e) {
                 return forwardToPageActionNotConfigured();
@@ -730,27 +752,21 @@ public class ManyToManyAction extends AbstractPageAction {
 
             booleanRelation = new LinkedHashMap<Object, Boolean>();
             if(potentiallyAvailableAssociations != null) {
-                for(Object o : potentiallyAvailableAssociations) {
-                    booleanRelation.put(o, !availableAssociations.contains(o));
-                    //TODO use only this "for" loop
+                ClassAccessor ca = getManyTableAccessor();
+                PkHelper pkHelper = new PkHelper(ca);
+
+                for(Object obj : potentiallyAvailableAssociations) {
+                    String pk = StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
+                    enumList.put(pk);
+                    titleMap.put(pk,ShortNameUtils.getName(ca, obj));
+                    StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
+
+                    if(!availableAssociations.contains(obj)) {
+                        trueRelations.put(pk);
+                    }
                 }
             }else{
                 logger.warn("potentiallyAvailableAssociations is empty");
-            }
-
-            ClassAccessor ca = getManyTableAccessor();
-            PkHelper pkHelper = new PkHelper(ca);
-
-            for(Map.Entry<Object, Boolean> entry : booleanRelation.entrySet()) {
-                Object obj = entry.getKey();
-                String pk = StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
-                enumList.put(pk);
-                titleMap.put(pk,ShortNameUtils.getName(ca, obj));
-                StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
-
-                if(entry.getValue()) {
-                    trueRelations.put(pk);
-                }
             }
 
             model.put(onePk.toString(),trueRelations);
