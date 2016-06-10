@@ -36,7 +36,6 @@ import com.manydesigns.mail.queue.model.Recipient;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatchElement;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -60,11 +59,6 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     //--------------------------------------------------------------------------
     // Properties
     //--------------------------------------------------------------------------
-
-    /**
-     * The dispatch property. Injected.
-     */
-    public Dispatch dispatch;
 
     /**
      * The PageInstance property. Injected.
