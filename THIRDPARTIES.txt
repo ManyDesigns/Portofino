@@ -71,7 +71,7 @@ License: Apache License v2.0
 
 Bootstrap
 Site: http://twitter.github.io/bootstrap/index.html
-Files: bootstrap-3.3.5.jar
+Files: bootstrap-3.3.6.jar
 License: Apache License v2.0
 
 Bootstrap DateTimePicker

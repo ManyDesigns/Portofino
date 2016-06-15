@@ -75,6 +75,7 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
         if (dateFormatAnnotation != null) {
             datePattern = dateFormatAnnotation.value();
         } else {
+            //TODO provide defaults for time, date
             Configuration elementsConfiguration =
                     ElementsProperties.getConfiguration();
             datePattern = elementsConfiguration.getString(
