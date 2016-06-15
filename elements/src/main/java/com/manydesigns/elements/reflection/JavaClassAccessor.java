@@ -20,6 +20,8 @@
 
 package com.manydesigns.elements.reflection;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.manydesigns.elements.annotations.Key;
 import com.manydesigns.elements.util.ReflectionUtil;
 import org.apache.commons.lang.ArrayUtils;
@@ -36,11 +38,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+/**
+ * A {@link ClassAccessor} targeting Java classes. Use {@link GroovyClassAccessor} for Groovy classes instead.
+ * 
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class JavaClassAccessor implements ClassAccessor {
     public static final String copyright =
@@ -64,16 +68,16 @@ public class JavaClassAccessor implements ClassAccessor {
     // Static fields and methods
     //**************************************************************************
 
-    protected static final Map<Class, JavaClassAccessor> classAccessorCache;
+    protected static final Cache<Class, JavaClassAccessor> classAccessorCache;
     public static final Logger logger =
                 LoggerFactory.getLogger(JavaClassAccessor.class);
 
     static {
-        classAccessorCache = new HashMap<Class, JavaClassAccessor>();
+        classAccessorCache = CacheBuilder.newBuilder().weakKeys().build();
     }
 
     public static JavaClassAccessor getClassAccessor(Class javaClass) {
-        JavaClassAccessor cachedResult = classAccessorCache.get(javaClass);
+        JavaClassAccessor cachedResult = classAccessorCache.getIfPresent(javaClass);
         if (cachedResult == null) {
             logger.debug("Cache miss for: {}", javaClass);
             cachedResult = new JavaClassAccessor(javaClass);
