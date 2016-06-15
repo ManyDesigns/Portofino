@@ -36,12 +36,6 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>assembly-gae-bin.xml</source>
-      <outputDirectory></outputDirectory>
-      <destName>assembly-gae-bin.xml</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
       <source>elements/pom.xml</source>
       <outputDirectory>elements</outputDirectory>
       <destName>pom.xml</destName>

@@ -21,7 +21,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- JAX-RS annotations for the Login action -->
@@ -46,12 +45,6 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId> <!-- Used also by google OAuth client -->
-            <version>${guava.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.cage</groupId>
