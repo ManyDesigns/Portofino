@@ -35,7 +35,7 @@
 </div>
 <%!
     private void writePaginator(Writer out, AbstractCrudAction actionBean, int rowsPerPage, long totalSearchRecords) {
-        int firstResult = actionBean.getFirstResult() != null ? actionBean.getFirstResult() : 1;
+        int firstResult = actionBean.getFirstResult() != null ? actionBean.getFirstResult() : 0;
         int currentPage = firstResult / rowsPerPage;
         int lastPage = (int) (totalSearchRecords / rowsPerPage);
         if(totalSearchRecords % rowsPerPage == 0) {
