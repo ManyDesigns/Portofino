@@ -82,8 +82,17 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
     public void reset() {}
 
     public void init(Model model) {
-        assert name != null;
-        assert toDatabase != null;
+        if(name == null) {
+            throw new RuntimeException("name is required. Parent: " + fromTable.getQualifiedName());
+        }
+        if(toDatabase == null) {
+            if(fromTable != null && fromTable.getSchema() != null) {
+                toDatabase = fromTable.getSchema().getDatabaseName();
+            }
+            if(toDatabase == null) {
+                throw new RuntimeException("toDatabase is required. Parent: " + fromTable.getQualifiedName());
+            }
+        }
     }
 
     public void link(Model model) {}

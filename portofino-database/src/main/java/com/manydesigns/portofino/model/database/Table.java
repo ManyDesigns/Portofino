@@ -100,7 +100,7 @@ public class Table implements ModelObject, Annotated {
     //**************************************************************************
 
     public String getQualifiedName() {
-        if(schema.getQualifiedName() == null) {
+        if(schema == null || schema.getQualifiedName() == null) {
             return tableName;
         }
         return MessageFormat.format("{0}.{1}",
