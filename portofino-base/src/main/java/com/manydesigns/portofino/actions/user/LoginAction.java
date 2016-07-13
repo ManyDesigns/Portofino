@@ -316,8 +316,11 @@ public abstract class LoginAction extends AbstractActionBean {
                         PortofinoProperties.MAIL_FROM, "example@example.com");
                 sendForgotPasswordEmail(
                         from, email, ElementsThreadLocals.getText("password.reset.confirmation.required"), body);
+            } else {
+                logger.warn("Forgot password request for nonexistent email");
             }
 
+            //This is by design, for better security. Always give the successful message even if no mail was sent. 
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));
         } catch (Exception e) {
             logger.error("Error during password reset", e);

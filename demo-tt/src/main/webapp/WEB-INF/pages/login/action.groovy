@@ -19,7 +19,7 @@ class MyLogin extends DefaultLoginAction {
             return false;
         }
         if (password.length() < 8) {
-            errorMessages.add(ElementsThreadLocals.getText("password.too.short"))
+            errorMessages.add(ElementsThreadLocals.getText("password.too.short", 8))
             return false;
         }
         return true;
