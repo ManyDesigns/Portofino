@@ -5,6 +5,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesRequestWrapper;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -52,6 +53,14 @@ public class StripesMessageBodyWriter implements MessageBodyWriter<Resolution> {
             throws IOException, WebApplicationException {
         // OutputStream and Writer for HttpServletResponseWrapper.
         final ServletOutputStream responseStream = new ServletOutputStream() {
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void setWriteListener(WriteListener writeListener) {}
+
             @Override
             public void write(final int b) throws IOException {
                 entityStream.write(b);

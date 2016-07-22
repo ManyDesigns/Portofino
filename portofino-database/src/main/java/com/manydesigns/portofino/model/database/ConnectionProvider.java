@@ -357,7 +357,8 @@ public abstract class ConnectionProvider {
     }
 
     public boolean isHibernateDialectAutodetected() {
-        return StringUtils.isBlank(hibernateDialect) && getDatabasePlatform().isDialectAutodetected();
+        return StringUtils.isBlank(hibernateDialect) &&
+                (getDatabasePlatform() == null || getDatabasePlatform().isDialectAutodetected());
     }
 
     public String getActualHibernateDialectName() {

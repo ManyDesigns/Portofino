@@ -103,8 +103,8 @@ public class TablesAction extends AbstractActionBean {
     protected String returnUrl;
     protected String shortName;
     protected String selectionProviderName;
-    protected final Map<String, String> fkOnePropertyNames = new HashMap<String, String>();
-    protected final Map<String, String> fkManyPropertyNames = new HashMap<String, String>();
+    protected final Map<String, String> fkOnePropertyNames = new LinkedHashMap<String, String>();
+    protected final Map<String, String> fkManyPropertyNames = new LinkedHashMap<String, String>();
 
     //**************************************************************************
     // Domain objects
@@ -212,7 +212,7 @@ public class TablesAction extends AbstractActionBean {
     private Map createObject(
             String title, boolean expanded, boolean folder, boolean lazy,
             @Nullable String href, @Nullable List children) {
-        Map<String,Object> map = new HashMap<String,Object>();
+        Map<String,Object> map = new LinkedHashMap<String, Object>();
         map.put("title",title);
         map.put("expanded",expanded);
         map.put("folder",folder);

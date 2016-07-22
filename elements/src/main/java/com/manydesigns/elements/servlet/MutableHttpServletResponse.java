@@ -220,6 +220,11 @@ public class MutableHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
+    public void setContentLengthLong(long len) {
+        setContentLength((int) len);
+    }
+
+    @Override
     public void setContentType(String s) {
         logger.debug("Setting content type to: {}", s);
         contentType = s;
