@@ -31,6 +31,8 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
@@ -52,6 +54,7 @@ public abstract class AbstractDateSearchField extends RangeSearchField {
     protected String datePattern;
     protected DateTimeFormatter dateTimeFormatter;
     protected boolean containsTime;
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractDateSearchField.class);
 
     //**************************************************************************
     // Constructors
@@ -114,10 +117,12 @@ public abstract class AbstractDateSearchField extends RangeSearchField {
         Object value;
         try {
             value = toDate(Util.parseDateTime(dateTimeFormatter, stringValue, containsTime));
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            logger.debug("Value not parseable", e);
             try {
                 value = toDate(new DateTime(Long.valueOf(stringValue)));
             } catch (Exception ex) {
+                logger.debug("Value is not a date representation", ex);
                 //We tried, we failed
                 value = null;
             }
