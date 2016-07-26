@@ -5,13 +5,13 @@ You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "4.2"
-tomcat_dir = "apache-tomcat-8.0.26"
+portofino_version = "4.2.2"
+tomcat_dir = "apache-tomcat-8.5.4"
 portofino_path = "~/projects/portofino4"
-tomcat_url = "http://it.apache.contactlab.it/tomcat/tomcat-8/v8.0.26/bin/apache-tomcat-8.0.26.zip"
-drivers = [["org/postgresql/postgresql/9.2-1003-jdbc4/", "postgresql-9.2-1003-jdbc4.jar"],
-           ["mysql/mysql-connector-java/5.1.25/", "mysql-connector-java-5.1.25.jar"],
-           ["net/sourceforge/jtds/jtds/1.2.8/", "jtds-1.2.8.jar"]]
+tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-8/v8.5.4/bin/apache-tomcat-8.5.4.zip"
+drivers = [["org/postgresql/postgresql/9.3-1102-jdbc4/", "postgresql-9.3-1102-jdbc4.jar"],
+           ["mysql/mysql-connector-java/5.1.32/", "mysql-connector-java-5.1.32.jar"],
+           ["net/sourceforge/jtds/jtds/1.3.1/", "jtds-1.3.1.jar"]]
 
 '''
 
@@ -23,7 +23,7 @@ import os
 
 #Derived variables
 build_path = "build"
-portofino_dir = "portofino-" + local.portofino_version;
+portofino_dir = "portofino-" + local.portofino_version
 base_path = build_path + "/" + portofino_dir
 oneclick_path = build_path + "/portofino-oneclick"
 portofino_path = os.path.expanduser(local.portofino_path)
@@ -40,6 +40,12 @@ if(os.path.exists(base_path)):
 os.makedirs(base_path)
 
 print "Downloading Tomcat..."
+class MyURLopener(urllib.FancyURLopener):
+    def http_error_default(self, url, fp, errcode, errmsg, headers):
+        raise IOError("Could not download Tomcat, error is " + errmsg + " (" + str(errcode) + ")")
+
+urllib._urlopener = MyURLopener()
+
 urllib.urlretrieve(local.tomcat_url, tomcat_zip)
 
 if(os.path.exists(tomcat_path)):
@@ -58,7 +64,7 @@ for driver in local.drivers:
     urllib.urlretrieve("http://repo1.maven.org/maven2/" + driver[0] + driver[1], tomcat_path + "/lib/" + driver[1])
 
 command = "cd " + portofino_path + "; mvn clean install"
-print "Building Portofino: " + command
+print "Building Portofino with command: " + command
 os.system(command)
 
 print "Generating oneclick from archetype..."

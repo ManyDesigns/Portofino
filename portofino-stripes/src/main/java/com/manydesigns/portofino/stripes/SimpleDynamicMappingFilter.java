@@ -21,7 +21,7 @@ import java.util.Enumeration;
  */
 public class SimpleDynamicMappingFilter extends DynamicMappingFilter {
     public static final String copyright =
-            "Copyright (c) 2005-2015, ManyDesigns srl";
+            "Copyright (C) 2005-2016, ManyDesigns srl";
 
     private DispatcherServlet stripesDispatcher;
 

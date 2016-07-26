@@ -23,7 +23,7 @@ import java.util.List;
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration implements PageActionConfiguration, ConfigurationWithDefaults {
     public static final String copyright =
-            "Copyright (c) 2005-2015, ManyDesigns srl";
+            "Copyright (C) 2005-2016, ManyDesigns srl";
 
     //**************************************************************************
     // Fields

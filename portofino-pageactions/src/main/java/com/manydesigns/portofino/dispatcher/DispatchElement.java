@@ -29,7 +29,7 @@ package com.manydesigns.portofino.dispatcher;
 public interface DispatchElement {
 
     public static final String copyright =
-            "Copyright (c) 2005-2015, ManyDesigns srl";
+            "Copyright (C) 2005-2016, ManyDesigns srl";
 
     /**
      * Returns the PageInstance of this action.

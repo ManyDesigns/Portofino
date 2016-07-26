@@ -46,7 +46,7 @@ License: Apache License v2.0
 
 Apache Shiro
 Site: http://shiro.apache.org
-Files: shiro-core-1.2.3.jar, shiro-web-1.2.3.jar
+Files: shiro-core-1.3.0.jar, shiro-web-1.3.0.jar
 License: Apache License v2.0
 
 Apache Xerces
@@ -76,7 +76,7 @@ License: Apache License v2.0
 
 Bootstrap DateTimePicker
 Site: https://github.com/eternicode/bootstrap-datepicker
-Files: Eonasdan-bootstrap-datetimepicker-4.15.35.jar
+Files: Eonasdan-bootstrap-datetimepicker-4.17.37.jar
 License: Apache License v2.0
 
 Bouncy Castle

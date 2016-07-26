@@ -70,7 +70,7 @@ import java.util.List;
 public class PortofinoFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final String copyright =
-            "Copyright (c) 2005-2015, ManyDesigns srl";
+            "Copyright (C) 2005-2016, ManyDesigns srl";
 
     public final static Logger logger =
             LoggerFactory.getLogger(PortofinoFilter.class);

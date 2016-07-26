@@ -8,7 +8,7 @@ package com.manydesigns.elements;
  */
 public interface KeyValueAccessor {
     public static final String copyright =
-            "Copyright (c) 2005-2015, ManyDesigns srl";
+            "Copyright (C) 2005-2016, ManyDesigns srl";
 
     Object get(String name);
     void set(String name, Object value);

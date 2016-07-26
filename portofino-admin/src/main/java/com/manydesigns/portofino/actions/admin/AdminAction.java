@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -46,7 +46,7 @@ import java.util.List;
 @UrlBinding(AdminAction.URL_BINDING)
 public class AdminAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (c) 2005-2015, ManyDesigns srl";
+            "Copyright (C) 2005-2016, ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/admin";
 

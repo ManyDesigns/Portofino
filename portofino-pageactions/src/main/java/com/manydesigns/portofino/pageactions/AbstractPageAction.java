@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -89,7 +89,7 @@ import java.util.regex.Pattern;
 @RequiresPermissions(level = AccessLevel.VIEW)
 public abstract class AbstractPageAction extends AbstractActionBean implements PageAction {
     public static final String copyright =
-        "Copyright (c) 2005-2015, ManyDesigns srl";
+        "Copyright (C) 2005-2016, ManyDesigns srl";
 
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
