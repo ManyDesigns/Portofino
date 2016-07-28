@@ -169,7 +169,7 @@ public class TextField extends AbstractTextField<String> {
     }
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("p");
+        xb.openElement("div");
         String cssClass = STATIC_VALUE_CSS_CLASS;
         if (ArrayUtils.contains(red, stringValue)) {
             cssClass += " status_red";
@@ -196,7 +196,7 @@ public class TextField extends AbstractTextField<String> {
         if (href != null) {
             xb.closeElement("a");
         }
-        xb.closeElement("p");
+        xb.closeElement("div");
     }
 
     public String getDisplayValue() {

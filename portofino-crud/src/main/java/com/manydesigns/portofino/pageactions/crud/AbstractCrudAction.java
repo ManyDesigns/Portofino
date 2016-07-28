@@ -495,8 +495,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected void writeFormToObject() {
         form.writeToObject(object);
         for(TextField textField : FormUtil.collectEditableRichTextFields(form)) {
+            //TODO in bulk edit mode, the field should be skipped altogether if the checkbox is not checked.
             PropertyAccessor propertyAccessor = textField.getPropertyAccessor();
-            String stringValue = textField.getStringValue();
+            String stringValue = (String) propertyAccessor.get(object);
             String cleanText;
             try {
                 Whitelist whitelist = getWhitelist();

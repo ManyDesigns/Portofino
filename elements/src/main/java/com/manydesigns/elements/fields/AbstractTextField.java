@@ -124,7 +124,7 @@ public abstract class AbstractTextField<T> extends AbstractField<T> {
     }
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("p");
+        xb.openElement("div");
         xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
         xb.addAttribute("id", id);
         if (href == null) {
@@ -132,7 +132,7 @@ public abstract class AbstractTextField<T> extends AbstractField<T> {
         } else {
             xb.writeAnchor(href, stringValue, null, title);
         }
-        xb.closeElement("p");
+        xb.closeElement("div");
     }
 
     //**************************************************************************

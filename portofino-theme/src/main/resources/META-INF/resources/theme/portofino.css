@@ -549,6 +549,10 @@ Search form
     margin-bottom: 0;
 }
 
+.search_results .form-control-static p {
+    margin: 0;
+}
+
 .searchFormButtons {
     margin-top: 1em;
 }

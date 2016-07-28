@@ -11,6 +11,9 @@
         <c:out value="${actionBean.editTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
+        <c:if test="${actionBean.formWithRichTextFields}">
+            <portofino:enable-ckeditor />
+        </c:if>
         <p><fmt:message key = "in.the.first.column.select.the.fields.you.want.to.edit"/></p>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
                       id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
