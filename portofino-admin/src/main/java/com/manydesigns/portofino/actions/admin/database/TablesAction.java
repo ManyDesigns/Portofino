@@ -53,6 +53,7 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import groovy.json.JsonBuilder;
 import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.util.StringUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -382,7 +383,7 @@ public class TablesAction extends AbstractActionBean {
         setupColumnForm(); //Recalculate applicable annotations
         columnForm.readFromRequest(context.getRequest());
         saveToColumnForm(columnForm, cf);
-        return new RedirectResolution(TablesAction.class, "editColumn")
+        return new RedirectResolution(TablesAction.class)
                 .addParameter("databaseName", databaseName)
                 .addParameter("schemaName", schemaName)
                 .addParameter("tableName", tableName)
@@ -804,6 +805,7 @@ public class TablesAction extends AbstractActionBean {
     }
 
     public Column findColumn() {
+        String columnName = StringUtil.urlDecode(this.columnName);
         Column column = DatabaseLogic.findColumnByName(table, columnName);
         if(column == null) {
             throw new ModelObjectNotFoundError(table.getQualifiedName() + "." + column);
