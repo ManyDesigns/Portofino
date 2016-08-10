@@ -23,7 +23,7 @@
         $("div.childrenTable tbody").each(function(i, table) {
             $(table).find('tr').each(function(i, tr) {
                 tr = $(tr);
-                tr.data('childName', tr.find("td p.form-control-static").first().html());
+                tr.data('childName', tr.find("td .form-control-static").first().html());
             });
         });
         var sortables = $("div.childrenTable tbody").sortable({
