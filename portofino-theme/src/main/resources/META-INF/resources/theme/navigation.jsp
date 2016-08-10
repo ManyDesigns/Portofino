@@ -95,7 +95,7 @@
         }
         if (nextNavigationItem != null && level < maxLevel) {
             navigationItems = nextNavigationItem.getChildNavigationItems();
-            title = nextNavigationItem.getDescription();
+            title = StringEscapeUtils.escapeXml(nextNavigationItem.getTitle());
         } else {
             navigationItems = Collections.EMPTY_LIST;
         }
