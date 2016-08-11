@@ -394,7 +394,7 @@ public class Util {
                 xb.writeBr();
             }
             if (highlightLinks) {
-                xb.writeNoHtmlEscape(highlightLinks(line));
+                xb.writeNoHtmlEscape(highlightLinks(xb.escape(line)));
             } else {
                 xb.write(line);
             }
@@ -402,7 +402,7 @@ public class Util {
     }
 
     public final static Pattern linkPattern =
-            Pattern.compile("(http://|https://|ftp://|www\\.)\\S+", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("(http://|https://|ftp://|www\\.)[^\\s,)]+", Pattern.CASE_INSENSITIVE);
     public final static Pattern emailPattern =
             Pattern.compile("[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)*@[a-z0-9\\-_]++" +
                     "(\\.[a-z0-9\\-_]++)++", Pattern.CASE_INSENSITIVE);
@@ -415,7 +415,7 @@ public class Util {
         // Pattern Matching will be case insensitive.
         Matcher linkMatcher = linkPattern.matcher(str);
 
-        boolean linkTrovato = false;
+        boolean linkFound = false;
         StringBuffer sb = new StringBuffer();
         while (linkMatcher.find()) {
             String text = shortenEscaped(linkMatcher.group(0), 22);
@@ -426,12 +426,12 @@ public class Util {
                 linkMatcher.appendReplacement(sb, "<a href=\"" + linkMatcher.group(0) +
                         "\">" + text + "</a>");
             }
-            linkTrovato = true;
+            linkFound = true;
         }
-        if (linkTrovato) {
+        if (linkFound) {
             linkMatcher.appendTail(sb);
             str = sb.toString();
-            linkTrovato = false;
+            linkFound = false;
             sb = new StringBuffer();
         }
 
@@ -440,9 +440,9 @@ public class Util {
         while (emailMatcher.find()) {
             emailMatcher.appendReplacement(sb, "<a href=\"mailto:" +
                     emailMatcher.group(0) + "\">" + emailMatcher.group(0) + "</a>");
-            linkTrovato = true;
+            linkFound = true;
         }
-        if (linkTrovato) {
+        if (linkFound) {
             emailMatcher.appendTail(sb);
             str = sb.toString();
         }
