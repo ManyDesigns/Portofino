@@ -18,9 +18,9 @@
             </div>
         </div>
 
-        <script>
+        <script type="text/javascript">
             // create a map in the "map" div, set the view to a given place and zoom
-            var map = L.map('map').setView([45, 9], 8);
+            var map = L.map('map').setView([${actionBean.configuration.latitude}, ${actionBean.configuration.longitude}], ${actionBean.configuration.zoom});
             var json = { geolocation:false , lat:45 , lon:9 , zoom:8 , markers:[] };
 
             function showPosition(position) {
@@ -43,7 +43,7 @@
                 attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            $.get("?getJsonMarkers", function(data, status){
+            $.get("${pageContext.request.contextPath}${actionBean.context.actionPath}?getJsonMarkers", function(data, status){
                 json = data;
 
                 for( var i in  data.markers){

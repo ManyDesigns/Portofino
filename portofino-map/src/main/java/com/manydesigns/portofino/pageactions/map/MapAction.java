@@ -176,10 +176,7 @@ public class MapAction extends AbstractPageAction {
         JSONArray markers = new JSONArray();
 
         loadObjects();
-        result.put("geolocation",getConfiguration().getGeolocation());
-        result.put("lat",getConfiguration().getLatitude());
-        result.put("lon",getConfiguration().getLongitude());
-        result.put("zoom",getConfiguration().getZoom());
+        configureLocation(result);
 
         for( Marker marker : map.getMarkers() ){
             JSONObject m = new JSONObject();
@@ -194,5 +191,12 @@ public class MapAction extends AbstractPageAction {
 
         return new StreamingResolution("application/json", result.toString());
 
+    }
+
+    protected void configureLocation(JSONObject result) {
+        result.put("geolocation",getConfiguration().getGeolocation());
+        result.put("lat",getConfiguration().getLatitude());
+        result.put("lon",getConfiguration().getLongitude());
+        result.put("zoom",getConfiguration().getZoom());
     }
 }
