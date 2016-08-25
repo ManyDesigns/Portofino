@@ -62,6 +62,6 @@ public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
-        return connectionProvider.getDatabaseProductName().startsWith("DB2");
+        return connectionProvider.getDatabaseProductName().startsWith("DB2/");
     }
 }
