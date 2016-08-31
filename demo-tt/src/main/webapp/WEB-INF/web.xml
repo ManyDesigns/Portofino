@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright 2005-2015 ManyDesigns srl
+  Copyright 2005-2016 ManyDesigns srl
 -->
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -20,10 +20,19 @@
         <param-name>LocalePicker.Locales</param-name>
         <param-value>en</param-value>
     </context-param>
-    <!-- Here you can change where the Portofino app lives. The default is ${serverInfo:realPath}/WEB-INF
+    <!--
+        Here you can change where the Portofino app lives. If you comment this out, the default value
+        ${serverInfo:realPath}/WEB-INF is used.
+    -->
     <context-param>
         <param-name>portofino.application.directory</param-name>
-        <param-value>${serverInfo:realPath}/WEB-INF</param-value>
+        <param-value>${portofino.application.directory}</param-value>
+        <!--
+        The param-value above is meant to be interpolated by Maven. If you activate the portofino-development profile
+        (-Pportofino-development from the command line), it will point to the src/main/webapp/WEB-INF directory so
+        that you'll be able to work on it from an IDE and from Portofino's web UI and immediately see the changes in
+        both directions. Note that this hardcodes the path of your source tree in web.xml and thus it is only meant
+        for development on your own machine. The generated war WILL NOT WORK on other machines.
+         -->
     </context-param>
-    -->
 </web-app>

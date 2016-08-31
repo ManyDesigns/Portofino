@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+#set($dollar = '$')<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -9,6 +9,7 @@
     <version>${version}</version>
     <properties>
         <portofino.version>${portofinoVersion}</portofino.version>
+        <portofino.application.directory>${dollar}{serverInfo:realPath}/WEB-INF</portofino.application.directory>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -281,6 +282,14 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                </configuration>
+            </plugin>
             <!--
             To run the application in an embedded Tomcat 7:
             <plugin>
@@ -309,4 +318,14 @@
             </resource>
         </resources>
     </build>
+    
+    <!-- See web.xml for an explanation -->
+    <profiles>
+        <profile>
+            <id>portofino-development</id>
+            <properties>
+                <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
+            </properties>
+        </profile>
+    </profiles>
 </project>

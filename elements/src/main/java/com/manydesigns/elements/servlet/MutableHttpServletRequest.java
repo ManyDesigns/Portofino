@@ -293,7 +293,6 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         return getSession(true);
     }
 
-    @Override
     public String changeSessionId() {
         throw new UnsupportedOperationException();
     }
@@ -331,7 +330,6 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public long getContentLengthLong() {
         return getContentLength();
     }
@@ -436,11 +434,6 @@ public class MutableHttpServletRequest implements HttpServletRequest {
 
     @Override
     public Part getPart(String s) throws IOException, ServletException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException {
         throw new UnsupportedOperationException();
     }
 

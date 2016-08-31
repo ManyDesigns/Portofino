@@ -11,6 +11,9 @@
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
     <url>http://www.manydesigns.com/</url>
+    <properties>
+        <portofino.application.directory>${serverInfo:realPath}/WEB-INF</portofino.application.directory>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -120,4 +123,26 @@
             <version>1.1.11</version>
         </dependency>
     </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <profiles>
+        <profile>
+            <id>portofino-development</id>
+            <properties>
+                <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
+            </properties>
+        </profile>
+    </profiles>
 </project>

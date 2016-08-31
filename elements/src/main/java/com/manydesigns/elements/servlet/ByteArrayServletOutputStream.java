@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+//import javax.servlet.WriteListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -57,13 +57,12 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
         byteArrayOutputStream = new ByteArrayOutputStream();
     }
 
-    @Override
     public boolean isReady() {
         return true;
     }
 
-    @Override
-    public void setWriteListener(WriteListener writeListener) {}
+/*    @Override
+    public void setWriteListener(WriteListener writeListener) {}*/
 
 
     @Override
