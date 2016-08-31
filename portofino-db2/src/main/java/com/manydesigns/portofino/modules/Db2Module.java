@@ -22,6 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.IbmDb2DatabasePlatform;
+import com.manydesigns.portofino.database.platforms.IbmDb2ZosDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.IbmDb2iDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
 import org.apache.commons.configuration.Configuration;
@@ -91,6 +92,7 @@ public class Db2Module implements Module {
     public void init() {
         databasePlatformsRegistry.addDatabasePlatform(new IbmDb2DatabasePlatform());
         databasePlatformsRegistry.addDatabasePlatform(new IbmDb2iDatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new IbmDb2ZosDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

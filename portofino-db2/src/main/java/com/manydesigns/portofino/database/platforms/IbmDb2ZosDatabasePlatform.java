@@ -21,19 +21,21 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import org.hibernate.dialect.DB2Dialect;
+import com.manydesigns.portofino.database.dialects.DB2ZOSDialect;
+
 
 /*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ * @author Manuel Durán Aguete  - manuel@aguete.org
 */
-public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
+public class IbmDb2ZosDatabasePlatform extends AbstractDatabasePlatform{
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
 
-    public final static String DESCRIPTION = "IBM DB2";
+    public final static String DESCRIPTION = "IBM DB2 for ZOS";
     public final static String STANDARD_DRIVER_CLASS_NAME =
             "com.ibm.db2.jcc.DB2Driver";
 
@@ -41,8 +43,8 @@ public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
     // Constructors
     //**************************************************************************
 
-    public IbmDb2DatabasePlatform() {
-        super(new DB2Dialect(), "jdbc:db2://<host>[:<port>]/<database_name>");
+    public IbmDb2ZosDatabasePlatform()  {
+        super(new DB2ZOSDialect(), "jdbc:db2://<host>[:<port>]/<database_name>");
     }
 
     //**************************************************************************
@@ -62,6 +64,6 @@ public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
-        return connectionProvider.getDatabaseProductName().startsWith("DB2/");
+        return connectionProvider.getDatabaseProductName().startsWith("DB2");
     }
 }
