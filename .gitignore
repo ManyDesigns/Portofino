@@ -1,1 +1,8 @@
 .hg/**
+*.iml
+*.versionsBackup
+*.orig
+**/target/**
+.DS_Store
+.idea
+oneclick/local.*

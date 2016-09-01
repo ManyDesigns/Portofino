@@ -1,5 +1,4 @@
 ^[.]git/.*$
-^[.]gitignore$
 ^profiles.xml
 ^target
 ^[^/]*/target

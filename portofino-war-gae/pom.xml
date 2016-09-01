@@ -11,6 +11,9 @@
     <artifactId>portofino-war-gae</artifactId>
     <packaging>war</packaging>
     <url>http://www.manydesigns.com/</url>
+    <properties>
+        <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
