@@ -23,7 +23,10 @@ public class ClassAccessorDecorator extends AbstractAnnotatedAccessor implements
     private final PropertyAccessor[] properties;
     private final PropertyAccessor[] keyProperties;
 
-    public ClassAccessorDecorator(ClassAccessor delegate) {
+    protected ClassAccessorDecorator(ClassAccessor delegate) {
+        if(ClassAccessorDecorator.class.equals(getClass())) {
+            throw new IllegalStateException("This constructor is supposed to be called on subclasses that act as decorator definitions");
+        }
         ClassAccessor decoratorAccessor = getDecoratorAccessor();
         Object decorator = this;
         this.delegate = delegate;

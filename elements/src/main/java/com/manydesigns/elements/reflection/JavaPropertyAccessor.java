@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -35,7 +36,7 @@ import java.lang.reflect.Method;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class JavaPropertyAccessor implements PropertyAccessor {
+public class JavaPropertyAccessor extends AbstractAnnotatedAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
 
@@ -59,9 +60,23 @@ public class JavaPropertyAccessor implements PropertyAccessor {
         this.propertyDescriptor = propertyDescriptor;
         getter = propertyDescriptor.getReadMethod();
         setter = propertyDescriptor.getWriteMethod();
+        try {
+            Field field = getter.getDeclaringClass().getDeclaredField(propertyDescriptor.getName());
+            for(Annotation ann : field.getAnnotations()) {
+                annotations.put(ann.annotationType(), ann);
+            }
+        } catch (NoSuchFieldException e) {
+            logger.debug("No field for " + propertyDescriptor.getName(), e);
+        }
+        for(Annotation ann : getter.getAnnotations()) {
+            annotations.put(ann.annotationType(), ann);
+        }
         if (setter == null) {
-            logger.debug("Setter not available for: {}",
-                    propertyDescriptor.getName());
+            logger.debug("Setter not available for: {}", propertyDescriptor.getName());
+        } else {
+            for(Annotation ann : setter.getAnnotations()) {
+                annotations.put(ann.annotationType(), ann);
+            }
         }
     }
 
@@ -110,26 +125,6 @@ public class JavaPropertyAccessor implements PropertyAccessor {
                         String.format("Cannot set property: %s", getName()), e);
             }
         }
-    }
-
-    //**************************************************************************
-    // AnnotatedElement implementation
-    //**************************************************************************
-
-    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
-        return getter.isAnnotationPresent(annotationClass);
-    }
-
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-        return getter.getAnnotation(annotationClass);
-    }
-
-    public Annotation[] getAnnotations() {
-        return getter.getAnnotations();
-    }
-
-    public Annotation[] getDeclaredAnnotations() {
-        return getter.getDeclaredAnnotations();
     }
 
     //**************************************************************************
