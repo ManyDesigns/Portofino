@@ -34,10 +34,7 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ErrorResolution;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,8 +144,9 @@ public abstract class FormAction extends AbstractPageAction {
             }
         } else {
             validationFailed(form, object);
+            return getShowFormResolution();
         }
-        return getShowFormResolution();
+        return new RedirectResolution(context.getActionPath());
     }
 
     protected Resolution getShowFormResolution() {
