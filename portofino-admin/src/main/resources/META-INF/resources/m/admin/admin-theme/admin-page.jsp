@@ -82,7 +82,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-2">
+                <div class="navigation-container col-md-2">
                     <div class="navigation">
                         <ul class="nav nav-list portofino-sidenav">
                             <%

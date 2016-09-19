@@ -24,6 +24,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -71,7 +72,7 @@ public class CustomAction extends AbstractPageAction {
     }
 
     public Resolution preparePage() {
-        if(!pageInstance.getParameters().isEmpty()) {
+        if(!PageActionLogic.supportsDetail(getClass()) && !pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
         return null;

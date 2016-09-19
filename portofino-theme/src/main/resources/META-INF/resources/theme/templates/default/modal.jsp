@@ -16,10 +16,10 @@
         </jsp:include>
         <div id="content" class="container">
             <div class="row">
-                <div class="col-md-2">
+                <div class="navigation-container col-md-2">
                     <jsp:include page="/theme/navigation.jsp" />
                 </div>
-                <div class="col-md-10">
+                <div class="content col-md-10">
                     <div class="contentHeader">
                         <stripes:layout-component name="contentHeader">
                             <mde:sessionMessages />
