@@ -23,6 +23,7 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.Resolution;
+import org.apache.commons.collections.MultiMap;
 
 /**
  * An extension of ActionBean from the Stripes framework to handle Portofino's hierarchical page structure.
@@ -49,6 +50,13 @@ public interface PageAction extends ActionBean, DispatchElement {
 
     @Override
     ElementsActionBeanContext getContext();
+
+    /**
+     * Lifecycle method called by templates that can include embedded pages to compute the set of pages to embed
+     * and their locations and order.
+     * @return a multi-valued map layout-container: String -> embedded-pages: list(EmbeddedPageAction)
+     */
+    MultiMap initEmbeddedPageActions();
 
     /**
      * This is the URL (typically relative to the application, i.e. without scheme, host, and port components)

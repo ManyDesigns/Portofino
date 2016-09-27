@@ -6,7 +6,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request"
-               type="com.manydesigns.portofino.pageactions.AbstractPageAction" /><%--
+               type="com.manydesigns.portofino.dispatcher.PageAction" /><%--
 --%><stripes:layout-definition><%--
 --%><c:set var="embedded" value="<%= PageActionLogic.isEmbedded(actionBean) %>" scope="page" /><%--
 --%><c:if test="${embedded}"><%--

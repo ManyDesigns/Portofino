@@ -60,6 +60,7 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -299,9 +300,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     }
 
+    @Override
     public MultiMap initEmbeddedPageActions() {
         if(embeddedPageActions == null) {
-            MultiMap mm = new MultiHashMap();
+            MultiMap mm = new MultiValueMap();
             Layout layout = pageInstance.getLayout();
             for(ChildPage childPage : layout.getChildPages()) {
                 String layoutContainerInParent = childPage.getContainer();

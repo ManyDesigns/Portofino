@@ -43,6 +43,7 @@ import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import net.sourceforge.stripes.action.Resolution;
+import org.apache.commons.collections.MultiMap;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -106,6 +107,11 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
 
     @Override
     public Resolution preparePage() {
+        return null;
+    }
+
+    @Override
+    public MultiMap initEmbeddedPageActions() {
         return null;
     }
 

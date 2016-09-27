@@ -5,7 +5,7 @@
 %><stripes:layout-definition><%----%><!DOCTYPE html>
     <html lang="<%= request.getLocale() %>">
     <jsp:useBean id="actionBean" scope="request"
-                 type="com.manydesigns.portofino.pageactions.AbstractPageAction" />
+                 type="com.manydesigns.portofino.dispatcher.PageAction" />
     <jsp:include page="/theme/head.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
