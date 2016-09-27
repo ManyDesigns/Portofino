@@ -96,7 +96,7 @@
         <jsqlparser.version>0.9.5</jsqlparser.version>
         <json.version>20140107</json.version>
         <jsoup.version>1.9.2</jsoup.version>
-        <jstl.version>1.1.2</jstl.version>
+        <jstl.version>1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>3.5.0</liquibase.version>
         <logback.version>1.1.7</logback.version>
@@ -353,7 +353,7 @@
                             <links>
                                 <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
                                 <link>https://stripesframework.ci.cloudbees.com/job/Stripes%201.6.0/javadoc/</link>
-                                <link>https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/</link>
+                                <link>https://commons.apache.org/proper/commons-configuration/javadocs/v${commons.configuration.version}/apidocs/</link>
                                 <link>http://docs.jboss.org/hibernate/orm/4.3/javadocs/</link>
                                 <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/api/</link>
                                 <link>http://www.joda.org/joda-time/apidocs/</link>

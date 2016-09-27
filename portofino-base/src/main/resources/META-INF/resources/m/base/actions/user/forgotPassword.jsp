@@ -13,15 +13,15 @@
         Forgot your password?
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <fmt:message key='possword.resend'/>
+        <fmt:message key='password.resend'/>
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="spacingTop">
             <div class="form-group">
                 <input type="text" name="email" id="email" class="form-control"
                        placeholder="<fmt:message key='email'/>" />
             </div>
             <div class="marginTop20px">
-                <button type="submit" name="forgotPassword2" class="btn btn-primary">Next</button>
-                <button type="submit" name="cancel" class="btn btn-default">Cancel</button>
+                <button type="submit" name="forgotPassword2" class="btn btn-primary"><fmt:message key='next'/></button>
+                <button type="submit" name="cancel" class="btn btn-default"><fmt:message key='cancel'/></button>
             </div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

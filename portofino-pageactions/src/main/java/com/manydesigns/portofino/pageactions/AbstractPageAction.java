@@ -703,7 +703,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     /**
      * Returns a description of this PageAction.
-     * @since 4.3
+     * @since 4.2.1
      * @return the page's description as JSON.
      */
     @Path(":page")

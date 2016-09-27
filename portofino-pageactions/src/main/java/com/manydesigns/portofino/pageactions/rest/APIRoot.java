@@ -142,13 +142,13 @@ public class APIRoot {
 
     /**
      * Returns a fixed description simulating AbstractPageAction#getPageDescription.
-     * @since 4.3
+     * @since 4.2.2
      * @return the description as JSON.
      */
     @Path(":page")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Map<String, Object> describeClassAccessor() {
+    public Map<String, Object> getPageDescription() {
         Map<String, Object> description = new HashMap<String, Object>();
         description.put("javaClass", APIRoot.class.getName());
         description.put("groovyClass", null);

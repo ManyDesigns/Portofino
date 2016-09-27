@@ -584,8 +584,8 @@ public class ManyToManyAction extends AbstractPageAction {
 
     /**
      * Handles available keys via REST.
-     * @since 4.3
-     * @return key set results (key,label) as JSON (streamed using a Stripes Resolution).
+     * @since 4.2.1
+     * @return key set results (key, label) as JSON (streamed using a Stripes Resolution).
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -593,11 +593,11 @@ public class ManyToManyAction extends AbstractPageAction {
         return jsonKeys();
     }
 
-     /**
+    /**
      * Handles available associations for given key
      * @param key the key string
-     * @since 4.3
-     * @return available associatos set results as JSON (streamed using a Stripes Resolution).
+     * @since 4.2.1
+     * @return available associations set results as JSON (streamed using a Stripes Resolution).
      */
     @GET
     @Path(":availableAssociations/{key}")
@@ -626,7 +626,7 @@ public class ManyToManyAction extends AbstractPageAction {
     /**
      * Handles object creation via REST.
      * @param jsonObject the object (in serialized JSON form)
-     * @since 4.3
+     * @since 4.2.1
      * @return the created object as JSON (in a JAX-RS Response).
      * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */

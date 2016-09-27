@@ -2302,7 +2302,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     /**
      * Handles object creation with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
-     * @since 4.3
+     * @since 4.2.1
      * @return the created object as JSON (in a JAX-RS Response).
      * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug. 
      */
