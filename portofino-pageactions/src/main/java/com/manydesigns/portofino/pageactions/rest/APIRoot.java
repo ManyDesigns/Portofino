@@ -27,6 +27,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.i18n.TextProviderBean;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.navigation.Navigation;
@@ -81,6 +82,8 @@ public class APIRoot {
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
+        logger.debug("Publishing textProvider in OGNL context");
+        ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
 
         String actionPath = uriInfo.getPath();

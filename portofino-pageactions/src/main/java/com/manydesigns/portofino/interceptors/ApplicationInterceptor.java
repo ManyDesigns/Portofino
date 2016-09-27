@@ -24,7 +24,9 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.i18n.TextProviderBean;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -32,6 +34,7 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import ognl.OgnlContext;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
@@ -56,6 +59,10 @@ public class ApplicationInterceptor implements Interceptor {
             LoggerFactory.getLogger(ApplicationInterceptor.class);
 
     public static Resolution dispatch(ActionBeanContext actionContext) throws Exception {
+        logger.debug("Publishing textProvider in OGNL context");
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
+
         Dispatch dispatch = DispatcherUtil.getDispatch(actionContext);
         if (dispatch != null) {
             HttpServletRequest request = actionContext.getRequest();
