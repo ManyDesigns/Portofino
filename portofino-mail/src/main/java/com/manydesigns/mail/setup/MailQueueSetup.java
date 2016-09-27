@@ -56,11 +56,17 @@ public class MailQueueSetup {
     public void setup() {
         boolean mailEnabled = mailConfiguration.getBoolean(MailProperties.MAIL_ENABLED, false);
         if (mailEnabled) {
+            String mailQueueLocation = mailConfiguration.getString(MailProperties.MAIL_QUEUE_LOCATION);
+            boolean keepSent = mailConfiguration.getBoolean(MailProperties.MAIL_KEEP_SENT, false);
+            logger.info("Mail queue location: {}", mailQueueLocation);
+            //TODO rendere configurabile
+            mailQueue = new LockingMailQueue(new FileSystemMailQueue(new File(mailQueueLocation)));
+            mailQueue.setKeepSent(keepSent);
             String mailHost = mailConfiguration.getString(MailProperties.MAIL_SMTP_HOST);
             if (null == mailHost) {
-                logger.error("Mail queue is enabled but smtp server not set in configuration");
+                logger.info("Mail queue is enabled but no SMTP server is configured. Mail won't be sent, only enqueued.");
             } else {
-                logger.info("Mail queue is enabled, starting sender");
+                logger.info("Mail queue is enabled, creating sender");
                 int port = mailConfiguration.getInt(
                         MailProperties.MAIL_SMTP_PORT, 25);
                 boolean ssl = mailConfiguration.getBoolean(
@@ -71,15 +77,7 @@ public class MailQueueSetup {
                         MailProperties.MAIL_SMTP_LOGIN);
                 String password = mailConfiguration.getString(
                         MailProperties.MAIL_SMTP_PASSWORD);
-                boolean keepSent = mailConfiguration.getBoolean(
-                        MailProperties.MAIL_KEEP_SENT, false);
-
-                String mailQueueLocation =
-                        mailConfiguration.getString(MailProperties.MAIL_QUEUE_LOCATION);
-                logger.info("Mail queue location: {}", mailQueueLocation);
-                //TODO rendere configurabile
-                mailQueue = new LockingMailQueue(new FileSystemMailQueue(new File(mailQueueLocation)));
-                mailQueue.setKeepSent(keepSent);
+                
                 mailSender = new DefaultMailSender(mailQueue);
                 mailSender.setServer(mailHost);
                 mailSender.setLogin(login);
@@ -88,7 +86,7 @@ public class MailQueueSetup {
                 mailSender.setSsl(ssl);
                 mailSender.setTls(tls);
 
-                logger.info("Mail sender started");
+                logger.info("Mail sender created.");
             }
         } else {
             logger.info("Mail queue is not enabled");
