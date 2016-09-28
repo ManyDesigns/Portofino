@@ -79,11 +79,13 @@ public @interface Button {
 
     /**
      * The list where this button is to be placed. Web pages will include lists of buttons by name.
+     * @return the list
      */
     String list();
 
     /**
      * The order of the button inside the list. Buttons with lower order come before buttons with higher order.
+     * @return the order
      */
     double order() default 1.0;
 

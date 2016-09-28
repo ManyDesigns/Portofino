@@ -107,7 +107,7 @@ import java.util.regex.Pattern;
 
 /**
  * <p>A generic PageAction offering CRUD functionality, independently on the underlying data source.</p>
- * <p>Out of the box, instances of this class are capable of the following:
+ * <p>Out of the box, instances of this class are capable of the following:</p>
  *   <ul>
  *      <li>Presenting search, create, read, delete, update operations (the last two also in bulk mode) to the user,
  *          while delegating the actual implementation (e.g. accessing a database table, calling a web service,
@@ -124,7 +124,6 @@ import java.util.regex.Pattern;
  *      <li>Offering hooks for subclasses to easily customize certain key functions (e.g. execute custom code
  *          before or after saving an object).</li>
  *   </ul>
- * </p>
  * <p>This PageAction can handle a varying number of URL path parameters. Each parameter is assumed to be part
  * of an object identifier - for example, a database primary key (single or multi-valued). When no parameter is
  * specified, the page is in search mode. When the correct number of parameters is provided, the action attempts
@@ -291,7 +290,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * {@link #loadObjectByPrimaryKey(java.io.Serializable))
+     * {@link #loadObjectByPrimaryKey(java.io.Serializable)}
      * @param identifier the object identifier in String form
      */
     protected void loadObject(String... identifier) {

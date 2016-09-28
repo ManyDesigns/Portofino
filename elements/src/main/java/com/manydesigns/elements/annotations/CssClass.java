@@ -39,6 +39,7 @@ public @interface CssClass {
 
     /**
      * The classes applied to the input field.
+     * @return the CSS classes as they'll appear in the generated HTML.
      */
     String[] value();
 }

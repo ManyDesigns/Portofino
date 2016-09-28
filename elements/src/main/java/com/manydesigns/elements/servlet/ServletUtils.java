@@ -51,7 +51,7 @@ public class ServletUtils {
     }
 
     /**
-     * Returns the requested path, without the context path. E.g. webapp deployed under /foo, GET /foo/bar/baz?q=1&k=2,
+     * Returns the requested path, without the context path. E.g. webapp deployed under /foo, GET /foo/bar/baz?q=1&amp;k=2,
      * getPath() returns /bar/baz.
      * @param request the HTTP request
      * @return the path of the requested resource as a path internal to the webapp.

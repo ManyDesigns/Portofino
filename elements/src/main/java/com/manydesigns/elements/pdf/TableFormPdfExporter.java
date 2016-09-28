@@ -145,7 +145,7 @@ public class TableFormPdfExporter {
     }
 
     /**
-     * <p>Returns an array of column sizes (in characters) for the search export.<br />
+     * <p>Returns an array of column sizes (in characters) for the search export.<br>
      * By default, sizes are computed comparing the relative sizes of each column,
      * consisting of the header and the values produced by the search.</p>
      * <p>Users can override this method to compute the sizes using a different algorithm,

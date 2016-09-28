@@ -40,7 +40,7 @@ public interface PageAction extends ActionBean, DispatchElement {
     /**
      * A lifecycle method invoked during the dispatch phase, where a http request is translated to a dispatch
      * (a path in the page tree) ultimately leading to an action invocation. This method is invoked after
-     * the PageInstance has been injected by the framework.<br />
+     * the PageInstance has been injected by the framework.<br>
      * Also, this method is invoked on this object after it has been invoked on the PageAction corresponding
      * to the parent page, if any.
      * @return either null, meaning that the dispatch process is to go forward regularly, or a Resolution to be
@@ -54,7 +54,7 @@ public interface PageAction extends ActionBean, DispatchElement {
     /**
      * Lifecycle method called by templates that can include embedded pages to compute the set of pages to embed
      * and their locations and order.
-     * @return a multi-valued map layout-container: String -> embedded-pages: list(EmbeddedPageAction)
+     * @return a multi-valued map layout-container: String -&gt; embedded-pages: list(EmbeddedPageAction)
      */
     MultiMap initEmbeddedPageActions();
 

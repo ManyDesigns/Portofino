@@ -73,10 +73,12 @@ public class HttpBasicAuthenticationFilter extends PathMatchingFilter {
     }
 
     /**
-     * Returns the host name or IP associated with the current subject.  This method is primarily provided for use
+     * <p>Returns the host name or IP associated with the current subject.  This method is primarily provided for use
      * during construction of an <code>AuthenticationToken</code>.
-     * <p/>
+     * </p>
+     * <p>
      * The default implementation merely returns {@link ServletRequest#getRemoteHost()}.
+     * </p>
      *
      * @param request the incoming ServletRequest
      * @return the <code>InetAddress</code> to associate with the login attempt.
@@ -86,10 +88,10 @@ public class HttpBasicAuthenticationFilter extends PathMatchingFilter {
     }
 
     /**
-     * Returns the username obtained from the authorization header.
-     * <p/>
+     * <p>Returns the username obtained from the authorization header.</p>
+     * <p>
      * Once the header is split per the RFC (based on the space character ' '), the resulting split tokens
-     * are translated into the username/password pair.
+     * are translated into the username/password pair.</p>
      *
      * @param authorizationHeader the authorization header obtained from the request.
      * @return the username (index 0)/password pair (index 1) submitted by the user for the given header value and request.

@@ -106,7 +106,7 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     /**
      * Returns the list of users known to the system. This is used by the framework when presenting a list of
      * possible users, e.g. when configuring permissions for a page.
-     * @return a map of user id -> pretty name. The pretty name might be the username, email address, full name, etc.
+     * @return a map of user id -&gt; pretty name. The pretty name might be the username, email address, full name, etc.
      */
     Map<Serializable, String> getUsers();
 
