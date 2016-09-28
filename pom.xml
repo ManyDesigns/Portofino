@@ -93,7 +93,7 @@
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
-        <jsqlparser.version>0.9.5</jsqlparser.version>
+        <jsqlparser.version>0.9.6</jsqlparser.version>
         <json.version>20140107</json.version>
         <jsoup.version>1.9.2</jsoup.version>
         <jstl.version>1.2</jstl.version>
