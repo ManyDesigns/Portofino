@@ -32,19 +32,22 @@ public interface DispatchElement {
             "Copyright (C) 2005-2016, ManyDesigns srl";
 
     /**
-     * Returns the PageInstance of this action.
+     * Returns the PageInstance of this element.
      */
     PageInstance getPageInstance();
 
     /**
-     * Sets the PageInstance of this action. Invoked automatically by the framework before calling preparePage().
+     * Sets the PageInstance of this element. Invoked automatically by the framework.
      */
     void setPageInstance(PageInstance pageInstance);
 
     /**
-     * Visits a path element
-     * @param pathFragment
-     * @return
+     * Visits a path element.
+     * @param pathFragment one of the elements of the path being visited (e.g. in /a/b/c, one path fragment might be
+     *                     the string "a")
+     * @return the next element in the dispatch, or null if not available. Typically it is either a sub-page action
+     * matching the specified fragment, or `this` (the same element) if the fragment was used as a path parameter.
+     * However, subclasses have freedom to return what they want.
      */
     public DispatchElement consumePathFragment(String pathFragment);
 
