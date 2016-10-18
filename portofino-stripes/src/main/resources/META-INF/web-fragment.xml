@@ -30,7 +30,7 @@
     </context-param>
     <context-param>
         <param-name>LocalePicker.Locales</param-name>
-        <param-value>en,it</param-value>
+        <param-value>en,it,de</param-value>
     </context-param>
     <context-param>
         <param-name>MultipartWrapper.Class</param-name>
