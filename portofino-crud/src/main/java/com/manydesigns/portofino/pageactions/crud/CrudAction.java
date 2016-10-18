@@ -277,6 +277,12 @@ public class CrudAction extends AbstractCrudAction<Object> {
         }
     }
 
+    /**
+     * Computes the query underlying the CRUD action. By default, it returns configuration.query i.e. the HQL query
+     * stored in configuration.xml. However, you can override this method to insert your own logic, for example to
+     * change the query depending on the user's role.
+     * @return the query used as a basis for search and object loading.
+     */
     protected String getBaseQuery() {
         return getCrudConfiguration().getQuery();
     }
