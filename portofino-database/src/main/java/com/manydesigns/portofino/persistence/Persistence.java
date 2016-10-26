@@ -314,7 +314,7 @@ public class Persistence {
                     setups.put(databaseName, setup);
                 }
             } catch (Exception e) {
-                logger.error("Could not create connection provider for " + database);
+                logger.error("Could not create connection provider for " + database, e);
             }
         }
 
