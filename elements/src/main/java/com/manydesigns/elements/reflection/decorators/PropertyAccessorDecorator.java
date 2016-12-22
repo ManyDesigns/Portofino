@@ -20,10 +20,10 @@ public class PropertyAccessorDecorator extends AbstractAnnotatedAccessor impleme
     public PropertyAccessorDecorator(PropertyAccessor delegate, PropertyAccessor decorator) {
         this.delegate = delegate;
         for(Annotation annotation : delegate.getAnnotations()) {
-            this.annotations.put(annotation.getClass().getInterfaces()[0], annotation);
+            this.annotations.put(annotation.annotationType(), annotation);
         }
         for(Annotation annotation : decorator.getAnnotations()) {
-            this.annotations.put(annotation.getClass().getInterfaces()[0], annotation);
+            this.annotations.put(annotation.annotationType(), annotation);
         }
     }
 

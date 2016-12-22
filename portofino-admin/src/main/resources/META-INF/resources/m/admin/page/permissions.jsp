@@ -35,7 +35,7 @@
 
             <div class="row">
                 <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
-                <div class="col-md-9" style="margin-left: 0; overflow-x: scroll;">
+                <div class="col-md-9" style="margin-left: 0; overflow-x: auto;">
                     <table class="table table-condensed">
                     <%
                         PageInstance currentPageInstance = actionBean.getPageInstance();

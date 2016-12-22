@@ -69,10 +69,10 @@ public class ClassAccessorDecorator extends AbstractAnnotatedAccessor implements
             p++;
         }
         for(Annotation annotation : delegate.getAnnotations()) {
-            this.annotations.put(annotation.getClass().getInterfaces()[0], annotation);
+            this.annotations.put(annotation.annotationType(), annotation);
         }
         for(Annotation annotation : decoratorAccessor.getAnnotations()) {
-            this.annotations.put(annotation.getClass().getInterfaces()[0], annotation);
+            this.annotations.put(annotation.annotationType(), annotation);
         }
     }
 

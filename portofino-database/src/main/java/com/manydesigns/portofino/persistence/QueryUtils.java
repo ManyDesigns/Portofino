@@ -294,18 +294,26 @@ public class QueryUtils {
                 TableCriteria.LikeCriterion likeCriterion =
                         (TableCriteria.LikeCriterion) criterion;
                 String value = (String) likeCriterion.getValue();
-                String pattern = processTextMatchMode(
-                        likeCriterion.getTextMatchMode(), value);
-                hqlFormat = "{0} like ?" + (parametersList.size() + initialParameterIndex);
-                parametersList.add(pattern);
+                if(likeCriterion.getTextMatchMode() == TextMatchMode.EQUALS) {
+                    hqlFormat = "{0} = ?" + (parametersList.size() + initialParameterIndex);
+                    parametersList.add(value);
+                } else {
+                    String pattern = processTextMatchMode(likeCriterion.getTextMatchMode(), value);
+                    hqlFormat = "{0} like ?" + (parametersList.size() + initialParameterIndex);
+                    parametersList.add(pattern);
+                }
             } else if (criterion instanceof TableCriteria.IlikeCriterion) {
                 TableCriteria.IlikeCriterion ilikeCriterion =
                         (TableCriteria.IlikeCriterion) criterion;
                 String value = (String) ilikeCriterion.getValue();
-                String pattern = processTextMatchMode(
-                        ilikeCriterion.getTextMatchMode(), value);
-                hqlFormat = "lower({0}) like lower(?" + (parametersList.size() + initialParameterIndex) + ")";
-                parametersList.add(pattern);
+                if(ilikeCriterion.getTextMatchMode() == TextMatchMode.EQUALS) {
+                    hqlFormat = "lower({0}) = lower(?" + (parametersList.size() + initialParameterIndex + ")");
+                    parametersList.add(value);
+                } else {
+                    String pattern = processTextMatchMode(ilikeCriterion.getTextMatchMode(), value);
+                    hqlFormat = "lower({0}) like lower(?" + (parametersList.size() + initialParameterIndex) + ")";
+                    parametersList.add(pattern);
+                }
             } else if (criterion instanceof TableCriteria.IsNullCriterion) {
                 hqlFormat = "{0} is null";
             } else if (criterion instanceof TableCriteria.IsNotNullCriterion) {
