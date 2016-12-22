@@ -123,7 +123,7 @@ public class SelectField extends AbstractField<Object> {
         autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
 
-    public static SelectionProvider createEnumSelectionProvider(PropertyAccessor accessor) {
+    public SelectionProvider createEnumSelectionProvider(PropertyAccessor accessor) {
         try {
             Method valuesMethod = accessor.getType().getMethod("values");
             Enum[] values = (Enum[]) valuesMethod.invoke(null);
@@ -138,11 +138,11 @@ public class SelectField extends AbstractField<Object> {
         }
     }
 
-    public static SelectionProvider createValuesSelectionProvider
+    public SelectionProvider createValuesSelectionProvider
             (PropertyAccessor accessor, Object[] values, String[] labels) {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(accessor.getName(), 1);
         for(int i = 0; i < values.length; i++) {
-            selectionProvider.appendRow(values[i], labels[i], true);
+            selectionProvider.appendRow(values[i], getText(labels[i]), true);
         }
         return selectionProvider;
     }

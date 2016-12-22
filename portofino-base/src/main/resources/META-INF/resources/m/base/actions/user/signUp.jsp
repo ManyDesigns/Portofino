@@ -48,12 +48,9 @@
         </script>
         <div>
             <hr />
-            If you don't receive an email from us within a few minutes,
-            please check your spam filter.
-            We send you emails from the following address:
-
-            <!-- TODO: put text in portofino messages -->
-
+            <fmt:message key='password.spam.filter'>
+                <fmt:param value="${actionBean.portofinoConfiguration.getString('mail.from', 'N/A')}" />
+            </fmt:message>
         </div>
     </stripes:layout-component>
 </stripes:layout-render>

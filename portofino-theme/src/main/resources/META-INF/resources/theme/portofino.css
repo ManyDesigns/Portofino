@@ -273,7 +273,7 @@ label.control-label:after {
     content: ":";
 }
 
- .form-group.readonly {
+.form-group.readonly {
     margin-bottom: 2px;
 }
 
@@ -283,6 +283,10 @@ label.control-label:after {
 
 .form-group.readwrite.required label.control-label:before {
     content: "*\a0 ";
+}
+
+.form-group.no-value .form-control-static:before {
+    content: "-";
 }
 
 .portofino-datatable {
@@ -330,10 +334,6 @@ label.control-label:after {
 .g_pag_right {
     left: 12px;
     margin-left: -12px;
-}
-
-.form-control-static.no-value:before {
-    content: "-";
 }
 
 /*******************************************************************************

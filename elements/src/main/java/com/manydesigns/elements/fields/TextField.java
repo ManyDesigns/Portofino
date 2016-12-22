@@ -178,9 +178,6 @@ public class TextField extends AbstractTextField<String> {
         } else if (ArrayUtils.contains(green, stringValue)) {
             cssClass += " status_green";
         }
-        if(StringUtils.isBlank(stringValue)) {
-            cssClass += " no-value";
-        }
         xb.addAttribute("class", cssClass);
         xb.addAttribute("id", id);
         if (href != null) {

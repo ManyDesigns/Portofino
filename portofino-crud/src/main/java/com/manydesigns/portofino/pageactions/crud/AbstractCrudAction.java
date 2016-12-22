@@ -1063,7 +1063,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 return notInUseCase(context, parameters);
             }
         } else {
-            String title = crudConfiguration.getSearchTitle();
+            String title = getSearchTitle();
             pageInstance.setTitle(title);
             pageInstance.setDescription(title);
         }

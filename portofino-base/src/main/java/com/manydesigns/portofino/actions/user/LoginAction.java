@@ -330,7 +330,7 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     protected String getResetPasswordEmailBody(String siteUrl, String changePasswordLink) throws IOException {
-        String countryIso = context.getLocale().getCountry().toLowerCase();
+        String countryIso = context.getLocale().getLanguage().toLowerCase();
         InputStream is = LoginAction.class.getResourceAsStream("passwordResetEmail." + countryIso + ".html");
         if(is == null) {
             is = LoginAction.class.getResourceAsStream("passwordResetEmail.en.html");

@@ -123,6 +123,7 @@ public abstract class AbstractField<T> implements Field<T> {
         if (accessor.isAnnotationPresent(Help.class)) {
             help = accessor.getAnnotation(Help.class).value();
             logger.debug("Help annotation present with value: {}", help);
+            help = getText(help);
         }
 
         Enabled enabledAnnotation =
@@ -179,7 +180,7 @@ public abstract class AbstractField<T> implements Field<T> {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        if (mode.isView(insertable, updatable)) {
+        if (isReadOnly()) {
             openVisibleField(xb);
             valueToXhtml(xb);
             closeVisibleField(xb);
@@ -208,12 +209,15 @@ public abstract class AbstractField<T> implements Field<T> {
     protected void openVisibleField(XhtmlBuffer xb) {
         xb.openElement("div");
         String cssClass = "form-group";
-        if(mode.isView(insertable, updatable)) {
+        if(isReadOnly()) {
             cssClass += " readonly";
         } else {
             cssClass += " readwrite";
         }
-        if(errors.size() > 0) {
+        if(isBlank()) {
+            cssClass += " no-value";
+        }
+        if(!isValid()) {
             cssClass += " has-error";
         }
         if(hasRequiredFields()) {
@@ -223,6 +227,18 @@ public abstract class AbstractField<T> implements Field<T> {
         labelToXhtml(xb);
         xb.openElement("div");
         xb.addAttribute("class", INPUT_CONTAINER_CSS_CLASS + " " + fieldCssClass);
+    }
+
+    public boolean isValid() {
+        return errors.isEmpty();
+    }
+
+    public boolean isReadOnly() {
+        return mode.isView(insertable, updatable);
+    }
+
+    public boolean isBlank() {
+        return StringUtils.isBlank(getStringValue());
     }
 
     /**
@@ -242,12 +258,12 @@ public abstract class AbstractField<T> implements Field<T> {
 
 
         xb.openElement("label");
-        if(!mode.isView(insertable, updatable)) {
+        if(!isReadOnly()) {
             xb.addAttribute("for", id); //HTML5 validation
         }
         xb.addAttribute("class", FORM_LABEL_CSS_CLASS);
 
-        if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
+        if (mode.isBulk() && mode.isEdit() && !isReadOnly()) {
             String cid = id+"_check";
             xb.openElement("div");
             xb.addAttribute("class", "pull-left checkbox");
@@ -284,7 +300,7 @@ public abstract class AbstractField<T> implements Field<T> {
     }
 
     public void errorsToXhtml(XhtmlBuffer xb) {
-        if (errors.size() > 0) {
+        if (!isValid()) {
             xb.openElement("span");
             xb.addAttribute("class", "help-block");
             for (String error : errors) {
@@ -307,7 +323,7 @@ public abstract class AbstractField<T> implements Field<T> {
 
     @Override
     public void readFrom(KeyValueAccessor keyValueAccessor) {
-        if (mode.isView(insertable, updatable)) {
+        if (isReadOnly()) {
             return;
         }
         if(!keyValueAccessor.has(accessor.getName())) {
@@ -427,7 +443,7 @@ public abstract class AbstractField<T> implements Field<T> {
     }
 
     public boolean hasRequiredFields() {
-        return required && !mode.isView(insertable, updatable);
+        return required && !isReadOnly();
     }
 
     public @NotNull String getFieldCssClass() {
@@ -471,7 +487,7 @@ public abstract class AbstractField<T> implements Field<T> {
     }
 
     protected void writeToObject(@NotNull PropertyAccessor accessor, @NotNull Object obj, @Nullable Object value) {
-        if (mode.isView(insertable, updatable) || (mode.isBulk() && !bulkChecked)) {
+        if (isReadOnly() || (mode.isBulk() && !bulkChecked)) {
             return;
         }
         Object convertedValue =

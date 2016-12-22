@@ -7,10 +7,10 @@
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
-        Forgot your password?
+        <fmt:message key='forgot.your.password' />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        Forgot your password?
+        <fmt:message key='forgot.your.password' />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <fmt:message key='password.resend'/>
@@ -32,7 +32,9 @@
         <div>
             <hr />
             <small>
-                <fmt:message key='password.spam.filter'/>
+                <fmt:message key='password.spam.filter'>
+                    <fmt:param value="${actionBean.portofinoConfiguration.getString('mail.from', 'N/A')}" />
+                </fmt:message>
             </small>
         </div>
     </stripes:layout-component>
