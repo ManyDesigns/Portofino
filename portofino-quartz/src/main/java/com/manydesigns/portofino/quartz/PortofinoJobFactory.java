@@ -30,11 +30,13 @@
 package com.manydesigns.portofino.quartz;
 
 import com.manydesigns.portofino.di.Injections;
-import org.quartz.Job;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import com.manydesigns.portofino.modules.DatabaseModule;
+import com.manydesigns.portofino.persistence.Persistence;
+import org.quartz.*;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.TriggerFiredBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 
@@ -49,6 +51,7 @@ public class PortofinoJobFactory extends SimpleJobFactory {
             "Copyright (C) 2005-2016, ManyDesigns srl";
 
     private final ServletContext servletContext;
+    private static final Logger logger = LoggerFactory.getLogger(PortofinoJobFactory.class);
 
     public PortofinoJobFactory(ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -56,9 +59,27 @@ public class PortofinoJobFactory extends SimpleJobFactory {
 
     @Override
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
-        Job job = super.newJob(bundle, scheduler);
+        final Job job = super.newJob(bundle, scheduler);
         Injections.inject(job, servletContext, null);
-        return job;
+        return new Job() {
+            @Override
+            public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+                job.execute(jobExecutionContext);
+                try {
+                    //In a different class to make the database module optional at runtime
+                    SessionCleaner.closeSessions(servletContext);
+                } catch (NoClassDefFoundError e) {
+                    logger.debug("Database module not available, not closing sessions", e);
+                }
+            }
+        };
     }
 
+}
+
+class SessionCleaner {
+    public static void closeSessions(ServletContext servletContext) {
+        Persistence persistence = (Persistence) servletContext.getAttribute(DatabaseModule.PERSISTENCE);
+        persistence.closeSessions();
+    }
 }

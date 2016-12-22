@@ -19,6 +19,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-database</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
