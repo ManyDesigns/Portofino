@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.database.platforms.ApacheDerbyDatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;

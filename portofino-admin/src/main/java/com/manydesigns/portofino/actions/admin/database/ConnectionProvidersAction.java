@@ -35,8 +35,8 @@ import com.manydesigns.portofino.actions.admin.database.forms.ConnectionProvider
 import com.manydesigns.portofino.actions.admin.database.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.BaseModule;

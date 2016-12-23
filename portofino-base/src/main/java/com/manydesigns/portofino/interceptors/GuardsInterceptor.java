@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.portofino.buttons.ButtonsLogic;
+import com.manydesigns.portofino.buttons.Guarded;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -46,13 +47,11 @@ public class GuardsInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
 
-    public final static Logger logger =
-            LoggerFactory.getLogger(GuardsInterceptor.class);
+    public final static Logger logger = LoggerFactory.getLogger(GuardsInterceptor.class);
 
     private static final int CONFLICT = 409;
 
     public Resolution intercept(ExecutionContext context) throws Exception {
-        logger.debug("Retrieving Stripes objects");
         ActionBean actionBean = context.getActionBean();
         Method handler = context.getHandler();
 
@@ -60,8 +59,12 @@ public class GuardsInterceptor implements Interceptor {
         if(ButtonsLogic.doGuardsPass(actionBean, handler)) {
             return context.proceed();
         } else {
-            logger.warn("Operation not permitted.");
-            return new ErrorResolution(CONFLICT);
+            logger.warn("Operation not permitted. Method: " + context.getHandler());
+            if(actionBean instanceof Guarded) {
+                return ((Guarded) actionBean).guardsFailed(handler);
+            } else {
+                return new ErrorResolution(CONFLICT);
+            }
         }
     }
 }

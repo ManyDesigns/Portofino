@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.database.platforms;
+package com.manydesigns.portofino.model.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.apache.commons.dbutils.DbUtils;
@@ -88,7 +88,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     public AbstractDatabasePlatform(Dialect hibernateDialect, String connectionStringTemplate) {
         this.hibernateDialect = hibernateDialect;
         this.connectionStringTemplate = connectionStringTemplate;
-        status = STATUS_CREATED;
+        status = DatabasePlatform.STATUS_CREATED;
     }
 
     //**************************************************************************
@@ -98,9 +98,9 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     public void test() {
         boolean success = DbUtils.loadDriver(getStandardDriverClassName());
         if (success) {
-            status = STATUS_OK;
+            status = DatabasePlatform.STATUS_OK;
         } else {
-            status = STATUS_DRIVER_NOT_FOUND;
+            status = DatabasePlatform.STATUS_DRIVER_NOT_FOUND;
         }
     }
 

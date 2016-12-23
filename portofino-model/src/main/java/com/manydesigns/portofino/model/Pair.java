@@ -20,19 +20,45 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
-
-/**
+/*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ResetVisitor extends ModelObjectVisitor {
+public class Pair<T> {
+    public static final String copyright =
+            "Copyright (C) 2005-2016, ManyDesigns srl";
+
+    public T left;
+    public T right;
+
+    public Pair(T left, T right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    public Pair() {}
 
     @Override
-    public void visitNodeBeforeChildren(ModelObject node) {
-        node.reset();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Pair that = (Pair) o;
+
+        if (left != null ? !left.equals(that.left) : that.left != null)
+            return false;
+        if (right != null ? !right.equals(that.right) : that.right != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = left != null ? left.hashCode() : 0;
+        result = 31 * result + (right != null ? right.hashCode() : 0);
+        return result;
     }
 }

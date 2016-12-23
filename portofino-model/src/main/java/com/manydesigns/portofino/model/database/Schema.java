@@ -142,7 +142,7 @@ public class Schema implements ModelObject {
 
     @XmlElementWrapper(name="tables")
     @XmlElement(name = "table",
-            type = com.manydesigns.portofino.model.database.Table.class)
+            type = Table.class)
     public List<Table> getImmediateTables() {
         return immediateTables;
     }

@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.util.Pair;
+import com.manydesigns.portofino.model.Pair;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

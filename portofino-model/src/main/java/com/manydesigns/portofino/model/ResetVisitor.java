@@ -20,26 +20,16 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
-
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class LinkVisitor extends ModelObjectVisitor {
-
-    private Model model;
-
-    public LinkVisitor(Model model) {
-        this.model = model;
-    }
+public class ResetVisitor extends ModelObjectVisitor {
 
     @Override
     public void visitNodeBeforeChildren(ModelObject node) {
-        node.link(model);
+        node.reset();
     }
 }

@@ -22,7 +22,7 @@ package com.manydesigns.portofino.actions.admin.tables.forms;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.database.Type;
+import com.manydesigns.portofino.model.database.Type;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.DatabaseLogic;

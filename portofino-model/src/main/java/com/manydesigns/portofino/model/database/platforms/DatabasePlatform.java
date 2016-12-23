@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.database.platforms;
+package com.manydesigns.portofino.model.database.platforms;
 
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.portofino.model.database.ConnectionProvider;

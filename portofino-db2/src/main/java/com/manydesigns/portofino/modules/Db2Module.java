@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.IbmDb2DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.IbmDb2ZosDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.IbmDb2iDatabasePlatform;

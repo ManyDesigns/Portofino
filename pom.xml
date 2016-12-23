@@ -118,6 +118,7 @@
         <module>portofino-stripes</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
+        <module>portofino-model</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
         <module>portofino-db2</module>

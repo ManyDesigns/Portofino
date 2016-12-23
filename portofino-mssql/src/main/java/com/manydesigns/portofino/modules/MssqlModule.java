@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.JTDSDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.MSSqlServerDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;

@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
+import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
 import org.hibernate.dialect.Oracle9iDialect;
 
 import java.sql.DatabaseMetaData;

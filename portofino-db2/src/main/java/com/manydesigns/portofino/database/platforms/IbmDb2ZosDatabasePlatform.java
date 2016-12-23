@@ -22,6 +22,7 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import com.manydesigns.portofino.database.dialects.DB2ZOSDialect;
+import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
 
 
 /*
@@ -31,7 +32,7 @@ import com.manydesigns.portofino.database.dialects.DB2ZOSDialect;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  * @author Manuel Durán Aguete  - manuel@aguete.org
 */
-public class IbmDb2ZosDatabasePlatform extends AbstractDatabasePlatform{
+public class IbmDb2ZosDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
 

@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;

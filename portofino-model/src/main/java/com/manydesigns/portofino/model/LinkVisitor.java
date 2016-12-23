@@ -18,47 +18,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.util;
+package com.manydesigns.portofino.model;
 
-/*
+/**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class Pair<T> {
-    public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+public class LinkVisitor extends ModelObjectVisitor {
 
-    public T left;
-    public T right;
+    private Model model;
 
-    public Pair(T left, T right) {
-        this.left = left;
-        this.right = right;
-    }
-
-    public Pair() {}
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Pair that = (Pair) o;
-
-        if (left != null ? !left.equals(that.left) : that.left != null)
-            return false;
-        if (right != null ? !right.equals(that.right) : that.right != null)
-            return false;
-
-        return true;
+    public LinkVisitor(Model model) {
+        this.model = model;
     }
 
     @Override
-    public int hashCode() {
-        int result = left != null ? left.hashCode() : 0;
-        result = 31 * result + (right != null ? right.hashCode() : 0);
-        return result;
+    public void visitNodeBeforeChildren(ModelObject node) {
+        node.link(model);
     }
 }

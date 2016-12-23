@@ -79,7 +79,7 @@ public class Model {
 
     @XmlElementWrapper(name="databases")
     @XmlElement(name = "database",
-            type = com.manydesigns.portofino.model.database.Database.class)
+            type = Database.class)
     public List<Database> getDatabases() {
         return databases;
     }

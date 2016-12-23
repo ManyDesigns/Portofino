@@ -213,7 +213,7 @@ public class Table implements ModelObject, Annotated {
 
     @XmlElementWrapper(name="columns")
     @XmlElement(name = "column",
-            type = com.manydesigns.portofino.model.database.Column.class)
+            type = Column.class)
     public List<Column> getColumns() {
         return columns;
     }
@@ -233,7 +233,7 @@ public class Table implements ModelObject, Annotated {
 
     @XmlElementWrapper(name="foreignKeys")
     @XmlElement(name = "foreignKey",
-            type = com.manydesigns.portofino.model.database.ForeignKey.class)
+            type = ForeignKey.class)
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }

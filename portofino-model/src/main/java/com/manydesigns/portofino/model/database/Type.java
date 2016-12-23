@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.model.database;
 
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

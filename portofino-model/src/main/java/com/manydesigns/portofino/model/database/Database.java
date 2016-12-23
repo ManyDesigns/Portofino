@@ -111,7 +111,7 @@ public class Database implements ModelObject {
 
     @XmlElementWrapper(name="schemas")
     @XmlElement(name = "schema",
-            type = com.manydesigns.portofino.model.database.Schema.class)
+            type = Schema.class)
     public List<Schema> getSchemas() {
         return schemas;
     }
