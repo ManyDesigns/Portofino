@@ -176,6 +176,7 @@ public class DemoTTModule implements Module {
             return job.getKey();
         } catch (Exception e) {
             logger.error("Could not schedule " + jobName + " job", e);
+            return null
         }
     }
 

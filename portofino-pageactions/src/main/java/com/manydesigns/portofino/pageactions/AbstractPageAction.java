@@ -241,7 +241,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         DispatchElement resource = consumePathFragment(pathFragment);
         if(resource != this) {
             if(context == null) {
-                setContext(pageInstance.getParent().getActionBean().getContext());
+                setContext(getParent().getContext());
             }
             Resolution resolution = preparePage();
             if(resolution != null) {
@@ -250,7 +250,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
         return resource;
     }
-    
+
+    @Override
+    public PageAction getParent() {
+        return pageInstance.getParent().getActionBean();
+    }
+
     @Path(":pages")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)

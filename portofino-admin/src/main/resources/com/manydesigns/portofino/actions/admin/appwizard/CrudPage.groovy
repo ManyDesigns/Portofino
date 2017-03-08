@@ -26,6 +26,14 @@ class CrudPage extends CrudAction {
     String linkToParentProperty = "$linkToParentProperty";
     String parentName = "$parentName";
 
+    //**************************************************************************
+    // Extension hooks
+    //**************************************************************************
+
+    protected boolean isCreateEnabled() {
+        true
+    }
+    
     protected void createSetup(Object object) {
         if(!StringUtils.isEmpty(parentName)) {
             object[linkToParentProperty] = ognlContext[parentName].$parentProperty
@@ -33,54 +41,85 @@ class CrudPage extends CrudAction {
     }
 
     protected boolean createValidate(Object object) {
-        return true;
+        true
     }
 
     protected void createPostProcess(Object object) {}
 
 
+    protected boolean isEditEnabled() {
+        true
+    }
+
     protected void editSetup(Object object) {}
 
     protected boolean editValidate(Object object) {
-        return true;
+        true
     }
 
     protected void editPostProcess(Object object) {}
 
 
+    protected boolean isDeleteEnabled() {
+        true
+    }
+
     protected boolean deleteValidate(Object object) {
-        return true;
+        true
     }
 
     protected void deletePostProcess(Object object) {}
 
+    //**************************************************************************
+    // View hooks
+    //**************************************************************************
 
     protected Resolution getBulkEditView() {
-        return super.getBulkEditView();
+        super.getBulkEditView()
     }
 
     protected Resolution getCreateView() {
-        return super.getCreateView();
+        super.getCreateView()
     }
 
     protected Resolution getEditView() {
-        return super.getEditView();
+        super.getEditView()
     }
 
     protected Resolution getReadView() {
-        return super.getReadView();
+        super.getReadView()
+    }
+
+    protected Resolution getEmbeddedReadView() {
+        super.getEmbeddedReadView()
     }
 
     protected Resolution getSearchView() {
-        return super.getSearchView();
+        super.getSearchView()
     }
 
     protected Resolution getEmbeddedSearchView() {
-        return super.getEmbeddedSearchView();
+        super.getEmbeddedSearchView()
     }
 
     protected Resolution getSearchResultsPageView() {
-        return super.getSearchResultsPageView()
+        super.getSearchResultsPageView()
+    }
+
+    protected Resolution getConfigurationView() {
+        super.getConfigurationView()
+    }
+
+    protected Resolution getSuccessfulSaveView() {
+        super.getSuccessfulSaveView()
+    }
+
+    protected Resolution getSuccessfulUpdateView() {
+        super.getSuccessfulUpdateView()
+    }
+
+    protected Resolution getSuccessfulDeleteView() {
+        super.getSuccessfulDeleteView()
     }
 
 }

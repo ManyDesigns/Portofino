@@ -531,6 +531,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-search", key = "create.new", order = 1, type = Button.TYPE_SUCCESS,
             icon = Button.ICON_PLUS + Button.ICON_WHITE)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
     public Resolution create() {
         preCreate();
         return getCreateView();
@@ -538,6 +539,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Button(list = "crud-create", key = "save", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
     public Resolution save() {
         preCreate();
         form.readFromRequest(context.getRequest());
@@ -603,6 +605,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "crud-read-default-button", key = "search")
     })
     @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Resolution edit() {
         preEdit();
         BlobUtils.loadBlobs(form, getBlobManager(), false);
@@ -611,6 +614,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Button(list = "crud-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Resolution update() {
         preEdit();
         List<Blob> blobsBefore = getBlobsFromForm();
@@ -686,7 +690,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT),
         @Button(list = "crud-bulk", key = "edit", order = 2, icon = Button.ICON_EDIT)
     })
-    @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
+    @Guard(test = "isBulkOperationsEnabled() && isEditEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
@@ -714,6 +718,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return which view to render next.
      */
     @Button(list = "crud-bulk-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
+    @Guard(test = "isBulkOperationsEnabled() && isEditEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkUpdate() {
         int updated = 0;
@@ -753,6 +758,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Button(list = "crud-read", key = "delete", order = 2, icon = Button.ICON_TRASH)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
+    @Guard(test = "isDeleteEnabled()", type = GuardType.VISIBLE)
     public Resolution delete() {
         if(deleteValidate(object)) {
             try {
@@ -775,7 +781,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH),
         @Button(list = "crud-bulk", key = "delete", order = 3, icon = Button.ICON_TRASH)
     })
-    @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
+    @Guard(test = "isBulkOperationsEnabled() && isDeleteEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         int deleted = 0;
@@ -813,6 +819,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Hooks/scripting
     //**************************************************************************
 
+    protected boolean isCreateEnabled() {
+        return true;
+    }
+    
     /**
      * Hook method called just after a new object has been created.
      * @param object the new object.
@@ -842,6 +852,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected void commitTransaction() {}
 
+    protected boolean isEditEnabled() {
+        return true;
+    }
+    
     /**
      * Hook method called just before an object is used to populate the edit form.
      * @param object the object.
@@ -865,6 +879,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected void editPostProcess(T object) {}
 
+    protected boolean isDeleteEnabled() {
+        return true;
+    }
+    
     /**
      * Hook method called before an object is deleted.
      * @param object the object.

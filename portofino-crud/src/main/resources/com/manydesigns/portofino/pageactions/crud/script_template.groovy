@@ -30,26 +30,38 @@ class MyCrudAction extends CrudAction {
     // Extension hooks
     //**************************************************************************
 
+    protected boolean isCreateEnabled() {
+        true
+    }
+    
     protected void createSetup(Object object) {}
 
     protected boolean createValidate(Object object) {
-        return true;
+        true
     }
 
     protected void createPostProcess(Object object) {}
 
 
+    protected boolean isEditEnabled() {
+        true
+    }
+
     protected void editSetup(Object object) {}
 
     protected boolean editValidate(Object object) {
-        return true;
+        true
     }
 
     protected void editPostProcess(Object object) {}
 
 
+    protected boolean isDeleteEnabled() {
+        true
+    }
+
     protected boolean deleteValidate(Object object) {
-        return true;
+        true
     }
 
     protected void deletePostProcess(Object object) {}
@@ -59,52 +71,51 @@ class MyCrudAction extends CrudAction {
     //**************************************************************************
 
     protected Resolution getBulkEditView() {
-        return super.getBulkEditView();
+        super.getBulkEditView()
     }
 
     protected Resolution getCreateView() {
-        return super.getCreateView();
+        super.getCreateView()
     }
 
     protected Resolution getEditView() {
-        return super.getEditView();
+        super.getEditView()
     }
 
     protected Resolution getReadView() {
-        return super.getReadView();
+        super.getReadView()
     }
 
     protected Resolution getEmbeddedReadView() {
-        return super.getEmbeddedReadView()
+        super.getEmbeddedReadView()
     }
 
     protected Resolution getSearchView() {
-        return super.getSearchView();
+        super.getSearchView()
     }
 
     protected Resolution getEmbeddedSearchView() {
-        return super.getEmbeddedSearchView();
+        super.getEmbeddedSearchView()
     }
 
     protected Resolution getSearchResultsPageView() {
-        return super.getSearchResultsPageView()
+        super.getSearchResultsPageView()
     }
 
     protected Resolution getConfigurationView() {
-        return super.getConfigurationView()
+        super.getConfigurationView()
     }
 
     protected Resolution getSuccessfulSaveView() {
-        return super.getSuccessfulSaveView()
+        super.getSuccessfulSaveView()
     }
 
     protected Resolution getSuccessfulUpdateView() {
-        return super.getSuccessfulUpdateView()
+        super.getSuccessfulUpdateView()
     }
 
     protected Resolution getSuccessfulDeleteView() {
-        return super.getSuccessfulDeleteView()
+        super.getSuccessfulDeleteView()
     }
-
 
 }

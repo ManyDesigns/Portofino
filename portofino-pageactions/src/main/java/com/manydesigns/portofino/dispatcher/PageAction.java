@@ -51,6 +51,8 @@ public interface PageAction extends ActionBean, DispatchElement {
     @Override
     ElementsActionBeanContext getContext();
 
+    PageAction getParent();
+
     /**
      * Lifecycle method called by templates that can include embedded pages to compute the set of pages to embed
      * and their locations and order.
