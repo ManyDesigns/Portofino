@@ -18,7 +18,7 @@
             Welcome <c:out value="${principal['first_name']} ${principal['last_name']}"/>
         </shiro:user>
         <shiro:guest>
-            <c:out value="${actionBean.page.title}"/>
+            <c:out value="${actionBean.pageInstance.title}"/>
         </shiro:guest>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">

@@ -473,6 +473,8 @@ public abstract class LoginAction extends AbstractActionBean {
 
             String from = portofinoConfiguration.getString(
                     PortofinoProperties.MAIL_FROM, "example@example.com");
+            //TODO this line below assumes that the email property of the user is called 'email' but it should be
+            //extracted dynamically from the user object
             sendSignupConfirmationEmail(
                     from, email, ElementsThreadLocals.getText("confirm.signup"), body);
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));

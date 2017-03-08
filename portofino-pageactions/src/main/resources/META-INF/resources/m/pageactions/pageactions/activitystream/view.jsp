@@ -6,7 +6,7 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.page.title}"/>
+        <c:out value="${actionBean.pageInstance.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <c:forEach var="activityItem" items="${actionBean.activityItems}">

@@ -166,8 +166,7 @@ public abstract class ConnectionProvider {
         } catch (Throwable e) {
             status = STATUS_ERROR;
             errorMessage = e.getMessage();
-            logger.warn("Could not create database platform for " +
-                    databaseName, e);
+            logger.warn("Could not create database platform for " + databaseName, e);
         } finally {
             DbUtil.closeResultSetAndStatement(typeRs);
             releaseConnection(conn);

@@ -5,7 +5,7 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.map.MapAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.page.title}"/>
+        <c:out value="${actionBean.pageInstance.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
 

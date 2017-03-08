@@ -20,7 +20,7 @@
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.page.title}"/>
+        <c:out value="${actionBean.pageInstance.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data"

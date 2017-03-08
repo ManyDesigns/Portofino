@@ -43,11 +43,8 @@ public class SelectFieldHelper implements FieldHelper {
                                   PropertyAccessor propertyAccessor,
                                   Mode mode,
                                   String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(Select.class)) {
-                return new SelectField(propertyAccessor, mode, prefix);
-        } else if (propertyAccessor.getType().isEnum()) {
-                return new SelectField(propertyAccessor, mode, prefix);
+        if (propertyAccessor.isAnnotationPresent(Select.class) || propertyAccessor.getType().isEnum()) {
+            return new SelectField(propertyAccessor, mode, prefix);
         }
         return null;
     }
@@ -55,8 +52,7 @@ public class SelectFieldHelper implements FieldHelper {
     public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
                                                    PropertyAccessor propertyAccessor,
                                                    String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(Select.class)) {
+        if (propertyAccessor.isAnnotationPresent(Select.class) || propertyAccessor.getType().isEnum()) {
                 return new SelectSearchField(propertyAccessor, prefix);
         }
         return null;

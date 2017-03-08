@@ -44,8 +44,7 @@ import java.lang.reflect.Method;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @Intercepts(LifecycleStage.BindingAndValidation)
-public class
-        SecurityInterceptor implements Interceptor {
+public class SecurityInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
 

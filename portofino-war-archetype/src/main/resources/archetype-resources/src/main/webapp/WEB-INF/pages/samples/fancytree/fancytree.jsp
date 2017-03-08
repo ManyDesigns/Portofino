@@ -4,7 +4,7 @@
         %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"
         /><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.page.title}"/>
+        <c:out value="${actionBean.pageInstance.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <link href="<stripes:url value="/webjars/fancytree/2.11.0/dist/skin-bootstrap/ui.fancytree.css"/>" rel="stylesheet" type="text/css"

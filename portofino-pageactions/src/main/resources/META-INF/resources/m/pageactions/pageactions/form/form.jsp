@@ -9,7 +9,7 @@
                type="com.manydesigns.portofino.pageactions.form.FormAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.page.title}"/>
+        <c:out value="${actionBean.pageInstance.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <c:if test="${actionBean.formWithRichTextFields}">

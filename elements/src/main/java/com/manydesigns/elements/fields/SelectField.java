@@ -142,7 +142,8 @@ public class SelectField extends AbstractField<Object> {
             (PropertyAccessor accessor, Object[] values, String[] labels) {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(accessor.getName(), 1);
         for(int i = 0; i < values.length; i++) {
-            selectionProvider.appendRow(values[i], getText(labels[i]), true);
+            Object convertedValue = OgnlUtils.convertValue(values[i], accessor.getType());
+            selectionProvider.appendRow(convertedValue, getText(labels[i]), true);
         }
         return selectionProvider;
     }
