@@ -192,11 +192,6 @@ Site: http://www.jetbrains.com/idea
 File: annotations-7.0.3.jar
 License: Apache License
 
-iText
-Site: http://itextpdf.com/
-File: itext-2.1.7.jar
-License: LGPL
-
 Java Excel API
 Site: http://jexcelapi.sourceforge.net/
 File: jxl-2.6.12.jar
@@ -327,5 +322,5 @@ License: Creative Commons Attribution-ShareAlike 3.0 Unported
 
 Xalan-Java
 Site: http://xml.apache.org/xalan-j/
-File: xalan-2.6.0.jar
+File: xalan-2.7.0.jar
 License: Apache License v2

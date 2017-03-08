@@ -63,7 +63,7 @@ public class FormPdfExporter {
     }
 
     public void export(OutputStream out) throws FOPException, IOException, TransformerException {
-        FopFactory fopFactory = FopFactory.newInstance();
+        FopFactory fopFactory = FopFactory.newInstance(new File(".").toURI());
 
         Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
 

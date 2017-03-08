@@ -140,7 +140,7 @@ public class Persistence {
         logger.info("Loading xml model from file: {}", appModelFile.getAbsolutePath());
 
         try {
-            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+            JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
             Unmarshaller um = jc.createUnmarshaller();
             Model model = (Model) um.unmarshal(appModelFile);
             File modelDir = getModelDirectory();
@@ -230,7 +230,7 @@ public class Persistence {
         //TODO gestire conflitti con modifiche esterne?
         File tempFile = File.createTempFile(appModelFile.getName(), "");
 
-        JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+        JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         m.marshal(model, tempFile);

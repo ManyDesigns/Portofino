@@ -39,7 +39,6 @@ import java.util.List;
 public class Model {
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
-    public static final String JAXB_MODEL_PACKAGES = "com.manydesigns.portofino.model";
 
     //**************************************************************************
     // Fields

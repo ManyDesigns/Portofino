@@ -41,10 +41,7 @@ import org.apache.fop.apps.MimeConstants;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -67,7 +64,7 @@ public class TableFormPdfExporter {
 
     public void export(OutputStream outputStream) throws FOPException,
             IOException, TransformerException {
-        FopFactory fopFactory = FopFactory.newInstance();
+        FopFactory fopFactory = FopFactory.newInstance(new File(".").toURI());
 
         Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, outputStream);
 

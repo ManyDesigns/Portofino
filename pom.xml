@@ -81,11 +81,10 @@
         <commons.io.version>2.0.1</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <ehcache.version>2.10.2.2.21</ehcache.version>
-        <fop.version>1.0</fop.version>
+        <fop.version>2.1</fop.version>
         <groovy.version>2.4.7</groovy.version>
         <guava.version>18.0</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
-        <itext.version>2.1.7</itext.version>
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.0.1</javax.ws.rs.api.version>
