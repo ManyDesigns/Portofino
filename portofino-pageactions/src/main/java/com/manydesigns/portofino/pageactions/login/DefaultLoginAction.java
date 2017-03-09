@@ -130,8 +130,14 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
         return null;
     }
 
+    @Override
     public String getPageTemplate() {
-        return getPageInstance().getLayout().getTemplate();
+        return pageInstance.getLayout().getTemplate();
+    }
+    
+    @Override
+    public PageAction getParent() {
+        return pageInstance.getParent().getActionBean();
     }
 
 }

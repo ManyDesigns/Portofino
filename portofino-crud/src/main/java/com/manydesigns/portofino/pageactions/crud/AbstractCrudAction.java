@@ -534,6 +534,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
     public Resolution create() {
         preCreate();
+        form.readFromRequest(context.getRequest());
         return getCreateView();
     }
 
