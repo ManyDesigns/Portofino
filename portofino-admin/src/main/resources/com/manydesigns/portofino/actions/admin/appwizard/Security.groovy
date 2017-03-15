@@ -136,20 +136,35 @@ public class Security extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(databaseName);
-        org.hibernate.Criteria criteria = session.createCriteria(userTableEntityName);
+        Criteria criteria = session.createCriteria(userTableEntityName);
         criteria.add(Restrictions.eq(userNameProperty, userName));
 
-        List result = criteria.list();
+        List result = criteria.list()
 
         if (result.size() == 1) {
-            def user = result.get(0);
-
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(user, user[passwordProperty], getName());
-            return info;
+            def user = cleanUser(result[0])
+            return new SimpleAuthenticationInfo(user, user[passwordProperty], name)
         } else {
             throw new IncorrectCredentialsException("Login failed");
         }
+    }
+
+    protected Map cleanUser(user) {
+        try {
+            user.hashCode()
+        } catch (StackOverflowError ignored) {
+            logger.warn("The user entity has self-references that make it unusable as a principal. Returning a non-persistent map with no references.")
+            Map cleanUser = new HashMap()
+            user.each { k, v ->
+                if (v instanceof List || v instanceof Map) {
+                    logger.debug("Skipping {}", k)
+                } else {
+                    cleanUser.put(k, v)
+                }
+            }
+            user = cleanUser
+        }
+        user
     }
 
     AuthenticationInfo loadAuthenticationInfo(PasswordResetToken token) {
