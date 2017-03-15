@@ -820,7 +820,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Hooks/scripting
     //**************************************************************************
 
-    protected boolean isCreateEnabled() {
+    public boolean isCreateEnabled() {
         return true;
     }
     
@@ -853,7 +853,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected void commitTransaction() {}
 
-    protected boolean isEditEnabled() {
+    public boolean isEditEnabled() {
         return true;
     }
     
@@ -880,7 +880,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected void editPostProcess(T object) {}
 
-    protected boolean isDeleteEnabled() {
+    public boolean isDeleteEnabled() {
         return true;
     }
     
@@ -1516,6 +1516,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Return to parent
     //**************************************************************************
 
+    @Button(list = "crud-read", key = "return.to.list", order = 99, icon = Button.ICON_LEFT)
     public Resolution returnToSearch() throws Exception {
         if (pk != null) {
             return new RedirectResolution(

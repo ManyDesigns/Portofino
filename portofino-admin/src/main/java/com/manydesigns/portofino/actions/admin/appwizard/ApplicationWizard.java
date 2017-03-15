@@ -938,7 +938,9 @@ public class ApplicationWizard extends AbstractPageAction {
         if(userTable != null) {
             SecurityUtils.getSubject().logout();
             context.getRequest().getSession().invalidate();
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("user.management.has.been.configured.please.edit.security.groovy"));
+            XhtmlBuffer buffer = new XhtmlBuffer();
+            buffer.writeNoHtmlEscape(ElementsThreadLocals.getText("user.management.has.been.configured.please.edit.security.groovy"));
+            SessionMessages.addWarningMessage(buffer);
             //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
         XhtmlBuffer messageBuffer = new XhtmlBuffer();

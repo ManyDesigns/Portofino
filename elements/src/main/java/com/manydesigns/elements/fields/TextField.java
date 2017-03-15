@@ -153,6 +153,9 @@ public class TextField extends AbstractTextField<String> {
             if(richText) {
                 htmlClass += " mde-form-rich-text";
             }
+            if (maxLength != null) {
+                xb.addAttribute("data-max-length", Integer.toString(maxLength));
+            }
             if(!StringUtils.isEmpty(htmlClass)) {
                 xb.addAttribute("class", htmlClass);
             }

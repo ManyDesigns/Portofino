@@ -30,7 +30,7 @@ class CrudPage extends CrudAction {
     // Extension hooks
     //**************************************************************************
 
-    protected boolean isCreateEnabled() {
+    public boolean isCreateEnabled() {
         true
     }
     
@@ -47,7 +47,7 @@ class CrudPage extends CrudAction {
     protected void createPostProcess(Object object) {}
 
 
-    protected boolean isEditEnabled() {
+    public boolean isEditEnabled() {
         true
     }
 
@@ -60,7 +60,7 @@ class CrudPage extends CrudAction {
     protected void editPostProcess(Object object) {}
 
 
-    protected boolean isDeleteEnabled() {
+    public boolean isDeleteEnabled() {
         true
     }
 
