@@ -16,10 +16,10 @@ import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
-import org.joda.time.DateMidnight
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
+import org.joda.time.LocalDate
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class CalendarPage extends CalendarAction {
@@ -63,11 +63,11 @@ class CalendarPage extends CalendarAction {
         def name = ShortNameUtils.getName(classAccessor, object)
         def evtInterval
         if(object[property] instanceof java.sql.Date) {
-            def eventStart = new DateMidnight(object[property], DateTimeZone.UTC)
+            def eventStart = new LocalDate(object[property]).toDateTimeAtStartOfDay()
             evtInterval = new Interval(eventStart, eventStart.plusDays(1));
         } else {
-            def eventStart = new DateTime(object[property], DateTimeZone.UTC)
-            evtInterval = new Interval(eventStart, eventStart);
+            def eventStart = new DateTime(object[property])
+            evtInterval = new Interval(eventStart, eventStart.plusMillis(1));
         }
         def prettyProperty = Util.guessToWords(property);
         def event = new Event(

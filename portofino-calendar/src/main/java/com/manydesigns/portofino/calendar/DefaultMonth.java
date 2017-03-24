@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.calendar;
 
 import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -32,7 +33,7 @@ public class DefaultMonth extends AbstractMonth<DefaultDay> {
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
 
-    public DefaultMonth(DateMidnight referenceDateMidnight) {
+    public DefaultMonth(LocalDate referenceDateMidnight) {
         super(referenceDateMidnight);
     }
 
@@ -42,7 +43,7 @@ public class DefaultMonth extends AbstractMonth<DefaultDay> {
     }
 
     @Override
-    protected DefaultDay createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+    protected DefaultDay createDay(LocalDate dayStart, LocalDate dayEnd) {
         return new DefaultDay(dayStart, dayEnd);
     }
 }

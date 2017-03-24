@@ -22,6 +22,7 @@ package com.manydesigns.portofino.pageactions.calendar;
 
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,33 +39,38 @@ public class AgendaView {
     public static final String copyright =
             "Copyright (C) 2005-2016, ManyDesigns srl";
 
-    protected DateMidnight firstDay;
+    protected LocalDate firstDay;
     protected final List<EventDay> events = new LinkedList<EventDay>();
-
+    
     public AgendaView(DateTime referenceDateTime) {
-        firstDay = new DateMidnight(referenceDateTime);
+        firstDay = referenceDateTime.toLocalDate();
     }
 
     public int addEvent(Event event) {
-        DateMidnight day = new DateMidnight(event.getInterval().getStart());
+        DateTime day = event.getInterval().getStart();
         DateTime end = event.getInterval().getEnd();
         int added = 0;
         while(end.minus(1).compareTo(day) >= 0) {
-            if(addEvent(day, event)) {
+            if(addEvent(day.toLocalDate(), event)) {
                 added++;
             }
             day = day.plusDays(1);
         }
         return added;
     }
-
+    
+    @Deprecated
     protected boolean addEvent(DateMidnight date, Event event) {
+        return addEvent(date.toLocalDate(), event);
+    }
+
+    protected boolean addEvent(LocalDate date, Event event) {
         if(date.isBefore(firstDay)) {
             return false;
         }
         int position = 0;
         for(EventDay eventDay : events) {
-            int cmp = eventDay.getDay().compareTo(date);
+            int cmp = eventDay.getDay().compareTo(date.toDateTimeAtStartOfDay());
             if(cmp == 0) {
                 eventDay.getEvents().add(event);
                 return true;
@@ -94,7 +100,7 @@ public class AgendaView {
         return events;
     }
 
-    public DateMidnight getFirstDay() {
+    public LocalDate getFirstDay() {
         return firstDay;
     }
 }

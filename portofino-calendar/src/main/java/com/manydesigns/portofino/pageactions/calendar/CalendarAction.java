@@ -68,7 +68,7 @@ public class CalendarAction extends AbstractPageAction {
 
     protected MonthView monthView;
     protected AgendaView agendaView;
-    protected DateTime referenceDateTime = new DateTime(DateTimeZone.UTC);
+    protected DateTime referenceDateTime = new DateTime();
     protected final List<Calendar> calendars = new ArrayList<Calendar>();
     protected final List<Event> events = new ArrayList<Event>();
 
@@ -161,7 +161,7 @@ public class CalendarAction extends AbstractPageAction {
         calendarViewType = "agenda";
         agendaView = new AgendaView(referenceDateTime);
         int maxEvents = getConfiguration().getEstimateEventsPerPageInAgendaView();
-        loadObjects(agendaView.getFirstDay().toDateTime(), maxEvents);
+        loadObjects(agendaView.getFirstDay().toDateTimeAtStartOfDay(), maxEvents);
         int added = 0;
         for(Event event : events) {
             added += agendaView.addEvent(event);
@@ -194,7 +194,7 @@ public class CalendarAction extends AbstractPageAction {
     }
 
     public Resolution today() {
-        referenceDateTime = new DateTime(DateTimeZone.UTC);
+        referenceDateTime = new DateTime();
         return execute();
     }
 
@@ -223,7 +223,7 @@ public class CalendarAction extends AbstractPageAction {
     }
 
     public void setReferenceDateTimeLong(long millis) {
-        this.referenceDateTime = new DateTime(millis, DateTimeZone.UTC);
+        this.referenceDateTime = new DateTime(millis);
     }
 
     public List<Calendar> getCalendars() {

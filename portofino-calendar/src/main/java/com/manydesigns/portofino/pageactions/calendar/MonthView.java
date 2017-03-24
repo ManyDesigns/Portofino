@@ -23,9 +23,9 @@ package com.manydesigns.portofino.pageactions.calendar;
 import com.manydesigns.portofino.calendar.AbstractDay;
 import com.manydesigns.portofino.calendar.AbstractMonthView;
 import com.manydesigns.portofino.calendar.AbstractWeek;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 
 import java.util.*;
 
@@ -61,7 +61,7 @@ public class MonthView extends AbstractMonthView<MonthView.MonthViewWeek> {
     }
 
     @Override
-    protected MonthViewWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+    protected MonthViewWeek createWeek(LocalDate weekStart, LocalDate weekEnd) {
         return new MonthViewWeek(weekStart, weekEnd);
     }
 
@@ -125,7 +125,7 @@ public class MonthView extends AbstractMonthView<MonthView.MonthViewWeek> {
     public class MonthViewWeek extends AbstractWeek<MonthViewDay> {
         final List<EventWeek> eventWeekOverlaps;
 
-        public MonthViewWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+        public MonthViewWeek(LocalDate weekStart, LocalDate weekEnd) {
             super(weekStart, weekEnd);
             eventWeekOverlaps = new ArrayList<EventWeek>();
         }
@@ -136,7 +136,7 @@ public class MonthView extends AbstractMonthView<MonthView.MonthViewWeek> {
         }
 
         @Override
-        protected MonthViewDay createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        protected MonthViewDay createDay(LocalDate dayStart, LocalDate dayEnd) {
             return new MonthViewDay(dayStart, dayEnd);
         }
 
@@ -197,7 +197,7 @@ public class MonthView extends AbstractMonthView<MonthView.MonthViewWeek> {
                 }
 
                 boolean continues =
-                        event.getInterval().getEnd().isAfter(weekEnd);
+                        event.getInterval().getEnd().isAfter(weekEnd.toDateTimeAtStartOfDay());
 
                 EventWeek eventWeek =
                         new EventWeek(event, startDay, endDay, continues);
@@ -256,7 +256,7 @@ public class MonthView extends AbstractMonthView<MonthView.MonthViewWeek> {
     public class MonthViewDay extends AbstractDay {
         final List<EventWeek> slots;
 
-        public MonthViewDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        public MonthViewDay(LocalDate dayStart, LocalDate dayEnd) {
             super(dayStart, dayEnd);
             slots = new ArrayList<EventWeek>();
         }

@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.calendar;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -30,22 +30,22 @@ import org.joda.time.Interval;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class AbstractDay {
-    final DateMidnight dayStart;
-    final DateMidnight dayEnd;
+    final LocalDate dayStart;
+    final LocalDate dayEnd;
     final Interval dayInterval;
 
-    public AbstractDay(DateMidnight dayStart, DateMidnight dayEnd) {
+    public AbstractDay(LocalDate dayStart, LocalDate dayEnd) {
         this.dayStart = dayStart;
         this.dayEnd = dayEnd;
-        dayInterval = new Interval(dayStart, dayEnd);
+        dayInterval = new Interval(dayStart.toDateTimeAtStartOfDay(), dayEnd.toDateTimeAtStartOfDay());
         AbstractMonthView.logger.debug("Day interval: {}", dayInterval);
     }
 
-    public DateMidnight getDayStart() {
+    public LocalDate getDayStart() {
         return dayStart;
     }
 
-    public DateMidnight getDayEnd() {
+    public LocalDate getDayEnd() {
         return dayEnd;
     }
 

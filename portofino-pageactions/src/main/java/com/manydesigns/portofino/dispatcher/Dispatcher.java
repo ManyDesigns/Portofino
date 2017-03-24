@@ -127,7 +127,7 @@ public class Dispatcher {
                     pagePath.add(currentPageInstance);
                 }
             } catch (Exception e) {
-                logger.debug("Couldn't create dispatch", e);
+                logger.error("Couldn't create dispatch", e);
                 return null;
             }
         }

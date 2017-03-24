@@ -21,9 +21,9 @@
 package com.manydesigns.portofino.calendar;
 
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +39,8 @@ public abstract class AbstractWeek<U extends AbstractDay> {
     // Fields
     //--------------------------------------------------------------------------
 
-    final DateMidnight weekStart;
-    protected final DateMidnight weekEnd;
+    final LocalDate weekStart;
+    protected final LocalDate weekEnd;
     protected final Interval weekInterval;
     protected final U[] days;
 
@@ -55,17 +55,17 @@ public abstract class AbstractWeek<U extends AbstractDay> {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public AbstractWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+    public AbstractWeek(LocalDate weekStart, LocalDate weekEnd) {
         this.weekStart = weekStart;
         this.weekEnd = weekEnd;
-        weekInterval = new Interval(weekStart, weekEnd);
+        weekInterval = new Interval(weekStart.toDateTimeAtStartOfDay(), weekEnd.toDateTimeAtStartOfDay());
         AbstractMonthView.logger.debug("Week interval: {}", weekInterval);
 
         AbstractMonthView.logger.debug("Initializing days");
         days = createDaysArray(7);
-        DateMidnight dayStart = weekStart;
+        LocalDate dayStart = weekStart;
         for (int i = 0; i < 7; i++) {
-            DateMidnight dayEnd = dayStart.plusDays(1);
+            LocalDate dayEnd = dayStart.plusDays(1);
             days[i] = createDay(dayStart, dayEnd);
 
             dayStart = dayEnd;
@@ -74,7 +74,7 @@ public abstract class AbstractWeek<U extends AbstractDay> {
 
     protected abstract U[] createDaysArray(int size);
 
-    protected abstract U createDay(DateMidnight dayStart, DateMidnight dayEnd);
+    protected abstract U createDay(LocalDate dayStart, LocalDate dayEnd);
 
     public U findDayByDateTime(@NotNull DateTime dateTime) {
         if (!weekInterval.contains(dateTime)) {
@@ -90,11 +90,11 @@ public abstract class AbstractWeek<U extends AbstractDay> {
     }
 
 
-    public DateMidnight getWeekStart() {
+    public LocalDate getWeekStart() {
         return weekStart;
     }
 
-    public DateMidnight getWeekEnd() {
+    public LocalDate getWeekEnd() {
         return weekEnd;
     }
 

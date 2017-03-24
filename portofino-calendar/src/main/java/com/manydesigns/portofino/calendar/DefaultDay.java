@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.calendar;
 
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -29,7 +29,7 @@ import org.joda.time.DateMidnight;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class DefaultDay extends AbstractDay {
-    public DefaultDay(DateMidnight dayStart, DateMidnight dayEnd) {
+    public DefaultDay(LocalDate dayStart, LocalDate dayEnd) {
         super(dayStart, dayEnd);
     }
 }

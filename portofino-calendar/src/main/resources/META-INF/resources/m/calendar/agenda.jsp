@@ -9,6 +9,7 @@
 <%@ page import="java.text.MessageFormat" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="com.manydesigns.portofino.calendar.PresentationHelper" %>
+<%@ page import="org.joda.time.Duration" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -221,7 +222,11 @@
             startPrinted = true;
         }
         if(end.isBefore(day.getDay().plusDays(1))) {
-            if(startPrinted) {
+            if(new Duration(start, end).isShorterThan(new Duration(60000))) {
+                if(!startPrinted) {
+                    xhtmlBuffer.write(hhmmFormatter.print(start));
+                }
+            } else if(startPrinted) {
                 xhtmlBuffer.write(" - " + hhmmFormatter.print(end));
             } else {
                 String msg = MessageFormat.format

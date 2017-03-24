@@ -1,4 +1,3 @@
-<%@ page import="org.joda.time.DateMidnight" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="net.sourceforge.stripes.action.ActionBean" %>
 <%@ page import="java.util.List" %>

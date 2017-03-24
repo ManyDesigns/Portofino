@@ -20,7 +20,8 @@
 
 package com.manydesigns.portofino.pageactions.calendar;
 
-import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +40,14 @@ public class EventDay {
     // Fields
     //--------------------------------------------------------------------------
 
-    protected final DateMidnight day;
+    protected final LocalDate day;
     protected final List<Event> events = new ArrayList<Event>();
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public EventDay(DateMidnight day, Event event) {
+    public EventDay(LocalDate day, Event event) {
         this.day = day;
         events.add(event);
     }
@@ -60,8 +61,8 @@ public class EventDay {
         return events;
     }
 
-    public DateMidnight getDay() {
-        return day;
+    public DateTime getDay() {
+        return day.toDateTimeAtStartOfDay();
     }
 
 }

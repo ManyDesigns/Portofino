@@ -4,7 +4,6 @@
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.EventWeek" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.MonthView" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.joda.time.DateMidnight" %>
 <%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.Interval" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
@@ -13,6 +12,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="com.manydesigns.portofino.calendar.PresentationHelper" %>
+<%@ page import="org.joda.time.LocalDate" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -143,7 +143,7 @@
         <tr>
             <%
                 for(int i = 0; i < 7; i++) {
-                    DateMidnight dayOfWeek = monthView.getWeek(0).getDay(i).getDayStart();
+                    LocalDate dayOfWeek = monthView.getWeek(0).getDay(i).getDayStart();
                     xhtmlBuffer.openElement("th");
                     xhtmlBuffer.write(dayOfWeekFormatter.print(dayOfWeek));
                     xhtmlBuffer.closeElement("th");
@@ -176,7 +176,7 @@
                         for(int i = 0; i < 7; i++) {
                             MonthView.MonthViewDay day = week.getDay(i);
                             xhtmlBuffer.openElement("th");
-                            if(!monthInterval.contains(day.getDayStart())) {
+                            if(!monthInterval.contains(day.getDayStart().toDateTimeAtStartOfDay())) {
                                 xhtmlBuffer.addAttribute("class", "outOfMonth");
                             }
                             int dayOfMonth = day.getDayStart().getDayOfMonth();
@@ -271,15 +271,15 @@
                 }
                 Event event = eventWeek.getEvent();
                 DateTime start = event.getInterval().getStart();
-                if(day.getDayStart().isAfter(start)) {
-                    start = day.getDayStart().toDateTime();
+                if(day.getDayStart().toDateTimeAtStartOfDay().isAfter(start)) {
+                    start = day.getDayStart().toDateTimeAtStartOfDay();
                 }
                 DateTime end = event.getInterval().getEnd();
                 dialogIds[i] = writeEventDialog(
                     monthView, day, xhtmlBuffer, eventWeek, start, end, hhmmFormatter);
             }
 
-            dialogId = "more-events-dialog-" + day.getDayStart().getMillis();
+            dialogId = "more-events-dialog-" + day.getDayStart().toDateTimeAtStartOfDay().getMillis();
             PresentationHelper.openDialog(xhtmlBuffer, dialogId, null);
 
             // modal-header
@@ -523,8 +523,8 @@
         //Event content
         Event event = eventWeek.getEvent();
         DateTime start = event.getInterval().getStart();
-        if(day.getDayStart().isAfter(start)) {
-            start = day.getDayStart().toDateTime();
+        if(day.getDayStart().toDateTimeAtStartOfDay().isAfter(start)) {
+            start = day.getDayStart().toDateTimeAtStartOfDay();
         }
 
         DateTimeFormatter hhmmFormatter = getHoursMinutesFormatter();

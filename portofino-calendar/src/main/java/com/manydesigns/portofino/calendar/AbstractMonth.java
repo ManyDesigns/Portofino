@@ -21,9 +21,7 @@
 package com.manydesigns.portofino.calendar;
 
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateMidnight;
-import org.joda.time.Days;
-import org.joda.time.Interval;
+import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +39,10 @@ public abstract class AbstractMonth<T extends AbstractDay> {
     // Fields
     //--------------------------------------------------------------------------
 
-    final DateMidnight referenceDateMidnight;
+    final LocalDate referenceDateMidnight;
 
-    final DateMidnight monthStart;
-    final DateMidnight monthEnd;
+    final LocalDate monthStart;
+    final LocalDate monthEnd;
     final Interval monthInterval;
     final int daysCount;
 
@@ -61,23 +59,23 @@ public abstract class AbstractMonth<T extends AbstractDay> {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public AbstractMonth(DateMidnight referenceDateMidnight) {
+    public AbstractMonth(LocalDate referenceDateMidnight) {
         logger.debug("Initializing month");
         this.referenceDateMidnight = referenceDateMidnight;
         logger.debug("Reference date midnight: {}", referenceDateMidnight);
 
         monthStart = referenceDateMidnight.withDayOfMonth(1);
         monthEnd = monthStart.plusMonths(1);
-        monthInterval = new Interval(monthStart, monthEnd);
+        monthInterval = new Interval(monthStart.toDateTimeAtStartOfDay(), monthEnd.toDateTimeAtStartOfDay());
         logger.debug("Month interval: {}", monthInterval);
 
         daysCount = Days.daysIn(monthInterval).getDays();
         logger.debug("Initializing {} days", daysCount);
 
         days = createDaysArray(daysCount);
-        DateMidnight dayStart = monthStart;
+        LocalDate dayStart = monthStart;
         for (int i = 0; i < daysCount; i++) {
-            DateMidnight dayEnd = dayStart.plusDays(1);
+            LocalDate dayEnd = dayStart.plusDays(1);
             days[i] = createDay(dayStart, dayEnd);
 
             // advance to next day
@@ -87,11 +85,12 @@ public abstract class AbstractMonth<T extends AbstractDay> {
 
     protected abstract T[] createDaysArray(int size);
 
-    protected abstract T createDay(DateMidnight dayStart, DateMidnight dayEnd);
+    protected abstract T createDay(LocalDate dayStart, LocalDate dayEnd);
 
-    public T findDayByDate(@NotNull DateMidnight dateMidnight) {
+    public T findDayByDate(@NotNull LocalDate localDate) {
+        DateTime dateMidnight = localDate.toDateTimeAtStartOfDay();
         if (!monthInterval.contains(dateMidnight)) {
-            logger.debug("Date not in month interval: {}", dateMidnight);
+            logger.debug("Date not in month interval: {}", localDate);
             return null;
         }
         for (T current : days) {
@@ -99,7 +98,7 @@ public abstract class AbstractMonth<T extends AbstractDay> {
                 return current;
             }
         }
-        throw new InternalError("Date in month but not in month's days: " + dateMidnight);
+        throw new InternalError("Date in month but not in month's days: " + localDate);
     }
 
     //--------------------------------------------------------------------------
@@ -107,15 +106,15 @@ public abstract class AbstractMonth<T extends AbstractDay> {
     //--------------------------------------------------------------------------
 
 
-    public DateMidnight getReferenceDateMidnight() {
+    public LocalDate getReferenceDateMidnight() {
         return referenceDateMidnight;
     }
 
-    public DateMidnight getMonthStart() {
+    public LocalDate getMonthStart() {
         return monthStart;
     }
 
-    public DateMidnight getMonthEnd() {
+    public LocalDate getMonthEnd() {
         return monthEnd;
     }
 

@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.calendar;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,7 +47,7 @@ public class DefaultMonthView extends AbstractMonthView<DefaultWeek> {
     }
 
     @Override
-    protected DefaultWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+    protected DefaultWeek createWeek(LocalDate weekStart, LocalDate weekEnd) {
         return new DefaultWeek(weekStart, weekEnd);
     }
 

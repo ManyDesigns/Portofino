@@ -21,10 +21,7 @@
 package com.manydesigns.portofino.calendar;
 
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.Interval;
+import org.joda.time.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,19 +39,19 @@ public abstract class AbstractMonthView<T extends AbstractWeek> {
     // Fields
     //--------------------------------------------------------------------------
 
-    final DateTime     referenceDateTime;
-    final int          firstDayOfWeek;
-    final DateMidnight referenceDateMidnight;
-    final int          referenceYear;
-    final int          referenceMonth;
+    final DateTime  referenceDateTime;
+    final int       firstDayOfWeek;
+    final LocalDate referenceDateMidnight;
+    final int       referenceYear;
+    final int       referenceMonth;
 
-    final DateMidnight monthStart;
-    final DateMidnight monthEnd;
-    final Interval     monthInterval;
+    final LocalDate monthStart;
+    final LocalDate monthEnd;
+    final Interval  monthInterval;
 
-    final           DateMidnight monthViewStart;
-    final           DateMidnight monthViewEnd;
-    protected final Interval     monthViewInterval;
+    final           LocalDate monthViewStart;
+    final           LocalDate monthViewEnd;
+    protected final Interval  monthViewInterval;
 
     protected final T[] weeks;
 
@@ -80,25 +77,25 @@ public abstract class AbstractMonthView<T extends AbstractWeek> {
         this.firstDayOfWeek = firstDayOfWeek;
         logger.debug("First day of week: {}", firstDayOfWeek);
 
-        referenceDateMidnight = new DateMidnight(referenceDateTime);
+        referenceDateMidnight = new LocalDate(referenceDateTime);
         referenceYear = referenceDateTime.getYear();
         referenceMonth = referenceDateTime.getMonthOfYear();
 
         monthStart = referenceDateMidnight.withDayOfMonth(1);
         monthEnd = monthStart.plusMonths(1);
-        monthInterval = new Interval(monthStart, monthEnd);
+        monthInterval = new Interval(monthStart.toDateTimeAtStartOfDay(), monthEnd.toDateTimeAtStartOfDay());
 
         monthViewStart = monthStart.withDayOfWeek(firstDayOfWeek);
         monthViewEnd = monthViewStart.plusWeeks(6);
-        monthViewInterval = new Interval(monthViewStart, monthViewEnd);
+        monthViewInterval = new Interval(monthViewStart.toDateTimeAtStartOfDay(), monthViewEnd.toDateTimeAtStartOfDay());
         logger.debug("Month view start: {}", monthViewStart);
 
 
         logger.debug("Initializing weeks");
         weeks = createWeeksArray(6);
-        DateMidnight weekStart = monthViewStart;
+        LocalDate weekStart = monthViewStart;
         for (int i = 0; i < weeks.length; i++) {
-            DateMidnight weekEnd = weekStart.plusWeeks(1);
+            LocalDate weekEnd = weekStart.plusWeeks(1);
             weeks[i] = createWeek(weekStart, weekEnd);
 
             weekStart = weekEnd;
@@ -107,7 +104,7 @@ public abstract class AbstractMonthView<T extends AbstractWeek> {
 
     protected abstract T[] createWeeksArray(int size);
 
-    protected abstract T createWeek(DateMidnight weekStart, DateMidnight weekEnd);
+    protected abstract T createWeek(LocalDate weekStart, LocalDate weekEnd);
 
     public T findWeekByDateTime(@NotNull DateTime dateTime) {
         if (!monthViewInterval.contains(dateTime)) {
@@ -127,15 +124,15 @@ public abstract class AbstractMonthView<T extends AbstractWeek> {
     //--------------------------------------------------------------------------
 
 
-    public DateMidnight getReferenceDateMidnight() {
+    public LocalDate getReferenceDateMidnight() {
         return referenceDateMidnight;
     }
 
-    public DateMidnight getMonthStart() {
+    public LocalDate getMonthStart() {
         return monthStart;
     }
 
-    public DateMidnight getMonthEnd() {
+    public LocalDate getMonthEnd() {
         return monthEnd;
     }
 
@@ -147,11 +144,11 @@ public abstract class AbstractMonthView<T extends AbstractWeek> {
         return monthViewInterval;
     }
 
-    public DateMidnight getMonthViewStart() {
+    public LocalDate getMonthViewStart() {
         return monthViewStart;
     }
 
-    public DateMidnight getMonthViewEnd() {
+    public LocalDate getMonthViewEnd() {
         return monthViewEnd;
     }
 
