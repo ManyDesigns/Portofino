@@ -102,18 +102,7 @@ public abstract class AbstractDateSearchField extends RangeSearchField {
     }
 
     @Override
-    public void readFromRequest(HttpServletRequest req) {
-        minStringValue = StringUtils.trimToNull(req.getParameter(minInputName));
-        minValue = readDate(minStringValue);
-
-        maxStringValue = StringUtils.trimToNull(req.getParameter(maxInputName));
-        maxValue = readDate(maxStringValue);
-
-        searchNullValue = (NULL_VALUE.equals(minStringValue)
-                || NULL_VALUE.equals(maxStringValue));
-    }
-
-    protected Object readDate(String stringValue) {
+    protected Object readValue(String stringValue, Class type) {
         Object value;
         try {
             value = toDate(Util.parseDateTime(dateTimeFormatter, stringValue, containsTime));

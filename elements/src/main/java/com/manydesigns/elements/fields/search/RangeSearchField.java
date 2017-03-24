@@ -115,21 +115,29 @@ public class RangeSearchField extends AbstractSearchField {
         Class type = accessor.getType();
 
         minStringValue = StringUtils.trimToNull(req.getParameter(minInputName));
-        try {
-            minValue = OgnlUtils.convertValue(minStringValue, type);
-        } catch (Throwable e) {
-            minValue = null;
-        }
+        minValue = readValue(minStringValue, type);
 
         maxStringValue = StringUtils.trimToNull(req.getParameter(maxInputName));
-        try {
-            maxValue = OgnlUtils.convertValue(maxStringValue, type);
-        } catch (Throwable e) {
-            maxValue = null;
+        maxValue = readValue(maxStringValue, type);
+
+        if(minValue != null && maxValue != null) {
+            if(isGreaterThan(minValue, maxValue)) {
+                Object tmp = minValue;
+                minValue = maxValue;
+                maxValue = tmp;
+            }
         }
 
         searchNullValue = (NULL_VALUE.equals(minStringValue)
                 || NULL_VALUE.equals(maxStringValue));
+    }
+
+    protected Object readValue(String parameter, Class type) {
+        try {
+            return OgnlUtils.convertValue(parameter, type);
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public boolean validate() {
@@ -154,6 +162,14 @@ public class RangeSearchField extends AbstractSearchField {
             criteria.ge(accessor, minValue);
         } else if (maxValue != null) {
             criteria.le(accessor, maxValue);
+        }
+    }
+
+    protected boolean isGreaterThan(Object v1, Object v2) {
+        if(v1 instanceof Comparable) {
+            return ((Comparable) v1).compareTo(v2) > 0;
+        } else {
+            return false;
         }
     }
     

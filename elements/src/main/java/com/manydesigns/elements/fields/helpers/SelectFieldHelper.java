@@ -53,7 +53,7 @@ public class SelectFieldHelper implements FieldHelper {
                                                    PropertyAccessor propertyAccessor,
                                                    String prefix) {
         if (propertyAccessor.isAnnotationPresent(Select.class) || propertyAccessor.getType().isEnum()) {
-                return new SelectSearchField(propertyAccessor, prefix);
+            return new SelectSearchField(propertyAccessor, prefix);
         }
         return null;
     }

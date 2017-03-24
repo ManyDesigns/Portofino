@@ -138,7 +138,6 @@ public class SearchFormBuilder extends AbstractFormBuilder {
             configReflectiveFields();
         }
 
-
         Map<String, SearchField> fieldMap = new HashMap<String,SearchField>();
         for (PropertyAccessor propertyAccessor : propertyAccessors) {
             SearchField field = null;
