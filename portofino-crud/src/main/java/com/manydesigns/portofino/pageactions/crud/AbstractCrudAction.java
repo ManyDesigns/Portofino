@@ -2028,8 +2028,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Returns values to update multiple related select fields or a single autocomplete
-     * text field, in JSON form.
+     * Returns values to update multiple a single select or autocomplete field, in JSON form.
+     * Note that, for autocomplete fields, it expects the autocomplete value
+     * as a request parameter with the field's name. See {@link #jsonOptions(String, int, String, boolean)}.
+     * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
      * @param prefix form prefix, to read values from the request.
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
@@ -2037,16 +2039,41 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return a Resolution to produce the JSON.
      */
     @GET
-    @Path(":selectionProvider/{selectionProviderName}{separator : /?}{selectionProviderIndex : (\\d*)}")
+    @Path(":selectionProvider/{selectionProviderName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Resolution jsonOptions(
             @PathParam("selectionProviderName") String selectionProviderName,
             @QueryParam("prefix") String prefix,
+            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt
+    ) {
+        return jsonOptions(selectionProviderName, selectionProviderIndex, prefix, includeSelectPrompt);
+    }
+    
+    /**
+     * Returns values to update multiple related select fields or a single autocomplete
+     * text field, in JSON form. Note that, for autocomplete fields, it expects the autocomplete value 
+     * as a request parameter with the field's name.
+     * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
+     * @param selectionProviderIndex index of the selection field (in case of multiple-valued selection providers,
+     *                               otherwise it is always 0 and you can use
+     *                               {@link #jsonOptions(String, String, boolean)}).
+     * @param prefix form prefix, to read values from the request.
+     * @param includeSelectPrompt controls if the first option is a label with no value indicating
+     * what field is being selected. For combo boxes you would generally pass true as the value of
+     * this parameter; for autocomplete fields, you would likely pass false.
+     * @return a Resolution to produce the JSON.
+     */
+    @GET
+    @Path(":selectionProvider/{selectionProviderName}/{selectionProviderIndex : (\\d+)}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Resolution jsonOptions(
+            @PathParam("selectionProviderName") String selectionProviderName,
+            @PathParam("selectionProviderIndex") int selectionProviderIndex,
+            @QueryParam("prefix") String prefix,
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider =
-                    current.getSelectionProvider();
+            SelectionProvider selectionProvider = current.getSelectionProvider();
             if (selectionProvider.getName().equals(selectionProviderName)) {
                 crudSelectionProvider = current;
                 break;
@@ -2056,8 +2083,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return new ErrorResolution(404);
         }
 
-        SelectionProvider selectionProvider =
-                crudSelectionProvider.getSelectionProvider();
+        SelectionProvider selectionProvider = crudSelectionProvider.getSelectionProvider();
         String[] fieldNames = crudSelectionProvider.getFieldNames();
 
         Form form = buildForm(createFormBuilder()
@@ -2066,15 +2092,18 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .configPrefix(prefix)
                 .configMode(Mode.EDIT));
 
-        FieldSet fieldSet = form.get(0);
+        FieldSet fieldSet = form.get(0); //Guaranteed to be the only one per the code above
         //Ensure the value is actually read from the request
         for(Field field : fieldSet.fields()) {
             field.setUpdatable(true);
         }
         form.readFromRequest(context.getRequest());
-
-        SelectField targetField =
-                (SelectField) fieldSet.get(selectionProviderIndex);
+        
+        //The form only contains fields from the selection provider, so the index matches that of the field
+        if(selectionProviderIndex < 0 || selectionProviderIndex >= fieldSet.size()) {
+            return new ErrorResolution(400, "Invalid index");
+        }
+        SelectField targetField = (SelectField) fieldSet.get(selectionProviderIndex);
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
