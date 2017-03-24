@@ -76,10 +76,11 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     public TypeDescriptor getDatabaseSpecificType(Column column) {
         if ("JSONB".equalsIgnoreCase(column.getColumnType())) {
             Properties typeParams = new Properties();
-            typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Map.class));
             if(column.getActualJavaType() == Map.class) {
+                typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Map.class));
                 return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonUserType", typeParams);
             } else if(column.getActualJavaType() == List.class) {
+                typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Object.class));
                 return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonListUserType", typeParams);
             } else {
                 logger.warn("Unsupported column data type: " + column.getActualJavaType());
