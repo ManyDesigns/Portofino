@@ -499,7 +499,7 @@ public class DatabaseSyncer {
                     Field field = Types.class.getField(jdbcTypeName);
                     jdbcType = (Integer) field.get(null);
                 } catch (Exception e) {
-                    logger.warn("Could not determine type (type name = {})", jdbcTypeName);
+                    logger.debug("Could not determine JDBC type (type name = {})", jdbcTypeName);
                 }
             }
             targetColumn.setJdbcType(jdbcType);

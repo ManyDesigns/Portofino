@@ -123,7 +123,7 @@ public class Column implements ModelObject, Annotated {
                 logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
             }
         } else {
-            actualJavaType = Type.getDefaultJavaType(jdbcType, length, scale);
+            actualJavaType = Type.getDefaultJavaType(jdbcType, columnType, length, scale);
             if (actualJavaType == null) {
                 logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
                         new Object[]{table.getTableName(),

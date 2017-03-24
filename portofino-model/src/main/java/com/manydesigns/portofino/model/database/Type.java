@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model.database;
 
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,8 @@ import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.List;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -125,10 +128,10 @@ public class Type {
     }
 
     public Class getDefaultJavaType() {
-        return getDefaultJavaType(jdbcType, maximumPrecision, maximumScale);
+        return getDefaultJavaType(jdbcType, typeName, maximumPrecision, maximumScale);
     }
 
-    public static @Nullable Class getDefaultJavaType(int jdbcType, Integer precision, Integer scale) {
+    public static @Nullable Class getDefaultJavaType(int jdbcType, String databaseType, Integer precision, Integer scale) {
         switch (jdbcType) {
             case Types.BIGINT:
                 return Long.class;
@@ -186,9 +189,14 @@ public class Type {
             case Types.JAVA_OBJECT:
                 return Object.class;
             case Types.NULL:
-            case Types.OTHER:
             case Types.REF:
                 return java.sql.Ref.class;
+            case Types.OTHER:
+                if("JSONB".equalsIgnoreCase(databaseType)) { //TODO make configurable by modules
+                    return String.class;
+                } else {
+                    return java.sql.Ref.class;
+                }
             case Types.STRUCT:
                 return java.sql.Struct.class;
             default:
@@ -214,6 +222,36 @@ public class Type {
         }
     }
 
+    public Class[] getAvailableJavaTypes(Integer length) {
+        if(isNumeric()) {
+            return new Class[] {
+                    Integer.class, Long.class, Byte.class, Short.class,
+                    Float.class, Double.class, BigInteger.class, BigDecimal.class,
+                    Boolean.class };
+        } else {
+            if("JSONB".equalsIgnoreCase(typeName)) { //TODO make configurable by modules
+                return new Class[] { String.class, Map.class, List.class };
+            }
+            Class defaultJavaType = getDefaultJavaType();
+            if(defaultJavaType == String.class) {
+                if(length != null && length < 256) {
+                    return new Class[] { String.class, Boolean.class };
+                } else {
+                    return new Class[] { String.class };
+                }
+            } else if(defaultJavaType == Timestamp.class) {
+                return new Class[] { Timestamp.class, java.sql.Date.class, DateTime.class };
+            } else if(defaultJavaType == java.sql.Date.class) {
+                return new Class[] { java.sql.Date.class, Timestamp.class, DateTime.class };
+            } else {
+                if(defaultJavaType != null) {
+                    return new Class[] { defaultJavaType };
+                } else {
+                    return new Class[] { Object.class };
+                }
+            }
+        }
+    }
 
     public boolean isAutoincrement() {
         return autoincrement;

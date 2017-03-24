@@ -673,10 +673,10 @@ public class TablesAction extends AbstractActionBean {
 
     protected void configureTypesSelectionProvider(DefaultSelectionProvider typesSP, ColumnForm columnForm) {
         Type type = columnForm.getType();
-        Class[] javaTypes = getAvailableJavaTypes(type, columnForm.getLength());
+        Class[] javaTypes = type.getAvailableJavaTypes(columnForm.getLength());
         Integer precision = columnForm.getLength();
         Integer scale = columnForm.getScale();
-        Class defaultJavaType = Type.getDefaultJavaType(columnForm.getJdbcType(), precision, scale);
+        Class defaultJavaType = Type.getDefaultJavaType(columnForm.getJdbcType(), columnForm.getColumnType(), precision, scale);
         if(defaultJavaType == null) {
             defaultJavaType = Object.class;
         }
@@ -747,32 +747,6 @@ public class TablesAction extends AbstractActionBean {
             cf = new ColumnForm(column, columnAccessor, type);
         }
         return cf;
-    }
-
-    protected Class[] getAvailableJavaTypes(Type type, Integer length) {
-        if(type.isNumeric()) {
-            return new Class[] {
-                    Integer.class, Long.class, Byte.class, Short.class,
-                    Float.class, Double.class, BigInteger.class, BigDecimal.class,
-                    Boolean.class };
-        } else if(type.getDefaultJavaType() == String.class) {
-            if(length != null && length < 256) {
-                return new Class[] { String.class, Boolean.class };
-            } else {
-                return new Class[] { String.class };
-            }
-        } else if(type.getDefaultJavaType() == Timestamp.class) {
-            return new Class[] { Timestamp.class, java.sql.Date.class, DateTime.class };
-        } else if(type.getDefaultJavaType() == java.sql.Date.class) {
-            return new Class[] { java.sql.Date.class, Timestamp.class, DateTime.class };
-        } else {
-            Class defaultJavaType = type.getDefaultJavaType();
-            if(defaultJavaType != null) {
-                return new Class[] { defaultJavaType };
-            } else {
-                return new Class[] { Object.class };
-            }
-        }
     }
 
     protected String[] getApplicableAnnotations(Class type) {

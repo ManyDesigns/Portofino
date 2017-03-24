@@ -20,12 +20,12 @@
 
 package com.manydesigns.portofino.persistence.hibernate;
 
-
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.StringBooleanType;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.ForeignKey;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import liquibase.structure.core.ForeignKeyConstraintType;
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
@@ -60,6 +60,7 @@ import java.util.Set;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Angelo    Lupo       - angelo.lupo@manydesigns.com
  * @author Paolo     Predonzani - paolo.predonzani@manydesigns.com
+ * @author Alessio   Stalla     - alessio.stalla@manydesigns.com
  */
 public class HibernateConfig {
 
@@ -213,7 +214,7 @@ public class HibernateConfig {
             
             //First param = null ==> doesn't really set anything, just check
             boolean hibernateTypeOk =
-                    setHibernateType(null, modelColumn, javaType, jdbcType);
+                    setHibernateType(null, modelColumn);
             if (hibernateTypeOk) {
                 columnList.add(modelColumn);
             } else {
@@ -278,7 +279,7 @@ public class HibernateConfig {
         col.setSqlType(columnType);
 
         SimpleValue value = new SimpleValue(mappings, tab);
-        if (!setHibernateType(value, column, column.getActualJavaType(), jdbcType)) {
+        if (!setHibernateType(value, column)) {
             logger.error("Skipping column {}", column.getQualifiedName());
             return null;
         }
@@ -874,10 +875,10 @@ public class HibernateConfig {
         return "`"+name+"`";
     }
 
-    public boolean setHibernateType(@Nullable SimpleValue value,
-                                 com.manydesigns.portofino.model.database.Column column,
-                                 Class javaType,
-                                 final int jdbcType) {
+    public boolean setHibernateType(
+            @Nullable SimpleValue value, com.manydesigns.portofino.model.database.Column column) {
+        Class javaType = column.getActualJavaType();
+        int jdbcType = column.getJdbcType();
         String typeName;
         Properties typeParams = null;
         if(javaType == null) {
@@ -937,7 +938,14 @@ public class HibernateConfig {
         } else if (javaType == byte[].class) {
             typeName = BinaryType.INSTANCE.getName();
         } else {
-            typeName = null;
+            DatabasePlatform.TypeDescriptor databaseSpecificType =
+                    connectionProvider.getDatabasePlatform().getDatabaseSpecificType(column);
+            if(databaseSpecificType != null) {
+                typeName = databaseSpecificType.name;
+                typeParams = databaseSpecificType.parameters;
+            } else {
+                typeName = null;
+            }
         }
 
         if (typeName == null) {
@@ -975,4 +983,5 @@ public class HibernateConfig {
     public void setFalseString(String falseString) {
         this.falseString = falseString;
     }
+
 }

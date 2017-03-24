@@ -37,6 +37,7 @@ import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.json.JsonKeyValueAccessor;
 import org.apache.commons.lang.ObjectUtils;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -71,6 +72,9 @@ public class FormUtil {
             Object value = field.getValue();
             if(value instanceof Date) {
                 value = ((Date) value).getTime();
+            }
+            if(value instanceof DateTime) {
+                value = ((DateTime) value).getMillis();
             }
             String displayValue = field.getDisplayValue();
             String href = field.getHref();

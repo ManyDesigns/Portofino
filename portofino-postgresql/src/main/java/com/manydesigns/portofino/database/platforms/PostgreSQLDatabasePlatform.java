@@ -20,14 +20,19 @@
 
 package com.manydesigns.portofino.database.platforms;
 
+import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
+import com.manydesigns.portofino.persistence.hibernate.ColumnParameterType;
 import org.hibernate.dialect.PostgreSQL82Dialect;
+import org.hibernate.usertype.DynamicParameterizedType;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,6 +70,22 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
         return "PostgreSQL".equals(connectionProvider.getDatabaseProductName());
+    }
+
+    @Override
+    public TypeDescriptor getDatabaseSpecificType(Column column) {
+        if ("JSONB".equalsIgnoreCase(column.getColumnType())) {
+            Properties typeParams = new Properties();
+            typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Map.class));
+            if(column.getActualJavaType() == Map.class) {
+                return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonUserType", typeParams);
+            } else if(column.getActualJavaType() == List.class) {
+                return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonListUserType", typeParams);
+            } else {
+                logger.warn("Unsupported column data type: " + column.getActualJavaType());
+            }
+        }
+        return super.getDatabaseSpecificType(column);
     }
 
     @Override

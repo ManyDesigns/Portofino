@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model.database.platforms;
 
+import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.Dialect;
@@ -106,6 +107,11 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
     public String getStatus() {
         return status;
+    }
+
+    @Override
+    public TypeDescriptor getDatabaseSpecificType(Column column) {
+        return null;
     }
 
     public Dialect getHibernateDialect() {

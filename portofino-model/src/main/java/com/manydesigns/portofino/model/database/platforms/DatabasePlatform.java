@@ -21,12 +21,14 @@
 package com.manydesigns.portofino.model.database.platforms;
 
 import com.manydesigns.elements.annotations.Status;
+import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.hibernate.dialect.Dialect;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,13 +37,12 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public interface DatabasePlatform {
-    public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2016, ManyDesigns srl";
 
-    final static String STATUS_CREATED = "created";
-    final static String STATUS_OK = "ok";
-    final static String STATUS_DRIVER_NOT_FOUND = "driver not found";
-    final static String STATUS_DRIVER_ERROR = "driver error";
+    String STATUS_CREATED = "created";
+    String STATUS_OK = "ok";
+    String STATUS_DRIVER_NOT_FOUND = "driver not found";
+    String STATUS_DRIVER_ERROR = "driver error";
 
     String getDescription();
     String getStandardDriverClassName();
@@ -57,10 +58,23 @@ public interface DatabasePlatform {
     @Status(red={STATUS_DRIVER_ERROR}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
     String getStatus();
 
+    TypeDescriptor getDatabaseSpecificType(Column column);
+    
     void test();
     boolean isApplicable(ConnectionProvider connectionProvider);
     void shutdown(ConnectionProvider connectionProvider);
 
     List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException;
+    
+    class TypeDescriptor {
+        
+        public final String name;
+        public final Properties parameters;
+
+        public TypeDescriptor(String name, Properties parameters) {
+            this.name = name;
+            this.parameters = parameters;
+        }
+    }
 
 }

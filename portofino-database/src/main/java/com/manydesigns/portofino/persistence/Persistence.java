@@ -287,10 +287,8 @@ public class Persistence {
             try {
                 ConnectionProvider connectionProvider = database.getConnectionProvider();
                 connectionProvider.init(databasePlatformsRegistry);
-                if (connectionProvider.getStatus()
-                        .equals(ConnectionProvider.STATUS_CONNECTED)) {
-                    HibernateConfig builder =
-                            new HibernateConfig(connectionProvider, configuration);
+                if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
+                    HibernateConfig builder = new HibernateConfig(connectionProvider, configuration);
                     String trueString = database.getTrueString();
                     if (trueString != null) {
                         builder.setTrueString(
