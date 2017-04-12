@@ -27,7 +27,7 @@ import java.lang.reflect.Type;
 public class XhtmlFragmentMessageBodyWriter implements MessageBodyWriter<XhtmlFragment> {
 
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

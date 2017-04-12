@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,7 +37,7 @@ import java.util.List;
 */
 public class OracleDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public final static String DESCRIPTION = "Oracle";
     public final static String STANDARD_DRIVER_CLASS_NAME =

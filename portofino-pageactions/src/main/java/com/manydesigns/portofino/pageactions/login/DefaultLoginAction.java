@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -55,7 +55,7 @@ import org.apache.commons.collections.MultiMap;
 @PageActionName("Login")
 public class DefaultLoginAction extends LoginAction implements PageAction {
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Properties

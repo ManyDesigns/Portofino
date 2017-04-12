@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 @RequiresAdministrator
 @UrlBinding(InfoAction.URL_BINDING)
 public class InfoAction extends AbstractActionBean {
-    public static final String copyright = "Copyright (C) 2005-2016, ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/admin/info";
 

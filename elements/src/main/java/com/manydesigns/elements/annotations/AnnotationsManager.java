@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -29,15 +29,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * A central registry that knows about all annotation implementations in Elements (listed in elements.properties).
+ * 
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ **/
 public class AnnotationsManager {
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     //**************************************************************************
     // Static fields

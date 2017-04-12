@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -39,7 +39,7 @@ import java.math.BigInteger;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"autoplay","autoplayInterval","height","width"})
 public class GalleryConfiguration implements PageActionConfiguration {
-    public static final String copyright = "Copyright (C) 2005-2016, ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
 
     //**************************************************************************
     // Fields

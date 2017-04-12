@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import org.joda.time.LocalDate;
  */
 public class DefaultMonthView extends AbstractMonthView<DefaultWeek> {
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public DefaultMonthView(DateTime referenceDateTime) {
         super(referenceDateTime);

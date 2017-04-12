@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -32,7 +32,7 @@ import org.jfree.data.general.PieDataset;
  */
 public class ChartPieGenerator extends Chart1DGenerator {
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     protected JFreeChart createChart(ChartDefinition chartDefinition, PieDataset dataset) {
         return ChartFactory.createPieChart(

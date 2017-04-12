@@ -120,6 +120,12 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>portofino-model/pom.xml</source>
+      <outputDirectory>portofino-model</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>portofino-mssql/pom.xml</source>
       <outputDirectory>portofino-mssql</outputDirectory>
       <destName>pom.xml</destName>
@@ -282,6 +288,13 @@
     <fileSet>
       <directory>portofino-mail/src/main</directory>
       <outputDirectory>portofino-mail/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-model/src/main</directory>
+      <outputDirectory>portofino-model/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -458,6 +471,13 @@
     <fileSet>
       <directory>portofino-mail/target/apidocs</directory>
       <outputDirectory>javadocs/portofino-mail</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-model/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-model</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

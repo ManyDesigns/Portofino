@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,7 +37,7 @@ import java.util.*;
 */
 public class DefaultSelectionProvider implements SelectionProvider {
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -170,7 +170,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     class DefaultSelectionModel implements SelectionModel {
         public static final String copyright =
-                "Copyright (C) 2005-2016, ManyDesigns srl";
+                "Copyright (C) 2005-2017 ManyDesigns srl";
 
         private final Object[] values;
         private final String[] labelSearches;

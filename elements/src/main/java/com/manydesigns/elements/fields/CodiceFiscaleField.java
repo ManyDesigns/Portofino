@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2016 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 */
 public class CodiceFiscaleField extends RegExpTextField {
     public static final String copyright =
-            "Copyright (C) 2005-2016, ManyDesigns srl";
+            "Copyright (C) 2005-2017 ManyDesigns srl";
 
     // regex per codice fiscale con gestione omocodie.
     public final static String codiceFiscaleRegExp =
