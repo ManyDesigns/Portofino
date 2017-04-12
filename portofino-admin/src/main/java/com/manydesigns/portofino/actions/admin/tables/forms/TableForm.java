@@ -58,21 +58,21 @@ public class TableForm extends Table {
     @RegExp(
         value = "(_|$|[a-z]|[A-Z]|[\u0080-\ufffe])(_|$|[a-z]|[A-Z]|[\u0080-\ufffe]|[0-9])*",
         errorMessage = "invalid.entity.name")
-    @LabelI18N("entity.name")
+    @Label("entity.name")
     public String getEntityName() {
         return super.getEntityName();
     }
 
     @Override
     @FieldSize(50)
-    @LabelI18N("java.class")
+    @Label("java.class")
     public String getJavaClass() {
         return super.getJavaClass();
     }
 
     @Override
     @FieldSize(50)
-    @LabelI18N("short.name")
+    @Label("short.name")
     public String getShortName() {
         return super.getShortName();
     }

@@ -81,7 +81,7 @@ public class GalleryConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("Autoplay")
-    @LabelI18N("autoplay")
+    @Label("autoplay")
     public Boolean getAutoplay() {
         return autoplay;
     }
@@ -93,7 +93,7 @@ public class GalleryConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("Autoplay")
-    @LabelI18N("interval")
+    @Label("interval")
     public Integer getAutoplayInterval() {
         return autoplayInterval;
     }
@@ -105,7 +105,7 @@ public class GalleryConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("Size")
-    @LabelI18N("width")
+    @Label("width")
     public Integer getWidth() {
         return width;
     }
@@ -117,7 +117,7 @@ public class GalleryConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("Size")
-    @LabelI18N("height")
+    @Label("height")
     public Integer getHeight() {
         return height;
     }

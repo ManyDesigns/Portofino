@@ -104,7 +104,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
     //**************************************************************************
     @Required
     @XmlAttribute(required = true)
-    @LabelI18N("name")
+    @Label("name")
     public String getName() {
         return name;
     }
@@ -115,7 +115,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
 
     @XmlAttribute(name = "type", required = true)
     @Required
-    @LabelI18N("type")
+    @Label("type")
     public String getType() {
         return type;
     }
@@ -126,7 +126,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
 
     @Required
     @XmlAttribute(required = true)
-    @LabelI18N("database")
+    @Label("database")
     public String getDatabase() {
         return database;
     }
@@ -136,7 +136,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
     }
 
     @Required
-    @LabelI18N("sql.query")
+    @Label("sql.query")
     @Multiline
     @XmlAttribute(required = true)
     @CssClass(BootstrapSizes.FILL_ROW)

@@ -154,6 +154,11 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     @Override
+    public String encryptPassword(String password) {
+        return ensureDelegate().encryptPassword(password);
+    }
+
+    @Override
     public Map<Serializable, String> getUsers() {
         return ensureDelegate().getUsers();
     }

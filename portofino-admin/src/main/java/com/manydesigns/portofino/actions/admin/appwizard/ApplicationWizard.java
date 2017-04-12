@@ -25,7 +25,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.fields.BooleanField;
@@ -1566,7 +1566,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return selectableSchemas;
     }
 
-    @LabelI18N("users.table")
+    @Label("users.table")
     public String getUserTableName() {
         return userTableName;
     }
@@ -1575,7 +1575,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userTableName = userTableName;
     }
 
-    @LabelI18N("groups.table")
+    @Label("groups.table")
     public String getGroupTableName() {
         return groupTableName;
     }
@@ -1592,7 +1592,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return userManagementSetupForm;
     }
 
-    @LabelI18N("username.property")
+    @Label("username.property")
     public String getUserNameProperty() {
         return userNameProperty;
     }
@@ -1601,7 +1601,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userNameProperty = userNameProperty;
     }
 
-    @LabelI18N("email.property")
+    @Label("email.property")
     public String getUserEmailProperty() {
         return userEmailProperty;
     }
@@ -1610,7 +1610,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userEmailProperty = userEmailProperty;
     }
 
-    @LabelI18N("token.property")
+    @Label("token.property")
     public String getUserTokenProperty() {
         return userTokenProperty;
     }
@@ -1619,7 +1619,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userTokenProperty = userTokenProperty;
     }
 
-    @LabelI18N("user.id.property")
+    @Label("user.id.property")
     public String getUserIdProperty() {
         return userIdProperty;
     }
@@ -1628,7 +1628,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userIdProperty = userIdProperty;
     }
 
-    @LabelI18N("password.property")
+    @Label("password.property")
     public String getUserPasswordProperty() {
         return userPasswordProperty;
     }
@@ -1645,7 +1645,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.groupIdProperty = groupIdProperty;
     }
 
-    @LabelI18N("user-group.join.table")
+    @Label("user-group.join.table")
     public String getUserGroupTableName() {
         return userGroupTableName;
     }
@@ -1662,7 +1662,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.groupNameProperty = groupNameProperty;
     }
 
-    @LabelI18N("property.that.links.to.group")
+    @Label("property.that.links.to.group")
     public String getGroupLinkProperty() {
         return groupLinkProperty;
     }
@@ -1671,7 +1671,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.groupLinkProperty = groupLinkProperty;
     }
 
-    @LabelI18N("property.that.links.to.user")
+    @Label("property.that.links.to.user")
     public String getUserLinkProperty() {
         return userLinkProperty;
     }
@@ -1680,7 +1680,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userLinkProperty = userLinkProperty;
     }
 
-    @LabelI18N("name.of.the.administrators.group")
+    @Label("name.of.the.administrators.group")
     public String getAdminGroupName() {
         return adminGroupName;
     }
@@ -1689,7 +1689,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.adminGroupName = adminGroupName;
     }
 
-    @LabelI18N("password.encryption.algorithm")
+    @Label("password.encryption.algorithm")
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }

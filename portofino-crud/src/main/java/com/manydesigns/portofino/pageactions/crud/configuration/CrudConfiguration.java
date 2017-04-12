@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud.configuration;
 
 import com.manydesigns.elements.annotations.CssClass;
-import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
@@ -51,12 +51,15 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     }
 
     @XmlElementWrapper(name="properties")
-    @XmlElement(name="property",type=CrudProperty.class)
+    @XmlElements({
+        @XmlElement(name="property",type=CrudProperty.class),
+        @XmlElement(name="virtual-property",type=VirtualCrudProperty.class),
+    })
     public List<CrudProperty> getProperties() {
         return properties;
     }
 
-    @LabelI18N("name")
+    @Label("name")
     @XmlAttribute(required = true)
     public String getName() {
         return name;

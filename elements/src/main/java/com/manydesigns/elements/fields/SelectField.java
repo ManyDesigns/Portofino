@@ -60,6 +60,7 @@ public class SelectField extends AbstractField<Object> {
 
     protected String autocompleteId;
     protected String autocompleteInputName;
+    protected String autocompleteInputValue;
 
     protected String createNewValueHref;
     protected String createNewValueText;
@@ -165,11 +166,11 @@ public class SelectField extends AbstractField<Object> {
             if (StringUtils.isEmpty(stringValue)) {
                 value = null;
                 //Attempt to find the value among the options
-                String userValue = req.getParameter(autocompleteInputName);
+                autocompleteInputValue = req.getParameter(autocompleteInputName);
                 Map<Object, SelectionModel.Option> options = selectionModel.getOptions(selectionModelIndex);
                 boolean found = false;
                 for(SelectionModel.Option option : options.values()) {
-                    if(ObjectUtils.equals(userValue, option.label)) {
+                    if(ObjectUtils.equals(autocompleteInputValue, option.label) && option.active) {
                         found = true;
                         value = option.value;
                     }
@@ -203,6 +204,10 @@ public class SelectField extends AbstractField<Object> {
         Object value = selectionModel.getValue(selectionModelIndex);
         if (required && value == null) {
             errors.add(getText("elements.error.field.required"));
+            return false;
+        }
+        if(value == null && !StringUtils.isBlank(autocompleteInputValue)) {
+            errors.add(getText("elements.error.field.invalid", autocompleteInputValue));
             return false;
         }
         return true;

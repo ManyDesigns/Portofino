@@ -1,6 +1,6 @@
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.annotations.FileBlob
-import com.manydesigns.elements.annotations.LabelI18N
+import com.manydesigns.elements.annotations.Label
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.fields.FileBlobField
@@ -259,7 +259,7 @@ public class Profile extends CustomAction {
         return user;
     }
 
-    @LabelI18N("upload.a.new.photo")
+    @Label("upload.a.new.photo")
     @FileBlob
     String getAvatar() {
         return avatar;

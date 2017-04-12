@@ -79,6 +79,13 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     String generateOneTimeToken(Serializable user);
 
+    /**
+     * Returns an encrypted or hashed password.
+     * @param password the plaintext password.
+     * @return the encrypted password.
+     */
+    String encryptPassword(String password);
+
     //--------------------------------------------------------------------------
     // Self registration
     //--------------------------------------------------------------------------

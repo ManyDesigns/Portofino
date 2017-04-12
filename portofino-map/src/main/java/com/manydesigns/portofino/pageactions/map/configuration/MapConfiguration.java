@@ -81,7 +81,7 @@ public class MapConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("position")
-    @LabelI18N("latitude")
+    @Label("latitude")
     @MinDecimalValue(-85.0)
     @MaxDecimalValue(85.0)
     public BigDecimal getLatitude() {
@@ -95,7 +95,7 @@ public class MapConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("position")
-    @LabelI18N("longitude")
+    @Label("longitude")
     @MinDecimalValue(-180.0)
     @MaxDecimalValue(180.0)
     public BigDecimal getLongitude() {
@@ -109,7 +109,7 @@ public class MapConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("position")
-    @LabelI18N("geolocation")
+    @Label("geolocation")
     public Boolean getGeolocation() {
         return geolocation;
     }
@@ -121,7 +121,7 @@ public class MapConfiguration implements PageActionConfiguration {
     @XmlAttribute
     @Required
     @FieldSet("position")
-    @LabelI18N("zoom")
+    @Label("zoom")
     public Integer getZoom() {
         return zoom;
     }
