@@ -20,11 +20,16 @@
 
 package com.manydesigns.portofino.pageactions.crud.reflection;
 
+import com.manydesigns.elements.annotations.impl.EnabledImpl;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.MutablePropertyAccessor;
+import com.manydesigns.elements.reflection.OGNLPropertyAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
+import com.manydesigns.portofino.pageactions.crud.configuration.VirtualCrudProperty;
 import com.manydesigns.portofino.reflection.AbstractAnnotatedAccessor;
+import ognl.OgnlException;
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -32,6 +37,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 /*
@@ -67,9 +74,15 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
         this.nestedAccessor = nestedAccessor;
         PropertyAccessor[] columnAccessors = nestedAccessor.getProperties();
         PropertyAccessor[] keyColumnAccessors = nestedAccessor.getKeyProperties();
+        List<VirtualCrudProperty> virtualCrudProperties = new ArrayList<>();
+        for(CrudProperty crudProperty : crudConfiguration.getProperties()) {
+            if(crudProperty instanceof VirtualCrudProperty) {
+                virtualCrudProperties.add((VirtualCrudProperty) crudProperty);
+            }
+        }
 
         propertyAccessors =
-                new CrudPropertyAccessor[columnAccessors.length];
+                new CrudPropertyAccessor[columnAccessors.length + virtualCrudProperties.size()];
         keyPropertyAccessors =
                 new CrudPropertyAccessor[keyColumnAccessors.length];
 
@@ -81,6 +94,28 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
             boolean inKey = ArrayUtils.contains(keyColumnAccessors, columnAccessor);
             CrudPropertyAccessor propertyAccessor =
                         new CrudPropertyAccessor(crudProperty, columnAccessor, inKey);
+            propertyAccessors[i] = propertyAccessor;
+            i++;
+        }
+        for(VirtualCrudProperty virtualCrudProperty : virtualCrudProperties) {
+            PropertyAccessor nestedPropertyAccessor;
+            try {
+                if("ognl".equalsIgnoreCase(virtualCrudProperty.getLanguage())) {
+                    nestedPropertyAccessor = new OGNLPropertyAccessor(virtualCrudProperty.getName(), virtualCrudProperty.getType(), virtualCrudProperty.getExpression());
+                } else {
+                    logger.warn("Unsupported language: " + virtualCrudProperty.getLanguage());
+                    nestedPropertyAccessor = new MutablePropertyAccessor(
+                            virtualCrudProperty.getName(), virtualCrudProperty.getType()).
+                            configureAnnotation(new EnabledImpl(false));
+                }
+            } catch (Exception e) {
+                logger.error("Could not create OGNL accessor", e);
+                nestedPropertyAccessor = new MutablePropertyAccessor(
+                        virtualCrudProperty.getName(), virtualCrudProperty.getType()).
+                        configureAnnotation(new EnabledImpl(false));
+            }
+            CrudPropertyAccessor propertyAccessor =
+                        new CrudPropertyAccessor(virtualCrudProperty, nestedPropertyAccessor, false);
             propertyAccessors[i] = propertyAccessor;
             i++;
         }
@@ -98,34 +133,35 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
             i++;
         }
 
-
-/*        logger.debug("Sorting crud properties to preserve their previous order as much as possible");
-        Arrays.sort(propertyAccessors, new Comparator<CrudPropertyAccessor>() {
-            private int oldIndex(CrudPropertyAccessor c) {
-                int i = 0;
-                for (CrudProperty old : crudConfiguration.getProperties()) {
-                    if (old.equals(c.getCrudProperty())) {
-                        return i;
+        if(crudConfiguration.isUseLocalOrder()) {
+            logger.debug("Sorting crud properties to preserve their previous order as much as possible");
+            Arrays.sort(propertyAccessors, new Comparator<CrudPropertyAccessor>() {
+                private int oldIndex(CrudPropertyAccessor c) {
+                    int i = 0;
+                    for (CrudProperty old : crudConfiguration.getProperties()) {
+                        if (old.equals(c.getCrudProperty())) {
+                            return i;
+                        }
+                        i++;
                     }
-                    i++;
+                    return -1;
                 }
-                return -1;
-            }
 
-            public int compare(CrudPropertyAccessor c1, CrudPropertyAccessor c2) {
-                Integer index1 = oldIndex(c1);
-                Integer index2 = oldIndex(c2);
-                if (index1 != -1) {
-                    if (index2 != -1) {
-                        return index1.compareTo(index2);
+                public int compare(CrudPropertyAccessor c1, CrudPropertyAccessor c2) {
+                    Integer index1 = oldIndex(c1);
+                    Integer index2 = oldIndex(c2);
+                    if (index1 != -1) {
+                        if (index2 != -1) {
+                            return index1.compareTo(index2);
+                        } else {
+                            return -1;
+                        }
                     } else {
-                        return -1;
+                        return index2 == -1 ? 0 : 1;
                     }
-                } else {
-                    return index2 == -1 ? 0 : 1;
                 }
-            }
-        });*/
+            });
+        }
     }
 
     public static CrudProperty findCrudPropertyByName(CrudConfiguration crudConfiguration, String propertyName) {

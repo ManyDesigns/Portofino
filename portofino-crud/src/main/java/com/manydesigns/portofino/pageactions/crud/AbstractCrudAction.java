@@ -59,6 +59,7 @@ import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
+import com.manydesigns.portofino.pageactions.crud.configuration.VirtualCrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -1984,6 +1985,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             CrudProperty crudProperty = findProperty(edit.name, properties);
             if(crudProperty == null) {
                 crudProperty = new CrudProperty();
+                properties.add(crudProperty);
             }
 
             crudProperty.setName(edit.name);
@@ -1996,8 +1998,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             newProperties.add(crudProperty);
         }
-        properties.clear();
-        properties.addAll(newProperties);
+        Iterator<CrudProperty> propertyIterator = properties.iterator();
+        while (propertyIterator.hasNext()) {
+            CrudProperty property = propertyIterator.next();
+            if(!(property instanceof VirtualCrudProperty) && !newProperties.contains(property)) {
+                propertyIterator.remove();
+            }
+        }
     }
 
     public boolean isRequiredFieldsPresent() {

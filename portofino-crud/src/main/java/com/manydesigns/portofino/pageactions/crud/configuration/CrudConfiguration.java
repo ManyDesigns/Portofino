@@ -19,7 +19,7 @@ import java.util.List;
 */
 
 @XmlRootElement(name = "configuration")
-@XmlType(name = "configuration",propOrder = {"name", "searchTitle","createTitle","readTitle","editTitle","variable","largeResultSet","rowsPerPage","columns","properties"})
+@XmlType(name = "configuration",propOrder = {"name", "searchTitle","createTitle","readTitle","editTitle","variable","largeResultSet","rowsPerPage","columns","useLocalOrder","properties"})
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration implements PageActionConfiguration, ConfigurationWithDefaults {
     public static final String copyright =
@@ -37,6 +37,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     protected String editTitle;
     protected String variable;
     protected boolean largeResultSet;
+    protected boolean useLocalOrder = false;
     protected Integer rowsPerPage;
     protected Integer columns = 1;
 
@@ -150,5 +151,14 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
 
     public void setColumns(Integer columns) {
         this.columns = columns;
+    }
+
+    @XmlAttribute(required = false)
+    public boolean isUseLocalOrder() {
+        return useLocalOrder;
+    }
+
+    public void setUseLocalOrder(boolean useLocalOrder) {
+        this.useLocalOrder = useLocalOrder;
     }
 }
