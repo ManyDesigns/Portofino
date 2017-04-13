@@ -7,3 +7,6 @@ portofino.messages.en['pageactions.page.abandon.are.you.sure'] = 'Are you sure y
 
 portofino.messages.it = portofino.messages.it || {};
 portofino.messages.it['pageactions.page.abandon.are.you.sure'] = 'Sei sicuro di voler abbandonare la pagina? I dati inseriti saranno persi.';
+
+portofino.messages.de = portofino.messages.de || {};
+portofino.messages.de['pageactions.page.abandon.are.you.sure'] = 'Sind Sie sicher, dass Sie die Seite verlassen wollen? Nicht gespeicherte Daten werden dann verloren gehen.';
