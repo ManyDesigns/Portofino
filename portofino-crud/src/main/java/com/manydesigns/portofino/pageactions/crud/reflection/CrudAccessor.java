@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.crud.reflection;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.impl.EnabledImpl;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
@@ -29,7 +30,6 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguratio
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.configuration.VirtualCrudProperty;
 import com.manydesigns.portofino.reflection.AbstractAnnotatedAccessor;
-import ognl.OgnlException;
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -41,12 +41,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ **/
 public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
@@ -101,7 +101,11 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
             PropertyAccessor nestedPropertyAccessor;
             try {
                 if("ognl".equalsIgnoreCase(virtualCrudProperty.getLanguage())) {
-                    nestedPropertyAccessor = new OGNLPropertyAccessor(virtualCrudProperty.getName(), virtualCrudProperty.getType(), virtualCrudProperty.getExpression());
+                    nestedPropertyAccessor = new OGNLPropertyAccessor(
+                            virtualCrudProperty.getName(),
+                            virtualCrudProperty.getType(),
+                            virtualCrudProperty.getExpression(),
+                            ElementsThreadLocals.getOgnlContext());
                 } else {
                     logger.warn("Unsupported language: " + virtualCrudProperty.getLanguage());
                     nestedPropertyAccessor = new MutablePropertyAccessor(

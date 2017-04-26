@@ -41,13 +41,19 @@ public class OGNLPropertyAccessor extends AbstractAnnotatedAccessor implements P
     protected final Class type;
     protected final String expression;
     protected final Object parsedExpression;
+    protected OgnlContext ognlContext;
     protected int modifiers;
     
-    public OGNLPropertyAccessor(String name, Class type, String expression) throws OgnlException {
+    public OGNLPropertyAccessor(String name, Class type, String expression, OgnlContext ognlContext) throws OgnlException {
         this.name = name;
         this.type = type;
         this.expression = expression;
         this.parsedExpression = Ognl.parseExpression(expression);
+        this.ognlContext = ognlContext;
+    }
+    
+    public OGNLPropertyAccessor(String name, Class type, String expression) throws OgnlException {
+        this(name, type, expression, null);
     }
 
     @Override
@@ -69,10 +75,22 @@ public class OGNLPropertyAccessor extends AbstractAnnotatedAccessor implements P
         this.modifiers = modifiers;
     }
 
+    public OgnlContext getOgnlContext() {
+        return ognlContext;
+    }
+
+    public void setOgnlContext(OgnlContext ognlContext) {
+        this.ognlContext = ognlContext;
+    }
+
+    public String getExpression() {
+        return expression;
+    }
+
     @Override
     public Object get(Object obj) {
         try {
-            return Ognl.getValue(parsedExpression, ElementsThreadLocals.getOgnlContext(), obj, type);
+            return Ognl.getValue(parsedExpression, getActualOgnlContext(), obj, type);
         } catch (OgnlException e) {
             throw new RuntimeException(e);
         }
@@ -82,12 +100,16 @@ public class OGNLPropertyAccessor extends AbstractAnnotatedAccessor implements P
     public void set(Object obj, Object value) {
         try {
             Object convertedValue = OgnlUtils.convertValue(value, type);
-            Ognl.setValue(parsedExpression, ElementsThreadLocals.getOgnlContext(), obj, convertedValue);
+            Ognl.setValue(parsedExpression, getActualOgnlContext(), obj, convertedValue);
         } catch (OgnlException e) {
             throw new RuntimeException(e);
         }
     }
-    
+
+    public OgnlContext getActualOgnlContext() {
+        return ognlContext != null ? ognlContext : ElementsThreadLocals.getOgnlContext();
+    }
+
     public OGNLPropertyAccessor configureAnnotation(Annotation annotation) {
         annotations.put(annotation.annotationType(), annotation);
         return this;

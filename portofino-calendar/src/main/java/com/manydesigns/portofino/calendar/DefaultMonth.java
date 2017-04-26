@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.calendar;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.LocalDate;
 
 /**

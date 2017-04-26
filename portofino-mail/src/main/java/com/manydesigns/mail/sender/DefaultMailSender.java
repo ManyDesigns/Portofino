@@ -210,8 +210,8 @@ public class DefaultMailSender implements MailSender {
                     break;
             }
         }
-        email.setSSL(ssl);
-        email.setTLS(tls);
+        email.setSSLOnConnect(ssl);
+        email.setStartTLSEnabled(tls);
         email.setSslSmtpPort(port + "");
         email.setCharset("UTF-8");
         email.send();

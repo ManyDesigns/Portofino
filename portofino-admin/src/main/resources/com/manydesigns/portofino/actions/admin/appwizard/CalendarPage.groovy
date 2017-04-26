@@ -17,7 +17,6 @@ import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import org.joda.time.LocalDate
 
