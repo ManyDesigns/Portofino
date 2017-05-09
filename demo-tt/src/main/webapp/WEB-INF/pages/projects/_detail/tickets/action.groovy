@@ -73,7 +73,7 @@ class ProjectsTicketsAction extends CrudAction {
     @Override
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
         formBuilder.configPrefix(prefix).configMode(mode);
-        configureFormSelectionProviders(formBuilder, mode);
+        configureFormSelectionProviders(formBuilder);
 
         if (mode == Mode.VIEW) {
             def viewFields = [];

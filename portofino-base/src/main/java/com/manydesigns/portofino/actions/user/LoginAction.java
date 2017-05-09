@@ -253,7 +253,6 @@ public abstract class LoginAction extends AbstractActionBean {
         Session session = subject.getSession(false);
         if(session != null && session.getId().equals(sessionId)) {
             subject.logout();
-            session.stop();
             logger.info("User logout");
         } else {
             logger.debug("Unnecessary call to logout");
