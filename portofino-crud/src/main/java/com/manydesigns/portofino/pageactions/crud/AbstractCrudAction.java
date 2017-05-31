@@ -1608,6 +1608,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         BlobManager blobManager = getBlobManager();
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
+        if(field == null) {
+            return new ErrorResolution(404);
+        }
         Blob blob = field.getValue();
         if(blob == null) {
             return new ErrorResolution(404);
@@ -1650,6 +1653,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupForm(Mode.EDIT);
         form.readFromObject(object);
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
+        if(field == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if(!field.isUpdatable()) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Property not writable").build();
         }

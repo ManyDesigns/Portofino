@@ -65,11 +65,7 @@
                         leavesOnly:true
                     },
 
-                    iconClass: function(event, data){
-                        // if( data.node.isFolder() ) {
-                        //   return "glyphicon glyphicon-book";
-                        // }
-                    },
+                    iconClass: function(event, data) {},
                     lazyLoad: function(event, data) {
                         data.result = {url: "ajax-sub2.json", debugDelay: 1000};
                     },
