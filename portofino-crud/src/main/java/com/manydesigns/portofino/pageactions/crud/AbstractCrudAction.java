@@ -681,8 +681,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public boolean isBulkOperationsEnabled() {
         return (objects != null && !objects.isEmpty()) ||
+                "bulkDelete".equals(context.getEventName()) ||
                 "bulkEdit".equals(context.getEventName()) ||
-                "bulkDelete".equals(context.getEventName());
+                "bulkUpdate".equals(context.getEventName());
     }
 
     @Buttons({
