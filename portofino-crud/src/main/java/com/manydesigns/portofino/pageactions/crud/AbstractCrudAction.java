@@ -1646,7 +1646,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Response uploadBlob(
-            @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename)
+            @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename,
+            InputStream inputStream)
             throws IOException, NoSuchFieldException {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
@@ -1667,7 +1668,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         blob.setContentType(context.getRequest().getContentType());
         blob.setCharacterEncoding(context.getRequest().getCharacterEncoding());
         blob.setCreateTimestamp(new DateTime());
-        blob.setInputStream(context.getRequest().getInputStream());
+        blob.setInputStream(inputStream);
         Blob oldBlob = field.getValue();
         field.setValue(blob);
         field.writeToObject(object);
