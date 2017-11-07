@@ -26,7 +26,6 @@ import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;

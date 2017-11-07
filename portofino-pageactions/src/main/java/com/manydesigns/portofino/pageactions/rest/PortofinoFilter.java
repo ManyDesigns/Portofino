@@ -21,19 +21,20 @@
 package com.manydesigns.portofino.pageactions.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.stripes.ElementsActionBeanContext;
+import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
+import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
+import com.manydesigns.portofino.buttons.Guarded;
+import com.manydesigns.portofino.cache.ControlsCache;
+import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.dispatcher.PageActionContext;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.controller.BeforeAfterMethodInterceptor;
-import net.sourceforge.stripes.controller.ExecutionContext;
-import net.sourceforge.stripes.controller.LifecycleStage;
-import net.sourceforge.stripes.controller.StripesConstants;
+import ognl.OgnlContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
@@ -44,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ConstrainedTo;
@@ -53,11 +55,14 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import static javax.ws.rs.core.Response.Status.CONFLICT;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -72,16 +77,19 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    public final static Logger logger =
-            LoggerFactory.getLogger(PortofinoFilter.class);
-
-    protected final BeforeAfterMethodInterceptor beforeAfterMethodInterceptor = new BeforeAfterMethodInterceptor();
+    public final static Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
 
     @Context
     protected ResourceInfo resourceInfo;
 
     @Context
+    protected HttpServletRequest request;
+
+    @Context
     protected HttpServletResponse response;
+
+    @Context
+    protected ServletContext servletContext;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -96,11 +104,54 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         if(resource.getClass() != resourceInfo.getResourceClass()) {
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
-
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.startsWith("multipart/form-data")) {
+            try {
+                buildMultipart();
+            } catch (FileUploadLimitExceededException e) {
+                logger.warn("File upload limit exceeded", e);
+            }
+        }
         fillMDC();
+        logger.debug("Publishing securityUtils in OGNL context");
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        ognlContext.put("securityUtils", new SecurityUtilsBean());
         checkAuthorizations(requestContext, resource);
+        addHeaders();
         preparePage(requestContext, resource);
-        runStripesInterceptors(requestContext, resource, true);
+    }
+
+    protected void addHeaders() {
+        if(resourceInfo.getResourceMethod() != null && resourceInfo.getResourceMethod().isAnnotationPresent(ControlsCache.class)) {
+            return;
+        }
+        // Avoid caching of dynamic pages
+        //HTTP 1.0
+        response.setHeader(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);
+        response.setDateHeader(ServletConstants.HTTP_EXPIRES, 0);
+
+        //HTTP 1.1
+        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_CACHE);
+        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
+        //response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
+        //response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MAX_AGE + 0);
+    }
+
+    protected void buildMultipart() throws IOException, FileUploadLimitExceededException {
+        StreamingCommonsMultipartWrapper multipart = new StreamingCommonsMultipartWrapper();
+        // Figure out where the temp directory is, and store that info
+        File tempDir = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+        if (tempDir == null) {
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            if (tmpDir != null) {
+                tempDir = new File(tmpDir).getAbsoluteFile();
+            } else {
+                logger.warn("The tmpdir system property was null! File uploads will probably fail.");
+            }
+        }
+        long maxPostSize = Long.MAX_VALUE;
+        multipart.build(request, tempDir, maxPostSize);
+        ElementsThreadLocals.setMultipart(multipart);
     }
 
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
@@ -120,50 +171,26 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         if(resource.getClass() != resourceInfo.getResourceClass()) {
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
-
-        runStripesInterceptors(requestContext, resource, false);
-    }
-
-    protected void runStripesInterceptors(ContainerRequestContext requestContext, Object resource, boolean before) {
-        if(resource instanceof ActionBean) {
-            BridgeExecutionContext executionContext = new BridgeExecutionContext(before);
-            ActionBean actionBean = (ActionBean) resource;
-            executionContext.setActionBean(actionBean);
-            executionContext.setActionBeanContext(actionBean.getContext());
-            executionContext.setHandler(resourceInfo.getResourceMethod());
-            executionContext.setLifecycleStage(LifecycleStage.EventHandling);
-            try {
-                Resolution resolution = beforeAfterMethodInterceptor.intercept(executionContext);
-                if(resolution != null) {
-                    requestContext.abortWith(Response.ok(resolution).build());
-                }
-            } catch (Exception e) {
-                logger.error("Exception applying before/after method interceptor", e);
-                requestContext.abortWith(Response.serverError().entity(e).build());
-            }
-        }
     }
 
     protected void preparePage(ContainerRequestContext requestContext, Object resource) {
         if(resource instanceof PageAction) {
             PageAction pageAction = (PageAction) resource;
-            HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-            request.setAttribute(StripesConstants.REQ_ATTR_ACTION_BEAN, pageAction);
+            Injections.inject(pageAction, servletContext, request);
             if(!pageAction.getPageInstance().isPrepared()) {
-                ElementsActionBeanContext context = new ElementsActionBeanContext();
+                PageActionContext context = new PageActionContext();
                 context.setRequest(request);
                 context.setResponse(response);
                 context.setServletContext(request.getServletContext());
-                context.setEventName("");
                 String path = requestContext.getUriInfo().getPath();
                 if(!path.startsWith("/")) {
                     path = "/" + path;
                 }
                 context.setActionPath(path); //TODO
                 pageAction.setContext(context);
-                Resolution resolution = pageAction.preparePage();
-                if(resolution != null) {
-                    requestContext.abortWith(Response.serverError().entity(resolution).build());
+                Response response = pageAction.preparePage();
+                if(response != null) {
+                    requestContext.abortWith(response);
                 }
             }
         }
@@ -226,10 +253,15 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                             Response.Status.UNAUTHORIZED;
             requestContext.abortWith(Response.status(status).build());
         } else if(!ButtonsLogic.doGuardsPass(pageAction, handler)) {
-            requestContext.abortWith(
-                    Response.status(Response.Status.CONFLICT)
-                            .entity("The action couldn't be invoked, a guard did not pass")
-                            .build());
+            if(pageAction instanceof Guarded) {
+                Response response = ((Guarded) pageAction).guardsFailed(handler);
+                requestContext.abortWith(response);
+            } else {
+                requestContext.abortWith(
+                        Response.status(CONFLICT)
+                                .entity("The action couldn't be invoked, a guard did not pass")
+                                .build());
+            }
         } else {
             logger.debug("Portofino-specific security check passed");
         }
@@ -264,30 +296,4 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
 
     protected static final AuthChecker AUTH_CHECKER = new AuthChecker();
 
-    public static final class BridgeExecutionContext extends ExecutionContext {
-
-        private final boolean before;
-        private boolean proceedCalled;
-
-        public BridgeExecutionContext(boolean before) {
-            this.before = before;
-        }
-
-        @Override
-        public Resolution proceed() throws Exception {
-            proceedCalled = true;
-            return null;
-        }
-
-        @Override
-        public ActionBean getActionBean() {
-            //BeforeAfterMethodInterceptor conditionalizes on context.getActionBean() != null, so trick it into
-            //not executing @Before/@After methods in the appropriate phase
-            if((before && !proceedCalled) || (!before && proceedCalled)) {
-                return super.getActionBean();
-            } else {
-                return null;
-            }
-        }
-    }
 }

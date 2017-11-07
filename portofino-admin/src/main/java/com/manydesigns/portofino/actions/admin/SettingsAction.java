@@ -37,7 +37,6 @@ import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;

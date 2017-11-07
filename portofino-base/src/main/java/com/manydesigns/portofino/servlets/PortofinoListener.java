@@ -35,8 +35,9 @@ import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import com.manydesigns.portofino.stripes.ResolverUtil;
 import groovy.util.GroovyScriptEngine;
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.matchprocessor.ImplementingClassMatchProcessor;
 import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.slf4j.Logger;
@@ -260,22 +261,22 @@ public class PortofinoListener
         );
     }
 
-    protected void discoverModules(ModuleRegistry moduleRegistry, ClassLoader classLoader) {
-        ResolverUtil<Module> resolver = new ResolverUtil<Module>();
-        resolver.setExtensions(".class", ".groovy");
-        resolver.setClassLoader(classLoader);
-        resolver.findImplementations(Module.class, Module.class.getPackage().getName());
-        Set<Class<? extends Module>> classes = resolver.getClasses();
-        classes.remove(Module.class);
-        for(Class<? extends Module> moduleClass : classes) {
-            try {
-                logger.debug("Adding discovered module " + moduleClass);
-                Module module = moduleClass.newInstance();
-                moduleRegistry.getModules().add(module);
-            } catch (Throwable e) {
-                logger.error("Could not register module " + moduleClass, e);
-            }
-        }
+    protected void discoverModules(final ModuleRegistry moduleRegistry, ClassLoader classLoader) {
+        new FastClasspathScanner(Module.class.getPackage().getName())
+//                .verbose()
+                .matchClassesImplementing(Module.class, new ImplementingClassMatchProcessor<Module>() {
+                    @Override
+                    public void processMatch(Class<? extends Module> moduleClass) {
+                        try {
+                            logger.debug("Adding discovered module " + moduleClass);
+                            Module module = moduleClass.newInstance();
+                            moduleRegistry.getModules().add(module);
+                        } catch (Throwable e) {
+                            logger.error("Could not register module " + moduleClass, e);
+                        }
+                    }
+                })
+                .scan();
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {

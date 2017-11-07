@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.elements.i18n.TextProvider;
 import ognl.OgnlContext;
 
@@ -42,6 +43,7 @@ public class ElementsContext {
     protected HttpServletResponse httpServletResponse;
     protected ServletContext servletContext;
     protected OgnlContext ognlContext;
+    protected MultipartWrapper multipart;
 
     //**************************************************************************
     // Constructors
@@ -92,4 +94,11 @@ public class ElementsContext {
         this.ognlContext = ognlContext;
     }
 
+    public MultipartWrapper getMultipart() {
+        return multipart;
+    }
+
+    public void setMultipart(MultipartWrapper multipart) {
+        this.multipart = multipart;
+    }
 }

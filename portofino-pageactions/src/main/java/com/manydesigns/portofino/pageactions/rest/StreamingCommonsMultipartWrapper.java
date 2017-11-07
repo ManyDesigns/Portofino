@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.stripes;
+package com.manydesigns.portofino.pageactions.rest;
 
+import com.manydesigns.elements.blobs.FileBean;
+import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
+import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.portofino.files.TempFile;
 import com.manydesigns.portofino.files.TempFileService;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.controller.FileUploadLimitExceededException;
-import net.sourceforge.stripes.controller.multipart.MultipartWrapper;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadBase;

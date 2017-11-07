@@ -28,7 +28,6 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import groovy.util.GroovyScriptEngine;
 import net.sourceforge.stripes.action.*;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;

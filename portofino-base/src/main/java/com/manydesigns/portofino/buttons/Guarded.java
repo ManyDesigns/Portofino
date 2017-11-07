@@ -1,7 +1,6 @@
 package com.manydesigns.portofino.buttons;
 
-import net.sourceforge.stripes.action.Resolution;
-
+import javax.ws.rs.core.Response;
 import java.lang.reflect.Method;
 
 /**
@@ -9,6 +8,6 @@ import java.lang.reflect.Method;
  */
 public interface Guarded {
     
-    Resolution guardsFailed(Method handler);
+    Response guardsFailed(Method handler);
     
 }

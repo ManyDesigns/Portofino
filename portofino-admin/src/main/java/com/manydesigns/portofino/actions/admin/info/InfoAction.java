@@ -1,7 +1,6 @@
 package com.manydesigns.portofino.actions.admin.info;
 
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.Resolution;

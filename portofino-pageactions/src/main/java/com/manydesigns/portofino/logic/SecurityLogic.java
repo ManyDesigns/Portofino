@@ -22,6 +22,7 @@ package com.manydesigns.portofino.logic;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pages.Page;
@@ -31,7 +32,6 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.GroupPermission;
 import com.manydesigns.portofino.shiro.PagePermission;
-import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -221,7 +221,7 @@ public class SecurityLogic {
         return isUserInGroup(administratorsGroup);
     }
 
-    public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, ActionBean actionBean, Method handler) {
+    public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, PageAction actionBean, Method handler) {
         logger.debug("Checking if action or method required administrator");
         boolean requiresAdministrator = false;
         if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
@@ -265,7 +265,7 @@ public class SecurityLogic {
     }
 
     public static boolean isAllowed(
-            HttpServletRequest request, Dispatch dispatch, ActionBean actionBean, Method handler) {
+            HttpServletRequest request, Dispatch dispatch, PageAction actionBean, Method handler) {
         Subject subject = SecurityUtils.getSubject();
 
         if (!satisfiesRequiresAdministrator(request, actionBean, handler)) {

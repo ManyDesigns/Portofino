@@ -106,7 +106,6 @@
         <shiro.version>1.3.2</shiro.version>
         <slf4j.version>1.7.21</slf4j.version>
         <stax.version>1.2.0</stax.version>
-        <stripes.version>1.6.0</stripes.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -114,7 +113,6 @@
         <!-- Core stuff -->
         <module>elements</module>
         <module>portofino-base</module>
-        <module>portofino-stripes</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>
@@ -357,14 +355,13 @@
                         <configuration>
                             <links>
                                 <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
-                                <link>https://stripesframework.ci.cloudbees.com/job/Stripes%201.6.0/javadoc/</link>
                                 <link>https://commons.apache.org/proper/commons-configuration/javadocs/v${commons.configuration.version}/apidocs/</link>
                                 <link>http://docs.jboss.org/hibernate/orm/4.3/javadocs/</link>
                                 <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/api/</link>
                                 <link>http://www.joda.org/joda-time/apidocs/</link>
                                 <link>https://docs.oracle.com/javaee/6/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -link http://shiro.apache.org/static/1.3.2/apidocs/ -link https://stripesframework.ci.cloudbees.com/job/Stripes%201.6.0/javadoc/ -link https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/ -link https://docs.jboss.org/hibernate/orm/4.3/javadocs/ -link http://docs.groovy-lang.org/latest/html/api/ -link http://www.joda.org/joda-time/apidocs/ -link http://docs.oracle.com/javase/6/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
+                                -link http://shiro.apache.org/static/1.3.2/apidocs/ -link https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/ -link https://docs.jboss.org/hibernate/orm/4.3/javadocs/ -link http://docs.groovy-lang.org/latest/html/api/ -link http://www.joda.org/joda-time/apidocs/ -link http://docs.oracle.com/javase/6/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>

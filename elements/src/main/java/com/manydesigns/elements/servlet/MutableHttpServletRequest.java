@@ -20,8 +20,6 @@
 
 package com.manydesigns.elements.servlet;
 
-import net.sourceforge.stripes.mock.MockHttpSession;
-import net.sourceforge.stripes.mock.MockServletContext;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -65,8 +63,8 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     private String contentType;
     private String characterEncoding;
 
-    private MockServletContext servletContext;
-    private MockHttpSession session;
+    private MutableServletContext servletContext;
+    private MutableHttpSession session;
 
     //**************************************************************************
     // Constructor
@@ -81,7 +79,7 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         locales.add(Locale.getDefault());
     }
 
-    public MutableHttpServletRequest(MockServletContext servletContext) {
+    public MutableHttpServletRequest(MutableServletContext servletContext) {
         this();
         this.servletContext = servletContext;
     }
@@ -282,7 +280,7 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         if(create) {
             synchronized (this) {
                 if(session == null) {
-                    session = new MockHttpSession(servletContext);
+                    session = new MutableHttpSession(servletContext);
                 }
             }
         }

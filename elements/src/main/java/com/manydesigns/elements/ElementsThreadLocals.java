@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.ognl.CustomTypeConverter;
@@ -105,6 +106,14 @@ public final class ElementsThreadLocals {
 
     public static void setServletContext(ServletContext servletContext) {
         getElementsContext().setServletContext(servletContext);
+    }
+
+    public static MultipartWrapper getMultipart() {
+        return getElementsContext().getMultipart();
+    }
+
+    public static void setMultipart(MultipartWrapper multipart) {
+        getElementsContext().setMultipart(multipart);
     }
 
     public static OgnlContext getOgnlContext() {

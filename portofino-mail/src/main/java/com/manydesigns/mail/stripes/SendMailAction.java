@@ -22,7 +22,6 @@ package com.manydesigns.mail.stripes;
 
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.modules.MailModule;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.Resolution;

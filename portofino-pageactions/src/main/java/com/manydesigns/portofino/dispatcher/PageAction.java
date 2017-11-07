@@ -20,10 +20,9 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.elements.stripes.ElementsActionBeanContext;
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.collections.MultiMap;
+
+import javax.ws.rs.core.Response;
 
 /**
  * An extension of ActionBean from the Stripes framework to handle Portofino's hierarchical page structure.
@@ -33,7 +32,7 @@ import org.apache.commons.collections.MultiMap;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PageAction extends ActionBean, DispatchElement {
+public interface PageAction extends DispatchElement {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -46,10 +45,11 @@ public interface PageAction extends ActionBean, DispatchElement {
      * @return either null, meaning that the dispatch process is to go forward regularly, or a Resolution to be
      * executed, interrupting normal action invocation.
      */
-    Resolution preparePage();
+    Response preparePage();
 
-    @Override
-    ElementsActionBeanContext getContext();
+    PageActionContext getContext();
+
+    void setContext(PageActionContext context);
 
     PageAction getParent();
 

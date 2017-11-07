@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.controller.StripesConstants;
 

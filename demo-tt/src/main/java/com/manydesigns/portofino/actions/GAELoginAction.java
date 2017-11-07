@@ -23,8 +23,6 @@ package com.manydesigns.portofino.actions;
 //import com.google.appengine.api.users.UserService;
 //import com.google.appengine.api.users.UserServiceFactory;
 
-import com.manydesigns.portofino.stripes.AbstractActionBean;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com

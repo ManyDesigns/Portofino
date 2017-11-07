@@ -24,7 +24,6 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.modules.AdminModule;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;

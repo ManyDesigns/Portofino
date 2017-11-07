@@ -6,8 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to mark methods that control cache headers by themselves (and need
- * {@link com.manydesigns.portofino.interceptors.NoCacheInterceptor} not to do anything, for example).
+ * Used to mark methods that control HTTP cache headers by themselves.
  * 
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com

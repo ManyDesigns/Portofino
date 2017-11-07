@@ -97,7 +97,7 @@ public class APIRoot {
             request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
         }
 
-        ElementsActionBeanContext context = new ElementsActionBeanContext();
+        PageActionContext context = new PageActionContext();
         context.setServletContext(servletContext);
         context.setRequest(request);
         context.setResponse(response);
