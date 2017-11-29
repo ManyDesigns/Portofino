@@ -339,8 +339,8 @@ public abstract class LoginAction {
 //        }
 //    }
 //
-//    protected abstract void sendForgotPasswordEmail(String from, String to, String subject, String body);
-//
+    protected abstract void sendForgotPasswordEmail(String from, String to, String subject, String body);
+
 //    protected String getForgotPasswordPage() {
 //        return "/m/base/actions/user/forgotPassword.jsp";
 //    }
@@ -467,8 +467,8 @@ public abstract class LoginAction {
 //        return body;
 //    }
 //
-//    protected abstract void sendSignupConfirmationEmail(String from, String to, String subject, String body);
-//
+    protected abstract void sendSignupConfirmationEmail(String from, String to, String subject, String body);
+
 //    public Resolution confirmSignUp() {
 //        Subject subject = SecurityUtils.getSubject();
 //        if (subject.getPrincipal() != null) {

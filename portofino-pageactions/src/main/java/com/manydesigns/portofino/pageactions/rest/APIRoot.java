@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.pageactions.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
@@ -101,7 +100,6 @@ public class APIRoot {
         context.setServletContext(servletContext);
         context.setRequest(request);
         context.setResponse(response);
-        context.setEventName("");
         context.setActionPath(actionPath);
 
         Configuration configuration = (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);

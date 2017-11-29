@@ -33,7 +33,6 @@ import com.manydesigns.portofino.pageactions.form.FormAction;
 import com.manydesigns.portofino.pageactions.form.TableFormAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
-import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
@@ -164,7 +163,7 @@ public class PageactionsModule implements Module {
         pageActionRegistry.register(CustomAction.class);
         pageActionRegistry.register(FormAction.class);
         pageActionRegistry.register(TableFormAction.class);
-        pageActionRegistry.register(TextAction.class);
+        //pageActionRegistry.register(TextAction.class);
         servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);
 
         servletContext.setAttribute(TEMPLATES_REGISTRY, new TemplateRegistry());

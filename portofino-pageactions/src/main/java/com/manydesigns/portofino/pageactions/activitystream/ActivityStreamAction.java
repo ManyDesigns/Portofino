@@ -20,21 +20,15 @@
 
 package com.manydesigns.portofino.pageactions.activitystream;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ErrorResolution;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,12 +62,12 @@ public class ActivityStreamAction extends AbstractPageAction {
     // Web methods
     //--------------------------------------------------------------------------
 
-    @DefaultHandler
+    /*@DefaultHandler
     public Resolution execute() {
         populateActivityItems();
 
         return getViewResolution();
-    }
+    }*/
 
     //--------------------------------------------------------------------------
     // Hooks
@@ -83,16 +77,16 @@ public class ActivityStreamAction extends AbstractPageAction {
         logger.info("Default populateActivityItems()");
     }
 
-    protected Resolution getViewResolution() {
+    /*protected Resolution getViewResolution() {
         return new ForwardResolution("/m/pageactions/pageactions/activitystream/view.jsp");
-    }
+    }*/
 
 
     //--------------------------------------------------------------------------
     // Configuration
     //--------------------------------------------------------------------------
 
-    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
+    /*@Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -110,15 +104,15 @@ public class ActivityStreamAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
         }
         return cancel();
-    }
+    }*/
 
     //--------------------------------------------------------------------------
     // PageAction implementation
     //--------------------------------------------------------------------------
 
-    public Resolution preparePage() {
+    public Response preparePage() {
         if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+            return Response.status(404).build();
         }
         return null;
     }

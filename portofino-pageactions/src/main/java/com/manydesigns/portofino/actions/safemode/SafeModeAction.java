@@ -21,9 +21,6 @@
 package com.manydesigns.portofino.actions.safemode;
 
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -34,10 +31,5 @@ import net.sourceforge.stripes.action.Resolution;
 public class SafeModeAction extends CustomAction {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
-
-    @DefaultHandler
-    public Resolution execute() {
-        return new ForwardResolution("/m/pageactions/safemode/safemode.jsp");
-    }
 
 }

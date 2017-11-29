@@ -38,12 +38,14 @@ import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatchElement;
 import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.dispatcher.PageActionContext;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
-import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.collections.MultiMap;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -68,6 +70,18 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
 
     @Inject(MailModule.MAIL_QUEUE)
     public MailQueue mailQueue;
+
+    protected PageActionContext context;
+
+    @Override
+    public PageActionContext getContext() {
+        return context;
+    }
+
+    @Override
+    public void setContext(PageActionContext context) {
+        this.context = context;
+    }
 
     //--------------------------------------------------------------------------
     // PageAction implementation
@@ -106,7 +120,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     }
 
     @Override
-    public Resolution preparePage() {
+    public Response preparePage() {
         return null;
     }
 

@@ -22,7 +22,6 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.pages.NavigationRoot;
-import net.sourceforge.stripes.action.ActionBean;
 
 /**
  * A <em>Dispatch</em> is an object representing a path of page instances from the root of the application,
@@ -92,7 +91,7 @@ public class Dispatch {
         return 0;
     }
 
-    public Class<? extends ActionBean> getActionBeanClass() {
+    public Class<? extends PageAction> getActionBeanClass() {
         return getLastPageInstance().getActionClass();
     }
 

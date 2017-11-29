@@ -1,33 +1,45 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
- * http://www.manydesigns.com/
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
+* Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+* http://www.manydesigns.com/
+*
+* Unless you have purchased a commercial license agreement from ManyDesigns srl,
+* the following license terms apply:
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 3 as published by
+* the Free Software Foundation.
+*
+* There are special exceptions to the terms and conditions of the GPL
+* as it is applied to this software. View the full text of the
+* exception in file OPEN-SOURCE-LICENSE.txt in the directory of this
+* software distribution.
+*
+* This program is distributed WITHOUT ANY WARRANTY; and without the
+* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* See the GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, see http://www.gnu.org/licenses/gpl.txt
+* or write to:
+* Free Software Foundation, Inc.,
+* 59 Temple Place - Suite 330,
+* Boston, MA  02111-1307  USA
+*
+*/
 
-package com.manydesigns.mail.stripes;
+package com.manydesigns.portofino.actions.mail;
 
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.modules.MailModule;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ErrorResolution;
-import net.sourceforge.stripes.action.Resolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -40,29 +52,36 @@ import java.util.HashSet;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class SendMailAction extends AbstractActionBean {
+@Path("/actions/mail-sender-run")
+public class SendMailAction {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(SendMailAction.class);
 
-    @DefaultHandler
-    public Resolution execute() {
-        String clientIP = context.getRequest().getRemoteAddr();
+    @Context
+    protected ServletContext servletContext;
+
+    @Context
+    protected HttpServletRequest request;
+
+    @GET
+    public Response execute() {
+        String clientIP = request.getRemoteAddr();
         try {
             InetAddress clientAddr = InetAddress.getByName(clientIP);
             if(!isLocalIPAddress(clientAddr)) {
                 logger.warn("Received request from non-local addr, forbidding access: {}", clientAddr);
-                return new ErrorResolution(403);
+                return Response.status(Response.Status.FORBIDDEN).build();
             }
         } catch (UnknownHostException e) {
             logger.error("Could not determine request address", e);
-            return new ErrorResolution(403);
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        MailSender mailSender = (MailSender) context.getServletContext().getAttribute(MailModule.MAIL_SENDER);
+        MailSender mailSender = (MailSender) servletContext.getAttribute(MailModule.MAIL_SENDER);
         if(mailSender == null) {
-            return new ErrorResolution(500, "Mail Sender not active");
+            return Response.serverError().entity("Mail Sender not active").build();
         }
         logger.debug("Sending pending email messages");
         HashSet<String> idsToMarkAsSent = new HashSet<String>();

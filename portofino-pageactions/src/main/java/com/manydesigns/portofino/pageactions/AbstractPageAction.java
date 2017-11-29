@@ -33,7 +33,6 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
-import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
@@ -51,12 +50,6 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.servlets.ServerInfo;
-import com.manydesigns.portofino.stripes.ModelActionResolver;
-import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.commons.configuration.Configuration;
@@ -69,6 +62,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -86,7 +80,7 @@ import java.util.regex.Pattern;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
-public abstract class AbstractPageAction extends AbstractActionBean implements PageAction {
+public abstract class AbstractPageAction implements PageAction {
     public static final String copyright =
         "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -95,8 +89,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             {{"id", "title", "description", "template", "detailTemplate", "applyTemplateRecursively"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
             {{"id", "title", "description", "template", "applyTemplateRecursively"}};
-    public static final String PORTOFINO_PAGEACTION_EXCEPTION = "portofino.pageaction.exception";
-
     public static final String CONF_FORM_PREFIX = "config";
 
     //--------------------------------------------------------------------------
@@ -163,6 +155,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * The Form to configure standard page settings.
      */
     public Form pageConfigurationForm;
+
+    /**
+     * The context object holds various elements of contextual information such
+     * as the HTTP request and response objects.
+     */
+    protected PageActionContext context;
 
     //**************************************************************************
     // Logging
@@ -241,9 +239,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             if(context == null) {
                 setContext(getParent().getContext());
             }
-            Resolution resolution = preparePage();
-            if(resolution != null) {
-                return new TerminalResource(resolution);
+            Response response = preparePage();
+            if(response != null) {
+                return response; //new TerminalResource(response);
             }
         }
         return resource;
@@ -377,11 +375,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public void setPageConfigurationForm(Form pageConfigurationForm) {
         this.pageConfigurationForm = pageConfigurationForm;
-    }
-
-    @Button(list = "configuration", key = "cancel", order = 99)
-    public Resolution cancel() {
-        return new RedirectResolution(getReturnUrl(), false);
     }
 
     @Override
@@ -573,17 +566,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             if(scriptClass == null) {
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.class.is.not.valid"));
             }
-            if(this instanceof GroovyObject) {
-                logger.debug("Attempting to remove old instance of page action from Stripes caches");
-                //not guaranteed to work
-                try {
-                    ModelActionResolver actionResolver =
-                            (ModelActionResolver) StripesFilter.getConfiguration().getActionResolver();
-                    actionResolver.removeActionBean(getClass());
-                } catch (Exception e) {
-                    logger.warn("Couldn't remove action bean " + this, e);
-                }
-            }
         } catch (IOException e) {
             logger.error("Error writing script to " + groovyScriptFile, e);
             String msg = ElementsThreadLocals.getText("couldnt.write.script.to._", groovyScriptFile.getAbsolutePath());
@@ -613,36 +595,26 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return portofinoConfiguration;
     }
 
+    @Override
+    public void setContext(PageActionContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public PageActionContext getContext() {
+        return context;
+    }
+
     //--------------------------------------------------------------------------
     // Utitilities
     //--------------------------------------------------------------------------
 
     /**
-     * Returns a ForwardResolution to the given page.
-     * @param page the path to the page, from the root of the webapp.
-     * @return a Resolution that forwards to the given page.
-     * @deprecated use simply new ForwardResolution(page) instead.
-     */
-    @Deprecated
-    public Resolution forwardTo(String page) {
-        return new ForwardResolution(page);
-    }
-
-    /**
      * Returns a ForwardResolution to a standard page with an error message saying that the pageaction is not properly
      * configured.
      */
-    public Resolution forwardToPageActionNotConfigured() {
-        return new ForwardResolution("/m/pageactions/pageaction-not-configured.jsp");
-    }
-
-    /**
-     * Returns a ForwardResolution to a standard page that reports an exception with an error message saying that
-     * the pageaction is not properly configured.
-     */
-    public Resolution forwardToPageActionError(Throwable e) {
-        context.getRequest().setAttribute(PORTOFINO_PAGEACTION_EXCEPTION, e);
-        return new ForwardResolution("/m/pageactions/pageaction-error.jsp");
+    public Response forwardToPageActionNotConfigured() {
+        return Response.serverError().entity("page-action-not-configured").build();
     }
 
     public String getPageTemplate() {

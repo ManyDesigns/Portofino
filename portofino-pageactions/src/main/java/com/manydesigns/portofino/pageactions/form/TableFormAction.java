@@ -33,10 +33,10 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -58,7 +58,7 @@ public abstract class TableFormAction extends AbstractPageAction {
 
     protected TableForm form;
 
-    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
+    /*@Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -76,11 +76,11 @@ public abstract class TableFormAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
         }
         return cancel();
-    }
+    }*/
 
-    public Resolution preparePage() {
+    public Response preparePage() {
         if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+            return Response.status(404).build();
         }
         return null;
     }
@@ -127,7 +127,7 @@ public abstract class TableFormAction extends AbstractPageAction {
         return Mode.EDIT;
     }
 
-    @DefaultHandler
+    /*@DefaultHandler
     public Resolution execute() {
         setupTableForm(getMode());
         List<?> objects = getObjects();
@@ -159,7 +159,7 @@ public abstract class TableFormAction extends AbstractPageAction {
 
     protected Resolution getShowFormResolution() {
         return new ForwardResolution("/m/pageactions/pageactions/form/table-form.jsp");
-    }
+    }*/
 
     /**
      * Invoked when form validation fails.

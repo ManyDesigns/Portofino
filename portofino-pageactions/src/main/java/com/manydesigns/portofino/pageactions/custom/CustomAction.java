@@ -29,11 +29,10 @@ import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.ErrorResolution;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.Response;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,7 +50,7 @@ public class CustomAction extends AbstractPageAction {
     public static final Logger logger =
             LoggerFactory.getLogger(CustomAction.class);
 
-    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
+    /*@Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -69,11 +68,11 @@ public class CustomAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
         }
         return cancel();
-    }
+    }*/
 
-    public Resolution preparePage() {
+    public Response preparePage() {
         if(!PageActionLogic.supportsDetail(getClass()) && !pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+            return Response.status(404).build();
         }
         return null;
     }

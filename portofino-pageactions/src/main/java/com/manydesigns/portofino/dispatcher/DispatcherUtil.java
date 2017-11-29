@@ -21,11 +21,9 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import org.apache.commons.configuration.Configuration;
 
 import javax.servlet.ServletContext;
@@ -67,23 +65,19 @@ public class DispatcherUtil {
 
     public static Dispatch getDispatch(HttpServletRequest request, Object actionBean) {
         Dispatcher dispatcher = get(request);
-        if(actionBean instanceof AbstractActionBean) {
-            String actionPath = ((AbstractActionBean) actionBean).getContext().getActionPath();
+        if(actionBean instanceof PageAction) {
+            String actionPath = ((PageAction) actionBean).getContext().getActionPath();
             return dispatcher.getDispatch(actionPath);
         } else {
             return getDispatch(request);
         }
     }
 
-    public static Dispatch getDispatch(ActionBeanContext context) {
+    public static Dispatch getDispatch(PageActionContext context) {
         HttpServletRequest request = context.getRequest();
         Dispatcher dispatcher = get(request);
-        if(context instanceof PageActionContext) {
-            String actionPath = ((PageActionContext) context).getActionPath();
-            return dispatcher.getDispatch(actionPath);
-        } else {
-            return getDispatch(request);
-        }
+        String actionPath = context.getActionPath();
+        return dispatcher.getDispatch(actionPath);
     }
 
     public static Dispatch getDispatch(Dispatcher dispatcher, HttpServletRequest request) {
