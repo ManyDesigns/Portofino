@@ -125,6 +125,9 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     }
 
     @Override
+    public void init() {}
+
+    @Override
     public MultiMap initEmbeddedPageActions() {
         return null;
     }

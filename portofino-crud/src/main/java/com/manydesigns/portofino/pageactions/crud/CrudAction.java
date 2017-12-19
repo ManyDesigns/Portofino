@@ -51,9 +51,6 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
@@ -200,8 +197,8 @@ public class CrudAction extends AbstractCrudAction<Object> {
     // Setup
     //**************************************************************************
 
-    @Before
-    public void prepare() {
+    @Override
+    public void init() {
         if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
             session = persistence.getSession(getCrudConfiguration().getDatabase());
             selectionProviderSupport = createSelectionProviderSupport();
@@ -293,14 +290,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 persistence,
                 baseTable, pkObject,
                 getBaseQuery(), this);
-    }
-
-    //**************************************************************************
-    // Configuration
-    //**************************************************************************
-
-    protected Resolution getConfigurationView() {
-        return new ForwardResolution("/m/crud/configure.jsp");
     }
 
     //--------------------------------------------------------------------------

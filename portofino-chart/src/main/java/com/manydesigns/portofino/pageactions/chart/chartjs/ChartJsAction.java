@@ -89,7 +89,7 @@ public class ChartJsAction extends AbstractPageAction {
     @DefaultHandler
     public Resolution execute() {
         if(chartConfiguration == null) {
-            return forwardToPageActionNotConfigured();
+            return pageActionNotConfigured();
         }
         List<Object[]> result = loadChartData();
         if(result == null) {
@@ -98,18 +98,18 @@ public class ChartJsAction extends AbstractPageAction {
         if(chartConfiguration.getActualType().kind == 1) {
             JSONArray data = new JSONArray();
             if (!fillData1D(result, data)) {
-                return forwardToPageActionNotConfigured();
+                return pageActionNotConfigured();
             }
             chartData = data.toString();
         } else if(chartConfiguration.getActualType().kind == 2) {
             JSONObject data = new JSONObject();
             if (!fillData2D(result, data)) {
-                return forwardToPageActionNotConfigured();
+                return pageActionNotConfigured();
             }
             chartData = data.toString();
         } else {
             logger.error("Unsupported chart type: " + chartConfiguration.getActualType());
-            return forwardToPageActionNotConfigured();
+            return pageActionNotConfigured();
         }
         return new ForwardResolution("/m/chart/chartjs/display.jsp");
     }

@@ -193,6 +193,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                     requestContext.abortWith(response);
                 }
             }
+            pageAction.init();
         }
     }
 
@@ -202,7 +203,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             AUTH_CHECKER.assertAuthorized(resource, handler);
             logger.debug("Standard Shiro security check passed.");
             if(resource instanceof PageAction) {
-                checkActionBeanInvocation(requestContext, (PageAction) resource);
+                checkPageActionInvocation(requestContext, (PageAction) resource);
             }
         } catch (UnauthenticatedException e) {
             logger.debug("Method required authentication", e);
@@ -236,7 +237,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-    protected void checkActionBeanInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
+    protected void checkPageActionInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
         Method handler = resourceInfo.getResourceMethod();
         List<PageInstance> pageInstancePath = new ArrayList<PageInstance>();
         PageInstance last = pageAction.getPageInstance();

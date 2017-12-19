@@ -47,6 +47,11 @@ public interface PageAction extends DispatchElement {
      */
     Response preparePage();
 
+    /**
+     * A lifecycle method invoked just before an action method is invoked.
+     */
+    void init();
+
     PageActionContext getContext();
 
     void setContext(PageActionContext context);

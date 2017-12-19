@@ -301,6 +301,8 @@ public abstract class AbstractPageAction implements PageAction {
 
     }
 
+    public void init() {}
+
     @Override
     public MultiMap initEmbeddedPageActions() {
         if(embeddedPageActions == null) {
@@ -613,7 +615,7 @@ public abstract class AbstractPageAction implements PageAction {
      * Returns a ForwardResolution to a standard page with an error message saying that the pageaction is not properly
      * configured.
      */
-    public Response forwardToPageActionNotConfigured() {
+    public Response pageActionNotConfigured() {
         return Response.serverError().entity("page-action-not-configured").build();
     }
 

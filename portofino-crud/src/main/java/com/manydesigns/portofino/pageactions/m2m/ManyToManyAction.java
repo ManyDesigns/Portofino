@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.pageactions.m2m;
 
-import com.google.api.client.json.Json;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
@@ -37,10 +36,6 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
-import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.buttons.GuardType;
-import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -62,24 +57,21 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
-import net.sourceforge.stripes.action.*;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.SecurityUtils;
 import org.hibernate.Session;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.Serializable;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -131,9 +123,9 @@ public class ManyToManyAction extends AbstractPageAction {
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
 
-    public Resolution preparePage() {
+    public Response preparePage() {
         if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
         m2mConfiguration = (ManyToManyConfiguration) pageInstance.getConfiguration();
         if(m2mConfiguration != null && m2mConfiguration.getActualRelationDatabase() != null) {
@@ -143,8 +135,8 @@ public class ManyToManyAction extends AbstractPageAction {
         return null;
     }
 
-    @Before
-    public void prepare() throws NoSuchFieldException {
+    @Override
+    public void init() {
         if(m2mConfiguration == null || m2mConfiguration.getActualRelationTable() == null ||
            m2mConfiguration.getActualManyTable() == null) {
             logger.error("Configuration is null or relation/many table not found (check previous log messages)");
@@ -176,7 +168,12 @@ public class ManyToManyAction extends AbstractPageAction {
                 }
 
                 TableAccessor tableAccessor = new TableAccessor(m2mConfiguration.getActualRelationTable());
-                PropertyAccessor onePkAccessor = tableAccessor.getProperty(m2mConfiguration.getActualOnePropertyName());
+                PropertyAccessor onePkAccessor = null;
+                try {
+                    onePkAccessor = tableAccessor.getProperty(m2mConfiguration.getActualOnePropertyName());
+                } catch (NoSuchFieldException e) {
+                    throw new RuntimeException(e);
+                }
 
                 if(onePkAccessor == null) {
                     logger.warn("Not a property: {}", m2mConfiguration.getActualOnePropertyName());
@@ -244,40 +241,6 @@ public class ManyToManyAction extends AbstractPageAction {
         return selectionProvider;
     }
 
-    @DefaultHandler
-    public Resolution execute() {
-        if(!correctlyConfigured) {
-            return forwardToPageActionNotConfigured();
-        }
-        if(onePk != null) {
-            try {
-                loadAssociations();
-                if(potentiallyAvailableAssociations == null && onePk != null) {
-                    return forwardToPageActionNotConfigured(); //TODO
-                }
-            } catch (NoSuchFieldException e) {
-                return forwardToPageActionNotConfigured();
-            }
-        }
-        return view();
-    }
-
-    protected Resolution view() {
-        switch (m2mConfiguration.getActualViewType()) {
-            case CHECKBOXES:
-            case CHECKBOXES_VERTICAL:
-                booleanRelation = new LinkedHashMap<Object, Boolean>();
-                if(potentiallyAvailableAssociations != null) {
-                    for(Object o : potentiallyAvailableAssociations) {
-                        booleanRelation.put(o, !availableAssociations.contains(o));
-                    }
-                }
-                return new ForwardResolution("/m/crud/many2many/checkboxes.jsp");
-            default:
-                return forwardToPageActionNotConfigured();
-        }
-    }
-
     protected void loadAssociations() throws NoSuchFieldException {
         Table table = m2mConfiguration.getActualRelationTable();
         TableCriteria criteria = new TableCriteria(table);
@@ -332,12 +295,12 @@ public class ManyToManyAction extends AbstractPageAction {
         return existing;
     }
 
-    @Button(list = "m2m-checkboxes-edit", key = "save", type = Button.TYPE_PRIMARY)
+    /*@Button(list = "m2m-checkboxes-edit", key = "save", type = Button.TYPE_PRIMARY)
     @Guard(test = "onePk != null", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = ManyToManyAction.PERMISSION_UPDATE)
     public Resolution saveCheckboxes() throws Exception {
         if(!correctlyConfigured) {
-            return forwardToPageActionNotConfigured();
+            return pageActionNotConfigured();
         }
         try {
             loadAssociations();
@@ -388,7 +351,7 @@ public class ManyToManyAction extends AbstractPageAction {
         } else {
             return cancel();
         }
-    }
+    }*/
 
     protected void deleteRelation(Object rel) {
         session.delete(m2mConfiguration.getActualRelationTable().getActualEntityName(), rel);
@@ -401,38 +364,6 @@ public class ManyToManyAction extends AbstractPageAction {
         prepareSave(newRelation);
         session.save(m2mConfiguration.getActualRelationTable().getActualEntityName(), newRelation);
         return newRelation;
-    }
-
-    //Configuration
-
-    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution configure() {
-        prepareConfigurationForms();
-        return new ForwardResolution("/m/crud/many2many/configure.jsp");
-    }
-
-    @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution updateConfiguration() {
-        prepareConfigurationForms();
-        ConfigurationForm conf = new ConfigurationForm(m2mConfiguration);
-        configurationForm.readFromObject(conf);
-        readPageConfigurationFromRequest();
-        configurationForm.readFromRequest(context.getRequest());
-        boolean valid = validatePageConfiguration();
-        valid = configurationForm.validate() && valid;
-        if(valid) {
-            updatePageConfiguration();
-            configurationForm.writeToObject(conf);
-            conf.writeTo(m2mConfiguration);
-            saveConfiguration(m2mConfiguration);
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
-            return cancel();
-        } else {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
-            return new ForwardResolution("/m/crud/many2many/configure.jsp");
-        }
     }
 
     @Override
@@ -589,7 +520,7 @@ public class ManyToManyAction extends AbstractPageAction {
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Resolution getAsJson() {
+    public Response getAsJson() {
         return jsonKeys();
     }
 
@@ -602,7 +533,7 @@ public class ManyToManyAction extends AbstractPageAction {
     @GET
     @Path(":availableAssociations/{key}")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Resolution selectionProviders(@PathParam("key") String key) {
+    public Response selectionProviders(@PathParam("key") String key) {
         try{
             loadOnePk(key);
         }catch (Exception e){
@@ -700,9 +631,9 @@ public class ManyToManyAction extends AbstractPageAction {
         return Response.status(Response.Status.CREATED). build();
     }
 
-    public Resolution jsonKeys() throws JSONException {
+    public Response jsonKeys() throws JSONException {
         if(!correctlyConfigured) {
-            return forwardToPageActionNotConfigured();
+            return pageActionNotConfigured();
         }
 
         JSONArray keys = new JSONArray();
@@ -727,11 +658,11 @@ public class ManyToManyAction extends AbstractPageAction {
 
         JSONObject response = new JSONObject();
         response.put("keys",keys);
-
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, response.toString(2));
+        String jsonText = response.toString(2);
+        return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
     }
 
-    public Resolution jsonAssociations() throws JSONException {
+    public Response jsonAssociations() throws JSONException {
         JSONObject response = new JSONObject();
         JSONArray enumList = new JSONArray();
         JSONObject model = new JSONObject();
@@ -744,10 +675,10 @@ public class ManyToManyAction extends AbstractPageAction {
             try {
                 loadAssociations();
                 if(potentiallyAvailableAssociations == null && onePk != null) {
-                    return forwardToPageActionNotConfigured();
+                    return pageActionNotConfigured();
                 }
             } catch (NoSuchFieldException e) {
-                return forwardToPageActionNotConfigured();
+                return pageActionNotConfigured();
             }
 
             booleanRelation = new LinkedHashMap<Object, Boolean>();
@@ -805,6 +736,7 @@ public class ManyToManyAction extends AbstractPageAction {
         response.put("schema",schema);
         response.put("form",form);
 
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, response.toString(2));
+        String jsonText = response.toString(2);
+        return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
     }
 }
