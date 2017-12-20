@@ -1,7 +1,6 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.util.RandomUtil
-import com.manydesigns.mail.stripes.SendMailAction
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
@@ -173,13 +172,6 @@ class Security extends AbstractPortofinoRealm {
         }
         return result;
     }
-
-    protected boolean isLocalUser() {
-        String remoteIp = ElementsThreadLocals.getHttpServletRequest().getRemoteAddr();
-        InetAddress clientAddr = InetAddress.getByName(remoteIp);
-        return SendMailAction.isLocalIPAddress(clientAddr)
-    }
-
 
     //--------------------------------------------------------------------------
     // Users crud
