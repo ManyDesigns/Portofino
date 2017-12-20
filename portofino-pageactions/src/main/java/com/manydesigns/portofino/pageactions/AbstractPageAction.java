@@ -133,11 +133,6 @@ public abstract class AbstractPageAction implements PageAction {
     // Navigation
     //--------------------------------------------------------------------------
 
-    /**
-     * The URL the user cakeme from within the application.
-     */
-    public String returnUrl;
-
     //**************************************************************************
     // Scripting
     //**************************************************************************
@@ -303,7 +298,7 @@ public abstract class AbstractPageAction implements PageAction {
 
     public void init() {}
 
-    @Override
+    /*@Override
     public MultiMap initEmbeddedPageActions() {
         if(embeddedPageActions == null) {
             MultiMap mm = new MultiValueMap();
@@ -337,7 +332,7 @@ public abstract class AbstractPageAction implements PageAction {
             embeddedPageActions = mm;
         }
         return embeddedPageActions;
-    }
+    }*/
 
     /**
      * Returns the path inside the web application of a resource relative to this action's directory.
@@ -391,28 +386,6 @@ public abstract class AbstractPageAction implements PageAction {
 
     public Page getPage() {
         return getPageInstance().getPage();
-    }
-
-    @Override
-    public String getReturnUrl() {
-        if (!StringUtils.isEmpty(returnUrl)) {
-            return returnUrl;
-        } else {
-            String url = (String) context.getRequest().getAttribute("returnUrl");
-            if(!StringUtils.isEmpty(url)) {
-                return url;
-            } else {
-                return getDefaultReturnUrl();
-            }
-        }
-    }
-
-    protected String getDefaultReturnUrl() {
-        return Util.getAbsoluteUrl(context.getActionPath());
-    }
-
-    public void setReturnUrl(String returnUrl) {
-        this.returnUrl = returnUrl;
     }
 
     //--------------------------------------------------------------------------

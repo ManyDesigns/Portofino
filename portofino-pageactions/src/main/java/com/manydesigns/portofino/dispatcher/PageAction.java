@@ -33,8 +33,7 @@ import javax.ws.rs.core.Response;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface PageAction extends DispatchElement {
-    public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
 
     /**
      * A lifecycle method invoked during the dispatch phase, where a http request is translated to a dispatch
@@ -58,19 +57,4 @@ public interface PageAction extends DispatchElement {
 
     PageAction getParent();
 
-    /**
-     * Lifecycle method called by templates that can include embedded pages to compute the set of pages to embed
-     * and their locations and order.
-     * @return a multi-valued map layout-container: String -&gt; embedded-pages: list(EmbeddedPageAction)
-     */
-    MultiMap initEmbeddedPageActions();
-
-    /**
-     * This is the URL (typically relative to the application, i.e. without scheme, host, and port components)
-     * where the action should redirect to after handling an event.
-     * @return the return URL.
-     */
-    String getReturnUrl();
-
-    String getPageTemplate();
 }

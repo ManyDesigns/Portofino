@@ -128,11 +128,6 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     public void init() {}
 
     @Override
-    public MultiMap initEmbeddedPageActions() {
-        return null;
-    }
-
-    @Override
     public PageInstance getPageInstance() {
         return pageInstance;
     }
@@ -147,11 +142,6 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
         return null;
     }
 
-    @Override
-    public String getPageTemplate() {
-        return pageInstance.getLayout().getTemplate();
-    }
-    
     @Override
     public PageAction getParent() {
         return pageInstance.getParent().getActionBean();

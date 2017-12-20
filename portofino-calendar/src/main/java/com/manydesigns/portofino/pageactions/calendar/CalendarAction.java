@@ -32,14 +32,12 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,13 +88,13 @@ public class CalendarAction extends AbstractPageAction {
     // Setup and configuration
     //**************************************************************************
 
-    public Resolution preparePage() {
+    public Response preparePage() {
         if(pageInstance.getConfiguration() == null) {
             pageInstance.setConfiguration(new CalendarConfiguration());
         }
         return null;
     }
-
+/*
     @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
@@ -129,13 +127,13 @@ public class CalendarAction extends AbstractPageAction {
         super.prepareConfigurationForms();
         configurationForm = new FormBuilder(CalendarConfiguration.class).build();
         configurationForm.readFromObject(pageInstance.getConfiguration());
-    }
+    }*/
 
     //**************************************************************************
     // Handlers
     //**************************************************************************
 
-    @DefaultHandler
+    /*@DefaultHandler
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() {
         if("agenda".equals(calendarViewType)) {
@@ -195,7 +193,7 @@ public class CalendarAction extends AbstractPageAction {
     public Resolution today() {
         referenceDateTime = new DateTime();
         return execute();
-    }
+    }*/
 
     //--------------------------------------------------------------------------
     // Data provider
