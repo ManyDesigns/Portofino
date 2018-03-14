@@ -285,7 +285,7 @@ public class SecurityLogic {
                 resource = dispatch.getLastPageInstance().getPath();
                 allowed = hasPermissions(configuration, dispatch, subject, handler);
             } else {
-                logger.debug("The protected resource is a plain Stripes ActionBean");
+                logger.debug("The protected resource is a regular JAX-RS resource");
                 resource = request.getRequestURI();
                 permissions = new Permissions();
                 allowed = hasPermissions

@@ -1930,7 +1930,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param searchString the search string
      * @since 4.2
-     * @return search results (/) or single object (/pk) as JSON (streamed using a Stripes Resolution).
+     * @return search results (/) or single object (/pk) as JSON
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)

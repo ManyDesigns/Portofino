@@ -11,7 +11,6 @@ import com.manydesigns.elements.reflection.GroovyClassAccessor
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import net.sourceforge.stripes.action.Resolution
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyTableFormAction extends TableFormAction {
@@ -49,14 +48,14 @@ class MyTableFormAction extends TableFormAction {
 
     protected List<MyFormBean> objects = [new MyFormBean(), new MyFormBean()];
 
-    //Adds a button to the page to process the form
+    /*//Adds a button to the page to process the form
     @Button(list = "form", key = "submit", type = Button.TYPE_SUCCESS)
     @RequiresPermissions(permissions = FormAction.POST_FORM_PERMISSION)
     public Resolution process() {
         return doWithForm({ form, objects ->
             logger.info("Processing table form {} with objects {}", form, objects);
         });
-    }
+    }*/
 
     //Methods to implement
 

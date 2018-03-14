@@ -11,7 +11,6 @@ import com.manydesigns.portofino.pageactions.*
 import com.manydesigns.portofino.security.*
 import com.manydesigns.portofino.shiro.*
 
-import net.sourceforge.stripes.action.*
 import org.apache.shiro.*
 import org.hibernate.*
 import org.hibernate.criterion.*

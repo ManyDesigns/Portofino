@@ -37,7 +37,6 @@ import java.util.Map;
  * the single parameter value to the method.</p>
  *
  * @author Tim Fennell
- * @since Stripes 1.1.2
  */
 public class UrlBuilder {
     /**

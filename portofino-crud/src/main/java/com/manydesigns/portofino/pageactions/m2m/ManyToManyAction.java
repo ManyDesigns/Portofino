@@ -516,7 +516,7 @@ public class ManyToManyAction extends AbstractPageAction {
     /**
      * Handles available keys via REST.
      * @since 4.2.1
-     * @return key set results (key, label) as JSON (streamed using a Stripes Resolution).
+     * @return key set results (key, label) as JSON.
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -528,7 +528,7 @@ public class ManyToManyAction extends AbstractPageAction {
      * Handles available associations for given key
      * @param key the key string
      * @since 4.2.1
-     * @return available associations set results as JSON (streamed using a Stripes Resolution).
+     * @return available associations set results as JSON.
      */
     @GET
     @Path(":availableAssociations/{key}")

@@ -11,12 +11,13 @@ import com.manydesigns.portofino.pageactions.*
 import com.manydesigns.portofino.security.*
 import com.manydesigns.portofino.shiro.*
 
-import net.sourceforge.stripes.action.*
 import org.apache.shiro.*
 import org.hibernate.*
 import org.hibernate.criterion.*
 
 import com.manydesigns.portofino.pageactions.custom.*
+
+import javax.ws.rs.GET
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyCustomAction extends CustomAction {
@@ -24,10 +25,9 @@ class MyCustomAction extends CustomAction {
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
 
-    @DefaultHandler
-    public Resolution execute() {
-        String fwd = "/m/pageactions/pageactions/custom/example.jsp";
-        return new ForwardResolution(fwd);
+    @GET
+    public String greet() {
+        "Hello, it works!"
     }
 
 }

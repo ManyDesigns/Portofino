@@ -25,7 +25,7 @@ import org.apache.commons.collections.MultiMap;
 import javax.ws.rs.core.Response;
 
 /**
- * An extension of ActionBean from the Stripes framework to handle Portofino's hierarchical page structure.
+ * An element in Portofino's hierarchical resource structure.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com

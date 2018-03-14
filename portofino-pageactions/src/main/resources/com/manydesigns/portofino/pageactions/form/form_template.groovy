@@ -10,7 +10,6 @@ import com.manydesigns.elements.reflection.GroovyClassAccessor
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import net.sourceforge.stripes.action.Resolution
 import com.manydesigns.elements.annotations.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -91,14 +90,14 @@ class MyFormAction extends FormAction {
 
     protected MyFormBean object = new MyFormBean();
 
-    //Adds a button to the page to process the form
+    /*//Adds a button to the page to process the form
     @Button(list = "form", key = "submit", type = Button.TYPE_SUCCESS)
     @RequiresPermissions(permissions = FormAction.POST_FORM_PERMISSION)
     public Resolution process() {
         return doWithForm({ form, object ->
             SessionMessages.addInfoMessage("Processed form, written to object " + (object.properties));
         });
-    }
+    }*/
 
     //Methods to implement
 

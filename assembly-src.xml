@@ -168,12 +168,6 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>portofino-stripes/pom.xml</source>
-      <outputDirectory>portofino-stripes</outputDirectory>
-      <destName>pom.xml</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
       <source>portofino-theme/pom.xml</source>
       <outputDirectory>portofino-theme</outputDirectory>
       <destName>pom.xml</destName>
@@ -344,13 +338,6 @@
     <fileSet>
       <directory>portofino-quartz/src/main</directory>
       <outputDirectory>portofino-quartz/src/main</outputDirectory>
-      <useDefaultExcludes>true</useDefaultExcludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>portofino-stripes/src/main</directory>
-      <outputDirectory>portofino-stripes/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -527,13 +514,6 @@
     <fileSet>
       <directory>portofino-quartz/target/apidocs</directory>
       <outputDirectory>javadocs/portofino-quartz</outputDirectory>
-      <useDefaultExcludes>true</useDefaultExcludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>portofino-stripes/target/apidocs</directory>
-      <outputDirectory>javadocs/portofino-stripes</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

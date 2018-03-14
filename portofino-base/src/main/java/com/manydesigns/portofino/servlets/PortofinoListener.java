@@ -243,9 +243,6 @@ public class PortofinoListener
         if(!Charset.isSupported(encoding)) {
             logger.error("The encoding is not supported by the JVM!");
         }
-        if(!"UTF-8".equals(encoding)) {
-            logger.warn("URL encoding is not UTF-8, but the Stripes framework always generates UTF-8 encoded URLs. URLs with non-ASCII characters may not work.");
-        }
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +

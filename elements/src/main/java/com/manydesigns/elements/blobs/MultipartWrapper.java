@@ -25,7 +25,6 @@ import java.util.Enumeration;
  * wrapper interface around third party libraries which provide this capability.
  *
  * @author Tim Fennell
- * @since Stripes 1.4
  */
 public interface MultipartWrapper {
     /**
