@@ -210,13 +210,6 @@
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Stripes framework integration. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-stripes</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- REST support through Jersey. -->
         <dependency>
             <groupId>com.manydesigns</groupId>

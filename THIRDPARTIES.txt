@@ -285,11 +285,6 @@ Site: http://www.slf4j.org/
 Files: slf4j-api-1.7.21.jar, slf4j-nop-1.7.21.jar, jcl-over-slf4j-1.7.21.jar, log4j-over-slf4j-1.7.21.jar
 License: MIT
 
-Stripes
-Site: http://www.stripesframework.org
-File: stripes-1.6.0.jar
-License: Apache License v2.0
-
 SweetiePlus Icon Set
 Site: http://sublink.ca/icons/sweetieplus/
 Files: SweetiePlus-v2-SublinkInteractive directory
