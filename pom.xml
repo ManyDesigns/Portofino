@@ -142,6 +142,8 @@
         <module>portofino-mail</module>
         <module>portofino-openid</module>
         <module>portofino-quartz</module>
+        <!-- UI -->
+        <module>ui</module>
         <!-- Archetypes -->
         <module>portofino-war-archetype</module>
         <!-- Applications -->

@@ -21,6 +21,7 @@ oneclick/build/*
 /ui/out-tsc
 
 # dependencies
+/ui/node
 /ui/node_modules
 
 # misc
