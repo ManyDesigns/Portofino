@@ -4,16 +4,20 @@ import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { PortofinoComponent } from './portofino.component';
+import { CrudComponent } from './crud/crud.component';
+import { PortofinoService } from './portofino.service';
+import { HttpClientModule } from '@angular/common/http';
 
 
 @NgModule({
   declarations: [
-    PortofinoComponent
+    PortofinoComponent,
+    CrudComponent
   ],
   imports: [
-    BrowserModule, FormsModule, NgbModule.forRoot()
+    BrowserModule, FormsModule, HttpClientModule, NgbModule.forRoot()
   ],
-  providers: [],
+  providers: [PortofinoService],
   bootstrap: [PortofinoComponent]
 })
 export class PortofinoModule { }
