@@ -47,7 +47,7 @@ public class JWTFilter extends PathMatchingFilter {
     @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         HttpServletRequest httpRequest = WebUtils.toHttp(request);
-        String jwt = getJSONWebToken(response, httpRequest);
+        String jwt = getJSONWebToken(httpRequest);
         if(jwt == null) {
             logger.debug("JWT not found, proceeding with the request");
             return true;
@@ -68,7 +68,7 @@ public class JWTFilter extends PathMatchingFilter {
     }
 
     @Nullable
-    public static String getJSONWebToken(ServletResponse response, HttpServletRequest httpRequest) {
+    protected String getJSONWebToken(HttpServletRequest httpRequest) {
         String jwt = httpRequest.getHeader("Authorization");
         if(jwt != null && jwt.startsWith("Bearer ")) {
             jwt = jwt.substring("Bearer ".length());

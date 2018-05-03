@@ -31,6 +31,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.Base64Codec;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -40,6 +41,7 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.codec.Base64;
 import org.apache.shiro.crypto.hash.HashService;
 import org.apache.shiro.crypto.hash.format.HashFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -48,7 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.io.Serializable;
+import java.io.*;
 import java.security.Key;
 import java.util.*;
 
@@ -91,13 +93,33 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         Jwt jwt = Jwts.parser().setSigningKey(key).parse(token.getPrincipal());
         Map body = (Map) jwt.getBody();
         String credentials = legacyHashing ? token.getCredentials() : encryptPassword(token.getCredentials());
-        return new SimpleAuthenticationInfo(body.get("principal"), credentials, getName());
+        String base64Principal = (String) body.get("serialized-principal");
+        byte[] serializedPrincipal = Base64.decode(base64Principal);
+        Object principal;
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedPrincipal));
+            principal = objectInputStream.readObject();
+            objectInputStream.close();
+        } catch (Exception e) {
+            throw new AuthenticationException(e);
+        }
+        return new SimpleAuthenticationInfo(principal, credentials, getName());
     }
 
     public String generateWebToken(Object principal) {
         Key key = getJWTKey();
         Map<String, Object> claims = new HashMap<>();
         claims.put("principal", principal);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            objectOutputStream = new ObjectOutputStream(bytes);
+            objectOutputStream.writeObject(principal);
+            objectOutputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        claims.put("serialized-principal", bytes.toByteArray());
         return Jwts.builder().
                 setClaims(claims).
                 setExpiration(new DateTime().plusDays(1).toDate()).

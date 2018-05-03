@@ -25,8 +25,6 @@ export class CrudComponent implements OnInit {
     ).subscribe(result => {
       if(result['jwt']) {
         localStorage.setItem('jwt', result['jwt']);
-      } else {
-        localStorage.removeItem('jwt')
       }
       this.http.get<ClassAccessor>(this.portofinoService.apiPath + this.config.path + '/:classAccessor').subscribe(
         classAccessor => this.classAccessor = classAccessor
