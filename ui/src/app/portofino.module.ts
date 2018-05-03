@@ -6,7 +6,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PortofinoComponent } from './portofino.component';
 import { CrudComponent } from './crud/crud.component';
 import { PortofinoService } from './portofino.service';
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {AuthenticationService} from "./security/authentication.service";
 
 
 @NgModule({
@@ -17,7 +18,11 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     BrowserModule, FormsModule, HttpClientModule, NgbModule.forRoot()
   ],
-  providers: [PortofinoService],
+  providers: [PortofinoService, {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthenticationService,
+    multi: true
+  }],
   bootstrap: [PortofinoComponent]
 })
 export class PortofinoModule { }

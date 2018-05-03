@@ -25,7 +25,15 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.Base64Codec;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.authz.AuthorizationException;
@@ -36,8 +44,12 @@ import org.apache.shiro.crypto.hash.HashService;
 import org.apache.shiro.crypto.hash.format.HashFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.Serializable;
+import java.security.Key;
 import java.util.*;
 
 /**
@@ -57,12 +69,49 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     protected PasswordService passwordService;
 
+    protected boolean legacyHashing = false;
+
     protected AbstractPortofinoRealm() {
         //Legacy - let the actual implementation handle hashing
         setup(new PlaintextHashService(), new PlaintextHashFormat());
+        legacyHashing = true;
     }
 
     //--------------------------------------------------------------------------
+    // Authentication
+    //--------------------------------------------------------------------------
+
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof JSONWebToken || super.supports(token);
+    }
+
+    public AuthenticationInfo loadAuthenticationInfo(JSONWebToken token) {
+        Key key = getJWTKey();
+        Jwt jwt = Jwts.parser().setSigningKey(key).parse(token.getPrincipal());
+        Map body = (Map) jwt.getBody();
+        String credentials = legacyHashing ? token.getCredentials() : encryptPassword(token.getCredentials());
+        return new SimpleAuthenticationInfo(body.get("principal"), credentials, getName());
+    }
+
+    public String generateWebToken(Object principal) {
+        Key key = getJWTKey();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("principal", principal);
+        return Jwts.builder().
+                setClaims(claims).
+                setExpiration(new DateTime().plusDays(1).toDate()).
+                signWith(SignatureAlgorithm.HS512, key).
+                compact();
+    }
+
+    @NotNull
+    protected Key getJWTKey() {
+        String secret = portofinoConfiguration.getString("jwt.secret");
+        return new SecretKeySpec(Base64Codec.BASE64.decode(secret), SignatureAlgorithm.HS512.getJcaName());
+    }
+
+    // --------------------------------------------------------------------------
     // Authorization
     //--------------------------------------------------------------------------
 
@@ -184,5 +233,6 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         passwordMatcher.setPasswordService(passwordService);
         setCredentialsMatcher(passwordMatcher);
         this.passwordService = passwordService;
+        this.legacyHashing = false;
     }
 }

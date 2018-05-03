@@ -20,33 +20,6 @@
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
-    <!--
-        Include the following in your web.xml to enable container-managed security.
-
-        For Google AppEngine only:
-        note that, in order to properly use the GAE user service, you must also ensure that the class defined in your
-        Security.groovy file inherits from com.manydesigns.portofino.shiro.GAEPortofinoRealm and that your
-        app.properties file contains the following settings:
-
-            login.link={0}/actions/user/login.gae?login=&returnUrl={1}
-            logout.link={0}/actions/user/login.gae?logout=
-
-        Those URLs point to the built-in action com.manydesigns.portofino.actions.GAELoginAction which is mapped to
-        the path /actions/user/login.gae and exposes the two methods login() and logout(). The action is automatically
-        discovered by Stripes based on its package.
-    -->
-    <!--
-    <filter>
-        <filter-name>ServletContainerSecurityFilter</filter-name>
-        <filter-class>com.manydesigns.portofino.shiro.ServletContainerSecurityFilter</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>ServletContainerSecurityFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    -->
-
     <filter>
         <filter-name>portofino-dispatcher</filter-name>
         <filter-class>

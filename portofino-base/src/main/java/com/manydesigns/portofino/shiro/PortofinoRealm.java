@@ -159,4 +159,5 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     Set<String> getGroups();
 
+    String generateWebToken(Object principal);
 }

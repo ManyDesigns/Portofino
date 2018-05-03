@@ -56,7 +56,7 @@ class Security extends AbstractPortofinoRealm {
         Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("email", login).ignoreCase());
 
-        Serializable principal = (Serializable)criteria.uniqueResult();
+        Serializable principal = (Serializable) criteria.uniqueResult();
 
         if (principal == null) {
             throw new UnknownAccountException("Unknown user");
@@ -73,7 +73,7 @@ class Security extends AbstractPortofinoRealm {
 
         SimpleAuthenticationInfo info =
                 new SimpleAuthenticationInfo(
-                        principal, plainTextPassword.toCharArray(), getName());
+                        cleanUser(principal), plainTextPassword.toCharArray(), getName());
         return info;
     }
 
@@ -87,7 +87,7 @@ class Security extends AbstractPortofinoRealm {
         Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("token", token));
 
-        Serializable principal = (Serializable)criteria.uniqueResult();
+        Serializable principal = (Serializable) criteria.uniqueResult();
 
         if (principal == null) {
             throw new IncorrectCredentialsException();
@@ -105,7 +105,7 @@ class Security extends AbstractPortofinoRealm {
 
         SimpleAuthenticationInfo info =
                 new SimpleAuthenticationInfo(
-                        principal, token, getName());
+                        cleanUser(principal), token, getName());
         return info;
     }
 
@@ -133,7 +133,7 @@ class Security extends AbstractPortofinoRealm {
 
         SimpleAuthenticationInfo info =
                 new SimpleAuthenticationInfo(
-                        principal, token, getName());
+                        cleanUser(principal), token, getName());
         return info;
     }
 
@@ -143,18 +143,27 @@ class Security extends AbstractPortofinoRealm {
         principal.last_access_ip = request.getRemoteAddr();
     }
 
+    protected Map cleanUser(user) {
+        Map cleanUser = new HashMap()
+        user.each { k, v ->
+            if (v instanceof List || v instanceof Map) {
+                logger.debug("Skipping {}", k)
+            } else {
+                cleanUser.put(k, v)
+            }
+        }
+        cleanUser
+    }
 
-    public String encryptPassword(String plainText) {
+    String encryptPassword(String plainText) {
         Sha1Hash sha1Hash = new Sha1Hash(plainText);
         String encrypted = sha1Hash.toHex();
         return encrypted;
     }
 
     @Override
-    public boolean supports(AuthenticationToken token) {
-        return token instanceof PasswordResetToken ||
-               token instanceof UsernamePasswordToken ||
-               token instanceof SignUpToken;
+    boolean supports(AuthenticationToken token) {
+        token instanceof PasswordResetToken || token instanceof SignUpToken || super.supports(token)
     }
 
     //--------------------------------------------------------------------------
