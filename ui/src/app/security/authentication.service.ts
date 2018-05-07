@@ -14,10 +14,16 @@ import "rxjs/add/operator/skipWhile";
 import 'rxjs/add/observable/throw';
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/takeWhile";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {LoginComponent} from "./login/login.component";
+import "rxjs/add/observable/fromPromise";
+import "rxjs/add/operator/mergeMap";
+import {identity} from "rxjs/util/identity";
 
 @Injectable()
 export class AuthenticationService implements HttpInterceptor {
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient, private modal: NgbModal) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     req = this.withAuthenticationHeader(req);
@@ -26,20 +32,13 @@ export class AuthenticationService implements HttpInterceptor {
     return observable.catch((error, caught) => {
       if (error.status === 401) {
         localStorage.removeItem('jwt');
-        let askForCredentials: Observable<any> = Observable.create(function(observer) {
-          http.post(
-            "http://localhost:8080/demo-tt/api/login",
-            new HttpParams({fromObject: {"username": "alessiostalla@gmail.com", "password": "admin"}}),
-            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-          ).subscribe(result => {
-            if(result['jwt']) {
-              localStorage.setItem('jwt', result['jwt']);
-            }
-            observer.complete();
-          }, error => observer.error(error));
-        });
-        return askForCredentials.concat(http.request(this.withAuthenticationHeader(req)));
-
+        let promise = this.modal.open(LoginComponent).result;
+        let askForCredentials = Observable.fromPromise(promise);
+        return askForCredentials.do(result => {
+          if(result['jwt']) {
+            localStorage.setItem('jwt', result['jwt']);
+          }
+        }).concat(http.request(this.withAuthenticationHeader(req)));
       }
       return Observable.throw(error);
     });

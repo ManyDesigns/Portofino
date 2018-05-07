@@ -8,12 +8,14 @@ import { CrudComponent } from './crud/crud.component';
 import { PortofinoService } from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {AuthenticationService} from "./security/authentication.service";
+import { LoginComponent } from './security/login/login.component';
 
 
 @NgModule({
   declarations: [
     PortofinoComponent,
-    CrudComponent
+    CrudComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule, FormsModule, HttpClientModule, NgbModule.forRoot()
@@ -23,6 +25,7 @@ import {AuthenticationService} from "./security/authentication.service";
     useClass: AuthenticationService,
     multi: true
   }],
-  bootstrap: [PortofinoComponent]
+  bootstrap: [PortofinoComponent],
+  entryComponents: [LoginComponent]
 })
 export class PortofinoModule { }
