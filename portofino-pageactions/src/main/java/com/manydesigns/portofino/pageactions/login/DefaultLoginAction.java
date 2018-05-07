@@ -55,9 +55,11 @@ import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -112,7 +114,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
             return stringer.toString();
         } catch (AuthenticationException e) {
             logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);
-            throw e;
+            throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
         }
         return "{}";
     }

@@ -18,18 +18,12 @@ export class CrudComponent implements OnInit {
   constructor(private http: HttpClient, public portofinoService: PortofinoService) { }
 
   ngOnInit() {
-    this.http.post(
-      "http://localhost:8080/demo-tt/api/login",
-      new HttpParams({fromObject: {"username": "alessiostalla@gmail.com", "password": "admin"}}),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).subscribe(result => {
-      if(result['jwt']) {
-        localStorage.setItem('jwt', result['jwt']);
-      }
-      this.http.get<ClassAccessor>(this.portofinoService.apiPath + this.config.path + '/:classAccessor').subscribe(
-        classAccessor => this.classAccessor = classAccessor
-      );
-    });
+    this.http.get<ClassAccessor>(this.portofinoService.apiPath + this.config.path + '/:classAccessor').subscribe(
+      classAccessor => this.classAccessor = classAccessor
+    );
+    this.http.get<ClassAccessor>(this.portofinoService.apiPath + 'admin/users').subscribe(
+      x => console.log("crud", x)
+    );
   }
 
 }
