@@ -15,10 +15,9 @@ import 'rxjs/add/observable/throw';
 import "rxjs/add/observable/of";
 import "rxjs/add/operator/takeWhile";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
-import {LoginComponent} from "./login/login.component";
+import {LoginComponent, UserDeclinedLogin} from "./login/login.component";
 import "rxjs/add/observable/fromPromise";
 import "rxjs/add/operator/mergeMap";
-import {identity} from "rxjs/util/identity";
 
 @Injectable()
 export class AuthenticationService implements HttpInterceptor {
@@ -29,18 +28,39 @@ export class AuthenticationService implements HttpInterceptor {
     req = this.withAuthenticationHeader(req);
     let observable = next.handle(req);
     let http = this.http;
-    return observable.catch((error, caught) => {
+    return observable.catch((error) => {
       if (error.status === 401) {
         localStorage.removeItem('jwt');
-        let promise = this.modal.open(LoginComponent).result;
-        let askForCredentials = Observable.fromPromise(promise);
-        return askForCredentials.do(result => {
-          if(result['jwt']) {
-            localStorage.setItem('jwt', result['jwt']);
-          }
-        }).concat(http.request(this.withAuthenticationHeader(req)));
+        return this.askForCredentials().concat(http.request(this.withAuthenticationHeader(req)));
       }
       return Observable.throw(error);
+    });
+  }
+
+  protected askForCredentials() {
+    let modal = this.modal;
+    function prompt(): Observable<any> {
+      return Observable.create(function (observer) {
+        let promise = modal.open(LoginComponent).result;
+        promise.then(function (result) {
+          observer.next(result);
+          observer.complete();
+        }).catch(function (error) {
+          observer.error(error);
+        });
+      });
+    }
+
+    return prompt().catch((error, _) => {
+      if(error instanceof UserDeclinedLogin) {
+        throw error;
+      } else {
+        return prompt();
+      }
+    }).do(result => {
+      if (result['jwt']) {
+        localStorage.setItem('jwt', result['jwt']);
+      }
     });
   }
 

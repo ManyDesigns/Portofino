@@ -15,14 +15,15 @@ export class CrudComponent implements OnInit {
 
   classAccessor: ClassAccessor;
 
-  constructor(private http: HttpClient, public portofinoService: PortofinoService) { }
+  constructor(private http: HttpClient, public portofino: PortofinoService) { }
 
   ngOnInit() {
-    this.http.get<ClassAccessor>(this.portofinoService.apiPath + this.config.path + '/:classAccessor').subscribe(
+    this.http.get<ClassAccessor>(this.portofino.apiPath + this.config.path + '/:classAccessor').subscribe(
       classAccessor => this.classAccessor = classAccessor
     );
-    this.http.get<ClassAccessor>(this.portofinoService.apiPath + 'admin/users').subscribe(
-      x => console.log("crud", x)
+    this.http.get<ClassAccessor>(this.portofino.apiPath + 'admin/users').subscribe(
+      x => console.log("crud", x),
+      e => console.error("error", e)
     );
   }
 

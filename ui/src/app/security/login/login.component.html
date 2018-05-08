@@ -1,12 +1,15 @@
 <div class="modal-header">
-  <h4 class="modal-title">Modal title</h4>
+  <h4 class="modal-title">Sign in</h4>
   <button type="button" class="close" aria-label="Close" (click)="close()">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 <div class="modal-body">
-  <p>One fine body&hellip;</p>
+  <p>
+    <input type="text" [(ngModel)]="username">
+    <input type="password" [(ngModel)]="password">
+  </p>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-dark" (click)="login()">Login</button>
+  <button type="button" class="btn btn-outline-dark" (click)="login()">Sign in</button>
 </div>
