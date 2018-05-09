@@ -5,6 +5,7 @@
   </button>
 </div>
 <div class="modal-body">
+  <p *ngIf="message" style="color: red;">{{message}}</p>
   <p>
     <input type="text" [(ngModel)]="username">
     <input type="password" [(ngModel)]="password">

@@ -13,6 +13,7 @@ export class LoginComponent implements OnInit {
 
   username: string;
   password: string;
+  message: string;
   loginPath: string = "login";
 
   constructor(private modal: NgbActiveModal, private http: HttpClient, private portofino: PortofinoService) { }
@@ -31,7 +32,11 @@ export class LoginComponent implements OnInit {
         this.password = "";
       },
       error => {
-        this.modal.dismiss(error);
+        if(error.status == 401) {
+          this.message = "Login failed";
+        } else {
+          this.modal.dismiss(error);
+        }
         this.password = "";
       });
   }

@@ -22,9 +22,14 @@ import "rxjs/add/operator/mergeMap";
 @Injectable()
 export class AuthenticationService implements HttpInterceptor {
 
+  loginModal;
+
   constructor(private http: HttpClient, private modal: NgbModal) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if(this.loginModal) {
+      return next.handle(req);
+    }
     req = this.withAuthenticationHeader(req);
     let observable = next.handle(req);
     let http = this.http;
@@ -38,14 +43,19 @@ export class AuthenticationService implements HttpInterceptor {
   }
 
   protected askForCredentials() {
-    let modal = this.modal;
+    let self = this;
     function prompt(): Observable<any> {
       return Observable.create(function (observer) {
-        let promise = modal.open(LoginComponent).result;
+        if(!self.loginModal) {
+          self.loginModal = self.modal.open(LoginComponent);
+        }
+        let promise = self.loginModal.result;
         promise.then(function (result) {
+          self.loginModal = null;
           observer.next(result);
           observer.complete();
         }).catch(function (error) {
+          self.loginModal = null;
           observer.error(error);
         });
       });
