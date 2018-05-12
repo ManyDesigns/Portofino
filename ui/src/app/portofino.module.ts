@@ -9,6 +9,7 @@ import { PortofinoService } from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {AuthenticationService} from "./security/authentication.service";
 import { LoginComponent } from './security/login/login.component';
+import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
 
 
 @NgModule({
@@ -20,11 +21,10 @@ import { LoginComponent } from './security/login/login.component';
   imports: [
     BrowserModule, FormsModule, HttpClientModule, NgbModule.forRoot()
   ],
-  providers: [PortofinoService, {
-    provide: HTTP_INTERCEPTORS,
-    useClass: AuthenticationService,
-    multi: true
-  }],
+  providers: [
+    PortofinoService,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthenticationService, multi: true },
+    { provide: TokenStorageService, useClass: LocalTokenStorageService }],
   bootstrap: [PortofinoComponent],
   entryComponents: [LoginComponent]
 })

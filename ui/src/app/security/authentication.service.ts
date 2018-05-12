@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   HttpClient,
-  HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpParams,
-  HttpRequest
+  HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
 } from "@angular/common/http";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/operator/catch";
@@ -18,13 +17,14 @@ import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {LoginComponent, UserDeclinedLogin} from "./login/login.component";
 import "rxjs/add/observable/fromPromise";
 import "rxjs/add/operator/mergeMap";
+import {TokenStorageService} from "./token-storage.service";
 
 @Injectable()
 export class AuthenticationService implements HttpInterceptor {
 
   loginModal;
 
-  constructor(private http: HttpClient, private modal: NgbModal) { }
+  constructor(private http: HttpClient, private modal: NgbModal, private storage: TokenStorageService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if(this.loginModal) {
@@ -35,7 +35,7 @@ export class AuthenticationService implements HttpInterceptor {
     let http = this.http;
     return observable.catch((error) => {
       if (error.status === 401) {
-        localStorage.removeItem('jwt');
+        this.storage.remove();
         return this.askForCredentials().concat(http.request(this.withAuthenticationHeader(req)));
       }
       return Observable.throw(error);
@@ -69,18 +69,18 @@ export class AuthenticationService implements HttpInterceptor {
       }
     }).do(result => {
       if (result['jwt']) {
-        localStorage.setItem('jwt', result['jwt']);
+        this.storage.set(result['jwt']);
       }
     });
   }
 
   protected withAuthenticationHeader(req: HttpRequest<any>) {
-    if(!localStorage.getItem('jwt')) {
+    if(!this.storage.get()) {
       return req;
     }
     req = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${localStorage.getItem('jwt')}`
+        Authorization: `Bearer ${this.storage.get()}`
       }
     });
     return req;

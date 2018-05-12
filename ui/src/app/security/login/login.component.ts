@@ -32,11 +32,7 @@ export class LoginComponent implements OnInit {
         this.password = "";
       },
       error => {
-        if(error.status == 401) {
-          this.message = "Login failed";
-        } else {
-          this.modal.dismiss(error);
-        }
+        this.message = "Login failed";
         this.password = "";
       });
   }
