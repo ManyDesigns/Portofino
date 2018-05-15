@@ -1,0 +1,9 @@
+<div class="form-group" *ngIf="property.type == 'java.lang.String'">
+  <label [for]="parent.getFieldId('search', property)">{{property.name}}</label>
+  <input [id]="parent.getFieldId('search', property)" [(ngModel)]="parent.searchValues[property.name]">
+</div>
+<div class="form-group" *ngIf="property.type == 'java.lang.Long'">
+  <label [for]="parent.getFieldId('search', property)">{{property.name}}</label>
+  <input [id]="parent.getFieldId('search', property)" [(ngModel)]="parent.searchValues[property.name]"
+         type="number">
+</div>

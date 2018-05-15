@@ -10,13 +10,15 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {AuthenticationService} from "./security/authentication.service";
 import { LoginComponent } from './security/login/login.component';
 import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
+import { SearchFieldComponent } from './crud/search-field/search-field.component';
 
 
 @NgModule({
   declarations: [
     PortofinoComponent,
     CrudComponent,
-    LoginComponent
+    LoginComponent,
+    SearchFieldComponent
   ],
   imports: [
     BrowserModule, FormsModule, HttpClientModule, NgbModule.forRoot()

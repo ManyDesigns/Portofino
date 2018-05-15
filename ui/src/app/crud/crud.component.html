@@ -1,3 +1,11 @@
-<p *ngIf="classAccessor">
-  crud works! Accessor: {{classAccessor.name}}
-</p>
+<div *ngIf="classAccessor">
+  Search
+  <form (submit)="search()">
+    <portofino-crud-search-field
+      *ngFor="let field of searchFields"
+      [parent]="this" [property]="field">
+    </portofino-crud-search-field>
+    <button class="btn btn-primary">Search</button>
+    <button type="button" (click)="clearSearch()" class="btn btn-secondary">Clear</button>
+  </form>
+</div>
