@@ -6,11 +6,19 @@
 </div>
 <div class="modal-body">
   <p *ngIf="message" style="color: red;">{{message}}</p>
-  <p>
-    <input type="text" [(ngModel)]="username">
-    <input type="password" [(ngModel)]="password">
-  </p>
+  <form (submit)="login()">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" [(ngModel)]="username">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" [(ngModel)]="password">
+    </div>
+    <button type="submit" style="display:none">Sign in</button>
+  </form>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-dark" (click)="login()">Sign in</button>
+  <button type="button" class="btn btn-outline-primary" (click)="login()">Sign in</button>
+  <button type="button" class="btn btn-outline-secondary" (click)="close()">Cancel</button>
 </div>
