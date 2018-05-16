@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
-import {ClassAccessor, isSearchable, Property} from "./class-accessor";
+import {ClassAccessor, isInSummary, isSearchable, Property} from "../class-accessor";
 
 @Component({
   selector: 'portofino-crud',
@@ -15,8 +15,10 @@ export class CrudComponent implements OnInit {
   classAccessor: ClassAccessor;
   classAccessorPath = '/:classAccessor';
 
-  searchFields: Property[];
+  searchFields: Property[] = [];
   searchValues = {};
+  searchResults: SearchResults;
+  searchResultFields: Property[] = [];
 
   constructor(private http: HttpClient, public portofino: PortofinoService) { }
 
@@ -28,13 +30,15 @@ export class CrudComponent implements OnInit {
 
   protected init(classAccessor: ClassAccessor) {
     this.classAccessor = classAccessor;
-    this.searchFields = [];
     this.classAccessor.properties.forEach(property => {
       if(isSearchable(property)) {
         this.searchFields.push(property);
-        console.log("searchable", property);
+      }
+      if(isInSummary(property)) {
+        this.searchResultFields.push(property);
       }
     });
+    this.search();
   }
 
   getFieldId(prefix: string, field: Property) {
@@ -42,11 +46,30 @@ export class CrudComponent implements OnInit {
   }
 
   search() {
-    console.log("search", this.searchValues)
+    let params = new HttpParams();
+    let searchString = new HttpParams();
+    for(let p in this.searchValues) {
+      searchString = searchString.set(`search_${p}`, this.searchValues[p]);
+    }
+    params = params.set("searchString", searchString.toString());
+    this.http.get<SearchResults>(this.portofino.apiPath + this.config.path, { params: params }).subscribe(
+      results => {
+        results.records = results['Result'];
+        this.searchResults = results;
+      }
+    );
   }
 
   clearSearch() {
-    this.searchValues = {}
+    this.searchValues = {};
+    this.searchResults = null;
   }
 
+}
+
+class SearchResults {
+  recordsReturned: number;
+  totalRecords: number;
+  startIndex: number;
+  records: object[];
 }

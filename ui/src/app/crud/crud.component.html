@@ -8,4 +8,22 @@
     <button class="btn btn-primary">Search</button>
     <button type="button" (click)="clearSearch()" class="btn btn-secondary">Clear</button>
   </form>
+  <div class="search_results" *ngIf="searchResults">
+    <table class="table">
+      <thead>
+      <tr>
+        <th *ngFor="let field of searchResultFields">
+          {{field.name}}
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let row of searchResults.records">
+        <td *ngFor="let field of searchResultFields">
+          {{row[field.name].displayValue || row[field.name].value}}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

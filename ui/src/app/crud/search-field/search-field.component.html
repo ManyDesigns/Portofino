@@ -1,8 +1,8 @@
-<div class="form-group" *ngIf="property.type == 'java.lang.String'">
+<div class="form-group" *ngIf="parent.portofino.isString(property)">
   <label [for]="parent.getFieldId('search', property)">{{property.name}}</label>
   <input [id]="parent.getFieldId('search', property)" [(ngModel)]="parent.searchValues[property.name]">
 </div>
-<div class="form-group" *ngIf="property.type == 'java.lang.Long'">
+<div class="form-group" *ngIf="parent.portofino.isNumber(property)">
   <label [for]="parent.getFieldId('search', property)">{{property.name}}</label>
   <input [id]="parent.getFieldId('search', property)" [(ngModel)]="parent.searchValues[property.name]"
          type="number">

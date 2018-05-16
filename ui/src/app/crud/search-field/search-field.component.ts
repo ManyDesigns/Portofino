@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Property} from "../class-accessor";
+import {Property} from "../../class-accessor";
 import {CrudComponent} from "../crud.component";
 
 @Component({
