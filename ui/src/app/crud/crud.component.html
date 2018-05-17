@@ -5,25 +5,17 @@
       *ngFor="let field of searchFields"
       [parent]="this" [property]="field">
     </portofino-crud-search-field>
-    <button class="btn btn-primary">Search</button>
-    <button type="button" (click)="clearSearch()" class="btn btn-secondary">Clear</button>
+    <button mat-button color="primary">Search</button>
+    <button mat-button="" (click)="clearSearch()" class="btn btn-secondary">Clear</button>
   </form>
   <div class="search_results" *ngIf="searchResults">
-    <table class="table">
-      <thead>
-      <tr>
-        <th *ngFor="let field of searchResultFields">
-          {{field.name}}
-        </th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let row of searchResults.records">
-        <td *ngFor="let field of searchResultFields">
-          {{row[field.name].displayValue || row[field.name].value}}
-        </td>
-      </tr>
-      </tbody>
+    <table mat-table [dataSource]="searchResultsDataSource">
+      <ng-container *ngFor="let field of searchResultFields" [matColumnDef]="field.name">
+        <th mat-header-cell *matHeaderCellDef>{{field.name}}</th>
+        <td mat-cell *matCellDef="let row">{{row[field.name].displayValue || row[field.name].value}}</td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
     </table>
   </div>
 </div>

@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor, isInSummary, isSearchable, Property} from "../class-accessor";
+import {MatTableDataSource} from "@angular/material";
 
 @Component({
   selector: 'portofino-crud',
@@ -18,7 +19,9 @@ export class CrudComponent implements OnInit {
   searchFields: Property[] = [];
   searchValues = {};
   searchResults: SearchResults;
+  searchResultsDataSource = new MatTableDataSource();
   searchResultFields: Property[] = [];
+  columnsToDisplay: string[] = [];
 
   constructor(private http: HttpClient, public portofino: PortofinoService) { }
 
@@ -36,6 +39,7 @@ export class CrudComponent implements OnInit {
       }
       if(isInSummary(property)) {
         this.searchResultFields.push(property);
+        this.columnsToDisplay.push(property.name);
       }
     });
     this.search();
@@ -56,6 +60,7 @@ export class CrudComponent implements OnInit {
       results => {
         results.records = results['Result'];
         this.searchResults = results;
+        this.searchResultsDataSource.data = this.searchResults.records;
       }
     );
   }
@@ -63,6 +68,7 @@ export class CrudComponent implements OnInit {
   clearSearch() {
     this.searchValues = {};
     this.searchResults = null;
+    this.searchResultsDataSource.data = [];
   }
 
 }

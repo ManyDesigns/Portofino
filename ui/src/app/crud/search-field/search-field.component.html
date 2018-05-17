@@ -1,9 +1,8 @@
-<div class="form-group" *ngIf="parent.portofino.isString(property)">
-  <label [for]="parent.getFieldId('search', property)">{{property.name}}</label>
-  <input [id]="parent.getFieldId('search', property)" [(ngModel)]="parent.searchValues[property.name]">
-</div>
-<div class="form-group" *ngIf="parent.portofino.isNumber(property)">
-  <label [for]="parent.getFieldId('search', property)">{{property.name}}</label>
-  <input [id]="parent.getFieldId('search', property)" [(ngModel)]="parent.searchValues[property.name]"
-         type="number">
-</div>
+<mat-form-field *ngIf="parent.portofino.isString(property)">
+  <input matInput [(ngModel)]="parent.searchValues[property.name]"
+         [placeholder]="property.name">
+</mat-form-field >
+<mat-form-field  *ngIf="parent.portofino.isNumber(property)">
+  <input matInput [(ngModel)]="parent.searchValues[property.name]"
+         type="number" [placeholder]="property.name">
+</mat-form-field >
