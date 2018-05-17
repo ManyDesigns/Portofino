@@ -1,24 +1,17 @@
-<div class="modal-header">
-  <h4 class="modal-title">Sign in</h4>
-  <button type="button" class="close" aria-label="Close" (click)="close()">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-<div class="modal-body">
+<h4 mat-dialog-title>Sign in</h4>
+<mat-dialog-content>
   <p *ngIf="message" style="color: red;">{{message}}</p>
   <form (submit)="login()">
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input id="username" name="username" type="text" [(ngModel)]="username">
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" [(ngModel)]="password">
-    </div>
+    <mat-form-field>
+      <input matInput placeholder="Username" [(ngModel)]="username" name="username">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="Password" type="password" [(ngModel)]="password" name="password">
+    </mat-form-field>
     <button type="submit" style="display:none">Sign in</button>
   </form>
-</div>
-<div class="modal-footer">
-  <button type="button" class="btn btn-outline-primary" (click)="login()">Sign in</button>
-  <button type="button" class="btn btn-outline-secondary" (click)="close()">Cancel</button>
-</div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="login()" color="primary">Sign in</button>
+  <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>
