@@ -17,7 +17,7 @@ export class PortofinoService {
   }
 
   isDate(property: Property) {
-    return property.type == 'java.util.Date'
+    return property.type == 'java.util.Date' || property.type == 'java.sql.Timestamp';
   }
 
 }

@@ -65,11 +65,7 @@ export class CrudComponent implements OnInit {
 
   protected loadSearchResultsPage(page: number) {
     let params = new HttpParams();
-    let searchString = new HttpParams();
-    for (let p in this.searchValues) {
-      searchString = searchString.set(`search_${p}`, this.searchValues[p]);
-    }
-    params = params.set("searchString", searchString.toString());
+    params = this.composeSearch(params);
     params = params.set("firstResult", (page * this.pageSize).toString());
     params = params.set("maxResults", this.pageSize.toString());
     if(this.sortInfo) {
@@ -85,6 +81,28 @@ export class CrudComponent implements OnInit {
     );
   }
 
+  protected composeSearch(params: HttpParams) {
+    for (let p in this.searchValues) {
+      if (this.searchValues[p] === null) {
+        continue;
+      }
+      const property = this.searchFields.find(value => value.name == p);
+      if (!property) {
+        continue;
+      }
+      if (this.portofino.isDate(property)) {
+        params = params.set(`search_${p}_min`, this.searchValues[p].valueOf().toString());
+        params = params.set(`search_${p}_max`, this.searchValues[p].valueOf().toString());
+      } else if (this.portofino.isNumber(property)) {
+        params = params.set(`search_${p}_min`, this.searchValues[p].toString());
+        params = params.set(`search_${p}_max`, this.searchValues[p].toString());
+      } else {
+        params = params.set(`search_${p}`, this.searchValues[p].toString());
+      }
+    }
+    return params;
+  }
+
   loadPage(event: PageEvent) {
     this.loadSearchResultsPage(event.pageIndex);
   }
@@ -96,8 +114,6 @@ export class CrudComponent implements OnInit {
 
   clearSearch() {
     this.searchValues = {};
-    this.searchResults = null;
-    this.searchResultsDataSource.data = [];
   }
 
 }

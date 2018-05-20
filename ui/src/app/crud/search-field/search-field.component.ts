@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Property} from "../../class-accessor";
 import {CrudComponent} from "../crud.component";
+import {PortofinoService} from "../../portofino.service";
 
 @Component({
   selector: 'portofino-crud-search-field',
@@ -15,7 +16,7 @@ export class SearchFieldComponent implements OnInit {
   @Input()
   parent: CrudComponent;
 
-  constructor() { }
+  constructor(public portofino: PortofinoService) { }
 
   ngOnInit() {
   }

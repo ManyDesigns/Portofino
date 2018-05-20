@@ -21,10 +21,12 @@
     "@angular/forms": "^6.0.2",
     "@angular/http": "^6.0.2",
     "@angular/material": "^6.0.2",
+    "@angular/material-moment-adapter": "^6.0.2",
     "@angular/platform-browser": "^6.0.0",
     "@angular/platform-browser-dynamic": "^6.0.0",
     "@angular/router": "^6.0.2",
     "core-js": "^2.4.1",
+    "moment": "^2.22.1",
     "rxjs": "^6.0.0",
     "zone.js": "^0.8.19"
   },
