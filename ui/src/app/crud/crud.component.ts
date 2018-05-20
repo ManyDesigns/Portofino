@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor, isInSummary, isSearchable, Property} from "../class-accessor";
-import {MatTableDataSource, PageEvent} from "@angular/material";
+import {MatTableDataSource, MatSort, PageEvent, Sort} from "@angular/material";
 
 @Component({
   selector: 'portofino-crud',
@@ -16,6 +16,7 @@ export class CrudComponent implements OnInit {
 
   classAccessor: ClassAccessor;
   classAccessorPath = '/:classAccessor';
+  configuationPath = '/:configuration';
 
   searchFields: Property[] = [];
   searchValues = {};
@@ -24,17 +25,20 @@ export class CrudComponent implements OnInit {
   searchResultFields: Property[] = [];
   columnsToDisplay: string[] = [];
   @Input()
-  pageSize = 1;
+  pageSize: number;
+  sortInfo: Sort;
 
   constructor(private http: HttpClient, public portofino: PortofinoService) { }
 
   ngOnInit() {
     this.http.get<ClassAccessor>(this.portofino.apiPath + this.config.path + this.classAccessorPath).subscribe(
-      classAccessor => this.init(classAccessor)
+      classAccessor => this.http.get<Configuration>(this.portofino.apiPath + this.config.path + this.configuationPath).subscribe(
+        configuration => this.init(classAccessor, configuration)
+      )
     );
   }
 
-  protected init(classAccessor: ClassAccessor) {
+  protected init(classAccessor: ClassAccessor, configuration: Configuration) {
     this.classAccessor = classAccessor;
     this.classAccessor.properties.forEach(property => {
       if(isSearchable(property)) {
@@ -45,6 +49,9 @@ export class CrudComponent implements OnInit {
         this.columnsToDisplay.push(property.name);
       }
     });
+    if(!this.pageSize) {
+      this.pageSize = configuration.rowsPerPage;
+    }
     this.search();
   }
 
@@ -65,6 +72,10 @@ export class CrudComponent implements OnInit {
     params = params.set("searchString", searchString.toString());
     params = params.set("firstResult", (page * this.pageSize).toString());
     params = params.set("maxResults", this.pageSize.toString());
+    if(this.sortInfo) {
+      params = params.set("sortProperty", this.sortInfo.active);
+      params = params.set("sortDirection", this.sortInfo.direction);
+    }
     this.http.get<SearchResults>(this.portofino.apiPath + this.config.path, {params: params}).subscribe(
       results => {
         results.records = results['Result'];
@@ -76,6 +87,11 @@ export class CrudComponent implements OnInit {
 
   loadPage(event: PageEvent) {
     this.loadSearchResultsPage(event.pageIndex);
+  }
+
+  sort(sort: Sort) {
+    this.sortInfo = sort;
+    this.loadSearchResultsPage(0);
   }
 
   clearSearch() {
@@ -91,4 +107,8 @@ class SearchResults {
   totalRecords: number;
   startIndex: number;
   records: object[];
+}
+
+class Configuration {
+  rowsPerPage: number;
 }

@@ -12,7 +12,8 @@ import { LoginComponent } from './security/login/login.component';
 import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
 import { SearchFieldComponent } from './crud/search-field/search-field.component';
 import {
-  MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatPaginatorModule, MatTableModule
+  MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatPaginatorModule, MatSortModule,
+  MatTableModule
 } from '@angular/material';
 import {FlexLayoutModule} from "@angular/flex-layout";
 
@@ -26,7 +27,8 @@ import {FlexLayoutModule} from "@angular/flex-layout";
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule,
-    MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatPaginatorModule, MatTableModule
+    MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatPaginatorModule,
+    MatSortModule, MatTableModule
   ],
   providers: [
     PortofinoService,
