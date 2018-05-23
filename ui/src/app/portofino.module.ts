@@ -10,26 +10,27 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {AuthenticationService} from "./security/authentication.service";
 import { LoginComponent } from './security/login/login.component';
 import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
-import { SearchFieldComponent } from './crud/search-field/search-field.component';
+import { SearchFieldComponent } from './crud/search/search-field.component';
 import {
-  MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatPaginatorModule,
-  MatSortModule, MatTableModule
+  MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
+  MatPaginatorModule, MatSortModule, MatTableModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
-
+import { SearchComponent } from './crud/search/search.component';
 
 @NgModule({
   declarations: [
     PortofinoComponent,
     CrudComponent,
     LoginComponent,
-    SearchFieldComponent
+    SearchFieldComponent,
+    SearchComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule,
-    MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatPaginatorModule,
-    MatSortModule, MatTableModule,
+    MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatPaginatorModule, MatSortModule, MatTableModule,
     MatMomentDateModule
   ],
   providers: [

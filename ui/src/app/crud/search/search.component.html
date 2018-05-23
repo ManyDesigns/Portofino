@@ -1,0 +1,42 @@
+<div fxLayout="column" fxLayoutGap="20px">
+  <div>
+    Search
+    <form (submit)="search()">
+      <div fxLayout="row wrap" fxLayoutGap="10px" >
+        <portofino-crud-search-field
+          *ngFor="let field of searchFields"
+          [parent]="this" [property]="field">
+        </portofino-crud-search-field>
+      </div>
+      <div fxLayout="row">
+        <button mat-raised-button color="primary">
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+        <button mat-raised-button (click)="clearSearch()" type="reset">Clear</button>
+      </div>
+    </form>
+  </div>
+  <div class="search-results" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="start stretch">
+    <table mat-table [dataSource]="searchResultsDataSource"
+           matSort (matSortChange)="sort($event)"
+           class="mat-elevation-z8">
+      <ng-container *ngFor="let field of searchResultFields" [matColumnDef]="field.name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{field.name}}</th>
+        <td mat-cell *matCellDef="let row">{{row[field.name].displayValue || row[field.name].value}}</td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <button mat-raised-button color="accent">
+        <mat-icon>add</mat-icon>
+        Create new
+      </button>
+      <mat-paginator [length]="searchResults ? searchResults.totalRecords : 0"
+                     [pageSize]="pageSize"
+                     (page)="loadPage($event)">
+      </mat-paginator>
+    </div>
+  </div>
+</div>
