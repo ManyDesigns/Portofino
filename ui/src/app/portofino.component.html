@@ -3,5 +3,9 @@
     {{ title }}
   </h1>
 </div>
-<portofino-crud [config]="config"></portofino-crud>
-<a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a>
+<mat-sidenav-container>
+  <mat-sidenav [opened]="true" mode="side">Navigation</mat-sidenav>
+  <mat-sidenav-content>
+    <ng-template portofino-content></ng-template>
+  </mat-sidenav-content>
+</mat-sidenav-container>

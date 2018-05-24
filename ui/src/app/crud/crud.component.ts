@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor, isEnabled, isInSummary, isSearchable, isUpdatable, Property} from "../class-accessor";
+import {PortofinoComponent} from "../portofino.component";
 
 @Component({
   selector: 'portofino-crud',
@@ -9,6 +10,8 @@ import {ClassAccessor, isEnabled, isInSummary, isSearchable, isUpdatable, Proper
   styleUrls: ['./crud.component.css']
 })
 export class CrudComponent implements OnInit {
+
+  private static __componentRegistration = PortofinoComponent.components.crud = CrudComponent;
 
   @Input()
   config: any;
@@ -26,8 +29,6 @@ export class CrudComponent implements OnInit {
   editVisible = false;
 
   id: string;
-
-  createProperties: Property[] = [];
 
   constructor(private http: HttpClient, public portofino: PortofinoService) { }
 

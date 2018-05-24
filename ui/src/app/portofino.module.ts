@@ -13,7 +13,7 @@ import {LocalTokenStorageService, TokenStorageService} from "./security/token-st
 import { SearchFieldComponent } from './crud/search/search-field.component';
 import {
   MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-  MatPaginatorModule, MatSortModule, MatTableModule
+  MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -21,16 +21,17 @@ import { SearchComponent } from './crud/search/search.component';
 import { FieldComponent } from './crud/detail/field.component';
 import { EditComponent } from './crud/detail/edit.component';
 import { CreateComponent } from './crud/detail/create.component';
+import { ContentDirective } from './content.directive';
 
 @NgModule({
   declarations: [
     PortofinoComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent, FieldComponent,
-    EditComponent, CreateComponent
+    EditComponent, CreateComponent, ContentDirective
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule,
     MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatPaginatorModule, MatSortModule, MatTableModule,
+    MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule,
     MatMomentDateModule
   ],
   providers: [
@@ -38,6 +39,6 @@ import { CreateComponent } from './crud/detail/create.component';
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationService, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService }],
   bootstrap: [PortofinoComponent],
-  entryComponents: [LoginComponent]
+  entryComponents: [LoginComponent, CrudComponent]
 })
 export class PortofinoModule { }
