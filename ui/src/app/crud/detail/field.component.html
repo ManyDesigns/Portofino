@@ -1,21 +1,16 @@
-<div *ngIf="property.updatable">
-  <mat-form-field *ngIf="portofino.isString(property)">
-    <input matInput [(ngModel)]="object[property.name]"
-           [placeholder]="property.name">
-  </mat-form-field >
-  <mat-form-field  *ngIf="portofino.isNumber(property)">
-    <input matInput [(ngModel)]="object[property.name]"
-           type="number" [placeholder]="property.name">
-  </mat-form-field >
-  <mat-form-field  *ngIf="portofino.isDate(property)">
-    <input matInput [(ngModel)]="object[property.name]"
-           [placeholder]="property.name"
-           [matDatepicker]="datepicker">
-    <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
-    <mat-datepicker #datepicker></mat-datepicker>
-  </mat-form-field >
-</div>
-<div *ngIf="!property.updatable">
-  {{property.name}}:
-  <span *ngIf="object[property.name]">{{object[property.name].displayValue || object[property.name].value}}</span>
-</div>
+<mat-form-field *ngIf="portofino.isString(property)">
+  <input matInput [(ngModel)]="object[property.name]"
+         [placeholder]="property.name" [disabled]="!property.updatable">
+</mat-form-field >
+<mat-form-field  *ngIf="portofino.isNumber(property)">
+  <input matInput [(ngModel)]="object[property.name]"
+         [placeholder]="property.name" [disabled]="!property.updatable">
+</mat-form-field >
+<mat-form-field  *ngIf="portofino.isDate(property)">
+  <input matInput [(ngModel)]="object[property.name]"
+         [placeholder]="property.name"
+         [matDatepicker]="datepicker"
+         [disabled]="!property.updatable">
+  <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+  <mat-datepicker #datepicker></mat-datepicker>
+</mat-form-field >

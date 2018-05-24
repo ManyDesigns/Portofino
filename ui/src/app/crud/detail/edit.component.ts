@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {Configuration, CrudComponent} from "../crud.component";
 import {ClassAccessor, isEnabled, isUpdatable, Property} from "../../class-accessor";
+import * as moment from 'moment';
 
 @Component({
   selector: 'portofino-crud-edit',
@@ -21,6 +22,7 @@ export class EditComponent implements OnInit {
   close = new EventEmitter();
 
   properties: Property[] = [];
+  loadedObject;
   object;
 
   constructor(private http: HttpClient, private portofino: PortofinoService) { }
@@ -34,11 +36,24 @@ export class EditComponent implements OnInit {
       property.updatable = isUpdatable(property);
     });
     const objectUrl = `${this.portofino.apiPath + this.configuration.path}/${this.id}`;
-    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(
-      object => {
-        this.object = object;
+    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.initObject(o));
+  }
+
+  protected initObject(object) {
+    this.loadedObject = object;
+    this.object = {};
+    this.properties.forEach(p => {
+      if(!object[p.name]) {
+        return;
       }
-    );
+      if (this.portofino.isDate(p)) {
+        this.object[p.name] = moment(object[p.name].value);
+      } else if(!p.updatable && object[p.name].displayValue) {
+        this.object[p.name] = object[p.name].displayValue;
+      } else {
+        this.object[p.name] = object[p.name].value;
+      }
+    });
   }
 
   cancel() {
@@ -46,7 +61,16 @@ export class EditComponent implements OnInit {
   }
 
   save() {
-
+    const objectUrl = `${this.portofino.apiPath + this.configuration.path}/${this.id}`;
+    let object = {...this.object};
+    this.properties.forEach(p => {
+      if (this.portofino.isDate(p) && object[p.name]) {
+        object[p.name] = object[p.name].valueOf();
+      } else if(!p.updatable && this.loadedObject[p.name]) {
+        object[p.name] = this.loadedObject[p.name].value;
+      }
+    });
+    this.http.put(objectUrl, object).subscribe(o => this.close.emit(object));
   }
 
 }

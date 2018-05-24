@@ -4,7 +4,7 @@
 </mat-form-field >
 <mat-form-field  *ngIf="portofino.isNumber(property)">
   <input matInput [(ngModel)]="searchQuery[property.name]"
-         type="number" [placeholder]="property.name">
+         [placeholder]="property.name">
 </mat-form-field >
 <mat-form-field  *ngIf="portofino.isDate(property)">
   <input matInput [(ngModel)]="searchQuery[property.name]"

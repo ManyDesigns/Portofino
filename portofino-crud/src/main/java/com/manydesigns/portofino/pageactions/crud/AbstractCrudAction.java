@@ -476,9 +476,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
 
-        setupForm(Mode.VIEW);
         if(forEdit) {
+            setupForm(Mode.EDIT);
             editSetup(object);
+        } else {
+            setupForm(Mode.VIEW);
         }
         form.readFromObject(object);
         BlobUtils.loadBlobs(form, getBlobManager(), false);
