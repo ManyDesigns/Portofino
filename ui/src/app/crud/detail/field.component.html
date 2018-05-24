@@ -1,16 +1,16 @@
 <mat-form-field *ngIf="portofino.isString(property)">
   <input matInput [(ngModel)]="object[property.name]"
-         [placeholder]="property.name" [disabled]="!property.updatable">
+         [placeholder]="property.name" [disabled]="!property.editable">
 </mat-form-field >
 <mat-form-field  *ngIf="portofino.isNumber(property)">
   <input matInput [(ngModel)]="object[property.name]"
-         [placeholder]="property.name" [disabled]="!property.updatable">
+         [placeholder]="property.name" [disabled]="!property.editable">
 </mat-form-field >
 <mat-form-field  *ngIf="portofino.isDate(property)">
   <input matInput [(ngModel)]="object[property.name]"
          [placeholder]="property.name"
          [matDatepicker]="datepicker"
-         [disabled]="!property.updatable">
+         [disabled]="!property.editable">
   <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
   <mat-datepicker #datepicker></mat-datepicker>
 </mat-form-field >

@@ -36,10 +36,9 @@
       <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
     </table>
     <div fxLayout="row" fxLayoutAlign="space-between center">
-      <button mat-raised-button color="accent">
-        <mat-icon>add</mat-icon>
-        Create new
-      </button>
+      <div fxLayout="row">
+        <ng-template [ngTemplateOutlet]="buttons"></ng-template>
+      </div>
       <mat-paginator [length]="results ? results.totalRecords : 0"
                      [pageSize]="pageSize"
                      (page)="loadPage($event)">

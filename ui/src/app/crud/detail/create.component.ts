@@ -1,19 +1,17 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ClassAccessor, isEnabled, isInsertable, isUpdatable, Property} from "../../class-accessor";
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
-import {Configuration, CrudComponent} from "../crud.component";
-import {ClassAccessor, isEnabled, isUpdatable, Property} from "../../class-accessor";
-import * as moment from 'moment';
+import * as moment from "moment";
+import {Configuration} from "../crud.component";
 
 @Component({
-  selector: 'portofino-crud-edit',
-  templateUrl: './edit.component.html',
-  styleUrls: ['./edit.component.css']
+  selector: 'portofino-crud-create',
+  templateUrl: './create.component.html',
+  styleUrls: ['./create.component.css']
 })
-export class EditComponent implements OnInit {
+export class CreateComponent implements OnInit {
 
-  @Input()
-  id: string;
   @Input()
   classAccessor: ClassAccessor;
   @Input()
@@ -33,10 +31,10 @@ export class EditComponent implements OnInit {
         return;
       }
       this.properties.push(property);
-      property.editable = isUpdatable(property);
+      property.editable = isInsertable(property);
     });
-    const objectUrl = `${this.portofino.apiPath + this.configuration.path}/${this.id}`;
-    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.initObject(o));
+    const objectUrl = `${this.portofino.apiPath + this.configuration.path}`;
+    this.http.get(objectUrl, {params: {newObject: "true"}}).subscribe(o => this.initObject(o));
   }
 
   protected initObject(object) {
@@ -61,7 +59,7 @@ export class EditComponent implements OnInit {
   }
 
   save() {
-    const objectUrl = `${this.portofino.apiPath + this.configuration.path}/${this.id}`;
+    const objectUrl = `${this.portofino.apiPath + this.configuration.path}`;
     let object = {...this.object};
     this.properties.forEach(p => {
       if (this.portofino.isDate(p) && object[p.name]) {
@@ -70,7 +68,7 @@ export class EditComponent implements OnInit {
         object[p.name] = this.loadedObject[p.name].value;
       }
     });
-    this.http.put(objectUrl, object).subscribe(o => this.close.emit(object));
+    this.http.post(objectUrl, object).subscribe(o => this.close.emit(object));
   }
 
 }

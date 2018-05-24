@@ -20,16 +20,12 @@ import {FlexLayoutModule} from "@angular/flex-layout";
 import { SearchComponent } from './crud/search/search.component';
 import { FieldComponent } from './crud/detail/field.component';
 import { EditComponent } from './crud/detail/edit.component';
+import { CreateComponent } from './crud/detail/create.component';
 
 @NgModule({
   declarations: [
-    PortofinoComponent,
-    CrudComponent,
-    LoginComponent,
-    SearchFieldComponent,
-    SearchComponent,
-    FieldComponent,
-    EditComponent
+    PortofinoComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent, FieldComponent,
+    EditComponent, CreateComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule,

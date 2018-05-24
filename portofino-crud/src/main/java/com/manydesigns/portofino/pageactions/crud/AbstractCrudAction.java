@@ -468,26 +468,39 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public Resolution jsonReadData() throws JSONException {
-        return jsonReadData(false);
-    }
-
-    public Resolution jsonReadData(boolean forEdit) throws JSONException {
         if(object == null) {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
 
-        if(forEdit) {
-            setupForm(Mode.EDIT);
-            editSetup(object);
-        } else {
-            setupForm(Mode.VIEW);
-        }
+        setupForm(Mode.VIEW);
         form.readFromObject(object);
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
         return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
+
+    public Resolution jsonEditData() throws JSONException {
+        if(object == null) {
+            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
+        }
+
+        preEdit();
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
+        refreshBlobDownloadHref();
+        String jsonText = FormUtil.writeToJson(form);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+    }
+
+    public Resolution jsonCreateData() throws JSONException {
+        preCreate();
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
+        refreshBlobDownloadHref();
+        String jsonText = FormUtil.writeToJson(form);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+    }
+
+
     //**************************************************************************
     // Form handling
     //**************************************************************************
@@ -2310,6 +2323,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     /**
      * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param searchString the search string
+     * @param firstResult pagination: the index of the first result returned by the search
+     * @param maxResults pagination: the maximum number of results returned by the search
      * @since 4.2
      * @return search results (/) or single object (/pk) as JSON (streamed using a Stripes Resolution).
      */
@@ -2319,7 +2334,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             @QueryParam("searchString") String searchString,
             @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults,
             @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection,
-            @QueryParam("forEdit") boolean forEdit) {
+            @QueryParam("forEdit") boolean forEdit, @QueryParam("newObject") boolean newObject) {
+        if(newObject) {
+            return jsonCreateData();
+        }
         if(object == null) {
             this.searchString = searchString;
             this.firstResult = firstResult;
@@ -2327,8 +2345,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             this.sortProperty = sortProperty;
             this.sortDirection = sortDirection;
             return jsonSearchData();
+        } else if(forEdit) {
+            return jsonEditData();
         } else {
-            return jsonReadData(forEdit);
+            return jsonReadData();
         }
     }
 

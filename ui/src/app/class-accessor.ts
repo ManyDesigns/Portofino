@@ -11,8 +11,7 @@ export class Property {
   modifiers: string[];
   key: boolean;
 
-  insertable: boolean;
-  updatable: boolean;
+  editable: boolean;
 }
 
 export class Annotation {

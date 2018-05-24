@@ -1,0 +1,18 @@
+<div fxLayout="column" fxLayoutGap="20px">
+  <h2>Create new</h2>
+  <form (submit)="save()" *ngIf="object">
+    <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center" >
+      <portofino-crud-field
+        *ngFor="let property of properties"
+        [object]="object" [property]="property">
+      </portofino-crud-field>
+    </div>
+    <div fxLayout="row">
+      <button mat-raised-button color="primary">
+        <mat-icon>save</mat-icon>
+        Save
+      </button>
+      <button mat-raised-button (click)="cancel()" type="button">Cancel</button>
+    </div>
+  </form>
+</div>

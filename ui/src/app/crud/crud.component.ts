@@ -49,10 +49,17 @@ export class CrudComponent implements OnInit {
     this.searchVisible = true;
   }
 
+  createNew() {
+    this.searchVisible = false;
+    this.editVisible = false;
+    this.createVisible = true;
+  }
+
   openDetail(id: string) {
     this.id = id;
     this.searchVisible = false;
     this.editVisible = true;
+    this.createVisible = false;
   }
 
   closeDetail() {

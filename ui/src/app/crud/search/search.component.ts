@@ -1,4 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {
+  Component, ContentChild, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild,
+  ViewContainerRef
+} from '@angular/core';
 import {Configuration, CrudComponent} from "../crud.component";
 import {ClassAccessor, isEnabled, isInSummary, isSearchable, Property} from "../../class-accessor";
 import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
@@ -29,7 +32,9 @@ export class SearchComponent implements OnInit {
   pageSize: number;
   sortInfo: Sort;
 
-  constructor(private http: HttpClient, private portofino: PortofinoService) { }
+  @ContentChild("buttons") buttons: TemplateRef<any>;
+
+  constructor(private http: HttpClient, private portofino: PortofinoService) {}
 
   ngOnInit() {
     this.classAccessor.properties.forEach(property => {
