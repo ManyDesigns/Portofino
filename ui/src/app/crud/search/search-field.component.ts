@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Property} from "../../class-accessor";
 import {CrudComponent} from "../crud.component";
 import {PortofinoService} from "../../portofino.service";
@@ -15,7 +15,7 @@ export class SearchFieldComponent implements OnInit {
   property: Property;
 
   @Input()
-  parent: SearchComponent;
+  searchQuery;
 
   constructor(public portofino: PortofinoService) { }
 

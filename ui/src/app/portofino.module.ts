@@ -18,6 +18,8 @@ import {
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import { SearchComponent } from './crud/search/search.component';
+import { FieldComponent } from './crud/detail/field.component';
+import { EditComponent } from './crud/detail/edit.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +27,9 @@ import { SearchComponent } from './crud/search/search.component';
     CrudComponent,
     LoginComponent,
     SearchFieldComponent,
-    SearchComponent
+    SearchComponent,
+    FieldComponent,
+    EditComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule,

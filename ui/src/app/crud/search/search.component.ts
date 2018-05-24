@@ -1,6 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {CrudComponent} from "../crud.component";
-import {isInSummary, isSearchable, Property} from "../../class-accessor";
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Configuration, CrudComponent} from "../crud.component";
+import {ClassAccessor, isEnabled, isInSummary, isSearchable, Property} from "../../class-accessor";
 import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
@@ -13,13 +13,17 @@ import {PortofinoService} from "../../portofino.service";
 export class SearchComponent implements OnInit {
 
   @Input()
-  crud: CrudComponent;
+  classAccessor: ClassAccessor;
+  @Input()
+  configuration: Configuration;
+  @Output()
+  detail = new EventEmitter<string>();
 
   searchFields: Property[] = [];
-  searchValues = {};
-  searchResults: SearchResults;
-  searchResultsDataSource = new MatTableDataSource();
-  searchResultFields: Property[] = [];
+  searchQuery = {};
+  results: SearchResults;
+  resultsDataSource = new MatTableDataSource();
+  resultFields: Property[] = [];
   columnsToDisplay: string[] = [];
   @Input()
   pageSize: number;
@@ -28,17 +32,20 @@ export class SearchComponent implements OnInit {
   constructor(private http: HttpClient, private portofino: PortofinoService) { }
 
   ngOnInit() {
-    this.crud.classAccessor.properties.forEach(property => {
+    this.classAccessor.properties.forEach(property => {
+      if(!isEnabled(property)) {
+        return;
+      }
       if(isSearchable(property)) {
         this.searchFields.push(property);
       }
       if(isInSummary(property)) {
-        this.searchResultFields.push(property);
+        this.resultFields.push(property);
         this.columnsToDisplay.push(property.name);
       }
     });
     if(!this.pageSize) {
-      this.pageSize = this.crud.configuration.rowsPerPage;
+      this.pageSize = this.configuration.rowsPerPage;
     }
     this.search();
   }
@@ -56,19 +63,19 @@ export class SearchComponent implements OnInit {
       params = params.set("sortProperty", this.sortInfo.active);
       params = params.set("sortDirection", this.sortInfo.direction);
     }
-    const searchUrl = this.portofino.apiPath + this.crud.configuration.path;
+    const searchUrl = this.portofino.apiPath + this.configuration.path;
     this.http.get<SearchResults>(searchUrl, {params: params}).subscribe(
       results => {
         results.records = results['Result'];
-        this.searchResults = results;
-        this.searchResultsDataSource.data = this.searchResults.records;
+        this.results = results;
+        this.resultsDataSource.data = this.results.records;
       }
     );
   }
 
   protected composeSearch(params: HttpParams) {
-    for (let p in this.searchValues) {
-      if (this.searchValues[p] === null) {
+    for (let p in this.searchQuery) {
+      if (this.searchQuery[p] === null) {
         continue;
       }
       const property = this.searchFields.find(value => value.name == p);
@@ -76,13 +83,13 @@ export class SearchComponent implements OnInit {
         continue;
       }
       if (this.portofino.isDate(property)) {
-        params = params.set(`search_${p}_min`, this.searchValues[p].valueOf().toString());
-        params = params.set(`search_${p}_max`, this.searchValues[p].valueOf().toString());
+        params = params.set(`search_${p}_min`, this.searchQuery[p].valueOf().toString());
+        params = params.set(`search_${p}_max`, this.searchQuery[p].valueOf().toString());
       } else if (this.portofino.isNumber(property)) {
-        params = params.set(`search_${p}_min`, this.searchValues[p].toString());
-        params = params.set(`search_${p}_max`, this.searchValues[p].toString());
+        params = params.set(`search_${p}_min`, this.searchQuery[p].toString());
+        params = params.set(`search_${p}_max`, this.searchQuery[p].toString());
       } else {
-        params = params.set(`search_${p}`, this.searchValues[p].toString());
+        params = params.set(`search_${p}`, this.searchQuery[p].toString());
       }
     }
     return params;
@@ -98,7 +105,11 @@ export class SearchComponent implements OnInit {
   }
 
   clearSearch() {
-    this.searchValues = {};
+    this.searchQuery = {};
+  }
+
+  openDetail(id: string) {
+    this.detail.emit(id);
   }
 
 }

@@ -468,11 +468,18 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public Resolution jsonReadData() throws JSONException {
+        return jsonReadData(false);
+    }
+
+    public Resolution jsonReadData(boolean forEdit) throws JSONException {
         if(object == null) {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
 
         setupForm(Mode.VIEW);
+        if(forEdit) {
+            editSetup(object);
+        }
         form.readFromObject(object);
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
@@ -2309,7 +2316,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution getAsJson(
             @QueryParam("searchString") String searchString,
             @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults,
-            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection) {
+            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection,
+            @QueryParam("forEdit") boolean forEdit) {
         if(object == null) {
             this.searchString = searchString;
             this.firstResult = firstResult;
@@ -2318,7 +2326,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             this.sortDirection = sortDirection;
             return jsonSearchData();
         } else {
-            return jsonReadData();
+            return jsonReadData(forEdit);
         }
     }
 

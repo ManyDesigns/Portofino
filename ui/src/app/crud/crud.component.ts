@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
-import {ClassAccessor, Property} from "../class-accessor";
+import {ClassAccessor, isEnabled, isInSummary, isSearchable, isUpdatable, Property} from "../class-accessor";
 
 @Component({
   selector: 'portofino-crud',
@@ -21,8 +21,13 @@ export class CrudComponent implements OnInit {
   @Input()
   pageSize: number;
 
-  searchVisible = true;
+  searchVisible = false;
   createVisible = false;
+  editVisible = false;
+
+  id: string;
+
+  createProperties: Property[] = [];
 
   constructor(private http: HttpClient, public portofino: PortofinoService) { }
 
@@ -30,21 +35,35 @@ export class CrudComponent implements OnInit {
     const baseUrl = this.portofino.apiPath + this.config.path;
     this.http.get<ClassAccessor>(baseUrl + this.classAccessorPath).subscribe(
       classAccessor => this.http.get<Configuration>(baseUrl + this.configurationPath).subscribe(
-        configuration => {
-          this.classAccessor = classAccessor;
-          this.configuration = {...this.config, ...configuration};
-        }
+        configuration => this.init(classAccessor, configuration)
       )
     );
   }
 
-  getFieldId(prefix: string, field: Property) {
-    return `crud-${prefix}-${this.classAccessor.name}-${field.name}`
+  protected init(classAccessor, configuration) {
+    this.classAccessor = classAccessor;
+    this.configuration = {...configuration, ...this.config};
+    this.classAccessor.properties.forEach(p => {
+      p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
+    });
+    this.searchVisible = true;
   }
 
+  openDetail(id: string) {
+    this.id = id;
+    this.searchVisible = false;
+    this.editVisible = true;
+  }
+
+  closeDetail() {
+    this.searchVisible = true;
+    this.createVisible = false;
+    this.editVisible = false;
+    this.id = null;
+  }
 }
 
-class Configuration {
+export class Configuration {
   rowsPerPage: number;
   path: string;
 }

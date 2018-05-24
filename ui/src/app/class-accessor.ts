@@ -1,7 +1,7 @@
 export class ClassAccessor {
   name: string;
   properties: Property[];
-  keyProperties: Property[];
+  keyProperties: string[];
 }
 
 export class Property {
@@ -9,6 +9,10 @@ export class Property {
   type: string;
   annotations: Annotation[];
   modifiers: string[];
+  key: boolean;
+
+  insertable: boolean;
+  updatable: boolean;
 }
 
 export class Annotation {
@@ -17,8 +21,23 @@ export class Annotation {
 }
 
 export function getAnnotation(property: Property, type: string): Annotation {
-    return property.annotations.find(value => value.type == type);
-  }
+  return property.annotations.find(value => value.type == type);
+}
+
+export function isEnabled(property: Property) {
+  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Enabled");
+  return annotation && annotation.properties["value"];
+}
+
+export function isUpdatable(property: Property) {
+  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Updatable");
+  return annotation && annotation.properties["value"];
+}
+
+export function isInsertable(property: Property) {
+  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Insertable");
+  return annotation && annotation.properties["value"];
+}
 
 export function isSearchable(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Searchable");

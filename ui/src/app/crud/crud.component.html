@@ -1,3 +1,10 @@
-<portofino-crud-search *ngIf="classAccessor && searchVisible" [crud]="this"></portofino-crud-search>
-<div *ngIf="classAccessor && createVisible" fxLayout="column" fxLayoutGap="20px">
-</div>
+<portofino-crud-search
+  *ngIf="searchVisible"
+  [classAccessor]="classAccessor" [configuration]="configuration"
+  (detail)="openDetail($event)"></portofino-crud-search>
+<div *ngIf="classAccessor && createVisible" fxLayout="column" fxLayoutGap="20px"></div>
+<portofino-crud-edit
+  *ngIf="editVisible"
+  [id]="id" [classAccessor]="classAccessor" [configuration]="configuration"
+  (close)="closeDetail()"
+></portofino-crud-edit>
