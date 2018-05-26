@@ -19,6 +19,9 @@ export class PortofinoComponent implements OnInit {
   @ViewChild(ContentDirective)
   contentHost: ContentDirective;
 
+  path = "";
+  page: PageConfiguration;
+
   constructor(
     public portofinoService: PortofinoService, private componentFactoryResolver: ComponentFactoryResolver,
     private http: HttpClient) {}
@@ -27,9 +30,13 @@ export class PortofinoComponent implements OnInit {
     if(this.apiPath) {
       this.portofinoService.apiPath = this.apiPath;
     }
-    this.http.get<Config>("pages/config.json").subscribe(config => {
+    this.loadPage();
+  }
+
+  protected loadPage() {
+    this.http.get<PageConfiguration>(`pages${this.path}/config.json`).subscribe(config => {
       const componentType = PortofinoComponent.components[config.type];
-      if(!componentType) {
+      if (!componentType) {
         throw new Error("Unknown component type: " + config.type);
       }
 
@@ -39,11 +46,19 @@ export class PortofinoComponent implements OnInit {
       viewContainerRef.clear();
 
       let componentRef = viewContainerRef.createComponent(componentFactory);
-      componentRef.instance['config'] = config;
+      componentRef.instance['configuration'] = config;
+      this.page = config;
     });
   }
 }
 
-class Config {
+export class PageConfiguration {
   type: string;
+  title: string;
+  children: PageChild[];
+}
+
+export class PageChild {
+  path: string;
+  title: string;
 }

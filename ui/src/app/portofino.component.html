@@ -4,7 +4,10 @@
   </h1>
 </div>
 <mat-sidenav-container>
-  <mat-sidenav [opened]="true" mode="side">Navigation</mat-sidenav>
+  <mat-sidenav [opened]="true" mode="side">
+    <h3>Navigation</h3>
+    {{page ? page.title : ""}}
+  </mat-sidenav>
   <mat-sidenav-content>
     <ng-template portofino-content></ng-template>
   </mat-sidenav-content>

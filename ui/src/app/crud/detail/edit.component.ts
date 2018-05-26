@@ -35,7 +35,7 @@ export class EditComponent implements OnInit {
       this.properties.push(property);
       property.editable = isUpdatable(property);
     });
-    const objectUrl = `${this.portofino.apiPath + this.configuration.path}/${this.id}`;
+    const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
     this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.initObject(o));
   }
 
@@ -61,7 +61,7 @@ export class EditComponent implements OnInit {
   }
 
   save() {
-    const objectUrl = `${this.portofino.apiPath + this.configuration.path}/${this.id}`;
+    const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
     let object = {...this.object};
     this.properties.forEach(p => {
       if (this.portofino.isDate(p) && object[p.name]) {

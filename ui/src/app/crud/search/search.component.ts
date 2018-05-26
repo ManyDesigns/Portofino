@@ -68,7 +68,7 @@ export class SearchComponent implements OnInit {
       params = params.set("sortProperty", this.sortInfo.active);
       params = params.set("sortDirection", this.sortInfo.direction);
     }
-    const searchUrl = this.portofino.apiPath + this.configuration.path;
+    const searchUrl = this.portofino.apiPath + this.configuration.source;
     this.http.get<SearchResults>(searchUrl, {params: params}).subscribe(
       results => {
         results.records = results['Result'];

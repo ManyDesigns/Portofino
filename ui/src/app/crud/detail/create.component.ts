@@ -33,7 +33,7 @@ export class CreateComponent implements OnInit {
       this.properties.push(property);
       property.editable = isInsertable(property);
     });
-    const objectUrl = `${this.portofino.apiPath + this.configuration.path}`;
+    const objectUrl = `${this.portofino.apiPath + this.configuration.source}`;
     this.http.get(objectUrl, {params: {newObject: "true"}}).subscribe(o => this.initObject(o));
   }
 
@@ -59,7 +59,7 @@ export class CreateComponent implements OnInit {
   }
 
   save() {
-    const objectUrl = `${this.portofino.apiPath + this.configuration.path}`;
+    const objectUrl = `${this.portofino.apiPath + this.configuration.source}`;
     let object = {...this.object};
     this.properties.forEach(p => {
       if (this.portofino.isDate(p) && object[p.name]) {
