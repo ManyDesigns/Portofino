@@ -1,0 +1,17 @@
+<mat-sidenav-container>
+  <mat-sidenav [opened]="true" mode="side">
+    <h3>Navigation</h3>
+    <ng-container *ngIf="page">
+      {{page.title}}
+      <a *ngFor="let child of page.children"
+         [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+    </ng-container>
+
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <ng-template portofino-content></ng-template>
+    <div *ngIf="error">
+      Page not found!
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
