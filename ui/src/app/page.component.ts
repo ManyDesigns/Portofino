@@ -14,6 +14,7 @@ export class PageComponent implements OnInit {
   @ViewChild(ContentDirective)
   contentHost: ContentDirective;
 
+  parentPage;
   path = "";
   page: PageConfiguration;
   error;
@@ -24,7 +25,9 @@ export class PageComponent implements OnInit {
   ngOnInit() {
     this.route.url.subscribe(segment => {
       this.path = "";
+      this.parentPage = null;
       segment.forEach(s => {
+        this.parentPage = { path: this.path };
         this.path += `/${s.path}`;
       });
       this.loadPage();
@@ -32,6 +35,14 @@ export class PageComponent implements OnInit {
   }
 
   protected loadPage() {
+    if(this.parentPage) {
+      this.http.get<PageConfiguration>(`pages${this.parentPage.path}/config.json`).subscribe(config => {
+        config.children.forEach(c => {
+          c.path = `${this.parentPage.path}/${c.path}`;
+        });
+        this.parentPage.configuration = config;
+      });
+    }
     this.http.get<PageConfiguration>(`pages${this.path}/config.json`).subscribe(config => {
       const componentType = PortofinoComponent.components[config.type];
       if (!componentType) {

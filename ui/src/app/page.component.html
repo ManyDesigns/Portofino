@@ -1,12 +1,35 @@
-<mat-sidenav-container>
-  <mat-sidenav [opened]="true" mode="side">
+<mat-sidenav-container [autosize]="true">
+  <mat-sidenav [opened]="true" mode="side" [disableClose]="true">
     <h3>Navigation</h3>
     <ng-container *ngIf="page">
-      {{page.title}}
-      <a *ngFor="let child of page.children"
-         [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+      <ul *ngIf="parentPage">
+        <li>
+          <a [routerLink]="parentPage.path" routerLinkActive="active">{{parentPage.configuration.title}}</a>
+          <ul>
+            <li *ngFor="let child of parentPage.configuration.children">
+              <a *ngIf="child.path != path"
+                 [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+              <ng-container *ngIf="child.path == path">
+                <strong>{{page.title}}</strong>
+                <ul>
+                  <li *ngFor="let child of page.children">
+                    <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+                  </li>
+                </ul>
+              </ng-container>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <div *ngIf="!parentPage">
+        <strong>{{page.title}}</strong>
+        <ul>
+          <li *ngFor="let child of page.children">
+            <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+          </li>
+        </ul>
+      </div>
     </ng-container>
-
   </mat-sidenav>
   <mat-sidenav-content>
     <ng-template portofino-content></ng-template>
