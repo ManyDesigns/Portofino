@@ -44,6 +44,7 @@ import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.shiro.JSONWebToken;
 import com.manydesigns.portofino.shiro.JWTFilter;
+import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.collections.MultiMap;
@@ -60,6 +61,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import java.io.Serializable;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -102,13 +104,16 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
             logger.info("User {} login", ShiroUtils.getUserId(subject));
             Object principal = subject.getPrincipal();
             subject.logout();
-            String jwt = ShiroUtils.getPortofinoRealm().generateWebToken(principal);
+            PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+            String jwt = portofinoRealm.generateWebToken(principal);
             subject.login(new JSONWebToken(jwt));
             Session session = subject.getSession(true);
             JSONStringer stringer = new JSONStringer();
             stringer.
                 object().
                     key("portofinoSessionId").value(session.getId()).
+                    key("userId").value(ShiroUtils.getUserId(subject)).
+                    key("displayName").value(portofinoRealm.getUserPrettyName((Serializable) subject.getPrincipal())).
                     key("jwt").value(jwt).
                 endObject();
             return stringer.toString();

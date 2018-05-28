@@ -1,6 +1,5 @@
-<div style="text-align:center">
-  <h1>
-    {{ title }}
-  </h1>
-</div>
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+  {{ title }}
+  <span *ngIf="authenticationService.currentUser">{{ authenticationService.currentUser.displayName }}</span>
+</mat-toolbar>
 <router-outlet></router-outlet>

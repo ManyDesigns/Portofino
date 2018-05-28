@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * An Shiro filter to validate a JSON Web Token.
+ * A Shiro filter to validate a JSON Web Token.
  *
  * @author Alessio Stalla       - alessiostalla@gmail.com
  */

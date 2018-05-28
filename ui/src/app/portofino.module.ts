@@ -7,13 +7,13 @@ import { PortofinoComponent } from './portofino.component';
 import { CrudComponent } from './crud/crud.component';
 import { PortofinoService } from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {AuthenticationService} from "./security/authentication.service";
+import {AuthenticationInterceptor, AuthenticationService} from "./security/authentication.service";
 import { LoginComponent } from './security/login/login.component';
 import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
 import { SearchFieldComponent } from './crud/search/search-field.component';
 import {
   MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-  MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule
+  MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule, MatToolbarModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -33,16 +33,16 @@ import { PageComponent } from './page.component';
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule,
     MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule,
+    MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule, MatToolbarModule,
     MatMomentDateModule,
     RouterModule.forRoot([{
       path: "**", component: PageComponent
     }])
   ],
   providers: [
-    PortofinoService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthenticationService, multi: true },
-    { provide: TokenStorageService, useClass: LocalTokenStorageService }],
+    PortofinoService, AuthenticationService,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
+    { provide: TokenStorageService, useClass: LocalTokenStorageService, deps: [] }],
   bootstrap: [PortofinoComponent],
   entryComponents: [LoginComponent, CrudComponent]
 })

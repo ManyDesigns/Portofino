@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor, isEnabled, isInSummary, isSearchable, isUpdatable, Property} from "../class-accessor";
-import {Page, PageConfiguration, PortofinoComponent} from "../portofino.component";
+import {Page, PageChild, PageConfiguration, PortofinoComponent} from "../portofino.component";
 import {Router} from "@angular/router";
 
 @Component({
@@ -78,15 +78,23 @@ export class CrudComponent extends Page implements OnInit {
     this.router.navigateByUrl(this.path);
   }
 
-  consumePathFragment(fragment: string): boolean {
-    const child = this.configuration.children.find(c => c.path == fragment);
+  consumePathSegment(segment: string): boolean {
+    const child = this.children.find(c => c.path == segment);
     if(child) {
       return true;
     }
     if(this.id) {
-      this.id = `${this.id}/${fragment}`;
+      this.id = `${this.id}/${segment}`;
     } else {
-      this.id = fragment;
+      this.id = segment;
+    }
+  }
+
+  get children(): PageChild[] {
+    if(this.id) {
+      return this.configuration.detailChildren || []
+    } else {
+      return this.configuration.children
     }
   }
 }

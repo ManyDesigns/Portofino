@@ -3,52 +3,46 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export abstract class TokenStorageService {
 
-  abstract get(): any;
-  abstract set(value);
-  abstract remove();
+  abstract get(key: string): any;
+  abstract set(key: string, value);
+  abstract remove(key: string);
 }
 
 @Injectable()
 export class LocalTokenStorageService extends TokenStorageService {
-  key: string = "portofino-jwt";
-
-  get(): any {
-    return localStorage.getItem(this.key);
+  constructor(protected prefix: string = "portofino-") {
+    super();
   }
 
-  set(value) {
-    localStorage.setItem(this.key, value);
+  get(key): any {
+    return localStorage.getItem(this.prefix + key);
   }
 
-  remove() {
-    localStorage.removeItem(this.key);
+  set(key, value) {
+    localStorage.setItem(this.prefix + key, value);
+  }
+
+  remove(key) {
+    localStorage.removeItem(this.prefix + key);
   }
 }
 
 @Injectable()
 export class SessionTokenStorageService extends TokenStorageService {
-  key: string = "portofino-jwt";
-
-  get(): any {
-    return sessionStorage.getItem(this.key);
+  constructor(protected prefix: string = "portofino-") {
+    super();
   }
 
-  set(value) {
-    sessionStorage.setItem(this.key, value);
+  get(key): any {
+    return sessionStorage.getItem(this.prefix + key);
   }
 
-  remove() {
-    sessionStorage.removeItem(this.key);
+  set(key, value) {
+    sessionStorage.setItem(this.prefix + key, value);
+  }
+
+  remove(key) {
+    sessionStorage.removeItem(this.prefix + key);
   }
 }
 
-@Injectable()
-export class NoOpTokenStorageService extends TokenStorageService {
-  get(): any {
-    return null;
-  }
-
-  set(value) {}
-
-  remove() {}
-}

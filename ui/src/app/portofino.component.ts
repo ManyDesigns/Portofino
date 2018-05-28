@@ -2,6 +2,7 @@ import {Component, ComponentFactoryResolver, Input, OnInit, ViewChild} from '@an
 import {PortofinoService} from "./portofino.service";
 import {ContentDirective} from "./content.directive";
 import {HttpClient} from "@angular/common/http";
+import {AuthenticationService} from "./security/authentication.service";
 
 @Component({
   selector: 'portofino-app',
@@ -16,8 +17,7 @@ export class PortofinoComponent implements OnInit {
   @Input()
   apiPath: string = 'http://localhost:8080/demo-tt/api/';
 
-  constructor(
-    public portofinoService: PortofinoService, private http: HttpClient) {}
+  constructor(public portofinoService: PortofinoService, public authenticationService: AuthenticationService) {}
 
   ngOnInit(): void {
     if(this.apiPath) {
@@ -34,7 +34,6 @@ export class PageConfiguration {
 
 export class PageChild {
   path: string;
-  absolutePath: string;
   title: string;
 }
 
@@ -42,9 +41,14 @@ export abstract class Page {
 
   configuration: PageConfiguration & any;
   path: string;
+  segment: string;
   parent: Page;
 
-  consumePathFragment(fragment: string): boolean {
+  consumePathSegment(fragment: string): boolean {
     return true;
+  }
+
+  get children(): PageChild[] {
+    return this.configuration.children
   }
 }

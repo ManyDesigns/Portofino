@@ -5,6 +5,7 @@ import {HttpClient} from "@angular/common/http";
 import {ContentDirective} from "./content.directive";
 import {Observable} from "rxjs/index";
 import {map} from "rxjs/operators";
+import {AuthenticationService} from "./security/authentication.service";
 
 @Component({
   selector: 'portofino-page',
@@ -19,11 +20,13 @@ export class PageComponent implements OnInit {
   page: Page = null;
   error;
 
-  constructor(private route: ActivatedRoute, private http: HttpClient,
-              private componentFactoryResolver: ComponentFactoryResolver) { }
+  constructor(protected route: ActivatedRoute, protected http: HttpClient,
+              protected componentFactoryResolver: ComponentFactoryResolver) { }
 
   ngOnInit() {
     this.route.url.subscribe(segment => {
+      this.page = null;
+      this.error = null;
       this.loadPageInPath("", segment, 0);
     });
   }
@@ -32,23 +35,15 @@ export class PageComponent implements OnInit {
     this.loadPage(path).subscribe(
       page => {
         page.parent = this.page;
-        if (page.parent) {
-          page.parent.configuration.children.forEach(child =>
-            child.absolutePath = `${page.parent.path}/${child.path}`
-          );
-        }
         this.page = page;
-        segment.slice(index, segment.length).forEach(s => {
+        for(let i = index; i < segment.length; i++) {
+          let s = segment[i];
           path += `/${s.path}`;
-          index++;
-          if (this.page.consumePathFragment(s.path)) {
-            this.loadPageInPath(path, segment, index);
-            return;
-          } else if (index == segment.length) {
-            //page.show()
+          if (this.page.consumePathSegment(s.path)) {
+            this.loadPageInPath(path, segment, i + 1);
             return;
           }
-        });
+        }
       },
       error => this.error = error);
   }
@@ -72,6 +67,12 @@ export class PageComponent implements OnInit {
           const component = <Page>componentRef.instance;
           component.configuration = config;
           component.path = path;
+          const lastIndexOf = path.lastIndexOf('/');
+          if(lastIndexOf >= 0) {
+            component.segment = path.substring(lastIndexOf + 1);
+          } else {
+            component.segment = path;
+          }
           return component;
         }));
   }
