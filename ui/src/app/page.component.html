@@ -32,7 +32,7 @@
     </ng-container>
   </mat-sidenav>
   <mat-sidenav-content>
-    <ng-template portofino-content></ng-template>
+    <ng-template portofino-content *ngIf="!error"></ng-template>
     <div *ngIf="error">
       Page not found!
     </div>

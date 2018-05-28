@@ -1,5 +1,5 @@
 import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, UrlSegment} from "@angular/router";
 import {Page, PageConfiguration, PortofinoComponent} from "./portofino.component";
 import {HttpClient} from "@angular/common/http";
 import {ContentDirective} from "./content.directive";
@@ -16,7 +16,7 @@ export class PageComponent implements OnInit {
   @ViewChild(ContentDirective)
   contentHost: ContentDirective;
 
-  page: Page;
+  page: Page = null;
   error;
 
   constructor(private route: ActivatedRoute, private http: HttpClient,
@@ -24,31 +24,31 @@ export class PageComponent implements OnInit {
 
   ngOnInit() {
     this.route.url.subscribe(segment => {
-      let path = "";
-      this.setPage(path);
-      segment.forEach(s => {
-        if(this.error) {
-          return;
-        }
-        path += `/${s.path}`;
-        if(this.page.consumePathFragment(s.path)) {
-          this.setPage(path);
-        }
-      });
+      this.loadPageInPath("", segment, 0);
     });
   }
 
-  protected setPage(path: string) {
+  protected loadPageInPath(path: string, segment: UrlSegment[], index: number) {
     this.loadPage(path).subscribe(
       page => {
-        page.path = path;
         page.parent = this.page;
-        this.page = page;
-        if(page.parent) {
-          this.page.configuration.children.forEach(child =>
+        if (page.parent) {
+          page.parent.configuration.children.forEach(child =>
             child.path = `${page.parent.path}/${child.path}`
           );
         }
+        this.page = page;
+        segment.slice(index, segment.length).forEach(s => {
+          path += `/${s.path}`;
+          index++;
+          if (this.page.consumePathFragment(s.path)) {
+            this.loadPageInPath(path, segment, index);
+            return;
+          } else if (index == segment.length) {
+            //page.show()
+            return;
+          }
+        });
       },
       error => this.error = error);
   }
