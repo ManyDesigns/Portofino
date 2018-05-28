@@ -7,13 +7,13 @@ import { PortofinoComponent } from './portofino.component';
 import { CrudComponent } from './crud/crud.component';
 import { PortofinoService } from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {AuthenticationInterceptor, AuthenticationService} from "./security/authentication.service";
+import {AuthenticationInterceptor, AuthenticationService, LOGIN_COMPONENT} from "./security/authentication.service";
 import { LoginComponent } from './security/login/login.component';
 import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
 import { SearchFieldComponent } from './crud/search/search-field.component';
 import {
   MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-  MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule, MatToolbarModule
+  MatMenuModule, MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule, MatToolbarModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -33,7 +33,7 @@ import { PageComponent } from './page.component';
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule,
     MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule, MatToolbarModule,
+    MatMenuModule, MatPaginatorModule, MatSidenavModule, MatSortModule, MatTableModule, MatToolbarModule,
     MatMomentDateModule,
     RouterModule.forRoot([{
       path: "**", component: PageComponent
@@ -41,6 +41,7 @@ import { PageComponent } from './page.component';
   ],
   providers: [
     PortofinoService, AuthenticationService,
+    { provide: LOGIN_COMPONENT, useFactory: () => LoginComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService, deps: [] }],
   bootstrap: [PortofinoComponent],

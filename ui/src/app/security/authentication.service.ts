@@ -1,22 +1,30 @@
-import { Injectable } from '@angular/core';
+import {Inject, Injectable, InjectionToken} from '@angular/core';
 import {
   HttpClient,
-  HttpEvent, HttpHandler, HttpInterceptor, HttpRequest
+  HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest
 } from "@angular/common/http";
 import {LoginComponent} from "./login/login.component";
 import {TokenStorageService} from "./token-storage.service";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {concat, Observable, throwError} from "rxjs";
 import { catchError, map, mergeMap } from "rxjs/operators";
+import {PortofinoService} from "../portofino.service";
+
+export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 
 @Injectable()
 export class AuthenticationService {
 
-  dialogRef: MatDialogRef<LoginComponent>;
+  dialogRef: MatDialogRef<any>;
   currentUser: UserInfo;
+  loginPath: string = "login";
 
-  constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService) {
-    this.currentUser = new UserInfo(this.storage.get('user.displayName'));
+  constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
+              private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected component) {
+    const displayName = this.storage.get('user.displayName');
+    if(displayName) {
+      this.currentUser = new UserInfo(displayName);
+    }
   }
 
   request(req: HttpRequest<any>, observable: Observable<HttpEvent<any>>): Observable<HttpEvent<any>> {
@@ -25,9 +33,7 @@ export class AuthenticationService {
     }
     return observable.pipe(catchError((error) => {
       if (error.status === 401) {
-        this.storage.remove('jwt');
-        this.storage.remove('user.displayName');
-        this.currentUser = null;
+        this.removeAuthenticationInfo();
         return this.askForCredentials().pipe(mergeMap(_ => this.http.request(this.withAuthenticationHeader(req))));
       }
       return throwError(error);
@@ -35,18 +41,36 @@ export class AuthenticationService {
   }
 
   protected askForCredentials(): Observable<any> {
-    this.dialogRef = this.dialog.open(LoginComponent);
-    return this.dialogRef.afterClosed().pipe(map(result => {
-      this.dialogRef = null;
+    return this.showLoginDialog().pipe(map(result => {
       if (result && result.jwt) {
-        this.storage.set('jwt', result.jwt);
-        this.storage.set('user.displayName', result.displayName);
-        this.currentUser = new UserInfo(result.displayName);
+        this.setAuthenticationInfo(result);
         return result;
       } else {
         throw new Error("User declined login");
       }
     }));
+  }
+
+  protected showLoginDialog() {
+    this.dialogRef = this.dialog.open(this.component);
+    return this.dialogRef.afterClosed().pipe(map(result => {
+      this.dialogRef = null;
+      return result;
+    }));
+  }
+
+  protected removeAuthenticationInfo() {
+    this.storage.remove('jwt');
+    this.storage.remove('user.displayName');
+    this.storage.remove('sessionId');
+    this.currentUser = null;
+  }
+
+  protected setAuthenticationInfo(result) {
+    this.storage.set('jwt', result.jwt);
+    this.storage.set('user.displayName', result.displayName);
+    this.storage.set('sessionId', result.portofinoSessionId);
+    this.currentUser = new UserInfo(result.displayName);
   }
 
   withAuthenticationHeader(req: HttpRequest<any>) {
@@ -59,6 +83,21 @@ export class AuthenticationService {
       }
     });
     return req;
+  }
+
+  login(username, password) {
+    return this.http.post(
+      `${this.portofino.apiPath}${this.loginPath}`,
+      new HttpParams({fromObject: {"username": username, "password": password}}),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+    )
+  }
+
+  logout() {
+    const url = `${this.portofino.apiPath}${this.loginPath}/${this.storage.get('sessionId')}`;
+    this.http.delete(url).subscribe(value => {
+      this.removeAuthenticationInfo();
+    });
   }
 }
 
