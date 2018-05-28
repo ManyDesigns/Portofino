@@ -36,3 +36,14 @@ export class PageChild {
   path: string;
   title: string;
 }
+
+export abstract class Page {
+
+  configuration: PageConfiguration & any;
+  path: string;
+  parent: Page;
+
+  consumePathFragment(fragment: string): boolean {
+    return true;
+  }
+}

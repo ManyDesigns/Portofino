@@ -2,17 +2,17 @@
   <mat-sidenav [opened]="true" mode="side" [disableClose]="true">
     <h3>Navigation</h3>
     <ng-container *ngIf="page">
-      <ul *ngIf="parentPage">
+      <ul *ngIf="page.parent">
         <li>
-          <a [routerLink]="parentPage.path" routerLinkActive="active">{{parentPage.configuration.title}}</a>
+          <a [routerLink]="page.parent.path" routerLinkActive="active">{{page.parent.configuration.title}}</a>
           <ul>
-            <li *ngFor="let child of parentPage.configuration.children">
-              <a *ngIf="child.path != path"
+            <li *ngFor="let child of page.parent.configuration.children">
+              <a *ngIf="child.path != page.path"
                  [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
-              <ng-container *ngIf="child.path == path">
-                <strong>{{page.title}}</strong>
+              <ng-container *ngIf="child.path == page.path">
+                <strong>{{page.configuration.title}}</strong>
                 <ul>
-                  <li *ngFor="let child of page.children">
+                  <li *ngFor="let child of page.configuration.children">
                     <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
                   </li>
                 </ul>
@@ -21,10 +21,10 @@
           </ul>
         </li>
       </ul>
-      <div *ngIf="!parentPage">
-        <strong>{{page.title}}</strong>
+      <div *ngIf="!page.parent">
+        <strong>{{page.configuration.title}}</strong>
         <ul>
-          <li *ngFor="let child of page.children">
+          <li *ngFor="let child of page.configuration.children">
             <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
           </li>
         </ul>

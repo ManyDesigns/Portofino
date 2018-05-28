@@ -2,19 +2,19 @@ import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor, isEnabled, isInSummary, isSearchable, isUpdatable, Property} from "../class-accessor";
-import {PageConfiguration, PortofinoComponent} from "../portofino.component";
+import {Page, PageConfiguration, PortofinoComponent} from "../portofino.component";
 
 @Component({
   selector: 'portofino-crud',
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.css']
 })
-export class CrudComponent implements OnInit {
+export class CrudComponent extends Page implements OnInit {
 
   private static __componentRegistration = PortofinoComponent.components.crud = CrudComponent;
 
   @Input()
-  configuration: any;
+  configuration: PageConfiguration & any;
 
   classAccessor: ClassAccessor;
   classAccessorPath = '/:classAccessor';
@@ -29,7 +29,9 @@ export class CrudComponent implements OnInit {
 
   id: string;
 
-  constructor(private http: HttpClient, public portofino: PortofinoService) { }
+  constructor(private http: HttpClient, public portofino: PortofinoService) {
+    super();
+  }
 
   ngOnInit() {
     const baseUrl = this.portofino.apiPath + this.configuration.source;
