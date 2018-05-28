@@ -1,10 +1,9 @@
 <h2>{{configuration.title}}</h2>
 <portofino-crud-search
   *ngIf="searchVisible"
-  [classAccessor]="classAccessor" [configuration]="configuration"
-  (detail)="openDetail($event)">
+  [classAccessor]="classAccessor" [configuration]="configuration">
   <ng-template #buttons>
-    <button mat-raised-button color="accent" (click)="createNew()">
+    <button mat-raised-button color="accent" (click)="showCreate()">
       <mat-icon>add</mat-icon>
       Create new
     </button>
@@ -13,8 +12,8 @@
 <portofino-crud-edit
   *ngIf="editVisible"
   [id]="id" [classAccessor]="classAccessor" [configuration]="configuration"
-  (close)="closeDetail()"></portofino-crud-edit>
+  (close)="goToSearch()"></portofino-crud-edit>
 <portofino-crud-create
   *ngIf="createVisible"
   [classAccessor]="classAccessor" [configuration]="configuration"
-  (close)="closeDetail()"></portofino-crud-create>
+  (close)="goToSearch()"></portofino-crud-create>

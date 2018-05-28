@@ -34,6 +34,7 @@ export class PageConfiguration {
 
 export class PageChild {
   path: string;
+  absolutePath: string;
   title: string;
 }
 

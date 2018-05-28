@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor, isEnabled, isInSummary, isSearchable, isUpdatable, Property} from "../class-accessor";
 import {Page, PageConfiguration, PortofinoComponent} from "../portofino.component";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'portofino-crud',
@@ -29,7 +30,7 @@ export class CrudComponent extends Page implements OnInit {
 
   id: string;
 
-  constructor(private http: HttpClient, public portofino: PortofinoService) {
+  constructor(private http: HttpClient, public portofino: PortofinoService, private router: Router) {
     super();
   }
 
@@ -48,27 +49,45 @@ export class CrudComponent extends Page implements OnInit {
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
-    this.searchVisible = true;
+    if(this.id) {
+      this.showDetail();
+    } else {
+      this.showSearch();
+    }
   }
 
-  createNew() {
+  showCreate() {
     this.searchVisible = false;
     this.editVisible = false;
     this.createVisible = true;
   }
 
-  openDetail(id: string) {
-    this.id = id;
+  showDetail() {
     this.searchVisible = false;
     this.editVisible = true;
     this.createVisible = false;
   }
 
-  closeDetail() {
+  showSearch() {
     this.searchVisible = true;
     this.createVisible = false;
     this.editVisible = false;
-    this.id = null;
+  }
+
+  goToSearch() {
+    this.router.navigateByUrl(this.path);
+  }
+
+  consumePathFragment(fragment: string): boolean {
+    const child = this.configuration.children.find(c => c.path == fragment);
+    if(child) {
+      return true;
+    }
+    if(this.id) {
+      this.id = `${this.id}/${fragment}`;
+    } else {
+      this.id = fragment;
+    }
   }
 }
 

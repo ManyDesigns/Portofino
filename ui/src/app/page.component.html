@@ -7,13 +7,13 @@
           <a [routerLink]="page.parent.path" routerLinkActive="active">{{page.parent.configuration.title}}</a>
           <ul>
             <li *ngFor="let child of page.parent.configuration.children">
-              <a *ngIf="child.path != page.path"
-                 [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
-              <ng-container *ngIf="child.path == page.path">
+              <a *ngIf="child.absolutePath != page.path"
+                 [routerLink]="child.absolutePath" routerLinkActive="active">{{child.title}}</a>
+              <ng-container *ngIf="child.absolutePath == page.path">
                 <strong>{{page.configuration.title}}</strong>
                 <ul>
                   <li *ngFor="let child of page.configuration.children">
-                    <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+                    <a [routerLink]="child.absolutePath" routerLinkActive="active">{{child.title}}</a>
                   </li>
                 </ul>
               </ng-container>
@@ -25,7 +25,7 @@
         <strong>{{page.configuration.title}}</strong>
         <ul>
           <li *ngFor="let child of page.configuration.children">
-            <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+            <a [routerLink]="child.absolutePath" routerLinkActive="active">{{child.title}}</a>
           </li>
         </ul>
       </div>

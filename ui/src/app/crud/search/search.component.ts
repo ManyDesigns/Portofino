@@ -19,8 +19,6 @@ export class SearchComponent implements OnInit {
   classAccessor: ClassAccessor;
   @Input()
   configuration: Configuration;
-  @Output()
-  detail = new EventEmitter<string>();
 
   searchFields: Property[] = [];
   searchQuery = {};
@@ -111,10 +109,6 @@ export class SearchComponent implements OnInit {
 
   clearSearch() {
     this.searchQuery = {};
-  }
-
-  openDetail(id: string) {
-    this.detail.emit(id);
   }
 
 }

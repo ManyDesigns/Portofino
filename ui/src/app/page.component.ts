@@ -34,7 +34,7 @@ export class PageComponent implements OnInit {
         page.parent = this.page;
         if (page.parent) {
           page.parent.configuration.children.forEach(child =>
-            child.path = `${page.parent.path}/${child.path}`
+            child.absolutePath = `${page.parent.path}/${child.path}`
           );
         }
         this.page = page;
