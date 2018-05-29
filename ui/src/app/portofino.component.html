@@ -1,7 +1,7 @@
 <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
   {{ title }}
   <ng-container *ngIf="authenticationService.currentUser">
-    <mat-menu #userMenu="matMenu">
+    <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="authenticationService.logout()">Logout</button>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="userMenu">
