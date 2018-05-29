@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
+import {enableProdMode, NgModule} from '@angular/core';
 
 import { PortofinoComponent } from './portofino.component';
 import { CrudComponent } from './crud/crud.component';
@@ -24,6 +24,11 @@ import { EditComponent } from './crud/detail/edit.component';
 import { CreateComponent } from './crud/detail/create.component';
 import { ContentDirective } from './content.directive';
 import { PageComponent } from './page.component';
+import {environment} from "../environments/environment";
+
+if(environment.production) {
+  enableProdMode();
+}
 
 @NgModule({
   declarations: [
@@ -43,7 +48,7 @@ import { PageComponent } from './page.component';
     PortofinoService, AuthenticationService,
     { provide: LOGIN_COMPONENT, useFactory: () => LoginComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
-    { provide: TokenStorageService, useClass: LocalTokenStorageService, deps: [] }],
+    { provide: TokenStorageService, useClass: LocalTokenStorageService }],
   bootstrap: [PortofinoComponent],
   entryComponents: [LoginComponent, CrudComponent]
 })

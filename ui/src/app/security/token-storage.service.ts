@@ -10,9 +10,7 @@ export abstract class TokenStorageService {
 
 @Injectable()
 export class LocalTokenStorageService extends TokenStorageService {
-  constructor(protected prefix: string = "portofino-") {
-    super();
-  }
+  prefix = "portofino-";
 
   get(key): any {
     return localStorage.getItem(this.prefix + key);
@@ -29,9 +27,7 @@ export class LocalTokenStorageService extends TokenStorageService {
 
 @Injectable()
 export class SessionTokenStorageService extends TokenStorageService {
-  constructor(protected prefix: string = "portofino-") {
-    super();
-  }
+  prefix = "portofino-";
 
   get(key): any {
     return sessionStorage.getItem(this.prefix + key);
