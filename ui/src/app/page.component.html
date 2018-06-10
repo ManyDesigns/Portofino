@@ -1,6 +1,6 @@
 <mat-sidenav-container [autosize]="true">
   <mat-sidenav [opened]="true" mode="side" [disableClose]="true">
-    <h3>Navigation</h3>
+    <h3 i18n>Navigation</h3>
     <ng-container *ngIf="page">
       <ul *ngIf="page.parent">
         <li>
@@ -33,7 +33,7 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <ng-template portofino-content *ngIf="!error"></ng-template>
-    <div *ngIf="error">
+    <div *ngIf="error" i18n>
       Page not found!
     </div>
   </mat-sidenav-content>

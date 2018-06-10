@@ -3,7 +3,7 @@
   *ngIf="searchVisible"
   [classAccessor]="classAccessor" [configuration]="configuration">
   <ng-template #buttons>
-    <button mat-raised-button color="accent" (click)="showCreate()">
+    <button mat-raised-button color="accent" (click)="showCreate()" i18n>
       <mat-icon>add</mat-icon>
       Create new
     </button>

@@ -1,4 +1,4 @@
-<h4 mat-dialog-title>Sign in</h4>
+<h4 mat-dialog-title i18n>Sign in</h4>
 <mat-dialog-content>
   <p *ngIf="message" style="color: red;">{{message}}</p>
   <form (submit)="login()">
@@ -8,10 +8,10 @@
     <mat-form-field>
       <input matInput placeholder="Password" type="password" [(ngModel)]="password" name="password">
     </mat-form-field>
-    <button type="submit" style="display:none">Sign in</button>
+    <button type="submit" style="display:none" i18n>Sign in</button>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="login()" color="primary">Sign in</button>
-  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button (click)="login()" color="primary" i18n>Sign in</button>
+  <button mat-button mat-dialog-close i18n>Cancel</button>
 </mat-dialog-actions>

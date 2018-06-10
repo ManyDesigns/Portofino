@@ -1,6 +1,6 @@
 <div fxLayout="column" fxLayoutGap="20px">
   <div>
-    Search
+    <span i18n>Search</span>
     <form (submit)="search()">
       <div fxLayout="row wrap" fxLayoutGap="10px" >
         <portofino-crud-search-field
@@ -9,11 +9,11 @@
         </portofino-crud-search-field>
       </div>
       <div fxLayout="row">
-        <button mat-raised-button color="primary">
+        <button mat-raised-button color="primary" i18n>
           <mat-icon>search</mat-icon>
           Search
         </button>
-        <button mat-raised-button (click)="clearSearch()" type="reset">Clear</button>
+        <button mat-raised-button (click)="clearSearch()" type="reset" i18n>Clear</button>
       </div>
     </form>
   </div>
