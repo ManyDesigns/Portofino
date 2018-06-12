@@ -1,9 +1,10 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ClassAccessor, isEnabled, isInsertable, isUpdatable, Property} from "../../class-accessor";
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
-import * as moment from "moment";
 import {Configuration} from "../crud.component";
+import {ClassAccessor, isEnabled, isInsertable, isUpdatable, Property} from "../../class-accessor";
+import * as moment from "moment";
+import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'portofino-crud-create',
@@ -19,8 +20,8 @@ export class CreateComponent implements OnInit {
   @Output()
   close = new EventEmitter();
 
+  form: FormGroup;
   properties: Property[] = [];
-  loadedObject;
   object;
 
   constructor(private http: HttpClient, private portofino: PortofinoService) { }
@@ -38,20 +39,22 @@ export class CreateComponent implements OnInit {
   }
 
   protected initObject(object) {
-    this.loadedObject = object;
-    this.object = {};
+    this.object = object;
+    const formControls = {};
     this.properties.forEach(p => {
+      let value;
       if(!object[p.name]) {
-        return;
-      }
-      if (this.portofino.isDate(p)) {
-        this.object[p.name] = moment(object[p.name].value);
+        //value is undefined
+      } else if (this.portofino.isDate(p)) {
+        value = moment(object[p.name].value);
       } else if(!p.editable && object[p.name].displayValue) {
-        this.object[p.name] = object[p.name].displayValue;
+        value = object[p.name].displayValue;
       } else {
-        this.object[p.name] = object[p.name].value;
+        value = object[p.name].value;
       }
+      formControls[p.name] = new FormControl({value: value, disabled: !p.editable});
     });
+    this.form = new FormGroup(formControls);
   }
 
   cancel() {
@@ -60,12 +63,13 @@ export class CreateComponent implements OnInit {
 
   save() {
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}`;
-    let object = {...this.object};
-    this.properties.forEach(p => {
-      if (this.portofino.isDate(p) && object[p.name]) {
-        object[p.name] = object[p.name].valueOf();
-      } else if(!p.editable && this.loadedObject[p.name]) {
-        object[p.name] = this.loadedObject[p.name].value;
+    let object = {};
+    this.properties.filter(p => p.editable).forEach(p => {
+      let value = this.form.get(p.name).value;
+      if (this.portofino.isDate(p) && value) {
+        object[p.name] = value.valueOf();
+      } else {
+        object[p.name] = value;
       }
     });
     this.http.post(objectUrl, object).subscribe(o => this.close.emit(object));

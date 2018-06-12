@@ -75,7 +75,11 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   goToSearch() {
-    this.router.navigateByUrl(this.path);
+    if(this.editVisible) {
+      this.router.navigateByUrl(this.path);
+    } else {
+      this.showSearch();
+    }
   }
 
   consumePathSegment(segment: string): boolean {

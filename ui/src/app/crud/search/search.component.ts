@@ -30,7 +30,8 @@ export class SearchComponent implements OnInit {
   pageSize: number;
   sortInfo: Sort;
 
-  @ContentChild("buttons") buttons: TemplateRef<any>;
+  @ContentChild("buttons")
+  buttons: TemplateRef<any>;
 
   constructor(private http: HttpClient, private portofino: PortofinoService) {}
 

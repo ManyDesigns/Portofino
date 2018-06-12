@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Property} from "../../class-accessor";
 import {PortofinoService} from "../../portofino.service";
+import {FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'portofino-crud-field',
@@ -11,9 +12,8 @@ export class FieldComponent implements OnInit {
 
   @Input()
   property: Property;
-
   @Input()
-  object;
+  form: FormGroup;
 
   constructor(public portofino: PortofinoService) { }
 
