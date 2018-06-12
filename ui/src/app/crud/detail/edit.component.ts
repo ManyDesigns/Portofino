@@ -33,6 +33,7 @@ export class EditComponent implements OnInit {
       if(!isEnabled(property)) {
         return;
       }
+      property = {...property};
       this.properties.push(property);
       property.editable = isUpdatable(property);
     });
@@ -74,7 +75,7 @@ export class EditComponent implements OnInit {
         object[p.name] = value;
       }
     });
-    this.http.put(objectUrl, object).subscribe(o => this.close.emit(object));
+    this.http.put(objectUrl, object).subscribe(() => this.close.emit(object));
   }
 
 }

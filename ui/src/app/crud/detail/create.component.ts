@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {Configuration} from "../crud.component";
-import {ClassAccessor, isEnabled, isInsertable, isUpdatable, Property} from "../../class-accessor";
+import {ClassAccessor, isEnabled, isInsertable, Property} from "../../class-accessor";
 import * as moment from "moment";
 import {FormControl, FormGroup} from "@angular/forms";
 
@@ -31,6 +31,7 @@ export class CreateComponent implements OnInit {
       if(!isEnabled(property)) {
         return;
       }
+      property = {...property};
       this.properties.push(property);
       property.editable = isInsertable(property);
     });
@@ -72,7 +73,7 @@ export class CreateComponent implements OnInit {
         object[p.name] = value;
       }
     });
-    this.http.post(objectUrl, object).subscribe(o => this.close.emit(object));
+    this.http.post(objectUrl, object).subscribe(() => this.close.emit(object));
   }
 
 }

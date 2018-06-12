@@ -1,13 +1,13 @@
-<mat-form-field *ngIf="portofino.isString(property)">
-  <input matInput [(ngModel)]="searchQuery[property.name]"
+<mat-form-field *ngIf="portofino.isString(property)" [formGroup]="form">
+  <input matInput [formControlName]="property.name"
          [placeholder]="property.name">
 </mat-form-field >
-<mat-form-field  *ngIf="portofino.isNumber(property)">
-  <input matInput [(ngModel)]="searchQuery[property.name]"
+<mat-form-field  *ngIf="portofino.isNumber(property)" [formGroup]="form">
+  <input matInput [formControlName]="property.name"
          [placeholder]="property.name">
 </mat-form-field >
-<mat-form-field  *ngIf="portofino.isDate(property)">
-  <input matInput [(ngModel)]="searchQuery[property.name]"
+<mat-form-field  *ngIf="portofino.isDate(property)" [formGroup]="form">
+  <input matInput [formControlName]="property.name"
          [placeholder]="property.name"
          [matDatepicker]="datepicker">
   <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>

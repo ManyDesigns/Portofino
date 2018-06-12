@@ -1,7 +1,7 @@
 <h2>{{configuration.title}}</h2>
 <portofino-crud-search
   *ngIf="searchVisible"
-  [classAccessor]="classAccessor" [configuration]="configuration">
+  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders">
   <ng-template #buttons>
     <button mat-raised-button color="accent" (click)="showCreate()" i18n>
       <mat-icon>add</mat-icon>

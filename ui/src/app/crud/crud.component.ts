@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
-import {ClassAccessor, isEnabled, isInSummary, isSearchable, isUpdatable, Property} from "../class-accessor";
+import {ClassAccessor} from "../class-accessor";
 import {Page, PageChild, PageConfiguration, PortofinoComponent} from "../portofino.component";
 import {Router} from "@angular/router";
 
@@ -18,8 +18,10 @@ export class CrudComponent extends Page implements OnInit {
   configuration: PageConfiguration & any;
 
   classAccessor: ClassAccessor;
+  selectionProviders: SelectionProvider[];
   classAccessorPath = '/:classAccessor';
   configurationPath = '/:configuration';
+  selectionProvidersPath = '/:selectionProviders';
 
   @Input()
   pageSize: number;
@@ -38,13 +40,13 @@ export class CrudComponent extends Page implements OnInit {
     const baseUrl = this.portofino.apiPath + this.configuration.source;
     this.http.get<ClassAccessor>(baseUrl + this.classAccessorPath).subscribe(
       classAccessor => this.http.get<Configuration>(baseUrl + this.configurationPath).subscribe(
-        configuration => this.init(classAccessor, configuration)
-      )
-    );
+        configuration => this.http.get<SelectionProvider[]>(baseUrl + this.selectionProvidersPath).subscribe(
+          sps => this.init(classAccessor, configuration, sps))));
   }
 
-  protected init(classAccessor, configuration) {
+  protected init(classAccessor, configuration, selectionProviders: SelectionProvider[]) {
     this.classAccessor = classAccessor;
+    this.selectionProviders = selectionProviders;
     this.configuration = {...configuration, ...this.configuration};
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
@@ -106,4 +108,11 @@ export class CrudComponent extends Page implements OnInit {
 export class Configuration {
   rowsPerPage: number;
   source: string;
+}
+
+export class SelectionProvider {
+  name: string;
+  fieldNames: string[];
+  displayMode: string;
+  searchDisplayMode: string;
 }

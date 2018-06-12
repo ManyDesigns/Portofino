@@ -1,12 +1,10 @@
-import {
-  Component, ContentChild, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild,
-  ViewContainerRef
-} from '@angular/core';
-import {Configuration, CrudComponent} from "../crud.component";
+import {Component, ContentChild, Input, OnInit, TemplateRef} from '@angular/core';
+import {Configuration, SelectionProvider} from "../crud.component";
 import {ClassAccessor, isEnabled, isInSummary, isSearchable, Property} from "../../class-accessor";
 import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
+import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -18,10 +16,12 @@ export class SearchComponent implements OnInit {
   @Input()
   classAccessor: ClassAccessor;
   @Input()
+  selectionProviders: SelectionProvider[];
+  @Input()
   configuration: Configuration;
 
   searchFields: Property[] = [];
-  searchQuery = {};
+  form: FormGroup;
   results: SearchResults;
   resultsDataSource = new MatTableDataSource();
   resultFields: Property[] = [];
@@ -36,12 +36,15 @@ export class SearchComponent implements OnInit {
   constructor(private http: HttpClient, private portofino: PortofinoService) {}
 
   ngOnInit() {
+    const formControls = {};
     this.classAccessor.properties.forEach(property => {
       if(!isEnabled(property)) {
         return;
       }
+      property = {...property};
       if(isSearchable(property)) {
         this.searchFields.push(property);
+        formControls[property.name] = new FormControl();
       }
       if(isInSummary(property)) {
         this.resultFields.push(property);
@@ -51,6 +54,7 @@ export class SearchComponent implements OnInit {
     if(!this.pageSize) {
       this.pageSize = this.configuration.rowsPerPage;
     }
+    this.form = new FormGroup(formControls);
     this.search();
   }
 
@@ -78,24 +82,22 @@ export class SearchComponent implements OnInit {
   }
 
   protected composeSearch(params: HttpParams) {
-    for (let p in this.searchQuery) {
-      if (this.searchQuery[p] === null) {
-        continue;
-      }
-      const property = this.searchFields.find(value => value.name == p);
-      if (!property) {
-        continue;
+    this.searchFields.forEach(property => {
+      const name = property.name;
+      const value = this.form.get(name).value;
+      if(value == null) {
+        return;
       }
       if (this.portofino.isDate(property)) {
-        params = params.set(`search_${p}_min`, this.searchQuery[p].valueOf().toString());
-        params = params.set(`search_${p}_max`, this.searchQuery[p].valueOf().toString());
+        params = params.set(`search_${name}_min`, value.valueOf().toString());
+        params = params.set(`search_${name}_max`, value.valueOf().toString());
       } else if (this.portofino.isNumber(property)) {
-        params = params.set(`search_${p}_min`, this.searchQuery[p].toString());
-        params = params.set(`search_${p}_max`, this.searchQuery[p].toString());
+        params = params.set(`search_${name}_min`, value.toString());
+        params = params.set(`search_${name}_max`, value.toString());
       } else {
-        params = params.set(`search_${p}`, this.searchQuery[p].toString());
+        params = params.set(`search_${name}`, value.toString());
       }
-    }
+    });
     return params;
   }
 
@@ -109,7 +111,7 @@ export class SearchComponent implements OnInit {
   }
 
   clearSearch() {
-    this.searchQuery = {};
+    this.form.reset();
   }
 
 }
