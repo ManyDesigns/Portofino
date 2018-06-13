@@ -66,6 +66,11 @@ export class DetailComponent implements OnInit {
     this.createForm(this.object);
   }
 
+  delete() {
+    const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
+    this.http.delete(objectUrl).subscribe(() => this.close.emit(this.object));
+  }
+
   cancel() {
     if(this.editMode) {
       this.editMode = false;
