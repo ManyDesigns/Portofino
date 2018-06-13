@@ -24,12 +24,16 @@
           <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">app/crud/detail/edit.component.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="sourcefile">app/crud/detail/detail.component.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/crud/detail/detail.component.ts</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">app/crud/detail/create.component.ts</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
       <trans-unit id="bb694b49d408265c91c62799c2b3a7e3151c824d" datatype="html">
@@ -63,21 +67,28 @@
         </source>
         <context-group purpose="location">
           <context context-type="sourcefile">app/crud/search/search.component.ts</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit id="99ee4faa69cd2ea8e3678c1f557c0ff1f05aae46" datatype="html">
         <source>Clear</source>
         <context-group purpose="location">
           <context context-type="sourcefile">app/crud/search/search.component.ts</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">14</context>
         </context-group>
       </trans-unit>
       <trans-unit id="51a4ff5e9bae6fa738928b4a58edd9467fdadcc5" datatype="html">
         <source>Edit <x id="INTERPOLATION" equiv-text="{{id}}"/></source>
         <context-group purpose="location">
-          <context context-type="sourcefile">app/crud/detail/edit.component.ts</context>
+          <context context-type="sourcefile">app/crud/detail/detail.component.ts</context>
           <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="08a860b37731fac940227a58b8ac8f2b8343d974" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{id}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/crud/detail/detail.component.ts</context>
+          <context context-type="linenumber">3</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ecb6d47ebfaee8714b5515520d6f6955ae6b5e9d" datatype="html">
@@ -86,12 +97,22 @@
         Save
       </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">app/crud/detail/edit.component.ts</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="sourcefile">app/crud/detail/detail.component.ts</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">app/crud/detail/create.component.ts</context>
-          <context context-type="linenumber">11</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="452898af53ab35dbdb626caed22e71df14ccaf0f" datatype="html">
+        <source>
+        <x id="START_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;mat-icon&gt;"/>edit<x id="CLOSE_TAG_MAT-ICON" ctype="x-mat-icon" equiv-text="&lt;/mat-icon&gt;"/>
+        Edit
+      </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">app/crud/detail/detail.component.ts</context>
+          <context context-type="linenumber">16</context>
         </context-group>
       </trans-unit>
       <trans-unit id="d26383b3c0614e4c1445b8d5f82560cfb7253cce" datatype="html">

@@ -20,7 +20,7 @@ import {FlexLayoutModule} from "@angular/flex-layout";
 import { RouterModule, Routes } from '@angular/router';
 import { SearchComponent } from './crud/search/search.component';
 import { FieldComponent } from './crud/detail/field.component';
-import { EditComponent } from './crud/detail/edit.component';
+import { DetailComponent } from './crud/detail/detail.component';
 import { CreateComponent } from './crud/detail/create.component';
 import { ContentDirective } from './content.directive';
 import { PageComponent } from './page.component';
@@ -33,7 +33,7 @@ if(environment.production) {
 @NgModule({
   declarations: [
     PortofinoComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent, FieldComponent,
-    EditComponent, CreateComponent, ContentDirective, PageComponent
+    DetailComponent, CreateComponent, ContentDirective, PageComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,

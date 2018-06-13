@@ -28,7 +28,7 @@ export class CrudComponent extends Page implements OnInit {
 
   searchVisible = false;
   createVisible = false;
-  editVisible = false;
+  detailVisible = false;
 
   id: string;
 
@@ -60,24 +60,24 @@ export class CrudComponent extends Page implements OnInit {
 
   showCreate() {
     this.searchVisible = false;
-    this.editVisible = false;
+    this.detailVisible = false;
     this.createVisible = true;
   }
 
   showDetail() {
     this.searchVisible = false;
-    this.editVisible = true;
+    this.detailVisible = true;
     this.createVisible = false;
   }
 
   showSearch() {
     this.searchVisible = true;
     this.createVisible = false;
-    this.editVisible = false;
+    this.detailVisible = false;
   }
 
   goToSearch() {
-    if(this.editVisible) {
+    if(this.detailVisible) {
       this.router.navigateByUrl(this.path);
     } else {
       this.showSearch();

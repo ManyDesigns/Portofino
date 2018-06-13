@@ -7,11 +7,11 @@ import * as moment from "moment";
 import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
-  selector: 'portofino-crud-edit',
-  templateUrl: './edit.component.html',
-  styleUrls: ['./edit.component.css']
+  selector: 'portofino-crud-detail',
+  templateUrl: './detail.component.html',
+  styleUrls: ['./detail.component.css']
 })
-export class EditComponent implements OnInit {
+export class DetailComponent implements OnInit {
 
   @Input()
   id: string;
@@ -25,6 +25,7 @@ export class EditComponent implements OnInit {
   form: FormGroup;
   properties: Property[] = [];
   object;
+  editMode = false;
 
   constructor(private http: HttpClient, private portofino: PortofinoService) { }
 
@@ -38,10 +39,10 @@ export class EditComponent implements OnInit {
       property.editable = isUpdatable(property);
     });
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
-    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.initObject(o));
+    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.createForm(o));
   }
 
-  protected initObject(object) {
+  protected createForm(object) {
     this.object = object;
     const formControls = {};
     this.properties.forEach(p => {
@@ -55,13 +56,23 @@ export class EditComponent implements OnInit {
       } else {
         value = object[p.name].value;
       }
-      formControls[p.name] = new FormControl({value: value, disabled: !p.editable});
+      formControls[p.name] = new FormControl({value: value, disabled: !this.editMode || !p.editable});
     });
     this.form = new FormGroup(formControls);
   }
 
+  edit() {
+    this.editMode = true;
+    this.createForm(this.object);
+  }
+
   cancel() {
-    this.close.emit();
+    if(this.editMode) {
+      this.editMode = false;
+      this.createForm(this.object);
+    } else {
+      this.close.emit();
+    }
   }
 
   save() {

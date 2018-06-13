@@ -9,10 +9,10 @@
     </button>
   </ng-template>
 </portofino-crud-search>
-<portofino-crud-edit
-  *ngIf="editVisible"
+<portofino-crud-detail
+  *ngIf="detailVisible"
   [id]="id" [classAccessor]="classAccessor" [configuration]="configuration"
-  (close)="goToSearch()"></portofino-crud-edit>
+  (close)="goToSearch()"></portofino-crud-detail>
 <portofino-crud-create
   *ngIf="createVisible"
   [classAccessor]="classAccessor" [configuration]="configuration"
