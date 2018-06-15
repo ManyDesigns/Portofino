@@ -2062,7 +2062,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Returns values to update multiple a single select or autocomplete field, in JSON form.
+     * Returns values to update a single select or autocomplete field, in JSON form.
      * Note that, for autocomplete fields, it expects the autocomplete value
      * as a request parameter with the field's name. See {@link #jsonOptions(String, int, String, boolean)}.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.

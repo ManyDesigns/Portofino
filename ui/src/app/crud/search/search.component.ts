@@ -1,5 +1,5 @@
 import {Component, ContentChild, Input, OnInit, TemplateRef} from '@angular/core';
-import {Configuration, SelectionProvider} from "../crud.component";
+import {Configuration, SelectionOption, SelectionProvider} from "../crud.component";
 import {ClassAccessor, isEnabled, isInSummary, isSearchable, Property} from "../../class-accessor";
 import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
 import {HttpClient, HttpParams} from "@angular/common/http";
@@ -51,10 +51,41 @@ export class SearchComponent implements OnInit {
         this.columnsToDisplay.push(property.name);
       }
     });
+
+    this.form = new FormGroup(formControls);
+
+    this.selectionProviders.forEach(sp => {
+      sp.fieldNames.forEach((name, index) => {
+        const property = this.searchFields.find(p => p.name == name);
+        if(!property) {
+          return;
+        }
+        const spUrl = `${this.portofino.apiPath + this.configuration.source}/:selectionProvider/${sp.name}/${index}`;
+        property.selectionProvider = {
+          name: sp.name,
+          index: index,
+          displayMode: sp.searchDisplayMode,
+          url: spUrl,
+          options: []
+        };
+        if(index == 0) {
+          this.http.get<SelectionOption[]>(spUrl).subscribe(
+            options => {
+              property.selectionProvider.options = options;
+              const selected = options.find(o => o.s);
+              this.form.get(property.name).setValue(selected ? selected.v : null);
+            });
+        }
+        if(index < sp.fieldNames.length - 1) {
+          property.selectionProvider.nextProperty = sp.fieldNames[index + 1];
+        }
+      });
+    });
+
     if(!this.pageSize) {
       this.pageSize = this.configuration.rowsPerPage;
     }
-    this.form = new FormGroup(formControls);
+
     this.search();
   }
 
@@ -88,7 +119,9 @@ export class SearchComponent implements OnInit {
       if(value == null) {
         return;
       }
-      if (this.portofino.isDate(property)) {
+      if(property.selectionProvider) {
+        params = params.set(`search_${name}`, value.toString());
+      } else if (this.portofino.isDate(property)) {
         params = params.set(`search_${name}_min`, value.valueOf().toString());
         params = params.set(`search_${name}_max`, value.valueOf().toString());
       } else if (this.portofino.isNumber(property)) {

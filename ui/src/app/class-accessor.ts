@@ -12,6 +12,7 @@ export class Property {
   key: boolean;
 
   editable: boolean;
+  selectionProvider: any;
 }
 
 export class Annotation {

@@ -115,4 +115,11 @@ export class SelectionProvider {
   fieldNames: string[];
   displayMode: string;
   searchDisplayMode: string;
+  options: SelectionOption[];
+}
+
+export class SelectionOption {
+  v: string;
+  l: string;
+  s: boolean;
 }
