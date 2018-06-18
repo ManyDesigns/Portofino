@@ -11,9 +11,9 @@
 </portofino-crud-search>
 <portofino-crud-detail
   *ngIf="detailVisible"
-  [id]="id" [classAccessor]="classAccessor" [configuration]="configuration"
+  [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
   (close)="goToSearch()"></portofino-crud-detail>
 <portofino-crud-create
   *ngIf="createVisible"
-  [classAccessor]="classAccessor" [configuration]="configuration"
+  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
   (close)="goToSearch()"></portofino-crud-create>
