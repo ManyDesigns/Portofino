@@ -12,8 +12,9 @@ import { LoginComponent } from './security/login/login.component';
 import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
 import { SearchFieldComponent } from './crud/search/search-field.component';
 import {
-  MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-  MatMenuModule, MatPaginatorModule, MatSelectModule, MatSidenavModule, MatSortModule, MatTableModule, MatToolbarModule
+  MatAutocompleteModule, MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule,
+  MatInputModule, MatMenuModule, MatPaginatorModule, MatSelectModule, MatSidenavModule, MatSortModule, MatTableModule,
+  MatToolbarModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -37,8 +38,8 @@ if(environment.production) {
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
-    MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMenuModule, MatPaginatorModule, MatSelectModule, MatSidenavModule, MatSortModule, MatTableModule,
+    MatAutocompleteModule, MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule,
+    MatInputModule, MatMenuModule, MatPaginatorModule, MatSelectModule, MatSidenavModule, MatSortModule, MatTableModule,
     MatToolbarModule, MatMomentDateModule,
     RouterModule.forRoot([{
       path: "**", component: PageComponent

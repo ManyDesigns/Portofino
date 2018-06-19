@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {EventEmitter, Input, Output} from '@angular/core';
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {Configuration, SelectionOption, SelectionProvider} from "../crud.component";
-import {ClassAccessor, isEnabled, isUpdatable, Property} from "../../class-accessor";
+import {ClassAccessor, isEnabled, Property} from "../../class-accessor";
 import * as moment from "moment";
 import {FormControl, FormGroup} from "@angular/forms";
+import {debounceTime} from "rxjs/operators";
 
 export abstract class BaseDetailComponent {
 
@@ -78,7 +79,16 @@ export abstract class BaseDetailComponent {
           },
           options: []
         };
-        if(index == 0) {
+        if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+          const autocomplete = this.form.get(property.name);
+          const value = this.object[property.name];
+          autocomplete.setValue({ v: value.value, l: value.displayValue });
+          autocomplete.valueChanges.pipe(debounceTime(500)).subscribe(value => {
+            if(autocomplete.dirty && value != null && value.hasOwnProperty("length")) {
+              this.loadSelectionOptions(property, value);
+            }
+          });
+        } else if(index == 0) {
           this.loadSelectionOptions(property);
         }
         if(index < sp.fieldNames.length - 1) {
@@ -88,21 +98,42 @@ export abstract class BaseDetailComponent {
     });
   }
 
-  protected loadSelectionOptions(property: Property) {
+  protected loadSelectionOptions(property: Property, autocomplete: string = null) {
     const url = property.selectionProvider.url;
-    this.http.get<SelectionOption[]>(url).subscribe(
+    let params = new HttpParams();
+    if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+      if(autocomplete) {
+        params = params.set(`labelSearch`, autocomplete);
+      } else {
+        this.setSelectOptions(property, []);
+        return;
+      }
+    }
+    this.http.get<SelectionOption[]>(url, { params: params }).subscribe(
       options => {
-        property.selectionProvider.options = options;
-        this.clearSelectionValues(property);
-        const selected = options.find(o => o.s);
-        if(selected) {
-          this.form.get(property.name).setValue(selected.v);
-        }
+        this.setSelectOptions(property, options);
       });
+  }
+
+  protected setSelectOptions(property: Property, options) {
+    property.selectionProvider.options = options;
+    this.clearDependentSelectionValues(property);
+    const selected = options.find(o => o.s);
+    if (selected) {
+      this.form.get(property.name).setValue(selected.v);
+    }
+  }
+
+  protected clearDependentSelectionValues(property: Property) {
+    const nextProperty = property.selectionProvider.nextProperty;
+    if (nextProperty) {
+      this.clearSelectionValues(this.properties.find(p => p.name == nextProperty));
+    }
   }
 
   protected clearSelectionValues(property: Property) {
     this.form.get(property.name).setValue(null);
+    property.selectionProvider.options = [];
     const nextProperty = property.selectionProvider.nextProperty;
     if(nextProperty) {
       this.clearSelectionValues(this.properties.find(p => p.name == nextProperty));
@@ -113,6 +144,9 @@ export abstract class BaseDetailComponent {
     let object = {};
     this.properties.filter(p => p.editable).forEach(p => {
       let value = this.form.get(p.name).value;
+      if(p.selectionProvider && value) {
+        value = value.v;
+      }
       if (this.portofino.isDate(p) && value) {
         object[p.name] = value.valueOf();
       } else {

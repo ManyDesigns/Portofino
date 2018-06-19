@@ -18,7 +18,10 @@ export class SearchFieldComponent implements OnInit {
 
   constructor(public portofino: PortofinoService) { }
 
-  ngOnInit() {
+  getOptionLabel(option) {
+    return option ? option.l : null;
   }
+
+  ngOnInit() {}
 
 }

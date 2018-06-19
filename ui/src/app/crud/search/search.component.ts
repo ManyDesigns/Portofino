@@ -5,6 +5,7 @@ import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {FormControl, FormGroup} from "@angular/forms";
+import {debounceTime, flatMap, map, mergeMap, startWith} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -20,7 +21,7 @@ export class SearchComponent implements OnInit {
   @Input()
   configuration: Configuration;
 
-  searchFields: Property[] = [];
+  properties: Property[] = [];
   form: FormGroup;
   results: SearchResults;
   resultsDataSource = new MatTableDataSource();
@@ -43,7 +44,7 @@ export class SearchComponent implements OnInit {
       }
       property = {...property};
       if(isSearchable(property)) {
-        this.searchFields.push(property);
+        this.properties.push(property);
         formControls[property.name] = new FormControl();
       }
       if(isInSummary(property)) {
@@ -56,7 +57,7 @@ export class SearchComponent implements OnInit {
 
     this.selectionProviders.forEach(sp => {
       sp.fieldNames.forEach((name, index) => {
-        const property = this.searchFields.find(p => p.name == name);
+        const property = this.properties.find(p => p.name == name);
         if(!property) {
           return;
         }
@@ -75,7 +76,14 @@ export class SearchComponent implements OnInit {
           },
           options: []
         };
-        if(index == 0) {
+        if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+          const autocomplete = this.form.get(property.name);
+          autocomplete.valueChanges.pipe(debounceTime(500)).subscribe(value => {
+            if(autocomplete.dirty && value != null && value.hasOwnProperty("length")) {
+              this.loadSelectionOptions(property, value);
+            }
+          });
+        } else if(index == 0) {
           this.loadSelectionOptions(property);
         }
         if(index < sp.fieldNames.length - 1) {
@@ -91,21 +99,42 @@ export class SearchComponent implements OnInit {
     this.search();
   }
 
-  protected loadSelectionOptions(property: Property) {
+  protected loadSelectionOptions(property: Property, autocomplete: string = null) {
     const url = property.selectionProvider.url;
-    this.http.get<SelectionOption[]>(url).subscribe(
+    let params = new HttpParams();
+    if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+      if(autocomplete) {
+        params = params.set(`labelSearch`, autocomplete);
+      } else {
+        this.setSelectOptions(property, []);
+        return;
+      }
+    }
+    this.http.get<SelectionOption[]>(url, { params: params }).subscribe(
       options => {
-        property.selectionProvider.options = options;
-        this.clearSelectionValues(property);
-        const selected = options.find(o => o.s);
-        if(selected) {
-          this.form.get(property.name).setValue(selected.v);
-        }
+        this.setSelectOptions(property, options);
       });
+  }
+
+  private setSelectOptions(property: Property, options) {
+    property.selectionProvider.options = options;
+    this.clearDependentSelectionValues(property);
+    const selected = options.find(o => o.s);
+    if (selected) {
+      this.form.get(property.name).setValue(selected.v);
+    }
+  }
+
+  protected clearDependentSelectionValues(property: Property) {
+    const nextProperty = property.selectionProvider.nextProperty;
+    if (nextProperty) {
+      this.clearSelectionValues(this.properties.find(p => p.name == nextProperty));
+    }
   }
 
   protected clearSelectionValues(property: Property) {
     this.form.get(property.name).setValue(null);
+    property.selectionProvider.options = [];
     const nextProperty = property.selectionProvider.nextProperty;
     if(nextProperty) {
       this.clearSelectionValues(this.properties.find(p => p.name == nextProperty));
@@ -136,13 +165,14 @@ export class SearchComponent implements OnInit {
   }
 
   protected composeSearch(params: HttpParams) {
-    this.searchFields.forEach(property => {
+    this.properties.forEach(property => {
       const name = property.name;
-      const value = this.form.get(name).value;
+      let value = this.form.get(name).value;
       if(value == null) {
         return;
       }
       if(property.selectionProvider) {
+        value = value.v;
         if(value instanceof Array) {
           value.forEach(v => {
             params = params.append(`search_${name}`, v.toString());
@@ -174,6 +204,15 @@ export class SearchComponent implements OnInit {
 
   clearSearch() {
     this.form.reset();
+    this.properties.forEach(property => {
+      const sp = property.selectionProvider;
+      if(sp) {
+        if(sp.displayMode == 'AUTOCOMPLETE') {
+          sp.options = [];
+        }
+        this.clearDependentSelectionValues(property);
+      }
+    });
   }
 
 }

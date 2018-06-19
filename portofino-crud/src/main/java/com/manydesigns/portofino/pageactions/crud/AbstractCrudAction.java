@@ -2046,26 +2046,26 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution jsonSelectFieldOptions() {
-        return jsonOptions(relName, prefix, true);
+        return jsonOptions(relName, prefix, labelSearch, true);
     }
 
     public Resolution jsonSelectFieldSearchOptions() {
-        return jsonOptions(relName, searchPrefix, true);
+        return jsonOptions(relName, searchPrefix, labelSearch, true);
     }
 
     public Resolution jsonAutocompleteOptions() {
-        return jsonOptions(relName, prefix, false);
+        return jsonOptions(relName, prefix, labelSearch, false);
     }
 
     public Resolution jsonAutocompleteSearchOptions() {
-        return jsonOptions(relName, searchPrefix, false);
+        return jsonOptions(relName, searchPrefix, labelSearch, false);
     }
 
     /**
      * Returns values to update a single select or autocomplete field, in JSON form.
-     * Note that, for autocomplete fields, it expects the autocomplete value
-     * as a request parameter with the field's name. See {@link #jsonOptions(String, int, String, boolean)}.
+     * See {@link #jsonOptions(String, int, String, String, boolean)}.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
+     * @param labelSearch for autocomplete fields, the text entered by the user.
      * @param prefix form prefix, to read values from the request.
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
@@ -2077,20 +2077,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MediaType.APPLICATION_JSON)
     public Resolution jsonOptions(
             @PathParam("selectionProviderName") String selectionProviderName,
+            @QueryParam("labelSearch") String labelSearch,
             @QueryParam("prefix") String prefix,
-            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt
-    ) {
-        return jsonOptions(selectionProviderName, selectionProviderIndex, prefix, includeSelectPrompt);
+            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
+        return jsonOptions(selectionProviderName, selectionProviderIndex, labelSearch, prefix, includeSelectPrompt);
     }
     
     /**
-     * Returns values to update multiple related select fields or a single autocomplete
-     * text field, in JSON form. Note that, for autocomplete fields, it expects the autocomplete value 
-     * as a request parameter with the field's name.
+     * Returns values to update multiple related select fields or a single autocomplete text field, in JSON form.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
      * @param selectionProviderIndex index of the selection field (in case of multiple-valued selection providers,
      *                               otherwise it is always 0 and you can use
-     *                               {@link #jsonOptions(String, String, boolean)}).
+     *                               {@link #jsonOptions(String, String, String, boolean)}).
+     * @param labelSearch for autocomplete fields, the text entered by the user.
      * @param prefix form prefix, to read values from the request.
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
@@ -2103,6 +2102,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution jsonOptions(
             @PathParam("selectionProviderName") String selectionProviderName,
             @PathParam("selectionProviderIndex") int selectionProviderIndex,
+            @QueryParam("labelSearch") String labelSearch,
             @QueryParam("prefix") String prefix,
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
