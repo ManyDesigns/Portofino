@@ -7,6 +7,14 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
+  <mat-form-field *ngIf="property.selectionProvider.displayMode == 'MULTIPLESELECT'" [formGroup]="form">
+    <mat-select [formControlName]="property.name" [placeholder]="property.name" [multiple]="true"
+                (selectionChange)="property.selectionProvider.updateOptions(property)">
+      <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option.v">
+        {{ option.l }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 </ng-container>
 <ng-template #simple>
   <mat-form-field *ngIf="portofino.isString(property)" [formGroup]="form">

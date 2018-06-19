@@ -143,7 +143,13 @@ export class SearchComponent implements OnInit {
         return;
       }
       if(property.selectionProvider) {
-        params = params.set(`search_${name}`, value.toString());
+        if(value instanceof Array) {
+          value.forEach(v => {
+            params = params.append(`search_${name}`, v.toString());
+          });
+        } else {
+          params = params.set(`search_${name}`, value.toString());
+        }
       } else if (this.portofino.isDate(property)) {
         params = params.set(`search_${name}_min`, value.valueOf().toString());
         params = params.set(`search_${name}_max`, value.valueOf().toString());
