@@ -69,21 +69,44 @@ export abstract class BaseDetailComponent {
           index: index,
           displayMode: sp.displayMode,
           url: spUrl,
+          nextProperty: null,
+          updateOptions: () => {
+            const nextProperty = property.selectionProvider.nextProperty;
+            if(nextProperty) {
+              this.loadSelectionOptions(this.properties.find(p => p.name == nextProperty));
+            }
+          },
           options: []
         };
         if(index == 0) {
-          this.http.get<SelectionOption[]>(spUrl).subscribe(
-            options => {
-              property.selectionProvider.options = options;
-              const selected = options.find(o => o.s);
-              this.form.get(property.name).setValue(selected ? selected.v : null);
-            });
+          this.loadSelectionOptions(property);
         }
         if(index < sp.fieldNames.length - 1) {
           property.selectionProvider.nextProperty = sp.fieldNames[index + 1];
         }
       });
     });
+  }
+
+  protected loadSelectionOptions(property: Property) {
+    const url = property.selectionProvider.url;
+    this.http.get<SelectionOption[]>(url).subscribe(
+      options => {
+        property.selectionProvider.options = options;
+        this.clearSelectionValues(property);
+        const selected = options.find(o => o.s);
+        if(selected) {
+          this.form.get(property.name).setValue(selected.v);
+        }
+      });
+  }
+
+  protected clearSelectionValues(property: Property) {
+    this.form.get(property.name).setValue(null);
+    const nextProperty = property.selectionProvider.nextProperty;
+    if(nextProperty) {
+      this.clearSelectionValues(this.properties.find(p => p.name == nextProperty));
+    }
   }
 
   protected getObjectToSave(): any {

@@ -1,6 +1,7 @@
 <ng-container *ngIf="property.selectionProvider; else simple">
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
-    <mat-select [formControlName]="property.name" [placeholder]="property.name">
+    <mat-select [formControlName]="property.name" [placeholder]="property.name"
+                (selectionChange)="property.selectionProvider.updateOptions(property)">
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option.v">
         {{ option.l }}
       </mat-option>
