@@ -34,12 +34,12 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   ngOnInit() {
     this.initClassAccessor();
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
-    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.createForm(o));
+    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.setupForm(o));
   }
 
   edit() {
     this.editMode = true;
-    this.createForm(this.object);
+    this.setupForm(this.object);
   }
 
   delete() {
@@ -50,7 +50,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   cancel() {
     if(this.editMode) {
       this.editMode = false;
-      this.createForm(this.object);
+      this.setupForm(this.object);
     } else {
       this.close.emit();
     }

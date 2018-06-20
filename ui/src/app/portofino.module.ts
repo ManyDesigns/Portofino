@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {enableProdMode, NgModule} from '@angular/core';
-
 import { PortofinoComponent } from './portofino.component';
 import { CrudComponent } from './crud/crud.component';
 import { PortofinoService } from './portofino.service';
@@ -12,8 +11,20 @@ import { LoginComponent } from './security/login/login.component';
 import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
 import { SearchFieldComponent } from './crud/search/search-field.component';
 import {
-  MatAutocompleteModule, MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule,
-  MatInputModule, MatMenuModule, MatPaginatorModule, MatSelectModule, MatSidenavModule, MatSortModule, MatTableModule,
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatDatepickerModule,
+  MatDialogModule,
+  MatFormFieldModule,
+  MatIconModule,
+  MatInputModule,
+  MatMenuModule,
+  MatPaginatorModule,
+  MatRadioModule,
+  MatSelectModule,
+  MatSidenavModule,
+  MatSortModule,
+  MatTableModule,
   MatToolbarModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
@@ -39,8 +50,8 @@ if(environment.production) {
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule,
-    MatInputModule, MatMenuModule, MatPaginatorModule, MatSelectModule, MatSidenavModule, MatSortModule, MatTableModule,
-    MatToolbarModule, MatMomentDateModule,
+    MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSortModule,
+    MatTableModule, MatToolbarModule, MatMomentDateModule,
     RouterModule.forRoot([{
       path: "**", component: PageComponent
     }])

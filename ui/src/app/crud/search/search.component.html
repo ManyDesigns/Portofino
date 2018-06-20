@@ -2,12 +2,12 @@
   <div>
     <span i18n>Search</span>
     <form (submit)="search()" [formGroup]="form">
-      <div fxLayout="row wrap" fxLayoutGap="10px" >
+      <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
         <portofino-crud-search-field *ngFor="let field of properties" [form]="form" [property]="field">
         </portofino-crud-search-field>
       </div>
       <div fxLayout="row">
-        <button mat-raised-button color="primary" i18n>
+        <button mat-raised-button color="primary" (click)="search()" i18n>
           <mat-icon>search</mat-icon>
           Search
         </button>

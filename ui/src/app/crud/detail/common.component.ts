@@ -39,25 +39,35 @@ export abstract class BaseDetailComponent {
 
   protected abstract isEditEnabled(): boolean;
 
-  protected createForm(object) {
+  protected setupForm(object) {
     this.object = object;
     const formControls = {};
     this.properties.forEach(p => {
       let value;
+      const disabled = !this.isEditEnabled() || !this.isEditable(p);
       if(!object[p.name]) {
         //value is undefined
       } else if (this.portofino.isDate(p)) {
         value = moment(object[p.name].value);
-      } else if(!p.editable && object[p.name].displayValue) {
+      } else if(disabled && object[p.name].displayValue) {
         value = object[p.name].displayValue;
       } else {
         value = object[p.name].value;
       }
-      const formState = { value: value, disabled: !this.isEditEnabled() || !this.isEditable(p) };
-      formControls[p.name] = new FormControl(formState);
+      const formState = { value: value, disabled: disabled };
+      if(this.form) {
+        this.form.get(p.name).reset(formState);
+      } else {
+        formControls[p.name] = new FormControl(formState);
+      }
     });
-    this.form = new FormGroup(formControls);
+    if(!this.form) {
+      this.form = new FormGroup(formControls);
+    }
 
+    if(!this.isEditEnabled()) {
+      return;
+    }
     this.selectionProviders.forEach(sp => {
       sp.fieldNames.forEach((name, index) => {
         const property = this.properties.find(p => p.name == name);
@@ -71,7 +81,7 @@ export abstract class BaseDetailComponent {
           displayMode: sp.displayMode,
           url: spUrl,
           nextProperty: null,
-          updateOptions: () => {
+          updateDependentOptions: () => {
             const nextProperty = property.selectionProvider.nextProperty;
             if(nextProperty) {
               this.loadSelectionOptions(this.properties.find(p => p.name == nextProperty));

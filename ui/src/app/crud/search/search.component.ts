@@ -68,7 +68,7 @@ export class SearchComponent implements OnInit {
           displayMode: sp.searchDisplayMode,
           url: spUrl,
           nextProperty: null,
-          updateOptions: () => {
+          updateDependentOptions: () => {
             const nextProperty = property.selectionProvider.nextProperty;
             if(nextProperty) {
               this.loadSelectionOptions(this.properties.find(p => p.name == nextProperty));

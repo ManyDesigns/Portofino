@@ -29,7 +29,7 @@ export class CreateComponent extends BaseDetailComponent implements OnInit {
   ngOnInit() {
     this.initClassAccessor();
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}`;
-    this.http.get(objectUrl, {params: {newObject: "true"}}).subscribe(o => this.createForm(o));
+    this.http.get(objectUrl, {params: {newObject: "true"}}).subscribe(o => this.setupForm(o));
   }
 
   cancel() {

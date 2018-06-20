@@ -11,6 +11,8 @@ import {FormGroup} from "@angular/forms";
 export class FieldComponent implements OnInit {
 
   @Input()
+  enabled: boolean;
+  @Input()
   property: Property;
   @Input()
   form: FormGroup;
@@ -18,7 +20,10 @@ export class FieldComponent implements OnInit {
   constructor(public portofino: PortofinoService) { }
 
   getOptionLabel(option) {
-    return option ? option.l : null;
+    if (option && option.l) {
+      return option.l;
+    }
+    return option;
   }
 
   ngOnInit() {}
