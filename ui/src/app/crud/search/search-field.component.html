@@ -32,6 +32,13 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
+  <ng-container *ngIf="property.selectionProvider.displayMode == 'CHECKBOX'" [formGroup]="form">
+    <ng-container [formArrayName]="property.name">
+      <mat-checkbox *ngFor="let option of property.selectionProvider.options; let i = index" [formControlName]="i">
+        {{option.l}}
+      </mat-checkbox>
+    </ng-container>
+  </ng-container>
 </ng-container>
 <ng-template #simple>
   <mat-form-field *ngIf="portofino.isString(property)" [formGroup]="form">

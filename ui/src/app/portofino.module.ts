@@ -12,7 +12,7 @@ import {LocalTokenStorageService, TokenStorageService} from "./security/token-st
 import { SearchFieldComponent } from './crud/search/search-field.component';
 import {
   MatAutocompleteModule,
-  MatButtonModule,
+  MatButtonModule, MatCheckboxModule,
   MatDatepickerModule,
   MatDialogModule,
   MatFormFieldModule,
@@ -29,7 +29,7 @@ import {
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule} from '@angular/router';
 import { SearchComponent } from './crud/search/search.component';
 import { FieldComponent } from './crud/detail/field.component';
 import { DetailComponent } from './crud/detail/detail.component';
@@ -49,9 +49,9 @@ if(environment.production) {
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
-    MatAutocompleteModule, MatButtonModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule, MatIconModule,
-    MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSortModule,
-    MatTableModule, MatToolbarModule, MatMomentDateModule,
+    MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
+    MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
+    MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     RouterModule.forRoot([{
       path: "**", component: PageComponent
     }])

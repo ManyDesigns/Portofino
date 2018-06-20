@@ -4,8 +4,8 @@ import {ClassAccessor, isEnabled, isInSummary, isSearchable, Property} from "../
 import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
-import {FormControl, FormGroup} from "@angular/forms";
-import {debounceTime, flatMap, map, mergeMap, startWith} from "rxjs/operators";
+import {FormArray, FormControl, FormGroup} from "@angular/forms";
+import {debounceTime} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -113,6 +113,13 @@ export class SearchComponent implements OnInit {
     this.http.get<SelectionOption[]>(url, { params: params }).subscribe(
       options => {
         this.setSelectOptions(property, options);
+        if(property.selectionProvider.displayMode == 'CHECKBOX') {
+          const controls = [];
+          for(let i = 0; i < options.length; i++) {
+            controls.push(new FormControl());
+          }
+          this.form.setControl(property.name, new FormArray(controls));
+        }
       });
   }
 
@@ -121,7 +128,7 @@ export class SearchComponent implements OnInit {
     this.clearDependentSelectionValues(property);
     const selected = options.find(o => o.s);
     if (selected) {
-      this.form.get(property.name).setValue(selected.v);
+      this.form.get(property.name).setValue(selected);
     }
   }
 
@@ -166,30 +173,55 @@ export class SearchComponent implements OnInit {
 
   protected composeSearch(params: HttpParams) {
     this.properties.forEach(property => {
-      const name = property.name;
-      let value = this.form.get(name).value;
-      if(value == null) {
-        return;
-      }
       if(property.selectionProvider) {
+        params = this.addSelectionProviderSearchParameter(property, params);
+      } else {
+        params = this.addSimpleSearchParameter(property, params);
+      }
+    });
+    return params;
+  }
+
+  protected addSimpleSearchParameter(property, params: HttpParams) {
+    const name = property.name;
+    const value = this.form.get(name).value;
+    if(value == null) {
+      return params;
+    }
+    if (this.portofino.isDate(property)) {
+      params = params.set(`search_${name}_min`, value.valueOf().toString());
+      params = params.set(`search_${name}_max`, value.valueOf().toString());
+    } else if (this.portofino.isNumber(property)) {
+      params = params.set(`search_${name}_min`, value.toString());
+      params = params.set(`search_${name}_max`, value.toString());
+    } else {
+      params = params.set(`search_${name}`, value.toString());
+    }
+    return params;
+  }
+
+  protected addSelectionProviderSearchParameter(property, params: HttpParams) {
+    const name = property.name;
+    let value = this.form.get(name).value;
+    if (property.selectionProvider.displayMode == 'CHECKBOX') {
+      property.selectionProvider.options.forEach((option, index) => {
+        if(value[index]) {
+          params = params.append(`search_${name}`, option.v);
+        }
+      });
+
+    } else {
+      if (value != null) {
         value = value.v;
-        if(value instanceof Array) {
+        if (value instanceof Array) {
           value.forEach(v => {
             params = params.append(`search_${name}`, v.toString());
           });
         } else {
           params = params.set(`search_${name}`, value.toString());
         }
-      } else if (this.portofino.isDate(property)) {
-        params = params.set(`search_${name}_min`, value.valueOf().toString());
-        params = params.set(`search_${name}_max`, value.valueOf().toString());
-      } else if (this.portofino.isNumber(property)) {
-        params = params.set(`search_${name}_min`, value.toString());
-        params = params.set(`search_${name}_max`, value.toString());
-      } else {
-        params = params.set(`search_${name}`, value.toString());
       }
-    });
+    }
     return params;
   }
 
