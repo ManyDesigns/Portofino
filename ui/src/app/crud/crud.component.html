@@ -3,7 +3,7 @@
   *ngIf="searchVisible"
   [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders">
   <ng-template #buttons>
-    <button mat-raised-button color="accent" (click)="showCreate()" i18n>
+    <button mat-raised-button color="accent" (click)="showCreate()" *ngIf="createEnabled" i18n>
       <mat-icon>add</mat-icon>
       Create new
     </button>
@@ -12,7 +12,7 @@
 <portofino-crud-detail
   *ngIf="detailVisible"
   [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-  (close)="goToSearch()"></portofino-crud-detail>
+  [editEnabled]="editEnabled" [deleteEnabled]="deleteEnabled" (close)="goToSearch()"></portofino-crud-detail>
 <portofino-crud-create
   *ngIf="createVisible"
   [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"

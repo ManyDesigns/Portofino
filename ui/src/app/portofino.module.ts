@@ -54,7 +54,7 @@ if(environment.production) {
     MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     RouterModule.forRoot([{
       path: "**", component: PageComponent
-    }])
+    }], { onSameUrlNavigation: "reload" })
   ],
   providers: [
     PortofinoService, AuthenticationService,

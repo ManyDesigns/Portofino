@@ -22,6 +22,7 @@ export class CrudComponent extends Page implements OnInit {
   classAccessorPath = '/:classAccessor';
   configurationPath = '/:configuration';
   selectionProvidersPath = '/:selectionProviders';
+  operationsPath = '/:operations';
 
   @Input()
   pageSize: number;
@@ -29,6 +30,10 @@ export class CrudComponent extends Page implements OnInit {
   searchVisible = false;
   createVisible = false;
   detailVisible = false;
+
+  createEnabled: boolean;
+  editEnabled: boolean;
+  deleteEnabled: boolean;
 
   id: string;
 
@@ -42,6 +47,12 @@ export class CrudComponent extends Page implements OnInit {
       classAccessor => this.http.get<Configuration>(baseUrl + this.configurationPath).subscribe(
         configuration => this.http.get<SelectionProvider[]>(baseUrl + this.selectionProvidersPath).subscribe(
           sps => this.init(classAccessor, configuration, sps))));
+    this.http.get<Operation[]>(baseUrl + this.operationsPath).subscribe(ops => {
+      this.createEnabled = ops.some(op => op.signature == "POST" && op.available);
+      this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
+      this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
+    });
+
   }
 
   protected init(classAccessor, configuration, selectionProviders: SelectionProvider[]) {
@@ -122,4 +133,10 @@ export class SelectionOption {
   v: string;
   l: string;
   s: boolean;
+}
+
+export class Operation {
+  name: string;
+  signature: string;
+  available: boolean;
 }

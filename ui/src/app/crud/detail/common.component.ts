@@ -15,6 +15,10 @@ export abstract class BaseDetailComponent {
   selectionProviders: SelectionProvider[];
   @Input()
   configuration: Configuration;
+  @Input()
+  editEnabled: boolean;
+  @Input()
+  deleteEnabled: boolean;
   @Output()
   close = new EventEmitter();
 

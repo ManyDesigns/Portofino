@@ -9,6 +9,7 @@ import {Observable, throwError} from "rxjs";
 import { catchError, map, mergeMap } from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
 import {EMPTY} from "rxjs/internal/observable/empty";
+import {Router} from "@angular/router";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 
@@ -20,7 +21,8 @@ export class AuthenticationService {
   loginPath: string = "login";
 
   constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
-              private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected component) {
+              private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected component,
+              protected router: Router) {
     const displayName = this.storage.get('user.displayName');
     if(displayName) {
       this.currentUser = new UserInfo(displayName);
@@ -39,29 +41,37 @@ export class AuthenticationService {
           return EMPTY;
         }
         this.removeAuthenticationInfo();
-        return this.askForCredentials().pipe(mergeMap(_ => this.http.request(this.withAuthenticationHeader(req))));
+        return this.askForCredentials().pipe(
+          map(result => {
+            if (!result) {
+              throw new Error("User declined login");
+            }
+          }),
+          mergeMap(_ => this.http.request(this.withAuthenticationHeader(req))));
       }
       return throwError(error);
     }));
   }
 
-  protected askForCredentials(): Observable<any> {
-    return this.showLoginDialog().pipe(map(result => {
+  protected askForCredentials() {
+    this.dialogRef = this.dialog.open(this.component);
+    return this.dialogRef.afterClosed().pipe(map(result => {
+      this.dialogRef = null;
       if (result && result.jwt) {
         this.setAuthenticationInfo(result);
         return result;
       } else {
-        throw new Error("User declined login");
+        return null;
       }
     }));
   }
 
-  protected showLoginDialog() {
-    this.dialogRef = this.dialog.open(this.component);
-    return this.dialogRef.afterClosed().pipe(map(result => {
-      this.dialogRef = null;
-      return result;
-    }));
+  public showLoginDialog() {
+    this.askForCredentials().subscribe(result => {
+      if(result) {
+        this.router.navigateByUrl(this.router.url);
+      }
+    });
   }
 
   protected removeAuthenticationInfo() {
@@ -102,6 +112,7 @@ export class AuthenticationService {
     const url = `${this.portofino.apiPath}${this.loginPath}/${this.storage.get('sessionId')}`;
     this.http.delete(url).subscribe(value => {
       this.removeAuthenticationInfo();
+      this.router.navigateByUrl(this.router.url);
     });
   }
 }

@@ -42,6 +42,8 @@ import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.navigation.NavigationItem;
+import com.manydesigns.portofino.operations.Operation;
+import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pageactions.rest.APIRoot;
 import com.manydesigns.portofino.pages.ChildPage;
@@ -662,6 +664,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     @Path(":buttons")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Deprecated
     public List getButtons() {
         HttpServletRequest request = context.getRequest();
         String list = request.getParameter("list");
@@ -694,6 +697,38 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             buttonData.put("method", button.getMethod().getName());
             buttonData.put("enabled", enabled);
             result.add(buttonData);
+        }
+        return result;
+    }
+
+    @Path(":operations")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public List describeOperations() {
+        HttpServletRequest request = context.getRequest();
+        List<Operation> operations = Operations.getOperations(getClass());
+        List result = new ArrayList();
+        Subject subject = SecurityUtils.getSubject();
+        for(Operation operation : operations) {
+            logger.trace("ButtonInfo: {}", operation);
+            Method handler = operation.getMethod();
+            boolean isAdmin = SecurityLogic.isAdministrator(request);
+            if(!isAdmin &&
+                    ((pageInstance != null && !SecurityLogic.hasPermissions(
+                            portofinoConfiguration, operation.getMethod(), getClass(), pageInstance, subject)) ||
+                            !SecurityLogic.satisfiesRequiresAdministrator(request, this, handler))) {
+                continue;
+            }
+            boolean visible = ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE);
+            if(!visible) {
+                continue;
+            }
+            boolean available = ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED);
+            Map<String, Object> operationInfo = new HashMap<>();
+            operationInfo.put("name", operation.getName());
+            operationInfo.put("signature", operation.getSignature());
+            operationInfo.put("available", available);
+            result.add(operationInfo);
         }
         return result;
     }
