@@ -8,7 +8,7 @@
       </portofino-crud-field>
     </div>
     <div fxLayout="row" *ngIf="editMode">
-      <button mat-raised-button (click)="save()" color="primary" i18n>
+      <button mat-raised-button (click)="save()" color="primary" [disabled]="form.invalid" i18n>
         <mat-icon>save</mat-icon>
         Save
       </button>

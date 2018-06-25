@@ -37,6 +37,9 @@ export class CreateComponent extends BaseDetailComponent implements OnInit {
   }
 
   save() {
+    if(this.form.invalid) {
+      return;
+    }
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}`;
     let object = this.getObjectToSave();
     this.http.post(objectUrl, object).subscribe(() => this.close.emit(object));

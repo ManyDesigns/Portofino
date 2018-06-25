@@ -3,12 +3,12 @@ import {
   HttpClient,
   HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest
 } from "@angular/common/http";
-import {LoginComponent} from "./login/login.component";
 import {TokenStorageService} from "./token-storage.service";
 import {MatDialog, MatDialogRef} from "@angular/material";
-import {concat, Observable, throwError} from "rxjs";
+import {Observable, throwError} from "rxjs";
 import { catchError, map, mergeMap } from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
+import {EMPTY} from "rxjs/internal/observable/empty";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 
@@ -29,10 +29,15 @@ export class AuthenticationService {
 
   request(req: HttpRequest<any>, observable: Observable<HttpEvent<any>>): Observable<HttpEvent<any>> {
     if(this.dialogRef) {
+      //We're already asking for credentials
       return observable;
     }
     return observable.pipe(catchError((error) => {
       if (error.status === 401) {
+        if(this.dialogRef) {
+          //We're already asking for credentials
+          return EMPTY;
+        }
         this.removeAuthenticationInfo();
         return this.askForCredentials().pipe(mergeMap(_ => this.http.request(this.withAuthenticationHeader(req))));
       }

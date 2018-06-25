@@ -2,9 +2,9 @@ import {EventEmitter, Input, Output} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {Configuration, SelectionOption, SelectionProvider} from "../crud.component";
-import {ClassAccessor, isEnabled, Property} from "../../class-accessor";
+import {ClassAccessor, getAnnotation, isEnabled, isRequired, Property} from "../../class-accessor";
 import * as moment from "moment";
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 
 export abstract class BaseDetailComponent {
@@ -58,7 +58,8 @@ export abstract class BaseDetailComponent {
       if(this.form) {
         this.form.get(p.name).reset(formState);
       } else {
-        formControls[p.name] = new FormControl(formState);
+        const validators = this.setupValidators(p);
+        formControls[p.name] = new FormControl(formState, validators);
       }
     });
     if(!this.form) {
@@ -106,6 +107,30 @@ export abstract class BaseDetailComponent {
         }
       });
     });
+  }
+
+  protected setupValidators(property: Property) {
+    let validators = [];
+    if (isRequired(property)) {
+      validators.push(Validators.required);
+    }
+    const maxLength = getAnnotation(property, "com.manydesigns.elements.annotations.MaxLength");
+    if (maxLength) {
+      validators.push(Validators.maxLength(maxLength.properties["value"]));
+    }
+    const maxValue =
+      getAnnotation(property, "com.manydesigns.elements.annotations.MaxDecimalValue") ||
+      getAnnotation(property, "com.manydesigns.elements.annotations.MaxIntValue");
+    if (maxValue) {
+      validators.push(Validators.max(maxValue.properties["value"]));
+    }
+    const minValue =
+      getAnnotation(property, "com.manydesigns.elements.annotations.MinDecimalValue") ||
+      getAnnotation(property, "com.manydesigns.elements.annotations.MinIntValue");
+    if (minValue) {
+      validators.push(Validators.max(minValue.properties["value"]));
+    }
+    return validators;
   }
 
   protected loadSelectionOptions(property: Property, autocomplete: string = null) {

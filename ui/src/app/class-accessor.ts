@@ -48,3 +48,8 @@ export function isInSummary(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.InSummary");
   return annotation && annotation.properties["value"];
 }
+
+export function isRequired(property: Property) {
+  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Required");
+  return annotation && annotation.properties["value"];
+}

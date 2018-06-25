@@ -1,7 +1,8 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Property} from "../../class-accessor";
+import {isRequired, Property} from "../../class-accessor";
 import {PortofinoService} from "../../portofino.service";
-import {FormGroup} from "@angular/forms";
+import {FormControl, FormGroup} from "@angular/forms";
+import {AbstractControl} from "@angular/forms/src/model";
 
 @Component({
   selector: 'portofino-crud-field',
@@ -17,6 +18,8 @@ export class FieldComponent implements OnInit {
   @Input()
   form: FormGroup;
 
+  control: AbstractControl;
+
   constructor(public portofino: PortofinoService) { }
 
   getOptionLabel(option) {
@@ -26,6 +29,12 @@ export class FieldComponent implements OnInit {
     return option;
   }
 
-  ngOnInit() {}
+  isRequired() {
+    return isRequired(this.property);
+  }
+
+  ngOnInit() {
+    this.control = this.form.get(this.property.name);
+  }
 
 }

@@ -1,24 +1,32 @@
 <ng-container *ngIf="enabled && property.selectionProvider; else simple">
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
-    <mat-select [formControlName]="property.name" [placeholder]="property.name"
+    <mat-select [formControlName]="property.name" [placeholder]="property.name" [required]="isRequired()"
                 (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
       </mat-option>
     </mat-select>
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
+      {{property.name}} is required.
+    </mat-error>
   </mat-form-field>
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'AUTOCOMPLETE'" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name" [matAutocomplete]="autocomplete">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name" [matAutocomplete]="autocomplete"
+           [required]="isRequired()">
     <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
       </mat-option>
     </mat-autocomplete>
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
+      {{property.name}} is required.
+    </mat-error>
   </mat-form-field>
   <ng-container *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
     <label>{{property.name}}</label>
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
-                     (change)="property.selectionProvider.updateDependentOptions(property)">
+                     (change)="property.selectionProvider.updateDependentOptions(property)"
+                     [required]="isRequired()">
       <mat-radio-button *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
       </mat-radio-button>
@@ -27,14 +35,27 @@
 </ng-container>
 <ng-template #simple>
   <mat-form-field *ngIf="portofino.isString(property)" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name" [required]="isRequired()" />
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
+      {{property.name}} is required. {{control.getError('required').message}}
+    </mat-error>
+    <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger" i18n>
+      {{property.name}}: max {{control.getError('maxLength').message}}.
+    </mat-error>
   </mat-form-field>
   <mat-form-field *ngIf="portofino.isNumber(property)" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name" [required]="isRequired()">
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
+      {{property.name}} is required.
+    </mat-error>
   </mat-form-field>
   <mat-form-field *ngIf="portofino.isDate(property)" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name" [matDatepicker]="datepicker">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name"
+           [required]="isRequired()" [matDatepicker]="datepicker">
     <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
     <mat-datepicker #datepicker></mat-datepicker>
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
+      {{property.name}} is required.
+    </mat-error>
   </mat-form-field>
 </ng-template>
