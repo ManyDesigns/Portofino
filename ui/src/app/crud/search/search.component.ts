@@ -6,6 +6,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
+import {SelectionModel} from "@angular/cdk/collections";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -31,6 +32,11 @@ export class SearchComponent implements OnInit {
   pageSize: number;
   sortInfo: Sort;
 
+  @Input()
+  selectionEnabled: boolean;
+  selection = new SelectionModel<any>(true, []);
+  readonly selectColumnName = "__select";
+
   @ContentChild("buttons")
   buttons: TemplateRef<any>;
 
@@ -38,6 +44,9 @@ export class SearchComponent implements OnInit {
 
   ngOnInit() {
     const formControls = {};
+    if(this.selectionEnabled) {
+      this.columnsToDisplay.push(this.selectColumnName);
+    }
     this.classAccessor.properties.forEach(property => {
       if(!isEnabled(property)) {
         return;
@@ -245,6 +254,20 @@ export class SearchComponent implements OnInit {
         this.clearDependentSelectionValues(property);
       }
     });
+  }
+
+  //Selection
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.resultsDataSource.data.length;
+    return numSelected == numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  toggleSelectAll() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.resultsDataSource.data.forEach(row => this.selection.select(row));
   }
 
 }

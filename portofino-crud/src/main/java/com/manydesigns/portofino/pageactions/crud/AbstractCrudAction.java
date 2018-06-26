@@ -1667,10 +1667,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @PUT
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Response uploadBlob(
             @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename,
             InputStream inputStream)
-            throws IOException, NoSuchFieldException {
+            throws IOException {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
@@ -2457,17 +2458,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object update via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles object update via REST. Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * {@link #uploadBlob(String, String, InputStream)}.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
-     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @PUT
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response httpPutJson(String jsonObject) throws Exception {
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
+    public Response httpPutJson(String jsonObject) {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
@@ -2496,7 +2499,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object update with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles object update with attachments via REST.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
      */
@@ -2504,6 +2508,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Response httpPutMultipart() throws Throwable {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
@@ -2547,7 +2552,53 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object deletion via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles the update of multiple objects via REST.
+     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * {@link #uploadBlob(String, String, InputStream)}.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param jsonObject the object (in serialized JSON form)
+     * @since 4.2.4-SNAPSHOT
+     * @return the updated object as JSON (in a JAX-RS Response).
+     */
+    @Path(":bulk")
+    @PUT
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    @Guard(test = "isBulkOperationsEnabled() && isEditEnabled()", type = GuardType.VISIBLE)
+    public Response jsonBulkSave(@QueryParam("ids") List<String> ids, String jsonObject) {
+        List<String> idsNotUpdated = new ArrayList<>();
+        setupForm(Mode.BULK_EDIT);
+        disableBlobFields();
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            for (String id : ids) {
+                loadObject(id.split("/"));
+                editSetup(object);
+                writeFormToObject();
+                if(editValidate(object)) {
+                    doUpdate(object);
+                    editPostProcess(object);
+                } else {
+                    idsNotUpdated.add(id);
+                }
+            }
+            try {
+                commitTransaction();
+            } catch (Throwable e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                return Response.serverError().entity(e).build();
+            }
+            return Response.ok(idsNotUpdated).build();
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    /**
+     * Handles object deletion via REST.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      */
     @DELETE

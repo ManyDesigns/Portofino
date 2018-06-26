@@ -4,6 +4,7 @@ import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
 import {Page, PageChild, PageConfiguration, PortofinoComponent} from "../portofino.component";
 import {Router} from "@angular/router";
+import {SelectionModel} from "@angular/cdk/collections";
 
 @Component({
   selector: 'portofino-crud',
@@ -34,6 +35,8 @@ export class CrudComponent extends Page implements OnInit {
   createEnabled: boolean;
   editEnabled: boolean;
   deleteEnabled: boolean;
+  bulkEditEnabled: boolean;
+  bulkDeleteEnabled: boolean;
 
   id: string;
 
@@ -51,6 +54,8 @@ export class CrudComponent extends Page implements OnInit {
       this.createEnabled = ops.some(op => op.signature == "POST" && op.available);
       this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
       this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
+      this.bulkEditEnabled = ops.some(op => op.signature == "PUT :bulk?ids" && op.available);
+      this.bulkDeleteEnabled = ops.some(op => op.signature == "DELETE :bulk?ids" && op.available);
     });
 
   }
@@ -93,6 +98,10 @@ export class CrudComponent extends Page implements OnInit {
     } else {
       this.showSearch();
     }
+  }
+
+  bulkEdit(selection: SelectionModel<any>) {
+    console.log("bulk", selection.selected);
   }
 
   consumePathSegment(segment: string): boolean {

@@ -1,11 +1,17 @@
 <h2>{{configuration.title}}</h2>
-<portofino-crud-search
+<portofino-crud-search #search
   *ngIf="searchVisible"
-  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders">
+  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+  [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
   <ng-template #buttons>
     <button mat-raised-button color="accent" (click)="showCreate()" *ngIf="createEnabled" i18n>
       <mat-icon>add</mat-icon>
       Create new
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="bulkEdit(search.selection)"
+            *ngIf="bulkEditEnabled" i18n>
+      <mat-icon>edit</mat-icon>
+      Edit
     </button>
   </ng-template>
 </portofino-crud-search>

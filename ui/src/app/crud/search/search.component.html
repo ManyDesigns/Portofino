@@ -19,6 +19,20 @@
     <table mat-table [dataSource]="resultsDataSource"
            matSort (matSortChange)="sort($event)"
            class="mat-elevation-z8">
+      <ng-container [matColumnDef]="selectColumnName" *ngIf="selectionEnabled">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? toggleSelectAll() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
       <ng-container *ngFor="let field of resultFields" [matColumnDef]="field.name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{field.name}}</th>
         <td mat-cell *matCellDef="let row">
@@ -30,16 +44,14 @@
           </span>
         </td>
       </ng-container>
-      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
     </table>
     <div fxLayout="row" fxLayoutAlign="space-between center">
       <div fxLayout="row">
         <ng-template [ngTemplateOutlet]="buttons"></ng-template>
       </div>
-      <mat-paginator [length]="results ? results.totalRecords : 0"
-                     [pageSize]="pageSize"
-                     (page)="loadPage($event)">
+      <mat-paginator [length]="results ? results.totalRecords : 0" [pageSize]="pageSize" (page)="loadPage($event)">
       </mat-paginator>
     </div>
   </div>

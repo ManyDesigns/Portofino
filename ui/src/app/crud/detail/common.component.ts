@@ -26,7 +26,7 @@ export abstract class BaseDetailComponent {
   properties: Property[] = [];
   object;
 
-  constructor(protected http: HttpClient, protected portofino: PortofinoService) { }
+  protected constructor(protected http: HttpClient, protected portofino: PortofinoService) { }
 
   protected initClassAccessor() {
     this.classAccessor.properties.forEach(property => {
@@ -62,8 +62,7 @@ export abstract class BaseDetailComponent {
       if(this.form) {
         this.form.get(p.name).reset(formState);
       } else {
-        const validators = this.setupValidators(p);
-        formControls[p.name] = new FormControl(formState, validators);
+        formControls[p.name] = new FormControl(formState, this.getValidators(p));
       }
     });
     if(!this.form) {
@@ -113,7 +112,7 @@ export abstract class BaseDetailComponent {
     });
   }
 
-  protected setupValidators(property: Property) {
+  protected getValidators(property: Property) {
     let validators = [];
     if (isRequired(property)) {
       validators.push(Validators.required);

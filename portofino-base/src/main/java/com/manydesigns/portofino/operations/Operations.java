@@ -25,22 +25,16 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.GuardType;
-import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.buttons.annotations.Guards;
 import ognl.OgnlContext;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import javax.ws.rs.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -106,8 +100,17 @@ public class Operations {
         if(annotation == null) {
             return null;
         }
-        String signature = annotation.annotationType().getSimpleName() + " " + path;
-        return new Operation(method, signature.trim());
+        StringBuilder signature = new StringBuilder(annotation.annotationType().getSimpleName() + " " + path);
+        String paramSeparator = "?";
+        for(Annotation[] paramAnns : method.getParameterAnnotations()) {
+            for(Annotation paramAnn : paramAnns) {
+                if(paramAnn instanceof QueryParam) {
+                    signature.append(paramSeparator).append(((QueryParam) paramAnn).value());
+                    paramSeparator = "&";
+                }
+            }
+        }
+        return new Operation(method, signature.toString().trim());
     }
 
     public static boolean doGuardsPass(Object actionBean, Method method) {

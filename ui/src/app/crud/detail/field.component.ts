@@ -17,8 +17,11 @@ export class FieldComponent implements OnInit {
   property: Property;
   @Input()
   form: FormGroup;
+  @Input()
+  selectable: boolean;
 
   control: AbstractControl;
+  selector: FormControl;
 
   constructor(public portofino: PortofinoService) { }
 
@@ -35,6 +38,22 @@ export class FieldComponent implements OnInit {
 
   ngOnInit() {
     this.control = this.form.get(this.property.name);
+    if(this.selectable) {
+      this.selector = new FormControl();
+      const validator = this.control.validator;
+      this.control.clearValidators();
+      this.selector.valueChanges.subscribe(v => {
+        if(v) {
+          this.control.setValidators(validator);
+        } else {
+          this.control.clearValidators();
+        }
+        this.control.updateValueAndValidity({ emitEvent: false });
+      });
+      this.control.valueChanges.subscribe(ch => {
+        this.selector.setValue(this.enabled);
+      });
+    }
   }
 
 }

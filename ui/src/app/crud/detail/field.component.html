@@ -1,6 +1,7 @@
 <ng-container *ngIf="enabled && property.selectionProvider; else simple">
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
-    <mat-select [formControlName]="property.name" [placeholder]="property.name" [required]="isRequired()"
+    <mat-label>{{property.name}}</mat-label>
+    <mat-select [formControlName]="property.name" [required]="isRequired()"
                 (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
@@ -9,9 +10,12 @@
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.name}} is required.
     </mat-error>
+    <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix
+                  (click)="$event.stopPropagation()"></mat-checkbox>
   </mat-form-field>
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'AUTOCOMPLETE'" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name" [matAutocomplete]="autocomplete"
+    <mat-label>{{property.name}}</mat-label>
+    <input matInput [formControlName]="property.name" [matAutocomplete]="autocomplete"
            [required]="isRequired()">
     <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
@@ -21,9 +25,11 @@
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.name}} is required.
     </mat-error>
+    <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
   <ng-container *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
     <label>{{property.name}}</label>
+    <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector"></mat-checkbox>
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
                      (change)="property.selectionProvider.updateDependentOptions(property)"
                      [required]="isRequired()">
@@ -35,27 +41,32 @@
 </ng-container>
 <ng-template #simple>
   <mat-form-field *ngIf="portofino.isString(property)" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name" [required]="isRequired()" />
+    <mat-label>{{property.name}}</mat-label>
+    <input matInput [formControlName]="property.name" [required]="isRequired()" />
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.name}} is required. {{control.getError('required').message}}
     </mat-error>
     <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger" i18n>
       {{property.name}}: max {{control.getError('maxLength').message}}.
     </mat-error>
+    <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
   <mat-form-field *ngIf="portofino.isNumber(property)" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name" [required]="isRequired()">
+    <mat-label>{{property.name}}</mat-label>
+    <input matInput [formControlName]="property.name" [required]="isRequired()">
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.name}} is required.
     </mat-error>
+    <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
   <mat-form-field *ngIf="portofino.isDate(property)" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.name"
-           [required]="isRequired()" [matDatepicker]="datepicker">
+    <mat-label>{{property.name}}</mat-label>
+    <input matInput [formControlName]="property.name" [required]="isRequired()" [matDatepicker]="datepicker">
     <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
     <mat-datepicker #datepicker></mat-datepicker>
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.name}} is required.
     </mat-error>
+    <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
 </ng-template>
