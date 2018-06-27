@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {isRequired, Property} from "../../class-accessor";
-import {PortofinoService} from "../../portofino.service";
+import {isRequired, Property} from "../class-accessor";
+import {PortofinoService} from "../portofino.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {AbstractControl} from "@angular/forms/src/model";
 
@@ -38,17 +38,20 @@ export class FieldComponent implements OnInit {
 
   ngOnInit() {
     this.control = this.form.get(this.property.name);
-    if(this.selectable) {
+    if(this.selectable && this.enabled) {
       this.selector = new FormControl();
       const validator = this.control.validator;
       this.control.clearValidators();
+      this.control.updateValueAndValidity();
       this.selector.valueChanges.subscribe(v => {
         if(v) {
           this.control.setValidators(validator);
         } else {
           this.control.clearValidators();
         }
+        this.property.editable = v;
         this.control.updateValueAndValidity({ emitEvent: false });
+        this.control.markAsDirty();
       });
       this.control.valueChanges.subscribe(ch => {
         this.selector.setValue(this.enabled);

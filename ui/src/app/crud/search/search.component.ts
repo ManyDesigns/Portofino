@@ -270,6 +270,10 @@ export class SearchComponent implements OnInit {
       this.resultsDataSource.data.forEach(row => this.selection.select(row));
   }
 
+  getSelectedIds(): string[] {
+    return this.selection.selected.map(row => row.__rowKey);
+  }
+
 }
 
 class SearchResults {

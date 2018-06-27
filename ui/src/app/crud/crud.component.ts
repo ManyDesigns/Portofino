@@ -28,9 +28,7 @@ export class CrudComponent extends Page implements OnInit {
   @Input()
   pageSize: number;
 
-  searchVisible = false;
-  createVisible = false;
-  detailVisible = false;
+  view: CrudView;
 
   createEnabled: boolean;
   editEnabled: boolean;
@@ -39,6 +37,7 @@ export class CrudComponent extends Page implements OnInit {
   bulkDeleteEnabled: boolean;
 
   id: string;
+  selection: string[];
 
   constructor(private http: HttpClient, public portofino: PortofinoService, private router: Router) {
     super();
@@ -75,33 +74,44 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   showCreate() {
-    this.searchVisible = false;
-    this.detailVisible = false;
-    this.createVisible = true;
+    this.view = CrudView.CREATE;
   }
 
   showDetail() {
-    this.searchVisible = false;
-    this.detailVisible = true;
-    this.createVisible = false;
+    this.view = CrudView.DETAIL;
   }
 
   showSearch() {
-    this.searchVisible = true;
-    this.createVisible = false;
-    this.detailVisible = false;
+    this.view = CrudView.SEARCH;
+  }
+
+  showBulkEdit(selection: string[]) {
+    this.selection = selection;
+    this.view = CrudView.BULK_EDIT;
+  }
+
+  isCreateView() {
+    return this.view == CrudView.CREATE;
+  }
+
+  isDetailView() {
+    return this.view == CrudView.DETAIL;
+  }
+
+  isSearchView() {
+    return this.view == CrudView.SEARCH;
+  }
+
+  isBulkEditView() {
+    return this.view == CrudView.BULK_EDIT;
   }
 
   goToSearch() {
-    if(this.detailVisible) {
+    if(this.view == CrudView.DETAIL) {
       this.router.navigateByUrl(this.path);
     } else {
       this.showSearch();
     }
-  }
-
-  bulkEdit(selection: SelectionModel<any>) {
-    console.log("bulk", selection.selected);
   }
 
   consumePathSegment(segment: string): boolean {
@@ -149,3 +159,6 @@ export class Operation {
   signature: string;
   available: boolean;
 }
+ export enum CrudView {
+   SEARCH, DETAIL, CREATE, BULK_EDIT
+ }

@@ -5,7 +5,7 @@ import {Configuration, SelectionOption, SelectionProvider} from "../crud.compone
 import {ClassAccessor, isEnabled, isInsertable, Property} from "../../class-accessor";
 import * as moment from "moment";
 import {FormControl, FormGroup} from "@angular/forms";
-import {BaseDetailComponent} from "./common.component";
+import {BaseDetailComponent} from "../common.component";
 
 @Component({
   selector: 'portofino-crud-create',

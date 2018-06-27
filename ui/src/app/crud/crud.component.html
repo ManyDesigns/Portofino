@@ -1,6 +1,6 @@
 <h2>{{configuration.title}}</h2>
 <portofino-crud-search #search
-  *ngIf="searchVisible"
+  *ngIf="isSearchView()"
   [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
   [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
   <ng-template #buttons>
@@ -8,18 +8,23 @@
       <mat-icon>add</mat-icon>
       Create new
     </button>
-    <button mat-raised-button color="primary" type="button" (click)="bulkEdit(search.selection)"
-            *ngIf="bulkEditEnabled" i18n>
+    <button mat-raised-button color="primary" type="button" (click)="showBulkEdit(search.getSelectedIds())"
+            *ngIf="bulkEditEnabled" [disabled]="search.getSelectedIds().length == 0" i18n>
       <mat-icon>edit</mat-icon>
       Edit
     </button>
   </ng-template>
 </portofino-crud-search>
 <portofino-crud-detail
-  *ngIf="detailVisible"
+  *ngIf="isDetailView()"
   [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
   [editEnabled]="editEnabled" [deleteEnabled]="deleteEnabled" (close)="goToSearch()"></portofino-crud-detail>
 <portofino-crud-create
-  *ngIf="createVisible"
+  *ngIf="isCreateView()"
   [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
   (close)="goToSearch()"></portofino-crud-create>
+<portofino-crud-bulk-edit
+  *ngIf="isBulkEditView()"
+  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+  [ids]="selection"
+  (close)="goToSearch()"></portofino-crud-bulk-edit>

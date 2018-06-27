@@ -1,11 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
-import {Configuration, SelectionOption, SelectionProvider} from "../crud.component";
-import {ClassAccessor, isEnabled, isUpdatable, Property} from "../../class-accessor";
-import * as moment from "moment";
-import {FormControl, FormGroup} from "@angular/forms";
-import {BaseDetailComponent} from "./common.component";
+import {isUpdatable, Property} from "../../class-accessor";
+import {BaseDetailComponent} from "../common.component";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -16,6 +13,10 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   @Input()
   id: string;
+  @Input()
+  editEnabled: boolean;
+  @Input()
+  deleteEnabled: boolean;
 
   editMode = false;
 

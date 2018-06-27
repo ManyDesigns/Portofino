@@ -1,10 +1,10 @@
 import {EventEmitter, Input, Output} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {PortofinoService} from "../../portofino.service";
-import {Configuration, SelectionOption, SelectionProvider} from "../crud.component";
-import {ClassAccessor, getAnnotation, isEnabled, isRequired, Property} from "../../class-accessor";
+import {PortofinoService} from "../portofino.service";
+import {Configuration, SelectionOption, SelectionProvider} from "./crud.component";
+import {ClassAccessor, getAnnotation, isEnabled, isRequired, Property} from "../class-accessor";
 import * as moment from "moment";
-import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, FormControl, FormGroup, Validators} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 
 export abstract class BaseDetailComponent {
@@ -15,10 +15,6 @@ export abstract class BaseDetailComponent {
   selectionProviders: SelectionProvider[];
   @Input()
   configuration: Configuration;
-  @Input()
-  editEnabled: boolean;
-  @Input()
-  deleteEnabled: boolean;
   @Output()
   close = new EventEmitter();
 
