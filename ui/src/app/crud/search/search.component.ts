@@ -31,6 +31,7 @@ export class SearchComponent implements OnInit {
   @Input()
   pageSize: number;
   sortInfo: Sort;
+  page: number;
 
   @Input()
   selectionEnabled: boolean;
@@ -176,6 +177,8 @@ export class SearchComponent implements OnInit {
         results.records = results['Result'];
         this.results = results;
         this.resultsDataSource.data = this.results.records;
+        this.page = page;
+        this.selection.clear();
       }
     );
   }
@@ -254,6 +257,10 @@ export class SearchComponent implements OnInit {
         this.clearDependentSelectionValues(property);
       }
     });
+  }
+
+  refreshSearch() {
+    this.loadSearchResultsPage(this.page);
   }
 
   //Selection

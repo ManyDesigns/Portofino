@@ -3,6 +3,8 @@ import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
+import {Operation} from "../crud.component";
+import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -13,12 +15,12 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   @Input()
   id: string;
-  @Input()
   editEnabled: boolean;
-  @Input()
   deleteEnabled: boolean;
 
   editMode = false;
+
+  operationsPath = '/:operations';
 
   constructor(protected http: HttpClient, protected portofino: PortofinoService) {
     super(http, portofino);
@@ -36,6 +38,10 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     this.initClassAccessor();
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
     this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.setupForm(o));
+    this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
+      this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
+      this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
+    });
   }
 
   edit() {
@@ -59,6 +65,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   save() {
     if(this.form.invalid) {
+      this.triggerValidationForAllFields(this.form);
       return;
     }
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;

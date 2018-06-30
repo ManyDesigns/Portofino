@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.operations;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * @author Alessio Stalla       - alessio.stalla@gmail.com
@@ -31,10 +32,12 @@ public class Operation {
 
     private final Method method;
     private final String signature;
+    private final List<String> parameters;
 
-    public Operation(Method method, String signature) {
+    public Operation(Method method, String signature, List<String> parameters) {
         this.method = method;
         this.signature = signature;
+        this.parameters = parameters;
     }
 
     public Method getMethod() {
@@ -47,5 +50,9 @@ public class Operation {
 
     public String getSignature() {
         return signature;
+    }
+
+    public List<String> getParameters() {
+        return parameters;
     }
 }

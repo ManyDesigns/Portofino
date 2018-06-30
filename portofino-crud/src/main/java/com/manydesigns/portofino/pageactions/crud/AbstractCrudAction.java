@@ -2458,10 +2458,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object update via REST. Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * Handles object update via REST; either a single object or several ones in bulk.
+     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
      * {@link #uploadBlob(String, String, InputStream)}.
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
+     * @param ids the list of object id's (keys) to save if this is a bulk operation.
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
      */
@@ -2469,11 +2471,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
-    public Response httpPutJson(String jsonObject) {
+    @Guard(test = "isEditEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
+    public Response httpPutJson(@QueryParam("id") List<String> ids, String jsonObject) {
         if(object == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
+            return bulkUpdate(jsonObject, ids);
         }
+        if(ids != null && !ids.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    "You must either PUT a single object (/key) or PUT multiple objects (?ids=...), not both.").build();
+        }
+        return update(jsonObject);
+    }
+
+    protected Response update(String jsonObject) {
         preEdit();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
@@ -2493,6 +2503,45 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             } else {
                 return Response.serverError().entity(form).build();
             }
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    /**
+     * Handles the update of multiple objects via REST.
+     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * {@link #uploadBlob(String, String, InputStream)}.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param jsonObject the object (in serialized JSON form)
+     * @since 4.2.4-SNAPSHOT
+     * @return the updated object as JSON (in a JAX-RS Response).
+     */
+    protected Response bulkUpdate(String jsonObject, List<String> ids) {
+        List<String> idsNotUpdated = new ArrayList<>();
+        setupForm(Mode.BULK_EDIT);
+        disableBlobFields();
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            for (String id : ids) {
+                loadObject(id.split("/"));
+                editSetup(object);
+                writeFormToObject();
+                if(editValidate(object)) {
+                    doUpdate(object);
+                    editPostProcess(object);
+                } else {
+                    idsNotUpdated.add(id);
+                }
+            }
+            try {
+                commitTransaction();
+            } catch (Throwable e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                return Response.serverError().entity(e).build();
+            }
+            return Response.ok(idsNotUpdated).build();
         } else {
             return Response.serverError().entity(form).build();
         }
@@ -2552,73 +2601,62 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles the update of multiple objects via REST.
-     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
-     * {@link #uploadBlob(String, String, InputStream)}.
-     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
-     * @param jsonObject the object (in serialized JSON form)
-     * @since 4.2.4-SNAPSHOT
-     * @return the updated object as JSON (in a JAX-RS Response).
-     */
-    @Path(":bulk")
-    @PUT
-    @RequiresPermissions(permissions = PERMISSION_EDIT)
-    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    @Guard(test = "isBulkOperationsEnabled() && isEditEnabled()", type = GuardType.VISIBLE)
-    public Response jsonBulkSave(@QueryParam("ids") List<String> ids, String jsonObject) {
-        List<String> idsNotUpdated = new ArrayList<>();
-        setupForm(Mode.BULK_EDIT);
-        disableBlobFields();
-        FormUtil.readFromJson(form, new JSONObject(jsonObject));
-        if (form.validate()) {
-            for (String id : ids) {
-                loadObject(id.split("/"));
-                editSetup(object);
-                writeFormToObject();
-                if(editValidate(object)) {
-                    doUpdate(object);
-                    editPostProcess(object);
-                } else {
-                    idsNotUpdated.add(id);
-                }
-            }
-            try {
-                commitTransaction();
-            } catch (Throwable e) {
-                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                logger.warn(rootCauseMessage, e);
-                return Response.serverError().entity(e).build();
-            }
-            return Response.ok(idsNotUpdated).build();
-        } else {
-            return Response.serverError().entity(form).build();
-        }
-    }
-
-    /**
      * Handles object deletion via REST.
+     * @param ids the list of object id's (keys) to delete if this is a bulk deletion.
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      */
     @DELETE
     @RequiresPermissions(permissions = PERMISSION_DELETE)
-    public void httpDelete() throws Exception {
+    @Guard(test = "isDeleteEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
+    public int httpDelete(@QueryParam("id") List<String> ids) throws Exception {
         if(object == null) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /objectKey path parameter").build());
+            return bulkDelete(ids);
         }
+        if(ids != null && !ids.isEmpty()) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+                    "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+        }
+        return delete(object);
+    }
+
+    protected int delete(T object) {
         if(deleteValidate(object)) {
             try {
                 doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);
+                return 1;
             } catch (Exception e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 throw e;
             }
+        } else {
+            return 0;
         }
+    }
+
+    protected int bulkDelete(List<String> ids) throws Exception {
+        List<T> objects = new ArrayList<T>(ids.size());
+        int deleted = 0;
+        for (String current : ids) {
+            String[] pkArr = current.split("/");
+            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
+            T obj = loadObjectByPrimaryKey(pkObject);
+            if(obj != null && deleteValidate(obj)) {
+                doDelete(obj);
+                deletePostProcess(obj);
+                objects.add(obj);
+                deleted++;
+            }
+        }
+        commitTransaction();
+        for(T obj : objects) {
+            deleteBlobs(obj);
+        }
+        return deleted;
     }
 
     /**

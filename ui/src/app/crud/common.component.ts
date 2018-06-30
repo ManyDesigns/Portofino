@@ -4,7 +4,7 @@ import {PortofinoService} from "../portofino.service";
 import {Configuration, SelectionOption, SelectionProvider} from "./crud.component";
 import {ClassAccessor, getAnnotation, isEnabled, isRequired, Property} from "../class-accessor";
 import * as moment from "moment";
-import {AbstractControl, FormControl, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 
 export abstract class BaseDetailComponent {
@@ -89,17 +89,21 @@ export abstract class BaseDetailComponent {
           },
           options: []
         };
-        if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
-          const autocomplete = this.form.get(property.name);
+        const control = this.form.get(property.name);
+        if(control.enabled) {
           const value = this.object[property.name];
-          autocomplete.setValue({ v: value.value, l: value.displayValue });
-          autocomplete.valueChanges.pipe(debounceTime(500)).subscribe(value => {
-            if(autocomplete.dirty && value != null && value.hasOwnProperty("length")) {
-              this.loadSelectionOptions(property, value);
-            }
-          });
-        } else if(index == 0) {
-          this.loadSelectionOptions(property);
+          if(value && value.value != null) {
+            control.setValue({ v: value.value, l: value.displayValue });
+          }
+          if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+            control.valueChanges.pipe(debounceTime(500)).subscribe(value => {
+              if(control.dirty && value != null && value.hasOwnProperty("length")) {
+                this.loadSelectionOptions(property, value);
+              }
+            });
+          } else if(index == 0) {
+            this.loadSelectionOptions(property);
+          }
         }
         if(index < sp.fieldNames.length - 1) {
           property.selectionProvider.nextProperty = sp.fieldNames[index + 1];
@@ -152,9 +156,13 @@ export abstract class BaseDetailComponent {
   protected setSelectOptions(property: Property, options) {
     property.selectionProvider.options = options;
     this.clearDependentSelectionValues(property);
-    const selected = options.find(o => o.s);
+    let selected = options.find(o => o.s);
+    const control = this.form.get(property.name);
+    if(!selected && control.value) {
+      selected = options.find(o => o.v == control.value.v);
+    }
     if (selected) {
-      this.form.get(property.name).setValue(selected.v);
+      control.setValue(selected);
     }
   }
 
@@ -188,5 +196,21 @@ export abstract class BaseDetailComponent {
       }
     });
     return object;
+  }
+
+  protected triggerValidationForAllFields(control: AbstractControl) {
+    if (control instanceof FormControl) {
+      if(control.invalid) {
+        console.log("invalid!", control)
+      }
+      control.markAsTouched({ onlySelf: true });
+    } else if (control instanceof FormGroup) {
+      Object.keys(control.controls).forEach(field => {
+        this.triggerValidationForAllFields(control.get(field));
+      });
+    } else if(control instanceof FormArray) {
+      control.controls.forEach(c => this.triggerValidationForAllFields(c));
+    }
+
   }
 }

@@ -1,10 +1,11 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
 import {Page, PageChild, PageConfiguration, PortofinoComponent} from "../portofino.component";
 import {Router} from "@angular/router";
 import {SelectionModel} from "@angular/cdk/collections";
+import {SearchComponent} from "./search/search.component";
 
 @Component({
   selector: 'portofino-crud',
@@ -31,8 +32,6 @@ export class CrudComponent extends Page implements OnInit {
   view: CrudView;
 
   createEnabled: boolean;
-  editEnabled: boolean;
-  deleteEnabled: boolean;
   bulkEditEnabled: boolean;
   bulkDeleteEnabled: boolean;
 
@@ -51,10 +50,8 @@ export class CrudComponent extends Page implements OnInit {
           sps => this.init(classAccessor, configuration, sps))));
     this.http.get<Operation[]>(baseUrl + this.operationsPath).subscribe(ops => {
       this.createEnabled = ops.some(op => op.signature == "POST" && op.available);
-      this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
-      this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
-      this.bulkEditEnabled = ops.some(op => op.signature == "PUT :bulk?ids" && op.available);
-      this.bulkDeleteEnabled = ops.some(op => op.signature == "DELETE :bulk?ids" && op.available);
+      this.bulkEditEnabled = ops.some(op => op.signature == "PUT" && op.available);
+      this.bulkDeleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
     });
 
   }
@@ -88,6 +85,13 @@ export class CrudComponent extends Page implements OnInit {
   showBulkEdit(selection: string[]) {
     this.selection = selection;
     this.view = CrudView.BULK_EDIT;
+  }
+
+  delete(selection: string[], search: SearchComponent) {
+    const baseUrl = this.portofino.apiPath + this.configuration.source;
+    let params = new HttpParams();
+    selection.forEach(id => params = params.append("id", id));
+    this.http.delete(baseUrl, { params: params }).subscribe(() => search.refreshSearch());
   }
 
   isCreateView() {
@@ -157,6 +161,7 @@ export class SelectionOption {
 export class Operation {
   name: string;
   signature: string;
+  parameters: string[];
   available: boolean;
 }
  export enum CrudView {

@@ -3,7 +3,8 @@
     <mat-label>{{property.name}}</mat-label>
     <mat-select [formControlName]="property.name" [required]="isRequired()"
                 (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
-      <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
+      <mat-option *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
+                  [value]="option">
         {{ option.l }}
       </mat-option>
     </mat-select>
@@ -18,7 +19,8 @@
     <input matInput [formControlName]="property.name" [matAutocomplete]="autocomplete"
            [required]="isRequired()">
     <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
-      <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
+      <mat-option *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
+                  [value]="option">
         {{ option.l }}
       </mat-option>
     </mat-autocomplete>
@@ -33,7 +35,8 @@
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
                      (change)="property.selectionProvider.updateDependentOptions(property)"
                      [required]="isRequired()">
-      <mat-radio-button *ngFor="let option of property.selectionProvider.options" [value]="option">
+      <mat-radio-button *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
+                        [value]="option">
         {{ option.l }}
       </mat-radio-button>
     </mat-radio-group>

@@ -38,6 +38,7 @@ export class CreateComponent extends BaseDetailComponent implements OnInit {
 
   save() {
     if(this.form.invalid) {
+      this.triggerValidationForAllFields(this.form);
       return;
     }
     const objectUrl = `${this.portofino.apiPath + this.configuration.source}`;

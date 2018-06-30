@@ -100,17 +100,16 @@ public class Operations {
         if(annotation == null) {
             return null;
         }
-        StringBuilder signature = new StringBuilder(annotation.annotationType().getSimpleName() + " " + path);
-        String paramSeparator = "?";
+        String signature = annotation.annotationType().getSimpleName() + " " + path;
+        List<String> parameters = new ArrayList<>();
         for(Annotation[] paramAnns : method.getParameterAnnotations()) {
             for(Annotation paramAnn : paramAnns) {
                 if(paramAnn instanceof QueryParam) {
-                    signature.append(paramSeparator).append(((QueryParam) paramAnn).value());
-                    paramSeparator = "&";
+                    parameters.add(((QueryParam) paramAnn).value());
                 }
             }
         }
-        return new Operation(method, signature.toString().trim());
+        return new Operation(method, signature.trim(), parameters);
     }
 
     public static boolean doGuardsPass(Object actionBean, Method method) {

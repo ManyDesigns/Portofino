@@ -13,12 +13,17 @@
       <mat-icon>edit</mat-icon>
       Edit
     </button>
+    <button mat-raised-button color="warn" type="button" (click)="delete(search.getSelectedIds(), search)"
+            *ngIf="bulkDeleteEnabled" [disabled]="search.getSelectedIds().length == 0" i18n>
+      <mat-icon>delete</mat-icon>
+      Delete
+    </button>
   </ng-template>
 </portofino-crud-search>
 <portofino-crud-detail
   *ngIf="isDetailView()"
   [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-  [editEnabled]="editEnabled" [deleteEnabled]="deleteEnabled" (close)="goToSearch()"></portofino-crud-detail>
+  (close)="goToSearch()"></portofino-crud-detail>
 <portofino-crud-create
   *ngIf="isCreateView()"
   [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"

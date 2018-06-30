@@ -36,6 +36,10 @@ export class FieldComponent implements OnInit {
     return isRequired(this.property);
   }
 
+  trackByOptionValue(index, option) {
+    return option.v;
+  }
+
   ngOnInit() {
     this.control = this.form.get(this.property.name);
     if(this.selectable && this.enabled) {
