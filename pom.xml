@@ -112,6 +112,7 @@
     <modules>
         <!-- Core stuff -->
         <module>code</module>
+        <module>dispatcher</module>
         <module>elements</module>
         <module>portofino-base</module>
         <module>portofino-jersey</module>
@@ -177,11 +178,18 @@
                 </exclusions>
                 <scope>compile</scope>
             </dependency>
+            <!-- Web -->
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-servlet-initializer</artifactId>
                 <version>${resteasy.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>${javax.ws.rs.api.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -195,6 +203,20 @@
                 <version>${jsp.api.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <!-- Utilities -->
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <!-- Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -225,8 +247,23 @@
                 <version>${logback.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.10</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

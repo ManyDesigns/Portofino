@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.portofino.dispatcher.security.SecureResource;
 import org.apache.commons.collections.MultiMap;
 
 import javax.ws.rs.core.Response;
@@ -32,7 +33,7 @@ import javax.ws.rs.core.Response;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PageAction extends DispatchElement {
+public interface PageAction extends DispatchElement, SecureResource {
     String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
 
     /**

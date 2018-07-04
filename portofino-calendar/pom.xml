@@ -26,7 +26,6 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>${javax.ws.rs.api.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

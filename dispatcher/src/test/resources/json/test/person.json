@@ -1,0 +1,15 @@
+{
+  "namespace": ":com:manydesigns:portofino:model:test:test1",
+  "title": "person",
+  "annotations": [],
+  "properties": {
+    "name": {
+      "annotations": [],
+      "type": "string"
+    },
+    "surname": {
+      "annotations": [],
+      "type": "string"
+    }
+  }
+}

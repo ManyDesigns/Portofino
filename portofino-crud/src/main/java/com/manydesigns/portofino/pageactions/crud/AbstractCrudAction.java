@@ -792,7 +792,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Computes the search URL from the current URL. In other words, it removes any /pk trailing path fragment from the
+     * Computes the search URL from the current URL. In other words, it removes any /pk trailing path segment from the
      * URL used to access the page.
      * @return the search URL.
      */
@@ -1221,7 +1221,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @GET
     @Path(":blob/{propertyName}")
-    public Response downloadBlob(@PathParam("propertyName") String propertyName) throws IOException, NoSuchFieldException {
+    public Response downloadBlob(@PathParam("propertyName") String propertyName) throws IOException {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).
                     entity("Object can not be null (this method can only be called with /objectKey)").build();
@@ -1281,7 +1281,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Response uploadBlob(
             @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename,
             InputStream inputStream)
-            throws IOException, NoSuchFieldException {
+            throws IOException {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
@@ -1325,7 +1325,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Response deleteBlob(
             @PathParam("propertyName") String propertyName)
-            throws IOException, NoSuchFieldException {
+            throws IOException {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
@@ -1676,7 +1676,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
      * this parameter; for autocomplete fields, you would likely pass false.
-     * @return a Resolution to produce the JSON.
+     * @return a Response with the JSON.
      */
     @GET
     @Path(":selectionProvider/{selectionProviderName}")
@@ -1701,7 +1701,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
      * this parameter; for autocomplete fields, you would likely pass false.
-     * @return a Resolution to produce the JSON.
+     * @return a Response with the JSON.
      */
     @GET
     @Path(":selectionProvider/{selectionProviderName}/{selectionProviderIndex : (\\d+)}")
