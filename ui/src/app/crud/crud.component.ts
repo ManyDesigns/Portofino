@@ -4,15 +4,20 @@ import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
 import {Page, PageChild, PageConfiguration, PortofinoComponent} from "../portofino.component";
 import {Router} from "@angular/router";
-import {SelectionModel} from "@angular/cdk/collections";
 import {SearchComponent} from "./search/search.component";
+
+export abstract class CrudPage extends Page {
+  id: string;
+  sourceUrl: string;
+  abstract computeSource();
+}
 
 @Component({
   selector: 'portofino-crud',
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.css']
 })
-export class CrudComponent extends Page implements OnInit {
+export class CrudComponent extends CrudPage implements OnInit {
 
   private static __componentRegistration = PortofinoComponent.components.crud = CrudComponent;
 
@@ -35,7 +40,6 @@ export class CrudComponent extends Page implements OnInit {
   bulkEditEnabled: boolean;
   bulkDeleteEnabled: boolean;
 
-  id: string;
   selection: string[];
 
   constructor(private http: HttpClient, public portofino: PortofinoService, private router: Router) {
@@ -43,17 +47,42 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   ngOnInit() {
-    const baseUrl = this.portofino.apiPath + this.configuration.source;
-    this.http.get<ClassAccessor>(baseUrl + this.classAccessorPath).subscribe(
-      classAccessor => this.http.get<Configuration>(baseUrl + this.configurationPath).subscribe(
-        configuration => this.http.get<SelectionProvider[]>(baseUrl + this.selectionProvidersPath).subscribe(
+    this.sourceUrl = this.computeSource();
+    this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
+      classAccessor => this.http.get<Configuration>(this.sourceUrl + this.configurationPath).subscribe(
+        configuration => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
           sps => this.init(classAccessor, configuration, sps))));
-    this.http.get<Operation[]>(baseUrl + this.operationsPath).subscribe(ops => {
+    this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
       this.createEnabled = ops.some(op => op.signature == "POST" && op.available);
       this.bulkEditEnabled = ops.some(op => op.signature == "PUT" && op.available);
       this.bulkDeleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
     });
 
+  }
+
+  computeSource() {
+    let source = "";
+    if(!this.configuration.source.startsWith('/')) {
+      let parent = this.parent;
+      while(parent) {
+        if(parent instanceof CrudPage) {
+          source = parent.computeSource();
+          if(parent.id) {
+            source += `/${parent.id}`;
+          }
+          source += '/';
+          break;
+        } else {
+          parent = parent.parent;
+        }
+      }
+    }
+    if(!source) {
+      source = this.portofino.apiPath;
+    }
+    return (source + this.configuration.source)
+      //replace double slash, but not in http://
+      .replace(new RegExp("([^:])//"), '$1/');
   }
 
   protected init(classAccessor, configuration, selectionProviders: SelectionProvider[]) {
@@ -88,10 +117,9 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   delete(selection: string[], search: SearchComponent) {
-    const baseUrl = this.portofino.apiPath + this.configuration.source;
     let params = new HttpParams();
     selection.forEach(id => params = params.append("id", id));
-    this.http.delete(baseUrl, { params: params }).subscribe(() => search.refreshSearch());
+    this.http.delete(this.sourceUrl, { params: params }).subscribe(() => search.refreshSearch());
   }
 
   isCreateView() {
@@ -164,6 +192,7 @@ export class Operation {
   parameters: string[];
   available: boolean;
 }
- export enum CrudView {
-   SEARCH, DETAIL, CREATE, BULK_EDIT
- }
+
+export enum CrudView {
+  SEARCH, DETAIL, CREATE, BULK_EDIT
+}

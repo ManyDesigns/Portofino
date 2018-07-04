@@ -2403,7 +2403,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response httpPostMultipart() throws Exception {
         if(object != null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    "update not supported, PUT to /objectKey instead").build();
         }
         preCreate();
         readFormFromMultipartRequest();
@@ -2421,17 +2422,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     return Response.serverError().entity(e).build();
                 }
                 return objectCreated();
-            } else {
-                return Response.serverError().entity(form).build();
             }
-        } else {
-            return Response.serverError().entity(form).build();
         }
+        return Response.serverError().entity(form).build();
     }
 
     protected void readFormFromMultipartRequest() throws StripesServletException {
         HttpServletRequest request = context.getRequest();
-        logger.error("request" + request + " - " + Arrays.asList(request.getClass().getInterfaces()));
         if(!"POST".equals(request.getMethod())) {
             //If method is POST, StripesFilter should have already built a multipart wrapper
             request = new HttpServletRequestWrapper(context.getRequest()) {

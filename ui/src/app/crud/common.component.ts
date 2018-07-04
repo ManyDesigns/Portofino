@@ -15,6 +15,8 @@ export abstract class BaseDetailComponent {
   selectionProviders: SelectionProvider[];
   @Input()
   configuration: Configuration;
+  @Input()
+  sourceUrl: string;
   @Output()
   close = new EventEmitter();
 
@@ -74,7 +76,7 @@ export abstract class BaseDetailComponent {
         if(!property) {
           return;
         }
-        const spUrl = `${this.portofino.apiPath + this.configuration.source}/:selectionProvider/${sp.name}/${index}`;
+        const spUrl = `${this.sourceUrl}/:selectionProvider/${sp.name}/${index}`;
         property.selectionProvider = {
           name: sp.name,
           index: index,
@@ -183,26 +185,26 @@ export abstract class BaseDetailComponent {
   }
 
   protected getObjectToSave(): any {
-    let object = {};
+    let formData = new FormData();
     this.properties.filter(p => p.editable).forEach(p => {
       let value = this.form.get(p.name).value;
       if(p.selectionProvider && value) {
         value = value.v;
       }
+      if(value == null) {
+        value = "";
+      }
       if (this.portofino.isDate(p) && value) {
-        object[p.name] = value.valueOf();
+        formData.append(p.name, value.valueOf());
       } else {
-        object[p.name] = value;
+        formData.append(p.name, value);
       }
     });
-    return object;
+    return formData;
   }
 
   protected triggerValidationForAllFields(control: AbstractControl) {
     if (control instanceof FormControl) {
-      if(control.invalid) {
-        console.log("invalid!", control)
-      }
       control.markAsTouched({ onlySelf: true });
     } else if (control instanceof FormGroup) {
       Object.keys(control.controls).forEach(field => {

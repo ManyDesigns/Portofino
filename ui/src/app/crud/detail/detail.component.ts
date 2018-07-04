@@ -36,7 +36,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   ngOnInit() {
     this.initClassAccessor();
-    const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
+    const objectUrl = `${this.sourceUrl}/${this.id}`;
     this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.setupForm(o));
     this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
       this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
@@ -50,7 +50,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   }
 
   delete() {
-    const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
+    const objectUrl = `${this.sourceUrl}/${this.id}`;
     this.http.delete(objectUrl).subscribe(() => this.close.emit(this.object));
   }
 
@@ -68,7 +68,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
       this.triggerValidationForAllFields(this.form);
       return;
     }
-    const objectUrl = `${this.portofino.apiPath + this.configuration.source}/${this.id}`;
+    const objectUrl = `${this.sourceUrl}/${this.id}`;
     let object = this.getObjectToSave();
     this.http.put(objectUrl, object).subscribe(() => this.close.emit(object));
   }

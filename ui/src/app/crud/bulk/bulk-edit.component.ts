@@ -48,11 +48,10 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
     if(!this.isFormValid()) {
       return;
     }
-    const objectUrl = `${this.portofino.apiPath + this.configuration.source}`;
     let object = this.getObjectToSave();
     let params = new HttpParams();
     this.ids.forEach(id => params = params.append("id", id));
-    this.http.put(objectUrl, object,  { params: params }).subscribe(() => this.close.emit(object));
+    this.http.put(this.sourceUrl, object,  { params: params }).subscribe(() => this.close.emit(object));
   }
 
 }

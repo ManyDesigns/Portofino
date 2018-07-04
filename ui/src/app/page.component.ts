@@ -38,8 +38,8 @@ export class PageComponent implements OnInit {
         this.page = page;
         for(let i = index; i < segment.length; i++) {
           let s = segment[i];
-          path += `/${s.path}`;
           if (this.page.consumePathSegment(s.path)) {
+            path += `/${s.path}`;
             this.loadPageInPath(path, segment, i + 1);
             return;
           }

@@ -11,29 +11,3 @@ Thumbs.db
 .idea
 oneclick/local.*
 oneclick/build/*
-
-#UI
-
-# compiled output
-/ui/dist
-/ui/dist-server
-/ui/tmp
-/ui/out-tsc
-
-# dependencies
-/ui/node
-/ui/node_modules
-
-# misc
-/ui/.sass-cache
-/ui/connect.lock
-/ui/coverage
-/ui/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/ui/typings
-
-# e2e
-/ui/e2e/*.js
-/ui/e2e/*.map

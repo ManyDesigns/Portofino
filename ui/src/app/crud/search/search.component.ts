@@ -21,6 +21,8 @@ export class SearchComponent implements OnInit {
   selectionProviders: SelectionProvider[];
   @Input()
   configuration: Configuration;
+  @Input()
+  sourceUrl: string;
 
   properties: Property[] = [];
   form: FormGroup;
@@ -71,7 +73,7 @@ export class SearchComponent implements OnInit {
         if(!property) {
           return;
         }
-        const spUrl = `${this.portofino.apiPath + this.configuration.source}/:selectionProvider/${sp.name}/${index}`;
+        const spUrl = `${this.sourceUrl}/:selectionProvider/${sp.name}/${index}`;
         property.selectionProvider = {
           name: sp.name,
           index: index,
@@ -171,8 +173,7 @@ export class SearchComponent implements OnInit {
       params = params.set("sortProperty", this.sortInfo.active);
       params = params.set("sortDirection", this.sortInfo.direction);
     }
-    const searchUrl = this.portofino.apiPath + this.configuration.source;
-    this.http.get<SearchResults>(searchUrl, {params: params}).subscribe(
+    this.http.get<SearchResults>(this.sourceUrl, {params: params}).subscribe(
       results => {
         results.records = results['Result'];
         this.results = results;

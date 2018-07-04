@@ -1,8 +1,8 @@
 <h2>{{configuration.title}}</h2>
 <portofino-crud-search #search
   *ngIf="isSearchView()"
-  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-  [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
+  [classAccessor]="classAccessor" [configuration]="configuration" [sourceUrl]="sourceUrl"
+  [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
   <ng-template #buttons>
     <button mat-raised-button color="accent" (click)="showCreate()" *ngIf="createEnabled" i18n>
       <mat-icon>add</mat-icon>
@@ -23,13 +23,12 @@
 <portofino-crud-detail
   *ngIf="isDetailView()"
   [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-  (close)="goToSearch()"></portofino-crud-detail>
+  [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-detail>
 <portofino-crud-create
   *ngIf="isCreateView()"
   [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-  (close)="goToSearch()"></portofino-crud-create>
+  [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-create>
 <portofino-crud-bulk-edit
   *ngIf="isBulkEditView()"
   [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-  [ids]="selection"
-  (close)="goToSearch()"></portofino-crud-bulk-edit>
+  [ids]="selection" [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-bulk-edit>
