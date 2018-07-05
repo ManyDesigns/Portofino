@@ -26,6 +26,8 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
+import com.manydesigns.portofino.dispatcher.web.ApplicationRoot;
 import com.manydesigns.portofino.i18n.TextProviderBean;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;

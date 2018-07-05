@@ -491,8 +491,7 @@ public class DispatcherLogic {
         return action;
     }
 
-    public static void configurePageAction(PageAction pageAction, PageInstance pageInstance)
-            throws JAXBException, IOException {
+    public static void configurePageAction(PageAction pageAction, PageInstance pageInstance) {
         if(pageInstance.getConfiguration() != null) {
             logger.debug("Page instance {} is already configured");
             return;

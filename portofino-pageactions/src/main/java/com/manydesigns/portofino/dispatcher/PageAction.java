@@ -33,7 +33,7 @@ import javax.ws.rs.core.Response;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PageAction extends DispatchElement, SecureResource {
+public interface PageAction extends DispatchElement {
     String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
 
     /**

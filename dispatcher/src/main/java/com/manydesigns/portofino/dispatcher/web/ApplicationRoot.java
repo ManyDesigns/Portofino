@@ -90,7 +90,7 @@ public class ApplicationRoot extends DocumentedApiRoot {
     }
 
     @Path("{pathSegment}")
-    public Object start(@PathParam("pathSegment") String pathSegment) throws Exception {
+    public Object start(@PathParam("pathSegment") String pathSegment) {
         return root.consumePathSegment(pathSegment);
     }
 

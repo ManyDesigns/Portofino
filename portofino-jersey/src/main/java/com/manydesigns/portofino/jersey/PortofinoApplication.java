@@ -10,7 +10,7 @@ import javax.ws.rs.ApplicationPath;
 public class PortofinoApplication extends ResourceConfig {
 
     public PortofinoApplication() {
-        packages("com.manydesigns");
+        packages("com.manydesigns.portofino.pageactions.rest"); //TODO configure user packages
         register(JacksonFeature.class);
     }
 

@@ -25,6 +25,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -40,7 +41,7 @@ public class Listener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext servletContext = sce.getServletContext();
-        String applicationDirectoryPath = servletContext.getInitParameter("portofino.application.directory");
+        String applicationDirectoryPath = getApplicationDirectoryPath(servletContext);
         if(applicationDirectoryPath != null) try {
             //TODO allow placeholders?
             applicationRoot = VFS.getManager().resolveFile(applicationDirectoryPath);
@@ -68,6 +69,10 @@ public class Listener implements ServletContextListener {
         String actionsDirectory = configuration.getString("actions.directory", "actions");
         initApplicationRoot(servletContext, actionsDirectory);
         logger.info("Application initialized.");
+    }
+
+    protected String getApplicationDirectoryPath(ServletContext servletContext) {
+        return servletContext.getInitParameter("portofino.application.directory");
     }
 
     protected void loadConfiguration(ServletContext servletContext, FileObject applicationRoot)
@@ -99,27 +104,40 @@ public class Listener implements ServletContextListener {
             if(actionsDirectory.getType() != FileType.FOLDER) {
                 initializationFailed(new Exception("Not a directory: " + actionsDirectory));
             }
+            CodeBase codeBase = getCodeBase();
             ResourceResolvers resourceResolver = new ResourceResolvers();
-            //TODO auto discovery?
-            FileObject codeBaseRoot = VFS.getManager().resolveFile("res:");
-            JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot);
-            CodeBase codeBase = javaCodeBase;
-            try {
-                Class<?> gcb = Class.forName("com.manydesigns.portofino.code.GroovyCodeBase");
-                Constructor<?> gcbConstructor = gcb.getConstructor(FileObject.class, CodeBase.class);
-                codeBase = (CodeBase) gcbConstructor.newInstance(codeBaseRoot, javaCodeBase);
-                logger.info("Groovy is available");
-            } catch (Exception e) {
-                logger.debug("Groovy not available", e);
-            }
-            resourceResolver.resourceResolvers.add(new JavaResourceResolver(codeBase));
-            addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.GroovyResourceResolver", codeBase, false);
-            addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver", codeBase, true);
-            Root root = Root.get(actionsDirectory, resourceResolver);
+            configureResourceResolvers(resourceResolver, codeBase);
+            Root root = getRoot(actionsDirectory, resourceResolver);
             DocumentedApiRoot.setRoot(root);
         } catch (Exception e) {
             initializationFailed(e);
         }
+    }
+
+    protected CodeBase getCodeBase() throws IOException {
+        //TODO auto discovery?
+        FileObject codeBaseRoot = VFS.getManager().resolveFile("res:");
+        JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot);
+        CodeBase codeBase = javaCodeBase;
+        try {
+            Class<?> gcb = Class.forName("com.manydesigns.portofino.code.GroovyCodeBase");
+            Constructor<?> gcbConstructor = gcb.getConstructor(FileObject.class, CodeBase.class);
+            codeBase = (CodeBase) gcbConstructor.newInstance(codeBaseRoot, javaCodeBase);
+            logger.info("Groovy is available");
+        } catch (Exception e) {
+            logger.debug("Groovy not available", e);
+        }
+        return codeBase;
+    }
+
+    protected void configureResourceResolvers(ResourceResolvers resourceResolver, CodeBase codeBase) {
+        resourceResolver.resourceResolvers.add(new JavaResourceResolver(codeBase));
+        addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.GroovyResourceResolver", codeBase, false);
+        addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver", codeBase, true);
+    }
+
+    protected Root getRoot(FileObject actionsDirectory, ResourceResolvers resourceResolver) throws Exception {
+        return Root.get(actionsDirectory, resourceResolver);
     }
 
     protected void addResourceResolver(ResourceResolvers resourceResolver, String className, CodeBase codeBase, boolean caching) {
