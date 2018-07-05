@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
-import {isUpdatable, Property} from "../../class-accessor";
+import {isBlob, isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 
 @Component({
@@ -24,6 +24,10 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
 
   protected isEditEnabled(): boolean {
     return true;
+  }
+
+  protected filterProperty(property): boolean {
+    return !!(super.filterProperty(property) || isBlob(property));
   }
 
   ngOnInit() {

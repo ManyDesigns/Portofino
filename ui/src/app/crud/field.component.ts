@@ -19,6 +19,8 @@ export class FieldComponent implements OnInit {
   form: FormGroup;
   @Input()
   selectable: boolean;
+  @Input()
+  objectUrl: string;
 
   control: AbstractControl;
   selector: FormControl;

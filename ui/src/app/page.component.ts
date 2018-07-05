@@ -1,18 +1,17 @@
-import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, UrlSegment} from "@angular/router";
 import {Page, PageConfiguration, PortofinoComponent} from "./portofino.component";
 import {HttpClient} from "@angular/common/http";
 import {ContentDirective} from "./content.directive";
-import {Observable} from "rxjs/index";
+import {Observable, Subscription} from "rxjs/index";
 import {map} from "rxjs/operators";
-import {AuthenticationService} from "./security/authentication.service";
 
 @Component({
   selector: 'portofino-page',
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.css']
 })
-export class PageComponent implements OnInit {
+export class PageComponent implements OnInit, OnDestroy {
 
   @ViewChild(ContentDirective)
   contentHost: ContentDirective;
@@ -20,27 +19,36 @@ export class PageComponent implements OnInit {
   page: Page = null;
   error;
 
+  protected subscription: Subscription;
+
   constructor(protected route: ActivatedRoute, protected http: HttpClient,
               protected componentFactoryResolver: ComponentFactoryResolver) { }
 
   ngOnInit() {
-    this.route.url.subscribe(segment => {
+    this.subscription = this.route.url.subscribe(segment => {
       this.page = null;
       this.error = null;
-      this.loadPageInPath("", segment, 0);
+      this.loadPageInPath("", null, segment, 0);
     });
   }
 
-  protected loadPageInPath(path: string, segment: UrlSegment[], index: number) {
+  ngOnDestroy() {
+    if(this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  protected loadPageInPath(path: string, parent: Page, segments: UrlSegment[], index: number) {
     this.loadPage(path).subscribe(
-      page => {
-        page.parent = this.page;
+      (page: Page) => {
+        page.parent = parent;
+        page.url = '/' + segments.slice(0, index).join('/');
         this.page = page;
-        for(let i = index; i < segment.length; i++) {
-          let s = segment[i];
-          if (this.page.consumePathSegment(s.path)) {
+        for(let i = index; i < segments.length; i++) {
+          let s = segments[i];
+          if (page.consumePathSegment(s.path)) {
             path += `/${s.path}`;
-            this.loadPageInPath(path, segment, i + 1);
+            this.loadPageInPath(path, page, segments, i + 1);
             return;
           }
         }

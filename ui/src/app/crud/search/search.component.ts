@@ -1,6 +1,15 @@
 import {Component, ContentChild, Input, OnInit, TemplateRef} from '@angular/core';
 import {Configuration, SelectionOption, SelectionProvider} from "../crud.component";
-import {ClassAccessor, isEnabled, isInSummary, isSearchable, Property} from "../../class-accessor";
+import {
+  ClassAccessor,
+  deriveKind,
+  isDate,
+  isEnabled,
+  isInSummary,
+  isNumber,
+  isSearchable,
+  Property
+} from "../../class-accessor";
 import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
@@ -24,11 +33,11 @@ export class SearchComponent implements OnInit {
   @Input()
   sourceUrl: string;
 
-  properties: Property[] = [];
+  searchProperties: Property[] = [];
   form: FormGroup;
   results: SearchResults;
   resultsDataSource = new MatTableDataSource();
-  resultFields: Property[] = [];
+  resultProperties: Property[] = [];
   columnsToDisplay: string[] = [];
   @Input()
   pageSize: number;
@@ -54,14 +63,17 @@ export class SearchComponent implements OnInit {
       if(!isEnabled(property)) {
         return;
       }
-      property = {...property};
+      property = {...property, kind: deriveKind(property)};
       if(isSearchable(property)) {
-        this.properties.push(property);
+        this.searchProperties.push(property);
         formControls[property.name] = new FormControl();
       }
       if(isInSummary(property)) {
-        this.resultFields.push(property);
+        this.resultProperties.push(property);
         this.columnsToDisplay.push(property.name);
+      }
+      if(this.resultProperties.length > 0 && !this.resultProperties.some(p => p.key)) {
+        this.resultProperties[0].key = true;
       }
     });
 
@@ -69,7 +81,7 @@ export class SearchComponent implements OnInit {
 
     this.selectionProviders.forEach(sp => {
       sp.fieldNames.forEach((name, index) => {
-        const property = this.properties.find(p => p.name == name);
+        const property = this.searchProperties.find(p => p.name == name);
         if(!property) {
           return;
         }
@@ -83,7 +95,7 @@ export class SearchComponent implements OnInit {
           updateDependentOptions: () => {
             const nextProperty = property.selectionProvider.nextProperty;
             if(nextProperty) {
-              this.loadSelectionOptions(this.properties.find(p => p.name == nextProperty));
+              this.loadSelectionOptions(this.searchProperties.find(p => p.name == nextProperty));
             }
           },
           options: []
@@ -147,7 +159,7 @@ export class SearchComponent implements OnInit {
   protected clearDependentSelectionValues(property: Property) {
     const nextProperty = property.selectionProvider.nextProperty;
     if (nextProperty) {
-      this.clearSelectionValues(this.properties.find(p => p.name == nextProperty));
+      this.clearSelectionValues(this.searchProperties.find(p => p.name == nextProperty));
     }
   }
 
@@ -156,7 +168,7 @@ export class SearchComponent implements OnInit {
     property.selectionProvider.options = [];
     const nextProperty = property.selectionProvider.nextProperty;
     if(nextProperty) {
-      this.clearSelectionValues(this.properties.find(p => p.name == nextProperty));
+      this.clearSelectionValues(this.searchProperties.find(p => p.name == nextProperty));
     }
   }
 
@@ -185,7 +197,7 @@ export class SearchComponent implements OnInit {
   }
 
   protected composeSearch(params: HttpParams) {
-    this.properties.forEach(property => {
+    this.searchProperties.forEach(property => {
       if(property.selectionProvider) {
         params = this.addSelectionProviderSearchParameter(property, params);
       } else {
@@ -201,10 +213,10 @@ export class SearchComponent implements OnInit {
     if(value == null) {
       return params;
     }
-    if (this.portofino.isDate(property)) {
+    if (isDate(property)) {
       params = params.set(`search_${name}_min`, value.valueOf().toString());
       params = params.set(`search_${name}_max`, value.valueOf().toString());
-    } else if (this.portofino.isNumber(property)) {
+    } else if (isNumber(property)) {
       params = params.set(`search_${name}_min`, value.toString());
       params = params.set(`search_${name}_max`, value.toString());
     } else {
@@ -249,7 +261,7 @@ export class SearchComponent implements OnInit {
 
   clearSearch() {
     this.form.reset();
-    this.properties.forEach(property => {
+    this.searchProperties.forEach(property => {
       const sp = property.selectionProvider;
       if(sp) {
         if(sp.displayMode == 'AUTOCOMPLETE') {

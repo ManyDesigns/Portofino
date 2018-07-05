@@ -1,8 +1,17 @@
 import {EventEmitter, Input, Output} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
-import {Configuration, SelectionOption, SelectionProvider} from "./crud.component";
-import {ClassAccessor, getAnnotation, isEnabled, isRequired, Property} from "../class-accessor";
+import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.component";
+import {
+  ClassAccessor,
+  deriveKind,
+  getAnnotation,
+  isBlob,
+  isDate,
+  isEnabled,
+  isRequired,
+  Property
+} from "../class-accessor";
 import * as moment from "moment";
 import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
@@ -28,13 +37,17 @@ export abstract class BaseDetailComponent {
 
   protected initClassAccessor() {
     this.classAccessor.properties.forEach(property => {
-      if (!isEnabled(property)) {
+      if (this.filterProperty(property)) {
         return;
       }
-      property = {...property};
-      this.properties.push(property);
+      property = {...property, kind: deriveKind(property)};
       property.editable = this.isEditable(property);
+      this.properties.push(property);
     });
+  }
+
+  protected filterProperty(property): boolean {
+    return !isEnabled(property);
   }
 
   protected abstract isEditable(property: Property): boolean;
@@ -49,8 +62,16 @@ export abstract class BaseDetailComponent {
       const disabled = !this.isEditEnabled() || !this.isEditable(p);
       if(!object[p.name]) {
         //value is undefined
-      } else if (this.portofino.isDate(p)) {
+      } else if (isDate(p)) {
         value = moment(object[p.name].value);
+      } else if (isBlob(p) && object[p.name].value) {
+        const portofinoBlob = object[p.name].value;
+        value = new BlobFile();
+        value.code = portofinoBlob.code;
+        value.size = portofinoBlob.size;
+        value.name = portofinoBlob.filename;
+        value.type = portofinoBlob.contentType;
+        value = [value];
       } else if(disabled && object[p.name].displayValue) {
         value = object[p.name].displayValue;
       } else {
@@ -194,8 +215,21 @@ export abstract class BaseDetailComponent {
       if(value == null) {
         value = "";
       }
-      if (this.portofino.isDate(p) && value) {
+      if (isDate(p) && value) {
         formData.append(p.name, value.valueOf());
+      } else if(isBlob(p)) {
+        if(value && value.length > 0) {
+          const file = value[0];
+          if(file.code) {
+            formData.append(p.name + '_operation', '_keep');
+            formData.append(p.name + '_code', file.code);
+          } else {
+            formData.append(p.name + '_operation', '_modify');
+            formData.append(p.name, file.slice(), file.name);
+          }
+        } else {
+          formData.append(p.name + '_operation', '_delete');
+        }
       } else {
         formData.append(p.name, value);
       }

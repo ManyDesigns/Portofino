@@ -31,13 +31,15 @@ import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import { RouterModule} from '@angular/router';
 import { SearchComponent } from './crud/search/search.component';
-import { FieldComponent } from './crud/field.component';
+import { FieldComponent} from './crud/field.component';
 import { DetailComponent } from './crud/detail/detail.component';
 import { CreateComponent } from './crud/detail/create.component';
 import { ContentDirective } from './content.directive';
 import { PageComponent } from './page.component';
 import {environment} from "../environments/environment";
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
+import {BlobFieldComponent} from "./crud/blob-field.component";
+import {FileInputAccessorModule} from "file-input-accessor";
 
 if(environment.production) {
   enableProdMode();
@@ -45,14 +47,16 @@ if(environment.production) {
 
 @NgModule({
   declarations: [
-    PortofinoComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent, FieldComponent,
-    DetailComponent, CreateComponent, BulkEditComponent, ContentDirective, PageComponent
+    PortofinoComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent,
+    FieldComponent, BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent,
+    ContentDirective, PageComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
+    FileInputAccessorModule,
     RouterModule.forRoot([{
       path: "**", component: PageComponent
     }], { onSameUrlNavigation: "reload" })

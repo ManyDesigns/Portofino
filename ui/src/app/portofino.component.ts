@@ -41,6 +41,7 @@ export abstract class Page {
 
   configuration: PageConfiguration & any;
   path: string;
+  url: string;
   segment: string;
   parent: Page;
 

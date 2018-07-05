@@ -43,7 +43,7 @@
   </ng-container>
 </ng-container>
 <ng-template #simple>
-  <mat-form-field *ngIf="portofino.isString(property)" [formGroup]="form">
+  <mat-form-field *ngIf="property.kind == 'string'" [formGroup]="form">
     <mat-label>{{property.name}}</mat-label>
     <input matInput [formControlName]="property.name" [required]="isRequired()" />
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
@@ -54,7 +54,7 @@
     </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
-  <mat-form-field *ngIf="portofino.isNumber(property)" [formGroup]="form">
+  <mat-form-field *ngIf="property.kind == 'number'" [formGroup]="form">
     <mat-label>{{property.name}}</mat-label>
     <input matInput [formControlName]="property.name" [required]="isRequired()">
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
@@ -62,7 +62,7 @@
     </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
-  <mat-form-field *ngIf="portofino.isDate(property)" [formGroup]="form">
+  <mat-form-field *ngIf="property.kind == 'date'" [formGroup]="form">
     <mat-label>{{property.name}}</mat-label>
     <input matInput [formControlName]="property.name" [required]="isRequired()" [matDatepicker]="datepicker">
     <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
@@ -72,4 +72,5 @@
     </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
+  <portofino-crud-blob-field *ngIf="property.kind == 'blob'" [field]="this"></portofino-crud-blob-field>
 </ng-template>

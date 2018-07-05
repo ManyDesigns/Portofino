@@ -57,7 +57,6 @@ export class CrudComponent extends CrudPage implements OnInit {
       this.bulkEditEnabled = ops.some(op => op.signature == "PUT" && op.available);
       this.bulkDeleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
     });
-
   }
 
   computeSource() {
@@ -140,7 +139,7 @@ export class CrudComponent extends CrudPage implements OnInit {
 
   goToSearch() {
     if(this.view == CrudView.DETAIL) {
-      this.router.navigateByUrl(this.path);
+      this.router.navigateByUrl(this.url);
     } else {
       this.showSearch();
     }
@@ -195,4 +194,13 @@ export class Operation {
 
 export enum CrudView {
   SEARCH, DETAIL, CREATE, BULK_EDIT
+}
+
+export class BlobFile {
+  lastModified: number;
+  lastModifiedDate: Date;
+  name: string;
+  size: number;
+  type: string;
+  code: string;
 }

@@ -1,9 +1,9 @@
 <div fxLayout="column" fxLayoutGap="20px">
-  <div *ngIf="properties.length">
+  <div *ngIf="searchProperties.length">
     <span i18n>Search</span>
     <form (submit)="search()" [formGroup]="form">
       <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
-        <portofino-crud-search-field *ngFor="let field of properties" [form]="form" [property]="field">
+        <portofino-crud-search-field *ngFor="let field of searchProperties" [form]="form" [property]="field">
         </portofino-crud-search-field>
       </div>
       <div fxLayout="row">
@@ -33,14 +33,19 @@
           </mat-checkbox>
         </td>
       </ng-container>
-      <ng-container *ngFor="let field of resultFields" [matColumnDef]="field.name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{field.name}}</th>
+      <ng-container *ngFor="let property of resultProperties" [matColumnDef]="property.name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{property.name}}</th>
         <td mat-cell *matCellDef="let row">
-          <a [routerLink]="row.__rowKey" *ngIf="field.key">
-            {{row[field.name].displayValue || row[field.name].value}}
+          <a [routerLink]="row.__rowKey" *ngIf="property.key">
+            {{row[property.name].displayValue || row[property.name].value}}
           </a>
-          <span *ngIf="!field.key">
-            {{row[field.name].displayValue || row[field.name].value}}
+          <span *ngIf="!property.key">
+            <a *ngIf="property.kind == 'blob'" [href]="sourceUrl + '/' + row.__rowKey + '/:blob/' + property.name">
+              {{row[property.name].displayValue}}
+            </a>
+            <ng-container *ngIf="property.kind != 'blob'">
+              {{row[property.name].displayValue || row[property.name].value}}
+            </ng-container>
           </span>
         </td>
       </ng-container>

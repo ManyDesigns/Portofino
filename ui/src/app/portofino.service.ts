@@ -8,16 +8,4 @@ export class PortofinoService {
 
   constructor() { }
 
-  isString(property: Property) {
-    return property.type == 'java.lang.String'
-  }
-
-  isNumber(property: Property) {
-    return property.type == 'java.lang.Long'
-  }
-
-  isDate(property: Property) {
-    return property.type == 'java.util.Date' || property.type == 'java.sql.Timestamp';
-  }
-
 }

@@ -1623,7 +1623,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @GET
     @Path(":blob/{propertyName}")
-    public Resolution downloadBlob(@PathParam("propertyName") String propertyName) throws IOException, NoSuchFieldException {
+    @ControlsCache
+    public Resolution downloadBlob(@PathParam("propertyName") String propertyName) throws IOException {
         if(object == null) {
             return new ErrorResolution(Response.Status.BAD_REQUEST.getStatusCode(), "Object can not be null (this method can only be called with /objectKey)");
         }
