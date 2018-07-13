@@ -43,9 +43,10 @@
   </ng-container>
 </ng-container>
 <ng-template #simple>
-  <mat-form-field *ngIf="property.kind == 'string'" [formGroup]="form">
+  <mat-form-field *ngIf="property.kind == 'string' && !isRichText()" [formGroup]="form">
     <mat-label>{{property.name}}</mat-label>
-    <input matInput [formControlName]="property.name" [required]="isRequired()" />
+    <input matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="!isMultiline()" />
+    <textarea matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="isMultiline()" ></textarea>
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.name}} is required. {{control.getError('required').message}}
     </mat-error>

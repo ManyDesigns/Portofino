@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {isRequired, Property} from "../class-accessor";
+import {isMultiline, isRequired, isRichText, Property} from "../class-accessor";
 import {PortofinoService} from "../portofino.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {AbstractControl} from "@angular/forms/src/model";
@@ -63,6 +63,14 @@ export class FieldComponent implements OnInit {
         this.selector.setValue(this.enabled);
       });
     }
+  }
+
+  isMultiline() {
+    return isMultiline(this.property);
+  }
+
+  isRichText() {
+    return isRichText(this.property);
   }
 
 }

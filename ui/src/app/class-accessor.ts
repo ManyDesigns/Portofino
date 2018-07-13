@@ -67,6 +67,16 @@ export function isRequired(property: Property) {
   return annotation && annotation.properties["value"];
 }
 
+export function isMultiline(property: Property) {
+  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Multiline");
+  return annotation && annotation.properties["value"];
+}
+
+export function isRichText(property: Property) {
+  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.RichText");
+  return annotation && annotation.properties["value"];
+}
+
 export function isBlob(property: Property) {
   return getAnnotation(property, "com.manydesigns.elements.annotations.FileBlob") ||
          getAnnotation(property, "com.manydesigns.elements.annotations.DatabaseBlob");
