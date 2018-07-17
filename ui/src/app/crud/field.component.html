@@ -73,5 +73,10 @@
     </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
+  <ng-container *ngIf="property.kind == 'boolean'" [formGroup]="form">
+    <mat-checkbox [formControlName]="property.name">
+      {{property.name}}
+    </mat-checkbox>
+  </ng-container>
   <portofino-crud-blob-field *ngIf="property.kind == 'blob'" [field]="this"></portofino-crud-blob-field>
 </ng-template>

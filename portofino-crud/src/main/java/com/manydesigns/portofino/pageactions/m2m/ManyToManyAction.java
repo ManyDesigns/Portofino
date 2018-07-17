@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.pageactions.m2m;
 
-import com.google.api.client.json.Json;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
@@ -37,7 +36,6 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
-import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Guard;
@@ -65,13 +63,11 @@ import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.SecurityUtils;
 import org.hibernate.Session;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +75,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.Serializable;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -192,7 +187,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 String name = sp.getName();
                 String hql = sp.getHql();
 
-                if (hql != null) {
+                if (StringUtils.isNotEmpty(hql)) {
                     selectionProvider =
                             createSelectionProviderFromHql
                                     (name, databaseName, hql, DisplayMode.DROPDOWN, SearchDisplayMode.DROPDOWN);
@@ -266,7 +261,7 @@ public class ManyToManyAction extends AbstractPageAction {
         switch (m2mConfiguration.getActualViewType()) {
             case CHECKBOXES:
             case CHECKBOXES_VERTICAL:
-                booleanRelation = new LinkedHashMap<Object, Boolean>();
+                booleanRelation = new LinkedHashMap<>();
                 if(potentiallyAvailableAssociations != null) {
                     for(Object o : potentiallyAvailableAssociations) {
                         booleanRelation.put(o, !availableAssociations.contains(o));
@@ -322,14 +317,12 @@ public class ManyToManyAction extends AbstractPageAction {
     }
 
     private boolean isExistingAssociation(PropertyAccessor manyPropertyAccessor, Object oPk) {
-        boolean existing = false;
         for(Object a : existingAssociations) {
             if(oPk.equals(manyPropertyAccessor.get(a))) {
-                existing = true;
-                break;
+                return true;
             }
         }
-        return existing;
+        return false;
     }
 
     @Button(list = "m2m-checkboxes-edit", key = "save", type = Button.TYPE_PRIMARY)
@@ -602,8 +595,8 @@ public class ManyToManyAction extends AbstractPageAction {
     @GET
     @Path(":availableAssociations/{key}")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Resolution selectionProviders(@PathParam("key") String key) {
-        try{
+    public Resolution getAssociations(@PathParam("key") String key) {
+        try {
             loadOnePk(key);
         }catch (Exception e){
             logger.error("Cannot get key "+key ,e);
@@ -758,8 +751,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 for(Object obj : potentiallyAvailableAssociations) {
                     String pk = StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
                     enumList.put(pk);
-                    titleMap.put(pk,ShortNameUtils.getName(ca, obj));
-                    StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
+                    titleMap.put(pk, ShortNameUtils.getName(ca, obj));
 
                     if(!availableAssociations.contains(obj)) {
                         trueRelations.put(pk);
@@ -769,11 +761,11 @@ public class ManyToManyAction extends AbstractPageAction {
                 logger.warn("potentiallyAvailableAssociations is empty");
             }
 
-            model.put(onePk.toString(),trueRelations);
+            model.put(onePk.toString(), trueRelations);
 
             JSONObject items = new JSONObject();
             items.put("type","string");
-            items.put("enum",enumList);
+            items.put("enum", enumList);
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("type","array");
@@ -788,9 +780,9 @@ public class ManyToManyAction extends AbstractPageAction {
             schema.put("properties",properties);
 
             JSONObject checkboxes = new JSONObject();
-            checkboxes.put("key",onePk.toString());
-            checkboxes.put("titleMap",titleMap);
-            checkboxes.put("notitle",true);
+            checkboxes.put("key", onePk.toString());
+            checkboxes.put("titleMap", titleMap);
+            checkboxes.put("notitle", true);
             form.put(checkboxes);
         }
 

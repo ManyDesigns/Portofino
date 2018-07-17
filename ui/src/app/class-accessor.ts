@@ -25,15 +25,19 @@ export function getAnnotation(property: Property, type: string): Annotation {
   return property.annotations.find(value => value.type == type);
 }
 
-export function isString(property: Property) {
+export function isBooleanProperty(property: Property) {
+  return property.type == 'java.lang.Boolean'
+}
+
+export function isStringProperty(property: Property) {
   return property.type == 'java.lang.String'
 }
 
-export function isNumber(property: Property) {
+export function isNumericProperty(property: Property) {
   return property.type == 'java.lang.Long'
 }
 
-export function isDate(property: Property) {
+export function isDateProperty(property: Property) {
   return property.type == 'java.util.Date' || property.type == 'java.sql.Timestamp';
 }
 
@@ -86,14 +90,17 @@ export function deriveKind(property: Property) {
   if(isBlob(property)) {
     return "blob";
   }
-  if(isNumber(property)) {
+  if(isNumericProperty(property)) {
     return "number";
   }
-  if(isDate(property)) {
+  if(isDateProperty(property)) {
     return "date";
   }
-  if(isString(property)) {
+  if(isStringProperty(property)) {
     return "string";
   }
-  throw "unsuppored"
+  if(isBooleanProperty(property)) {
+    return "boolean";
+  }
+  throw `${property.name}: unsuppored property type ${property.type}`
 }

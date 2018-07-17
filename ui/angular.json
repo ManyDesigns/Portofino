@@ -7,6 +7,7 @@
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
+      "prefix": "portofino",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",

@@ -1,6 +1,6 @@
 import {Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, UrlSegment} from "@angular/router";
-import {Page, PageConfiguration, PortofinoComponent} from "./portofino.component";
+import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient} from "@angular/common/http";
 import {ContentDirective} from "./content.directive";
 import {Observable, Subscription} from "rxjs/index";
@@ -42,7 +42,8 @@ export class PageComponent implements OnInit, OnDestroy {
     this.loadPage(path).subscribe(
       (page: Page) => {
         page.parent = parent;
-        page.url = '/' + segments.slice(0, index).join('/');
+        page.baseUrl = '/' + segments.slice(0, index).join('/');
+        page.url = page.baseUrl;
         this.page = page;
         for(let i = index; i < segments.length; i++) {
           let s = segments[i];
@@ -50,17 +51,24 @@ export class PageComponent implements OnInit, OnDestroy {
             path += `/${s.path}`;
             this.loadPageInPath(path, page, segments, i + 1);
             return;
+          } else {
+            page.url += `/${s.path}`;
           }
         }
       },
-      error => this.error = error);
+      error => this.handleErrorInLoadingPage(path, error));
+  }
+
+  private handleErrorInLoadingPage(path, error) {
+    console.log("Error in loading page " + path, error);
+    this.error = error;
   }
 
   protected loadPage(path: string): Observable<Page> {
     return this.http.get<PageConfiguration>(`pages${path}/config.json`).pipe(
       map(
         config => {
-          const componentType = PortofinoComponent.components[config.type];
+          const componentType = PortofinoAppComponent.components[config.type];
           if (!componentType) {
             this.error = Error("Unknown component type: " + config.type);
             return;
@@ -83,5 +91,42 @@ export class PageComponent implements OnInit, OnDestroy {
           }
           return component;
         }));
+  }
+}
+
+export class PageConfiguration {
+  type: string;
+  title: string;
+  children: PageChild[];
+}
+
+export class PageChild {
+  path: string;
+  title: string;
+}
+
+export abstract class Page {
+
+  configuration: PageConfiguration & any;
+  path: string;
+  baseUrl: string;
+  url: string;
+  segment: string;
+  parent: Page;
+
+  readonly operationsPath = '/:operations';
+  readonly configurationPath = '/:configuration';
+
+  consumePathSegment(fragment: string): boolean {
+    return true;
+  }
+
+  get children(): PageChild[] {
+    return this.configuration.children
+  }
+
+  getButtons(list: string) {
+    //TODO
+    console.log("mah", this.constructor['__prop__metadata__']);
   }
 }

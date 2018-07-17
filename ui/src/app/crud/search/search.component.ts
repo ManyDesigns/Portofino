@@ -3,10 +3,10 @@ import {Configuration, SelectionOption, SelectionProvider} from "../crud.compone
 import {
   ClassAccessor,
   deriveKind,
-  isDate,
+  isDateProperty,
   isEnabled,
   isInSummary,
-  isNumber,
+  isNumericProperty,
   isSearchable,
   Property
 } from "../../class-accessor";
@@ -213,10 +213,10 @@ export class SearchComponent implements OnInit {
     if(value == null) {
       return params;
     }
-    if (isDate(property)) {
+    if (isDateProperty(property)) {
       params = params.set(`search_${name}_min`, value.valueOf().toString());
       params = params.set(`search_${name}_max`, value.valueOf().toString());
-    } else if (isNumber(property)) {
+    } else if (isNumericProperty(property)) {
       params = params.set(`search_${name}_min`, value.toString());
       params = params.set(`search_${name}_max`, value.toString());
     } else {

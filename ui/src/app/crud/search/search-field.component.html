@@ -52,4 +52,9 @@
     <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
     <mat-datepicker #datepicker></mat-datepicker>
   </mat-form-field>
+  <ng-container *ngIf="property.kind == 'boolean'" [formGroup]="form">
+    <mat-checkbox [formControlName]="property.name">
+      {{property.name}}
+    </mat-checkbox>
+  </ng-container>
 </ng-template>

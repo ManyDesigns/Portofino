@@ -4,11 +4,11 @@
     <ng-container *ngIf="page">
       <ul *ngIf="page.parent">
         <li>
-          <a [routerLink]="page.parent.path" routerLinkActive="active">{{page.parent.configuration.title}}</a>
+          <a [routerLink]="page.parent.url" routerLinkActive="active">{{page.parent.configuration.title}}</a>
           <ul>
             <li *ngFor="let child of page.parent.children">
               <a *ngIf="child.path != page.segment"
-                 [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+                 [routerLink]="page.parent.url + '/' + child.path" routerLinkActive="active">{{child.title}}</a>
               <ng-container *ngIf="child.path == page.segment">
                 <strong>{{page.configuration.title}}</strong>
                 <ul>

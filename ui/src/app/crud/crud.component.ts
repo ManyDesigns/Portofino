@@ -2,9 +2,10 @@ import {Component, Input, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
-import {Page, PageChild, PageConfiguration, PortofinoComponent} from "../portofino.component";
+import {PortofinoComponent} from "../portofino-app.component";
 import {Router} from "@angular/router";
 import {SearchComponent} from "./search/search.component";
+import {Page, PageChild, PageConfiguration} from "../page.component";
 
 export abstract class CrudPage extends Page {
   id: string;
@@ -17,9 +18,8 @@ export abstract class CrudPage extends Page {
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.css']
 })
+@PortofinoComponent({ name: 'crud' })
 export class CrudComponent extends CrudPage implements OnInit {
-
-  private static __componentRegistration = PortofinoComponent.components.crud = CrudComponent;
 
   @Input()
   configuration: PageConfiguration & any;
@@ -27,9 +27,7 @@ export class CrudComponent extends CrudPage implements OnInit {
   classAccessor: ClassAccessor;
   selectionProviders: SelectionProvider[];
   classAccessorPath = '/:classAccessor';
-  configurationPath = '/:configuration';
   selectionProvidersPath = '/:selectionProviders';
-  operationsPath = '/:operations';
 
   @Input()
   pageSize: number;
@@ -61,7 +59,7 @@ export class CrudComponent extends CrudPage implements OnInit {
 
   computeSource() {
     let source = "";
-    if(!this.configuration.source.startsWith('/')) {
+    if(!this.configuration.source || !this.configuration.source.startsWith('/')) {
       let parent = this.parent;
       while(parent) {
         if(parent instanceof CrudPage) {
@@ -79,7 +77,7 @@ export class CrudComponent extends CrudPage implements OnInit {
     if(!source) {
       source = this.portofino.apiPath;
     }
-    return (source + this.configuration.source)
+    return (source + (this.configuration.source ? this.configuration.source : ''))
       //replace double slash, but not in http://
       .replace(new RegExp("([^:])//"), '$1/');
   }
@@ -139,7 +137,7 @@ export class CrudComponent extends CrudPage implements OnInit {
 
   goToSearch() {
     if(this.view == CrudView.DETAIL) {
-      this.router.navigateByUrl(this.url);
+      this.router.navigateByUrl(this.baseUrl);
     } else {
       this.showSearch();
     }
@@ -168,7 +166,6 @@ export class CrudComponent extends CrudPage implements OnInit {
 
 export class Configuration {
   rowsPerPage: number;
-  source: string;
 }
 
 export class SelectionProvider {

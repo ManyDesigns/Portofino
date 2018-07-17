@@ -7,7 +7,7 @@ import {
   deriveKind,
   getAnnotation,
   isBlob,
-  isDate,
+  isDateProperty,
   isEnabled,
   isRequired,
   Property
@@ -62,7 +62,7 @@ export abstract class BaseDetailComponent {
       const disabled = !this.isEditEnabled() || !this.isEditable(p);
       if(!object[p.name]) {
         //value is undefined
-      } else if (isDate(p)) {
+      } else if (isDateProperty(p)) {
         value = moment(object[p.name].value);
       } else if (isBlob(p) && object[p.name].value) {
         const portofinoBlob = object[p.name].value;
@@ -215,7 +215,7 @@ export abstract class BaseDetailComponent {
       if(value == null) {
         value = "";
       }
-      if (isDate(p) && value) {
+      if (isDateProperty(p) && value) {
         formData.append(p.name, value.valueOf());
       } else if(isBlob(p)) {
         if(value && value.length > 0) {
