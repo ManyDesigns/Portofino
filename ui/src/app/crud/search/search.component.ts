@@ -32,6 +32,8 @@ export class SearchComponent implements OnInit {
   configuration: Configuration;
   @Input()
   sourceUrl: string;
+  @Input()
+  baseUrl: string;
 
   searchProperties: Property[] = [];
   form: FormGroup;

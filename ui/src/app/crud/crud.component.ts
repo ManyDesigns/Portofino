@@ -160,7 +160,7 @@ export class CrudComponent extends CrudPage implements OnInit {
   }
 
   consumePathSegment(segment: string): boolean {
-    const child = this.children.find(c => c.path == segment);
+    const child = this.getChild(segment);
     if(child) {
       return true;
     }

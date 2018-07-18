@@ -29,7 +29,7 @@ export class PageComponent implements OnInit, OnDestroy {
     this.subscription = this.route.url.subscribe(segment => {
       this.page = null;
       this.error = null;
-      this.loadPageInPath("", null, segment, 0);
+      this.loadPageInPath("", null, segment, 0, false);
     });
   }
 
@@ -39,22 +39,38 @@ export class PageComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected loadPageInPath(path: string, parent: Page, segments: UrlSegment[], index: number) {
-    this.loadPage(path).subscribe(
+  protected loadPageInPath(path: string, parent: Page, segments: UrlSegment[], index: number, embed: boolean) {
+    this.loadPage(path, embed).subscribe(
       (page: Page) => {
         page.parent = parent;
         page.baseUrl = '/' + segments.slice(0, index).join('/');
         page.url = page.baseUrl;
-        this.page = page;
         for(let i = index; i < segments.length; i++) {
           let s = segments[i];
           if (page.consumePathSegment(s.path)) {
             path += `/${s.path}`;
-            this.loadPageInPath(path, page, segments, i + 1);
-            return;
+            let child = page.getChild(s.path);
+            if(child) {
+              this.loadPageInPath(path, page, segments, i + 1, false);
+              return;
+            } else {
+              this.error = `Nonexistent child of ${page.url}: ${s.path}`;
+              return;
+            }
           } else {
             page.url += `/${s.path}`;
           }
+        }
+        //If we arrive here, there are no more children in the URL to process
+        if(!embed) {
+          this.page = page;
+          page.children.forEach(child => {
+            if(child.embedded) {
+              let newSegments = segments.slice(0, segments.length);
+              newSegments.push(new UrlSegment(child.path, {}));
+              this.loadPageInPath(path + `/${child.path}`, page, newSegments, newSegments.length, true);
+            }
+          })
         }
       },
       error => this.handleErrorInLoadingPage(path, error));
@@ -65,7 +81,7 @@ export class PageComponent implements OnInit, OnDestroy {
     this.error = error;
   }
 
-  protected loadPage(path: string): Observable<Page> {
+  protected loadPage(path: string, embed: boolean): Observable<Page> {
     return this.http.get<PageConfiguration>(`pages${path}/config.json`).pipe(
       map(
         config => {
@@ -78,7 +94,11 @@ export class PageComponent implements OnInit, OnDestroy {
           let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
 
           let viewContainerRef = this.contentHost.viewContainerRef;
-          viewContainerRef.clear();
+          if(!embed) {
+            viewContainerRef.clear(); //Remove all components
+          } else {
+            //TODO insert some kind of separator?
+          }
 
           let componentRef = viewContainerRef.createComponent(componentFactory);
           const component = <Page>componentRef.instance;
@@ -104,6 +124,7 @@ export class PageConfiguration {
 export class PageChild {
   path: string;
   title: string;
+  embedded: boolean;
 }
 
 export abstract class Page {
@@ -124,6 +145,10 @@ export abstract class Page {
 
   get children(): PageChild[] {
     return this.configuration.children
+  }
+
+  getChild(segment: string) {
+    return this.children.find(c => c.path == segment);
   }
 
   getButtons(list: string = 'default'): ButtonInfo[] | null {
