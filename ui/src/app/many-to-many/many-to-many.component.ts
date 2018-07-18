@@ -2,10 +2,10 @@ import {Component, Input, OnInit} from '@angular/core';
 import {PortofinoComponent} from "../portofino-app.component";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {CrudPage, Operation} from "../crud/crud.component";
+import {CrudPage} from "../crud/crud.component";
 import {FormControl} from "@angular/forms";
 import {MatSnackBar} from "@angular/material";
-import {Page, PageConfiguration} from "../page.component";
+import {Button, Operation, Page, PageConfiguration} from "../page.component";
 
 @Component({
   selector: 'portofino-many-to-many',
@@ -60,6 +60,13 @@ export class ManyToManyComponent extends Page implements OnInit {
     });
   }
 
+  @Button({
+    icon: "save",
+    text: "Save",
+    color: "primary",
+    presentIf: (self) => self.saveEnabled,
+    enabledIf: (self) => self.key
+  })
   save() {
     if(!this.key) {
       return;

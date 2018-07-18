@@ -42,10 +42,11 @@ import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./crud/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {ManyToManyComponent} from './many-to-many/many-to-many.component';
+import {ButtonComponent} from "./button.component";
 
 @NgModule({
   declarations: [
-    PortofinoAppComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent,
+    PortofinoAppComponent, ButtonComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent,
     FieldComponent, BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent,
     ContentDirective, PageComponent, ManyToManyComponent
   ],

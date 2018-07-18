@@ -3,8 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
-import {Operation} from "../crud.component";
-import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
+import {Operation} from "../../page.component";
 
 @Component({
   selector: 'portofino-crud-detail',

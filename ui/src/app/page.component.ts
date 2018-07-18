@@ -5,6 +5,7 @@ import {HttpClient} from "@angular/common/http";
 import {ContentDirective} from "./content.directive";
 import {Observable, Subscription} from "rxjs/index";
 import {map} from "rxjs/operators";
+import {ThemePalette} from "@angular/material/core/typings/common-behaviors/color";
 
 @Component({
   selector: 'portofino-page',
@@ -125,8 +126,50 @@ export abstract class Page {
     return this.configuration.children
   }
 
-  getButtons(list: string) {
-    //TODO
-    console.log("mah", this.constructor['__prop__metadata__']);
+  getButtons(list: string = 'default'): ButtonInfo[] | null {
+    //TODO handle inheritance using prototype chain, either here or in @Button when registering
+    const allButtons = this[BUTTONS];
+    return allButtons ? allButtons[list] : null;
   }
+}
+
+export class ButtonInfo {
+  list: string = 'default';
+  class: Function;
+  methodName: string;
+  propertyDescriptor: PropertyDescriptor;
+  color: ThemePalette;
+  action: (self, event: any | undefined) => void;
+  presentIf: (self) => boolean = () => true;
+  enabledIf: (self) => boolean = () => true;
+  icon: string;
+  text: string;
+}
+
+export const BUTTONS = "__portofinoButtons__";
+
+export function Button(info: ButtonInfo | any) {
+  return function (target, methodName: string, descriptor: PropertyDescriptor) {
+    info = Object.assign({}, new ButtonInfo(), info);
+    info.class = target.constructor;
+    info.methodName = methodName;
+    info.propertyDescriptor = descriptor;
+    info.action = (self, event) => {
+      self[methodName].call(self, event);
+    };
+    if(!target.hasOwnProperty(BUTTONS)) {
+      target[BUTTONS] = {};
+    }
+    if(!target[BUTTONS].hasOwnProperty(info.list)) {
+      target[BUTTONS][info.list] = [];
+    }
+    target[BUTTONS][info.list].push(info);
+  }
+}
+
+export class Operation {
+  name: string;
+  signature: string;
+  parameters: string[];
+  available: boolean;
 }

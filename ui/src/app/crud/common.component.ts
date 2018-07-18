@@ -1,7 +1,6 @@
 import {EventEmitter, Input, Output} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
-import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.component";
 import {
   ClassAccessor,
   deriveKind,
@@ -15,6 +14,7 @@ import {
 import * as moment from "moment";
 import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
+import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.common";
 
 export abstract class BaseDetailComponent {
 

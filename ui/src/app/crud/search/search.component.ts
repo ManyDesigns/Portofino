@@ -1,5 +1,4 @@
 import {Component, ContentChild, Input, OnInit, TemplateRef} from '@angular/core';
-import {Configuration, SelectionOption, SelectionProvider} from "../crud.component";
 import {
   ClassAccessor,
   deriveKind,
@@ -16,6 +15,7 @@ import {PortofinoService} from "../../portofino.service";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 import {SelectionModel} from "@angular/cdk/collections";
+import {Configuration, SelectionOption, SelectionProvider} from "../crud.common";
 
 @Component({
   selector: 'portofino-crud-search',

@@ -9,8 +9,7 @@
   <mat-checkbox *ngFor="let assoc of associations" [(ngModel)]="assoc.selected" [disabled]="!saveEnabled">
     {{assoc.key.label}}
   </mat-checkbox>
-  <button mat-raised-button color="primary" type="button" (click)="save()" *ngIf="saveEnabled && key" i18n>
-    <mat-icon>save</mat-icon>
-    Save
-  </button>
+  <ng-container *ngFor="let button of getButtons()">
+    <portofino-button [button]="button" [component]="this"></portofino-button>
+  </ng-container>
 </div>

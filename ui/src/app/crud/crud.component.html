@@ -1,23 +1,12 @@
 <h2>{{configuration.title}}</h2>
-<portofino-crud-search #search
+<portofino-crud-search
   *ngIf="isSearchView()"
   [classAccessor]="classAccessor" [configuration]="configuration" [sourceUrl]="sourceUrl"
   [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
   <ng-template #buttons>
-    <button mat-raised-button color="accent" (click)="showCreate()" *ngIf="createEnabled" i18n>
-      <mat-icon>add</mat-icon>
-      Create new
-    </button>
-    <button mat-raised-button color="primary" type="button" (click)="showBulkEdit(search.getSelectedIds())"
-            *ngIf="bulkEditEnabled" [disabled]="search.getSelectedIds().length == 0" i18n>
-      <mat-icon>edit</mat-icon>
-      Edit
-    </button>
-    <button mat-raised-button color="warn" type="button" (click)="delete(search.getSelectedIds(), search)"
-            *ngIf="bulkDeleteEnabled" [disabled]="search.getSelectedIds().length == 0" i18n>
-      <mat-icon>delete</mat-icon>
-      Delete
-    </button>
+    <ng-container *ngFor="let button of getButtons()">
+      <portofino-button [button]="button" [component]="this"></portofino-button>
+    </ng-container>
   </ng-template>
 </portofino-crud-search>
 <portofino-crud-detail

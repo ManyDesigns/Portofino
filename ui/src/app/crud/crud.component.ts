@@ -1,11 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
 import {PortofinoComponent} from "../portofino-app.component";
 import {Router} from "@angular/router";
 import {SearchComponent} from "./search/search.component";
-import {Page, PageChild, PageConfiguration} from "../page.component";
+import {Button, Operation, Page, PageChild, PageConfiguration} from "../page.component";
+import {Configuration, SelectionProvider} from "./crud.common";
 
 export abstract class CrudPage extends Page {
   id: string;
@@ -31,6 +32,8 @@ export class CrudComponent extends CrudPage implements OnInit {
 
   @Input()
   pageSize: number;
+  @ViewChild(SearchComponent)
+  search: SearchComponent;
 
   view: CrudView;
 
@@ -96,6 +99,9 @@ export class CrudComponent extends CrudPage implements OnInit {
     }
   }
 
+  @Button({
+    color: 'accent', enabledIf: (self) => self.createEnabled, icon: 'add', text: 'Create new'
+  })
   showCreate() {
     this.view = CrudView.CREATE;
   }
@@ -108,15 +114,25 @@ export class CrudComponent extends CrudPage implements OnInit {
     this.view = CrudView.SEARCH;
   }
 
-  showBulkEdit(selection: string[]) {
-    this.selection = selection;
+  @Button({
+    color: 'primary', icon: 'edit', text: 'Edit',
+    presentIf: (self) => self.bulkEditEnabled,
+    enabledIf: (self) => self.search && self.search.getSelectedIds().length > 0
+  })
+  showBulkEdit() {
+    this.selection = this.search.getSelectedIds();
     this.view = CrudView.BULK_EDIT;
   }
 
-  delete(selection: string[], search: SearchComponent) {
+  @Button({
+    color: 'warn', icon: 'delete', text: 'Delete',
+    presentIf: (self) => self.bulkDeleteEnabled,
+    enabledIf: (self) => self.search && self.search.getSelectedIds().length > 0
+  })
+  bulkDelete() {
     let params = new HttpParams();
-    selection.forEach(id => params = params.append("id", id));
-    this.http.delete(this.sourceUrl, { params: params }).subscribe(() => search.refreshSearch());
+    this.search.getSelectedIds().forEach(id => params = params.append("id", id));
+    this.http.delete(this.sourceUrl, { params: params }).subscribe(() => this.search.refreshSearch());
   }
 
   isCreateView() {
@@ -164,40 +180,6 @@ export class CrudComponent extends CrudPage implements OnInit {
   }
 }
 
-export class Configuration {
-  rowsPerPage: number;
-}
-
-export class SelectionProvider {
-  name: string;
-  fieldNames: string[];
-  displayMode: string;
-  searchDisplayMode: string;
-  options: SelectionOption[];
-}
-
-export class SelectionOption {
-  v: string;
-  l: string;
-  s: boolean;
-}
-
-export class Operation {
-  name: string;
-  signature: string;
-  parameters: string[];
-  available: boolean;
-}
-
 export enum CrudView {
   SEARCH, DETAIL, CREATE, BULK_EDIT
-}
-
-export class BlobFile {
-  lastModified: number;
-  lastModifiedDate: Date;
-  name: string;
-  size: number;
-  type: string;
-  code: string;
 }
