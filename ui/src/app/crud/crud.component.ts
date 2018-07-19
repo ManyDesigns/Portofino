@@ -103,14 +103,17 @@ export class CrudComponent extends CrudPage implements OnInit {
     color: 'accent', enabledIf: (self) => self.createEnabled, icon: 'add', text: 'Create new'
   })
   showCreate() {
+    this.allowEmbeddedComponents = false;
     this.view = CrudView.CREATE;
   }
 
   showDetail() {
+    this.allowEmbeddedComponents = true;
     this.view = CrudView.DETAIL;
   }
 
   showSearch() {
+    this.allowEmbeddedComponents = true;
     this.view = CrudView.SEARCH;
   }
 
@@ -121,6 +124,7 @@ export class CrudComponent extends CrudPage implements OnInit {
   })
   showBulkEdit() {
     this.selection = this.search.getSelectedIds();
+    this.allowEmbeddedComponents = false;
     this.view = CrudView.BULK_EDIT;
   }
 
@@ -133,6 +137,10 @@ export class CrudComponent extends CrudPage implements OnInit {
     let params = new HttpParams();
     this.search.getSelectedIds().forEach(id => params = params.append("id", id));
     this.http.delete(this.sourceUrl, { params: params }).subscribe(() => this.search.refreshSearch());
+  }
+
+  onEditModeChange(event) {
+    this.allowEmbeddedComponents = !event;
   }
 
   isCreateView() {

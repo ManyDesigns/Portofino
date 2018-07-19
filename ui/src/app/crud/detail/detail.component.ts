@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
@@ -18,6 +18,8 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   deleteEnabled: boolean;
 
   editMode = false;
+  @Output()
+  editModeChanges = new EventEmitter();
 
   operationsPath = '/:operations';
 
@@ -45,6 +47,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   edit() {
     this.editMode = true;
+    this.editModeChanges.emit(true);
     this.setupForm(this.object);
   }
 
@@ -56,6 +59,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   cancel() {
     if(this.editMode) {
       this.editMode = false;
+      this.editModeChanges.emit(false);
       this.setupForm(this.object);
     } else {
       this.close.emit();

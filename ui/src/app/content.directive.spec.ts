@@ -1,8 +1,8 @@
-import { ContentDirective } from './content.directive';
+import { MainContentDirective } from './content.directive';
 
 describe('ContentDirective', () => {
   it('should create an instance', () => {
-    const directive = new ContentDirective();
+    const directive = new MainContentDirective();
     expect(directive).toBeTruthy();
   });
 });

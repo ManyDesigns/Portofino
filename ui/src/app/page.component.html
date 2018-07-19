@@ -32,7 +32,12 @@
     </ng-container>
   </mat-sidenav>
   <mat-sidenav-content>
-    <ng-template portofino-content *ngIf="!error"></ng-template>
+    <ng-container *ngIf="!error">
+      <ng-template portofino-main-content></ng-template>
+      <div [hidden]="!page || !page.allowEmbeddedComponents">
+        <ng-template portofino-embedded-content></ng-template>
+      </div>
+    </ng-container>
     <div *ngIf="error" i18n>
       Page not found!
     </div>

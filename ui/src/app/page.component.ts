@@ -2,7 +2,7 @@ import {Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from 
 import {ActivatedRoute, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient} from "@angular/common/http";
-import {ContentDirective} from "./content.directive";
+import {EmbeddedContentDirective, MainContentDirective} from "./content.directive";
 import {Observable, Subscription} from "rxjs/index";
 import {map} from "rxjs/operators";
 import {ThemePalette} from "@angular/material/core/typings/common-behaviors/color";
@@ -14,8 +14,10 @@ import {ThemePalette} from "@angular/material/core/typings/common-behaviors/colo
 })
 export class PageComponent implements OnInit, OnDestroy {
 
-  @ViewChild(ContentDirective)
-  contentHost: ContentDirective;
+  @ViewChild(MainContentDirective)
+  contentHost: MainContentDirective;
+  @ViewChild(EmbeddedContentDirective)
+  embeddedContentHost: EmbeddedContentDirective;
 
   page: Page = null;
   error;
@@ -64,13 +66,15 @@ export class PageComponent implements OnInit, OnDestroy {
         //If we arrive here, there are no more children in the URL to process
         if(!embed) {
           this.page = page;
-          page.children.forEach(child => {
-            if(child.embedded) {
-              let newSegments = segments.slice(0, segments.length);
-              newSegments.push(new UrlSegment(child.path, {}));
-              this.loadPageInPath(path + `/${child.path}`, page, newSegments, newSegments.length, true);
-            }
-          })
+          if(page.allowEmbeddedComponents) {
+            page.children.forEach(child => {
+              if(child.embedded) {
+                let newSegments = segments.slice(0, segments.length);
+                newSegments.push(new UrlSegment(child.path, {}));
+                this.loadPageInPath(path + `/${child.path}`, page, newSegments, newSegments.length, true);
+              }
+            })
+          }
         }
       },
       error => this.handleErrorInLoadingPage(path, error));
@@ -93,10 +97,15 @@ export class PageComponent implements OnInit, OnDestroy {
 
           let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
 
-          let viewContainerRef = this.contentHost.viewContainerRef;
+          let viewContainerRef;
           if(!embed) {
-            viewContainerRef.clear(); //Remove all components
+            viewContainerRef = this.contentHost.viewContainerRef;
+            viewContainerRef.clear(); //Remove main component
+            if(this.embeddedContentHost) {
+              this.embeddedContentHost.viewContainerRef.clear();  //Remove embedded components
+            }
           } else {
+            viewContainerRef = this.embeddedContentHost.viewContainerRef;
             //TODO insert some kind of separator?
           }
 
@@ -135,6 +144,7 @@ export abstract class Page {
   url: string;
   segment: string;
   parent: Page;
+  allowEmbeddedComponents: boolean = true;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';

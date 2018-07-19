@@ -36,7 +36,7 @@ import {SearchComponent} from './crud/search/search.component';
 import {FieldComponent} from './crud/field.component';
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
-import {ContentDirective} from './content.directive';
+import {EmbeddedContentDirective, MainContentDirective} from './content.directive';
 import {PageComponent} from './page.component';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./crud/blob-field.component";
@@ -48,7 +48,7 @@ import {ButtonComponent} from "./button.component";
   declarations: [
     PortofinoAppComponent, ButtonComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent,
     FieldComponent, BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    ContentDirective, PageComponent, ManyToManyComponent
+    MainContentDirective, EmbeddedContentDirective, PageComponent, ManyToManyComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
