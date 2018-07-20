@@ -7,12 +7,12 @@
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
-      "prefix": "portofino",
+      "schematics": {},
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist/ui",
             "index": "src/index.html",
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
@@ -140,6 +140,46 @@
           "options": {
             "tsConfig": [
               "e2e/tsconfig.e2e.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    },
+    "portofino": {
+      "root": "projects/portofino",
+      "sourceRoot": "projects/portofino/src",
+      "projectType": "library",
+      "prefix": "portofino",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/portofino/tsconfig.lib.json",
+            "project": "projects/portofino/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "project": "projects/portofino/ng-package.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/portofino/src/test.ts",
+            "tsConfig": "projects/portofino/tsconfig.spec.json",
+            "karmaConfig": "projects/portofino/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/portofino/tsconfig.lib.json",
+              "projects/portofino/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"

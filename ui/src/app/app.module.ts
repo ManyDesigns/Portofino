@@ -1,8 +1,6 @@
 import {Component, NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
-import {PortofinoModule} from "./portofino.module";
-import {PortofinoAppComponent} from "./portofino-app.component";
-import {PageComponent} from "./page.component";
+import {PortofinoModule, PortofinoAppComponent, PageComponent} from 'portofino';
 
 @Component({
   selector: 'portofino-hello',

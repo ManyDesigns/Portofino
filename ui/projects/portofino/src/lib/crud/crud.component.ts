@@ -99,8 +99,12 @@ export class CrudComponent extends CrudPage implements OnInit {
     }
   }
 
+  static createEnabled(self: CrudComponent) {
+    return self.createEnabled;
+  }
+
   @Button({
-    color: 'accent', enabledIf: (self) => self.createEnabled, icon: 'add', text: 'Create new'
+    color: 'accent', enabledIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
   })
   showCreate() {
     this.allowEmbeddedComponents = false;
@@ -117,10 +121,18 @@ export class CrudComponent extends CrudPage implements OnInit {
     this.view = CrudView.SEARCH;
   }
 
+  static bulkEditPresent(self: CrudComponent) {
+    return self.bulkEditEnabled;
+  }
+
+  static bulkButtonsEnabled(self: CrudComponent) {
+    return self.search && self.search.getSelectedIds().length > 0;
+  }
+
   @Button({
     color: 'primary', icon: 'edit', text: 'Edit',
-    presentIf: (self) => self.bulkEditEnabled,
-    enabledIf: (self) => self.search && self.search.getSelectedIds().length > 0
+    presentIf: CrudComponent.bulkEditPresent,
+    enabledIf: CrudComponent.bulkButtonsEnabled
   })
   showBulkEdit() {
     this.selection = this.search.getSelectedIds();
@@ -128,10 +140,14 @@ export class CrudComponent extends CrudPage implements OnInit {
     this.view = CrudView.BULK_EDIT;
   }
 
+  static bulkDeletePresent(self: CrudComponent) {
+    return self.bulkDeleteEnabled;
+  }
+
   @Button({
     color: 'warn', icon: 'delete', text: 'Delete',
-    presentIf: (self) => self.bulkDeleteEnabled,
-    enabledIf: (self) => self.search && self.search.getSelectedIds().length > 0
+    presentIf: CrudComponent.bulkDeletePresent,
+    enabledIf: CrudComponent.bulkButtonsEnabled
   })
   bulkDelete() {
     let params = new HttpParams();

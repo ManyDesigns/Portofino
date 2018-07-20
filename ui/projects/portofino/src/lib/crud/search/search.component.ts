@@ -298,7 +298,7 @@ export class SearchComponent implements OnInit {
 
 }
 
-class SearchResults {
+export class SearchResults {
   recordsReturned: number;
   totalRecords: number;
   startIndex: number;

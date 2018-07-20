@@ -11,7 +11,7 @@ import {
   isRequired,
   Property
 } from "../class-accessor";
-import * as moment from "moment";
+import moment from 'moment-es6';
 import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.common";
@@ -50,9 +50,9 @@ export abstract class BaseDetailComponent {
     return !isEnabled(property);
   }
 
-  protected abstract isEditable(property: Property): boolean;
+  abstract isEditable(property: Property): boolean;
 
-  protected abstract isEditEnabled(): boolean;
+  abstract isEditEnabled(): boolean;
 
   protected setupForm(object) {
     this.object = object;

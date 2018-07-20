@@ -27,11 +27,11 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     super(http, portofino);
   }
 
-  protected isEditable(property: Property): boolean {
+  isEditable(property: Property): boolean {
     return isUpdatable(property);
   }
 
-  protected isEditEnabled(): boolean {
+  isEditEnabled(): boolean {
     return this.editMode;
   }
 

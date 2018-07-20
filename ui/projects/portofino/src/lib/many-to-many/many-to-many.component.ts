@@ -60,12 +60,20 @@ export class ManyToManyComponent extends Page implements OnInit {
     });
   }
 
+  static saveEnabled(self: ManyToManyComponent) {
+    return self.saveEnabled;
+  }
+
+  static key(self: ManyToManyComponent) {
+    return self.key;
+  }
+
   @Button({
     icon: "save",
     text: "Save",
     color: "primary",
-    presentIf: (self) => self.saveEnabled,
-    enabledIf: (self) => self.key
+    presentIf: ManyToManyComponent.saveEnabled,
+    enabledIf: ManyToManyComponent.key
   })
   save() {
     if(!this.key) {
@@ -107,16 +115,16 @@ export class ManyToManyComponent extends Page implements OnInit {
 
 }
 
-class Keys {
+export class Keys {
   keys: Key[];
 }
 
-class Key {
+export class Key {
   key: string;
   label: string;
 }
 
-class Association {
+export class Association {
   key: Key;
   selected: boolean;
 }
