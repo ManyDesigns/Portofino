@@ -1,11 +1,14 @@
 import {Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {EmbeddedContentDirective, MainContentDirective} from "./content.directive";
 import {Observable, Subscription} from "rxjs/index";
-import {map} from "rxjs/operators";
+import {catchError, map, mergeMap} from "rxjs/operators";
 import {ThemePalette} from "@angular/material/core/typings/common-behaviors/color";
+import {PortofinoService} from "./portofino.service";
+import {of} from "rxjs/index";
+import {NO_AUTH_HEADER} from "./security/authentication.service";
 
 @Component({
   selector: 'portofino-page',
@@ -25,7 +28,8 @@ export class PageComponent implements OnInit, OnDestroy {
   protected subscription: Subscription;
 
   constructor(protected route: ActivatedRoute, protected http: HttpClient,
-              protected componentFactoryResolver: ComponentFactoryResolver) { }
+              protected componentFactoryResolver: ComponentFactoryResolver,
+              protected portofino: PortofinoService) { }
 
   ngOnInit() {
     this.subscription = this.route.url.subscribe(segment => {
@@ -42,9 +46,8 @@ export class PageComponent implements OnInit, OnDestroy {
   }
 
   protected loadPageInPath(path: string, parent: Page, segments: UrlSegment[], index: number, embed: boolean) {
-    this.loadPage(path, embed).subscribe(
+    this.loadPage(path, parent, embed).subscribe(
       (page: Page) => {
-        page.parent = parent;
         page.baseUrl = '/' + segments.slice(0, index).join('/');
         page.url = page.baseUrl;
         for(let i = index; i < segments.length; i++) {
@@ -66,18 +69,31 @@ export class PageComponent implements OnInit, OnDestroy {
         //If we arrive here, there are no more children in the URL to process
         if(!embed) {
           this.page = page;
-          if(page.allowEmbeddedComponents) {
-            page.children.forEach(child => {
-              if(child.embedded) {
-                let newSegments = segments.slice(0, segments.length);
-                newSegments.push(new UrlSegment(child.path, {}));
-                this.loadPageInPath(path + `/${child.path}`, page, newSegments, newSegments.length, true);
-              }
-            })
+          page.children.forEach(child => {
+            this.checkAccessibility(page, child);
+            if(page.allowEmbeddedComponents && child.embedded) {
+              let newSegments = segments.slice(0, segments.length);
+              newSegments.push(new UrlSegment(child.path, {}));
+              this.loadPageInPath(path + `/${child.path}`, page, newSegments, newSegments.length, true);
+            }
+          });
+          if(page.parent) {
+            page.parent.children.forEach(child => {
+              this.checkAccessibility(page.parent, child);
+            });
           }
         }
       },
       error => this.handleErrorInLoadingPage(path, error));
+  }
+
+  checkAccessibility(parent: Page, child: PageChild) {
+    let dummy = new DummyPage(this.portofino, this.http);
+    dummy.parent = parent;
+    this.loadPageConfiguration(parent.path + '/' + child.path).pipe(mergeMap(config => {
+      dummy.configuration = config;
+      return dummy.accessPermitted;
+    })).subscribe(flag => child.accessible = flag);
   }
 
   private handleErrorInLoadingPage(path, error) {
@@ -85,42 +101,48 @@ export class PageComponent implements OnInit, OnDestroy {
     this.error = error;
   }
 
-  protected loadPage(path: string, embed: boolean): Observable<Page> {
-    return this.http.get<PageConfiguration>(`pages${path}/config.json`).pipe(
-      map(
-        config => {
-          const componentType = PortofinoAppComponent.components[config.type];
-          if (!componentType) {
-            this.error = Error("Unknown component type: " + config.type);
-            return;
-          }
+  protected loadPage(path: string, parent: Page, embed: boolean): Observable<Page> {
+    return this.loadPageConfiguration(path).pipe(
+      mergeMap(config => this.createPageComponent(config, path, parent, embed)));
+  }
 
-          let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
+  private loadPageConfiguration(path: string) {
+    return this.http.get<PageConfiguration>(`pages${path}/config.json`);
+  }
 
-          let viewContainerRef;
-          if(!embed) {
-            viewContainerRef = this.contentHost.viewContainerRef;
-            viewContainerRef.clear(); //Remove main component
-            if(this.embeddedContentHost) {
-              this.embeddedContentHost.viewContainerRef.clear();  //Remove embedded components
-            }
-          } else {
-            viewContainerRef = this.embeddedContentHost.viewContainerRef;
-            //TODO insert some kind of separator?
-          }
+  protected createPageComponent(config: PageConfiguration, path: string, parent: Page, embed: boolean): Observable<Page> {
+    const componentType = PortofinoAppComponent.components[config.type];
+    if (!componentType) {
+      this.error = Error("Unknown component type: " + config.type);
+      return;
+    }
 
-          let componentRef = viewContainerRef.createComponent(componentFactory);
-          const component = <Page>componentRef.instance;
-          component.configuration = config;
-          component.path = path;
-          const lastIndexOf = path.lastIndexOf('/');
-          if(lastIndexOf >= 0) {
-            component.segment = path.substring(lastIndexOf + 1);
-          } else {
-            component.segment = path;
-          }
-          return component;
-        }));
+    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
+
+    let viewContainerRef;
+    if (!embed) {
+      viewContainerRef = this.contentHost.viewContainerRef;
+      viewContainerRef.clear(); //Remove main component
+      if (this.embeddedContentHost) {
+        this.embeddedContentHost.viewContainerRef.clear();  //Remove embedded components
+      }
+    } else {
+      viewContainerRef = this.embeddedContentHost.viewContainerRef;
+      //TODO insert some kind of separator?
+    }
+
+    let componentRef = viewContainerRef.createComponent(componentFactory);
+    const component = <Page>componentRef.instance;
+    component.configuration = config;
+    component.path = path;
+    const lastIndexOf = path.lastIndexOf('/');
+    if (lastIndexOf >= 0) {
+      component.segment = path.substring(lastIndexOf + 1);
+    } else {
+      component.segment = path;
+    }
+    component.parent = parent;
+    return component.prepare();
   }
 }
 
@@ -128,12 +150,15 @@ export class PageConfiguration {
   type: string;
   title: string;
   children: PageChild[];
+  source: string;
+  securityCheckPath: string = '/:page';
 }
 
 export class PageChild {
   path: string;
   title: string;
   embedded: boolean;
+  accessible: boolean;
 }
 
 export abstract class Page {
@@ -148,6 +173,8 @@ export abstract class Page {
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
+
+  protected constructor(protected portofino: PortofinoService, protected http: HttpClient) {}
 
   consumePathSegment(fragment: string): boolean {
     return true;
@@ -165,6 +192,46 @@ export abstract class Page {
     //TODO handle inheritance using prototype chain, either here or in @Button when registering
     const allButtons = this[BUTTONS];
     return allButtons ? allButtons[list] : null;
+  }
+
+  prepare(): Observable<Page> {
+    return this.checkAccess(true).pipe(map(() => this));
+  }
+
+  checkAccess(askForLogin: boolean): Observable<any> {
+    let headers = new HttpHeaders();
+    if(!askForLogin) {
+      headers = headers.set(NO_AUTH_HEADER, 'true');
+    }
+    return this.http.get<any>(
+      this.computeSourceUrl() + (this.configuration.securityCheckPath || '/:page'),
+      { headers: headers });
+  }
+
+  get accessPermitted(): Observable<boolean> {
+    return this.checkAccess(false).pipe(map(() => true), catchError(() => of(false)));
+  }
+
+  computeSourceUrl() {
+    let source = "";
+    if(!this.configuration.source || !this.configuration.source.startsWith('/') ||
+       !source.startsWith('http://') || !source.startsWith('https://')) {
+      if(this.parent) {
+        source = this.parent.computeSourceUrl() + '/';
+      }
+    }
+    if(!source) {
+      source = this.portofino.apiPath;
+    }
+    return (source + (this.configuration.source ? this.configuration.source : ''))
+      //replace double slash, but not in http://
+      .replace(new RegExp("([^:])//"), '$1/');
+  }
+}
+
+class DummyPage extends Page {
+  constructor(protected portofino: PortofinoService, protected http: HttpClient) {
+    super(portofino, http);
   }
 }
 

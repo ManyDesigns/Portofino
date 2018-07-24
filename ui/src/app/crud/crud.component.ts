@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
 import {PortofinoComponent} from "../portofino-app.component";
@@ -8,22 +8,17 @@ import {SearchComponent} from "./search/search.component";
 import {Button, Operation, Page, PageChild, PageConfiguration} from "../page.component";
 import {Configuration, SelectionProvider} from "./crud.common";
 
-export abstract class CrudPage extends Page {
-  id: string;
-  sourceUrl: string;
-  abstract computeSource();
-}
-
 @Component({
   selector: 'portofino-crud',
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.css']
 })
 @PortofinoComponent({ name: 'crud' })
-export class CrudComponent extends CrudPage implements OnInit {
+export class CrudComponent extends Page implements OnInit {
 
   @Input()
   configuration: PageConfiguration & any;
+  sourceUrl: string;
 
   classAccessor: ClassAccessor;
   selectionProviders: SelectionProvider[];
@@ -35,6 +30,7 @@ export class CrudComponent extends CrudPage implements OnInit {
   @ViewChild(SearchComponent)
   search: SearchComponent;
 
+  id: string;
   view: CrudView;
 
   createEnabled: boolean;
@@ -43,12 +39,12 @@ export class CrudComponent extends CrudPage implements OnInit {
 
   selection: string[];
 
-  constructor(private http: HttpClient, public portofino: PortofinoService, private router: Router) {
-    super();
+  constructor(protected http: HttpClient, public portofino: PortofinoService, private router: Router) {
+    super(portofino, http);
   }
 
   ngOnInit() {
-    this.sourceUrl = this.computeSource();
+    this.sourceUrl = this.computeBaseSourceUrl();
     this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
       classAccessor => this.http.get<Configuration>(this.sourceUrl + this.configurationPath).subscribe(
         configuration => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
@@ -60,29 +56,17 @@ export class CrudComponent extends CrudPage implements OnInit {
     });
   }
 
-  computeSource() {
-    let source = "";
-    if(!this.configuration.source || !this.configuration.source.startsWith('/')) {
-      let parent = this.parent;
-      while(parent) {
-        if(parent instanceof CrudPage) {
-          source = parent.computeSource();
-          if(parent.id) {
-            source += `/${parent.id}`;
-          }
-          source += '/';
-          break;
-        } else {
-          parent = parent.parent;
-        }
-      }
+  computeBaseSourceUrl() {
+    return super.computeSourceUrl();
+  }
+
+  computeSourceUrl() {
+    const baseSourceUrl = this.computeBaseSourceUrl();
+    if(this.id) {
+      return baseSourceUrl + '/' + this.id;
+    } else {
+      return baseSourceUrl;
     }
-    if(!source) {
-      source = this.portofino.apiPath;
-    }
-    return (source + (this.configuration.source ? this.configuration.source : ''))
-      //replace double slash, but not in http://
-      .replace(new RegExp("([^:])//"), '$1/');
   }
 
   protected init(classAccessor, configuration, selectionProviders: SelectionProvider[]) {
