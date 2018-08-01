@@ -82,15 +82,19 @@ export class AuthenticationService {
   }
 
   withAuthenticationHeader(req: HttpRequest<any>) {
-    if(!this.storage.get('jwt')) {
+    if(!this.jsonWebToken) {
       return req;
     }
     req = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${this.storage.get('jwt')}`
+        Authorization: `Bearer ${this.jsonWebToken}`
       }
     });
     return req;
+  }
+
+  public get jsonWebToken() {
+    return this.storage.get('jwt');
   }
 
   login(username, password) {
@@ -98,14 +102,14 @@ export class AuthenticationService {
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .set(NO_AUTH_HEADER, 'true');
     return this.http.post(
-      `${this.portofino.apiPath}${this.loginPath}`,
+      `${this.portofino.apiRoot}${this.loginPath}`,
       new HttpParams({fromObject: {"username": username, "password": password}}),
       {headers: headers}
     );
   }
 
   logout() {
-    const url = `${this.portofino.apiPath}${this.loginPath}/${this.storage.get('sessionId')}`;
+    const url = `${this.portofino.apiRoot}${this.loginPath}/${this.storage.get('sessionId')}`;
     this.http.delete(url).subscribe(value => {
       this.removeAuthenticationInfo();
       this.router.navigateByUrl(this.router.url);

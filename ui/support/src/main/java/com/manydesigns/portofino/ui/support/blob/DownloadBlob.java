@@ -24,6 +24,9 @@ public class DownloadBlob {
     if(baseUri == null) {
       baseUri = "http://localhost:8080/api";
     }
+    if(path.startsWith(baseUri)) {
+      path = path.substring(baseUri.length());
+    }
     WebTarget target = c.target(baseUri);
     Invocation.Builder req = target.path(path).request();
     if(token != null) {

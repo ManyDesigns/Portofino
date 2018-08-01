@@ -16,6 +16,7 @@ import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 import {SelectionModel} from "@angular/cdk/collections";
 import {Configuration, SelectionOption, SelectionProvider} from "../crud.common";
+import {AuthenticationService} from "../../security/authentication.service";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -54,7 +55,7 @@ export class SearchComponent implements OnInit {
   @ContentChild("buttons")
   buttons: TemplateRef<any>;
 
-  constructor(private http: HttpClient, private portofino: PortofinoService) {}
+  constructor(private http: HttpClient, private portofino: PortofinoService, private auth: AuthenticationService) {}
 
   ngOnInit() {
     const formControls = {};
@@ -294,6 +295,17 @@ export class SearchComponent implements OnInit {
 
   getSelectedIds(): string[] {
     return this.selection.selected.map(row => row.__rowKey);
+  }
+
+  //Blobs
+  getBlobUrl(id: string, property: Property) {
+    const blobUrl = `${this.sourceUrl}/${id}/:blob/${property.name}`;
+    if(this.portofino.localApiPath) {
+      return `${this.portofino.localApiPath}/blobs?path=${encodeURIComponent(blobUrl)}` +
+        `&token=${encodeURIComponent(this.auth.jsonWebToken)}`;
+    } else {
+      return blobUrl;
+    }
   }
 
 }

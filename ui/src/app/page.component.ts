@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ActivatedRoute, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
@@ -15,7 +15,7 @@ import {NO_AUTH_HEADER} from "./security/authentication.service";
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.css']
 })
-export class PageComponent implements OnInit, OnDestroy {
+export class PageComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild(MainContentDirective)
   contentHost: MainContentDirective;
@@ -31,7 +31,7 @@ export class PageComponent implements OnInit, OnDestroy {
               protected componentFactoryResolver: ComponentFactoryResolver,
               protected portofino: PortofinoService) { }
 
-  ngOnInit() {
+  ngAfterViewInit() {
     this.subscription = this.route.url.subscribe(segment => {
       this.page = null;
       this.error = null;
@@ -221,7 +221,7 @@ export abstract class Page {
       }
     }
     if(!source) {
-      source = this.portofino.apiPath;
+      source = this.portofino.apiRoot;
     }
     return (source + (this.configuration.source ? this.configuration.source : ''))
       //replace double slash, but not in http://

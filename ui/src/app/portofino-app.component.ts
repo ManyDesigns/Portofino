@@ -13,14 +13,16 @@ export class PortofinoAppComponent implements OnInit {
 
   title = 'Portofino UI';
   @Input()
-  apiPath: string = 'http://localhost:8080/demo-tt/api/';
+  apiRoot: string = 'http://localhost:8080/demo-tt/api/'; //TODO @Input() does not appear to work!
 
-  constructor(public portofinoService: PortofinoService, public authenticationService: AuthenticationService) {}
+  constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService) {}
 
   ngOnInit(): void {
-    if(this.apiPath) {
-      this.portofinoService.apiPath = this.apiPath;
+    if(this.apiRoot) {
+      this.portofino.defaultApiRoot = this.apiRoot;
+      this.portofino.localApiPath = null;
     }
+    this.portofino.init();
   }
 }
 

@@ -20,7 +20,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>Jersey Web Application</servlet-name>
-    <url-pattern>/api/*</url-pattern>
+    <url-pattern>/portofino/*</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>
