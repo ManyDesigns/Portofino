@@ -2,7 +2,7 @@
   <div class="mat-form-field-wrapper">
     <div class="mat-form-field-flex">
       <span *ngIf="control.value && control.value[0]">
-        <a *ngIf="!enabled && control.value[0].code && objectUrl; else noUrl" [href]="objectUrl + '/:blob/' + property.name">
+        <a *ngIf="!enabled && control.value[0].code && objectUrl; else noUrl" [href]="blobUrl">
           {{control.value[0].name}}
         </a>
         <ng-template #noUrl>

@@ -40,7 +40,7 @@
             {{row[property.name].displayValue || row[property.name].value}}
           </a>
           <span *ngIf="!property.key">
-            <a *ngIf="property.kind == 'blob'" [href]="sourceUrl + '/' + row.__rowKey + '/:blob/' + property.name">
+            <a *ngIf="property.kind == 'blob'" [href]="getBlobUrl(row.__rowKey, property)">
               {{row[property.name].displayValue}}
             </a>
             <ng-container *ngIf="property.kind != 'blob'">

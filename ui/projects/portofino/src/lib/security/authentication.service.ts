@@ -1,14 +1,13 @@
 import {Inject, Injectable, InjectionToken} from '@angular/core';
 import {
   HttpClient,
-  HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest
+  HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpParams, HttpRequest
 } from "@angular/common/http";
 import {TokenStorageService} from "./token-storage.service";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {Observable, throwError} from "rxjs";
 import { catchError, map, mergeMap } from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
-import {EMPTY} from "rxjs/internal/observable/empty";
 import {Router} from "@angular/router";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
@@ -30,16 +29,8 @@ export class AuthenticationService {
   }
 
   request(req: HttpRequest<any>, observable: Observable<HttpEvent<any>>): Observable<HttpEvent<any>> {
-    if(this.dialogRef) {
-      //We're already asking for credentials
-      return observable;
-    }
     return observable.pipe(catchError((error) => {
       if (error.status === 401) {
-        if(this.dialogRef) {
-          //We're already asking for credentials
-          return EMPTY;
-        }
         this.removeAuthenticationInfo();
         return this.askForCredentials().pipe(
           map(result => {
@@ -54,7 +45,9 @@ export class AuthenticationService {
   }
 
   protected askForCredentials() {
-    this.dialogRef = this.dialog.open(this.component);
+    if(!this.dialogRef) {
+      this.dialogRef = this.dialog.open(this.component);
+    }
     return this.dialogRef.afterClosed().pipe(map(result => {
       this.dialogRef = null;
       if (result && result.jwt) {
@@ -89,27 +82,34 @@ export class AuthenticationService {
   }
 
   withAuthenticationHeader(req: HttpRequest<any>) {
-    if(!this.storage.get('jwt')) {
+    if(!this.jsonWebToken) {
       return req;
     }
     req = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${this.storage.get('jwt')}`
+        Authorization: `Bearer ${this.jsonWebToken}`
       }
     });
     return req;
   }
 
+  public get jsonWebToken() {
+    return this.storage.get('jwt');
+  }
+
   login(username, password) {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .set(NO_AUTH_HEADER, 'true');
     return this.http.post(
-      `${this.portofino.apiPath}${this.loginPath}`,
+      `${this.portofino.apiRoot}${this.loginPath}`,
       new HttpParams({fromObject: {"username": username, "password": password}}),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    )
+      {headers: headers}
+    );
   }
 
   logout() {
-    const url = `${this.portofino.apiPath}${this.loginPath}/${this.storage.get('sessionId')}`;
+    const url = `${this.portofino.apiRoot}${this.loginPath}/${this.storage.get('sessionId')}`;
     this.http.delete(url).subscribe(value => {
       this.removeAuthenticationInfo();
       this.router.navigateByUrl(this.router.url);
@@ -124,11 +124,17 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     req = this.authenticationService.withAuthenticationHeader(req);
-    let observable = next.handle(req);
-    return this.authenticationService.request(req, observable);
+    if(req.headers.has(NO_AUTH_HEADER)) {
+      req = req.clone({ headers: req.headers.delete(NO_AUTH_HEADER) });
+      return next.handle(req);
+    } else {
+      return this.authenticationService.request(req, next.handle(req));
+    }
   }
 }
 
 export class UserInfo {
   constructor(public displayName: string) {}
 }
+
+export const NO_AUTH_HEADER = "portofino-no-auth";

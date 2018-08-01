@@ -2,7 +2,6 @@ import {Component, Input, OnInit} from '@angular/core';
 import {PortofinoComponent} from "../portofino-app.component";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {CrudPage} from "../crud/crud.component";
 import {FormControl} from "@angular/forms";
 import {MatSnackBar} from "@angular/material";
 import {Button, Operation, Page, PageConfiguration} from "../page.component";
@@ -26,8 +25,8 @@ export class ManyToManyComponent extends Page implements OnInit {
 
   readonly associationsPath = "/:availableAssociations";
 
-  constructor(private http: HttpClient, public portofino: PortofinoService, private snackBar: MatSnackBar) {
-    super();
+  constructor(protected http: HttpClient, public portofino: PortofinoService, private snackBar: MatSnackBar) {
+    super(portofino, http);
   }
 
   ngOnInit() {
@@ -48,7 +47,7 @@ export class ManyToManyComponent extends Page implements OnInit {
         });
       });
     });
-    this.sourceUrl = this.computeSource();
+    this.sourceUrl = this.computeSourceUrl();
     this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
       this.saveEnabled = ops.some(op => op.signature == "POST" && op.available);
     });
@@ -87,32 +86,6 @@ export class ManyToManyComponent extends Page implements OnInit {
       this.snackBar.open('Error', null, { duration: 10000, verticalPosition: 'top' });
     });
   }
-
-  computeSource() {
-    let source = "";
-    if(!this.configuration.source || !this.configuration.source.startsWith('/')) {
-      let parent = this.parent;
-      while(parent) {
-        if(parent instanceof CrudPage) {
-          source = parent.computeSource();
-          if(parent.id) {
-            source += `/${parent.id}`;
-          }
-          source += '/';
-          break;
-        } else {
-          parent = parent.parent;
-        }
-      }
-    }
-    if(!source) {
-      source = this.portofino.apiPath;
-    }
-    return (source + (this.configuration.source ? this.configuration.source : ''))
-    //replace double slash, but not in http://
-      .replace(new RegExp("([^:])//"), '$1/');
-  }
-
 }
 
 export class Keys {

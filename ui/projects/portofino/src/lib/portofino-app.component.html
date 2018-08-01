@@ -13,4 +13,4 @@
     <button mat-button (click)="authenticationService.showLoginDialog()" i18n>Sign in</button>
   </ng-container>
 </mat-toolbar>
-<router-outlet></router-outlet>
+<router-outlet *ngIf="portofino.apiRoot"></router-outlet>
