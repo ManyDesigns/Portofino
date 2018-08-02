@@ -63,8 +63,8 @@ import {ButtonComponent} from "./button.component";
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService }],
-  bootstrap: [PortofinoAppComponent],
-  entryComponents: [LoginComponent, CrudComponent, ManyToManyComponent]
+  entryComponents: [LoginComponent, CrudComponent, ManyToManyComponent],
+  exports: [PortofinoAppComponent]
 })
 export class PortofinoModule {
   static loginComponent() {

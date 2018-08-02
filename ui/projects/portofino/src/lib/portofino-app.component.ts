@@ -11,9 +11,10 @@ export class PortofinoAppComponent implements OnInit {
 
   static components: any = {};
 
-  title = 'Portofino UI';
   @Input()
-  apiRoot: string = 'http://localhost:8080/demo-tt/api/'; //TODO @Input() does not appear to work!
+  title = 'Portofino';
+  @Input()
+  apiRoot: string;
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService) {}
 

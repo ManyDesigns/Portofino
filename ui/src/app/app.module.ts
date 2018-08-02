@@ -8,14 +8,20 @@ import {PortofinoModule, PortofinoAppComponent, PageComponent} from 'portofino';
 })
 export class HelloPortofino {}
 
+@Component({
+  selector: 'my-app',
+  template: `<portofino-app title="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
+})
+export class AppComponent {}
+
 @NgModule({
-  declarations: [HelloPortofino],
+  declarations: [AppComponent, HelloPortofino],
   imports: [
     RouterModule.forRoot([
       { path: "start", component: HelloPortofino }, //TODO custom routes file
       { path: "**", component: PageComponent}], { onSameUrlNavigation: "reload", enableTracing: false }),
     PortofinoModule
   ],
-  bootstrap: [PortofinoAppComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
