@@ -1,7 +1,7 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {NgModule} from '@angular/core';
+import {ModuleWithProviders, NgModule} from '@angular/core';
 import {PortofinoAppComponent} from './portofino-app.component';
 import {CrudComponent} from './crud/crud.component';
 import {PortofinoService} from './portofino.service';
@@ -71,7 +71,7 @@ export class PortofinoModule {
     return LoginComponent;
   }
 
-  static withRoutes(routes: Routes) {
+  static withRoutes(routes: Routes): (ModuleWithProviders | PortofinoModule)[] {
     let defaultRoutes = [{ path: "**", component: PageComponent}];
     return [RouterModule.forRoot(
       routes.concat(defaultRoutes),
