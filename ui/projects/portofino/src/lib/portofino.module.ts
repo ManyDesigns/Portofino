@@ -79,3 +79,7 @@ export class PortofinoModule {
       PortofinoModule];
   }
 }
+
+export function portofinoModuleWithRoutes(routes: Routes) {
+  return PortofinoModule.withRoutes(routes);
+}

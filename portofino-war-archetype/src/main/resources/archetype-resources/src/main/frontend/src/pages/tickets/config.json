@@ -1,0 +1,7 @@
+{
+  "title": "Tickets",
+  "type": "crud",
+  "children": [],
+  "detailChildren": [{"path": "attachments", "title": "attachments"}],
+  "source": "tickets"
+}

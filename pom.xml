@@ -143,7 +143,6 @@
         <module>portofino-openid</module>
         <module>portofino-quartz</module>
         <!-- UI -->
-        <module>ui/support</module>
         <module>ui</module>
         <!-- Archetypes -->
         <module>portofino-war-archetype</module>

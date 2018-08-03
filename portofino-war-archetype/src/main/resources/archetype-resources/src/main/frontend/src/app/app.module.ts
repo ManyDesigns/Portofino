@@ -19,7 +19,7 @@ export class AppComponent {}
   imports: [
     RouterModule.forRoot(
       [{ path: "start", component: HelloPortofino },
-              { path: "**", component: PageComponent}],
+        { path: "**", component: PageComponent}],
       { onSameUrlNavigation: "reload", enableTracing: false }),
     PortofinoModule
   ],

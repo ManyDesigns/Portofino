@@ -9,16 +9,12 @@
     <version>4.2.4-SNAPSHOT</version>
   </parent>
   <artifactId>portofino-angular-ui</artifactId>
-  <packaging>war</packaging>
+  <packaging>pom</packaging>
   <url>http://www.manydesigns.com/</url>
 
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>portofino-angular-ui-support</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>support</module>
+  </modules>
 
   <build>
     <plugins>
