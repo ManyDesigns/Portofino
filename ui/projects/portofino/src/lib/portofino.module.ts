@@ -31,7 +31,7 @@ import {
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
-import {RouterModule} from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './crud/search/search.component';
 import {FieldComponent} from './crud/field.component';
 import {DetailComponent} from './crud/detail/detail.component';
@@ -69,5 +69,13 @@ import {ButtonComponent} from "./button.component";
 export class PortofinoModule {
   static loginComponent() {
     return LoginComponent;
+  }
+
+  static withRoutes(routes: Routes) {
+    let defaultRoutes = [{ path: "**", component: PageComponent}];
+    return [RouterModule.forRoot(
+      routes.concat(defaultRoutes),
+      { onSameUrlNavigation: "reload", enableTracing: false }),
+      PortofinoModule];
   }
 }

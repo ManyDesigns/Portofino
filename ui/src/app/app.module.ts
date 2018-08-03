@@ -1,6 +1,5 @@
 import {Component, NgModule} from '@angular/core';
-import {RouterModule} from '@angular/router';
-import {PortofinoModule, PortofinoAppComponent, PageComponent} from 'portofino';
+import {PortofinoModule} from 'portofino';
 
 @Component({
   selector: 'portofino-hello',
@@ -17,10 +16,7 @@ export class AppComponent {}
 @NgModule({
   declarations: [AppComponent, HelloPortofino],
   imports: [
-    RouterModule.forRoot([
-      { path: "start", component: HelloPortofino }, //TODO custom routes file
-      { path: "**", component: PageComponent}], { onSameUrlNavigation: "reload", enableTracing: false }),
-    PortofinoModule
+    PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }])
   ],
   bootstrap: [AppComponent]
 })
