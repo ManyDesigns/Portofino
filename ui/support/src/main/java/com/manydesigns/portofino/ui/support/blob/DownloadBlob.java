@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.ui.support.blob;
 
+import com.manydesigns.portofino.ui.support.ApiInfo;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,6 +12,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 @Path("blobs")
 public class DownloadBlob {
@@ -17,13 +20,13 @@ public class DownloadBlob {
   @Context
   protected ServletContext servletContext;
 
+  @Context
+  protected UriInfo uriInfo;
+
   @GET
   public Response download(@QueryParam("path") String path, @QueryParam("token") String token) {
     Client c = ClientBuilder.newClient();
-    String baseUri = servletContext.getInitParameter("api-root");
-    if(baseUri == null) {
-      baseUri = "http://localhost:8080/api";
-    }
+    String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
     if(path.startsWith(baseUri)) {
       path = path.substring(baseUri.length());
     }
@@ -34,5 +37,6 @@ public class DownloadBlob {
     }
     return req.get();
   }
+
 
 }
