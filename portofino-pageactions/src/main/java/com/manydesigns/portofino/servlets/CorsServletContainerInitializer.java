@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.servlets;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,10 @@ public class CorsServletContainerInitializer implements ServletContainerInitiali
             }
             corsFilter.setInitParameter("cors.allowed.headers", allowedHeaders);
             corsFilter.setInitParameter("cors.allowed.methods", "DELETE, GET, POST, PUT");
+            String allowedOrigins = ctx.getInitParameter("cors.allowed.origins");
+            if(!StringUtils.isEmpty(allowedOrigins)) {
+                corsFilter.setInitParameter("cors.allowed.origins", allowedOrigins);
+            }
             corsFilter.addMappingForUrlPatterns(null, false, "/*");
         } catch (ClassNotFoundException e) {
             logger.info("Tomcat CORS filter not available");
