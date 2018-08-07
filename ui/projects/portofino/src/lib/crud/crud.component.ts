@@ -88,7 +88,7 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   @Button({
-    color: 'accent', enabledIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
+    color: 'accent', presentIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
   })
   showCreate() {
     this.allowEmbeddedComponents = false;
