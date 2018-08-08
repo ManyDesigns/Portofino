@@ -170,10 +170,15 @@ public abstract class Node implements SecureResource {
             subResource.setLocation(location);
             subResource.setSegment(segment);
             initGenericResource(resource);
+            initSubResource(subResource);
             subResource.init();
         } else {
             initGenericResource(resource);
         }
+    }
+
+    protected void initSubResource(Resource resource) {
+        //By default, do nothing
     }
 
     protected void initGenericResource(Object resource) {

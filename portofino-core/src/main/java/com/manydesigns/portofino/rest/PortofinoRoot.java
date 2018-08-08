@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
 
@@ -33,6 +34,9 @@ public class PortofinoRoot extends Root {
     @Context
     protected UriInfo uriInfo;
 
+    protected PageActionContext context;
+    protected PageInstance pageInstance;
+
     protected PortofinoRoot(FileObject location, ResourceResolver resourceResolver) {
         super(location, resourceResolver);
     }
@@ -40,7 +44,9 @@ public class PortofinoRoot extends Root {
     public static PortofinoRoot get(FileObject location, ResourceResolver resourceResolver) throws Exception {
         Root root = Root.get(location, resourceResolver);
         if (!(root instanceof PortofinoRoot)) {
-            logger.warn(root + " defined in " + location + " does not extend PortofinoRoot, ignoring");
+            if(!root.getClass().equals(Root.class)) {
+                logger.warn(root + " defined in " + location + " does not extend PortofinoRoot, ignoring");
+            }
             root = new PortofinoRoot(location, resourceResolver);
         }
         return (PortofinoRoot) root;
@@ -78,11 +84,60 @@ public class PortofinoRoot extends Root {
             PageAction pageAction = (PageAction) page;
             pageAction.setContext(context);
             File pagesDirectory = (File) servletContext.getAttribute(PageactionsModule.PAGES_DIRECTORY);
-            Page rootPage = DispatcherLogic.getPage(pagesDirectory);
-            PageInstance pageInstance = new PageInstance(null, pagesDirectory, rootPage, null);
-            pageAction.setPageInstance(pageInstance);
-            Injections.inject(pageAction, servletContext, request);
+            File pageDirectory = new File(pagesDirectory, pathSegment);
+            Page subpage = DispatcherLogic.getPage(pageDirectory);
+            PageInstance pageInstance = new PageInstance(
+                    getPageInstance(), pageDirectory, subpage, (Class<? extends PageAction>) page.getClass());
+            pageInstance.setActionBean(pageAction);
+            DispatcherLogic.configurePageAction(pageAction, pageInstance);
         }
+        Injections.inject(page, servletContext, request);
         return page;
+    }
+
+    //@Override
+    public Response preparePage() {
+        return null;
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        File pagesDirectory = (File) servletContext.getAttribute(PageactionsModule.PAGES_DIRECTORY);
+        Page rootPage = DispatcherLogic.getPage(pagesDirectory);
+        PageInstance pageInstance = new PageInstance(null, pagesDirectory, rootPage, null);
+        setPageInstance(pageInstance);
+        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+        PageActionContext context = new PageActionContext();
+        context.setServletContext(servletContext);
+        context.setRequest(request);
+        context.setResponse(response);
+        context.setActionPath("/");
+        setContext(context);
+    }
+
+    //@Override
+    public PageActionContext getContext() {
+        return context;
+    }
+
+    //@Override
+    public void setContext(PageActionContext context) {
+        this.context = context;
+    }
+
+    //@Override
+    public PageInstance getPageInstance() {
+        return pageInstance;
+    }
+
+    //@Override
+    public void setPageInstance(PageInstance pageInstance) {
+        this.pageInstance = pageInstance;
+    }
+
+    //@Override
+    public DispatchElement consumePathFragment(String pathFragment) {
+        return (DispatchElement) consumePathSegment(pathFragment);
     }
 }

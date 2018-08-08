@@ -47,6 +47,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         final SubResourceReader subResourceReader = new SubResourceReader(reader);
         try {
             Root root = rootFactory.createRoot();
+            //TODO set ResourceContext (dummy?)
             new DepthFirstVisitor((NodeVisitor) node -> {
                 try {
                     subResourceReader.readSubResource(node);
@@ -82,7 +83,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
                     parameters.add(parameter);
                 }
             }
-            return read(node.getClass(), path, null, true, new String[0], new String[0], new HashMap<String, Tag>(), parameters);
+            return read(node.getClass(), path, null, true, new String[0], new String[0],
+                    new HashMap<String, Tag>(), parameters);
         }
     }
     

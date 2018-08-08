@@ -56,15 +56,18 @@ public class GroovyResourceResolver extends AbstractResourceResolver {
         this.groovyCodeBase = groovyCodeBase;
     }
     
-    public GroovyResourceResolver(CodeBase parentCodeBase) {
-            this(getGroovyCodeBase(parentCodeBase));
+    public GroovyResourceResolver(CodeBase codeBase) {
+            this(getGroovyCodeBase(codeBase));
         }
         
-    protected static GroovyCodeBase getGroovyCodeBase(CodeBase parent) {
+    protected static GroovyCodeBase getGroovyCodeBase(CodeBase codeBase) {
+        if(codeBase instanceof GroovyCodeBase) {
+            return (GroovyCodeBase) codeBase;
+        }
         try {
             return new GroovyCodeBase(
-                    VFS.getManager().resolveFile("ram://" + GroovyResourceResolver.class.getName()),
-                    parent);
+                    VFS.getManager().resolveFile("ram:///" + GroovyResourceResolver.class.getName()),
+                    codeBase);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import static com.manydesigns.portofino.code.JavaCodeBase.classNameToPath;
 
@@ -36,7 +38,12 @@ public class GroovyCodeBase implements CodeBase {
         this.parent = parent;
         this.classLoader = classLoader;
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
-        cc.setClasspath(root.getURL().getPath());
+        try {
+            String classpath = Paths.get(root.getURL().toURI()).toFile().getAbsolutePath();
+            cc.setClasspath(classpath);
+        } catch (Exception e) {
+            logger.debug("Could not set classpath", e);
+        }
         cc.setRecompileGroovySource(true);
         groovyScriptEngine = new GroovyScriptEngine(new URL[] { root.getURL() }, getClassLoader());
         groovyScriptEngine.setConfig(cc);

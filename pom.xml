@@ -87,7 +87,7 @@
         <hibernate.version>4.3.11.Final</hibernate.version>
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
-        <javax.ws.rs.api.version>2.0.1</javax.ws.rs.api.version>
+        <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.27</jersey.version>
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.9.1</joda-time.version>

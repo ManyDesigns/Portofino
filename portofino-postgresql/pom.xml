@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.marvinformatics.hibernate</groupId>
             <artifactId>hibernate-native-json</artifactId>
-            <version>0.4</version>
+            <version>0.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>

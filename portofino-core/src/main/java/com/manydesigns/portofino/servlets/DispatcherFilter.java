@@ -61,44 +61,6 @@ public class DispatcherFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    private void restoreRequestAttributes(ServletRequest request,
-                                          Map<String, Object> savedAttributes) {
-        List<String> attrNamesToRemove = new ArrayList<String>();
-        Enumeration attrNames = request.getAttributeNames();
-        while(attrNames.hasMoreElements()) {
-            attrNamesToRemove.add((String) attrNames.nextElement());
-        }
-        for(String attrName : attrNamesToRemove) {
-            request.removeAttribute(attrName);
-        }
-        for(Map.Entry<String, Object> entry : savedAttributes.entrySet()) {
-            request.setAttribute(entry.getKey(), entry.getValue());
-        }
-    }
-
-    private Map<String, Object> saveAndResetRequestAttributes(ServletRequest request) {
-        Map<String,Object> savedAttributes = new HashMap<String, Object>();
-        logger.debug("--- start req dump ---");
-        Enumeration attrNames = request.getAttributeNames();
-        while(attrNames.hasMoreElements()) {
-            String attrName = (String) attrNames.nextElement();
-            Object attrValue = request.getAttribute(attrName);
-            logger.debug("{} = {}", attrName, attrValue);
-            savedAttributes.put(attrName, attrValue);
-        }
-        for(String attrName : savedAttributes.keySet()) {
-            if(attrName.startsWith("javax.servlet")) {
-                continue;
-            }
-            if(attrName.equals("returnUrl")) {
-                continue;
-            }
-            request.removeAttribute(attrName);
-        }
-        logger.debug("--- end req dump ---");
-        return savedAttributes;
-    }
-
     public void destroy() {
         filterConfig = null;
         servletContext = null;
