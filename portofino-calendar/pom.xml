@@ -14,18 +14,13 @@
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-pageactions</artifactId>
+            <artifactId>portofino-core</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

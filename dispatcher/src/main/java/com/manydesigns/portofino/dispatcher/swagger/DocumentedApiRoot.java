@@ -3,12 +3,12 @@ package com.manydesigns.portofino.dispatcher.swagger;
 import com.manydesigns.portofino.dispatcher.Node;
 import com.manydesigns.portofino.dispatcher.NodeWithParameters;
 import com.manydesigns.portofino.dispatcher.Root;
+import com.manydesigns.portofino.dispatcher.RootFactory;
 import com.manydesigns.portofino.dispatcher.visitor.DepthFirstVisitor;
 import com.manydesigns.portofino.dispatcher.visitor.NodeVisitor;
 import io.swagger.annotations.Api;
 import io.swagger.jaxrs.Reader;
 import io.swagger.jaxrs.config.ReaderListener;
-import io.swagger.models.Info;
 import io.swagger.models.Swagger;
 import io.swagger.models.Tag;
 import io.swagger.models.parameters.Parameter;
@@ -27,14 +27,14 @@ import java.util.HashMap;
 public abstract class DocumentedApiRoot implements ReaderListener {
     
     protected static final Logger logger = LoggerFactory.getLogger(DocumentedApiRoot.class);
-    protected static Root root;
+    protected static RootFactory rootFactory;
 
-    public static void setRoot(Root root) {
-        DocumentedApiRoot.root = root;
+    public static void setRootFactory(RootFactory rootFactory) {
+        DocumentedApiRoot.rootFactory = rootFactory;
     }
 
-    public static Root getRoot() {
-        return root;
+    public static RootFactory getRootFactory() {
+        return rootFactory;
     }
     
     @Override
@@ -46,14 +46,12 @@ public abstract class DocumentedApiRoot implements ReaderListener {
     public void afterScan(Reader reader, Swagger swagger) {
         final SubResourceReader subResourceReader = new SubResourceReader(reader);
         try {
-            new DepthFirstVisitor(new NodeVisitor() {
-                @Override
-                public void visit(Node node) throws Exception {
-                    try {
-                        subResourceReader.readSubResource(node);
-                    } catch (Exception e) {
-                        logger.error("Could not read node at " + node.getLocation(), e);
-                    }
+            Root root = rootFactory.createRoot();
+            new DepthFirstVisitor((NodeVisitor) node -> {
+                try {
+                    subResourceReader.readSubResource(node);
+                } catch (Exception e) {
+                    logger.error("Could not read node at " + node.getLocation(), e);
                 }
             }).visit(root);
         } catch (Exception e) {

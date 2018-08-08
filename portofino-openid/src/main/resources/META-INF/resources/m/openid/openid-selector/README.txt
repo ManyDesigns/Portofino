@@ -27,9 +27,9 @@ it is reasonable to reuse the sprite: for example German
 localization is reusing sprite from English localization, Ukrainian 
 localization is reusing sprite from Russian localization, etc.
 
-So, if provider list in root localization changes, localizations 
+So, if provider list in rootFactory localization changes, localizations
 that reuse the sprite must be also changed, or unlinked or relinked
-to new root localization. 
+to new rootFactory localization.
 
 HOWTO
 -------------------

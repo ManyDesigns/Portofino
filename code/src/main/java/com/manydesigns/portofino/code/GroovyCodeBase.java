@@ -36,6 +36,7 @@ public class GroovyCodeBase implements CodeBase {
         this.parent = parent;
         this.classLoader = classLoader;
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
+        cc.setClasspath(root.getURL().getPath());
         cc.setRecompileGroovySource(true);
         groovyScriptEngine = new GroovyScriptEngine(new URL[] { root.getURL() }, getClassLoader());
         groovyScriptEngine.setConfig(cc);

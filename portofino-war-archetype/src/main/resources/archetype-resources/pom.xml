@@ -137,13 +137,6 @@
         ///////////////////////////////////////////////////////////////////////
         -->
 
-        <!-- Reliable mail sender. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mail</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- javax.mail. Some application servers natively provide it. -->
         <dependency>
             <groupId>javax.mail</groupId>
@@ -192,7 +185,7 @@
         <!-- Support for page actions. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-pageactions</artifactId>
+            <artifactId>portofino-core</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>

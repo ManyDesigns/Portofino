@@ -111,7 +111,9 @@ public abstract class Node implements SecureResource {
             return;
         }
         if(!child.getParent().equals(location)) {
-            throw new IllegalArgumentException("Path element " + pathSegment + " results in a path that is not a child of the current node and for security reasons this is forbidden.");
+            throw new IllegalArgumentException(
+                    "Path segment " + pathSegment + " results in a path that is not a child of the current node and " +
+                    "for security reasons this is forbidden.");
         }
     }
 

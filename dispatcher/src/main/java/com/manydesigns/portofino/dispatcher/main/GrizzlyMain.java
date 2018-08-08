@@ -79,9 +79,9 @@ public class GrizzlyMain {
         resourceResolver.resourceResolvers.add(new JavaResourceResolver(codeBase));
         resourceResolver.resourceResolvers.add(new GroovyResourceResolver(codeBase));
         FileObject root = manager.resolveFile(rootPath);
-        logger.info("Codebase root: " + codeBaseRoot.getURL());
+        logger.info("Codebase rootFactory: " + codeBaseRoot.getURL());
         logger.info("Root path: " + root.getURL());
-        DocumentedApiRoot.setRoot(Root.get(root, resourceResolver));
+        DocumentedApiRoot.setRootFactory(() -> Root.get(root, resourceResolver));
         String host = System.getProperty("portofino.web.host", "0.0.0.0");
         String port = System.getProperty("portofino.web.port", "8090");
         ResourceConfig config = new ResourceConfig(ApplicationRoot.class, ApiListingResource.class, SwaggerSerializers.class);

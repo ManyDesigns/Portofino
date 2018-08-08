@@ -48,7 +48,7 @@ public class Root extends Node {
                 Constructor constructor = rootClass.getConstructor(FileObject.class, ResourceResolver.class);
                 root = (Root) constructor.newInstance(location, resourceResolver);
             } else {
-                logger.warn(rootClass + " defined in " + location + " does not implement Root, ignoring");
+                logger.warn(rootClass + " defined in " + location + " does not extend Root, ignoring");
                 root = new Root(location, resourceResolver);
             }
         } else {
@@ -60,7 +60,7 @@ public class Root extends Node {
     public void setResourceContext(ResourceContext resourceContext) {
         this.resourceContext = resourceContext;
     }
-    
+
     protected Root(FileObject location, ResourceResolver resourceResolver) {
         setLocation(location);
         this.resourceResolver = resourceResolver;
@@ -73,7 +73,7 @@ public class Root extends Node {
 
     @Override
     public void setParent(Resource parent) {
-        throw new UnsupportedOperationException("Cannot set the parent of the root");
+        throw new UnsupportedOperationException("Cannot set the parent of the rootFactory");
     }
 
     @Override

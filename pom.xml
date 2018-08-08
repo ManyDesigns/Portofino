@@ -88,7 +88,7 @@
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.0.1</javax.ws.rs.api.version>
-        <jersey.version>2.22.1</jersey.version>
+        <jersey.version>2.27</jersey.version>
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
@@ -114,7 +114,7 @@
         <module>code</module>
         <module>dispatcher</module>
         <module>elements</module>
-        <module>portofino-base</module>
+        <module>portofino-core</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>
@@ -129,7 +129,6 @@
         <module>portofino-oracle</module>
         <module>portofino-postgresql</module>
         <!-- Pages -->
-        <module>portofino-pageactions</module>
         <module>portofino-calendar</module>
         <!--<module>portofino-map</module>
         <module>portofino-gallery</module>
@@ -137,10 +136,11 @@
         <module>portofino-crud</module>
         <!-- Optional services -->
         <module>portofino-atmosphere</module>
-        <module>portofino-mail</module>
         <module>portofino-quartz</module>
         <!-- Archetypes -->
         <module>portofino-war-archetype</module>
+        <!-- Applications -->
+        <module>demo-tt</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -189,7 +189,6 @@
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${javax.ws.rs.api.version}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -272,8 +271,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

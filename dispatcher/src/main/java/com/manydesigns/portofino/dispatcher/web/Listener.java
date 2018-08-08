@@ -1,15 +1,12 @@
 package com.manydesigns.portofino.dispatcher.web;
 
-import ch.qos.logback.classic.pattern.PropertyConverter;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.code.GroovyCodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.configuration.WritableCompositeConfiguration;
 import com.manydesigns.portofino.dispatcher.resolvers.*;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
-import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -27,7 +24,6 @@ import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * Created by alessio on 28/07/16.
@@ -101,14 +97,13 @@ public class Listener implements ServletContextListener {
     protected void initApplicationRoot(ServletContext servletContext, String actionsDirectoryName) {
         try {
             FileObject actionsDirectory = applicationRoot.getChild(actionsDirectoryName);
-            if(actionsDirectory.getType() != FileType.FOLDER) {
-                initializationFailed(new Exception("Not a directory: " + actionsDirectory));
+            if(actionsDirectory == null || actionsDirectory.getType() != FileType.FOLDER) {
+                initializationFailed(new Exception("Not a directory: " + actionsDirectoryName));
             }
             CodeBase codeBase = getCodeBase();
             ResourceResolvers resourceResolver = new ResourceResolvers();
             configureResourceResolvers(resourceResolver, codeBase);
-            Root root = getRoot(actionsDirectory, resourceResolver);
-            DocumentedApiRoot.setRoot(root);
+            DocumentedApiRoot.setRootFactory(() -> getRoot(actionsDirectory, resourceResolver));
         } catch (Exception e) {
             initializationFailed(e);
         }
@@ -116,7 +111,7 @@ public class Listener implements ServletContextListener {
 
     protected CodeBase getCodeBase() throws IOException {
         //TODO auto discovery?
-        FileObject codeBaseRoot = VFS.getManager().resolveFile("res:");
+        FileObject codeBaseRoot = getCodeBaseRoot();
         JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot);
         CodeBase codeBase = javaCodeBase;
         try {
@@ -128,6 +123,10 @@ public class Listener implements ServletContextListener {
             logger.debug("Groovy not available", e);
         }
         return codeBase;
+    }
+
+    protected FileObject getCodeBaseRoot() throws FileSystemException {
+        return VFS.getManager().resolveFile("res:");
     }
 
     protected void configureResourceResolvers(ResourceResolvers resourceResolver, CodeBase codeBase) {

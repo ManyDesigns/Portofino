@@ -1,10 +1,9 @@
 package com.manydesigns.portofino.resteasy;
 
-import com.manydesigns.portofino.pageactions.rest.APIRoot;
+import com.manydesigns.portofino.rest.APIRoot;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

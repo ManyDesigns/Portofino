@@ -12,14 +12,6 @@
     <session-config>
         <session-timeout>60</session-timeout>
     </session-config>
-    <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
-    </welcome-file-list>
-    
-    <context-param>
-        <param-name>LocalePicker.Locales</param-name>
-        <param-value>en</param-value>
-    </context-param>
     <!--
         Here you can change where the Portofino app lives. If you comment this out, the default value
         ${serverInfo:realPath}/WEB-INF is used.

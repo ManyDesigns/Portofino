@@ -33,14 +33,6 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- No support for OpedID for now
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-openid</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-admin</artifactId>
@@ -56,18 +48,6 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jersey</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mail</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-theme</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

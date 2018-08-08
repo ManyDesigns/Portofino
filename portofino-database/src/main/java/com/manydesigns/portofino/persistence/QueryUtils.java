@@ -162,10 +162,10 @@ public class QueryUtils {
 
     /**
      * Runs a query against the database. The query is processed with an {@link OgnlSqlFormat}, so it can
-     * access values from the OGNL context, as well as from an (optional) root object.
+     * access values from the OGNL context, as well as from an (optional) rootFactory object.
      * @param session the session
      * @param queryString the query
-     * @param rootObject the root object passed to the ognl evaluator (can be null).
+     * @param rootObject the rootFactory object passed to the ognl evaluator (can be null).
      * @param firstResult index of the first result to return
      * @param maxResults maximum number of results to return
      * @return at most <code>maxResults</code> results from the query
@@ -411,11 +411,11 @@ public class QueryUtils {
       * Runs a query against the database. The query is expressed as a {@link TableCriteria} object plus a
       * query string to be merged with it (the typical case of a search in a crud defined by a query).
       * The query string is processed with an {@link OgnlSqlFormat}, so it can access values from the OGNL context,
-      * as well as from an (optional) root object.
+      * as well as from an (optional) rootFactory object.
       * @param session the session
       * @param queryString the query
       * @param criteria the search criteria to merge with the query.
-      * @param rootObject the root object passed to the ognl evaluator (can be null).
+      * @param rootObject the rootFactory object passed to the ognl evaluator (can be null).
       * @param firstResult index of the first result to return
       * @param maxResults maximum number of results to return
       * @return at most <code>maxResults</code> results from the query
@@ -435,10 +435,10 @@ public class QueryUtils {
     /**
      * Merges a HQL query string with a {@link TableCriteria} object representing a search. The query string
      * is processed with an {@link OgnlSqlFormat}, so it can access values from the OGNL context, as well as
-     * from an (optional) root object.
+     * from an (optional) rootFactory object.
      * @param queryString the base query
      * @param criteria the criteria to merge with the query
-     * @param rootObject the OGNL root object (can be null)
+     * @param rootObject the OGNL rootFactory object (can be null)
      * @return the merged query
      */
     public static QueryStringWithParameters mergeQuery
@@ -662,7 +662,7 @@ public class QueryUtils {
      * @param baseTable the table to load from
      * @param pkObject the primary key object
      * @param query the query (where condition) that the object must fulfill
-     * @param rootObject the OGNL root object against which to evaluate the query string.
+     * @param rootObject the OGNL rootFactory object against which to evaluate the query string.
      * @return the loaded object, or null if an object with that key does not exist or falls outside the query.
      */
     public static Object getObjectByPk(
@@ -678,7 +678,7 @@ public class QueryUtils {
      * @param entityName the name of the entity to load
      * @param pk the primary key object
      * @param hqlQueryString the query (where condition) that the object must fulfill
-     * @param rootObject the OGNL root object against which to evaluate the query string.
+     * @param rootObject the OGNL rootFactory object against which to evaluate the query string.
      * @return the loaded object, or null if an object with that key does not exist or falls outside the query.
      */
     public static Object getObjectByPk(
