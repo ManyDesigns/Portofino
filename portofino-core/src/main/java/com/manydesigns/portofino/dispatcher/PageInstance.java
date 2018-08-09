@@ -20,12 +20,14 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.Page;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +45,7 @@ import java.util.List;
 public class PageInstance {
 
     protected final Page page;
-    protected final File directory;
+    protected final FileObject directory;
     protected final List<String> parameters;
     protected final PageInstance parent;
     protected final Class<? extends PageAction> actionClass;
@@ -61,7 +63,7 @@ public class PageInstance {
 
     public static final Logger logger = LoggerFactory.getLogger(PageInstance.class);
 
-    public PageInstance(PageInstance parent, File directory,
+    public PageInstance(PageInstance parent, FileObject directory,
                         Page page, Class<? extends PageAction> actionClass) {
         this.parent = parent;
         this.directory = directory;
@@ -95,7 +97,7 @@ public class PageInstance {
      * Returns the portion of the URL that identifies this PageInstance, including any parameters.
      */
     public String getUrlFragment() {
-        String fragment = directory.getName();
+        String fragment = directory.getName().getBaseName();
         for(String param : parameters) {
             fragment += "/" + param;
         }
@@ -117,7 +119,7 @@ public class PageInstance {
     /**
      * Returns the directory from which this page was loaded.
      */
-    public File getDirectory() {
+    public FileObject getDirectory() {
         return directory;
     }
 
@@ -192,25 +194,33 @@ public class PageInstance {
     }
 
     public Page getChildPage(String name) throws Exception {
-        File childDirectory = getChildPageDirectory(name);
-        return DispatcherLogic.getPage(childDirectory);
+        FileObject childDirectory = getChildPageDirectory(name);
+        return PageLogic.getPage(childDirectory);
     }
 
-    public File getChildPageDirectory(String name) {
-        File baseDir = getChildrenDirectory();
-        return new File(baseDir, name);
+    public FileObject getChildPageDirectory(String name) {
+        FileObject baseDir = getChildrenDirectory();
+        try {
+            return baseDir.getChild(name);
+        } catch (FileSystemException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public File getChildrenDirectory() {
-        File baseDir = directory;
+    public FileObject getChildrenDirectory() {
+        FileObject baseDir = directory;
         if(!parameters.isEmpty()) {
-            baseDir = new File(baseDir, DETAIL);
+            try {
+                baseDir = baseDir.getChild(DETAIL);
+            } catch (FileSystemException e) {
+                throw new RuntimeException(e);
+            }
         }
         return baseDir;
     }
 
     public String getName() {
-        return directory.getName();
+        return directory.getName().getBaseName();
     }
 
     public String getTitle() {

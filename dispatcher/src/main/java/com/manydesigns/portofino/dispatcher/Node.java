@@ -136,12 +136,8 @@ public abstract class Node implements SecureResource {
         }
     }
     
-    public FileObject getSubResourceLocation(String subResourceName) throws FileSystemException {
-        return getLocation().getChild(subResourceName);
-    }
-    
     public Object getSubResource(String subResourceName) throws Exception {
-        FileObject subResourceLocation = getSubResourceLocation(subResourceName);
+        FileObject subResourceLocation = getChildLocation(subResourceName);
         return getSubResource(subResourceLocation, subResourceName, getResourceResolver());
     }
     
@@ -178,6 +174,10 @@ public abstract class Node implements SecureResource {
     }
 
     protected void initSubResource(Resource resource) {
+        initSubResource((Object) resource);
+    }
+
+    protected void initSubResource(Object resource) {
         //By default, do nothing
     }
 
@@ -194,7 +194,16 @@ public abstract class Node implements SecureResource {
         description.put("class", getClass().getName());
         description.put("path", getPath());
         description.put("children", getSubResources());
+        describe(description);
         return description;
+    }
+
+    /**
+     * Customize the description of this node. The default implementation does nothing.
+     * @param description the default description.
+     */
+    protected void describe(Map<String, Object> description) {
+        //The default implementation does nothing
     }
     
     @Path(":description")

@@ -118,7 +118,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         ognlContext.put("securityUtils", new SecurityUtilsBean());
         checkAuthorizations(requestContext, resource);
         addHeaders();
-        preparePage(requestContext, resource);
+        if(resource instanceof PageAction) {
+            PageAction pageAction = (PageAction) resource;
+            pageAction.prepareForExecution();
+        }
     }
 
     protected void addHeaders() {
@@ -154,47 +157,23 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         ElementsThreadLocals.setMultipart(multipart);
     }
 
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        UriInfo uriInfo = requestContext.getUriInfo();
-        if(uriInfo.getMatchedResources().isEmpty()) {
-            return;
-        }
-        Object resource = uriInfo.getMatchedResources().get(0);
-        try {
-            if(resourceInfo == null || resourceInfo.getResourceClass() == null) {
-                return;
-            }
-        } catch (Exception e) {
-            logger.debug("Could not get resourceInfo (can happen under RestEasy)", e);
-            return;
-        }
-        if(resource.getClass() != resourceInfo.getResourceClass()) {
-            throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
-        }
-    }
-
-    protected void preparePage(ContainerRequestContext requestContext, Object resource) {
-        if(resource instanceof PageAction) {
-            PageAction pageAction = (PageAction) resource;
-            Injections.inject(pageAction, servletContext, request);
-            if(!pageAction.getPageInstance().isPrepared()) {
-                PageActionContext context = new PageActionContext();
-                context.setRequest(request);
-                context.setResponse(response);
-                context.setServletContext(request.getServletContext());
-                String path = requestContext.getUriInfo().getPath();
-                if(!path.startsWith("/")) {
-                    path = "/" + path;
-                }
-                context.setActionPath(path); //TODO
-                pageAction.setContext(context);
-                Response response = pageAction.preparePage();
-                if(response != null) {
-                    requestContext.abortWith(response);
-                }
-            }
-            pageAction.init();
-        }
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
+//        UriInfo uriInfo = requestContext.getUriInfo();
+//        if(uriInfo.getMatchedResources().isEmpty()) {
+//            return;
+//        }
+//        Object resource = uriInfo.getMatchedResources().get(0);
+//        try {
+//            if(resourceInfo == null || resourceInfo.getResourceClass() == null) {
+//                return;
+//            }
+//        } catch (Exception e) {
+//            logger.debug("Could not get resourceInfo (can happen under RestEasy)", e);
+//            return;
+//        }
+//        if(resource.getClass() != resourceInfo.getResourceClass()) {
+//            throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
+//        }
     }
 
     protected void checkAuthorizations(ContainerRequestContext requestContext, Object resource) {
@@ -239,7 +218,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
 
     protected void checkPageActionInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
         Method handler = resourceInfo.getResourceMethod();
-        List<PageInstance> pageInstancePath = new ArrayList<PageInstance>();
+        List<PageInstance> pageInstancePath = new ArrayList<>();
         PageInstance last = pageAction.getPageInstance();
         while(last != null) {
             pageInstancePath.add(0, last);

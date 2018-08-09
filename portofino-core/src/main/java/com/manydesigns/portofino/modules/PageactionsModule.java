@@ -26,7 +26,7 @@ import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.form.FormAction;
@@ -137,7 +137,7 @@ public class PageactionsModule implements Module {
     @Override
     public void init() {
         logger.debug("Initializing dispatcher");
-        DispatcherLogic.init(configuration);
+        PageLogic.init(configuration);
 
         logger.info("Initializing ehcache service");
         cacheManager = CacheManager.newInstance();
@@ -174,7 +174,7 @@ public class PageactionsModule implements Module {
     }
 
     protected void preloadPageActions(File directory) {
-        for(File file : directory.listFiles()) {
+        /*for(File file : directory.listFiles()) {
             logger.debug("visit {}", file);
             if(file.isDirectory()) {
                 if(!file.equals(directory) && !file.equals(directory.getParentFile())) {
@@ -183,13 +183,13 @@ public class PageactionsModule implements Module {
             } else if("action.groovy".equals(file.getName())) {
                 logger.debug("Preloading page: {}", file);
                 try {
-                    Class<?> clazz = DispatcherLogic.getActionClass(configuration, directory);
+                    Class<?> clazz = PageLogic.getActionClass(configuration, directory);
                     clazz.newInstance();
                 } catch(Throwable t) {
                     logger.warn("PageAction preload failed for page " + file.getAbsolutePath(), t);
                 }
             }
-        }
+        }*/
     }
 
     protected void preloadGroovyClasses(File directory) {
@@ -255,7 +255,7 @@ public class PageactionsModule implements Module {
     private static class ConfigurationCacheResetListener implements CacheResetListener {
         @Override
         public void handleReset(CacheResetEvent e) {
-            DispatcherLogic.clearConfigurationCache();
+            PageLogic.clearConfigurationCache();
         }
     }
 }

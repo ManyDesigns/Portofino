@@ -22,6 +22,7 @@ package com.manydesigns.portofino.dispatcher;
 
 import org.apache.commons.vfs2.FileObject;
 
+import javax.ws.rs.PathParam;
 import java.util.Collection;
 
 /**
@@ -49,7 +50,9 @@ public interface Resource {
     String getSegment();
     
     void setSegment(String segment);
-    
+
+    Object consumePathSegment(String pathSegment);
+
     void init();
 
 }

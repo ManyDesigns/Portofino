@@ -33,29 +33,26 @@ import javax.ws.rs.core.Response;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PageAction extends DispatchElement {
+public interface PageAction extends SecureResource {
     String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
-
-    /**
-     * A lifecycle method invoked during the dispatch phase, where a http request is translated to a dispatch
-     * (a path in the page tree) ultimately leading to an action invocation. This method is invoked after
-     * the PageInstance has been injected by the framework.<br>
-     * Also, this method is invoked on this object after it has been invoked on the PageAction corresponding
-     * to the parent page, if any.
-     * @return either null, meaning that the dispatch process is to go forward regularly, or a Resolution to be
-     * executed, interrupting normal action invocation.
-     */
-    Response preparePage();
-
-    /**
-     * A lifecycle method invoked just before an action method is invoked.
-     */
-    void init();
 
     PageActionContext getContext();
 
     void setContext(PageActionContext context);
 
     PageAction getParent();
+
+    /**
+     * Returns the PageInstance of this element.
+     */
+    PageInstance getPageInstance();
+
+    /**
+     * Sets the PageInstance of this element. Invoked automatically by the framework.
+     */
+    void setPageInstance(PageInstance pageInstance);
+
+    void prepareForExecution();
+
 
 }

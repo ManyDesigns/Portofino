@@ -681,12 +681,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //--------------------------------------------------------------------------
 
     @Override
-    protected boolean acceptsPathParameter() {
-        return (classAccessor != null &&
-                pageInstance.getParameters().size() < classAccessor.getKeyProperties().length);
-    }
-
-    @Override
     public void setPageInstance(PageInstance pageInstance) {
         super.setPageInstance(pageInstance);
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
@@ -702,15 +696,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
         classAccessor = new CrudAccessor(crudConfiguration, innerAccessor);
         pkHelper = new PkHelper(classAccessor);
+        maxParameters = classAccessor.getKeyProperties().length;
     }
 
     @Override
-    public Response preparePage() {
+    public void parametersAcquired() {
+        super.parametersAcquired();
         if(pkHelper == null) {
-            return null;
+            return;
         }
 
-        List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
             String encoding = getUrlEncoding();
             pk = parameters.toArray(new String[parameters.size()]);
@@ -728,7 +723,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 pkObject = pkHelper.getPrimaryKey(pk);
             } catch (Exception e) {
                 logger.warn("Invalid primary key", e);
-                return Response.status(Response.Status.NOT_FOUND).build();
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
             object = loadObjectByPrimaryKey(pkObject);
             if(object != null) {
@@ -737,14 +732,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 pageInstance.setTitle(title);
                 pageInstance.setDescription(title);
             } else {
-                return Response.status(Response.Status.NOT_FOUND).build();
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
         } else {
             String title = getSearchTitle();
             pageInstance.setTitle(title);
             pageInstance.setDescription(title);
         }
-        return null;
     }
 
     /**

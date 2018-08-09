@@ -29,7 +29,7 @@
 //import com.manydesigns.portofino.buttons.annotations.Button;
 //import com.manydesigns.portofino.buttons.annotations.Buttons;
 //import com.manydesigns.portofino.cache.ControlsCache;
-//import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+//import com.manydesigns.portofino.dispatcher.PageLogic;
 //import com.manydesigns.portofino.logic.SecurityLogic;
 //import com.manydesigns.portofino.pageactions.AbstractPageAction;
 //import com.manydesigns.portofino.pageactions.PageActionName;
@@ -570,7 +570,7 @@
 //        page.setTitle(title);
 //        page.setDescription(description);
 //        try {
-//            DispatcherLogic.savePage(pageInstance.getDirectory(), page);
+//            PageLogic.savePage(pageInstance.getDirectory(), page);
 //            saveContent();
 //            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
 //        } catch (Exception e) {

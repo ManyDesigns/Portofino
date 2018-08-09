@@ -119,11 +119,6 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     }
 
     @Override
-    public Response preparePage() {
-        return null;
-    }
-
-    @Override
     public void init() {}
 
     @Override
@@ -134,11 +129,6 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     @Override
     public void setPageInstance(PageInstance pageInstance) {
         this.pageInstance = pageInstance;
-    }
-
-    @Override
-    public DispatchElement consumePathFragment(String pathFragment) {
-        return null;
     }
 
     @Override

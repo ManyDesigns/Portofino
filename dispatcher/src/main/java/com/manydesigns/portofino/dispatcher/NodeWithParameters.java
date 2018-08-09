@@ -51,9 +51,12 @@ public abstract class NodeWithParameters extends Node {
             parametersAcquired();
             return element;
         } catch (WebApplicationException e) {
-            logger.error("Invalid subresource: " + pathSegment, e);
+            logger.debug("Invalid subresource: " + pathSegment, e);
             if(parameters.size() < maxParameters) {
                 consumeParameter(pathSegment);
+                if(parameters.size() == maxParameters) {
+                    parametersAcquired();
+                }
                 return this;
             } else {
                 throw new WebApplicationException("Too many path parameters", 404);

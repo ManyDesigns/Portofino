@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.pages;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -26,18 +26,13 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.actions.safemode.SafeModeAction;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
-import com.manydesigns.portofino.pages.ChildPage;
-import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,86 +54,12 @@ import java.util.concurrent.TimeUnit;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class DispatcherLogic {
+public class PageLogic {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    public static final Logger logger = LoggerFactory.getLogger(DispatcherLogic.class);
+    public static final Logger logger = LoggerFactory.getLogger(PageLogic.class);
     public static final String INVALID_PAGE_INSTANCE = "validDispatchPathLength";
-
-    public static SelectionProvider createPagesSelectionProvider
-            (File baseDir, File... excludes) {
-        return createPagesSelectionProvider(baseDir, false, false, excludes);
-    }
-
-    public static SelectionProvider createPagesSelectionProvider
-            (File baseDir, boolean includeRoot, boolean includeDetailChildren,
-             File... excludes) {
-        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
-        if (includeRoot) {
-            Page rootPage;
-            try {
-                rootPage = getPage(baseDir);
-            } catch (Exception e) {
-                throw new RuntimeException("Couldn't load rootFactory page", e);
-            }
-            selectionProvider.appendRow("/", rootPage.getTitle() + " (top level)", true);
-        }
-        appendChildrenToPagesSelectionProvider
-                (baseDir, baseDir, null, selectionProvider, includeDetailChildren, excludes);
-        return selectionProvider;
-    }
-
-    protected static void appendChildrenToPagesSelectionProvider
-            (File baseDir, File parentDir, String breadcrumb,
-             DefaultSelectionProvider selectionProvider, boolean includeDetailChildren, File... excludes) {
-        FileFilter filter = new FileFilter() {
-            public boolean accept(File pathname) {
-                return pathname.isDirectory();
-            }
-        };
-        for (File dir : parentDir.listFiles(filter)) {
-            try {
-                appendToPagesSelectionProvider
-                        (baseDir, dir, breadcrumb, selectionProvider, includeDetailChildren, excludes);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-    }
-
-    private static void appendToPagesSelectionProvider
-            (File baseDir, File file, String breadcrumb,
-             DefaultSelectionProvider selectionProvider, boolean includeDetailChildren, File... excludes) {
-        if (ArrayUtils.contains(excludes, file)) {
-            return;
-        }
-        if (PageInstance.DETAIL.equals(file.getName())) {
-            if (includeDetailChildren) {
-                breadcrumb += " (detail)"; //TODO I18n
-                selectionProvider.appendRow
-                        ("/" + ElementsFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
-                appendChildrenToPagesSelectionProvider
-                        (baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
-            }
-        } else {
-            Page page;
-            try {
-                page = getPage(file);
-            } catch (Exception e) {
-                throw new RuntimeException("Couldn't load page", e);
-            }
-            if (breadcrumb == null) {
-                breadcrumb = page.getTitle();
-            } else {
-                breadcrumb = String.format("%s > %s", breadcrumb, page.getTitle());
-            }
-            selectionProvider.appendRow
-                    ("/" + ElementsFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
-            appendChildrenToPagesSelectionProvider
-                    (baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
-        }
-    }
 
     protected static final JAXBContext pagesJaxbContext;
 
@@ -156,7 +77,7 @@ public class DispatcherLogic {
      * @return the file where the page was saved.
      * @throws Exception in case the save fails.
      */
-    public static File savePage(PageInstance pageInstance) throws Exception {
+    public static FileObject savePage(PageInstance pageInstance) throws Exception {
         return savePage(pageInstance.getDirectory(), pageInstance.getPage());
     }
 
@@ -167,12 +88,17 @@ public class DispatcherLogic {
      * @return the file where the page was saved.
      * @throws Exception in case the save fails.
      */
-    public static File savePage(File directory, Page page) throws Exception {
-        File pageFile = getPageFile(directory);
+    public static FileObject savePage(FileObject directory, Page page) throws Exception {
+        FileObject pageFile = getPageFile(directory);
         Marshaller marshaller = pagesJaxbContext.createMarshaller();
         marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.marshal(page, pageFile);
+        if(!pageFile.exists()) {
+            pageFile.createFile();
+        }
+        OutputStream outputStream = pageFile.getContent().getOutputStream();
+        marshaller.marshal(page, outputStream);
         pageCache.invalidate(pageFile);
+        IOUtils.closeQuietly(outputStream);
         return pageFile;
     }
 
@@ -221,23 +147,23 @@ public class DispatcherLogic {
     //un valore vecchio anche nel caso in cui sia appena stato rilevato un errore nel reload (es. ho scritto
     //caratteri invalidi all'inizio dell'xml).
 
-    protected static LoadingCache<File, FileCacheEntry<Page>> pageCache;
+    protected static LoadingCache<FileObject, FileCacheEntry<Page>> pageCache;
 
     public static void initPageCache(int maxSize, int refreshCheckFrequency) {
         pageCache =
                 CacheBuilder.newBuilder()
                         .maximumSize(maxSize)
                         .refreshAfterWrite(refreshCheckFrequency, TimeUnit.SECONDS)
-                        .build(new CacheLoader<File, FileCacheEntry<Page>>() {
+                        .build(new CacheLoader<FileObject, FileCacheEntry<Page>>() {
 
                             @Override
-                            public FileCacheEntry<Page> load(File key) throws Exception {
-                                return new FileCacheEntry<Page>(loadPage(key), key.lastModified(), false);
+                            public FileCacheEntry<Page> load(FileObject key) throws Exception {
+                                return new FileCacheEntry<Page>(loadPage(key), key.getContent().getLastModifiedTime(), false);
                             }
 
                             @Override
                             public ListenableFuture<FileCacheEntry<Page>> reload(
-                                    final File key, FileCacheEntry<Page> oldValue)
+                                    final FileObject key, FileCacheEntry<Page> oldValue)
                                     throws Exception {
                                 if(!key.exists()) {
                                     //Se la pagina non esiste più, registro questo fatto nella cache;
@@ -245,7 +171,7 @@ public class DispatcherLogic {
                                     //la entry problematica.
                                     return Futures.immediateFuture(
                                             new FileCacheEntry<Page>(null, 0, true));
-                                } else if (key.lastModified() > oldValue.lastModified) {
+                                } else if (key.getContent().getLastModifiedTime() > oldValue.lastModified) {
                                     /*return ListenableFutureTask.create(new Callable<PageCacheEntry>() {
                                         public PageCacheEntry call() throws Exception {
                                             return doLoad(key);
@@ -255,13 +181,13 @@ public class DispatcherLogic {
                                     try {
                                         Page page = loadPage(key);
                                         return Futures.immediateFuture(
-                                                new FileCacheEntry<Page>(page, key.lastModified(), false));
+                                                new FileCacheEntry<Page>(page, key.getContent().getLastModifiedTime(), false));
                                     } catch (Throwable t) {
                                         logger.error(
-                                                "Could not reload cached page from " + key.getAbsolutePath() +
+                                                "Could not reload cached page from " + key.getName().getPath() +
                                                 ", removing from cache", t);
                                         return Futures.immediateFuture(
-                                                new FileCacheEntry<Page>(null, key.lastModified(), true));
+                                                new FileCacheEntry<Page>(null, key.getContent().getLastModifiedTime(), true));
                                     }
                                 } else {
                                     return Futures.immediateFuture(oldValue);
@@ -271,23 +197,23 @@ public class DispatcherLogic {
                         });
     }
 
-    protected static LoadingCache<File, ConfigurationCacheEntry> configurationCache;
+    protected static LoadingCache<FileObject, ConfigurationCacheEntry> configurationCache;
 
     public static void initConfigurationCache(int maxSize, int refreshCheckFrequency) {
         configurationCache =
                 CacheBuilder.newBuilder()
                         .maximumSize(maxSize)
                         .refreshAfterWrite(refreshCheckFrequency, TimeUnit.SECONDS)
-                        .build(new CacheLoader<File, ConfigurationCacheEntry>() {
+                        .build(new CacheLoader<FileObject, ConfigurationCacheEntry>() {
 
                             @Override
-                            public ConfigurationCacheEntry load(File key) throws Exception {
+                            public ConfigurationCacheEntry load(FileObject key) throws Exception {
                                 throw new UnsupportedOperationException();
                             }
 
                             @Override
                             public ListenableFuture<ConfigurationCacheEntry> reload(
-                                    final File key, ConfigurationCacheEntry oldValue)
+                                    final FileObject key, ConfigurationCacheEntry oldValue)
                                     throws Exception {
                                 if(!key.exists()) {
                                     //Se la conf. non esiste più, la marco come errata;
@@ -297,7 +223,7 @@ public class DispatcherLogic {
                                     //correttamente... TODO da verificare meglio!!!)
                                     return Futures.immediateFuture(
                                             new ConfigurationCacheEntry(null, null, 0, true));
-                                } else if (key.lastModified() > oldValue.lastModified) {
+                                } else if (key.getContent().getLastModifiedTime() > oldValue.lastModified) {
                                     //TODO se oldValue.error non dovrei ricaricare (informazioni incomplete) - ?
                                     //TODO async?
                                     try {
@@ -305,11 +231,11 @@ public class DispatcherLogic {
                                                 key, oldValue.configurationClass);
                                         return Futures.immediateFuture(
                                                 new ConfigurationCacheEntry(
-                                                        newConf, newConf.getClass(), key.lastModified(),
+                                                        newConf, newConf.getClass(), key.getContent().getLastModifiedTime(),
                                                         false));
                                     } catch (Throwable t) {
                                         logger.error(
-                                                "Could not reload cached configuration from " + key.getAbsolutePath() +
+                                                "Could not reload cached configuration from " + key.getName().getPath() +
                                                 ", removing from cache", t);
                                         return Futures.immediateFuture(
                                             new ConfigurationCacheEntry(null, null, 0, true));
@@ -331,9 +257,9 @@ public class DispatcherLogic {
      * @param configurationClass the class of the entries to remove.
      */
     public static void clearConfigurationCache(Class configurationClass) {
-        Set<Map.Entry<File,ConfigurationCacheEntry>> entries = configurationCache.asMap().entrySet();
-        List<File> keysToInvalidate = new ArrayList<File>();
-        for(Map.Entry<File,ConfigurationCacheEntry> entry : entries) {
+        Set<Map.Entry<FileObject, ConfigurationCacheEntry>> entries = configurationCache.asMap().entrySet();
+        List<FileObject> keysToInvalidate = new ArrayList<>();
+        for(Map.Entry<FileObject, ConfigurationCacheEntry> entry : entries) {
             if(entry.getValue().configurationClass == configurationClass) {
                 keysToInvalidate.add(entry.getKey());
             }
@@ -341,12 +267,16 @@ public class DispatcherLogic {
         configurationCache.invalidateAll(keysToInvalidate);
     }
 
-    protected static File getPageFile(File directory) {
-        return new File(directory, "page.xml");
+    protected static FileObject getPageFile(FileObject directory) {
+        try {
+            return directory.getChild("page.xml");
+        } catch (FileSystemException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static Page loadPage(File key) throws Exception {
-        FileInputStream fileInputStream = new FileInputStream(key);
+    public static Page loadPage(FileObject key) throws Exception {
+        InputStream fileInputStream = key.getContent().getInputStream();
         try {
             Page page = loadPage(fileInputStream);
             page.init();
@@ -361,32 +291,34 @@ public class DispatcherLogic {
         return (Page) unmarshaller.unmarshal(inputStream);
     }
 
-    public static Page getPage(File directory) throws PageNotActiveException {
-        File pageFile = getPageFile(directory);
+    public static Page getPage(FileObject directory) throws PageNotActiveException {
+        FileObject pageFile = getPageFile(directory);
         try {
             FileCacheEntry<Page> entry = pageCache.get(pageFile);
             if(!entry.error) {
                 return entry.object;
             } else {
-                throw new PageNotActiveException(pageFile.getAbsolutePath());
+                throw new PageNotActiveException(pageFile.getName().getPath());
             }
         } catch (ExecutionException e) {
-            throw new PageNotActiveException(pageFile.getAbsolutePath(), e);
+            throw new PageNotActiveException(pageFile.getName().getPath(), e);
         }
     }
 
-    public static File saveConfiguration(File directory, Object configuration) throws Exception {
+    public static FileObject saveConfiguration(FileObject directory, Object configuration) throws Exception {
         String configurationPackage = configuration.getClass().getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        File configurationFile = new File(directory, "configuration.xml");
-        marshaller.marshal(configuration, configurationFile);
+        FileObject configurationFile = directory.getChild("configuration.xml");
+        OutputStream outputStream = configurationFile.getContent().getOutputStream();
+        marshaller.marshal(configuration, outputStream);
         configurationCache.invalidate(configurationFile);
+        IOUtils.closeQuietly(outputStream);
         return configurationFile;
     }
 
-    public static <T> T getConfiguration(File configurationFile, Class<? extends T> configurationClass)
+    public static <T> T getConfiguration(FileObject configurationFile, Class<? extends T> configurationClass)
             throws Exception {
         if (configurationClass == null) {
             return null;
@@ -395,25 +327,25 @@ public class DispatcherLogic {
         if(entry == null || !configurationClass.isInstance(entry.object) || entry.error) {
             if(entry != null && entry.error) {
                 logger.warn("Cached configuration for {} is in error state, forcing a reload",
-                            configurationFile.getAbsolutePath());
+                            configurationFile.getName().getPath());
             } else if(entry != null && !configurationClass.isInstance(entry.object)) {
                 logger.warn("Cached configuration for {} is an instance of the wrong class, forcing a reload",
-                            configurationFile.getAbsolutePath());
+                            configurationFile.getName().getPath());
             }
             T configuration = loadConfiguration(configurationFile, configurationClass);
             entry = new ConfigurationCacheEntry(
-                    configuration, configurationClass, configurationFile.lastModified(), false);
+                    configuration, configurationClass, configurationFile.getContent().getLastModifiedTime(), false);
             configurationCache.put(configurationFile, entry);
         }
         return (T) entry.object;
     }
 
     public static <T> T loadConfiguration(
-            File configurationFile, Class<? extends T> configurationClass) throws Exception {
+            FileObject configurationFile, Class<? extends T> configurationClass) throws Exception {
         if (configurationClass == null) {
             return null;
         }
-        InputStream inputStream = new FileInputStream(configurationFile);
+        InputStream inputStream = configurationFile.getContent().getInputStream();
         try {
             return loadConfiguration(inputStream, configurationClass);
         } finally {
@@ -447,99 +379,25 @@ public class DispatcherLogic {
         return (T) configuration;
     }
 
-    public static Class<? extends PageAction> getActionClass(Configuration configuration, File directory) {
-        return getActionClass(configuration, directory, true);
-    }
-
-    public static Class<? extends PageAction> getActionClass
-            (Configuration configuration, File directory, boolean fallback) {
-        File scriptFile = ScriptingUtil.getGroovyScriptFile(directory, "action");
-        Class<? extends PageAction> actionClass;
-        try {
-            actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(scriptFile);
-        } catch (Exception e) {
-            logger.error("Couldn't load action class for " + directory + ", returning safe-mode action", e);
-            return fallback ? SafeModeAction.class : null;
-        }
-        if (isValidActionClass(actionClass)) {
-            return actionClass;
-        } else {
-            logger.error("Invalid action class for " + directory + ": " + actionClass);
-            return fallback ? SafeModeAction.class : null;
-        }
-    }
-
-    public static boolean isValidActionClass(Class<?> actionClass) {
-        if (actionClass == null) {
-            return false;
-        }
-        if (!PageAction.class.isAssignableFrom(actionClass)) {
-            logger.error("Action " + actionClass + " must implement " + PageAction.class);
-            return false;
-        }
-        return true;
-    }
-
-    @Deprecated
-    public static PageAction ensureActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
-        PageAction action = page.getActionBean();
-        assert action != null;
-        if(action == null) {
-            action = page.getActionClass().newInstance();
-            page.setActionBean(action);
-        }
-        return action;
-    }
-
     public static void configurePageAction(PageAction pageAction, PageInstance pageInstance) {
         if(pageInstance.getConfiguration() != null) {
             logger.debug("Page instance {} is already configured");
             return;
         }
-        File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
+        FileObject configurationFile;
+        try {
+            configurationFile = pageInstance.getDirectory().getChild("configuration.xml");
+        } catch (FileSystemException e) {
+            throw new RuntimeException(e);
+        }
         Class<?> configurationClass = PageActionLogic.getConfigurationClass(pageAction.getClass());
         try {
             Object configuration = getConfiguration(configurationFile, configurationClass);
             pageInstance.setConfiguration(configuration);
         } catch (Throwable t) {
-            logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
+            logger.error("Couldn't load configuration from " + configurationFile.getName().getPath(), t);
         }
         pageAction.setPageInstance(pageInstance);
-    }
-
-    public static PageAction getSubpage(
-            Configuration configuration, PageInstance parentPageInstance, String pathFragment)
-            throws PageNotActiveException {
-        File currentDirectory = parentPageInstance.getChildrenDirectory();
-        File childDirectory = new File(currentDirectory, pathFragment);
-        if(childDirectory.isDirectory() && !PageInstance.DETAIL.equals(childDirectory.getName())) {
-            ChildPage childPage = null;
-            for(ChildPage candidate : parentPageInstance.getLayout().getChildPages()) {
-                if(candidate.getName().equals(childDirectory.getName())) {
-                    childPage = candidate;
-                    break;
-                }
-            }
-            if(childPage == null) {
-                throw new PageNotActiveException(childDirectory.getAbsolutePath());
-            }
-
-            Page page = DispatcherLogic.getPage(childDirectory);
-            Class<? extends PageAction> actionClass =
-                    DispatcherLogic.getActionClass(configuration, childDirectory);
-            try {
-                PageAction pageAction = actionClass.newInstance();
-                PageInstance pageInstance =
-                    new PageInstance(parentPageInstance, childDirectory, page, actionClass);
-                pageInstance.setActionBean(pageAction);
-                configurePageAction(pageAction, pageInstance);
-                return pageAction;
-            } catch (Exception e) {
-                throw new PageNotActiveException(e);
-            }
-        } else {
-            return null;
-        }
     }
 
 }

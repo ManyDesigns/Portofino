@@ -21,17 +21,17 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.vfs2.FileObject;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -124,10 +124,10 @@ public class Navigation {
             }
             currentNavigationItem = null;
             for (ChildPage childPage : childPages) {
-                File pageDir = current.getChildPageDirectory(childPage.getName());
+                FileObject pageDir = current.getChildPageDirectory(childPage.getName());
                 Page page;
                 try {
-                    page = DispatcherLogic.getPage(pageDir);
+                    page = PageLogic.getPage(pageDir);
                 } catch (Exception e) {
                     logger.warn("Nonexisting child page: " + pageDir);
                     logger.debug("Detailed explanation", e);

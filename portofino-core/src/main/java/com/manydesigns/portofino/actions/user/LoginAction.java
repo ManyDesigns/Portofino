@@ -31,6 +31,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.shiro.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
@@ -66,7 +67,7 @@ import java.util.Locale;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class LoginAction {
+public abstract class LoginAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 

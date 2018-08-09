@@ -39,7 +39,7 @@ public class GroovyCodeBase implements CodeBase {
         this.classLoader = classLoader;
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
         try {
-            String classpath = Paths.get(root.getURL().toURI()).toFile().getAbsolutePath();
+            String classpath = root.getName().getPath();
             cc.setClasspath(classpath);
         } catch (Exception e) {
             logger.debug("Could not set classpath", e);
