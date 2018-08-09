@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.pageactions;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;

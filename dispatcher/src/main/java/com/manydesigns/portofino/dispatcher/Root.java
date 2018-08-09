@@ -24,8 +24,14 @@ import org.apache.commons.vfs2.FileNotFolderException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.lang.reflect.Constructor;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -84,6 +90,18 @@ public class Root extends Node {
     @Override
     public ResourceResolver getResourceResolver() {
         return resourceResolver;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response homeJSON() throws URISyntaxException {
+        return Response.temporaryRedirect(new URI("swagger.json")).build();
+    }
+
+    @GET
+    @Produces("application/yaml")
+    public Response homeYAML() throws URISyntaxException {
+        return Response.temporaryRedirect(new URI("swagger.yaml")).build();
     }
 
 }

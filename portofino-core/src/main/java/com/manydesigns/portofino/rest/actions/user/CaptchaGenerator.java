@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.actions.user;
+package com.manydesigns.portofino.rest.actions.user;
 
 import com.github.cage.Cage;
 import com.github.cage.image.ConstantColorGenerator;

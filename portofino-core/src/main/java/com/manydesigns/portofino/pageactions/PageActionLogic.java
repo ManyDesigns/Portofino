@@ -20,8 +20,6 @@
 
 package com.manydesigns.portofino.pageactions;
 
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;

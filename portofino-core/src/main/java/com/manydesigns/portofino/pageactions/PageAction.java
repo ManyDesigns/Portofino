@@ -18,18 +18,38 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions.safemode;
+package com.manydesigns.portofino.pageactions;
 
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import com.manydesigns.portofino.dispatcher.security.SecureResource;
 
 /**
+ * An element in Portofino's hierarchical resource structure.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class SafeModeAction extends CustomAction {
-    public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+public interface PageAction extends SecureResource {
+    String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
+
+    PageActionContext getContext();
+
+    void setContext(PageActionContext context);
+
+    PageAction getParent();
+
+    /**
+     * Returns the PageInstance of this element.
+     */
+    PageInstance getPageInstance();
+
+    /**
+     * Sets the PageInstance of this element. Invoked automatically by the framework.
+     */
+    void setPageInstance(PageInstance pageInstance);
+
+    void prepareForExecution();
+
 
 }

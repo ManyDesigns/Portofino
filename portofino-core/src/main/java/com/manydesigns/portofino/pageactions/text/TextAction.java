@@ -30,7 +30,7 @@
 //import com.manydesigns.portofino.buttons.annotations.Buttons;
 //import com.manydesigns.portofino.cache.ControlsCache;
 //import com.manydesigns.portofino.dispatcher.PageLogic;
-//import com.manydesigns.portofino.logic.SecurityLogic;
+//import com.manydesigns.portofino.security.SecurityLogic;
 //import com.manydesigns.portofino.pageactions.AbstractPageAction;
 //import com.manydesigns.portofino.pageactions.PageActionName;
 //import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;

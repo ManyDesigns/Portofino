@@ -206,11 +206,11 @@ public class PortofinoListener extends Listener
 
         logger.debug("Registering Groovy class loader");
         logger.info("Groovy classpath: " + groovyClasspath.getAbsolutePath());
+        //TODO refactor using GroovyCodeBase
         GroovyScriptEngine groovyScriptEngine =
                 ScriptingUtil.createScriptEngine(groovyClasspath, getClass().getClassLoader());
         ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
         servletContext.setAttribute(BaseModule.GROOVY_CLASS_PATH, groovyClasspath);
-        servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);
         servletContext.setAttribute(BaseModule.GROOVY_SCRIPT_ENGINE, groovyScriptEngine);
 
         logger.debug("Installing I18n ResourceBundleManager");

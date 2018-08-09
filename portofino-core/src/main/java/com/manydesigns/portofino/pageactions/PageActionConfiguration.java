@@ -18,37 +18,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.pageactions;
 
 /**
+ * Optional interface that configuration objects can implement to participate in a simple lifecycle.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface DispatchElement {
-
+public interface PageActionConfiguration {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     /**
-     * Returns the PageInstance of this element.
+     * Initializes the configuration.
      */
-    PageInstance getPageInstance();
-
-    /**
-     * Sets the PageInstance of this element. Invoked automatically by the framework.
-     */
-    void setPageInstance(PageInstance pageInstance);
-
-    /**
-     * Visits a path element.
-     * @param pathFragment one of the elements of the path being visited (e.g. in /a/b/c, one path fragment might be
-     *                     the string "a")
-     * @return the next element in the dispatch, or null if not available. Typically it is either a sub-page action
-     * matching the specified fragment, or `this` (the same element) if the fragment was used as a path parameter.
-     * However, subclasses have freedom to return what they want.
-     */
-    public DispatchElement consumePathFragment(String pathFragment);
+    void init();
 
 }

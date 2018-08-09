@@ -25,7 +25,7 @@ import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
+import com.manydesigns.portofino.pageactions.PageActionConfiguration;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;

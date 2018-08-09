@@ -31,8 +31,8 @@ class ProjectsTicketsAction extends CrudAction {
     Serializable project;
     Object old;
 
-//    @Before
-    public void prepareProject() {
+    @Override
+    public void prepareForExecution() {
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
 

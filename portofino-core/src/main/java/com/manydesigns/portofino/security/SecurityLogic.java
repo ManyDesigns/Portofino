@@ -18,18 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.logic;
+package com.manydesigns.portofino.security;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
-import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.GroupPermission;
 import com.manydesigns.portofino.shiro.PagePermission;
 import org.apache.commons.configuration.Configuration;
@@ -72,11 +67,6 @@ public class SecurityLogic {
     public static final String GROUP_ADMINISTRATORS_DEFAULT = "administrators";
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
-
-    public static boolean hasPermissions(Configuration conf, Dispatch dispatch, Subject subject, Method handler) {
-        logger.debug("Checking action permissions");
-        return hasPermissions(conf, dispatch.getLastPageInstance(), subject, handler);
-    }
 
     public static boolean hasPermissions(Configuration conf, PageInstance instance, Subject subject, Method handler) {
         logger.debug("Checking action permissions");
@@ -221,7 +211,7 @@ public class SecurityLogic {
         return isUserInGroup(administratorsGroup);
     }
 
-    public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, PageAction actionBean, Method handler) {
+    public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, Object actionBean, Method handler) {
         logger.debug("Checking if action or method required administrator");
         boolean requiresAdministrator = false;
         if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
@@ -265,7 +255,7 @@ public class SecurityLogic {
     }
 
     public static boolean isAllowed(
-            HttpServletRequest request, Dispatch dispatch, PageAction actionBean, Method handler) {
+            HttpServletRequest request, PageInstance pageInstance, Object actionBean, Method handler) {
         Subject subject = SecurityUtils.getSubject();
 
         if (!satisfiesRequiresAdministrator(request, actionBean, handler)) {
@@ -280,10 +270,10 @@ public class SecurityLogic {
             Permissions permissions;
             String resource;
             boolean allowed;
-            if(dispatch != null) {
+            if(pageInstance != null) {
                 logger.debug("The protected resource is a page action");
-                resource = dispatch.getLastPageInstance().getPath();
-                allowed = hasPermissions(configuration, dispatch, subject, handler);
+                resource = pageInstance.getPath();
+                allowed = hasPermissions(configuration, pageInstance, subject, handler);
             } else {
                 logger.debug("The protected resource is a regular JAX-RS resource");
                 resource = request.getRequestURI();

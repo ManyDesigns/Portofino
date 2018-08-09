@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.text.configuration;
 
-import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
+import com.manydesigns.portofino.pageactions.PageActionConfiguration;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;

@@ -83,13 +83,6 @@
             <version>1.5.20</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Swagger UI -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>swagger-ui</artifactId>
-            <version>3.17.1</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet-core</artifactId>

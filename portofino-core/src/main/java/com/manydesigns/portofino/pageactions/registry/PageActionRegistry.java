@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.registry;
 
-import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.pageactions.PageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 
 import java.util.Iterator;

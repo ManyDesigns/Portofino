@@ -4,8 +4,8 @@ import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.BootstrapSizes;
-import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
-import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
+import com.manydesigns.portofino.pageactions.ConfigurationWithDefaults;
+import com.manydesigns.portofino.pageactions.PageActionConfiguration;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;

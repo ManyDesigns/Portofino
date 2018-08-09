@@ -49,9 +49,7 @@ public abstract class Node implements SecureResource {
     protected FileObject location;
     protected Resource parent;
     protected String segment;
-    protected final List<ResourceProcessor> resourceInitializers = new ArrayList<>();
-    protected final Map<String, Object> resourceEnhancers = new HashMap<>();
-    
+
     @Context
     protected ResourceContext resourceContext;
 
@@ -82,6 +80,10 @@ public abstract class Node implements SecureResource {
 
     public String getPath() {
         return parent.getPath() + getSegment() + "/";
+    }
+
+    public void setResourceContext(ResourceContext resourceContext) {
+        this.resourceContext = resourceContext;
     }
 
     /**
@@ -183,9 +185,6 @@ public abstract class Node implements SecureResource {
 
     protected void initGenericResource(Object resource) {
         resourceContext.initResource(resource);
-        for(ResourceProcessor processor : resourceInitializers) {
-            processor.process(resource);
-        }
     }
 
     public Map<String, Object> describe() {
@@ -279,21 +278,4 @@ public abstract class Node implements SecureResource {
         //The default implementation does nothing, it is only an extension hook
     }
 
-    @Path(":enhancer/{name}")
-    public Object getResourceEnhancer(@PathParam("name") String name) {
-        Object enhancer = resourceEnhancers.get(name);
-        if(enhancer != null) {
-            return enhancer;
-        } else {
-            throw new WebApplicationException(404);
-        }
-    }
-
-    public Map<String, Object> getResourceEnhancers() {
-        return resourceEnhancers;
-    }
-
-    public List<ResourceProcessor> getResourceInitializers() {
-        return resourceInitializers;
-    }
 }

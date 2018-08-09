@@ -29,7 +29,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.Table;
@@ -197,15 +197,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
     // Setup
     //**************************************************************************
 
-    @Override
-    public void prepareForExecution() {
-        if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
-            session = persistence.getSession(getCrudConfiguration().getDatabase());
-            selectionProviderSupport = createSelectionProviderSupport();
-            selectionProviderSupport.setup();
-        }
-    }
-
     protected ModelSelectionProviderSupport createSelectionProviderSupport() {
         return new ModelSelectionProviderSupport(this, persistence);
     }
@@ -244,6 +235,16 @@ public class CrudAction extends AbstractCrudAction<Object> {
         }
 
         return new TableAccessor(baseTable);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
+            session = persistence.getSession(getCrudConfiguration().getDatabase());
+            selectionProviderSupport = createSelectionProviderSupport();
+            selectionProviderSupport.setup();
+        }
     }
 
     //**************************************************************************

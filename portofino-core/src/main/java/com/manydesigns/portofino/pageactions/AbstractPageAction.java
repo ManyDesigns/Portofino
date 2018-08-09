@@ -33,7 +33,7 @@ import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
-import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
@@ -253,11 +253,13 @@ public abstract class AbstractPageAction extends NodeWithParameters implements P
         context.setRequest(request);
         context.setResponse(response);
         context.setServletContext(request.getServletContext());
-        String path = uriInfo.getPath();
-        if(!path.startsWith("/")) {
-            path = "/" + path;
+        if(uriInfo != null) { //TODO for Swagger
+            String path = uriInfo.getPath();
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+            context.setActionPath(path); //TODO
         }
-        context.setActionPath(path); //TODO
         pageAction.setContext(context);
     }
 

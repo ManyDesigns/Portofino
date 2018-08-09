@@ -23,7 +23,7 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.authc.credential.PasswordMatcher;

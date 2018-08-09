@@ -33,34 +33,6 @@ public class ApplicationRoot extends DocumentedApiRoot {
     @Context
     protected ResourceContext resourceContext;
 
-    @GET
-    @Produces(MediaType.TEXT_HTML)
-    public Response homeHTML() throws URISyntaxException {
-        return redirectToHome("home.html");
-    }
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response homeJSON() throws URISyntaxException {
-        return redirectToHome("home.json");
-    }
-    
-    @GET
-    @Produces("application/yaml")
-    public Response homeYAML() throws URISyntaxException {
-        return redirectToHome("home.yaml");
-    }
-
-    protected Response redirectToHome(String home) throws URISyntaxException {
-        Configuration configuration = getConfiguration();
-        String homeLocation = configuration.getString(home);
-        if(homeLocation != null) {
-            return Response.temporaryRedirect(new URI(homeLocation)).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-    }
-
     protected Configuration getConfiguration() {
         return (Configuration) servletContext.getAttribute("portofino.configuration");
     }

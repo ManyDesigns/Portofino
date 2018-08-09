@@ -26,12 +26,8 @@ import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.Guarded;
 import com.manydesigns.portofino.cache.ControlsCache;
-import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.PageActionContext;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.pageactions.PageAction;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import ognl.OgnlContext;
@@ -59,8 +55,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import static javax.ws.rs.core.Response.Status.CONFLICT;
 
@@ -218,15 +212,8 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
 
     protected void checkPageActionInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
         Method handler = resourceInfo.getResourceMethod();
-        List<PageInstance> pageInstancePath = new ArrayList<>();
-        PageInstance last = pageAction.getPageInstance();
-        while(last != null) {
-            pageInstancePath.add(0, last);
-            last = last.getParent();
-        }
-        Dispatch dispatch = new Dispatch(pageInstancePath.toArray(new PageInstance[pageInstancePath.size()]));
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        if(!SecurityLogic.isAllowed(request, dispatch, pageAction, handler)) {
+        if(!SecurityLogic.isAllowed(request, pageAction.getPageInstance(), pageAction, handler)) {
             Response.Status status =
                     SecurityUtils.getSubject().isAuthenticated() ?
                             Response.Status.FORBIDDEN :

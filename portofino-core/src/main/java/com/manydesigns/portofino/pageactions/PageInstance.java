@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.pageactions;
 
 import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Layout;
@@ -239,11 +239,4 @@ public class PageInstance {
         this.description = description;
     }
 
-    public boolean isPrepared() {
-        return prepared;
-    }
-
-    public void setPrepared(boolean prepared) {
-        this.prepared = prepared;
-    }
 }

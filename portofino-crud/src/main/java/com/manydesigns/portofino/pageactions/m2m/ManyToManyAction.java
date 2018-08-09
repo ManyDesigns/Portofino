@@ -38,7 +38,7 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.DatabaseModule;

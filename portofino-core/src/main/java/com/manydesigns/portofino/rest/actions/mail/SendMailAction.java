@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.actions.mail;
+package com.manydesigns.portofino.rest.actions.mail;
 
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.modules.MailModule;

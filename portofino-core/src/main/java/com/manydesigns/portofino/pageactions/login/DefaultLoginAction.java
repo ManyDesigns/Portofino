@@ -34,17 +34,14 @@ import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.user.LoginAction;
+import com.manydesigns.portofino.rest.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.DispatchElement;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.PageActionContext;
-import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pageactions.PageAction;
+import com.manydesigns.portofino.pageactions.PageActionContext;
+import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
-
-import javax.ws.rs.core.Response;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

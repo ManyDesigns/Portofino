@@ -19,7 +19,7 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
-import com.manydesigns.portofino.logic.SecurityLogic
+import com.manydesigns.portofino.security.SecurityLogic
 
 class Security extends AbstractPortofinoRealm {
 

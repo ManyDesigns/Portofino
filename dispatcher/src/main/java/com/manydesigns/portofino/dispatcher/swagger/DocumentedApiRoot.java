@@ -17,6 +17,7 @@ import io.swagger.models.properties.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.container.ResourceContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,6 +48,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         final SubResourceReader subResourceReader = new SubResourceReader(reader);
         try {
             Root root = rootFactory.createRoot();
+            root.setResourceContext(new DummyResourceContext());
             //TODO set ResourceContext (dummy?)
             new DepthFirstVisitor((NodeVisitor) node -> {
                 try {
@@ -68,7 +70,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
 
         public Swagger readSubResource(Node node) {
             ArrayList<Parameter> parameters = new ArrayList<>();
-            String path = node.getPath();
+            StringBuilder path = new StringBuilder(node.getPath());
             if(node instanceof NodeWithParameters) {
                 NodeWithParameters withParameters = (NodeWithParameters) node;
                 int minParameters = withParameters.getMinParameters();
@@ -77,14 +79,34 @@ public abstract class DocumentedApiRoot implements ReaderListener {
                     PathParameter parameter = new PathParameter();
                     String paramName = "param" + i;
                     parameter.setName(paramName);
-                    path += "/{" + paramName + "}";
+                    path.append("/{").append(paramName).append("}");
                     parameter.setProperty(new StringProperty());
                     parameter.setRequired(i < minParameters);
                     parameters.add(parameter);
                 }
             }
-            return read(node.getClass(), path, null, true, new String[0], new String[0],
-                    new HashMap<String, Tag>(), parameters);
+            return read(node.getClass(), path.toString(), null, true, new String[0], new String[0],
+                    new HashMap<>(), parameters);
+        }
+    }
+
+    protected static class DummyResourceContext implements ResourceContext {
+        @Override
+        public <T> T getResource(Class<T> resourceClass) {
+            try {
+                return initResource(resourceClass.newInstance());
+            } catch (Exception e) {
+                logger.warn("Could not create resource for Swagger", e);
+                return null;
+            }
+        }
+
+        @Override
+        public <T> T initResource(T resource) {
+            if(resource instanceof Node) {
+                ((Node) resource).setResourceContext(this);
+            }
+            return resource;
         }
     }
     

@@ -18,23 +18,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.pageactions;
 
 /**
- * Optional interface that configuration objects can implement to participate in a simple lifecycle.
- *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PageActionConfiguration {
+public class PageNotActiveException extends RuntimeException {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    /**
-     * Initializes the configuration.
-     */
-    public void init();
+    public PageNotActiveException() {
+    }
 
+    public PageNotActiveException(String message) {
+        super(message);
+    }
+
+    public PageNotActiveException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public PageNotActiveException(Throwable cause) {
+        super(cause);
+    }
 }
