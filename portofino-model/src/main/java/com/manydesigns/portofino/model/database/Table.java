@@ -188,7 +188,7 @@ public class Table implements ModelObject, Annotated {
 
     @Required
     public String getSchemaName() {
-        return schema.getSchemaName();
+        return schema.getSchema();
     }
 
     @Required

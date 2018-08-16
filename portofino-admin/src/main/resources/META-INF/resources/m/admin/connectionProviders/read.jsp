@@ -19,7 +19,7 @@
                 <h4><fmt:message key="schemas"/></h4>
                 <c:forEach var="schema" items="${actionBean.connectionProvider.database.schemas}"
                            varStatus="status">
-                    <c:out value="${schema.schemaName}" /><c:if test="${!status.last}">, </c:if>
+                    <c:out value="${schema.schemaName}" /> (<c:out value="${schema.schema}" />) <c:if test="${!status.last}">, </c:if>
                 </c:forEach>
             </c:if>
             <c:if test="${actionBean.detectedValuesForm != null}">
