@@ -20,23 +20,21 @@
 
 package com.manydesigns.elements.fields.helpers;
 
-import com.manydesigns.crypto.CryptoService;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Encrypted;
-import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.FileBlobField;
+import com.manydesigns.elements.fields.EncryptedField;
+import com.manydesigns.elements.fields.search.EncryptedTextSearchField;
 import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.fields.search.TextMatchMode;
+import com.manydesigns.elements.fields.search.TextSearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class FileBlobFieldHelper implements FieldHelper {
+ * @author Emanuele Poggi     - emanuele.poggi@manydesigns.com
+ */
+public class EncryptedFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -44,19 +42,28 @@ public class FileBlobFieldHelper implements FieldHelper {
                                        PropertyAccessor propertyAccessor,
                                        Mode mode,
                                        String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(FileBlob.class)) {
-            if(propertyAccessor.isAnnotationPresent(Encrypted.class))
-                return new FileBlobField(propertyAccessor, mode, prefix, CryptoService.getInstance().getTypeAlgo());
-                return new FileBlobField(propertyAccessor, mode, prefix);
+
+        Encrypted encrypted = propertyAccessor.getAnnotation(Encrypted.class);
+        if (encrypted != null &&
+                String.class.isAssignableFrom(propertyAccessor.getType())) {
+            EncryptedField field = new EncryptedField(propertyAccessor, mode, prefix, encrypted.value());
+            return field;
         }
+
         return null;
     }
 
     public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
                                                    PropertyAccessor propertyAccessor,
                                                    String prefix) {
+        Encrypted encrypted = propertyAccessor.getAnnotation(Encrypted.class);
+        if (encrypted != null  && String.class.isAssignableFrom(propertyAccessor.getType())) {
+            EncryptedTextSearchField textSearchField =
+                    new EncryptedTextSearchField(propertyAccessor, prefix,encrypted.value());
+            textSearchField.setShowMatchMode(false);
+            textSearchField.setMatchMode(TextMatchMode.EQUALS);
+            return textSearchField;
+        }
         return null;
     }
-
 }

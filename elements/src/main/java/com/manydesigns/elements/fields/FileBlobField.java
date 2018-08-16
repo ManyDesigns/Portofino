@@ -51,10 +51,19 @@ public class FileBlobField extends AbstractBlobField {
     };
     protected Callable<String> blobCodeGenerator = DEFAULT_CODE_GENERATOR;
 
+    protected String encryptionType=null;
+
     public FileBlobField(@NotNull PropertyAccessor accessor,
                          @NotNull Mode mode,
                          @Nullable String prefix) {
         super(accessor, mode, prefix);
+    }
+
+    public FileBlobField(@NotNull PropertyAccessor accessor,
+                         @NotNull Mode mode,
+                         @Nullable String prefix,@Nullable String encryptionType) {
+        super(accessor, mode, prefix);
+        this.encryptionType=encryptionType;
     }
 
     @Override
@@ -72,6 +81,7 @@ public class FileBlobField extends AbstractBlobField {
                 forgetBlob();
             } else {
                 blob = new Blob(code);
+                blob.setEncryptionType(encryptionType);
             }
         }
     }
@@ -98,5 +108,13 @@ public class FileBlobField extends AbstractBlobField {
 
     public void setBlobCodeGenerator(Callable<String> blobCodeGenerator) {
         this.blobCodeGenerator = blobCodeGenerator;
+    }
+
+    public String getEncryptionType() {
+        return encryptionType;
+    }
+
+    public void setEncryptionType(String encryptionType) {
+        this.encryptionType = encryptionType;
     }
 }

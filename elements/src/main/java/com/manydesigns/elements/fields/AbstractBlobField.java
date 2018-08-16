@@ -23,6 +23,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.Encrypted;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
@@ -66,6 +67,7 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
 
     protected Blob blob;
     protected String blobError;
+    protected String encryptionType;
 
     //**************************************************************************
     // Costruttori
@@ -87,6 +89,11 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
             size = Math.min(25, accessor.getAnnotation(MaxLength.class).value());
         } else {
             size = 25;
+        }
+
+
+        if (accessor.isAnnotationPresent(Encrypted.class)) {
+            encryptionType = accessor.getAnnotation(Encrypted.class).value();
         }
     }
 
@@ -303,6 +310,8 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
         blob.setContentType(fileBean.getContentType());
         blob.setCreateTimestamp(new DateTime());
         blob.setPropertiesLoaded(true);
+        blob.setEncryptionType(encryptionType);
+        blob.setSize(fileBean.getSize());
     }
 
     public abstract String generateNewCode();
