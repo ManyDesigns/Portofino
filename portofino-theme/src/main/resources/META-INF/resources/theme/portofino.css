@@ -14,8 +14,8 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    letter-spacing: 0.02em;
-    color: #333;
+    letter-spacing: 0.035em;
+    color: #5a5a5a;
 }
 
 /*******************************************************************************
@@ -433,7 +433,7 @@ Content
 }
 
 .navigation {
-    letter-spacing: 0.03em;
+    letter-spacing: 0.045em;
     margin-bottom: 1em;
 }
 
@@ -859,7 +859,18 @@ Brand image / Navbar
   vertical-align: text-top;
 }
 
-.navbar{ box-shadow: 1px 0px 5px  #666666 }
+.navbar{
+    border: none;
+    -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-menu {
+    margin-top: 0;
+    border: none;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
 
 /*******************************************************************************
 Menu
