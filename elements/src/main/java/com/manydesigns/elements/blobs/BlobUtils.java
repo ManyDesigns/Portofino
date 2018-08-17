@@ -1,12 +1,17 @@
 package com.manydesigns.elements.blobs;
 
+import com.manydesigns.crypto.CryptoService;
 import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.fields.AbstractBlobField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.TableForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.GeneralSecurityException;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -15,6 +20,13 @@ import java.io.IOException;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public abstract class BlobUtils {
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger =
+            LoggerFactory.getLogger(BlobUtils.class);
 
     public static void loadBlobs(Form form, BlobManager blobManager, boolean loadContents) {
         for(FieldSet fieldSet : form) {
@@ -65,4 +77,28 @@ public abstract class BlobUtils {
         }
     }
 
+    public static InputStream encrypt( InputStream decryptedInputStream, String type ){
+        try {
+            logger.debug("Decrypting encryptedInputStream");
+            return CryptoService.getInstance().encrypt(decryptedInputStream);
+        } catch (GeneralSecurityException | IOException e) {
+            logger.error(e.getMessage(),e);
+        }
+        return decryptedInputStream;
+    }
+
+    public static InputStream decrypt( InputStream encryptedInputStream , String type ){
+        try {
+            logger.debug("Decrypting encryptedInputStream");
+            return  CryptoService.getInstance().decrypt(encryptedInputStream);
+        } catch (GeneralSecurityException | IOException e) {
+            logger.error(e.getMessage(),e);
+        }
+        return encryptedInputStream;
+    }
+
+    public static Long calculatePaddingSize(Blob blob) {
+        logger.debug("Calculating padding size");
+        return CryptoService.getInstance().getFileSize(blob.getSize());
+    }
 }

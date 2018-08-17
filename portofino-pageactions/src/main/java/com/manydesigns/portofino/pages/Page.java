@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.pages;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.annotations.Required;
 import org.slf4j.Logger;
@@ -28,14 +29,14 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.*;
 
 /*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.NONE)
-@XmlType(propOrder = {"title","description", "navigationRoot","id","layout","detailLayout","permissions"})
+@XmlType(propOrder = {"title","titleKey","description", "navigationRoot","id","layout","detailLayout","permissions"})
 public class Page {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
@@ -46,6 +47,7 @@ public class Page {
 
     protected String id;
     protected String title;
+    protected String titleKey;
     protected String description;
     protected Layout layout;
     protected Layout detailLayout;
@@ -122,7 +124,17 @@ public class Page {
     @Required
     @FieldSize(50)
     public String getTitle() {
-        return title;
+        return titleKey==null?title: ElementsThreadLocals.getText(titleKey);
+    }
+
+    @XmlAttribute(required = false)
+    @FieldSize(50)
+    public String getTitleKey() {
+        return titleKey;
+    }
+
+    public void setTitleKey(String titleKey) {
+        this.titleKey = titleKey;
     }
 
     public void setTitle(String title) {

@@ -97,7 +97,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         if (accessor.isAnnotationPresent(MinDecimalValue.class)) {
             double minDecimalValue =
                     accessor.getAnnotation(MinDecimalValue.class).value();
-            minValue = new BigDecimal(minDecimalValue);
+            minValue = BigDecimal.valueOf(minDecimalValue);
         } else if (accessor.isAnnotationPresent(MinIntValue.class)) {
             int minIntValue =
                     accessor.getAnnotation(MinIntValue.class).value();
@@ -108,7 +108,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         if (accessor.isAnnotationPresent(MaxDecimalValue.class)) {
             double maxDecimalValue =
                     accessor.getAnnotation(MaxDecimalValue.class).value();
-            maxValue = new BigDecimal(maxDecimalValue);
+            maxValue = BigDecimal.valueOf(maxDecimalValue);
         } else if (accessor.isAnnotationPresent(MaxIntValue.class)) {
             int maxIntValue =
                     accessor.getAnnotation(MaxIntValue.class).value();
@@ -243,7 +243,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
                 return;
             }
             decimalValue = tmpValue.setScale(scale, BigDecimal.ROUND_HALF_EVEN);
-        } catch (Throwable e) {
+        }catch (Exception e) {
             logger.debug("Decimal parse error", e);
         }
     }

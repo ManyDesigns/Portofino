@@ -67,11 +67,12 @@ public class FormXlsExporter {
 
         addHeaderToSheet(sheet);
 
+        XlsUtil xlsUtil = new XlsUtil();
         int i = 1;
         for (FieldSet fieldset : form) {
             int j = 0;
             for (Field field : fieldset.fields()) {
-                XlsUtil.addFieldToCell(sheet, i, j, field);
+                xlsUtil.addFieldToCell(sheet, i, j, field);
                 j++;
             }
             i++;

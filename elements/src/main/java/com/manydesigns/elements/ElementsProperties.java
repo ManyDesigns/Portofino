@@ -86,7 +86,7 @@ public final class ElementsProperties {
         try {
             configuration.addConfiguration(
                     new PropertiesConfiguration(resource));
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.warn(String.format(
                     "Error loading properties from: %s", resource), e);
         }

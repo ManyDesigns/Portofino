@@ -135,7 +135,7 @@ public class RangeSearchField extends AbstractSearchField {
     protected Object readValue(String parameter, Class type) {
         try {
             return OgnlUtils.convertValue(parameter, type);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             return null;
         }
     }

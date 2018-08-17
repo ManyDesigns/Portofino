@@ -21,7 +21,7 @@
                 <c:if test="${actionBean.searchVisible}">
                     <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}"
                        class="search_form_toggle_link" data-search-visible="true">
-                        <span><fmt:message key="hide.search<<" /></span>
+                        <span><fmt:message key="hide.search" /></span>
                         <span style="display: none;"><fmt:message key="show.search" /></span>
                     </a>
                 </c:if>

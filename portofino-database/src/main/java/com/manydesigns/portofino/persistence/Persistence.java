@@ -205,7 +205,7 @@ public class Persistence {
                 JdbcConnection jdbcConnection = new JdbcConnection(connection);
                 liquibase.database.Database lqDatabase =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
-                lqDatabase.setDefaultSchemaName(schemaName);
+                lqDatabase.setDefaultSchemaName(schema.getSchema());
                 String relativeChangelogPath =
                         ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
                 if(new File(relativeChangelogPath).isAbsolute()) {

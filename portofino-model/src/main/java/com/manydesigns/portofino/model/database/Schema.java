@@ -39,7 +39,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"catalog", "schemaName","immediateTables"})
+@XmlType(propOrder = {"catalog", "schemaName","schema","immediateTables"})
 public class Schema implements ModelObject {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
@@ -53,6 +53,7 @@ public class Schema implements ModelObject {
     protected final List<Table> tables = new ArrayList<Table>();
 
     protected String schemaName;
+    protected String schema;
     protected String catalog;
     
     //**************************************************************************
@@ -86,9 +87,9 @@ public class Schema implements ModelObject {
 
     public String getQualifiedName() {
         if(getDatabaseName() == null) {
-            return schemaName;
+            return schema!=null?schema:schemaName;
         }
-        return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
+        return MessageFormat.format("{0}.{1}", getDatabaseName(), schema!=null?schema:schemaName);
     }
 
     public void reset() {}
@@ -96,6 +97,8 @@ public class Schema implements ModelObject {
     public void init(Model model) {
         assert database != null;
         assert schemaName != null;
+        if( schema == null )
+            schema = schemaName;
     }
 
     public void link(Model model) {}
@@ -129,6 +132,15 @@ public class Schema implements ModelObject {
 
     public void setSchemaName(String schemaName) {
         this.schemaName = schemaName;
+    }
+
+    @XmlAttribute(required = false)
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
     }
 
     @XmlAttribute(required = false)

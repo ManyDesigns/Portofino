@@ -199,7 +199,7 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
         try {
             DateTime dateTime = Util.parseDateTime(dateTimeFormatter, stringValue, containsTime);
             dateValue = toDate(dateTime);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             dateFormatError = true;
             logger.debug("Cannot parse date: {}", stringValue);
         }

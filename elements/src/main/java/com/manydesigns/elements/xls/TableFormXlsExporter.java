@@ -70,8 +70,9 @@ public class TableFormXlsExporter {
         addHeaderToSheet(sheet);
 
         int i = 1;
+        XlsUtil xlsUtil = new XlsUtil();
         for (TableForm.Row row : form.getRows()) {
-            exportRows(sheet, i, row);
+            exportRows(sheet, i, row,xlsUtil);
             i++;
         }
 
@@ -92,10 +93,11 @@ public class TableFormXlsExporter {
         }
     }
 
-    private void exportRows(WritableSheet sheet, int i,TableForm.Row row) throws WriteException {
+    private void exportRows(WritableSheet sheet, int i,TableForm.Row row,XlsUtil xlsUtil) throws WriteException {
         int j = 0;
+
         for (Field field : row) {
-            XlsUtil.addFieldToCell(sheet, i, j, field);
+            xlsUtil.addFieldToCell(sheet, i, j, field);
             j++;
         }
     }

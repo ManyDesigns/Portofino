@@ -122,8 +122,16 @@ public class SimpleBlobManager implements BlobManager {
             dataFile.getParentFile().mkdirs();
         }
         FileOutputStream out = new FileOutputStream(dataFile);
+        InputStream encryptInputStream;
         try {
-            blob.setSize(IOUtils.copyLarge(blob.getInputStream(), out));
+            InputStream inputStream = blob.getInputStream();
+            if(blob.isEncrypted()){
+                 encryptInputStream = BlobUtils.encrypt(inputStream,blob.getEncryptionType());
+                IOUtils.copyLarge(encryptInputStream, out);
+                //blob.setSize(BlobUtils.calculatePaddingSize(blob));
+            }else{
+                blob.setSize(IOUtils.copyLarge(inputStream, out));
+            }
         } finally {
             IOUtils.closeQuietly(out);
         }

@@ -301,8 +301,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Buttons({
-        @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY, icon = Button.ICON_SEARCH),
-        @Button(list = "crud-search-form-default-button", key = "search" )
+            @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY, icon = Button.ICON_SEARCH),
+            @Button(list = "crud-search-form-default-button", key = "search" )
     })
     public Resolution search() {
         //Not really used. Search is AJAX these days.
@@ -325,8 +325,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 return getEmbeddedSearchView();
             } else {
                 returnUrl = new UrlBuilder(
-                    context.getLocale(), Util.getAbsoluteUrl(context.getActionPath()), false)
-                    .toString();
+                        context.getLocale(), Util.getAbsoluteUrl(context.getActionPath()), false)
+                        .toString();
                 returnUrl = appendSearchStringParamIfNecessary(returnUrl);
                 return getSearchView();
             }
@@ -599,9 +599,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @Buttons({
-        @Button(list = "crud-read", key = "edit", order = 1 , icon = Button.ICON_EDIT + Button.ICON_WHITE,
-                group = "crud", type = Button.TYPE_SUCCESS),
-        @Button(list = "crud-read-default-button", key = "search")
+            @Button(list = "crud-read", key = "edit", order = 1 , icon = Button.ICON_EDIT + Button.ICON_WHITE,
+                    group = "crud", type = Button.TYPE_SUCCESS),
+            @Button(list = "crud-read-default-button", key = "search")
     })
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
@@ -687,8 +687,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @Buttons({
-        @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT),
-        @Button(list = "crud-bulk", key = "edit", order = 2, icon = Button.ICON_EDIT)
+            @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT),
+            @Button(list = "crud-bulk", key = "edit", order = 2, icon = Button.ICON_EDIT)
     })
     @Guard(test = "isBulkOperationsEnabled() && isEditEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
@@ -778,8 +778,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @Buttons({
-        @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH),
-        @Button(list = "crud-bulk", key = "delete", order = 3, icon = Button.ICON_TRASH)
+            @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH),
+            @Button(list = "crud-bulk", key = "delete", order = 3, icon = Button.ICON_TRASH)
     })
     @Guard(test = "isBulkOperationsEnabled() && isDeleteEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
@@ -822,7 +822,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public boolean isCreateEnabled() {
         return true;
     }
-    
+
     /**
      * Hook method called just after a new object has been created.
      * @param object the new object.
@@ -855,7 +855,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public boolean isEditEnabled() {
         return true;
     }
-    
+
     /**
      * Hook method called just before an object is used to populate the edit form.
      * @param object the object.
@@ -882,7 +882,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public boolean isDeleteEnabled() {
         return true;
     }
-    
+
     /**
      * Hook method called before an object is deleted.
      * @param object the object.
@@ -1281,7 +1281,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         boolean isShowingKey = false;
         for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             if(tableFormBuilder.getPropertyAccessors().contains(property) &&
-               tableFormBuilder.isPropertyVisible(property)) {
+                    tableFormBuilder.isPropertyVisible(property)) {
                 isShowingKey = true;
                 break;
             }
@@ -1298,9 +1298,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             logger.debug("TableForm: configuring detail link for the first visible property");
             for (PropertyAccessor property : classAccessor.getProperties()) {
                 if(tableFormBuilder.getPropertyAccessors().contains(property) &&
-                   tableFormBuilder.isPropertyVisible(property)) {
+                        tableFormBuilder.isPropertyVisible(property)) {
                     tableFormBuilder.configHrefTextFormat(
-                        property.getName(), hrefFormat);
+                            property.getName(), hrefFormat);
                     break;
                 }
             }
@@ -1527,10 +1527,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Override
     @Buttons({
-        @Button(list = "crud-edit", key = "cancel", order = 99),
-        @Button(list = "crud-create", key = "cancel", order = 99),
-        @Button(list = "crud-bulk-edit", key = "cancel", order = 99),
-        @Button(list = "configuration", key = "cancel", order = 99)
+            @Button(list = "crud-edit", key = "cancel", order = 99),
+            @Button(list = "crud-create", key = "cancel", order = 99),
+            @Button(list = "crud-bulk-edit", key = "cancel", order = 99),
+            @Button(list = "configuration", key = "cancel", order = 99)
     })
     public Resolution cancel() {
         if(isPopup()) {
@@ -1577,8 +1577,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     Blob blob = ((AbstractBlobField) field).getValue();
                     if(blob != null) {
                         UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
-                            .addParameter("downloadBlob", "")
-                            .addParameter("propertyName", field.getPropertyAccessor().getName());
+                                .addParameter("downloadBlob", "")
+                                .addParameter("propertyName", field.getPropertyAccessor().getName());
                         field.setHref(urlBuilder.toString());
                     }
                 }
@@ -1636,10 +1636,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } else {
             inputStream = blob.getInputStream();
         }
-        return new StreamingResolution(contentType, inputStream)
+        StreamingResolution streamingResolution = new StreamingResolution(contentType, inputStream)
                 .setFilename(fileName)
-                .setLength(contentLength)
                 .setLastModified(lastModified);
+
+        if( contentLength>0 ){
+            streamingResolution.setLength(contentLength);
+        }
+
+        return streamingResolution;
     }
 
     @PUT
@@ -1806,7 +1811,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(propertyEdits != null) {
             TableFormBuilder tableFormBuilder =
                     new TableFormBuilder(CrudPropertyEdit.class)
-                        .configNRows(propertyEdits.length);
+                            .configNRows(propertyEdits.length);
             propertiesTableForm = tableFormBuilder.build();
             propertiesTableForm.setCondensed(true);
         }
@@ -1955,7 +1960,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
 
             if(selectionProviderSupport != null &&
-               !selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
+                    !selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
                 updateSelectionProviders();
             }
 
@@ -2060,7 +2065,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     ) {
         return jsonOptions(selectionProviderName, selectionProviderIndex, prefix, includeSelectPrompt);
     }
-    
+
     /**
      * Returns values to update multiple related select fields or a single autocomplete
      * text field, in JSON form. Note that, for autocomplete fields, it expects the autocomplete value 
@@ -2110,7 +2115,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             field.setUpdatable(true);
         }
         form.readFromRequest(context.getRequest());
-        
+
         //The form only contains fields from the selection provider, so the index matches that of the field
         if(selectionProviderIndex < 0 || selectionProviderIndex >= fieldSet.size()) {
             return new ErrorResolution(400, "Invalid index");
@@ -2270,7 +2275,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 encodedSearchString += encoded;
             } else {
                 logger.warn("Could not encode search string \"" + StringEscapeUtils.escapeJava(searchString) +
-                            "\" with encoding " + encoding);
+                        "\" with encoding " + encoding);
                 return null;
             }
         } catch (UnsupportedEncodingException e) {

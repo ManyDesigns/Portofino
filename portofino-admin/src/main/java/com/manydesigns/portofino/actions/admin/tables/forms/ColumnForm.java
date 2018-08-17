@@ -73,7 +73,7 @@ public class ColumnForm extends Column {
             HighlightLinks.class.getName(), RegExp.class.getName(),
             DatabaseBlob.class.getName(), FileBlob.class.getName(),
             MinDecimalValue.class.getName(), MinIntValue.class.getName(), MaxDecimalValue.class.getName(),
-            MaxIntValue.class.getName(), DecimalFormat.class.getName(), DateFormat.class.getName()
+            MaxIntValue.class.getName(), DecimalFormat.class.getName(), DateFormat.class.getName(),Encrypted.class.getName()
     };
 
     public ColumnForm(Column copyFrom, PropertyAccessor columnAccessor, Type type) {
@@ -121,6 +121,9 @@ public class ColumnForm extends Column {
         }
         if(columnAccessor.isAnnotationPresent(Phone.class)) {
             stringFormat = Phone.class.getName();
+        }
+        if(columnAccessor.isAnnotationPresent(Encrypted.class)) {
+            stringFormat = Encrypted.class.getName();
         }
 
         HighlightLinks hlAnn = columnAccessor.getAnnotation(HighlightLinks.class);
@@ -216,8 +219,8 @@ public class ColumnForm extends Column {
             column.getAnnotations().add(ann);
         }
         if(!StringUtils.isEmpty(databaseBlobContentTypeProperty) ||
-           !StringUtils.isEmpty(databaseBlobFileNameProperty) ||
-           !StringUtils.isEmpty(databaseBlobTimestampProperty)) {
+                !StringUtils.isEmpty(databaseBlobFileNameProperty) ||
+                !StringUtils.isEmpty(databaseBlobTimestampProperty)) {
             Annotation ann = new Annotation(column, DatabaseBlob.class.getName());
             ann.getValues().add(databaseBlobContentTypeProperty);
             ann.getValues().add(databaseBlobFileNameProperty);
@@ -300,8 +303,8 @@ public class ColumnForm extends Column {
 
     @Override
     @RegExp(
-        value = "(_|$|[a-z]|[A-Z]|[\u0080-\ufffe])(_|$|[a-z]|[A-Z]|[\u0080-\ufffe]|[0-9])*",
-        errorMessage = "invalid.property.name")
+            value = "(_|$|[a-z]|[A-Z]|[\u0080-\ufffe])(_|$|[a-z]|[A-Z]|[\u0080-\ufffe]|[0-9])*",
+            errorMessage = "invalid.property.name")
     public String getPropertyName() {
         return super.getPropertyName();
     }
