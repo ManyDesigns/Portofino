@@ -59,6 +59,7 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
@@ -370,24 +371,23 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
     }
 
-    public Resolution jsonEditData() throws JSONException {
+    public Response jsonEditData() throws JSONException {
         if(object == null) {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
-
         preEdit();
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+        return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
     }
 
-    public Resolution jsonCreateData() throws JSONException {
+    public Response jsonCreateData() throws JSONException {
         preCreate();
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+        return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
     }
 
 
@@ -1178,22 +1178,21 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } else {
             inputStream = blob.getInputStream();
         }
-        StreamingOutput streamingOutput = new StreamingOutput() {
-            @Override
-            public void write(OutputStream output) throws IOException, WebApplicationException {
-                try {
-                    IOUtils.copyLarge(inputStream, output);
-                } finally {
-                    IOUtils.closeQuietly(inputStream);
-                }
+        StreamingOutput streamingOutput = output -> {
+            try {
+                IOUtils.copyLarge(inputStream, output);
+            } finally {
+                IOUtils.closeQuietly(inputStream);
             }
         };
-        return Response.ok(streamingOutput).
+        Response.ResponseBuilder responseBuilder = Response.ok(streamingOutput).
                 type(contentType).
                 lastModified(new Date(lastModified)).
-                header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName).
-                header(HttpHeaders.CONTENT_LENGTH, contentLength).
-                build();
+                header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+        if(contentLength > 0) {
+            responseBuilder.header(HttpHeaders.CONTENT_LENGTH, contentLength);
+        }
+        return responseBuilder.build();
     }
 
     @PUT
