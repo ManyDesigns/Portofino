@@ -133,6 +133,7 @@ public class ElementsFileUtils {
             int result = process.waitFor();
             return result == 0;
         } catch (Exception e) {
+            logger.warn("Couldn't chmod "+file.getAbsolutePath()+" "+e.getMessage());
             return false;
         }
     }

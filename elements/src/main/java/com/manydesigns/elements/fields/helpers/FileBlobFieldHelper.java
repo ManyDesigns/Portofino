@@ -20,7 +20,9 @@
 
 package com.manydesigns.elements.fields.helpers;
 
+import com.manydesigns.crypto.CryptoService;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.Encrypted;
 import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.FileBlobField;
@@ -44,6 +46,8 @@ public class FileBlobFieldHelper implements FieldHelper {
                                        String prefix) {
         if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(FileBlob.class)) {
+            if(propertyAccessor.isAnnotationPresent(Encrypted.class))
+                return new FileBlobField(propertyAccessor, mode, prefix, CryptoService.getInstance().getTypeAlgo());
                 return new FileBlobField(propertyAccessor, mode, prefix);
         }
         return null;

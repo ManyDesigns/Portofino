@@ -73,11 +73,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @RequiresAuthentication
 @RequiresAdministrator
 @UrlBinding(TablesAction.BASE_ACTION_PATH + "/{databaseName}/{schemaName}/{tableName}/{columnName}")
@@ -647,6 +647,7 @@ public class TablesAction extends AbstractActionBean {
         stringFormatSP.appendRow(PartitaIva.class.getName(), "Partita IVA", true);
         stringFormatSP.appendRow(CodiceFiscale.class.getName(), "Codice Fiscale", true);
         stringFormatSP.appendRow(Phone.class.getName(), "Phone", true);
+        stringFormatSP.appendRow(Encrypted.class.getName(), "Encrypted", true);
 
         DefaultSelectionProvider typeOfContentSP = new DefaultSelectionProvider("typeOfContent");
         typeOfContentSP.appendRow(Multiline.class.getName(), "Multiline", true);
@@ -655,7 +656,7 @@ public class TablesAction extends AbstractActionBean {
         columnForm = new FormBuilder(ColumnForm.class)
                 .configFieldSetNames("Properties", "Annotations")
                 .configFields(new String[] { "columnName", "propertyName", "javaType", "type",
-                        "length", "scale", "reallyNullable", "reallyAutoincrement", "inPk" },
+                                "length", "scale", "reallyNullable", "reallyAutoincrement", "inPk" },
                         getApplicableAnnotations(column.getActualJavaType()))
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
                 .configSelectionProvider(stringFormatSP, "stringFormat")

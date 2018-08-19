@@ -36,13 +36,16 @@ public class SelectableSchema {
     @Updatable(false)
     public final String catalogName;
     @Updatable(false)
-    public final String schemaName;
+    public final String schema;
+    @Updatable(true)
+    public String schemaName;
     @Label("")
     public boolean selected;
 
-    public SelectableSchema(String catalogName, String schemaName, boolean selected) {
+    public SelectableSchema(String catalogName, String schemaName,  String schema,boolean selected) {
         this.catalogName = catalogName;
         this.schemaName = schemaName;
+        this.schema = schema;
         this.selected = selected;
     }
 }

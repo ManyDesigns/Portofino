@@ -76,7 +76,8 @@ public class SimpleTextProvider implements TextProvider {
             else {
                 tmpBundle = ResourceBundle.getBundle(messageResource, locale);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            logger.warn("Couldn't load bundle: "+e.getMessage());
             tmpBundle  = null;
         }
         resourceBundle = tmpBundle;
@@ -107,7 +108,7 @@ public class SimpleTextProvider implements TextProvider {
             } else {
                 return resourceBundle.getString(key);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.debug("Key not found: " + key, e);
             return null;
         }

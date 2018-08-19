@@ -22,6 +22,8 @@ package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
+import java.io.Serializable;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -59,7 +61,7 @@ public interface Criteria {
 
     OrderBy getOrderBy();
 
-    static class OrderBy {
+    static class OrderBy implements Serializable {
 
         protected final PropertyAccessor propertyAccessor;
         protected final String direction;
