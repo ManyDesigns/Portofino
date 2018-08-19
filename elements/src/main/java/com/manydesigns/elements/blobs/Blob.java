@@ -73,7 +73,6 @@ public class Blob {
 
     public Blob(String code) {
         this.code = code;
-        //this.repository="cache";
     }
 
     protected void safeSetProperty(Properties metaProperties, String key, String value) {
@@ -249,9 +248,7 @@ public class Blob {
 
         Blob blob = (Blob) o;
 
-        if (code != null ? !code.equals(blob.code) : blob.code != null) return false;
-
-        return true;
+        return code != null ? code.equals(blob.code) : blob.code == null;
     }
 
     @Override

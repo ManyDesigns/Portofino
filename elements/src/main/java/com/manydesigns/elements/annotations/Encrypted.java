@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Encrypted {
-    public static final String copyright = "Copyright (C) 2005-2018 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2018 ManyDesigns srl";
 
     String value();
 

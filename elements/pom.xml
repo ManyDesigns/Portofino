@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.4-SNAPSHOT</version>
+        <version>4.2.4</version>
     </parent>
     <artifactId>elements</artifactId>
     <packaging>jar</packaging>
@@ -138,6 +138,18 @@
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
             <artifactId>jxl</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-cryptography</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.5.4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
