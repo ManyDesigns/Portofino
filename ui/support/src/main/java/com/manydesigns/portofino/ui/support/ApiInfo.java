@@ -27,7 +27,7 @@ public class ApiInfo {
   public static String getApiRootUri(ServletContext servletContext, UriInfo uriInfo) {
     String baseUri = servletContext.getInitParameter("portofino.api.root");
     if(baseUri == null) {
-      baseUri = "http://localhost:8080/api";
+      baseUri = "http://localhost:8080";
     } else if(!baseUri.startsWith("/")) {
       String appBaseUri = uriInfo.getBaseUri().toString();
       if(appBaseUri.endsWith("/")) {

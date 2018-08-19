@@ -4,7 +4,7 @@ import {HttpClient} from "@angular/common/http";
 @Injectable()
 export class PortofinoService implements OnInit {
 
-  defaultApiRoot = 'http://localhost:8080/api/';
+  defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
   localApiPath = '/portofino';
 

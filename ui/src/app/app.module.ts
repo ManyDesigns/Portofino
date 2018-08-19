@@ -10,7 +10,7 @@ export class HelloPortofino {}
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app title="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
+  template: `<portofino-app title="Demo-TT" apiRoot="http://localhost:8080/demo-tt/"></portofino-app>`
 })
 export class AppComponent {}
 

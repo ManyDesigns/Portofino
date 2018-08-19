@@ -1,13 +1,9 @@
-package com.manydesigns.crypto;
+package com.manydesigns.elements.crypto;
 
 import org.apache.commons.configuration.Configuration;
 import javax.crypto.*;
 import javax.crypto.spec.DESKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.ServletContext;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;

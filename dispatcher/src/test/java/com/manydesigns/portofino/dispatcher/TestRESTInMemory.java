@@ -126,14 +126,6 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
     }
 
     @Test
-    public void enhancers() {
-        String result = target("test/b/:enhancer/test").request().get(String.class);
-        assertEquals(result, "class B");
-        result = target("test/b/:enhancer/test/2").request().get(String.class);
-        assertEquals(result, "class B2");
-    }
-
-    @Test
     public void secure1NoWrapper() {
         IniSecurityManagerFactory iniSecurityManagerFactory = new IniSecurityManagerFactory("classpath:test/shiro.ini");
         RealmSecurityManager securityManager = (RealmSecurityManager) iniSecurityManagerFactory.createInstance();

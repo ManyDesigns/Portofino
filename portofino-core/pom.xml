@@ -45,15 +45,11 @@
             <version>${jstl.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Security -->
         <dependency>
-          <groupId>org.apache.taglibs</groupId>
-          <artifactId>taglibs-standard-spec</artifactId>
-          <version>1.2.5</version>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.taglibs</groupId>
-          <artifactId>taglibs-standard-impl</artifactId>
-          <version>1.2.5</version>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.10.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
@@ -106,6 +102,11 @@
             <scope>provided</scope>
         </dependency>
         <!-- Email -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>

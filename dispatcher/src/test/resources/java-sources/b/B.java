@@ -7,9 +7,7 @@ import javax.ws.rs.Path;
 public class B extends Node {
     public String string = new Inner().string;
 
-    public B() {
-        resourceEnhancers.put("test", new Inner());
-    }
+    public B() {}
 
     @Path("2")
     @GET

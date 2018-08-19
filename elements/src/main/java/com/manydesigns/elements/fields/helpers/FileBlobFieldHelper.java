@@ -20,7 +20,7 @@
 
 package com.manydesigns.elements.fields.helpers;
 
-import com.manydesigns.crypto.CryptoService;
+import com.manydesigns.elements.crypto.CryptoService;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Encrypted;
 import com.manydesigns.elements.annotations.FileBlob;

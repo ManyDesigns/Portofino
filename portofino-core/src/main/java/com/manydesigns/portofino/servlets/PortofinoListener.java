@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.crypto.KeyManager;
+import com.manydesigns.elements.crypto.KeyManager;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;

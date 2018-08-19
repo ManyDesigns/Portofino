@@ -23,12 +23,14 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.Base64Codec;
+import com.manydesigns.portofino.security.SecurityLogic;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -133,7 +135,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     @NotNull
     protected Key getJWTKey() {
         String secret = portofinoConfiguration.getString("jwt.secret");
-        return new SecretKeySpec(Base64Codec.BASE64.decode(secret), SignatureAlgorithm.HS512.getJcaName());
+        return new SecretKeySpec(Decoders.BASE64.decode(secret), SignatureAlgorithm.HS512.getJcaName());
     }
 
     // --------------------------------------------------------------------------

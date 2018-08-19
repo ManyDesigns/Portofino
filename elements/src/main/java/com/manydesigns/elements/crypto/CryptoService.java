@@ -1,4 +1,4 @@
-package com.manydesigns.crypto;
+package com.manydesigns.elements.crypto;
 
 import org.apache.commons.codec.binary.Base64;
 

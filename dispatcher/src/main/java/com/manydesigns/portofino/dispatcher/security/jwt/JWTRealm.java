@@ -4,7 +4,7 @@ import com.manydesigns.portofino.dispatcher.security.RolesPermission;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.Base64Codec;
+import io.jsonwebtoken.io.Decoders;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -51,7 +51,7 @@ public class JWTRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String secret = getSecret();
-        Key key = new SecretKeySpec(Base64Codec.BASE64.decode(secret), getSignatureAlgorithm().getJcaName());
+        Key key = new SecretKeySpec(Decoders.BASE64.decode(secret), getSignatureAlgorithm().getJcaName());
         
         Jwt jwt = Jwts.parser().
                 setSigningKey(key).

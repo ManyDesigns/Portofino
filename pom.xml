@@ -113,7 +113,6 @@
         <!-- Core stuff -->
         <module>code</module>
         <module>dispatcher</module>
-        <module>portofino-cryptography</module>
         <module>elements</module>
         <module>portofino-core</module>
         <module>portofino-jersey</module>
