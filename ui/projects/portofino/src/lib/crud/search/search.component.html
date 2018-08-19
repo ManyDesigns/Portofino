@@ -1,0 +1,63 @@
+<div fxLayout="column" fxLayoutGap="20px">
+  <div *ngIf="searchProperties.length">
+    <span i18n>Search</span>
+    <form (submit)="search()" [formGroup]="form">
+      <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
+        <portofino-crud-search-field *ngFor="let field of searchProperties" [form]="form" [property]="field">
+        </portofino-crud-search-field>
+      </div>
+      <div fxLayout="row">
+        <button mat-raised-button color="primary" (click)="search()" i18n>
+          <mat-icon>search</mat-icon>
+          Search
+        </button>
+        <button mat-raised-button (click)="clearSearch()" type="reset" i18n>Clear</button>
+      </div>
+    </form>
+  </div>
+  <div class="search-results" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="start stretch">
+    <table mat-table [dataSource]="resultsDataSource"
+           matSort (matSortChange)="sort($event)"
+           class="mat-elevation-z8">
+      <ng-container [matColumnDef]="selectColumnName" *ngIf="selectionEnabled">
+        <th mat-header-cell *matHeaderCellDef>
+          <mat-checkbox (change)="$event ? toggleSelectAll() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null"
+                        [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+      <ng-container *ngFor="let property of resultProperties" [matColumnDef]="property.name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{property.name}}</th>
+        <td mat-cell *matCellDef="let row">
+          <a [routerLink]="baseUrl + '/' + row.__rowKey" *ngIf="property.key">
+            {{row[property.name].displayValue || row[property.name].value}}
+          </a>
+          <span *ngIf="!property.key">
+            <a *ngIf="property.kind == 'blob'" [href]="getBlobUrl(row.__rowKey, property)">
+              {{row[property.name].displayValue}}
+            </a>
+            <ng-container *ngIf="property.kind != 'blob'">
+              {{row[property.name].displayValue || row[property.name].value}}
+            </ng-container>
+          </span>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
+    </table>
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <div fxLayout="row">
+        <ng-template [ngTemplateOutlet]="buttons"></ng-template>
+      </div>
+      <mat-paginator [length]="results ? results.totalRecords : 0" [pageSize]="pageSize" (page)="loadPage($event)">
+      </mat-paginator>
+    </div>
+  </div>
+</div>

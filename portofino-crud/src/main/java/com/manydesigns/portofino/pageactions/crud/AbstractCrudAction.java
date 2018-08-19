@@ -46,12 +46,12 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
+import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.pageactions.PageInstance;
-import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
@@ -369,6 +369,28 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         String jsonText = FormUtil.writeToJson(form);
         return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
     }
+
+    public Resolution jsonEditData() throws JSONException {
+        if(object == null) {
+            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
+        }
+
+        preEdit();
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
+        refreshBlobDownloadHref();
+        String jsonText = FormUtil.writeToJson(form);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+    }
+
+    public Resolution jsonCreateData() throws JSONException {
+        preCreate();
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
+        refreshBlobDownloadHref();
+        String jsonText = FormUtil.writeToJson(form);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+    }
+
+
     //**************************************************************************
     // Form handling
     //**************************************************************************
@@ -416,50 +438,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
     }
 
-/*    @Button(list = "crud-create", key = "save", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(permissions = PERMISSION_CREATE)
-    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
-    public Resolution save() {
-        preCreate();
-        form.readFromRequest(context.getRequest());
-        BlobUtils.loadBlobs(form, getTemporaryBlobManager(), false);
-        if (form.validate()) {
-            writeFormToObject();
-            if(createValidate(object)) {
-                try {
-                    doSave(object);
-                    createPostProcess(object);
-                    commitTransaction();
-                } catch (Throwable e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.warn(rootCauseMessage, e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                    saveTemporaryBlobs();
-                    return getCreateView();
-                }
-                //The object on the database was persisted. Now we can save the blobs.
-                try {
-                    BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
-                    BlobUtils.saveBlobs(form, getBlobManager());
-                } catch (IOException e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.error("Could not persist blobs!", e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                }
-                if(isPopup()) {
-                    popupCloseCallback += "(true)";
-                    return new ForwardResolution("/m/crud/popup/close.jsp");
-                } else {
-                    addSuccessfulSaveInfoMessage();
-                    return getSuccessfulSaveView();
-                }
-            }
-        } else {
-            saveTemporaryBlobs();
-        }
-        return getCreateView();
-    }*/
-
     protected void saveTemporaryBlobs() {
         try {
             BlobUtils.saveBlobs(form, getTemporaryBlobManager());
@@ -477,49 +455,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         editSetup(object);
         form.readFromObject(object);
     }
-
-    /*@Button(list = "crud-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(permissions = PERMISSION_EDIT)
-    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
-    public Resolution update() {
-        preEdit();
-        List<Blob> blobsBefore = getBlobsFromForm();
-        form.readFromRequest(context.getRequest());
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        BlobUtils.loadBlobs(form, getTemporaryBlobManager(), false);
-        if (form.validate()) {
-            writeFormToObject();
-            if(editValidate(object)) {
-                try {
-                    doUpdate(object);
-                    editPostProcess(object);
-                    commitTransaction();
-                } catch (Throwable e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.warn(rootCauseMessage, e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                    saveTemporaryBlobs();
-                    return getEditView();
-                }
-                try {
-                    List<Blob> blobsAfter = getBlobsFromForm();
-                    deleteOldBlobs(blobsBefore, blobsAfter);
-                    BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
-                    persistNewBlobs(blobsBefore, blobsAfter);
-                } catch (IOException e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.error("Could not persist blobs!", e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                }
-
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
-                return getSuccessfulUpdateView();
-            }
-        } else {
-            saveTemporaryBlobs();
-        }
-        return getEditView();
-    }*/
 
     protected void persistNewBlobs(List<Blob> blobsBefore, List<Blob> blobsAfter) throws IOException {
         for(FileBlobField field : getBlobFields()) {
@@ -1264,6 +1199,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @PUT
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Response uploadBlob(
             @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename,
             InputStream inputStream)
@@ -1638,26 +1574,26 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     public Response jsonSelectFieldOptions() {
-        return jsonOptions(relName, prefix, true);
+        return jsonOptions(relName, prefix, labelSearch, true);
     }
 
     public Response jsonSelectFieldSearchOptions() {
-        return jsonOptions(relName, searchPrefix, true);
+        return jsonOptions(relName, searchPrefix, labelSearch, true);
     }
 
     public Response jsonAutocompleteOptions() {
-        return jsonOptions(relName, prefix, false);
+        return jsonOptions(relName, prefix, labelSearch, false);
     }
 
     public Response jsonAutocompleteSearchOptions() {
-        return jsonOptions(relName, searchPrefix, false);
+        return jsonOptions(relName, searchPrefix, labelSearch, false);
     }
 
     /**
-     * Returns values to update multiple a single select or autocomplete field, in JSON form.
-     * Note that, for autocomplete fields, it expects the autocomplete value
-     * as a request parameter with the field's name. See {@link #jsonOptions(String, int, String, boolean)}.
+     * Returns values to update a single select or autocomplete field, in JSON form.
+     * See {@link #jsonOptions(String, int, String, String, boolean)}.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
+     * @param labelSearch for autocomplete fields, the text entered by the user.
      * @param prefix form prefix, to read values from the request.
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
@@ -1669,20 +1605,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MediaType.APPLICATION_JSON)
     public Response jsonOptions(
             @PathParam("selectionProviderName") String selectionProviderName,
+            @QueryParam("labelSearch") String labelSearch,
             @QueryParam("prefix") String prefix,
-            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt
-    ) {
-        return jsonOptions(selectionProviderName, selectionProviderIndex, prefix, includeSelectPrompt);
+            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
+        return jsonOptions(selectionProviderName, selectionProviderIndex, labelSearch, prefix, includeSelectPrompt);
     }
     
     /**
-     * Returns values to update multiple related select fields or a single autocomplete
-     * text field, in JSON form. Note that, for autocomplete fields, it expects the autocomplete value 
-     * as a request parameter with the field's name.
+     * Returns values to update multiple related select fields or a single autocomplete text field, in JSON form.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
      * @param selectionProviderIndex index of the selection field (in case of multiple-valued selection providers,
      *                               otherwise it is always 0 and you can use
-     *                               {@link #jsonOptions(String, String, boolean)}).
+     *                               {@link #jsonOptions(String, String, String, boolean)}).
+     * @param labelSearch for autocomplete fields, the text entered by the user.
      * @param prefix form prefix, to read values from the request.
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
@@ -1695,6 +1630,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Response jsonOptions(
             @PathParam("selectionProviderName") String selectionProviderName,
             @PathParam("selectionProviderIndex") int selectionProviderIndex,
+            @QueryParam("labelSearch") String labelSearch,
             @QueryParam("prefix") String prefix,
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
@@ -1915,6 +1851,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     /**
      * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param searchString the search string
+     * @param firstResult pagination: the index of the first result returned by the search
+     * @param maxResults pagination: the maximum number of results returned by the search
      * @since 4.2
      * @return search results (/) or single object (/pk) as JSON
      */
@@ -1923,7 +1861,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Response getAsJson(
             @QueryParam("searchString") String searchString,
             @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults,
-            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection) {
+            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection,
+            @QueryParam("forEdit") boolean forEdit, @QueryParam("newObject") boolean newObject) {
+        if(newObject) {
+            return jsonCreateData();
+        }
         if(object == null) {
             this.searchString = searchString;
             this.firstResult = firstResult;
@@ -1931,6 +1873,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             this.sortProperty = sortProperty;
             this.sortDirection = sortDirection;
             return jsonSearchData();
+        } else if(forEdit) {
+            return jsonEditData();
         } else {
             return jsonReadData();
         }
@@ -1986,7 +1930,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response httpPostMultipart() throws Exception {
         if(object != null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    "update not supported, PUT to /objectKey instead").build();
         }
         preCreate();
         form.readFromRequest(context.getRequest());
@@ -2004,12 +1949,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     return Response.serverError().entity(e).build();
                 }
                 return objectCreated();
-            } else {
-                return Response.serverError().entity(form).build();
             }
-        } else {
-            return Response.serverError().entity(form).build();
         }
+        return Response.serverError().entity(form).build();
     }
 
     protected Response objectCreated() throws URISyntaxException {
@@ -2022,20 +1964,32 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object update via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles object update via REST; either a single object or several ones in bulk.
+     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * {@link #uploadBlob(String, String, InputStream)}.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
+     * @param ids the list of object id's (keys) to save if this is a bulk operation.
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
-     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @PUT
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response httpPutJson(String jsonObject) throws Exception {
+    @Guard(test = "isEditEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
+    public Response httpPutJson(@QueryParam("id") List<String> ids, String jsonObject) {
         if(object == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
+            return bulkUpdate(jsonObject, ids);
         }
+        if(ids != null && !ids.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    "You must either PUT a single object (/key) or PUT multiple objects (?ids=...), not both.").build();
+        }
+        return update(jsonObject);
+    }
+
+    protected Response update(String jsonObject) {
         preEdit();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
@@ -2061,7 +2015,47 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object update with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles the update of multiple objects via REST.
+     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * {@link #uploadBlob(String, String, InputStream)}.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param jsonObject the object (in serialized JSON form)
+     * @since 4.2.4-SNAPSHOT
+     * @return the updated object as JSON (in a JAX-RS Response).
+     */
+    protected Response bulkUpdate(String jsonObject, List<String> ids) {
+        List<String> idsNotUpdated = new ArrayList<>();
+        setupForm(Mode.BULK_EDIT);
+        disableBlobFields();
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            for (String id : ids) {
+                loadObject(id.split("/"));
+                editSetup(object);
+                writeFormToObject();
+                if(editValidate(object)) {
+                    doUpdate(object);
+                    editPostProcess(object);
+                } else {
+                    idsNotUpdated.add(id);
+                }
+            }
+            try {
+                commitTransaction();
+            } catch (Throwable e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                return Response.serverError().entity(e).build();
+            }
+            return Response.ok(idsNotUpdated).build();
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    /**
+     * Handles object update with attachments via REST.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
      */
@@ -2069,6 +2063,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Response httpPutMultipart() throws Throwable {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
@@ -2112,27 +2107,62 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object deletion via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles object deletion via REST.
+     * @param ids the list of object id's (keys) to delete if this is a bulk deletion.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      */
     @DELETE
     @RequiresPermissions(permissions = PERMISSION_DELETE)
-    public void httpDelete() throws Exception {
+    @Guard(test = "isDeleteEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
+    public int httpDelete(@QueryParam("id") List<String> ids) throws Exception {
         if(object == null) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /objectKey path parameter").build());
+            return bulkDelete(ids);
         }
+        if(ids != null && !ids.isEmpty()) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+                    "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+        }
+        return delete(object);
+    }
+
+    protected int delete(T object) {
         if(deleteValidate(object)) {
             try {
                 doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);
+                return 1;
             } catch (Exception e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 throw e;
             }
+        } else {
+            return 0;
         }
+    }
+
+    protected int bulkDelete(List<String> ids) throws Exception {
+        List<T> objects = new ArrayList<T>(ids.size());
+        int deleted = 0;
+        for (String current : ids) {
+            String[] pkArr = current.split("/");
+            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
+            T obj = loadObjectByPrimaryKey(pkObject);
+            if(obj != null && deleteValidate(obj)) {
+                doDelete(obj);
+                deletePostProcess(obj);
+                objects.add(obj);
+                deleted++;
+            }
+        }
+        commitTransaction();
+        for(T obj : objects) {
+            deleteBlobs(obj);
+        }
+        return deleted;
     }
 
     /**

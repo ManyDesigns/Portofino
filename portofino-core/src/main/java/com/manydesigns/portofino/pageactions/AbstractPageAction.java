@@ -36,6 +36,8 @@ import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.operations.Operation;
+import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Page;
@@ -185,40 +187,6 @@ public abstract class AbstractPageAction extends NodeWithParameters implements P
         }
     }
 
-    //--------------------------------------------------------------------------
-    // Dispatch
-    //--------------------------------------------------------------------------
-
-//    /**
-//     * This is called to process a piece (fragment) of the requested URL. If the fragment matches a child page, that
-//     * page is instantiated and initialized. Otherwise, the fragment is taken to be a parameter for the current page.
-//     * Subclasses can override this method if they want to handle child pages differently (e.g. having them stored
-//     * elsewhere).
-//     * @param pathFragment the fragment to process. In path /foo/bar/baz, foo, bar and baz are three different fragments.
-//     * @return the object that will potentially continue path dispatch if there are other fragments to consume. This is
-//     * either a child page or <code>this</code>. A null return value means that the dispatch failed (no child page
-//     * exists and this page does not accept parameters).
-//     */
-//    @Override
-//    public DispatchElement consumePathFragment(String pathFragment) {
-//        boolean acceptsPathParameter = acceptsPathParameter();
-//        if(!acceptsPathParameter || pageInstance.getParameters().isEmpty()) {
-//            PageAction subpage = PageLogic.getSubpage(portofinoConfiguration, pageInstance, pathFragment);
-//            if (subpage != null) {
-//                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-//                Injections.inject(subpage, request.getServletContext(), request);
-//                return subpage;
-//            }
-//        }
-//        if(acceptsPathParameter) {
-//            pageInstance.getParameters().add(pathFragment);
-//            return this;
-//        } else {
-//            return null;
-//        }
-//    }
-
-
     @Override
     protected void initSubResource(Object resource) {
         super.initSubResource(resource);
@@ -282,96 +250,10 @@ public abstract class AbstractPageAction extends NodeWithParameters implements P
         }
     }
 
-    //    /**
-//     * REST support. Called by the JAX-RS implementation to handle a path fragment.
-//     * @param pathFragment the path fragment.
-//     * @return @see #consumePathFragment(String)
-//     */
-//    @Path("{pathFragment}")
-//    public Object getSubResource(@PathParam("pathFragment") String pathFragment) {
-//        DispatchElement resource = consumePathFragment(pathFragment);
-//        if(resource != this) {
-//            if(context == null) {
-//                setContext(getParent().getContext());
-//            }
-//            Response response = preparePage();
-//            if(response != null) {
-//                return response; //new TerminalResource(response);
-//            }
-//        }
-//        return resource;
-//    }
-
     @Override
     public PageAction getParent() {
         return (PageAction) super.getParent();
     }
-
-    /*public static class TerminalResource {
-
-        private final Object result;
-
-        public TerminalResource(Object result) {
-            this.result = result;
-        }
-
-        @GET
-        public Object get() {
-            return result;
-        }
-
-        @POST
-        public Object post() {
-            return result;
-        }
-
-        @PUT
-        public Object put() {
-            return result;
-        }
-
-        @DELETE
-        public Object delete() {
-            return result;
-        }
-
-    }*/
-
-    /*@Override
-    public MultiMap initEmbeddedPageActions() {
-        if(embeddedPageActions == null) {
-            MultiMap mm = new MultiValueMap();
-            Layout layout = pageInstance.getLayout();
-            for(ChildPage childPage : layout.getChildPages()) {
-                String layoutContainerInParent = childPage.getContainer();
-                if(layoutContainerInParent != null) {
-                    String newPath = context.getActionPath() + "/" + childPage.getName();
-                    newPath = ServletUtils.removePathParameters(newPath); //#PRT-1650 Path parameters mess with include
-                    File pageDir = new File(pageInstance.getChildrenDirectory(), childPage.getName());
-                    try {
-                        Page page = PageLogic.getPage(pageDir);
-                        EmbeddedPageAction embeddedPageAction =
-                            new EmbeddedPageAction(
-                                    childPage.getName(),
-                                    childPage.getActualOrder(),
-                                    newPath,
-                                    page);
-
-                        mm.put(layoutContainerInParent, embeddedPageAction);
-                    } catch (PageNotActiveException e) {
-                        logger.warn("Embedded page action is not active, skipping! " + pageDir, e);
-                    }
-                }
-            }
-            for(Object entryObj : mm.entrySet()) {
-                Map.Entry entry = (Map.Entry) entryObj;
-                List pageActionContainer = (List) entry.getValue();
-                Collections.sort(pageActionContainer);
-            }
-            embeddedPageActions = mm;
-        }
-        return embeddedPageActions;
-    }*/
 
 //    /**
 //     * Returns the path inside the web application of a resource relative to this action's directory.
@@ -616,6 +498,7 @@ public abstract class AbstractPageAction extends NodeWithParameters implements P
     @Path(":buttons")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Deprecated
     public List getButtons() {
         HttpServletRequest request = context.getRequest();
         String list = request.getParameter("list");
@@ -648,6 +531,38 @@ public abstract class AbstractPageAction extends NodeWithParameters implements P
             buttonData.put("method", button.getMethod().getName());
             buttonData.put("enabled", enabled);
             result.add(buttonData);
+        }
+        return result;
+    }
+
+    @Path(":operations")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public List describeOperations() {
+        HttpServletRequest request = context.getRequest();
+        List<Operation> operations = Operations.getOperations(getClass());
+        List result = new ArrayList();
+        Subject subject = SecurityUtils.getSubject();
+        for(Operation operation : operations) {
+            logger.trace("ButtonInfo: {}", operation);
+            Method handler = operation.getMethod();
+            boolean isAdmin = SecurityLogic.isAdministrator(request);
+            if(!isAdmin &&
+                    ((pageInstance != null && !SecurityLogic.hasPermissions(
+                            portofinoConfiguration, operation.getMethod(), getClass(), pageInstance, subject)) ||
+                            !SecurityLogic.satisfiesRequiresAdministrator(request, this, handler))) {
+                continue;
+            }
+            boolean visible = ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE);
+            if(!visible) {
+                continue;
+            }
+            boolean available = ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED);
+            Map<String, Object> operationInfo = new HashMap<>();
+            operationInfo.put("name", operation.getName());
+            operationInfo.put("signature", operation.getSignature());
+            operationInfo.put("available", available);
+            result.add(operationInfo);
         }
         return result;
     }

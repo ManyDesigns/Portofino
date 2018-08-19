@@ -182,6 +182,12 @@
         ///////////////////////////////////////////////////////////////////////
         -->
 
+        <!-- Angular UI support -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-angular-ui-support</artifactId>
+            <version>${portofino.version}</version>
+        </dependency>
         <!-- Support for page actions. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -239,11 +245,6 @@
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -274,7 +275,53 @@
                 <version>2.6</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <webResources>
+                        <resource><directory>target/frontend/</directory></resource>
+                        <resource><directory>src/main/webapp/</directory></resource>
+                    </webResources>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <workingDirectory>src/main/frontend</workingDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v8.11.1</nodeVersion>
+                            <npmVersion>6.0.1</npmVersion>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>build-client</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run-script build</arguments>
+                        </configuration>
+                        <phase>generate-resources</phase>
+                    </execution>
+                </executions>
             </plugin>
             <!--
             To run the application in an embedded Tomcat 7:
@@ -304,7 +351,7 @@
             </resource>
         </resources>
     </build>
-    
+
     <!-- See web.xml for an explanation -->
     <profiles>
         <profile>

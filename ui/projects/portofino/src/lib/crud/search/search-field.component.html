@@ -1,0 +1,60 @@
+<ng-container *ngIf="property.selectionProvider; else simple">
+  <mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
+    <mat-select [formControlName]="property.name" [placeholder]="property.name"
+                (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
+      <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
+        {{ option.l }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field *ngIf="property.selectionProvider.displayMode == 'AUTOCOMPLETE'" [formGroup]="form">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name" [matAutocomplete]="autocomplete">
+    <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
+      <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
+        {{ option.l }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <ng-container *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
+    <label>{{property.name}}</label>
+    <mat-radio-group [formControlName]="property.name" [name]="property.name"
+                     (change)="property.selectionProvider.updateDependentOptions(property)">
+      <mat-radio-button *ngFor="let option of property.selectionProvider.options" [value]="option">
+        {{ option.l }}
+      </mat-radio-button>
+    </mat-radio-group>
+  </ng-container>
+  <mat-form-field *ngIf="property.selectionProvider.displayMode == 'MULTIPLESELECT'" [formGroup]="form">
+    <mat-select [formControlName]="property.name" [placeholder]="property.name" [multiple]="true"
+                (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
+      <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
+        {{ option.l }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <ng-container *ngIf="property.selectionProvider.displayMode == 'CHECKBOX'" [formGroup]="form">
+    <ng-container [formArrayName]="property.name">
+      <mat-checkbox *ngFor="let option of property.selectionProvider.options; let i = index" [formControlName]="i">
+        {{option.l}}
+      </mat-checkbox>
+    </ng-container>
+  </ng-container>
+</ng-container>
+<ng-template #simple>
+  <mat-form-field *ngIf="property.kind == 'string'" [formGroup]="form">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name">
+  </mat-form-field>
+  <mat-form-field *ngIf="property.kind == 'number'" [formGroup]="form">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name">
+  </mat-form-field>
+  <mat-form-field *ngIf="property.kind == 'date'" [formGroup]="form">
+    <input matInput [formControlName]="property.name" [placeholder]="property.name" [matDatepicker]="datepicker">
+    <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+    <mat-datepicker #datepicker></mat-datepicker>
+  </mat-form-field>
+  <ng-container *ngIf="property.kind == 'boolean'" [formGroup]="form">
+    <mat-checkbox [formControlName]="property.name">
+      {{property.name}}
+    </mat-checkbox>
+  </ng-container>
+</ng-template>

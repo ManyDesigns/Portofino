@@ -1,0 +1,23 @@
+<h2>{{configuration.title}}</h2>
+<portofino-crud-search
+  *ngIf="isSearchView()"
+  [classAccessor]="classAccessor" [configuration]="configuration" [sourceUrl]="sourceUrl" [baseUrl]="url"
+  [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
+  <ng-template #buttons>
+    <ng-container *ngFor="let button of getButtons()">
+      <portofino-button [button]="button" [component]="this"></portofino-button>
+    </ng-container>
+  </ng-template>
+</portofino-crud-search>
+<portofino-crud-detail
+  *ngIf="isDetailView()"
+  [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+  [sourceUrl]="sourceUrl" (close)="goToSearch()" (editModeChanges)="onEditModeChange($event)"></portofino-crud-detail>
+<portofino-crud-create
+  *ngIf="isCreateView()"
+  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+  [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-create>
+<portofino-crud-bulk-edit
+  *ngIf="isBulkEditView()"
+  [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+  [ids]="selection" [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-bulk-edit>

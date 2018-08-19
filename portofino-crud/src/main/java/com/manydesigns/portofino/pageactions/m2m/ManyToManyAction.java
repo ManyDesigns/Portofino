@@ -189,7 +189,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 String name = sp.getName();
                 String hql = sp.getHql();
 
-                if (hql != null) {
+                if (StringUtils.isNotEmpty(hql)) {
                     selectionProvider =
                             createSelectionProviderFromHql
                                     (name, databaseName, hql, DisplayMode.DROPDOWN, SearchDisplayMode.DROPDOWN);
@@ -285,73 +285,13 @@ public class ManyToManyAction extends AbstractPageAction {
     }
 
     private boolean isExistingAssociation(PropertyAccessor manyPropertyAccessor, Object oPk) {
-        boolean existing = false;
         for(Object a : existingAssociations) {
             if(oPk.equals(manyPropertyAccessor.get(a))) {
-                existing = true;
-                break;
+                return true;
             }
         }
-        return existing;
+        return false;
     }
-
-    /*@Button(list = "m2m-checkboxes-edit", key = "save", type = Button.TYPE_PRIMARY)
-    @Guard(test = "onePk != null", type = GuardType.VISIBLE)
-    @RequiresPermissions(permissions = ManyToManyAction.PERMISSION_UPDATE)
-    public Resolution saveCheckboxes() throws Exception {
-        if(!correctlyConfigured) {
-            return pageActionNotConfigured();
-        }
-        try {
-            loadAssociations();
-        } catch (Exception e) {
-            logger.error("Could not load associations", e);
-            SessionMessages.addErrorMessage("Could not save associations");
-            return view();
-        }
-        PkHelper pkHelper = new PkHelper(manyTableAccessor);
-        //TODO chiave multipla
-        String onePropertyName = m2mConfiguration.getActualOnePropertyName();
-        PropertyAccessor onePropertyAccessor =
-                relationTableAccessor.getProperty(onePropertyName);
-        //TODO chiave multipla
-        String manyPropertyName = m2mConfiguration.getManySelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
-        PropertyAccessor manyPropertyAccessor =
-                relationTableAccessor.getProperty(manyPropertyName);
-        PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
-        //TODO handle manyKeyProperties.length > 1
-        PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
-        for(String pkString : selectedPrimaryKeys) {
-            Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
-            Object pk = manyPkAccessor.get(pkObject);
-            if(!isExistingAssociation(manyPropertyAccessor, pk)) {
-                Object newRelation = saveNewRelation(pk, onePropertyAccessor, manyPropertyAccessor);
-                existingAssociations.add(newRelation);
-            }
-        }
-        Iterator it = existingAssociations.iterator();
-        while(it.hasNext()) {
-            Object o = it.next();
-            //TODO handle manyKeyProperties.length > 1
-            Object pkObject = manyPropertyAccessor.get(o);
-            String pkString =
-                    (String) OgnlUtils.convertValue(pkObject, String.class);
-            if(!selectedPrimaryKeys.contains(pkString)) {
-                deleteRelation(o);
-                it.remove();
-            }
-        }
-        session.getTransaction().commit();
-        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
-        if(oneSelectField != null) {
-            session.beginTransaction();
-            session.clear();
-            loadAssociations();
-            return view();
-        } else {
-            return cancel();
-        }
-    }*/
 
     protected void deleteRelation(Object rel) {
         session.delete(m2mConfiguration.getActualRelationTable().getActualEntityName(), rel);
@@ -365,6 +305,38 @@ public class ManyToManyAction extends AbstractPageAction {
         session.save(m2mConfiguration.getActualRelationTable().getActualEntityName(), newRelation);
         return newRelation;
     }
+
+    //Configuration
+
+    /*@Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    public Resolution configure() {
+        prepareConfigurationForms();
+        return new ForwardResolution("/m/crud/many2many/configure.jsp");
+    }
+
+    @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    public Resolution updateConfiguration() {
+        prepareConfigurationForms();
+        ConfigurationForm conf = new ConfigurationForm(m2mConfiguration);
+        configurationForm.readFromObject(conf);
+        readPageConfigurationFromRequest();
+        configurationForm.readFromRequest(context.getRequest());
+        boolean valid = validatePageConfiguration();
+        valid = configurationForm.validate() && valid;
+        if(valid) {
+            updatePageConfiguration();
+            configurationForm.writeToObject(conf);
+            conf.writeTo(m2mConfiguration);
+            saveConfiguration(m2mConfiguration);
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
+            return cancel();
+        } else {
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
+            return new ForwardResolution("/m/crud/many2many/configure.jsp");
+        }
+    }*/
 
     @Override
     protected void prepareConfigurationForms() {
@@ -533,8 +505,8 @@ public class ManyToManyAction extends AbstractPageAction {
     @GET
     @Path(":availableAssociations/{key}")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response selectionProviders(@PathParam("key") String key) {
-        try{
+    public Response getAssociations(@PathParam("key") String key) {
+        try {
             loadOnePk(key);
         }catch (Exception e){
             logger.error("Cannot get key "+key ,e);
@@ -689,8 +661,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 for(Object obj : potentiallyAvailableAssociations) {
                     String pk = StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
                     enumList.put(pk);
-                    titleMap.put(pk,ShortNameUtils.getName(ca, obj));
-                    StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
+                    titleMap.put(pk, ShortNameUtils.getName(ca, obj));
 
                     if(!availableAssociations.contains(obj)) {
                         trueRelations.put(pk);
@@ -700,11 +671,11 @@ public class ManyToManyAction extends AbstractPageAction {
                 logger.warn("potentiallyAvailableAssociations is empty");
             }
 
-            model.put(onePk.toString(),trueRelations);
+            model.put(onePk.toString(), trueRelations);
 
             JSONObject items = new JSONObject();
             items.put("type","string");
-            items.put("enum",enumList);
+            items.put("enum", enumList);
 
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("type","array");
@@ -719,9 +690,9 @@ public class ManyToManyAction extends AbstractPageAction {
             schema.put("properties",properties);
 
             JSONObject checkboxes = new JSONObject();
-            checkboxes.put("key",onePk.toString());
-            checkboxes.put("titleMap",titleMap);
-            checkboxes.put("notitle",true);
+            checkboxes.put("key", onePk.toString());
+            checkboxes.put("titleMap", titleMap);
+            checkboxes.put("notitle", true);
             form.put(checkboxes);
         }
 

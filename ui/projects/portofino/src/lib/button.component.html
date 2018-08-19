@@ -1,0 +1,5 @@
+<button mat-raised-button [color]="button.color" type="button" (click)="button.action(component, $event)"
+        *ngIf="button.presentIf(component)" [disabled]="!button.enabledIf(component)" i18n>
+  <mat-icon *ngIf="button.icon">{{button.icon}}</mat-icon>
+  {{button.text}}
+</button>

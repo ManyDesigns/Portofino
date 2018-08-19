@@ -1,0 +1,17 @@
+<div fxLayout="column" fxLayoutGap="20px">
+  <h2 i18n>Create new</h2>
+  <form (submit)="save()" *ngIf="object" [formGroup]="form">
+    <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center" >
+      <portofino-crud-field *ngFor="let property of properties" [property]="property" [form]="form"
+                            [enabled]="isEditEnabled() && isEditable(property)">
+      </portofino-crud-field>
+    </div>
+    <div fxLayout="row">
+      <button mat-raised-button color="primary" i18n>
+        <mat-icon>save</mat-icon>
+        Save
+      </button>
+      <button mat-raised-button (click)="cancel()" type="button" i18n>Cancel</button>
+    </div>
+  </form>
+</div>

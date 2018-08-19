@@ -107,8 +107,8 @@
         </dependency>
         <!-- Email -->
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

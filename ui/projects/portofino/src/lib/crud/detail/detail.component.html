@@ -1,0 +1,32 @@
+<div fxLayout="column" fxLayoutGap="20px">
+  <h2 *ngIf="editMode" i18n>Edit {{id}}</h2>
+  <h2 *ngIf="!editMode" i18n>{{id}}</h2>
+  <form (submit)="save()" *ngIf="object" [formGroup]="form">
+    <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
+      <portofino-crud-field *ngFor="let property of properties" [property]="property" [form]="form"
+                            [enabled]="isEditEnabled() && isEditable(property)" [objectUrl]="sourceUrl + '/' + id">
+      </portofino-crud-field>
+    </div>
+    <div fxLayout="row" *ngIf="editMode">
+      <button mat-raised-button (click)="save()" color="primary" i18n>
+        <mat-icon>save</mat-icon>
+        Save
+      </button>
+      <button mat-raised-button (click)="cancel()" type="button" i18n>Cancel</button>
+    </div>
+    <div fxLayout="row" *ngIf="!editMode">
+      <button mat-raised-button color="primary" type="button" (click)="edit()" *ngIf="editEnabled" i18n>
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+      <button mat-raised-button color="warn" type="button" (click)="delete()" *ngIf="deleteEnabled" i18n>
+        <mat-icon>delete</mat-icon>
+        Delete
+      </button>
+      <button mat-raised-button (click)="cancel()" type="button" i18n>
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+    </div>
+  </form>
+</div>

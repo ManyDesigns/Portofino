@@ -1,0 +1,26 @@
+# compiled output
+dist
+dist-server
+tmp
+out-tsc
+
+# dependencies
+node
+node_modules
+
+# misc
+.sass-cache
+connect.lock
+coverage
+libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+typings
+
+# e2e
+e2e/*.js
+e2e/*.map
+
+#pages
+src/pages/**/config.json

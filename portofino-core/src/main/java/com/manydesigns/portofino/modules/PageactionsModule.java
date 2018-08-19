@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.File;
+import java.util.UUID;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -169,6 +170,12 @@ public class PageactionsModule implements Module {
         servletContext.setAttribute(TEMPLATES_REGISTRY, new TemplateRegistry());
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
+
+        if(!configuration.containsKey("jwt.secret")) {
+            String jwtSecret = UUID.randomUUID().toString();
+            logger.warn("No jwt.secret property was set, so we generated one: {}. It will only be valid until the application stops.", jwtSecret);
+            configuration.setProperty("jwt.secret", jwtSecret);
+        }
 
         status = ModuleStatus.ACTIVE;
     }

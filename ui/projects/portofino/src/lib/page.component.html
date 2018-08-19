@@ -1,0 +1,53 @@
+<mat-sidenav-container [autosize]="true">
+  <mat-sidenav [opened]="true" mode="side" [disableClose]="true">
+    <h3 i18n>Navigation</h3>
+    <ng-container *ngIf="!!page">
+      <ul *ngIf="page.parent">
+        <li>
+          <a [routerLink]="page.parent.url" routerLinkActive="active">{{page.parent.configuration.title}}</a>
+          <ul>
+            <ng-container *ngFor="let child of page.parent.children">
+              <li *ngIf="child.path != page.segment && child.accessible">
+                <a [routerLink]="page.parent.url + '/' + child.path" routerLinkActive="active">{{child.title}}</a>
+              </li>
+              <li *ngIf="child.path == page.segment">
+                <strong>{{page.configuration.title}}</strong>
+                <ul>
+                  <ng-container *ngFor="let child of page.children">
+                    <li *ngIf="child.accessible">
+                      <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+                    </li>
+                  </ng-container>
+                </ul>
+              </li>
+            </ng-container>
+          </ul>
+        </li>
+      </ul>
+      <div *ngIf="!page.parent">
+        <strong>{{page.configuration.title}}</strong>
+        <ul>
+          <ng-container *ngFor="let child of page.children">
+            <li *ngIf="child.accessible">
+              <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </ng-container>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div *ngIf="!page && !error"></div>
+    <ng-container *ngIf="!error">
+      <div [hidden]="!page">
+        <ng-template portofino-main-content></ng-template>
+      </div>
+      <div [hidden]="!page || !page.allowEmbeddedComponents">
+        <ng-template portofino-embedded-content></ng-template>
+      </div>
+    </ng-container>
+    <div *ngIf="!!error" i18n>
+      Page not found!
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
