@@ -49,7 +49,6 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         try {
             Root root = rootFactory.createRoot();
             root.setResourceContext(new DummyResourceContext());
-            //TODO set ResourceContext (dummy?)
             new DepthFirstVisitor((NodeVisitor) node -> {
                 try {
                     subResourceReader.readSubResource(node);
@@ -69,23 +68,30 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         }
 
         public Swagger readSubResource(Node node) {
+            String path = node.getPath();
             ArrayList<Parameter> parameters = new ArrayList<>();
-            StringBuilder path = new StringBuilder(node.getPath());
-            if(node instanceof NodeWithParameters) {
-                NodeWithParameters withParameters = (NodeWithParameters) node;
-                int minParameters = withParameters.getMinParameters();
-                int maxParameters = withParameters.getMaxParameters();
-                for(int i = 0; i < maxParameters; i++) {
-                    PathParameter parameter = new PathParameter();
-                    String paramName = "param" + i;
-                    parameter.setName(paramName);
-                    path.append("/{").append(paramName).append("}");
-                    parameter.setProperty(new StringProperty());
-                    parameter.setRequired(i < minParameters);
-                    parameters.add(parameter);
-                }
+            int paramCount = 0;
+            while (path.contains("{requiredPathParameter}")) {
+                String name = "requiredPathParameter_" + paramCount;
+                path = path.replaceFirst("\\{requiredPathParameter}", "{" + name + "}");
+                PathParameter parameter = new PathParameter();
+                parameter.setName(name);
+                parameter.setRequired(true);
+                parameters.add(parameter);
+                paramCount++;
             }
-            return read(node.getClass(), path.toString(), null, true, new String[0], new String[0],
+            paramCount = 0;
+            while (path.contains("{optionalPathParameter}")) {
+                String name = "optionalPathParameter_" + paramCount;
+                path = path.replaceFirst("\\{optionalPathParameter}", "{" + name + "}");
+                PathParameter parameter = new PathParameter();
+                parameter.setName(name);
+                parameter.setRequired(false);
+                parameters.add(parameter);
+                paramCount++;
+            }
+
+            return read(node.getClass(), path, null, true, new String[0], new String[0],
                     new HashMap<>(), parameters);
         }
     }

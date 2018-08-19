@@ -79,7 +79,7 @@ public class Root extends Node {
 
     @Override
     public void setParent(Resource parent) {
-        throw new UnsupportedOperationException("Cannot set the parent of the rootFactory");
+        throw new UnsupportedOperationException("Cannot set the parent of the root");
     }
 
     @Override

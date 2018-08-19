@@ -92,4 +92,7 @@ public abstract class NodeWithParameters extends Node {
         return maxParameters;
     }
 
+    public List<String> getParameters() {
+        return parameters;
+    }
 }

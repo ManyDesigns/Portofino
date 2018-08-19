@@ -103,7 +103,7 @@ public abstract class Node implements SecureResource {
     }
 
     protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
-        FileObject child = location.getChild(pathSegment);
+        FileObject child = getChildrenLocation().getChild(pathSegment);
         checkChildLocation(pathSegment, child);
         return child;
     }
@@ -112,7 +112,7 @@ public abstract class Node implements SecureResource {
         if(child == null) {
             return;
         }
-        if(!child.getParent().equals(location)) {
+        if(!child.getParent().equals(getChildrenLocation())) {
             throw new IllegalArgumentException(
                     "Path segment " + pathSegment + " results in a path that is not a child of the current node and " +
                     "for security reasons this is forbidden.");
@@ -212,11 +212,15 @@ public abstract class Node implements SecureResource {
         return describe();
     }
 
+    public FileObject getChildrenLocation() throws FileSystemException {
+        return location;
+    }
+
     @Override
     public Collection<String> getSubResources() {
         try {
             List<String> subResources = new ArrayList<>();
-            FileObject[] children = location.getChildren();
+            FileObject[] children = getChildrenLocation().getChildren();
             for (FileObject child : children) {
                 if (child.getType() == FileType.FOLDER) {
                     subResources.add(child.getName().getBaseName());

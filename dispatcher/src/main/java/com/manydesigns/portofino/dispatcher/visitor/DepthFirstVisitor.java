@@ -3,6 +3,7 @@ package com.manydesigns.portofino.dispatcher.visitor;
 import com.manydesigns.portofino.dispatcher.Node;
 import com.manydesigns.portofino.dispatcher.NodeWithParameters;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,16 +30,30 @@ public class DepthFirstVisitor {
     }
 
     public void visit(Node node) throws Exception {
+        if(node instanceof NodeWithParameters) {
+            for(int i = 0; i < ((NodeWithParameters) node).getMinParameters(); i++) {
+                ((NodeWithParameters) node).consumeParameter("{requiredPathParameter}");
+            }
+        }
+        visitResource(node);
+        if(node instanceof NodeWithParameters && ((NodeWithParameters) node).getMinParameters() == 0) {
+            for(int i = 0; i < ((NodeWithParameters) node).getMaxParameters(); i++) {
+                ((NodeWithParameters) node).consumeParameter("{optionalPathParameter}");
+            }
+            visitResource(node);
+        }
+    }
+
+    protected void visitResource(Node node) throws Exception {
         for(NodeVisitor visitor : visitors) {
             visitor.visit(node);
         }
+        visitSubResources(node);
+    }
+
+    protected void visitSubResources(Node node) throws FileSystemException {
         for(String subResourceName : node.getSubResources()) {
             try {
-                if(node instanceof NodeWithParameters) {
-                    for(int i = 0; i < ((NodeWithParameters) node).getMinParameters(); i++) {
-                        ((NodeWithParameters) node).consumeParameter("_" + i);
-                    }
-                }
                 Object element = node.getSubResource(subResourceName);
                 if (element instanceof Node) {
                     visit((Node) element);
@@ -48,5 +63,5 @@ public class DepthFirstVisitor {
             }
         }
     }
-    
+
 }

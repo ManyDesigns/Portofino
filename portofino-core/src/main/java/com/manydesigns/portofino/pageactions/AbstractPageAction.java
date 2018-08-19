@@ -274,11 +274,11 @@ public abstract class AbstractPageAction extends NodeWithParameters implements P
     }
 
     @Override
-    public FileObject getChildLocation(String subResourceName) throws FileSystemException {
+    public FileObject getChildrenLocation() throws FileSystemException {
         if(parameters.isEmpty()) {
-            return getLocation().getChild(subResourceName);
+            return getLocation();
         } else {
-            return getLocation().getChild(PageInstance.DETAIL).getChild(subResourceName);
+            return getLocation().getChild(PageInstance.DETAIL);
         }
     }
 
