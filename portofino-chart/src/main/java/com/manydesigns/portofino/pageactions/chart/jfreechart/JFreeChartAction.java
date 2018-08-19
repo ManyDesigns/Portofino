@@ -143,7 +143,7 @@ public class JFreeChartAction extends AbstractPageAction {
             jfreeChartInstance =
                     new JFreeChartInstance(chart, file, chartId, "Chart: " + chartConfiguration.getName(),
                                            width, height, url);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error("Chart exception", e);
             return forwardToPageActionError(e);
         }

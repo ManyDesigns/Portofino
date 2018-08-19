@@ -101,14 +101,14 @@ public class DatabaseSyncer {
 
             for (Schema schema : schemas) {
                 String schemaName = schema.getSchemaName();
-                logger.info("Processing schema: {}", schemaName);
-                Schema sourceSchema =
-                        DatabaseLogic.findSchemaByNameIgnoreCase(
-                                sourceDatabase, schemaName);
+                String schemaRealName = schema.getSchema();
+                logger.info("Processing schema: {}", schemaRealName);
+                Schema sourceSchema = DatabaseLogic.findSchemaByNameIgnoreCase(sourceDatabase, schemaName);
                 if (sourceSchema == null) {
                     logger.debug("Source schema not found. Creating an empty one.");
                     sourceSchema = new Schema();
                     sourceSchema.setSchemaName(schemaName);
+                    sourceSchema.setSchema(schemaRealName);
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
@@ -136,13 +136,13 @@ public class DatabaseSyncer {
     }
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
-        logger.info("Synchronizing schema: {}", sourceSchema.getSchemaName());
+        logger.info("Synchronizing schema: {}", sourceSchema.getSchema());
+
         targetSchema.setSchemaName(sourceSchema.getSchemaName());
+        targetSchema.setSchema(sourceSchema.getSchema());
 
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
-
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);
-
         syncForeignKeys(databaseSnapshot, sourceSchema, targetSchema);
 
         return targetSchema;

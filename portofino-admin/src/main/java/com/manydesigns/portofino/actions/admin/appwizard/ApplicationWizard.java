@@ -361,11 +361,11 @@ public class ApplicationWizard extends AbstractPageAction {
 
         selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
         for(String[] schemaName : schemaNamesFromDb) {
-            SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], schemaNamesFromDb.size() == 1);
+            SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1],schemaName[1], schemaNamesFromDb.size() == 1);
             selectableSchemas.add(schema);
         }
         schemasForm = new TableFormBuilder(SelectableSchema.class)
-                .configFields("selected", "schemaName")
+                .configFields("selected", "schema","schemaName")
                 .configMode(Mode.EDIT)
                 .configNRows(selectableSchemas.size())
                 .configPrefix("schemas_")
@@ -429,12 +429,13 @@ public class ApplicationWizard extends AbstractPageAction {
         List<Schema> tempSchemas = new ArrayList<Schema>();
         Database database = connectionProvider.getDatabase();
         for(SelectableSchema schema : selectableSchemas) {
-            Schema modelSchema = DatabaseLogic.findSchemaByName(database, schema.schemaName);
+            Schema modelSchema = DatabaseLogic.findSchemaByName(database, schema.schema);
             if(schema.selected) {
                 if(modelSchema == null) {
                     modelSchema = new Schema();
                     modelSchema.setCatalog(schema.catalogName);
                     modelSchema.setSchemaName(schema.schemaName);
+                    modelSchema.setSchema(schema.schema);
                     modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
                     tempSchemas.add(modelSchema);
@@ -758,7 +759,7 @@ public class ApplicationWizard extends AbstractPageAction {
         List<Table> roots = new ArrayList<Table>();
         for(SelectableSchema selectableSchema : selectableSchemas) {
             if(selectableSchema.selected) {
-                Schema schema = DatabaseLogic.findSchemaByName(database, selectableSchema.schemaName);
+                Schema schema = DatabaseLogic.findSchemaByName(database, selectableSchema.schema);
                 roots.addAll(schema.getTables());
             }
         }

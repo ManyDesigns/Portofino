@@ -18,34 +18,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions.admin.database.forms;
+package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Updatable;
+import com.manydesigns.elements.FieldEncrypter;
+import com.manydesigns.elements.annotations.Encrypted;
 
-/**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+import java.lang.annotation.Annotation;
+
+/*
+ * @author Emanuele Poggi     - emanuele.poggi@manydesigns.com
  */
-public class SelectableSchema {
+@SuppressWarnings({"ClassExplicitlyAnnotation"})
+public class EncryptedImpl implements Encrypted {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    @Updatable(false)
-    public final String catalogName;
-    @Updatable(false)
-    public final String schema;
-    @Updatable(true)
-    public String schemaName;
-    @Label("")
-    public boolean selected;
+    private final String value;
 
-    public SelectableSchema(String catalogName, String schemaName,  String schema,boolean selected) {
-        this.catalogName = catalogName;
-        this.schemaName = schemaName;
-        this.schema = schema;
-        this.selected = selected;
+    public EncryptedImpl(String value) {
+        this.value = value;
+    }
+
+    public String value() {
+        return value;
+    }
+
+    public Class<? extends Annotation> annotationType() {
+        return Encrypted.class;
     }
 }

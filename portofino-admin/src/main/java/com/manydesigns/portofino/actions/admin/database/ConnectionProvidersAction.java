@@ -240,17 +240,17 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             for(String[] schemaName : schemaNamesFromDb) {
                 boolean selected = false;
                 for(Schema schema : selectedSchemas) {
-                    if(schemaName[1].equalsIgnoreCase(schema.getSchemaName())) {
+                    if(schemaName[1].equalsIgnoreCase(schema.getSchema())) {
                         selected = true;
                         break;
                     }
                 }
-                SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], selected);
+                SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1],schemaName[1], selected);
                 selectableSchemas.add(schema);
             }
             schemasForm = new TableFormBuilder(SelectableSchema.class)
                     .configFields(
-                            "selected", "schemaName"
+                            "selected", "schema","schemaName"
                             )
                     .configMode(Mode.EDIT)
                     .configNRows(selectableSchemas.size())
@@ -321,19 +321,20 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 List<Schema> selectedSchemas = database.getSchemas();
                 List<String> selectedSchemaNames = new ArrayList<String>(selectedSchemas.size());
                 for(Schema schema : selectedSchemas) {
-                    selectedSchemaNames.add(schema.getSchemaName().toLowerCase());
+                    selectedSchemaNames.add(schema.getSchema().toLowerCase());
                 }
                 for(SelectableSchema schema : selectableSchemas) {
-                    if(schema.selected && !selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
+                    if(schema.selected && !selectedSchemaNames.contains(schema.schema.toLowerCase())) {
                         Schema modelSchema = new Schema();
                         modelSchema.setCatalog(schema.catalogName);
                         modelSchema.setSchemaName(schema.schemaName);
+                        modelSchema.setSchema(schema.schema);
                         modelSchema.setDatabase(database);
                         database.getSchemas().add(modelSchema);
-                    } else if(!schema.selected && selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
+                    } else if(!schema.selected && selectedSchemaNames.contains(schema.schema.toLowerCase())) {
                         Schema toBeRemoved = null;
                         for(Schema aSchema : database.getSchemas()) {
-                            if(aSchema.getSchemaName().equalsIgnoreCase(schema.schemaName)) {
+                            if(aSchema.getSchema().equalsIgnoreCase(schema.schema)) {
                                 toBeRemoved = aSchema;
                                 break;
                             }

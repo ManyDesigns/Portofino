@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.servlets;
 
+import com.manydesigns.crypto.KeyManager;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
@@ -197,6 +198,14 @@ public class PortofinoListener extends Listener
             logger.warn("Blobs found directly under the blobs directory; using old style (pre-4.1.1) flat file blob manager");
             defaultBlobManager = new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         }
+
+        try {
+            logger.info("Initializing KeyManager ");
+            KeyManager.init(configuration);
+        } catch (Exception e) {
+            logger.error("Could not initialize KeyManager", e);
+        }
+
         servletContext.setAttribute(BaseModule.TEMPORARY_BLOB_MANAGER, tempBlobManager);
         servletContext.setAttribute(BaseModule.DEFAULT_BLOB_MANAGER, defaultBlobManager);
 

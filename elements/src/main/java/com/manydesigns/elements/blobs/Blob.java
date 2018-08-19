@@ -20,13 +20,18 @@
 
 package com.manydesigns.elements.blobs;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -39,11 +44,17 @@ public class Blob {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
+    public static final Logger logger = LoggerFactory.getLogger(Blob.class);
+
     public final static String FILENAME_PROPERTY = "filename";
     public final static String CONTENT_TYPE_PROPERTY = "content.type";
     public final static String SIZE_PROPERTY = "size";
     public final static String CREATE_TIMESTAMP_PROPERTY = "create.timestamp";
     public final static String CHARACTER_ENCODING_PROPERTY = "character.encoding";
+    public final static String REPOSITORY_PROPERTY = "repository";
+    public final static String REPOSITORY_ID_PROPERTY = "repository.id";
+    public final static String ENCRYPTION_PROPERTY = "encryption.type";
+    public final static String CUSTOM_DATA_PROPERTY = "custom.data";
 
     protected final DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 
@@ -55,6 +66,10 @@ public class Blob {
     protected String characterEncoding;
     protected InputStream inputStream;
     protected boolean propertiesLoaded;
+    protected String encryptionType;
+    protected String repository;
+    protected String repositoryId;
+    protected Map customData;
 
     public Blob(String code) {
         this.code = code;
@@ -79,6 +94,10 @@ public class Blob {
         safeSetProperty(metaProperties, SIZE_PROPERTY, Long.toString(size));
         safeSetProperty(metaProperties, CREATE_TIMESTAMP_PROPERTY, formatter.print(createTimestamp));
         safeSetProperty(metaProperties, CHARACTER_ENCODING_PROPERTY, characterEncoding);
+        safeSetProperty(metaProperties, REPOSITORY_PROPERTY, repository);
+        safeSetProperty(metaProperties, REPOSITORY_ID_PROPERTY, repositoryId);
+        safeSetProperty(metaProperties, ENCRYPTION_PROPERTY, encryptionType);
+        safeSetProperty(metaProperties, CUSTOM_DATA_PROPERTY, getSerializedCustomData());
 
         return metaProperties;
     }
@@ -89,6 +108,10 @@ public class Blob {
         size = Long.parseLong(metaProperties.getProperty(SIZE_PROPERTY));
         createTimestamp = formatter.parseDateTime(metaProperties.getProperty(CREATE_TIMESTAMP_PROPERTY));
         characterEncoding = metaProperties.getProperty(CHARACTER_ENCODING_PROPERTY);
+        repository = metaProperties.getProperty(REPOSITORY_PROPERTY);
+        repositoryId = metaProperties.getProperty(REPOSITORY_ID_PROPERTY);
+        encryptionType=metaProperties.getProperty(ENCRYPTION_PROPERTY);
+        setCustomData(metaProperties.getProperty(CUSTOM_DATA_PROPERTY));
         propertiesLoaded = true;
     }
 
@@ -145,7 +168,7 @@ public class Blob {
     }
 
     public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+            this.inputStream = inputStream;
     }
 
     public boolean isPropertiesLoaded() {
@@ -160,6 +183,64 @@ public class Blob {
         IOUtils.closeQuietly(inputStream);
     }
 
+    public String getEncryptionType() {
+        return encryptionType;
+    }
+
+    public String getRepository() {
+        return repository;
+    }
+
+    public void setEncryptionType(String encryptionType) {
+        this.encryptionType = encryptionType;
+    }
+
+    public void setRepository(String repository) {
+        this.repository = repository;
+    }
+
+    public Boolean isEncrypted(){
+        return this.encryptionType!=null;
+    }
+
+    public String getRepositoryId() {
+        return repositoryId;
+    }
+
+    public void setRepositoryId(String repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+
+    public Map getCustomData() {
+        return customData;
+    }
+
+    public void setCustomData(Map customData) {
+        this.customData = customData;
+    }
+
+    public String getSerializedCustomData() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(customData);
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage(),e);
+        }
+        return null;
+    }
+
+    public void setCustomData(String customData) {
+        if (customData != null && !customData.equals("")) {
+            try {
+                logger.debug("Reading customData from: "+customData);
+                ObjectMapper mapper = new ObjectMapper();
+                this.customData = mapper.readValue(customData, Map.class);
+            } catch (IOException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -167,9 +248,7 @@ public class Blob {
 
         Blob blob = (Blob) o;
 
-        if (code != null ? !code.equals(blob.code) : blob.code != null) return false;
-
-        return true;
+        return code != null ? code.equals(blob.code) : blob.code == null;
     }
 
     @Override
