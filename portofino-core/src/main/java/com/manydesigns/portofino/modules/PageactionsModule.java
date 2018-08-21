@@ -35,6 +35,7 @@ import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.util.GroovyScriptEngine;
+import io.jsonwebtoken.io.Encoders;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -172,7 +173,7 @@ public class PageactionsModule implements Module {
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
 
         if(!configuration.containsKey("jwt.secret")) {
-            String jwtSecret = UUID.randomUUID().toString();
+            String jwtSecret = Encoders.BASE64.encode((UUID.randomUUID() + UUID.randomUUID().toString()).getBytes());
             logger.warn("No jwt.secret property was set, so we generated one: {}. It will only be valid until the application stops.", jwtSecret);
             configuration.setProperty("jwt.secret", jwtSecret);
         }

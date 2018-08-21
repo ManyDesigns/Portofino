@@ -21,12 +21,16 @@
 package com.manydesigns.portofino.rest.actions.user;
 
 import com.github.cage.Cage;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.shiro.*;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.session.Session;
@@ -37,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Action that handles the standard Portofino login form.
@@ -473,16 +478,16 @@ public abstract class LoginAction extends AbstractPageAction {
 //        return new ForwardResolution("/m/base/actions/user/signUp.jsp");
 //    }
 //
-//    protected void setupSignUpForm(PortofinoRealm realm) {
-//        FormBuilder formBuilder = new FormBuilder(realm.getSelfRegisteredUserClassAccessor())
-//                .configMode(Mode.CREATE)
-//                .configReflectiveFields();
-//        signUpForm = formBuilder.build();
-//    }
-//
-//    protected boolean validateSignUpPassword(List<String> errorMessages) {
-//        return true;
-//    }
+    protected void setupSignUpForm(PortofinoRealm realm) {
+        FormBuilder formBuilder = new FormBuilder(realm.getSelfRegisteredUserClassAccessor())
+                .configMode(Mode.CREATE)
+                .configReflectiveFields();
+        signUpForm = formBuilder.build();
+    }
+
+    protected boolean validateSignUpPassword(List<String> errorMessages) {
+        return true;
+    }
 
     //**************************************************************************
     // Change password
@@ -541,25 +546,25 @@ public abstract class LoginAction extends AbstractPageAction {
 //        return redirectToReturnUrl();
 //    }
 //
-//    //**************************************************************************
-//    // Utility methods
-//    //**************************************************************************
-//
-//    protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
-//        if (password == null) {
-//            errorMessages.add(ElementsThreadLocals.getText("null.password"));
-//            return false;
-//        }
-//        if (password.length() < 8) {
-//            errorMessages.add(ElementsThreadLocals.getText("password.too.short", 8));
-//            return false;
-//        }
-//        if (StringUtils.isAlpha(password)) {
-//            errorMessages.add(ElementsThreadLocals.getText("password.only.letters"));
-//            return false;
-//        }
-//        return true;
-//    }
+    //**************************************************************************
+    // Utility methods
+    //**************************************************************************
+
+    protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
+        if (password == null) {
+            errorMessages.add(ElementsThreadLocals.getText("null.password"));
+            return false;
+        }
+        if (password.length() < 8) {
+            errorMessages.add(ElementsThreadLocals.getText("password.too.short", 8));
+            return false;
+        }
+        if (StringUtils.isAlpha(password)) {
+            errorMessages.add(ElementsThreadLocals.getText("password.only.letters"));
+            return false;
+        }
+        return true;
+    }
 //
 //    protected Resolution redirectToReturnUrl() {
 //        return redirectToReturnUrl(returnUrl);
