@@ -1,8 +1,9 @@
 package com.manydesigns.portofino.dispatcher.visitor;
 
-import com.manydesigns.portofino.dispatcher.Node;
-import com.manydesigns.portofino.dispatcher.NodeWithParameters;
-import org.apache.commons.vfs2.FileObject;
+import com.manydesigns.portofino.dispatcher.AbstractResource;
+import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
+import com.manydesigns.portofino.dispatcher.Resource;
+import com.manydesigns.portofino.dispatcher.WithParameters;
 import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,55 +12,53 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.vfs2.FileType.FOLDER;
-
 /**
  * Created by alessio on 17/05/16.
  */
 public class DepthFirstVisitor {
     
-    protected final List<NodeVisitor> visitors = new ArrayList<>();
+    protected final List<ResourceVisitor> visitors = new ArrayList<>();
     protected static final Logger logger = LoggerFactory.getLogger(DepthFirstVisitor.class);
     
-    public DepthFirstVisitor(NodeVisitor... visitors) {
+    public DepthFirstVisitor(ResourceVisitor... visitors) {
         this.visitors.addAll(Arrays.asList(visitors));
     }
 
-    public List<NodeVisitor> getVisitors() {
+    public List<ResourceVisitor> getVisitors() {
         return visitors;
     }
 
-    public void visit(Node node) throws Exception {
-        if(node instanceof NodeWithParameters) {
-            for(int i = 0; i < ((NodeWithParameters) node).getMinParameters(); i++) {
-                ((NodeWithParameters) node).consumeParameter("{requiredPathParameter}");
+    public void visit(Resource resource) throws Exception {
+        if(resource instanceof AbstractResourceWithParameters) {
+            for(int i = 0; i < ((WithParameters) resource).getMinParameters(); i++) {
+                ((WithParameters) resource).consumeParameter("{requiredPathParameter}");
             }
         }
-        visitResource(node);
-        if(node instanceof NodeWithParameters && ((NodeWithParameters) node).getMinParameters() == 0) {
-            for(int i = 0; i < ((NodeWithParameters) node).getMaxParameters(); i++) {
-                ((NodeWithParameters) node).consumeParameter("{optionalPathParameter}");
+        visitResource(resource);
+        if(resource instanceof AbstractResourceWithParameters && ((WithParameters) resource).getMinParameters() == 0) {
+            for(int i = 0; i < ((WithParameters) resource).getMaxParameters(); i++) {
+                ((WithParameters) resource).consumeParameter("{optionalPathParameter}");
             }
-            visitResource(node);
+            visitResource(resource);
         }
     }
 
-    protected void visitResource(Node node) throws Exception {
-        for(NodeVisitor visitor : visitors) {
-            visitor.visit(node);
+    protected void visitResource(Resource resource) throws Exception {
+        for(ResourceVisitor visitor : visitors) {
+            visitor.visit(resource);
         }
-        visitSubResources(node);
+        visitSubResources(resource);
     }
 
-    protected void visitSubResources(Node node) throws FileSystemException {
-        for(String subResourceName : node.getSubResources()) {
+    protected void visitSubResources(Resource resource) throws FileSystemException {
+        for(String subResourceName : resource.getSubResources()) {
             try {
-                Object element = node.getSubResource(subResourceName);
-                if (element instanceof Node) {
-                    visit((Node) element);
+                Object element = resource.getSubResource(subResourceName);
+                if (element instanceof AbstractResource) {
+                    visit((AbstractResource) element);
                 }
             } catch (Exception e) {
-                logger.error("Could not visit node " + node.getLocation().getURL(), e);
+                logger.error("Could not visit resource " + resource.getLocation().getURL(), e);
             }
         }
     }

@@ -75,7 +75,7 @@ import java.util.regex.Pattern;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
-public abstract class AbstractPageAction extends NodeWithParameters implements PageAction {
+public abstract class AbstractPageAction extends AbstractResourceWithParameters implements PageAction {
     public static final String copyright =
         "Copyright (C) 2005-2017 ManyDesigns srl";
 

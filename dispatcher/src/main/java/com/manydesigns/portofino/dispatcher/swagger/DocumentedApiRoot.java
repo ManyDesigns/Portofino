@@ -1,19 +1,16 @@
 package com.manydesigns.portofino.dispatcher.swagger;
 
-import com.manydesigns.portofino.dispatcher.Node;
-import com.manydesigns.portofino.dispatcher.NodeWithParameters;
+import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.RootFactory;
 import com.manydesigns.portofino.dispatcher.visitor.DepthFirstVisitor;
-import com.manydesigns.portofino.dispatcher.visitor.NodeVisitor;
+import com.manydesigns.portofino.dispatcher.visitor.ResourceVisitor;
 import io.swagger.annotations.Api;
 import io.swagger.jaxrs.Reader;
 import io.swagger.jaxrs.config.ReaderListener;
 import io.swagger.models.Swagger;
-import io.swagger.models.Tag;
 import io.swagger.models.parameters.Parameter;
 import io.swagger.models.parameters.PathParameter;
-import io.swagger.models.properties.StringProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +46,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         try {
             Root root = rootFactory.createRoot();
             root.setResourceContext(new DummyResourceContext());
-            new DepthFirstVisitor((NodeVisitor) node -> {
+            new DepthFirstVisitor((ResourceVisitor) node -> {
                 try {
                     subResourceReader.readSubResource(node);
                 } catch (Exception e) {
@@ -67,8 +64,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
             super(reader.getSwagger(), reader.getConfig());
         }
 
-        public Swagger readSubResource(Node node) {
-            String path = node.getPath();
+        public Swagger readSubResource(Resource resource) {
+            String path = resource.getPath();
             ArrayList<Parameter> parameters = new ArrayList<>();
             int paramCount = 0;
             while (path.contains("{requiredPathParameter}")) {
@@ -91,7 +88,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
                 paramCount++;
             }
 
-            return read(node.getClass(), path, null, true, new String[0], new String[0],
+            return read(resource.getClass(), path, null, true, new String[0], new String[0],
                     new HashMap<>(), parameters);
         }
     }
@@ -109,8 +106,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
 
         @Override
         public <T> T initResource(T resource) {
-            if(resource instanceof Node) {
-                ((Node) resource).setResourceContext(this);
+            if(resource instanceof Resource) {
+                ((Resource) resource).setResourceContext(this);
             }
             return resource;
         }

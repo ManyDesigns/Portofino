@@ -23,6 +23,7 @@ package com.manydesigns.portofino.dispatcher;
 import org.apache.commons.vfs2.FileObject;
 
 import javax.ws.rs.PathParam;
+import javax.ws.rs.container.ResourceContext;
 import java.util.Collection;
 
 /**
@@ -44,8 +45,12 @@ public interface Resource {
     void setParent(Resource resource);
 
     String getPath();
+
+    void setResourceContext(ResourceContext resourceContext);
     
     Collection<String> getSubResources();
+
+    Object getSubResource(String name) throws Exception;
     
     String getSegment();
     

@@ -32,7 +32,7 @@ import java.util.List;
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class NodeWithParameters extends Node {
+public abstract class AbstractResourceWithParameters extends AbstractResource implements WithParameters {
 
     protected int minParameters = 0;
     protected int maxParameters = 1;
@@ -84,14 +84,17 @@ public abstract class NodeWithParameters extends Node {
         return path.toString();
     }
 
+    @Override
     public int getMinParameters() {
         return minParameters;
     }
 
+    @Override
     public int getMaxParameters() {
         return maxParameters;
     }
 
+    @Override
     public List<String> getParameters() {
         return parameters;
     }

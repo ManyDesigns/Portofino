@@ -39,7 +39,7 @@ import java.net.URISyntaxException;
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class Root extends Node {
+public class Root extends AbstractResource {
 
     protected ResourceResolver resourceResolver;
     

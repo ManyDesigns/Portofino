@@ -1,11 +1,11 @@
-import com.manydesigns.portofino.dispatcher.Node;
+import com.manydesigns.portofino.dispatcher.AbstractResource;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
-public class REST extends Node {
+public class REST extends AbstractResource {
     @GET
     public String get() {
         return "GET";

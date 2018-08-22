@@ -42,9 +42,9 @@ import java.util.*;
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class Node implements SecureResource {
+public abstract class AbstractResource implements SecureResource {
     
-    protected static final Logger logger = LoggerFactory.getLogger(Node.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractResource.class);
     
     protected FileObject location;
     protected Resource parent;

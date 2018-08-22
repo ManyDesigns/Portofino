@@ -121,7 +121,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
         Map result = target("test/p/1/2/:description").request().get(Map.class);
         assertEquals(result.get("path"), "p/1/2/");
         assertEquals(result.get("children"), Arrays.asList("sub"));
-        assertEquals(result.get("superclass"), NodeWithParameters.class.getName());
+        assertEquals(result.get("superclass"), AbstractResourceWithParameters.class.getName());
         assertEquals(result.get("class"), "Params");
     }
 

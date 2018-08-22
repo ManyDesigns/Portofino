@@ -1,8 +1,8 @@
-import com.manydesigns.portofino.dispatcher.Node;
+import com.manydesigns.portofino.dispatcher.AbstractResource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-public class B extends Node {
+public class B extends AbstractResource {
     public String string = new Inner().string;
 
     @Path("2")
