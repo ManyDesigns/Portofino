@@ -36,8 +36,8 @@ import {SearchComponent} from './crud/search/search.component';
 import {FieldComponent} from './crud/field.component';
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
-import {EmbeddedContentDirective, MainContentDirective} from './content.directive';
-import {PageComponent} from './page.component';
+import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from './content.directive';
+import {DefaultNavigationComponent, NAVIGATION_COMPONENT, PageComponent} from './page.component';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./crud/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
@@ -46,9 +46,10 @@ import {ButtonComponent} from "./button.component";
 
 @NgModule({
   declarations: [
-    PortofinoAppComponent, ButtonComponent, CrudComponent, LoginComponent, SearchFieldComponent, SearchComponent,
-    FieldComponent, BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    MainContentDirective, EmbeddedContentDirective, PageComponent, ManyToManyComponent
+    PortofinoAppComponent, ButtonComponent, LoginComponent,
+    CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent, BlobFieldComponent, DetailComponent,
+    CreateComponent, BulkEditComponent, ManyToManyComponent,
+    MainContentDirective, EmbeddedContentDirective, NavigationDirective, PageComponent, DefaultNavigationComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
@@ -61,9 +62,10 @@ import {ButtonComponent} from "./button.component";
   providers: [
     PortofinoService, AuthenticationService,
     { provide: LOGIN_COMPONENT, useFactory: () => LoginComponent },
+    { provide: NAVIGATION_COMPONENT, useFactory: () => DefaultNavigationComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService }],
   bootstrap: [PortofinoAppComponent],
-  entryComponents: [LoginComponent, CrudComponent, ManyToManyComponent]
+  entryComponents: [LoginComponent, DefaultNavigationComponent, CrudComponent, ManyToManyComponent]
 })
 export class PortofinoModule { }
