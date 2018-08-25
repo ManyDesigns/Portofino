@@ -1,40 +1,59 @@
-import {AfterViewInit, Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterContentInit,
+  AfterViewInit,
+  Component,
+  ComponentFactoryResolver, Inject,
+  InjectionToken, Input,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {ActivatedRoute, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {EmbeddedContentDirective, MainContentDirective} from "./content.directive";
+import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from "./content.directive";
 import {Observable, Subscription} from "rxjs/index";
 import {catchError, map, mergeMap} from "rxjs/operators";
 import {ThemePalette} from "@angular/material/core/typings/common-behaviors/color";
 import {PortofinoService} from "./portofino.service";
 import {of} from "rxjs/index";
-import {NO_AUTH_HEADER} from "./security/authentication.service";
+import {LOGIN_COMPONENT, NO_AUTH_HEADER} from "./security/authentication.service";
+
+export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
 @Component({
   selector: 'portofino-page',
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.css']
 })
-export class PageComponent implements AfterViewInit, OnDestroy {
+export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
 
+  @ViewChild(NavigationDirective)
+  navigationHost: NavigationDirective;
   @ViewChild(MainContentDirective)
   contentHost: MainContentDirective;
   @ViewChild(EmbeddedContentDirective)
   embeddedContentHost: EmbeddedContentDirective;
 
-  page: Page = null;
   error;
+  navigation: NavigationComponent;
 
   protected subscription: Subscription;
 
   constructor(protected route: ActivatedRoute, protected http: HttpClient,
               protected componentFactoryResolver: ComponentFactoryResolver,
-              protected portofino: PortofinoService) { }
+              protected portofino: PortofinoService, @Inject(NAVIGATION_COMPONENT) protected navigationComponent) { }
+
+  ngOnInit() {
+    //Dynamically create the navigation component
+    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
+    this.navigation = this.navigationHost.viewContainerRef.createComponent(componentFactory).instance as NavigationComponent;
+  }
 
   ngAfterViewInit() {
     this.subscription = this.route.url.subscribe(segment => {
-      this.page = null;
       this.error = null;
+      this.navigation.page = null;
       this.loadPageInPath("", null, segment, 0, false);
     });
   }
@@ -68,7 +87,7 @@ export class PageComponent implements AfterViewInit, OnDestroy {
         }
         //If we arrive here, there are no more children in the URL to process
         if(!embed) {
-          this.page = page;
+          this.navigation.page = page;
           page.children.forEach(child => {
             this.checkAccessibility(page, child);
             if(page.allowEmbeddedComponents && child.embedded) {
@@ -144,6 +163,19 @@ export class PageComponent implements AfterViewInit, OnDestroy {
     component.parent = parent;
     return component.prepare();
   }
+}
+
+export interface NavigationComponent {
+  page: Page;
+}
+
+@Component({
+  selector: 'portofino-default-navigation',
+  templateUrl: './navigation.component.html',
+  styleUrls: ['./navigation.component.css']
+})
+export class DefaultNavigationComponent implements NavigationComponent {
+  page: Page;
 }
 
 export class PageConfiguration {
