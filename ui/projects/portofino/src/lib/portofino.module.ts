@@ -43,6 +43,7 @@ import {BlobFieldComponent} from "./crud/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {ManyToManyComponent} from './many-to-many/many-to-many.component';
 import {ButtonComponent} from "./button.component";
+import {QuillModule} from "ngx-quill";
 
 @NgModule({
   declarations: [
@@ -56,7 +57,7 @@ import {ButtonComponent} from "./button.component";
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
-    FileInputAccessorModule,
+    FileInputAccessorModule, QuillModule,
     RouterModule.forChild([])
   ],
   providers: [

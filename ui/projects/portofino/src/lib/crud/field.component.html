@@ -43,6 +43,11 @@
   </ng-container>
 </ng-container>
 <ng-template #simple>
+  <ng-container *ngIf="isRichText()" [formGroup]="form">
+    <label>{{property.name}}</label>
+    <quill-editor [formControlName]="property.name" [required]="isRequired()" *ngIf="enabled"></quill-editor>
+    <span [innerHTML]="control.value" *ngIf="!enabled" class="rich-text"></span>
+  </ng-container>
   <mat-form-field *ngIf="property.kind == 'string' && !isRichText()" [formGroup]="form">
     <mat-label>{{property.name}}</mat-label>
     <input matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="!isMultiline()" />
