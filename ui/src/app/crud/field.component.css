@@ -1,0 +1,3 @@
+span.rich-text > ::ng-deep p {
+  margin: 0;
+}
