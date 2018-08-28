@@ -34,7 +34,7 @@
         </td>
       </ng-container>
       <ng-container *ngFor="let property of resultProperties" [matColumnDef]="property.name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{property.name}}</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{property.label}}</th>
         <td mat-cell *matCellDef="let row">
           <a [routerLink]="baseUrl + '/' + row.__rowKey" *ngIf="property.key">
             {{row[property.name].displayValue || row[property.name].value}}

@@ -9,6 +9,7 @@ export class Property {
   type: string;
   annotations: Annotation[];
   modifiers: string[];
+  label: string;
   key: boolean;
   kind: string;
 
