@@ -52,7 +52,7 @@ public abstract class AbstractResourceResolver implements ResourceResolver {
         if(location == null) {
             return null;
         }
-        if(location.getType() == FileType.FILE) {
+        if(location.getType() == FileType.FILE || location.getType() == FileType.IMAGINARY) {
             if(isSupportedResource(resolver, location, name)) {
                 return location;
             } else {

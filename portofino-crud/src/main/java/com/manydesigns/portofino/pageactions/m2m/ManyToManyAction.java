@@ -136,18 +136,18 @@ public class ManyToManyAction extends AbstractPageAction {
     }
 
     @Override
-    public void init() {
+    public Object init() {
         if(m2mConfiguration == null || m2mConfiguration.getActualRelationTable() == null ||
            m2mConfiguration.getActualManyTable() == null) {
             logger.error("Configuration is null or relation/many table not found (check previous log messages)");
-            return;
+            return this; //TODO WebApplicationException instead?
         }
         Table table = m2mConfiguration.getActualRelationTable();
         relationTableAccessor = new TableAccessor(table);
         manyTableAccessor = new TableAccessor(m2mConfiguration.getActualManyTable());
         if(StringUtils.isBlank(m2mConfiguration.getActualOnePropertyName())) {
             logger.error("One property name not set");
-            return;
+            return this;
         }
 
         String expression = m2mConfiguration.getOneExpression();
@@ -164,7 +164,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 ModelSelectionProvider actualSelectionProvider = oneSelectionProvider.getActualSelectionProvider();
                 if(!(actualSelectionProvider instanceof DatabaseSelectionProvider)) {
                     logger.warn("Selection provider {} not supported", actualSelectionProvider);
-                    return;
+                    return this;
                 }
 
                 TableAccessor tableAccessor = new TableAccessor(m2mConfiguration.getActualRelationTable());
@@ -177,7 +177,7 @@ public class ManyToManyAction extends AbstractPageAction {
 
                 if(onePkAccessor == null) {
                     logger.warn("Not a property: {}", m2mConfiguration.getActualOnePropertyName());
-                    return;
+                    return this;
                 }
 
                 String databaseName = m2mConfiguration.getActualOneDatabase().getDatabaseName();
@@ -199,7 +199,7 @@ public class ManyToManyAction extends AbstractPageAction {
                     }
                 } else {
                     logger.warn("ModelSelection provider '{}': unsupported query", name);
-                    return;
+                    return this;
                 }
 
                 Object myInstance = tableAccessor.newInstance();
@@ -212,6 +212,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 correctlyConfigured = true;
             }
         }
+        return this;
     }
 
     public DefaultSelectionProvider createSelectionProviderFromHql

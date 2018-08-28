@@ -105,4 +105,16 @@ public class TestJavaResourceResolver {
         assertEquals("it works!", string.get(a));
     }
 
+    @Test
+    public void testSubResource() throws Exception {
+        FileObject root = getRoot();
+        ResourceResolver javaResourceResolver = getResourceResolver();
+
+        FileObject p = root.resolveFile("p");
+        Class<?> c = javaResourceResolver.resolve(p, Class.class);
+        assertEquals("Params", c.getName());
+        c = javaResourceResolver.resolve(p.getChild("sub"), Class.class);
+        assertEquals("Sub", c.getName());
+    }
+
 }

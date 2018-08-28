@@ -27,6 +27,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
@@ -120,7 +121,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
     public void description() {
         Map result = target("test/p/1/2/:description").request().get(Map.class);
         assertEquals(result.get("path"), "p/1/2/");
-        assertEquals(result.get("children"), Arrays.asList("sub"));
+        assertTrue(((List) result.get("children")).contains("sub"));
         assertEquals(result.get("superclass"), AbstractResourceWithParameters.class.getName());
         assertEquals(result.get("class"), "Params");
     }
@@ -221,6 +222,15 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
         subject.logout();
 
         subjectThreadState.clear();
+    }
+
+    @Test
+    public void mountPoint() {
+        String result = target("test/p/someParam/alias/2").request().get(String.class);
+        assertEquals("2", result);
+
+        result = target("test/p/someParam/alias/1").request().get(String.class);
+        assertEquals("GET", result);
     }
 
 }

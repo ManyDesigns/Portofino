@@ -156,12 +156,10 @@ public abstract class AbstractResource implements SecureResource {
     protected Object createSubResource(
             Class<?> subResourceClass, FileObject location, String segment)
             throws IllegalAccessException, InstantiationException {
-        Object subResource = subResourceClass.newInstance();
-        initSubResource(subResource, location, segment);
-        return subResource;
+        return initSubResource(subResourceClass.newInstance(), location, segment);
     }
 
-    protected void initSubResource(Object resource, FileObject location, String segment) {
+    protected Object initSubResource(Object resource, FileObject location, String segment) {
         if(resource instanceof Resource) {
             Resource subResource = (Resource) resource;
             subResource.setParent(this);
@@ -169,9 +167,10 @@ public abstract class AbstractResource implements SecureResource {
             subResource.setSegment(segment);
             initGenericResource(resource);
             initSubResource(subResource);
-            subResource.init();
+            return subResource.init();
         } else {
             initGenericResource(resource);
+            return resource;
         }
     }
 
@@ -278,8 +277,9 @@ public abstract class AbstractResource implements SecureResource {
     }
 
     @Override
-    public void init() {
+    public Object init() {
         //The default implementation does nothing, it is only an extension hook
+        return this;
     }
 
 }

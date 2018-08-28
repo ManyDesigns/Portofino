@@ -238,13 +238,14 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    public void init() {
+    public Object init() {
         super.init();
         if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
             session = persistence.getSession(getCrudConfiguration().getDatabase());
             selectionProviderSupport = createSelectionProviderSupport();
             selectionProviderSupport.setup();
         }
+        return this;
     }
 
     //**************************************************************************

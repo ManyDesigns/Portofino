@@ -80,7 +80,7 @@ public class PortofinoRoot extends Root implements PageAction {
     }
 
     @Override
-    public void init() {
+    public Object init() {
         super.init();
         Page rootPage = PageLogic.getPage(location);
         PageInstance pageInstance = new PageInstance(null, location, rootPage, null);
@@ -92,6 +92,7 @@ public class PortofinoRoot extends Root implements PageAction {
         context.setResponse(response);
         context.setActionPath("/");
         setContext(context);
+        return this;
     }
 
     @Override

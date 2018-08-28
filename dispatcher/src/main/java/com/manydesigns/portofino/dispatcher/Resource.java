@@ -58,6 +58,6 @@ public interface Resource {
 
     Object consumePathSegment(String pathSegment);
 
-    void init();
+    Object init();
 
 }

@@ -75,25 +75,8 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     // Properties
     //--------------------------------------------------------------------------
 
-    /**
-     * The PageInstance property. Injected.
-     */
-    public PageInstance pageInstance;
-
     @Inject(MailModule.MAIL_QUEUE)
     public MailQueue mailQueue;
-
-    protected PageActionContext context;
-
-    @Override
-    public PageActionContext getContext() {
-        return context;
-    }
-
-    @Override
-    public void setContext(PageActionContext context) {
-        this.context = context;
-    }
 
     //--------------------------------------------------------------------------
     // PageAction implementation
@@ -162,24 +145,6 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     @Override
     public String getApplicationName() {
         return portofinoConfiguration.getString(PortofinoProperties.APP_NAME);
-    }
-
-    @Override
-    public void init() {}
-
-    @Override
-    public PageInstance getPageInstance() {
-        return pageInstance;
-    }
-
-    @Override
-    public void setPageInstance(PageInstance pageInstance) {
-        this.pageInstance = pageInstance;
-    }
-
-    @Override
-    public PageAction getParent() {
-        return pageInstance.getParent().getActionBean();
     }
 
 }
