@@ -38,6 +38,7 @@ import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.*;
 import java.io.Serializable;
@@ -59,7 +60,7 @@ public abstract class LoginAction extends AbstractPageAction {
     // Injections
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration portofinoConfiguration;
 
     //**************************************************************************

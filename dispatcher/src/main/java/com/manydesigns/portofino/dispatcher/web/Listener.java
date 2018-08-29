@@ -33,6 +33,8 @@ public class Listener implements ServletContextListener {
     protected FileObject applicationRoot;
     protected Configuration configuration;
     private static final Logger logger = LoggerFactory.getLogger(Listener.class);
+
+    public static final String CODE_BASE_ATTRIBUTE = "portofino.codebase";
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -100,7 +102,7 @@ public class Listener implements ServletContextListener {
             if(actionsDirectory == null || actionsDirectory.getType() != FileType.FOLDER) {
                 initializationFailed(new Exception("Not a directory: " + actionsDirectoryName));
             }
-            CodeBase codeBase = getCodeBase();
+            CodeBase codeBase = createAndStoreCodeBase(servletContext);
             ResourceResolvers resourceResolver = new ResourceResolvers();
             configureResourceResolvers(resourceResolver, codeBase);
             DocumentedApiRoot.setRootFactory(() -> getRoot(actionsDirectory, resourceResolver));
@@ -109,7 +111,7 @@ public class Listener implements ServletContextListener {
         }
     }
 
-    protected CodeBase getCodeBase() throws IOException {
+    protected CodeBase createAndStoreCodeBase(ServletContext servletContext) throws IOException {
         //TODO auto discovery?
         FileObject codeBaseRoot = getCodeBaseRoot();
         JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot);
@@ -122,6 +124,7 @@ public class Listener implements ServletContextListener {
         } catch (Exception e) {
             logger.debug("Groovy not available", e);
         }
+        servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
         return codeBase;
     }
 

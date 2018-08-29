@@ -38,7 +38,6 @@ import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
-import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -52,6 +51,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,14 +98,8 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     /**
      * The global configuration object. Injected.
      */
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration portofinoConfiguration;
-
-    /**
-     * The templates registry. Injected.
-     */
-    @Inject(PageactionsModule.TEMPLATES_REGISTRY)
-    public TemplateRegistry templates;
 
     /**
      * Information about the web server. Injected.
@@ -321,11 +315,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
                               PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
                 .configFieldSetNames("Page");
 
-        SelectionProvider layoutSelectionProvider = createTemplateSelectionProvider();
-        formBuilder.configSelectionProvider(layoutSelectionProvider, "template");
-        SelectionProvider detailLayoutSelectionProvider = createTemplateSelectionProvider();
-        formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailTemplate");
-
         pageConfigurationForm = formBuilder.build();
         EditPage edit = new EditPage();
         edit.id = page.getId();
@@ -338,14 +327,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
 //        if(script == null) {
 //            prepareScript();
 //        }
-    }
-
-    protected SelectionProvider createTemplateSelectionProvider() {
-        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("template");
-        for(String template : templates) {
-            selectionProvider.appendRow(template, template, true);
-        }
-        return selectionProvider;
     }
 
     /**

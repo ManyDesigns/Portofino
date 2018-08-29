@@ -185,12 +185,7 @@ public class PortofinoListener extends Listener
         String dataFilenamePattern = "blob-{0}.data";
         BlobManager tempBlobManager = new HierarchicalBlobManager(tempBlobsDir, metaFilenamePattern, dataFilenamePattern);
         BlobManager defaultBlobManager;
-        File[] blobs = appBlobsDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.startsWith("blob-") && name.endsWith(".properties");
-            }
-        });
+        File[] blobs = appBlobsDir.listFiles((dir, name) -> name.startsWith("blob-") && name.endsWith(".properties"));
         if(blobs == null || blobs.length == 0) { //Null if the directory does not exist yet
             logger.info("Using hierarchical blob manager");
             defaultBlobManager = new HierarchicalBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);

@@ -1,5 +1,6 @@
-import {Component, NgModule} from '@angular/core';
-import {PortofinoModule, Page, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent} from "portofino";
+import {Component, ModuleWithProviders, NgModule} from '@angular/core';
+import {PortofinoModule, Page, PageComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent} from "portofino";
+import {RouterModule} from "@angular/router";
 
 @Component({
   selector: 'portofino-hello',
@@ -26,12 +27,16 @@ export class AppComponent {}
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
-  imports: [ AppModule.portofinoModule ],
+  imports: [
+    /*RouterModule.forRoot(
+      [{ path: "start", component: HelloPortofino }, { path: "**", component: PageComponent}],
+      { onSameUrlNavigation: "reload", enableTracing: false }),*/
+    PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]) ],
   entryComponents: [ CustomNavigation ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  static portofinoModule = PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }])
+  static portofinoModule: (ModuleWithProviders | PortofinoModule)[] = PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }])
   static navigation() {
     return DefaultNavigationComponent
     //return CustomNavigation

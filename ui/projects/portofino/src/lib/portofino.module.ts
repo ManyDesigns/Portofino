@@ -37,7 +37,7 @@ import {FieldComponent} from './crud/field.component';
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
 import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from './content.directive';
-import {DefaultNavigationComponent, NAVIGATION_COMPONENT, NavigationComponent, PageComponent} from './page.component';
+import {DefaultNavigationComponent, NAVIGATION_COMPONENT, PageComponent} from './page.component';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./crud/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
@@ -78,11 +78,13 @@ export class PortofinoModule {
     return DefaultNavigationComponent;
   }
 
-  static withRoutes(routes: Routes): (ModuleWithProviders | PortofinoModule)[] {
-    let defaultRoutes = [{ path: "**", component: PageComponent}];
+  public static withRoutes(routes: Routes): (ModuleWithProviders)[] {
     return [RouterModule.forRoot(
-      routes.concat(defaultRoutes),
+      [...routes, { path: "**", component: PageComponent}],
       { onSameUrlNavigation: "reload", enableTracing: false }),
-      PortofinoModule];
+      {
+        ngModule: PortofinoModule,
+        providers: []
+      }];
   }
 }
