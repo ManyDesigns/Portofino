@@ -54,7 +54,7 @@ public class Security extends AbstractPortofinoRealm {
     protected String hashAlgorithm = $hashAlgorithm;
     protected HashFormat hashFormat = $hashFormat;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     Persistence persistence;
 
     public Security() {

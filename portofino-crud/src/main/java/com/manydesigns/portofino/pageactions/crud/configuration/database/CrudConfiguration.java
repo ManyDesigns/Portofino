@@ -32,6 +32,7 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.pageactions.cru
     protected String database;
     protected String query;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     //**************************************************************************

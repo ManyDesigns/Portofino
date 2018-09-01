@@ -48,6 +48,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
@@ -66,7 +67,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     protected Configuration portofinoConfiguration;
 
     protected PasswordService passwordService;

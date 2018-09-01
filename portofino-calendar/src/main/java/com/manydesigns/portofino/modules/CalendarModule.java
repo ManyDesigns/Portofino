@@ -26,6 +26,8 @@ import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@Component
 public class CalendarModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
@@ -41,10 +44,10 @@ public class CalendarModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(PageactionsModule.PAGE_ACTIONS_REGISTRY)
+    @Autowired
     public PageActionRegistry pageActionRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;

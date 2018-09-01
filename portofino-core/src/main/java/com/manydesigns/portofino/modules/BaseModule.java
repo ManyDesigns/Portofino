@@ -37,6 +37,8 @@ import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 import javax.servlet.ServletContext;
 
@@ -60,14 +62,10 @@ public class BaseModule implements Module {
     // Constants
     //**************************************************************************
 
-    public final static String SERVLET_CONTEXT = "com.manydesigns.portofino.servletContext";
     public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
     public final static String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public final static String RESOURCE_BUNDLE_MANAGER = "com.manydesigns.portofino.resourceBundleManager";
-    public final static String ELEMENTS_CONFIGURATION = "com.manydesigns.portofino.elementsConfiguration";
     public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
-    public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
-    public final static String CACHE_RESET_LISTENER_REGISTRY = "com.manydesigns.portofino.cache.CacheResetListenerRegistry";
     public static final String DEFAULT_BLOB_MANAGER = "com.manydesigns.portofino.blobs.DefaultBlobManager";
     public static final String TEMPORARY_BLOB_MANAGER = "com.manydesigns.portofino.blobs.TemporaryBlobManager";
 
@@ -75,10 +73,10 @@ public class BaseModule implements Module {
     // Injected objects
     //**************************************************************************
 
-    @Inject(PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
     //**************************************************************************
@@ -135,11 +133,12 @@ public class BaseModule implements Module {
         logger.info("Disabling OGNL security manager");
         OgnlRuntime.setSecurityManager(null);
 
-        logger.debug("Installing cache reset listener registry");
-        CacheResetListenerRegistry cacheResetListenerRegistry = new CacheResetListenerRegistry();
-        servletContext.setAttribute(CACHE_RESET_LISTENER_REGISTRY, cacheResetListenerRegistry);
-
         status = ModuleStatus.ACTIVE;
+    }
+
+    @Bean
+    public CacheResetListenerRegistry getCacheResetListenerRegistry() {
+        return new CacheResetListenerRegistry();
     }
 
     @Override

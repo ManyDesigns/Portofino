@@ -33,6 +33,7 @@ import com.manydesigns.portofino.persistence.QueryUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.annotation.*;
 
@@ -75,7 +76,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     protected Table actualManyTable;
     protected ViewType actualViewType;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     //**************************************************************************

@@ -29,6 +29,7 @@ import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
 
@@ -46,10 +47,10 @@ public class QuartzModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
     protected Scheduler scheduler;

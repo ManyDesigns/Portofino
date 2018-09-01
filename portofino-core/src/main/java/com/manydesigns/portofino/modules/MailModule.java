@@ -27,6 +27,7 @@ import com.manydesigns.portofino.di.Inject;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
 
@@ -44,10 +45,10 @@ public class MailModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
     protected MailQueueSetup mailQueueSetup;

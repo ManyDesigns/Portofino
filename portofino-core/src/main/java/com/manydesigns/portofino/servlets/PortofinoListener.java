@@ -95,8 +95,6 @@ public class PortofinoListener extends Listener
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
 
-    protected ModuleRegistry moduleRegistry;
-
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -134,14 +132,11 @@ public class PortofinoListener extends Listener
         servletContext = servletContextEvent.getServletContext();
 
         serverInfo = new ServerInfo(servletContext);
-        servletContext.setAttribute(BaseModule.SERVLET_CONTEXT, servletContext);
         servletContext.setAttribute(BaseModule.SERVER_INFO, serverInfo);
 
         setupCommonsConfiguration();
 
         elementsConfiguration = ElementsProperties.getConfiguration();
-        servletContext.setAttribute(
-                BaseModule.ELEMENTS_CONFIGURATION, elementsConfiguration);
 
         String applicationDirectoryPath = servletContext.getInitParameter("portofino.application.directory");
         if(applicationDirectoryPath != null) try {
@@ -173,8 +168,7 @@ public class PortofinoListener extends Listener
         if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
             appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
         } else {
-            File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
-            appBlobsDir = new File(appDir, "blobs");
+            appBlobsDir = new File(applicationDirectory, "blobs");
         }
         logger.info("Blobs directory: " + appBlobsDir.getAbsolutePath());
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
@@ -237,15 +231,6 @@ public class PortofinoListener extends Listener
             logger.warn(msg);
         }
 
-        logger.info("Loading modules...");
-        moduleRegistry = new ModuleRegistry(configuration);
-        discoverModules(moduleRegistry, classLoader);
-        servletContext.setAttribute(BaseModule.MODULE_REGISTRY, moduleRegistry);
-        moduleRegistry.migrateAndInit(servletContext);
-        logger.info("Starting modules...");
-        moduleRegistry.start();
-        logger.info("Modules initialization terminated.");
-
         String encoding = configuration.getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
@@ -283,32 +268,8 @@ public class PortofinoListener extends Listener
         return PortofinoRoot.get(actionsDirectory, resourceResolver);
     }
 
-    protected void discoverModules(final ModuleRegistry moduleRegistry, ClassLoader classLoader) {
-        //TODO use ServletContainerInitializer and @HandlesTypes
-        new FastClasspathScanner(Module.class.getPackage().getName())
-                .matchClassesImplementing(Module.class, new ImplementingClassMatchProcessor<Module>() {
-                    @Override
-                    public void processMatch(Class<? extends Module> moduleClass) {
-                        try {
-                            logger.debug("Adding discovered module " + moduleClass);
-                            Module module = moduleClass.newInstance();
-                            moduleRegistry.getModules().add(module);
-                        } catch (Throwable e) {
-                            logger.error("Could not register module " + moduleClass, e);
-                        }
-                    }
-                })
-                .scan();
-    }
-
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         MDC.clear();
-        logger.info("ManyDesigns Portofino stopping...");
-        logger.info("Stopping modules...");
-        moduleRegistry.stop();
-        logger.info("Destroying modules...");
-        moduleRegistry.destroy();
-        logger.info("ManyDesigns Portofino stopped.");
     }
 
     //**************************************************************************

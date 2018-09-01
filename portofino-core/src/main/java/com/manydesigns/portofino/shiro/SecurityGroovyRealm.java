@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.di.Injections;
 import groovy.util.GroovyScriptEngine;
@@ -36,6 +37,10 @@ import org.apache.shiro.util.Destroyable;
 import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContext;
 import java.io.Serializable;
@@ -65,7 +70,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
 
     protected final GroovyScriptEngine groovyScriptEngine;
     protected final String scriptUrl;
-    protected final ServletContext servletContext;
+    protected final ApplicationContext applicationContext;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
 
@@ -75,11 +80,12 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(GroovyScriptEngine groovyScriptEngine, String scriptUrl, ServletContext servletContext)
+    public SecurityGroovyRealm(
+            GroovyScriptEngine groovyScriptEngine, String scriptUrl, ApplicationContext applicationContext)
             throws ScriptException, ResourceException, InstantiationException, IllegalAccessException {
         this.groovyScriptEngine = groovyScriptEngine;
         this.scriptUrl = scriptUrl;
-        this.servletContext = servletContext;
+        this.applicationContext = applicationContext;
         doEnsureDelegate();
     }
 
@@ -126,10 +132,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     protected void configureDelegate(PortofinoRealm security) {
-        Injections.inject(
-                security,
-                servletContext,
-                null);
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(security);
         security.setCacheManager(cacheManager);
         LifecycleUtils.init(security);
     }

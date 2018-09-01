@@ -1,25 +1,24 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.util.RandomUtil
-import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
+import com.manydesigns.portofino.security.SecurityLogic
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.ExistingUserException
 import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
+import org.apache.shiro.authc.*
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.apache.shiro.authc.*
-import com.manydesigns.portofino.security.SecurityLogic
+import org.springframework.beans.factory.annotation.Autowired
 
 class Security extends AbstractPortofinoRealm {
 
@@ -28,7 +27,7 @@ class Security extends AbstractPortofinoRealm {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     Persistence persistence;
 
     //--------------------------------------------------------------------------

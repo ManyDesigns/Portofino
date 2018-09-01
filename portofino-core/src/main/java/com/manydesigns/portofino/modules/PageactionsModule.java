@@ -44,6 +44,12 @@ import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 
 import javax.servlet.ServletContext;
 import java.io.File;
@@ -55,7 +61,7 @@ import java.util.UUID;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PageactionsModule implements Module {
+public class PageactionsModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -63,13 +69,14 @@ public class PageactionsModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(BaseModule.APPLICATION_DIRECTORY)
+    @Autowired
+    @Qualifier("applicationDirectory")
     public File applicationDirectory;
 
     @Inject(BaseModule.GROOVY_SCRIPT_ENGINE)
@@ -78,11 +85,11 @@ public class PageactionsModule implements Module {
     @Inject(BaseModule.GROOVY_CLASS_PATH)
     public File groovyClasspath;
 
-    @Inject(BaseModule.CACHE_RESET_LISTENER_REGISTRY)
+    @Autowired
     public CacheResetListenerRegistry cacheResetListenerRegistry;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
-
+    protected ApplicationContext applicationContext;
     protected CacheManager cacheManager;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
@@ -93,10 +100,6 @@ public class PageactionsModule implements Module {
 
     public static final String PAGES_DIRECTORY = "PAGES_DIRECTORY";
     public static final String EHCACHE_MANAGER = "portofino.ehcache.manager";
-    public static final String PAGE_ACTIONS_REGISTRY =
-            "com.manydesigns.portofino.pageactions.registry.PageActionRegistry";
-    public static final String TEMPLATES_REGISTRY =
-            "com.manydesigns.portofino.pageactions.templates.registry";
 
     //**************************************************************************
     // Logging
@@ -158,15 +161,6 @@ public class PageactionsModule implements Module {
         }
         servletContext.setAttribute(PAGES_DIRECTORY, actionsDirectory);
 
-        logger.debug("Creating pageactions registry");
-        PageActionRegistry pageActionRegistry = new PageActionRegistry();
-        pageActionRegistry.register(ActivityStreamAction.class);
-        pageActionRegistry.register(CustomAction.class);
-        pageActionRegistry.register(FormAction.class);
-        pageActionRegistry.register(TableFormAction.class);
-        //pageActionRegistry.register(TextAction.class);
-        servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);
-
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
 
         if(!configuration.containsKey("jwt.secret")) {
@@ -176,6 +170,18 @@ public class PageactionsModule implements Module {
         }
 
         status = ModuleStatus.ACTIVE;
+    }
+
+    @Bean
+    public PageActionRegistry getPageActionRegistry() {
+        logger.debug("Creating pageactions registry");
+        PageActionRegistry pageActionRegistry = new PageActionRegistry();
+        pageActionRegistry.register(ActivityStreamAction.class);
+        pageActionRegistry.register(CustomAction.class);
+        pageActionRegistry.register(FormAction.class);
+        pageActionRegistry.register(TableFormAction.class);
+        //pageActionRegistry.register(TextAction.class);
+        return pageActionRegistry;
     }
 
     protected void preloadPageActions(File directory) {
@@ -225,7 +231,7 @@ public class PageactionsModule implements Module {
         try {
             String securityGroovy = new File(groovyClasspath, "Security.groovy").toURI().toString();
             logger.debug("Security.groovy URL: {}", securityGroovy);
-            SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, securityGroovy, servletContext);
+            SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, securityGroovy, applicationContext);
             LifecycleUtils.init(realm);
             rsm.setRealm(realm);
             status = ModuleStatus.STARTED;
@@ -262,5 +268,10 @@ public class PageactionsModule implements Module {
         public void handleReset(CacheResetEvent e) {
             PageLogic.clearConfigurationCache();
         }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

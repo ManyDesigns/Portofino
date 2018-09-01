@@ -34,6 +34,9 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
@@ -46,7 +49,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A collection of methods that operate on {@link Dispatch} instances and related objects.
+ * A collection of methods that operate on pages and related objects.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -370,8 +373,9 @@ public class PageLogic {
             logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
             return null;
         }
-        Injections.inject(
-                configuration, ElementsThreadLocals.getServletContext(), ElementsThreadLocals.getHttpServletRequest());
+        WebApplicationContext webApplicationContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(ElementsThreadLocals.getServletContext());
+        webApplicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
         if(configuration instanceof PageActionConfiguration) {
             ((PageActionConfiguration) configuration).init();
         }

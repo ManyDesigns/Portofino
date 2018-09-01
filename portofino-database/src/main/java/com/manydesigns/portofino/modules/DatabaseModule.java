@@ -27,6 +27,12 @@ import com.manydesigns.portofino.persistence.Persistence;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 
 import javax.servlet.ServletContext;
 import java.io.File;
@@ -37,7 +43,7 @@ import java.io.File;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DatabaseModule implements Module {
+public class DatabaseModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -45,16 +51,17 @@ public class DatabaseModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(BaseModule.APPLICATION_DIRECTORY)
+    @Autowired
+    @Qualifier("applicationDirectory")
     public File applicationDirectory;
 
-    protected Persistence persistence;
+    protected ApplicationContext applicationContext;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -62,10 +69,6 @@ public class DatabaseModule implements Module {
     // Constants
     //**************************************************************************
 
-    public static final String PERSISTENCE =
-            "com.manydesigns.portofino.modules.DatabaseModule.persistence";
-    public static final String DATABASE_PLATFORMS_REGISTRY =
-            "com.manydesigns.portofino.modules.DatabaseModule.databasePlatformsRegistry";
     //Liquibase properties
     public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
 
@@ -108,26 +111,28 @@ public class DatabaseModule implements Module {
 
     @Override
     public void init() {
-        logger.info("Initializing persistence");
-        DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
-
-        persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
-        Injections.inject(persistence, servletContext, null);
-        servletContext.setAttribute(DATABASE_PLATFORMS_REGISTRY, databasePlatformsRegistry);
-        servletContext.setAttribute(PERSISTENCE, persistence);
-
         status = ModuleStatus.ACTIVE;
+    }
+
+    @Bean
+    public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
+        return new DatabasePlatformsRegistry(configuration);
+    }
+
+    @Bean
+    public Persistence getPersistence(@Autowired DatabasePlatformsRegistry databasePlatformsRegistry) {
+        return new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
     }
 
     @Override
     public void start() {
-        persistence.start();
+        applicationContext.getBean(Persistence.class).start();
         status = ModuleStatus.STARTED;
     }
 
     @Override
     public void stop() {
-        persistence.stop();
+        applicationContext.getBean(Persistence.class).stop();
         status = ModuleStatus.STOPPED;
     }
 
@@ -141,5 +146,10 @@ public class DatabaseModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

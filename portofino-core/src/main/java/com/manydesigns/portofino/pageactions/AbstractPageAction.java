@@ -102,12 +102,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     public Configuration portofinoConfiguration;
 
     /**
-     * Information about the web server. Injected.
-     */
-    @Inject(BaseModule.SERVER_INFO)
-    public ServerInfo serverInfo;
-
-    /**
      * The page template to use. It can be set using a request parameter. If not set, the one from page.xml is used.
      */
     protected String pageTemplate;

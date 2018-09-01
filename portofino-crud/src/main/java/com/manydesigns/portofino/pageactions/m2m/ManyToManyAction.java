@@ -66,6 +66,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -119,8 +120,7 @@ public class ManyToManyAction extends AbstractPageAction {
     //Logging
     private  static final Logger logger = LoggerFactory.getLogger(ManyToManyAction.class);
 
-    //Persistence
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     public Response preparePage() {

@@ -56,6 +56,7 @@ import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.io.StringReader;
@@ -92,7 +93,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public Session session;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     protected long totalSearchRecords = -1;

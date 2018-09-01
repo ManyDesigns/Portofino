@@ -56,7 +56,7 @@ public class AdminModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
