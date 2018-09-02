@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by alessio on 11/6/17.
  */
-public class PageActionContext {
+public class ActionContext {
 
     protected HttpServletRequest request;
     protected HttpServletResponse response;

@@ -70,10 +70,4 @@ public class CustomAction extends AbstractPageAction {
         return cancel();
     }*/
 
-    public Response preparePage() {
-        if(!PageActionLogic.supportsDetail(getClass()) && !pageInstance.getParameters().isEmpty()) {
-            return Response.status(404).build();
-        }
-        return null;
-    }
 }

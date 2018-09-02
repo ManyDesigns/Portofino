@@ -7,7 +7,7 @@ import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.i18n.TextProviderBean;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageAction;
-import com.manydesigns.portofino.pageactions.PageActionContext;
+import com.manydesigns.portofino.pageactions.ActionContext;
 import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
@@ -34,7 +34,7 @@ public class PortofinoRoot extends Root implements PageAction {
     @Context
     protected UriInfo uriInfo;
 
-    protected PageActionContext context;
+    protected ActionContext context;
     protected PageInstance pageInstance;
 
     protected PortofinoRoot(FileObject location, ResourceResolver resourceResolver) {
@@ -78,7 +78,7 @@ public class PortofinoRoot extends Root implements PageAction {
         PageInstance pageInstance = new PageInstance(null, location, rootPage, null);
         setPageInstance(pageInstance);
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        PageActionContext context = new PageActionContext();
+        ActionContext context = new ActionContext();
         context.setServletContext(servletContext);
         context.setRequest(request);
         context.setResponse(response);
@@ -88,12 +88,12 @@ public class PortofinoRoot extends Root implements PageAction {
     }
 
     @Override
-    public PageActionContext getContext() {
+    public ActionContext getContext() {
         return context;
     }
 
     @Override
-    public void setContext(PageActionContext context) {
+    public void setContext(ActionContext context) {
         this.context = context;
     }
 

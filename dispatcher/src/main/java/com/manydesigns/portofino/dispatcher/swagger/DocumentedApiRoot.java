@@ -42,12 +42,12 @@ public abstract class DocumentedApiRoot implements ReaderListener {
 
     @Override
     public void afterScan(Reader reader, Swagger swagger) {
-        final SubResourceReader subResourceReader = new SubResourceReader(reader);
+        final SubResourceReader subResourceReader = getSubResourceReader(reader);
         try {
             //TODO actions should be put in a special "inspection mode" to avoid checks (e.g. not-in-use-case),
             //hitting the DB or services, etc.
             Root root = rootFactory.createRoot();
-            root.setResourceContext(new DummyResourceContext());
+            root.setResourceContext(getResourceContext());
             new DepthFirstVisitor((ResourceVisitor) node -> {
                 try {
                     subResourceReader.readSubResource(node);
@@ -60,7 +60,15 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         }
     }
 
-    static class SubResourceReader extends Reader {
+    protected SubResourceReader getSubResourceReader(Reader reader) {
+        return new SubResourceReader(reader);
+    }
+
+    protected ResourceContext getResourceContext() {
+        return new DummyResourceContext();
+    }
+
+    protected static class SubResourceReader extends Reader {
 
         public SubResourceReader(Reader reader) {
             super(reader.getSwagger(), reader.getConfig());
@@ -97,7 +105,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
 
     //TODO ability tu use a different resource context (perhaps this should be part of the RootFactory?)
     //in order to support injection using Spring
-    protected static class DummyResourceContext implements ResourceContext {
+    public static class DummyResourceContext implements ResourceContext {
         @Override
         public <T> T getResource(Class<T> resourceClass) {
             try {

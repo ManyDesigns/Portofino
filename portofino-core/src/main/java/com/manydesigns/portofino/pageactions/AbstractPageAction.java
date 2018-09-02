@@ -141,7 +141,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
      * The context object holds various elements of contextual information such
      * as the HTTP request and response objects.
      */
-    protected PageActionContext context;
+    protected ActionContext context;
 
     //**************************************************************************
     // Logging
@@ -197,7 +197,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
                 parentPageInstance, resource.getLocation(), page, (Class<? extends PageAction>) resource.getClass());
         pageInstance.setActionBean(pageAction);
         PageLogic.configurePageAction(pageAction, pageInstance);
-        PageActionContext context = new PageActionContext();
+        ActionContext context = new ActionContext();
         context.setRequest(request);
         context.setResponse(response);
         context.setServletContext(request.getServletContext());
@@ -428,12 +428,12 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     }
 
     @Override
-    public void setContext(PageActionContext context) {
+    public void setContext(ActionContext context) {
         this.context = context;
     }
 
     @Override
-    public PageActionContext getContext() {
+    public ActionContext getContext() {
         return context;
     }
 

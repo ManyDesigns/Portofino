@@ -33,9 +33,9 @@ import com.manydesigns.portofino.dispatcher.security.SecureResource;
 public interface PageAction extends SecureResource {
     String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    PageActionContext getContext();
+    ActionContext getContext();
 
-    void setContext(PageActionContext context);
+    void setContext(ActionContext context);
 
     PageAction getParent();
 
