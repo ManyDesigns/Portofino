@@ -20,9 +20,8 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.MySql5DatabasePlatform;
-import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

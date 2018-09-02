@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import org.apache.commons.configuration.Configuration;

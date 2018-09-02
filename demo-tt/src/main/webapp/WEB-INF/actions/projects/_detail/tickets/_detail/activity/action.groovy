@@ -3,8 +3,6 @@ import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Guard
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
@@ -18,6 +16,7 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
+import org.springframework.beans.factory.annotation.Autowired
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class TicketActivityAction extends ActivityStreamAction {
@@ -37,7 +36,7 @@ class TicketActivityAction extends ActivityStreamAction {
         ticket = ElementsThreadLocals.getOgnlContext().get("ticket");
     }
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     private Persistence persistence;
 
     //**************************************************************************

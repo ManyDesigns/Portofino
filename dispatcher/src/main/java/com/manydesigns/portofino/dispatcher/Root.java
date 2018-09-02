@@ -63,10 +63,6 @@ public class Root extends AbstractResource {
         return root;
     }
     
-    public void setResourceContext(ResourceContext resourceContext) {
-        this.resourceContext = resourceContext;
-    }
-
     protected Root(FileObject location, ResourceResolver resourceResolver) {
         setLocation(location);
         this.resourceResolver = resourceResolver;

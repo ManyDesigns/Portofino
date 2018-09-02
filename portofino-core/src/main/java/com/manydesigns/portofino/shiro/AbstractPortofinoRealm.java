@@ -22,8 +22,6 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.security.SecurityLogic;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtException;

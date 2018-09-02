@@ -1,6 +1,4 @@
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
@@ -11,11 +9,12 @@ import net.sourceforge.stripes.action.Resolution
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
+import org.springframework.beans.factory.annotation.Autowired
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectsRecentlyUpdatedTicketsAction extends CustomAction {
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     private Persistence persistence;
 
     List tickets;

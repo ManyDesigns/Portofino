@@ -86,4 +86,9 @@ public class GroovyCodeBase implements CodeBase {
     public void close() {
         
     }
+
+    @Override
+    public FileObject getRoot() {
+        return root;
+    }
 }

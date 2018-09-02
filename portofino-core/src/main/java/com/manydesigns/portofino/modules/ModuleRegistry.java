@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
-import com.manydesigns.portofino.di.Injections;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -73,7 +72,6 @@ public class ModuleRegistry {
             int installedVersion = configuration.getInt(key, -1);
 
             boolean migrationOk = true;
-            Injections.inject(module, servletContext, null);
 
             if(installedVersion == -1) try { //Install
                 logger.info("Installing module " + printModule(module) + "...");

@@ -8,34 +8,35 @@ import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Buttons
-import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
-import com.manydesigns.portofino.modules.BaseModule
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import java.awt.RenderingHints
-import java.awt.image.BufferedImage
-import javax.imageio.ImageIO
-import javax.imageio.stream.MemoryCacheImageOutputStream
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
+import net.sourceforge.stripes.action.*
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
-import net.sourceforge.stripes.action.*
-import org.apache.commons.io.IOUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+
+import javax.imageio.ImageIO
+import javax.imageio.stream.MemoryCacheImageOutputStream
+import java.awt.*
+import java.awt.image.BufferedImage
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class Profile extends CustomAction {
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
-    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
     protected Form form;

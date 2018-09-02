@@ -1,24 +1,19 @@
 package com.manydesigns.portofino.pageactions.activitystream
 
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
-import com.manydesigns.elements.servlet.ServletUtils
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.modules.BaseModule
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import javax.servlet.http.HttpServletResponse
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import net.sourceforge.stripes.action.StreamingResolution
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.hibernate.Session
-import com.manydesigns.elements.blobs.BlobManager
-import com.manydesigns.elements.blobs.BlobManager
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 @RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -27,10 +22,11 @@ class MyActivityStreamAction extends ActivityStreamAction {
     public static String SYSTEM_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +
             "WHERE act.project IS NULL ORDER BY act.id DESC";
 
-    @Inject(DatabaseModule.PERSISTENCE)
-    private Persistence persistence;
+    @Autowired
+    protected Persistence persistence;
 
-    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
     @Override

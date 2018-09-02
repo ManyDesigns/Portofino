@@ -20,12 +20,8 @@
 
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.portofino.di.Injections;
-import groovy.util.GroovyScriptEngine;
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
+import com.manydesigns.portofino.code.CodeBase;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -37,12 +33,9 @@ import org.apache.shiro.util.Destroyable;
 import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.ServletContext;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -54,7 +47,7 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
+public class SecurityClassRealm implements PortofinoRealm, Destroyable {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -62,14 +55,14 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Logger
     //--------------------------------------------------------------------------
 
-    public static final Logger logger = LoggerFactory.getLogger(SecurityGroovyRealm.class);
+    public static final Logger logger = LoggerFactory.getLogger(SecurityClassRealm.class);
 
     //--------------------------------------------------------------------------
     // Properties
     //--------------------------------------------------------------------------
 
-    protected final GroovyScriptEngine groovyScriptEngine;
-    protected final String scriptUrl;
+    protected final CodeBase codeBase;
+    protected final String className;
     protected final ApplicationContext applicationContext;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
@@ -80,11 +73,11 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(
-            GroovyScriptEngine groovyScriptEngine, String scriptUrl, ApplicationContext applicationContext)
-            throws ScriptException, ResourceException, InstantiationException, IllegalAccessException {
-        this.groovyScriptEngine = groovyScriptEngine;
-        this.scriptUrl = scriptUrl;
+    public SecurityClassRealm(
+            CodeBase codeBase, String className, ApplicationContext applicationContext)
+            throws InstantiationException, IllegalAccessException, IOException, ClassNotFoundException {
+        this.codeBase = codeBase;
+        this.className = className;
         this.applicationContext = applicationContext;
         doEnsureDelegate();
     }
@@ -105,8 +98,8 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     private PortofinoRealm doEnsureDelegate()
-            throws ScriptException, ResourceException, IllegalAccessException, InstantiationException {
-        Class<?> scriptClass = groovyScriptEngine.loadScriptByName(scriptUrl);
+            throws IllegalAccessException, InstantiationException, IOException, ClassNotFoundException {
+        Class<?> scriptClass = codeBase.loadClass(className);
         if(scriptClass.isInstance(security)) { //Class did not change
             return security;
         } else {

@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.m2m.ManyToManyAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;

@@ -63,7 +63,7 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
                     for(Class<?> moduleClass : moduleClasses) {
                         annotationConfig.register(moduleClass);
                     }
-                    annotationConfig.register(DefaultSpringConfiguration.class);
+                    annotationConfig.register(PortofinoSpringConfiguration.class);
                     CodeBase codeBase = (CodeBase) servletContext.getAttribute(PortofinoListener.CODE_BASE_ATTRIBUTE);
                     try {
                         annotationConfig.register(codeBase.loadClass("SpringConfiguration"));

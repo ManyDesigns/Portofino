@@ -31,7 +31,6 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.files.TempFileService;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
@@ -53,8 +52,6 @@ public class BaseModule implements Module {
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(BaseModule.class);
-    public static final String GROOVY_SCRIPT_ENGINE = "GROOVY_SCRIPT_ENGINE";
-    public static final String GROOVY_CLASS_PATH = "GROOVY_CLASS_PATH";
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -66,8 +63,6 @@ public class BaseModule implements Module {
     public final static String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public final static String RESOURCE_BUNDLE_MANAGER = "com.manydesigns.portofino.resourceBundleManager";
     public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
-    public static final String DEFAULT_BLOB_MANAGER = "com.manydesigns.portofino.blobs.DefaultBlobManager";
-    public static final String TEMPORARY_BLOB_MANAGER = "com.manydesigns.portofino.blobs.TemporaryBlobManager";
 
     //**************************************************************************
     // Injected objects

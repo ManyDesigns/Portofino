@@ -350,4 +350,9 @@ public class JavaCodeBase implements CodeBase {
             logger.warn("Could not close file manager", e);
         }
     }
+
+    @Override
+    public FileObject getRoot() {
+        return root;
+    }
 }

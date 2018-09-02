@@ -32,7 +32,6 @@ import com.manydesigns.portofino.actions.admin.info.InfoAction;
 import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
 import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
 import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import org.slf4j.Logger;

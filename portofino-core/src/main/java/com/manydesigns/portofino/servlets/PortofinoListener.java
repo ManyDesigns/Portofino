@@ -20,13 +20,10 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.elements.crypto.KeyManager;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.elements.blobs.SimpleBlobManager;
-import com.manydesigns.elements.blobs.HierarchicalBlobManager;
 import com.manydesigns.elements.configuration.BeanLookup;
+import com.manydesigns.elements.crypto.KeyManager;
 import com.manydesigns.elements.servlet.AttributeMap;
 import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.elements.util.ElementsFileUtils;
@@ -35,13 +32,8 @@ import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.Listener;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.rest.PortofinoRoot;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
-import groovy.util.GroovyScriptEngine;
-import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
-import io.github.lukehutch.fastclasspathscanner.matchprocessor.ImplementingClassMatchProcessor;
 import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.vfs2.FileObject;
@@ -56,7 +48,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -163,31 +154,6 @@ public class PortofinoListener extends Listener
         servletContext.setAttribute(BaseModule.APPLICATION_DIRECTORY, applicationDirectory);
         servletContext.setAttribute(BaseModule.PORTOFINO_CONFIGURATION, configuration);
 
-        logger.debug("Setting blobs directory");
-        File appBlobsDir;
-        if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
-            appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
-        } else {
-            appBlobsDir = new File(applicationDirectory, "blobs");
-        }
-        logger.info("Blobs directory: " + appBlobsDir.getAbsolutePath());
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        File tempBlobsDir = new File(tmpDir, "portofino-blobs" + servletContext.getContextPath().replace("/", "-"));
-        logger.info("Temporary blobs directory: " + tempBlobsDir.getAbsolutePath());
-
-        String metaFilenamePattern = "blob-{0}.properties";
-        String dataFilenamePattern = "blob-{0}.data";
-        BlobManager tempBlobManager = new HierarchicalBlobManager(tempBlobsDir, metaFilenamePattern, dataFilenamePattern);
-        BlobManager defaultBlobManager;
-        File[] blobs = appBlobsDir.listFiles((dir, name) -> name.startsWith("blob-") && name.endsWith(".properties"));
-        if(blobs == null || blobs.length == 0) { //Null if the directory does not exist yet
-            logger.info("Using hierarchical blob manager");
-            defaultBlobManager = new HierarchicalBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
-        } else {
-            logger.warn("Blobs found directly under the blobs directory; using old style (pre-4.1.1) flat file blob manager");
-            defaultBlobManager = new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
-        }
-
         try {
             logger.info("Initializing KeyManager ");
             KeyManager.init(configuration);
@@ -195,26 +161,14 @@ public class PortofinoListener extends Listener
             logger.error("Could not initialize KeyManager", e);
         }
 
-        servletContext.setAttribute(BaseModule.TEMPORARY_BLOB_MANAGER, tempBlobManager);
-        servletContext.setAttribute(BaseModule.DEFAULT_BLOB_MANAGER, defaultBlobManager);
-
         File groovyClasspath = new File(applicationDirectory, "groovy");
         logger.info("Initializing Groovy script engine with classpath: " + groovyClasspath.getAbsolutePath());
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(groovyClasspath);
 
-        logger.debug("Registering Groovy class loader");
-        logger.info("Groovy classpath: " + groovyClasspath.getAbsolutePath());
-        //TODO refactor using GroovyCodeBase
-        GroovyScriptEngine groovyScriptEngine =
-                ScriptingUtil.createScriptEngine(groovyClasspath, getClass().getClassLoader());
-        ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
-        servletContext.setAttribute(BaseModule.GROOVY_CLASS_PATH, groovyClasspath);
-        servletContext.setAttribute(BaseModule.GROOVY_SCRIPT_ENGINE, groovyScriptEngine);
-
         logger.debug("Installing I18n ResourceBundleManager");
         ResourceBundleManager resourceBundleManager = new ResourceBundleManager();
         try {
-            Enumeration<URL> messagesSearchPaths = classLoader.getResources(PORTOFINO_MESSAGES_FILE_NAME);
+            Enumeration<URL> messagesSearchPaths = getClass().getClassLoader().getResources(PORTOFINO_MESSAGES_FILE_NAME);
             while (messagesSearchPaths.hasMoreElements()) {
                 resourceBundleManager.addSearchPath(messagesSearchPaths.nextElement().toString());
             }
@@ -259,8 +213,11 @@ public class PortofinoListener extends Listener
 
     @Override
     protected FileObject getCodeBaseRoot() throws FileSystemException {
-        //TODO since this can handle both Java and Groovy we should move forward to a neutral directory name e.g. src/
-        return VFS.getManager().resolveFile(servletContext.getAttribute(BaseModule.GROOVY_CLASS_PATH).toString());
+        //TODO since this can handle both Java and Groovy we should move forward to a neutral directory name e.g. classes/
+        File codeBaseRoot = new File(applicationDirectory, "groovy");
+        logger.info("Initializing codebase with classpath: " + codeBaseRoot.getAbsolutePath());
+        ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(codeBaseRoot);
+        return VFS.getManager().resolveFile(codeBaseRoot.toString());
     }
 
     @Override

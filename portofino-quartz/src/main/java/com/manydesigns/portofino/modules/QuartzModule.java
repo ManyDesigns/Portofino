@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
 import org.apache.commons.configuration.Configuration;
 import org.quartz.Scheduler;

@@ -47,8 +47,6 @@ import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Guard;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.PageInstance;
@@ -61,6 +59,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import ognl.OgnlContext;
@@ -77,6 +76,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -207,10 +208,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public T object;
     public List<? extends T> objects;
 
-    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
-    @Inject(BaseModule.TEMPORARY_BLOB_MANAGER)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.TEMPORARY_BLOB_MANAGER)
     protected BlobManager temporaryBlobManager;
 
     //--------------------------------------------------------------------------

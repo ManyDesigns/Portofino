@@ -1,7 +1,5 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.fields.search.SelectSearchField
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
@@ -13,6 +11,7 @@ import net.sourceforge.stripes.action.Resolution
 import org.hibernate.SQLQuery
 import org.hibernate.Session
 import org.hibernate.transform.ResultTransformer
+import org.springframework.beans.factory.annotation.Autowired
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ActiveTicketsByVersionAction extends CustomAction {
@@ -27,40 +26,40 @@ class ActiveTicketsByVersionAction extends CustomAction {
     order by v.id desc
     """;
 
-    @Inject(DatabaseModule.PERSISTENCE)
-        private Persistence persistence;
+    @Autowired
+    private Persistence persistence;
 
-        List groups;
+    List groups;
 
-        @DefaultHandler
-        public Resolution execute() {
-            Object project = ElementsThreadLocals.getOgnlContext().get("project");
+    @DefaultHandler
+    public Resolution execute() {
+        Object project = ElementsThreadLocals.getOgnlContext().get("project");
 
-            Session session = persistence.getSession("tt");
-            SQLQuery query = session.createSQLQuery(SQL);
-            query.setResultTransformer(new ResultTransformer() {
-                Object transformTuple(Object[] tuple, String[] aliases) {
-                    Integer groupId = tuple[0];
-                    String groupName = tuple[1];
-                    String groupCode;
-                    if (groupId == null) {
-                        groupCode = SelectSearchField.VALUE_NOT_SET;
-                        groupName = "Unassigned"
-                    } else {
-                        groupCode = groupId.toString();
-                    }
-                    String url = "/projects/$project.id/tickets?search_state=1&search_state=2&search_state=3&search_fix_version=$groupCode";
-                    int groupCount = (int)tuple[2];
-                    return new TicketGroup(groupName, url, groupCount);
+        Session session = persistence.getSession("tt");
+        SQLQuery query = session.createSQLQuery(SQL);
+        query.setResultTransformer(new ResultTransformer() {
+            Object transformTuple(Object[] tuple, String[] aliases) {
+                Integer groupId = tuple[0];
+                String groupName = tuple[1];
+                String groupCode;
+                if (groupId == null) {
+                    groupCode = SelectSearchField.VALUE_NOT_SET;
+                    groupName = "Unassigned"
+                } else {
+                    groupCode = groupId.toString();
                 }
-                List transformList(List collection) {
-                    return collection;
-                }
-            });
-            query.setParameter("project", project.id);
-            groups = query.list();
+                String url = "/projects/$project.id/tickets?search_state=1&search_state=2&search_state=3&search_fix_version=$groupCode";
+                int groupCount = (int)tuple[2];
+                return new TicketGroup(groupName, url, groupCount);
+            }
+            List transformList(List collection) {
+                return collection;
+            }
+        });
+        query.setParameter("project", project.id);
+        groups = query.list();
 
-            return new ForwardResolution("/jsp/common/ticket-groups.jsp");
-        }
+        return new ForwardResolution("/jsp/common/ticket-groups.jsp");
+    }
 
 }

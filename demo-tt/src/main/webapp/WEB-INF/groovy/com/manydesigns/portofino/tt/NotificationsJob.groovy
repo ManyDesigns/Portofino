@@ -38,15 +38,10 @@ import com.manydesigns.mail.queue.model.Email
 import com.manydesigns.mail.queue.model.Recipient
 import com.manydesigns.mail.queue.model.Recipient.Type
 import com.manydesigns.mail.setup.MailProperties
-import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.i18n.I18nUtils
-import com.manydesigns.portofino.modules.BaseModule
-import com.manydesigns.portofino.modules.DatabaseModule
-import com.manydesigns.portofino.modules.MailModule
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
 import com.manydesigns.portofino.persistence.Persistence
-import javax.servlet.RequestDispatcher
-import javax.servlet.ServletContext
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
 import org.apache.commons.configuration.Configuration
 import org.hibernate.Criteria
 import org.hibernate.Session
@@ -56,6 +51,11 @@ import org.quartz.Job
 import org.quartz.JobExecutionContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+
+import javax.servlet.RequestDispatcher
+import javax.servlet.ServletContext
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -75,16 +75,17 @@ public class NotificationsJob implements Job {
     public static String PROJECT_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +
             "WHERE act.project IS NOT NULL AND act.notifications_sent is null ORDER BY act.id ASC";
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     Persistence persistence;
 
-    @Inject(MailModule.MAIL_QUEUE)
+    @Autowired
     MailQueue mailQueue;
 
     void execute(JobExecutionContext context) {

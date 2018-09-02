@@ -1,5 +1,3 @@
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
@@ -10,6 +8,7 @@ import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
 import org.hibernate.Session
+import org.springframework.beans.factory.annotation.Autowired
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class HomeProjectsAction extends CustomAction {
@@ -49,7 +48,7 @@ class HomeProjectsAction extends CustomAction {
     order by id
     """;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     private Persistence persistence;
 
     List projects;

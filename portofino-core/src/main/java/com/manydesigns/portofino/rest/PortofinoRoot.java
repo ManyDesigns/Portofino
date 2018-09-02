@@ -1,15 +1,16 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.dispatcher.Resource;
+import com.manydesigns.portofino.dispatcher.ResourceResolver;
+import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.i18n.TextProviderBean;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageAction;
 import com.manydesigns.portofino.pageactions.PageActionContext;
 import com.manydesigns.portofino.pageactions.PageInstance;
-import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
 import org.apache.commons.vfs2.FileObject;
@@ -17,7 +18,6 @@ import org.apache.commons.vfs2.FileObject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
@@ -61,14 +61,6 @@ public class PortofinoRoot extends Root implements PageAction {
         logger.debug("Publishing textProvider in OGNL context");
         ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
         return super.consumePathSegment(pathSegment);
-    }
-
-    @Override
-    protected void initSubResource(Object resource) {
-        super.initSubResource(resource);
-        //TODO use resourcecontext?
-        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        Injections.inject(resource, request.getServletContext(), request);
     }
 
     @Override

@@ -24,25 +24,19 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.dispatcher.*;
-import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
+import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
-import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.servlets.ServerInfo;
+import com.manydesigns.portofino.security.SecurityLogic;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
@@ -55,12 +49,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -173,14 +173,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
             SessionMessages.addErrorMessage("error saving conf");
             return false;
         }
-    }
-
-    @Override
-    protected void initSubResource(Object resource) {
-        super.initSubResource(resource);
-        //TODO use resourcecontext?
-        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        Injections.inject(resource, request.getServletContext(), request);
     }
 
     @Override

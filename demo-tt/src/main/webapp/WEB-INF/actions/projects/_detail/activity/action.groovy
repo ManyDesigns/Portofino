@@ -1,14 +1,12 @@
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import org.hibernate.Session
+import org.springframework.beans.factory.annotation.Autowired
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectActivityAction extends ActivityStreamAction {
@@ -23,7 +21,7 @@ class ProjectActivityAction extends ActivityStreamAction {
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     private Persistence persistence;
 
     @Override

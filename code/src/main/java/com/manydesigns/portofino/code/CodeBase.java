@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.code;
 
+import org.apache.commons.vfs2.FileObject;
+
 import java.io.IOException;
 
 /**
@@ -9,6 +11,8 @@ public interface CodeBase {
     Class loadClass(String className) throws IOException, ClassNotFoundException;
 
     ClassLoader getClassLoader();
+
+    FileObject getRoot();
 
     void close();
 }

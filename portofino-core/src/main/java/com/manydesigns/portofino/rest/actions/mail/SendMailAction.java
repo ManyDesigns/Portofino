@@ -33,6 +33,7 @@ import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.modules.MailModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -65,6 +66,9 @@ public class SendMailAction {
     @Context
     protected HttpServletRequest request;
 
+    @Autowired(required = false)
+    protected MailSender mailSender;
+
     @GET
     public Response execute() {
         String clientIP = request.getRemoteAddr();
@@ -79,7 +83,6 @@ public class SendMailAction {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        MailSender mailSender = (MailSender) servletContext.getAttribute(MailModule.MAIL_SENDER);
         if(mailSender == null) {
             return Response.serverError().entity("Mail Sender not active").build();
         }

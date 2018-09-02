@@ -25,18 +25,22 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
-import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.form.FormAction;
 import com.manydesigns.portofino.pageactions.form.TableFormAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
-import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
-import groovy.util.GroovyScriptEngine;
+import com.manydesigns.portofino.shiro.SecurityClassRealm;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.util.LifecycleUtils;
@@ -76,14 +80,11 @@ public class PageactionsModule implements Module, ApplicationContextAware {
     public Configuration configuration;
 
     @Autowired
-    @Qualifier("applicationDirectory")
+    @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
     public File applicationDirectory;
 
-    @Inject(BaseModule.GROOVY_SCRIPT_ENGINE)
-    public GroovyScriptEngine groovyScriptEngine;
-
-    @Inject(BaseModule.GROOVY_CLASS_PATH)
-    public File groovyClasspath;
+    @Autowired
+    public CodeBase codeBase;
 
     @Autowired
     public CacheResetListenerRegistry cacheResetListenerRegistry;
@@ -157,7 +158,7 @@ public class PageactionsModule implements Module, ApplicationContextAware {
         }
         if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false)) {
             logger.info("Preloading Groovy classes");
-            preloadGroovyClasses(groovyClasspath);
+            preloadClasses(codeBase.getRoot());
         }
         servletContext.setAttribute(PAGES_DIRECTORY, actionsDirectory);
 
@@ -203,22 +204,30 @@ public class PageactionsModule implements Module, ApplicationContextAware {
         }*/
     }
 
-    protected void preloadGroovyClasses(File directory) {
-        for(File file : directory.listFiles()) {
-            logger.debug("visit {}", file);
-            if(file.isDirectory()) {
-                if(!file.equals(directory) && !file.equals(directory.getParentFile())) {
-                    preloadGroovyClasses(file);
-                }
-            } else {
-                String scriptName = file.toURI().toString();
-                logger.debug("Preloading " + scriptName);
-                try {
-                    groovyScriptEngine.loadScriptByName(scriptName);
-                } catch(Throwable t) {
-                    logger.warn("Groovy class preload failed for " + scriptName, t);
+    protected void preloadClasses(FileObject directory) {
+        try {
+            for(FileObject file : directory.getChildren()) {
+                logger.debug("visit {}", file);
+                if(file.getType() == FileType.FOLDER) {
+                    if(!file.equals(directory) && !file.equals(directory.getParent())) {
+                        preloadClasses(file);
+                    }
+                } else {
+                    String extension = file.getName().getExtension();
+                    String className = file.getName().getRelativeName(codeBase.getRoot().getName());
+                    if(!StringUtils.isEmpty(extension)) {
+                        className = className.substring(0, className.length() - extension.length() - 1);
+                    }
+                    logger.debug("Preloading " + className);
+                    try {
+                        codeBase.loadClass(className);
+                    } catch(Throwable t) {
+                        logger.warn("Class preload failed for " + className, t);
+                    }
                 }
             }
+        } catch (FileSystemException e) {
+            logger.warn("Could not preload classes under " + directory, e);
         }
     }
 
@@ -227,16 +236,14 @@ public class PageactionsModule implements Module, ApplicationContextAware {
         logger.info("Initializing Shiro environment");
         WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-        logger.debug("Creating SecurityGroovyRealm");
+        logger.debug("Creating SecurityClassRealm");
         try {
-            String securityGroovy = new File(groovyClasspath, "Security.groovy").toURI().toString();
-            logger.debug("Security.groovy URL: {}", securityGroovy);
-            SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, securityGroovy, applicationContext);
+            SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
             LifecycleUtils.init(realm);
             rsm.setRealm(realm);
             status = ModuleStatus.STARTED;
         } catch (Exception  e) {
-            logger.error("Security.groovy not found or invalid; installing dummy realm", e);
+            logger.error("Security class not found or invalid; installing dummy realm", e);
             SimpleAccountRealm realm = new SimpleAccountRealm();
             LifecycleUtils.init(realm);
             rsm.setRealm(realm);

@@ -29,18 +29,16 @@
 
 package com.manydesigns.portofino.modules
 
-import com.manydesigns.portofino.tt.TtUtils
-import com.manydesigns.portofino.tt.NotificationsJob
-
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.i18n.ResourceBundleManager
 import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.tt.NotificationsJob
+import com.manydesigns.portofino.tt.TtUtils
 import org.hibernate.Session
+import org.quartz.*
 import org.quartz.DateBuilder.IntervalUnit
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.quartz.*
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,13 +58,10 @@ public class DemoTTModule implements Module {
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
-    @Inject(BaseModule.RESOURCE_BUNDLE_MANAGER)
-    public ResourceBundleManager resourceBundleManager;
-
-    @Inject(BaseModule.MODULE_REGISTRY)
+    @Autowired
     public ModuleRegistry moduleRegistry;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     public boolean installationMode = false;
@@ -100,17 +95,6 @@ public class DemoTTModule implements Module {
     }
 
     void init() {
-// Speed up for GAE
-//        for(Module module : moduleRegistry.getModules()) {
-//            def classFileName = module.getClass().getSimpleName() + ".class";
-//            def classUrl = module.getClass().getResource(classFileName);
-//            if(classUrl != null) {
-//                def path = classUrl.toString();
-//                path = path.substring(0, path.length() - module.getClass().getName().length() - ".class".length());
-//                resourceBundleManager.addSearchPath(path + PortofinoListener.PORTOFINO_MESSAGES_FILE_NAME);
-//            }
-//        }
-
         status = ModuleStatus.ACTIVE;
     }
 

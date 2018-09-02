@@ -29,14 +29,15 @@
 
 package com.manydesigns.portofino.quartz;
 
-import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
-import org.quartz.*;
+import org.quartz.Job;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -62,17 +63,16 @@ public class PortofinoJobFactory extends SimpleJobFactory {
     @Override
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
         final Job job = super.newJob(bundle, scheduler);
-        Injections.inject(job, servletContext, null);
-        return new Job() {
-            @Override
-            public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-                job.execute(jobExecutionContext);
-                try {
-                    //In a different class to make the database module optional at runtime
-                    SessionCleaner.closeSessions(servletContext);
-                } catch (NoClassDefFoundError e) {
-                    logger.debug("Database module not available, not closing sessions", e);
-                }
+        WebApplicationContext webApplicationContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        webApplicationContext.getAutowireCapableBeanFactory().autowireBean(job);
+        return jobExecutionContext -> {
+            job.execute(jobExecutionContext);
+            try {
+                //In a different class to make the database module optional at runtime
+                SessionCleaner.closeSessions(webApplicationContext);
+            } catch (NoClassDefFoundError e) {
+                logger.debug("Database module not available, not closing sessions", e);
             }
         };
     }
@@ -80,9 +80,7 @@ public class PortofinoJobFactory extends SimpleJobFactory {
 }
 
 class SessionCleaner {
-    public static void closeSessions(ServletContext servletContext) {
-        WebApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+    public static void closeSessions(ApplicationContext applicationContext) {
         Persistence persistence = applicationContext.getBean(Persistence.class);
         persistence.closeSessions();
     }

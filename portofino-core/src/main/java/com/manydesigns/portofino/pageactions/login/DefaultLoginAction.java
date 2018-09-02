@@ -34,14 +34,10 @@ import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.rest.actions.user.LoginAction;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.pageactions.PageAction;
-import com.manydesigns.portofino.pageactions.PageActionContext;
-import com.manydesigns.portofino.pageactions.PageInstance;
-import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
+import com.manydesigns.portofino.rest.actions.user.LoginAction;
 import com.manydesigns.portofino.shiro.JSONWebToken;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -51,6 +47,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
@@ -75,7 +72,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     // Properties
     //--------------------------------------------------------------------------
 
-    @Inject(MailModule.MAIL_QUEUE)
+    @Autowired
     public MailQueue mailQueue;
 
     //--------------------------------------------------------------------------

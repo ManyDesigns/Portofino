@@ -21,9 +21,8 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +57,7 @@ public class DatabaseModule implements Module, ApplicationContextAware {
     public Configuration configuration;
 
     @Autowired
-    @Qualifier("applicationDirectory")
+    @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
     public File applicationDirectory;
 
     protected ApplicationContext applicationContext;

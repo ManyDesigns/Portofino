@@ -22,12 +22,14 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.mail.quartz.MailScheduler;
 import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.mail.setup.MailQueueSetup;
-import com.manydesigns.portofino.di.Inject;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 import javax.servlet.ServletContext;
 
@@ -37,7 +39,7 @@ import javax.servlet.ServletContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MailModule implements Module {
+public class MailModule implements Module, InitializingBean {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -54,13 +56,6 @@ public class MailModule implements Module {
     protected MailQueueSetup mailQueueSetup;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
-
-    //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    public final static String MAIL_QUEUE = "com.manydesigns.mail.queue";
-    public final static String MAIL_SENDER = "com.manydesigns.mail.sender";
 
     //**************************************************************************
     // Logging
@@ -100,19 +95,23 @@ public class MailModule implements Module {
     }
 
     @Override
-    public void init() {
+    public void afterPropertiesSet() throws Exception {
         mailQueueSetup = new MailQueueSetup(configuration);
         mailQueueSetup.setup();
+    }
 
-        MailQueue mailQueue = mailQueueSetup.getMailQueue();
-        if(mailQueue == null) {
-            logger.info("Mail queue not enabled");
-            return;
-        }
+    @Bean
+    public MailQueue getMailQueue() {
+        return mailQueueSetup.getMailQueue();
+    }
 
-        servletContext.setAttribute(MAIL_QUEUE, mailQueue);
-        servletContext.setAttribute(MAIL_SENDER, mailQueueSetup.getMailSender());
+    @Bean
+    public MailSender getMailSender() {
+        return mailQueueSetup.getMailSender();
+    }
 
+    @Override
+    public void init() {
         status = ModuleStatus.ACTIVE;
     }
 
@@ -143,4 +142,5 @@ public class MailModule implements Module {
     public ModuleStatus getStatus() {
         return status;
     }
+
 }
