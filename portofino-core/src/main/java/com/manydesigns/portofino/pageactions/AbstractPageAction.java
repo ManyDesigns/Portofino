@@ -79,7 +79,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     public static final String copyright =
         "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
             {{"id", "title", "description", "template", "detailTemplate", "applyTemplateRecursively"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =

@@ -22,6 +22,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class PortofinoRoot extends Root implements PageAction {
 
@@ -36,6 +38,8 @@ public class PortofinoRoot extends Root implements PageAction {
 
     protected ActionContext context;
     protected PageInstance pageInstance;
+
+    public static final ConcurrentMap<String, FileObject> children = new ConcurrentHashMap<>();
 
     protected PortofinoRoot(FileObject location, ResourceResolver resourceResolver) {
         super(location, resourceResolver);
@@ -60,6 +64,10 @@ public class PortofinoRoot extends Root implements PageAction {
         ognlContext.put("securityUtils", new SecurityUtilsBean());
         logger.debug("Publishing textProvider in OGNL context");
         ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
+        FileObject child = children.get(pathSegment);
+        if(child != null) {
+            return consumePathSegment(pathSegment, child, resourceResolver);
+        }
         return super.consumePathSegment(pathSegment);
     }
 
@@ -113,5 +121,24 @@ public class PortofinoRoot extends Root implements PageAction {
     @Override
     public PageAction getParent() {
         return null;
+    }
+
+    public static void mount(FileObject fileObject) {
+        FileObject previous = children.putIfAbsent(getDefaultMountPointName(fileObject), fileObject);
+        if(previous != null) {
+            throw new RuntimeException("Already mounted: " + previous);
+        }
+    }
+
+    public static String getDefaultMountPointName(FileObject fileObject) {
+        return fileObject.getName().getBaseName();
+    }
+
+    public static FileObject unmount(String child) {
+        return children.remove(child);
+    }
+
+    public static boolean unmount(FileObject object) {
+        return children.remove(getDefaultMountPointName(object), object);
     }
 }
