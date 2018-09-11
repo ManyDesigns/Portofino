@@ -49,16 +49,4 @@ public class EditPage {
     @CssClass(BootstrapSizes.FILL_ROW)
     public String description;
 
-    @Label("template")
-    @Required
-    public String template;
-
-    @Label("detail.template")
-    @Required
-    public String detailTemplate;
-
-    @Label("apply.template.recursively")
-    @Required
-    public boolean applyTemplateRecursively;
-
 }

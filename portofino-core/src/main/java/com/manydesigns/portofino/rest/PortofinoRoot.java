@@ -39,7 +39,7 @@ public class PortofinoRoot extends Root implements PageAction {
     protected ActionContext context;
     protected PageInstance pageInstance;
 
-    public static final ConcurrentMap<String, FileObject> children = new ConcurrentHashMap<>();
+    protected static final ConcurrentMap<String, FileObject> children = new ConcurrentHashMap<>();
 
     protected PortofinoRoot(FileObject location, ResourceResolver resourceResolver) {
         super(location, resourceResolver);
@@ -75,7 +75,7 @@ public class PortofinoRoot extends Root implements PageAction {
     protected void initSubResource(Resource resource) {
         super.initSubResource(resource);
         if(resource instanceof PageAction) {
-            AbstractPageAction.initPageAction(resource, getPageInstance(), uriInfo);
+            AbstractPageAction.initPageAction((PageAction) resource, getPageInstance(), uriInfo);
         }
     }
 
@@ -125,6 +125,13 @@ public class PortofinoRoot extends Root implements PageAction {
 
     public static void mount(FileObject fileObject) {
         FileObject previous = children.putIfAbsent(getDefaultMountPointName(fileObject), fileObject);
+        if(previous != null) {
+            throw new RuntimeException("Already mounted: " + previous);
+        }
+    }
+
+    public static void mount(FileObject fileObject, String name) {
+        FileObject previous = children.putIfAbsent(name, fileObject);
         if(previous != null) {
             throw new RuntimeException("Already mounted: " + previous);
         }

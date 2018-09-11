@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.*;
  */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.NONE)
-@XmlType(propOrder = {"title","titleKey","description", "navigationRoot","id","layout","detailLayout","permissions"})
+@XmlType(propOrder = {"title","titleKey","description", "id", "permissions"})
 public class Page {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
@@ -49,16 +49,7 @@ public class Page {
     protected String title;
     protected String titleKey;
     protected String description;
-    protected Layout layout;
-    protected Layout detailLayout;
     protected Permissions permissions;
-    protected String navigationRoot;
-
-    //**************************************************************************
-    // Actual fields
-    //**************************************************************************
-
-    protected NavigationRoot actualNavigationRoot;
 
     //**************************************************************************
     // Logging
@@ -71,8 +62,6 @@ public class Page {
     //**************************************************************************
 
     public Page() {
-        layout = new Layout();
-        detailLayout = new Layout();
         permissions = new Permissions();
     }
 
@@ -83,23 +72,8 @@ public class Page {
     public void init() {
         assert title != null;
 
-        if( description==null ){
-            description="";
-        }
-        //assert description != null;
-
-        if(navigationRoot == null) {
-            actualNavigationRoot = NavigationRoot.INHERIT;
-            navigationRoot = actualNavigationRoot.name();
-        } else {
-            actualNavigationRoot = NavigationRoot.valueOf(navigationRoot);
-        }
-
-        if(layout != null) {
-            layout.init();
-        }
-        if(detailLayout != null) {
-            detailLayout.init();
+        if (description == null) {
+            description = "";
         }
         if(permissions != null) {
             permissions.init();
@@ -151,24 +125,6 @@ public class Page {
     }
 
     @XmlElement()
-    public Layout getLayout() {
-        return layout;
-    }
-
-    public void setLayout(Layout layout) {
-        this.layout = layout;
-    }
-
-    @XmlElement()
-    public Layout getDetailLayout() {
-        return detailLayout;
-    }
-
-    public void setDetailLayout(Layout detailLayout) {
-        this.detailLayout = detailLayout;
-    }
-
-    @XmlElement()
     public Permissions getPermissions() {
         return permissions;
     }
@@ -177,16 +133,4 @@ public class Page {
         this.permissions = permissions;
     }
 
-    @XmlAttribute(required = true)
-    public String getNavigationRoot() {
-        return navigationRoot;
-    }
-
-    public void setNavigationRoot(String navigationRoot) {
-        this.navigationRoot = navigationRoot;
-    }
-
-    public NavigationRoot getActualNavigationRoot() {
-        return actualNavigationRoot;
-    }
 }

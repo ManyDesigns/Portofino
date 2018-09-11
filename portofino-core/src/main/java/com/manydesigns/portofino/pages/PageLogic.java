@@ -268,12 +268,8 @@ public class PageLogic {
         configurationCache.invalidateAll(keysToInvalidate);
     }
 
-    protected static FileObject getPageFile(FileObject directory) {
-        try {
-            return directory.getChild("page.xml");
-        } catch (FileSystemException e) {
-            throw new RuntimeException(e);
-        }
+    protected static FileObject getPageFile(FileObject directory) throws FileSystemException {
+        return directory.getChild("page.xml");
     }
 
     public static Page loadPage(FileObject key) throws Exception {
@@ -293,16 +289,17 @@ public class PageLogic {
     }
 
     public static Page getPage(FileObject directory) throws PageNotActiveException {
-        FileObject pageFile = getPageFile(directory);
+        FileObject pageFile;
         try {
+            pageFile = getPageFile(directory);
             FileCacheEntry<Page> entry = pageCache.get(pageFile);
             if(!entry.error) {
                 return entry.object;
             } else {
-                throw new PageNotActiveException(pageFile.getName().getPath());
+                throw new PageNotActiveException(directory.getName().getPath());
             }
-        } catch (ExecutionException e) {
-            throw new PageNotActiveException(pageFile.getName().getPath(), e);
+        } catch (Exception e) {
+            throw new PageNotActiveException(directory.getName().getPath(), e);
         }
     }
 

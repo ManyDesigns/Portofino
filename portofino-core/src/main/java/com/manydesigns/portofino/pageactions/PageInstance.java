@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.pageactions;
 
 import com.manydesigns.portofino.pages.PageLogic;
-import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.Page;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -165,32 +164,6 @@ public class PageInstance {
      */
     public PageInstance getParent() {
         return parent;
-    }
-
-    /**
-     * Returns the layout that drives the display of the embedded children of this page.
-     * If this page instance has parameters, the detail layout is returned; else, the regular layout is returned.
-     * @return the layout.
-     */
-    public Layout getLayout() {
-        if(getParameters().isEmpty()) {
-            return getPage().getLayout();
-        } else {
-            return getPage().getDetailLayout();
-        }
-    }
-
-    /**
-     * Sets the layout that drives the display of the embedded children of this page.
-     * If this page instance has parameters, the detail layout is set; else, the regular layout is set.
-     * @param layout the new layout.
-     */
-    public void setLayout(Layout layout) {
-        if(getParameters().isEmpty()) {
-            getPage().setLayout(layout);
-        } else {
-            getPage().setDetailLayout(layout);
-        }
     }
 
     public Page getChildPage(String name) throws Exception {

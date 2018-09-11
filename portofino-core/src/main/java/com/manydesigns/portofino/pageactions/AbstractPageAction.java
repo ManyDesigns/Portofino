@@ -100,11 +100,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     @Autowired
     public Configuration portofinoConfiguration;
 
-    /**
-     * The page template to use. It can be set using a request parameter. If not set, the one from page.xml is used.
-     */
-    protected String pageTemplate;
-
     @Context
     protected UriInfo uriInfo;
 
@@ -178,22 +173,24 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     protected void initSubResource(Resource resource) {
         super.initSubResource(resource);
         if(resource instanceof PageAction) {
-            initPageAction(resource, getPageInstance(), uriInfo);
+            initPageAction((PageAction) resource, getPageInstance(), uriInfo);
         }
     }
 
-    public static void initPageAction(Resource resource, PageInstance parentPageInstance, UriInfo uriInfo) {
-        PageAction pageAction = (PageAction) resource;
+    public static void initPageAction(PageAction pageAction, PageInstance parentPageInstance, UriInfo uriInfo) {
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         HttpServletResponse response = ElementsThreadLocals.getHttpServletResponse();
         Page page;
         try {
-            page = PageLogic.getPage(resource.getLocation());
+            page = PageLogic.getPage(pageAction.getLocation());
         } catch (PageNotActiveException e) {
-            throw new WebApplicationException(e, 404);
+            logger.debug("page.xml not found or not valid", e);
+            page = new Page();
+            page.setTitle("");
+            page.init();
         }
         PageInstance pageInstance = new PageInstance(
-                parentPageInstance, resource.getLocation(), page, (Class<? extends PageAction>) resource.getClass());
+                parentPageInstance, pageAction.getLocation(), page, (Class<? extends PageAction>) pageAction.getClass());
         pageInstance.setActionBean(pageAction);
         PageLogic.configurePageAction(pageAction, pageInstance);
         ActionContext context = new ActionContext();
@@ -305,8 +302,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         edit.id = page.getId();
         edit.title = page.getTitle();
         edit.description = page.getDescription();
-        edit.template = page.getLayout().getTemplate();
-        edit.detailTemplate = page.getDetailLayout().getTemplate();
         pageConfigurationForm.readFromObject(edit);
 //
 //        if(script == null) {
@@ -446,19 +441,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
      */
     public Response pageActionNotConfigured() {
         return Response.serverError().entity("page-action-not-configured").build();
-    }
-
-    public String getPageTemplate() {
-        Pattern pattern = Pattern.compile("^(\\w|\\d|-)+");
-        if(pageTemplate != null && pattern.matcher(pageTemplate).matches()) {
-            return pageTemplate;
-        } else {
-            return getPageInstance().getLayout().getTemplate();
-        }
-    }
-
-    public void setPageTemplate(String pageTemplate) {
-        this.pageTemplate = pageTemplate;
     }
 
     @Path(":buttons")

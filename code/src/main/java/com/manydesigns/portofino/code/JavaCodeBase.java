@@ -192,7 +192,7 @@ public class JavaCodeBase implements CodeBase {
         }
 
         public Class<?> defineClass(String name, byte[] code) {
-            return defineClass(name, code, 0, code.length);
+            return defineClass(null, code, 0, code.length);
         }
     }
 

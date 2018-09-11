@@ -139,6 +139,8 @@
         <module>portofino-quartz</module>
         <!-- UI -->
         <module>ui</module>
+        <!-- upstairs -->
+        <module>upstairs</module>
         <!-- Archetypes -->
         <module>portofino-war-archetype</module>
         <!-- Applications -->
