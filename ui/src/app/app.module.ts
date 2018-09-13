@@ -26,8 +26,7 @@ export class AppComponent {}
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
-  imports: [
-    PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]) ],
+  imports: [ PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]) ],
   entryComponents: [ CustomNavigation ],
   bootstrap: [AppComponent]
 })

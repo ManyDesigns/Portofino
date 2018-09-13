@@ -1,6 +1,5 @@
-import {Component, NgModule} from '@angular/core';
-import {PortofinoModule, PageComponent} from "portofino";
-import {RouterModule} from "@angular/router";
+import {Component, ModuleWithProviders, NgModule} from '@angular/core';
+import {PortofinoModule, Page, PageComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent} from "portofino";
 
 @Component({
   selector: 'portofino-hello',
@@ -9,20 +8,31 @@ import {RouterModule} from "@angular/router";
 export class HelloPortofino {}
 
 @Component({
+  selector: 'custom-navigation',
+  template: `<h3>Custom navigation</h3><p><a routerLink="/start">Start here</a> </p>`
+})
+export class CustomNavigation implements NavigationComponent {
+  page: Page;
+}
+
+@Component({
   selector: 'app-root',
-  template: `<portofino-app title="Demo-TT" apiRoot="http://localhost:8080/"></portofino-app>`
+  template: `<portofino-app title="Portofino Application" apiRoot="http://localhost:8080/"></portofino-app>`
 })
 export class AppComponent {}
 
 @NgModule({
-  declarations: [AppComponent, HelloPortofino],
-  imports: [
-    RouterModule.forRoot(
-      [{ path: "start", component: HelloPortofino },
-        { path: "**", component: PageComponent}],
-      { onSameUrlNavigation: "reload", enableTracing: false }),
-    PortofinoModule
+  declarations: [AppComponent, HelloPortofino, CustomNavigation],
+  providers: [
+    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
+  imports: [ PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]) ],
+  entryComponents: [ CustomNavigation ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  static navigation() {
+    return DefaultNavigationComponent
+    //return CustomNavigation
+  }
+}
