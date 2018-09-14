@@ -100,33 +100,10 @@
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Chart pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-chart</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- Calendar pages. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-calendar</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-         <!-- Map pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-map</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-         <!-- Gallery pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-gallery</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -147,13 +124,6 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- OpenID support. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-openid</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -205,7 +175,7 @@
         <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-admin</artifactId>
+            <artifactId>portofino-upstairs</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -232,13 +202,6 @@
             <artifactId>resteasy-servlet-initializer</artifactId>
         </dependency>
         -->
-        <!-- Theme -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-theme</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
