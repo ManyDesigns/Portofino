@@ -161,10 +161,6 @@ public class PortofinoListener extends DispatcherInitializer
             logger.error("Could not initialize KeyManager", e);
         }
 
-        File groovyClasspath = new File(applicationDirectory, "groovy");
-        logger.info("Initializing Groovy script engine with classpath: " + groovyClasspath.getAbsolutePath());
-        ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(groovyClasspath);
-
         logger.debug("Installing I18n ResourceBundleManager");
         ResourceBundleManager resourceBundleManager = new ResourceBundleManager();
         try {
@@ -213,8 +209,7 @@ public class PortofinoListener extends DispatcherInitializer
 
     @Override
     protected FileObject getCodeBaseRoot() throws FileSystemException {
-        //TODO since this can handle both Java and Groovy we should move forward to a neutral directory name e.g. classes/
-        File codeBaseRoot = new File(applicationDirectory, "groovy");
+        File codeBaseRoot = new File(applicationDirectory, "classes");
         logger.info("Initializing codebase with classpath: " + codeBaseRoot.getAbsolutePath());
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(codeBaseRoot);
         return VFS.getManager().resolveFile(codeBaseRoot.toString());
