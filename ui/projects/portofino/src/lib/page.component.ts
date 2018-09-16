@@ -259,6 +259,11 @@ export abstract class Page {
       //replace double slash, but not in http://
       .replace(new RegExp("([^:])//"), '$1/');
   }
+
+  operationAvailable(ops: Operation[], signature: string) {
+    return ops.some(op => op.signature == signature && op.available);
+  }
+
 }
 
 class DummyPage extends Page {
