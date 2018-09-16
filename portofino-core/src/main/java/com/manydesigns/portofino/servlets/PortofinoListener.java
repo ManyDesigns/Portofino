@@ -29,7 +29,7 @@ import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
-import com.manydesigns.portofino.dispatcher.web.Listener;
+import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.ModuleRegistry;
@@ -59,7 +59,7 @@ import java.util.Enumeration;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PortofinoListener extends Listener
+public class PortofinoListener extends DispatcherInitializer
         implements ServletContextListener, HttpSessionListener, ServletContextAttributeListener {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";

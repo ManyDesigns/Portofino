@@ -6,7 +6,7 @@ import com.manydesigns.elements.blobs.HierarchicalBlobManager;
 import com.manydesigns.elements.blobs.SimpleBlobManager;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.dispatcher.web.Listener;
+import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
@@ -49,7 +49,7 @@ public class PortofinoSpringConfiguration {
 
     @Bean
     public CodeBase getCodeBase() {
-        return (CodeBase) getServletContext().getAttribute(Listener.CODE_BASE_ATTRIBUTE);
+        return (CodeBase) getServletContext().getAttribute(DispatcherInitializer.CODE_BASE_ATTRIBUTE);
     }
 
     @Bean

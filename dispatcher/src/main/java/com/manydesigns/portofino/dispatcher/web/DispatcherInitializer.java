@@ -28,17 +28,20 @@ import java.lang.reflect.Constructor;
 /**
  * Created by alessio on 28/07/16.
  */
-public class Listener implements ServletContextListener {
+public class DispatcherInitializer implements ServletContextListener {
     
     protected FileObject applicationRoot;
     protected Configuration configuration;
-    private static final Logger logger = LoggerFactory.getLogger(Listener.class);
+    private static final Logger logger = LoggerFactory.getLogger(DispatcherInitializer.class);
 
     public static final String CODE_BASE_ATTRIBUTE = "portofino.codebase";
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        ServletContext servletContext = sce.getServletContext();
+        initialize(sce.getServletContext());
+    }
+
+    public void initialize(ServletContext servletContext) {
         String applicationDirectoryPath = getApplicationDirectoryPath(servletContext);
         if(applicationDirectoryPath != null) try {
             //TODO allow placeholders?
@@ -63,8 +66,8 @@ public class Listener implements ServletContextListener {
         } catch (Exception e) {
             initializationFailed(e);
         }
-        
-        String actionsDirectory = configuration.getString("actions.directory", "actions");
+
+        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
         initApplicationRoot(servletContext, actionsDirectory);
         logger.info("Application initialized.");
     }
@@ -114,7 +117,7 @@ public class Listener implements ServletContextListener {
     protected CodeBase createAndStoreCodeBase(ServletContext servletContext) throws IOException {
         //TODO auto discovery?
         FileObject codeBaseRoot = getCodeBaseRoot();
-        JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot);
+        JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot, null, getClass().getClassLoader());
         CodeBase codeBase = javaCodeBase;
         try {
             Class<?> gcb = Class.forName("com.manydesigns.portofino.code.GroovyCodeBase");

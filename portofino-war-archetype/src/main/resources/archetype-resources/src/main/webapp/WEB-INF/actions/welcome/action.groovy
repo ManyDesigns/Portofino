@@ -5,13 +5,18 @@ import com.manydesigns.portofino.model.database.*
 import com.manydesigns.portofino.pageactions.*
 import com.manydesigns.portofino.security.*
 
-import net.sourceforge.stripes.action.*
+import javax.ws.rs.*
+
 import org.hibernate.*
 import org.hibernate.criterion.*
 
-import com.manydesigns.portofino.pageactions.text.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class Welcome extends TextAction {
+class Welcome extends CustomAction {
+
+    @GET
+    String welcomeMessage() {
+        'Welcome to your new Portofino application!'
+    }
 
 }

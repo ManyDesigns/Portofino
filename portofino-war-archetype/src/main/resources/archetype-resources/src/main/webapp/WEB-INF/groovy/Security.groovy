@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

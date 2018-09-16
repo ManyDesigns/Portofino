@@ -1,0 +1,5 @@
+<page id="root" description="portofino 4" title="Portofino4">
+    <permissions>
+        <group level="VIEW" name="all"/>
+    </permissions>
+</page>

@@ -1,18 +1,14 @@
-import {Injectable, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 
 @Injectable()
-export class PortofinoService implements OnInit {
+export class PortofinoService {
 
   defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
-  localApiPath = '/portofino';
+  localApiPath = 'portofino';
 
   constructor(public http: HttpClient) { }
-
-  ngOnInit(): void {
-    this.init();
-  }
 
   init(): void {
     if(!this.localApiPath) {

@@ -29,11 +29,20 @@
          -->
     </context-param>
 
+    <!-- The REST API -->
+    <servlet>
+        <servlet-name>com.manydesigns.portofino.jersey.PortofinoApplication</servlet-name>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>com.manydesigns.portofino.jersey.PortofinoApplication</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+
     <!-- Support for the Angular UI -->
     <context-param>
         <!-- The root of the API. It can be either a path relative to this webapp or an absolute URL. -->
         <param-name>portofino.api.root</param-name>
-        <param-value>/</param-value>
+        <param-value>/api/</param-value>
     </context-param>
 
     <servlet>
@@ -43,10 +52,10 @@
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>com.manydesigns.portofino.ui.support</param-value>
         </init-param>
-        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>Portofino Frontend API</servlet-name>
+        <url-pattern>/portofino</url-pattern>
         <url-pattern>/portofino/*</url-pattern>
     </servlet-mapping>
 

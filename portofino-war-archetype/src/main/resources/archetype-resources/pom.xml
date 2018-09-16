@@ -10,6 +10,7 @@
     <properties>
         <portofino.version>${portofinoVersion}</portofino.version>
         <portofino.application.directory>${dollar}{serverInfo:realPath}/WEB-INF</portofino.application.directory>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -124,13 +125,6 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Support for the Atmosphere framework (push notifications). -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-atmosphere</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
