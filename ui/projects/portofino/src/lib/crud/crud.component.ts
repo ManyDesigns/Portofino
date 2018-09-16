@@ -50,9 +50,9 @@ export class CrudComponent extends Page implements OnInit {
         configuration => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
           sps => this.init(classAccessor, configuration, sps))));
     this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
-      this.createEnabled = ops.some(op => op.signature == "POST" && op.available);
-      this.bulkEditEnabled = ops.some(op => op.signature == "PUT" && op.available);
-      this.bulkDeleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
+      this.createEnabled = this.operationAvailable(ops,"POST");
+      this.bulkEditEnabled = this.operationAvailable(ops,"PUT");
+      this.bulkDeleteEnabled = this.operationAvailable(ops,"DELETE");
     });
   }
 
@@ -177,6 +177,7 @@ export class CrudComponent extends Page implements OnInit {
     } else {
       this.id = segment;
     }
+    return false;
   }
 
   get children(): PageChild[] {

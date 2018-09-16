@@ -49,7 +49,7 @@ export class ManyToManyComponent extends Page implements OnInit {
     });
     this.sourceUrl = this.computeSourceUrl();
     this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
-      this.saveEnabled = ops.some(op => op.signature == "POST" && op.available);
+      this.saveEnabled = this.operationAvailable(ops,"POST");
     });
     this.http.get<Keys>(this.sourceUrl).subscribe(keys => {
       this.keys = keys.keys;
