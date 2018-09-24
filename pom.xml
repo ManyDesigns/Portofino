@@ -242,8 +242,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -405,7 +405,7 @@
                                 <configuration>
                                     <rules>
                                         <enforceBytecodeVersion>
-                                            <maxJdkVersion>1.8</maxJdkVersion>
+                                            <maxJdkVersion>1.7</maxJdkVersion>
                                         </enforceBytecodeVersion>
                                     </rules>
                                     <fail>true</fail>
