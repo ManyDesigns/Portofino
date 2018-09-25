@@ -60,4 +60,12 @@ public interface Resource {
 
     Object init();
 
+    default Resource getRoot() {
+        if(getParent() == null || getParent() == this) {
+            return this;
+        } else {
+            return getParent().getRoot();
+        }
+    }
+
 }

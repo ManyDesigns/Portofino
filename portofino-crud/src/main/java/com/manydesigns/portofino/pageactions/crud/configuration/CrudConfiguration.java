@@ -1,9 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud.configuration;
 
-import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.pageactions.ConfigurationWithDefaults;
 import com.manydesigns.portofino.pageactions.PageActionConfiguration;
 
@@ -70,7 +68,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.name = name;
     }
 
-    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getSearchTitle() {
         return searchTitle;
@@ -80,7 +77,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.searchTitle = searchTitle;
     }
 
-    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getCreateTitle() {
         return createTitle;
@@ -90,7 +86,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.createTitle = createTitle;
     }
 
-    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getReadTitle() {
         return readTitle;
@@ -100,7 +95,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.readTitle = readTitle;
     }
 
-    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getEditTitle() {
         return editTitle;
@@ -132,7 +126,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.largeResultSet = largeResultSet;
     }
 
-    @CssClass(BootstrapSizes.COL_SM_1)
     @XmlAttribute(required = false)
     public Integer getRowsPerPage() {
         return rowsPerPage;
@@ -143,7 +136,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     }
 
     @Required
-    @CssClass(BootstrapSizes.COL_SM_1)
     @XmlAttribute(required = false)
     public Integer getColumns() {
         return columns;

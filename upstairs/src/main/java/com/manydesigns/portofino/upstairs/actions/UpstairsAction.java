@@ -3,7 +3,9 @@ package com.manydesigns.portofino.upstairs.actions;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.ModuleInfo;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +24,8 @@ import java.util.Map;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-//@RequiresAuthentication
-//@RequiresAdministrator
+@RequiresAuthentication
+@RequiresAdministrator
 public class UpstairsAction extends AbstractPageAction {
     public static final String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
 

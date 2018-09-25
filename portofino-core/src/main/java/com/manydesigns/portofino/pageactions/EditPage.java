@@ -20,11 +20,9 @@
 
 package com.manydesigns.portofino.pageactions;
 
-import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.annotations.Updatable;
-import com.manydesigns.elements.util.BootstrapSizes;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,11 +40,9 @@ public class EditPage {
 
     @Label("title")
     @Required
-    @CssClass(BootstrapSizes.FILL_ROW)
     public String title;
 
     @Label("description")
-    @CssClass(BootstrapSizes.FILL_ROW)
     public String description;
 
 }

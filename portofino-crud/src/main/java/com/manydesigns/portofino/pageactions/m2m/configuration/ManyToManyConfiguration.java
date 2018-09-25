@@ -20,10 +20,8 @@
 
 package com.manydesigns.portofino.pageactions.m2m.configuration;
 
-import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.PageActionConfiguration;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -179,7 +177,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     @Required
     @Multiline
-    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;
@@ -199,7 +196,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.viewType = viewType;
     }
 
-    @CssClass(BootstrapSizes.COL_SM_6)
     @XmlAttribute(required = false)
     public String getOneExpression() {
         return oneExpression;
@@ -210,7 +206,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     }
 
     @XmlAttribute(required = false)
-    @CssClass(BootstrapSizes.COL_SM_6)
     public String getOnePropertyName() {
         return onePropertyName;
     }
