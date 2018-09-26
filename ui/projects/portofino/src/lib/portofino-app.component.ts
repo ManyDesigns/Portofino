@@ -11,8 +11,6 @@ import {
 } from '@angular/core';
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {NAVIGATION_COMPONENT, NavigationComponent, Page} from "./page.component";
-import {NavigationDirective} from "./content.directive";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 
@@ -25,6 +23,7 @@ export class ToolbarDirective {
 
 export interface ToolbarComponent {
   authenticationService: AuthenticationService;
+  title: string;
 }
 
 @Component({
@@ -33,6 +32,7 @@ export interface ToolbarComponent {
   styleUrls: ['./toolbar.component.css']
 })
 export class DefaultToolbarComponent implements ToolbarComponent {
+  title: string;
   constructor(public authenticationService: AuthenticationService) {}
 }
 
@@ -45,7 +45,7 @@ export class PortofinoAppComponent implements OnInit {
 
   static components: any = {};
 
-  @Input()
+  @Input('appTitle')
   title = 'Portofino';
   @Input()
   apiRoot: string;
@@ -64,7 +64,8 @@ export class PortofinoAppComponent implements OnInit {
     this.portofino.init();
     //Dynamically create the toolbar component
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
-    this.toolbarHost.viewContainerRef.createComponent(componentFactory);
+    let toolbar = this.toolbarHost.viewContainerRef.createComponent(componentFactory).instance as ToolbarComponent;
+    toolbar.title = this.title;
   }
 }
 

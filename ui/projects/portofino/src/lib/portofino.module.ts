@@ -70,7 +70,7 @@ import {QuillModule} from "ngx-quill";
     PortofinoService, AuthenticationService,
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
-    { provide: TOOLBAR_COMPONENT, useFactory: () => DefaultToolbarComponent },
+    { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService }],
@@ -86,6 +86,10 @@ export class PortofinoModule {
 
   static navigationComponent() {
     return DefaultNavigationComponent;
+  }
+
+  static toolbarComponent() {
+    return DefaultToolbarComponent;
   }
 
   static withRoutes(routes: Routes): (ModuleWithProviders | PortofinoModule)[] {

@@ -17,7 +17,7 @@ import {catchError, map, mergeMap} from "rxjs/operators";
 import {ThemePalette} from "@angular/material/core/typings/common-behaviors/color";
 import {PortofinoService} from "./portofino.service";
 import {of} from "rxjs/index";
-import {LOGIN_COMPONENT, NO_AUTH_HEADER} from "./security/authentication.service";
+import {NO_AUTH_HEADER} from "./security/authentication.service";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
