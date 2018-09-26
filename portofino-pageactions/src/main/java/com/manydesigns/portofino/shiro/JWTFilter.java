@@ -63,7 +63,7 @@ public class JWTFilter extends PathMatchingFilter {
             logger.warn("Failed JWT authentication to " + httpRequest.getRequestURL(), e);
             HttpServletResponse httpResponse = WebUtils.toHttp(response);
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return true;
+            return false;
         }
     }
 
