@@ -112,60 +112,6 @@ public abstract class LoginAction extends AbstractPageAction {
     // Login
     //**************************************************************************
 
-//    @Button(list = "login-buttons", key = "login", order = 1, type = Button.TYPE_PRIMARY)
-//    public Resolution login() {
-//        Subject subject = SecurityUtils.getSubject();
-//        if (subject.isAuthenticated()) {
-//            logger.debug("Already logged in");
-//            return redirectToReturnUrl();
-//        }
-//
-//        userName = StringUtils.defaultString(userName);
-//        try {
-//            UsernamePasswordToken usernamePasswordToken =
-//                    new UsernamePasswordToken(userName, pwd);
-//            usernamePasswordToken.setRememberMe(rememberMe);
-//            subject.login(usernamePasswordToken);
-//            logger.info("User {} login", ShiroUtils.getUserId(subject));
-//            String successMsg = ElementsThreadLocals.getText("user._.logged.in.successfully", userName);
-//            SessionMessages.addInfoMessage(successMsg);
-//            return redirectToReturnUrl();
-//        } catch (DisabledAccountException e) {
-//            String errMsg = ElementsThreadLocals.getText("user._.is.not.active", userName);
-//            SessionMessages.addErrorMessage(errMsg);
-//            logger.warn("Login failed for '" + userName + "': " + e.getMessage());
-//        } catch (IncorrectCredentialsException e) {
-//            String errMsg = ElementsThreadLocals.getText("login.failed.for.user._", userName);
-//            SessionMessages.addErrorMessage(errMsg);
-//            logger.warn("Login failed for '" + userName + "': " + e.getMessage());
-//        } catch (UnknownAccountException e) {
-//            String errMsg = ElementsThreadLocals.getText("login.failed.for.user._", userName);
-//            SessionMessages.addErrorMessage(errMsg);
-//            logger.warn("Login failed for '" + userName + "': " + e.getMessage());
-//        } catch (AuthenticationException e) {
-//            String errMsg = ElementsThreadLocals.getText("login.failed.for.user._", userName);
-//            SessionMessages.addErrorMessage(errMsg);
-//            logger.warn("Login failed for '" + userName + "': " + e.getMessage(), e);
-//        }
-//        return authenticate();
-//    }
-//
-//    public Resolution authenticate() {
-//        Subject subject = SecurityUtils.getSubject();
-//        context.getResponse().setStatus(401);
-//        context.getResponse().setHeader(
-//                AuthenticationRequiredResolution.LOGIN_PAGE_HEADER,
-//                context.getRequest().getRequestURL().toString());
-//        if(subject.isRemembered()) {
-//            Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
-//            userName = getRememberedUserName(principal);
-//            rememberMe = true;
-//            return new ForwardResolution(getAuthenticationPage());
-//        } else {
-//            return new ForwardResolution(getLoginPage());
-//        }
-//    }
-
     @POST
     @Produces("application/json")
     public String login(@FormParam("username") String username, @FormParam("password") String password)
@@ -184,14 +130,6 @@ public abstract class LoginAction extends AbstractPageAction {
             logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);
         }
         return "{}";
-    }
-
-    protected String getLoginPage() {
-        return "/m/base/actions/user/login.jsp";
-    }
-
-    protected String getAuthenticationPage() {
-        return "/m/base/actions/user/authenticate.jsp";
     }
 
     protected String getRememberedUserName(Serializable principal) {
@@ -326,10 +264,6 @@ public abstract class LoginAction extends AbstractPageAction {
 //    }
 //
     protected abstract void sendForgotPasswordEmail(String from, String to, String subject, String body);
-
-//    protected String getForgotPasswordPage() {
-//        return "/m/base/actions/user/forgotPassword.jsp";
-//    }
 
     //**************************************************************************
     // Sign up

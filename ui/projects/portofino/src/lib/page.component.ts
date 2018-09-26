@@ -17,7 +17,7 @@ import {catchError, map, mergeMap} from "rxjs/operators";
 import {ThemePalette} from "@angular/material/core/typings/common-behaviors/color";
 import {PortofinoService} from "./portofino.service";
 import {of} from "rxjs/index";
-import {LOGIN_COMPONENT, NO_AUTH_HEADER} from "./security/authentication.service";
+import {AuthenticationService, LOGIN_COMPONENT, NO_AUTH_HEADER} from "./security/authentication.service";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -42,7 +42,8 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(protected route: ActivatedRoute, protected http: HttpClient,
               protected componentFactoryResolver: ComponentFactoryResolver,
-              protected portofino: PortofinoService, @Inject(NAVIGATION_COMPONENT) protected navigationComponent) { }
+              protected portofino: PortofinoService, @Inject(NAVIGATION_COMPONENT) protected navigationComponent,
+              protected authenticationService: AuthenticationService) { }
 
   ngOnInit() {
     //Dynamically create the navigation component
@@ -107,7 +108,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   checkAccessibility(parent: Page, child: PageChild) {
-    let dummy = new DummyPage(this.portofino, this.http);
+    let dummy = new DummyPage(this.portofino, this.http, this.authenticationService);
     dummy.parent = parent;
     this.loadPageConfiguration(parent.path + '/' + child.path).pipe(mergeMap(config => {
       dummy.configuration = config;
@@ -206,7 +207,9 @@ export abstract class Page {
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
 
-  protected constructor(protected portofino: PortofinoService, protected http: HttpClient) {}
+  protected constructor(
+    protected portofino: PortofinoService, protected http: HttpClient,
+    public authenticationService: AuthenticationService) {}
 
   consumePathSegment(fragment: string): boolean {
     return true;
@@ -267,8 +270,10 @@ export abstract class Page {
 }
 
 class DummyPage extends Page {
-  constructor(protected portofino: PortofinoService, protected http: HttpClient) {
-    super(portofino, http);
+  constructor(
+    protected portofino: PortofinoService, protected http: HttpClient,
+    public authenticationService: AuthenticationService) {
+    super(portofino, http, authenticationService);
   }
 }
 

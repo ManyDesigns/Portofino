@@ -1,4 +1,9 @@
-<h2>{{configuration.title}}</h2>
+<h2 fxLayout="row" fxLayoutAlign="space-between center">
+  {{configuration.title}}
+  <button mat-icon-button *ngIf="authenticationService.currentUser && authenticationService.currentUser.administrator" color="primary" i18n>
+    <mat-icon>settings</mat-icon>
+  </button>
+</h2>
 <portofino-crud-search
   *ngIf="isSearchView()"
   [classAccessor]="classAccessor" [configuration]="configuration" [sourceUrl]="sourceUrl" [baseUrl]="url"

@@ -24,7 +24,7 @@ export class AuthenticationService {
               protected router: Router) {
     const displayName = this.storage.get('user.displayName');
     if(displayName) {
-      this.currentUser = new UserInfo(displayName);
+      this.currentUser = new UserInfo(displayName, this.storage.get('user.administrator') == 'true');
     }
   }
 
@@ -70,6 +70,7 @@ export class AuthenticationService {
   protected removeAuthenticationInfo() {
     this.storage.remove('jwt');
     this.storage.remove('user.displayName');
+    this.storage.remove('user.administrator');
     this.storage.remove('sessionId');
     this.currentUser = null;
   }
@@ -77,8 +78,9 @@ export class AuthenticationService {
   protected setAuthenticationInfo(result) {
     this.storage.set('jwt', result.jwt);
     this.storage.set('user.displayName', result.displayName);
+    this.storage.set('user.administrator', result.administrator);
     this.storage.set('sessionId', result.portofinoSessionId);
-    this.currentUser = new UserInfo(result.displayName);
+    this.currentUser = new UserInfo(result.displayName, result.administrator);
   }
 
   withAuthenticationHeader(req: HttpRequest<any>) {
@@ -134,7 +136,7 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 }
 
 export class UserInfo {
-  constructor(public displayName: string) {}
+  constructor(public displayName: string, public administrator: boolean) {}
 }
 
 export const NO_AUTH_HEADER = "portofino-no-auth";

@@ -38,6 +38,7 @@ import com.manydesigns.portofino.pageactions.PageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.rest.actions.user.LoginAction;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.JSONWebToken;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -91,6 +92,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
             subject.login(usernamePasswordToken);
             logger.info("User {} login", ShiroUtils.getUserId(subject));
             Object principal = subject.getPrincipal();
+            boolean administrator = SecurityLogic.isAdministrator(portofinoConfiguration);
             subject.logout();
             PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
             String jwt = portofinoRealm.generateWebToken(principal);
@@ -102,6 +104,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
                     key("portofinoSessionId").value(session.getId()).
                     key("userId").value(ShiroUtils.getUserId(subject)).
                     key("displayName").value(portofinoRealm.getUserPrettyName((Serializable) subject.getPrincipal())).
+                    key("administrator").value(administrator).
                     key("jwt").value(jwt).
                 endObject();
             return stringer.toString();

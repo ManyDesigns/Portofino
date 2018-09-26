@@ -115,7 +115,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         Map<String, Object> claims = new HashMap<>();
         claims.put("principal", principal);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = null;
+        ObjectOutputStream objectOutputStream;
         try {
             objectOutputStream = new ObjectOutputStream(bytes);
             objectOutputStream.writeObject(principal);
@@ -127,7 +127,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         return Jwts.builder().
                 setClaims(claims).
                 setExpiration(new DateTime().plusDays(1).toDate()).
-                signWith(SignatureAlgorithm.HS512, key).
+                signWith(key, SignatureAlgorithm.HS512).
                 compact();
     }
 
