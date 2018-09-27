@@ -17,7 +17,7 @@ export class CustomNavigation implements NavigationComponent {
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app title="Demo-TT" apiRoot="http://localhost:8080/demo-tt/"></portofino-app>`
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/"></portofino-app>`
 })
 export class AppComponent {}
 

@@ -1,16 +1,2 @@
-<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
-  {{ title }}
-  <ng-container *ngIf="authenticationService.currentUser">
-    <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="authenticationService.logout()" i18n>Sign out</button>
-    </mat-menu>
-    <button mat-button [matMenuTriggerFor]="userMenu">
-      <mat-icon>more_vert</mat-icon>
-      {{ authenticationService.currentUser.displayName }}
-    </button>
-  </ng-container>
-  <ng-container *ngIf="!authenticationService.currentUser">
-    <button mat-button (click)="authenticationService.showLoginDialog()" i18n>Sign in</button>
-  </ng-container>
-</mat-toolbar>
+<ng-template portofino-toolbar></ng-template>
 <router-outlet *ngIf="portofino.apiRoot"></router-outlet>

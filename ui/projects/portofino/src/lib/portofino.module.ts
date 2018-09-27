@@ -2,7 +2,12 @@ import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ModuleWithProviders, NgModule} from '@angular/core';
-import {PortofinoAppComponent} from './portofino-app.component';
+import {
+  DefaultToolbarComponent,
+  PortofinoAppComponent,
+  TOOLBAR_COMPONENT,
+  ToolbarDirective
+} from './portofino-app.component';
 import {CrudComponent} from './crud/crud.component';
 import {PortofinoService} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
@@ -50,7 +55,8 @@ import {QuillModule} from "ngx-quill";
     PortofinoAppComponent, ButtonComponent, LoginComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent, BlobFieldComponent, DetailComponent,
     CreateComponent, BulkEditComponent, ManyToManyComponent,
-    MainContentDirective, EmbeddedContentDirective, NavigationDirective, PageComponent, DefaultNavigationComponent
+    MainContentDirective, EmbeddedContentDirective, NavigationDirective, PageComponent, DefaultNavigationComponent,
+    ToolbarDirective, DefaultToolbarComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
@@ -64,9 +70,13 @@ import {QuillModule} from "ngx-quill";
     PortofinoService, AuthenticationService,
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
+    { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
+    { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService }],
-  entryComponents: [LoginComponent, DefaultNavigationComponent, CrudComponent, ManyToManyComponent],
+  entryComponents: [
+    LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent,
+    CrudComponent, ManyToManyComponent],
   exports: [PortofinoAppComponent, PageComponent]
 })
 export class PortofinoModule {
@@ -76,6 +86,10 @@ export class PortofinoModule {
 
   static navigationComponent() {
     return DefaultNavigationComponent;
+  }
+
+  static toolbarComponent() {
+    return DefaultToolbarComponent;
   }
 
   public static withRoutes(routes: Routes): (ModuleWithProviders)[] {
