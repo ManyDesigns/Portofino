@@ -34,8 +34,7 @@
               },
               "src/styles.css"
             ],
-            "scripts": [],
-            "verbose": true
+            "scripts": []
           },
           "configurations": {
             "production": {
