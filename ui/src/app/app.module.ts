@@ -1,5 +1,23 @@
-import {Component, ModuleWithProviders, NgModule} from '@angular/core';
-import {PortofinoModule, Page, PageComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent} from "portofino";
+import {Component, NgModule} from '@angular/core';
+import {PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent, PortofinoComponent} from "portofino";
+import {
+  MatAutocompleteModule,
+  MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
+  MatFormFieldModule,
+  MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule,
+  MatSidenavModule,
+  MatSnackBarModule,
+  MatSortModule,
+  MatTableModule, MatToolbarModule
+} from "@angular/material";
+import {BrowserModule} from "@angular/platform-browser";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {QuillModule} from "ngx-quill";
+import {HttpClientModule} from "@angular/common/http";
+import {FlexLayoutModule} from "@angular/flex-layout";
+import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import {FileInputAccessorModule} from "file-input-accessor";
 
 @Component({
   selector: 'portofino-hello',
@@ -21,13 +39,29 @@ export class CustomNavigation implements NavigationComponent {
 })
 export class AppComponent {}
 
+@PortofinoComponent({ name: 'customcrud' })
+export class CustomCrud extends CrudComponent {
+
+  ngOnInit(): void {
+    console.log("custom");
+    super.ngOnInit();
+    this.configuration.title = 'custom';
+  }
+}
+
 @NgModule({
-  declarations: [AppComponent, HelloPortofino, CustomNavigation],
+  declarations: [AppComponent, HelloPortofino, CustomNavigation, CustomCrud],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
-  imports: [ PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]) ],
-  entryComponents: [ CustomNavigation ],
+  imports: [
+    PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]),
+    BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
+    MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
+    MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
+    MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
+    FileInputAccessorModule, QuillModule],
+  entryComponents: [ CustomNavigation, CustomCrud ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

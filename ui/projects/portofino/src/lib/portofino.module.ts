@@ -77,7 +77,11 @@ import {QuillModule} from "ngx-quill";
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, ManyToManyComponent],
-  exports: [PortofinoAppComponent, PageComponent]
+  exports: [
+    PortofinoAppComponent, ButtonComponent, LoginComponent,
+    PageComponent, CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent,
+    BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent,
+    DefaultNavigationComponent, DefaultToolbarComponent]
 })
 export class PortofinoModule {
   static loginComponent() {

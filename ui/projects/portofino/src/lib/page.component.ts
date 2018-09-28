@@ -132,8 +132,8 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   protected createPageComponent(config: PageConfiguration, path: string, parent: Page, embed: boolean): Observable<Page> {
     const componentType = PortofinoAppComponent.components[config.type];
     if (!componentType) {
-      this.error = Error("Unknown component type: " + config.type);
-      return;
+      this.error = "Unknown component type: " + config.type;
+      return new Observable<Page>();
     }
 
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
