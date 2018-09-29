@@ -201,6 +201,7 @@ export abstract class Page {
   segment: string;
   parent: Page;
   allowEmbeddedComponents: boolean = true;
+  editingConfiguration: boolean;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
@@ -208,7 +209,16 @@ export abstract class Page {
 
   protected constructor(
     protected portofino: PortofinoService, protected http: HttpClient,
-    public authenticationService: AuthenticationService) {}
+    public authenticationService: AuthenticationService) {
+    //Declarative approach does not work for some reason.
+    //TODO investigate with newer versions
+    declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'configuration'
+    }, this, 'saveConfiguration', null);
+    declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'configuration'
+    }, this, 'cancelConfiguration', null);
+  }
 
   consumePathSegment(fragment: string): boolean {
     return true;
@@ -266,6 +276,19 @@ export abstract class Page {
     return ops.some(op => op.signature == signature && op.available);
   }
 
+  configure() {
+    this.editingConfiguration = true;
+  }
+
+  saveConfiguration() {
+    this.editingConfiguration = false;
+    //TODO
+  }
+
+  cancelConfiguration() {
+    this.editingConfiguration = false;
+  }
+
 }
 
 class DummyPage extends Page {
@@ -302,22 +325,26 @@ export class ButtonInfo {
 
 export const BUTTONS = "__portofinoButtons__";
 
+export function declareButton(info: ButtonInfo | any, target, methodName: string, descriptor: PropertyDescriptor) {
+  info = Object.assign({}, new ButtonInfo(), info);
+  info.class = target.constructor;
+  info.methodName = methodName;
+  info.propertyDescriptor = descriptor;
+  info.action = (self, event) => {
+    self[methodName].call(self, event);
+  };
+  if(!target.hasOwnProperty(BUTTONS)) {
+    target[BUTTONS] = {};
+  }
+  if(!target[BUTTONS].hasOwnProperty(info.list)) {
+    target[BUTTONS][info.list] = [];
+  }
+  target[BUTTONS][info.list].push(info);
+}
+
 export function Button(info: ButtonInfo | any) {
   return function (target, methodName: string, descriptor: PropertyDescriptor) {
-    info = Object.assign({}, new ButtonInfo(), info);
-    info.class = target.constructor;
-    info.methodName = methodName;
-    info.propertyDescriptor = descriptor;
-    info.action = (self, event) => {
-      self[methodName].call(self, event);
-    };
-    if(!target.hasOwnProperty(BUTTONS)) {
-      target[BUTTONS] = {};
-    }
-    if(!target[BUTTONS].hasOwnProperty(info.list)) {
-      target[BUTTONS][info.list] = [];
-    }
-    target[BUTTONS][info.list].push(info);
+    declareButton(info, target, methodName, descriptor)
   }
 }
 

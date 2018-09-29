@@ -3,9 +3,9 @@
   <h2 *ngIf="!editMode" i18n>{{id}}</h2>
   <form (submit)="save()" *ngIf="object" [formGroup]="form">
     <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
-      <portofino-crud-field *ngFor="let property of properties" [property]="property" [form]="form"
-                            [enabled]="isEditEnabled() && isEditable(property)" [objectUrl]="sourceUrl + '/' + id">
-      </portofino-crud-field>
+      <portofino-field *ngFor="let property of properties" [property]="property" [form]="form"
+                       [enabled]="isEditEnabled() && isEditable(property)" [objectUrl]="sourceUrl + '/' + id">
+      </portofino-field>
     </div>
     <div fxLayout="row" *ngIf="editMode">
       <button mat-raised-button (click)="save()" color="primary" i18n>

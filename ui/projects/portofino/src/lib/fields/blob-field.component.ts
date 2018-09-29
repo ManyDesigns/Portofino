@@ -4,7 +4,7 @@ import {PortofinoService} from "../portofino.service";
 import {AuthenticationService} from "../security/authentication.service";
 
 @Component({
-  selector: 'portofino-crud-blob-field',
+  selector: 'portofino-blob-field',
   templateUrl: './blob-field.component.html',
   styleUrls: ['./blob-field.component.css']
 })

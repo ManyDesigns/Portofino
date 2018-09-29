@@ -117,6 +117,10 @@ export class AuthenticationService {
       this.router.navigateByUrl(this.router.url);
     });
   }
+
+  get isAdmin() {
+    return this.currentUser && this.currentUser.administrator
+  }
 }
 
 @Injectable()

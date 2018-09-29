@@ -5,7 +5,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {AbstractControl} from "@angular/forms/src/model";
 
 @Component({
-  selector: 'portofino-crud-field',
+  selector: 'portofino-field',
   templateUrl: './field.component.html',
   styleUrls: ['./field.component.css']
 })
