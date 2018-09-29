@@ -1,9 +1,8 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver, Inject,
-  InjectionToken, Input,
-  OnDestroy,
+  ComponentFactoryResolver, Host, Inject,
+  InjectionToken, Input, OnDestroy,
   OnInit,
   ViewChild
 } from '@angular/core';
@@ -205,6 +204,7 @@ export abstract class Page {
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
+  readonly page = this;
 
   protected constructor(
     protected portofino: PortofinoService, protected http: HttpClient,
@@ -274,6 +274,17 @@ class DummyPage extends Page {
     public authenticationService: AuthenticationService) {
     super(portofino, http, authenticationService);
   }
+}
+
+@Component({
+  selector: 'portofino-page-header',
+  templateUrl: './page-header.component.html',
+  styleUrls: ['./page-header.component.css']
+})
+export class PageHeader {
+  @Input() //Note: @Host in the constructor does not work for superclasses
+  page: Page;
+  constructor(public authenticationService: AuthenticationService) {}
 }
 
 export class ButtonInfo {

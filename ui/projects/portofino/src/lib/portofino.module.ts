@@ -42,7 +42,7 @@ import {FieldComponent} from './crud/field.component';
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
 import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from './content.directive';
-import {DefaultNavigationComponent, NAVIGATION_COMPONENT, PageComponent} from './page.component';
+import {DefaultNavigationComponent, NAVIGATION_COMPONENT, PageComponent, PageHeader} from './page.component';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./crud/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
@@ -55,8 +55,8 @@ import {QuillModule} from "ngx-quill";
     PortofinoAppComponent, ButtonComponent, LoginComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent, BlobFieldComponent, DetailComponent,
     CreateComponent, BulkEditComponent, ManyToManyComponent,
-    MainContentDirective, EmbeddedContentDirective, NavigationDirective, PageComponent, DefaultNavigationComponent,
-    ToolbarDirective, DefaultToolbarComponent
+    PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
+    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
@@ -79,7 +79,7 @@ import {QuillModule} from "ngx-quill";
     CrudComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, ButtonComponent, LoginComponent,
-    PageComponent, CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent,
+    PageComponent, PageHeader, CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent,
     BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent,
     DefaultNavigationComponent, DefaultToolbarComponent]
 })
