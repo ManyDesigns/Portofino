@@ -18,7 +18,7 @@ import {AuthenticationService} from "../security/authentication.service";
 export class CrudComponent extends Page implements OnInit {
 
   @Input()
-  configuration: PageConfiguration & any;
+  configuration: PageConfiguration & Configuration & any;
   sourceUrl: string;
 
   classAccessor: ClassAccessor;

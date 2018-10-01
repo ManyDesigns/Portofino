@@ -20,7 +20,7 @@ export class AuthenticationService {
   loginPath: string = "login";
 
   constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
-              private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected component,
+              private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
               protected router: Router) {
     const displayName = this.storage.get('user.displayName');
     if(displayName) {
@@ -46,7 +46,7 @@ export class AuthenticationService {
 
   protected askForCredentials() {
     if(!this.dialogRef) {
-      this.dialogRef = this.dialog.open(this.component);
+      this.dialogRef = this.dialog.open(this.loginComponent);
     }
     return this.dialogRef.afterClosed().pipe(map(result => {
       this.dialogRef = null;

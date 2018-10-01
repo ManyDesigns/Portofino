@@ -239,7 +239,7 @@ export abstract class Page {
   }
 
   prepare(): Observable<Page> {
-    return this.checkAccess(true).pipe(map(() => this));
+    return this.checkAccess(true).pipe<Page>(map(() => this));
   }
 
   checkAccess(askForLogin: boolean): Observable<any> {
@@ -276,7 +276,13 @@ export abstract class Page {
     return ops.some(op => op.signature == signature && op.available);
   }
 
+  get supportedSourceTypes(): string[] {
+    return [];
+  }
+
   configure() {
+    this.http.get(this.portofino.apiRoot + '/:page')
+      .subscribe(page => console.log("Page", page));
     this.editingConfiguration = true;
   }
 
