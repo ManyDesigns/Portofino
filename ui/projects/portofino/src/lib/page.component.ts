@@ -17,7 +17,7 @@ import {PortofinoService} from "./portofino.service";
 import {of} from "rxjs/index";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {FormControl, FormGroup} from "@angular/forms";
-import {Annotation, ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
+import {Annotation, ANNOTATION_REQUIRED, ClassAccessor, getValidators, Property} from "./class-accessor";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -203,7 +203,9 @@ export class PageSettingsPanel {
       Object.assign(new Property(), {
         name: 'source',
         type: 'string',
-        annotations: [Object.assign(new Annotation(), { type: ANNOTATION_REQUIRED, properties: [true] })]})
+        label: 'Source',
+        annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
+      })
     ],
     keyProperties: []
   };
@@ -213,7 +215,7 @@ export class PageSettingsPanel {
   refresh() {
     const formControls = {};
     this.classAccessor.properties.forEach(p => {
-      formControls[p.name] = new FormControl(this.page.configuration[p.name]);
+      formControls[p.name] = new FormControl(this.page.configuration[p.name], getValidators(p));
     });
     this.form = new FormGroup(formControls);
   }

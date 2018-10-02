@@ -3,7 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
   ClassAccessor,
-  getAnnotation,
+  getAnnotation, getValidators,
   isBlob,
   isDateProperty,
   isEnabled,
@@ -79,7 +79,7 @@ export abstract class BaseDetailComponent {
       if(this.form) {
         this.form.get(p.name).reset(formState);
       } else {
-        formControls[p.name] = new FormControl(formState, this.getValidators(p));
+        formControls[p.name] = new FormControl(formState, getValidators(p));
       }
     });
     if(!this.form) {
@@ -131,30 +131,6 @@ export abstract class BaseDetailComponent {
         }
       });
     });
-  }
-
-  protected getValidators(property: Property) {
-    let validators = [];
-    if (isRequired(property)) {
-      validators.push(Validators.required);
-    }
-    const maxLength = getAnnotation(property, "com.manydesigns.elements.annotations.MaxLength");
-    if (maxLength) {
-      validators.push(Validators.maxLength(maxLength.properties["value"]));
-    }
-    const maxValue =
-      getAnnotation(property, "com.manydesigns.elements.annotations.MaxDecimalValue") ||
-      getAnnotation(property, "com.manydesigns.elements.annotations.MaxIntValue");
-    if (maxValue) {
-      validators.push(Validators.max(maxValue.properties["value"]));
-    }
-    const minValue =
-      getAnnotation(property, "com.manydesigns.elements.annotations.MinDecimalValue") ||
-      getAnnotation(property, "com.manydesigns.elements.annotations.MinIntValue");
-    if (minValue) {
-      validators.push(Validators.max(minValue.properties["value"]));
-    }
-    return validators;
   }
 
   protected loadSelectionOptions(property: Property, autocomplete: string = null) {

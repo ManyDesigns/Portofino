@@ -1,3 +1,5 @@
+import {ValidatorFn, Validators} from "@angular/forms";
+
 export class ClassAccessor {
   name: string;
   properties: Property[];
@@ -108,4 +110,28 @@ export function deriveKind(property: Property) {
     return "boolean";
   }
   throw `${property.name}: unsuppored property type ${property.type}`
+}
+
+export function getValidators(property: Property): ValidatorFn[] {
+  let validators = [];
+  if (isRequired(property)) {
+    validators.push(Validators.required);
+  }
+  const maxLength = getAnnotation(property, "com.manydesigns.elements.annotations.MaxLength");
+  if (maxLength) {
+    validators.push(Validators.maxLength(maxLength.properties["value"]));
+  }
+  const maxValue =
+    getAnnotation(property, "com.manydesigns.elements.annotations.MaxDecimalValue") ||
+    getAnnotation(property, "com.manydesigns.elements.annotations.MaxIntValue");
+  if (maxValue) {
+    validators.push(Validators.max(maxValue.properties["value"]));
+  }
+  const minValue =
+    getAnnotation(property, "com.manydesigns.elements.annotations.MinDecimalValue") ||
+    getAnnotation(property, "com.manydesigns.elements.annotations.MinIntValue");
+  if (minValue) {
+    validators.push(Validators.max(minValue.properties["value"]));
+  }
+  return validators;
 }
