@@ -3,7 +3,6 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
   ClassAccessor,
-  deriveKind,
   getAnnotation,
   isBlob,
   isDateProperty,
@@ -40,7 +39,6 @@ export abstract class BaseDetailComponent {
       if (this.filterProperty(property)) {
         return;
       }
-      property = {...property, kind: deriveKind(property)};
       property.editable = this.isEditable(property);
       this.properties.push(property);
     });

@@ -42,7 +42,14 @@ import {FieldComponent} from './fields/field.component';
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
 import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from './content.directive';
-import {DefaultNavigationComponent, NAVIGATION_COMPONENT, PageComponent, PageHeader} from './page.component';
+import {
+  DefaultNavigationComponent,
+  DefaultPageLayout,
+  NAVIGATION_COMPONENT,
+  Page,
+  PageComponent,
+  PageHeader
+} from './page.component';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
@@ -52,7 +59,7 @@ import {QuillModule} from "ngx-quill";
 
 @NgModule({
   declarations: [
-    PortofinoAppComponent, ButtonComponent, LoginComponent,
+    PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent, BlobFieldComponent, DetailComponent,
     CreateComponent, BulkEditComponent, ManyToManyComponent,
     PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
@@ -78,7 +85,7 @@ import {QuillModule} from "ngx-quill";
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, ManyToManyComponent],
   exports: [
-    PortofinoAppComponent, ButtonComponent, LoginComponent,
+    PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
     PageComponent, PageHeader, CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent,
     BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent,
     DefaultNavigationComponent, DefaultToolbarComponent]

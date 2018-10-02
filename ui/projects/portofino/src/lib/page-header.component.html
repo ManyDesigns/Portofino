@@ -1,6 +1,6 @@
 <h2 fxLayout="row" fxLayoutAlign="space-between center">
   {{page.configuration.title}}
-  <button mat-icon-button *ngIf="!page.editingConfiguration && authenticationService.isAdmin"
+  <button mat-icon-button *ngIf="!page.settingsPanel.active && authenticationService.isAdmin"
           (click)="page.configure()" color="primary" i18n>
     <mat-icon>settings</mat-icon>
   </button>

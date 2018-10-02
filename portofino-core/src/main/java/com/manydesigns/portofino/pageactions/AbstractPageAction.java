@@ -28,6 +28,7 @@ import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
+import com.manydesigns.portofino.dispatcher.AbstractResource;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.operations.Operation;
@@ -522,14 +523,24 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return pageInstance.getConfiguration();
     }
 
+    @Override
+    protected void describe(Map<String, Object> description) {
+        super.describe(description);
+        description.put("page", pageInstance.getPage());
+    }
+
     /**
      * Returns a description of this PageAction.
      * @since 4.2.1
      * @return the page's description as JSON.
+     * @deprecated replaced by :description.
+     * @see #describe(Map)
+     * @see AbstractResource#getJSONDescription()
      */
     @Path(":page")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Deprecated
     public Map<String, Object> getPageDescription() {
         Map<String, Object> description = new HashMap<String, Object>();
         description.put("superclass", pageInstance.getActionClass().getSuperclass().getName());

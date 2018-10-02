@@ -100,4 +100,10 @@ public class Root extends AbstractResource {
         return Response.temporaryRedirect(new URI("swagger.yaml")).build();
     }
 
+    @Override
+    public Root init() {
+        //Force subclasses to return Root
+        return this;
+    }
+
 }

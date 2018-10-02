@@ -1,0 +1,12 @@
+<portofino-page-header [page]="page"></portofino-page-header>
+<ng-container *ngIf="!page.settingsPanel.active">
+  <ng-template [ngTemplateOutlet]="content"></ng-template>
+</ng-container>
+<ng-container *ngIf="page.settingsPanel.active">
+  <portofino-field *ngFor="let property of page.settingsPanel.classAccessor.properties"
+                   [property]="property" [form]="page.settingsPanel.form">
+  </portofino-field>
+  <div></div>
+  <portofino-button *ngFor="let button of page.getButtons('configuration')"
+                    [button]="button" [component]="page"></portofino-button>
+</ng-container>

@@ -1,9 +1,9 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver, Host, Inject,
+  ComponentFactoryResolver, ContentChild, Host, Inject,
   InjectionToken, Input, OnDestroy,
-  OnInit,
+  OnInit, TemplateRef,
   ViewChild
 } from '@angular/core';
 import {ActivatedRoute, UrlSegment} from "@angular/router";
@@ -16,6 +16,8 @@ import {ThemePalette} from "@angular/material/core/typings/common-behaviors/colo
 import {PortofinoService} from "./portofino.service";
 import {of} from "rxjs/index";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
+import {FormControl, FormGroup} from "@angular/forms";
+import {Annotation, ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -182,7 +184,7 @@ export class PageConfiguration {
   title: string;
   children: PageChild[];
   source: string;
-  securityCheckPath: string = '/:page';
+  securityCheckPath: string = '/:description';
 }
 
 export class PageChild {
@@ -192,16 +194,42 @@ export class PageChild {
   accessible: boolean;
 }
 
+export class PageSettingsPanel {
+  active: boolean;
+  form: FormGroup;
+  classAccessor: ClassAccessor = {
+    name: 'configuration',
+    properties: [
+      Object.assign(new Property(), {
+        name: 'source',
+        type: 'string',
+        annotations: [Object.assign(new Annotation(), { type: ANNOTATION_REQUIRED, properties: [true] })]})
+    ],
+    keyProperties: []
+  };
+
+  constructor(public page: Page) {}
+
+  refresh() {
+    const formControls = {};
+    this.classAccessor.properties.forEach(p => {
+      formControls[p.name] = new FormControl(this.page.configuration[p.name]);
+    });
+    this.form = new FormGroup(formControls);
+  }
+
+}
+
 export abstract class Page {
 
   configuration: PageConfiguration & any;
+  readonly settingsPanel = new PageSettingsPanel(this);
   path: string;
   baseUrl: string;
   url: string;
   segment: string;
   parent: Page;
   allowEmbeddedComponents: boolean = true;
-  editingConfiguration: boolean;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
@@ -248,7 +276,7 @@ export abstract class Page {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
     return this.http.get<any>(
-      this.computeSourceUrl() + (this.configuration.securityCheckPath || '/:page'),
+      this.computeSourceUrl() + (this.configuration.securityCheckPath || '/:description'),
       { headers: headers });
   }
 
@@ -281,18 +309,19 @@ export abstract class Page {
   }
 
   configure() {
-    this.http.get(this.portofino.apiRoot + '/:page')
+    this.http.get(this.portofino.apiRoot + ':description')
       .subscribe(page => console.log("Page", page));
-    this.editingConfiguration = true;
+    this.settingsPanel.refresh();
+    this.settingsPanel.active = true;
   }
 
   saveConfiguration() {
-    this.editingConfiguration = false;
+    this.settingsPanel.active = false;
     //TODO
   }
 
   cancelConfiguration() {
-    this.editingConfiguration = false;
+    this.settingsPanel.active = false;
   }
 
 }
@@ -316,6 +345,23 @@ export class PageHeader {
   constructor(public authenticationService: AuthenticationService) {}
 }
 
+@Component({
+  selector: 'portofino-default-page-layout',
+  templateUrl: './default-page-layout.component.html',
+  styleUrls: ['./default-page-layout.component.css']
+})
+export class DefaultPageLayout {
+  @Input()
+  page: Page;
+  @ContentChild("content")
+  content: TemplateRef<any>
+}
+
+///////////
+//Buttons//
+///////////
+export const BUTTONS = "__portofinoButtons__";
+
 export class ButtonInfo {
   list: string = 'default';
   class: Function;
@@ -328,8 +374,6 @@ export class ButtonInfo {
   icon: string;
   text: string;
 }
-
-export const BUTTONS = "__portofinoButtons__";
 
 export function declareButton(info: ButtonInfo | any, target, methodName: string, descriptor: PropertyDescriptor) {
   info = Object.assign({}, new ButtonInfo(), info);

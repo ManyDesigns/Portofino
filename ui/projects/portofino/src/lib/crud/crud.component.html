@@ -1,28 +1,24 @@
-<portofino-page-header [page]="page"></portofino-page-header>
-<ng-container *ngIf="!editingConfiguration">
-  <portofino-crud-search
-    *ngIf="isSearchView()"
-    [classAccessor]="classAccessor" [configuration]="configuration" [sourceUrl]="sourceUrl" [baseUrl]="url"
-    [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
-    <ng-template #buttons>
-      <portofino-button *ngFor="let button of getButtons()" [button]="button" [component]="page"></portofino-button>
-    </ng-template>
-  </portofino-crud-search>
-  <portofino-crud-detail
-    *ngIf="isDetailView()"
-    [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-    [sourceUrl]="sourceUrl" (close)="goToSearch()" (editModeChanges)="onEditModeChange($event)"></portofino-crud-detail>
-  <portofino-crud-create
-    *ngIf="isCreateView()"
-    [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-    [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-create>
-  <portofino-crud-bulk-edit
-    *ngIf="isBulkEditView()"
-    [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-    [ids]="selection" [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-bulk-edit>
-</ng-container>
-<ng-container *ngIf="editingConfiguration">
-  TODO edit config
-  <div></div>
-  <portofino-button *ngFor="let button of getButtons('configuration')" [button]="button" [component]="page"></portofino-button>
-</ng-container>
+<portofino-default-page-layout [page]="this">
+  <ng-template #content>
+    <portofino-crud-search
+      *ngIf="isSearchView()"
+      [classAccessor]="classAccessor" [configuration]="configuration" [sourceUrl]="sourceUrl" [baseUrl]="url"
+      [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled">
+      <ng-template #buttons>
+        <portofino-button *ngFor="let button of getButtons()" [button]="button" [component]="page"></portofino-button>
+      </ng-template>
+    </portofino-crud-search>
+    <portofino-crud-detail
+      *ngIf="isDetailView()"
+      [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+      [sourceUrl]="sourceUrl" (close)="goToSearch()" (editModeChanges)="onEditModeChange($event)"></portofino-crud-detail>
+    <portofino-crud-create
+      *ngIf="isCreateView()"
+      [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+      [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-create>
+    <portofino-crud-bulk-edit
+      *ngIf="isBulkEditView()"
+      [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+      [ids]="selection" [sourceUrl]="sourceUrl" (close)="goToSearch()"></portofino-crud-bulk-edit>
+  </ng-template>
+</portofino-default-page-layout>

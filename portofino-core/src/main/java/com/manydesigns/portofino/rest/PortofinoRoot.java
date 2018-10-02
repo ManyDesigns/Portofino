@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
@@ -18,10 +19,15 @@ import org.apache.commons.vfs2.FileObject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -80,10 +86,10 @@ public class PortofinoRoot extends Root implements PageAction {
     }
 
     @Override
-    public Object init() {
+    public PortofinoRoot init() {
         super.init();
         Page rootPage = PageLogic.getPage(location);
-        PageInstance pageInstance = new PageInstance(null, location, rootPage, null);
+        PageInstance pageInstance = new PageInstance(null, location, rootPage, getClass());
         setPageInstance(pageInstance);
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         ActionContext context = new ActionContext();
@@ -147,5 +153,23 @@ public class PortofinoRoot extends Root implements PageAction {
 
     public static boolean unmount(FileObject object) {
         return children.remove(getDefaultMountPointName(object), object);
+    }
+
+    /**
+     * Returns a description of the root.
+     * @since 5.0
+     * @return the page's description as JSON.
+     */
+    @Path(":description")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    public Map<String, Object> getJSONDescription() {
+        Map<String, Object> description = new HashMap<String, Object>();
+        description.put("superclass", getClass().getSuperclass().getName());
+        description.put("class", getClass().getName());
+        description.put("page", pageInstance.getPage());
+        description.put("path", getPath());
+        description.put("children", getSubResources());
+        return description;
     }
 }

@@ -11,7 +11,9 @@ export class Property {
   modifiers: string[];
   label: string;
   key: boolean;
-  kind: string;
+  get kind() {
+    return deriveKind(this);
+  }
 
   editable: boolean;
   selectionProvider: any;
@@ -22,6 +24,8 @@ export class Annotation {
   properties: object[];
 }
 
+export const ANNOTATION_REQUIRED = "com.manydesigns.elements.annotations.Required";
+
 export function getAnnotation(property: Property, type: string): Annotation {
   return property.annotations.find(value => value.type == type);
 }
@@ -31,11 +35,11 @@ export function isBooleanProperty(property: Property) {
 }
 
 export function isStringProperty(property: Property) {
-  return property.type == 'java.lang.String'
+  return property.type == 'java.lang.String' || property.type == 'string'
 }
 
 export function isNumericProperty(property: Property) {
-  return property.type == 'java.lang.Long'
+  return property.type == 'java.lang.Long' || property.type == 'java.lang.Integer'
 }
 
 export function isDateProperty(property: Property) {
@@ -68,7 +72,7 @@ export function isInSummary(property: Property) {
 }
 
 export function isRequired(property: Property) {
-  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Required");
+  const annotation = getAnnotation(property, ANNOTATION_REQUIRED);
   return annotation && annotation.properties["value"];
 }
 

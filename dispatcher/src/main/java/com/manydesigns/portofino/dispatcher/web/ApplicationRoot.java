@@ -41,7 +41,7 @@ public class ApplicationRoot extends DocumentedApiRoot {
     public Root start() throws Exception {
         Root root = rootFactory.createRoot();
         resourceContext.initResource(root);
-        return root;
+        return root.init();
     }
 
 }

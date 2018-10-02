@@ -1,7 +1,6 @@
 import {Component, ContentChild, Input, OnInit, TemplateRef} from '@angular/core';
 import {
   ClassAccessor,
-  deriveKind,
   isDateProperty,
   isEnabled,
   isInSummary,
@@ -66,7 +65,6 @@ export class SearchComponent implements OnInit {
       if(!isEnabled(property)) {
         return;
       }
-      property = {...property, kind: deriveKind(property)};
       if(isSearchable(property)) {
         this.searchProperties.push(property);
         formControls[property.name] = new FormControl();
