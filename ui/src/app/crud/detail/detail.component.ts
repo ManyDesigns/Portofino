@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
@@ -23,7 +23,8 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   operationsPath = '/:operations';
 
-  constructor(protected http: HttpClient, protected portofino: PortofinoService) {
+  constructor(
+    protected http: HttpClient, protected portofino: PortofinoService, protected changeDetector: ChangeDetectorRef) {
     super(http, portofino);
   }
 
@@ -73,7 +74,21 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     }
     const objectUrl = `${this.sourceUrl}/${this.id}`;
     let object = this.getObjectToSave();
-    this.http.put(objectUrl, object).subscribe(() => this.close.emit(object));
+    this.http.put(objectUrl, object).subscribe(
+      () => this.close.emit(object),
+      (error) => {
+        if(error.status == 500 && error.error) {
+          for(let p in error.error) {
+            let property = error.error[p];
+            if(property.errors) {
+              let control = this.form.controls[p];
+              control.markAsTouched({ onlySelf: true });
+              control.setErrors({ 'server-side': property.errors }, { emitEvent: false });
+            }
+          }
+          this.changeDetector.detectChanges();
+        }
+      });
   }
 
 }
