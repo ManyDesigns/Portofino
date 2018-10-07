@@ -1,9 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../page.component";
+import {Observable} from "rxjs";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -23,8 +25,10 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   operationsPath = '/:operations';
 
-  constructor(protected http: HttpClient, protected portofino: PortofinoService) {
-    super(http, portofino);
+  constructor(
+    protected http: HttpClient, protected portofino: PortofinoService,
+    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {
+    super(http, portofino, changeDetector, snackBar);
   }
 
   isEditable(property: Property): boolean {
@@ -67,13 +71,15 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   }
 
   save() {
-    if(this.form.invalid) {
-      this.triggerValidationForAllFields(this.form);
-      return;
+    if(!this.editMode) {
+      throw "Not in edit mode!";
     }
+    super.save();
+  }
+
+  protected doSave(object) {
     const objectUrl = `${this.sourceUrl}/${this.id}`;
-    let object = this.getObjectToSave();
-    this.http.put(objectUrl, object).subscribe(() => this.close.emit(object));
+    return this.http.put(objectUrl, object);
   }
 
 }
