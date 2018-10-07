@@ -1,4 +1,4 @@
-import {EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectorRef, EventEmitter, Input, Output} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
@@ -15,6 +15,8 @@ import * as moment from "moment";
 import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.common";
+import {Observable} from "rxjs";
+import {MatSnackBar} from "@angular/material";
 
 export abstract class BaseDetailComponent {
 
@@ -32,8 +34,11 @@ export abstract class BaseDetailComponent {
   form: FormGroup;
   properties: Property[] = [];
   object;
+  protected saving = false;
 
-  protected constructor(protected http: HttpClient, protected portofino: PortofinoService) { }
+  protected constructor(
+    protected http: HttpClient, protected portofino: PortofinoService,
+    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {}
 
   protected initClassAccessor() {
     this.classAccessor.properties.forEach(property => {
@@ -137,7 +142,8 @@ export abstract class BaseDetailComponent {
 
   protected getValidators(property: Property) {
     let validators = [];
-    if (isRequired(property)) {
+    //Required on checkboxes means that they must be checked, which is not what we want
+    if (isRequired(property) && property.kind != 'boolean') {
       validators.push(Validators.required);
     }
     const maxLength = getAnnotation(property, "com.manydesigns.elements.annotations.MaxLength");
@@ -249,4 +255,44 @@ export abstract class BaseDetailComponent {
     }
 
   }
+
+  save() {
+    if(this.saving) {
+      return;
+    }
+    this.saving = true;
+    if(this.form.invalid) {
+      this.triggerValidationForAllFields(this.form);
+      this.snackBar.open('There are validation errors', null, { duration: 10000, verticalPosition: 'top' });
+      this.saving = false;
+      return;
+    }
+    let object = this.getObjectToSave();
+    this.doSave(object).subscribe(
+      () =>  {
+        this.saving = false;
+        this.close.emit(object);
+      },
+      (error) => {
+        this.saving = false;
+        if(error.status == 500 && error.error) { //TODO introduce a means to check that it is actually a validation error
+          let errorsFound = 0;
+          for(let p in error.error) {
+            let property = error.error[p];
+            if(property.errors) {
+              let control = this.form.controls[p];
+              control.markAsTouched({ onlySelf: true });
+              control.setErrors({ 'server-side': property.errors }, { emitEvent: false });
+              errorsFound++;
+            }
+          }
+          if(errorsFound > 0) {
+            this.snackBar.open('There are validation errors', null, { duration: 10000, verticalPosition: 'top' });
+            this.changeDetector.detectChanges();
+          }
+        }
+      });
+  }
+
+  protected abstract doSave(object): Observable<Object>;
 }

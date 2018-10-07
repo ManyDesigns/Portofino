@@ -1,8 +1,9 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isBlob, isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
@@ -14,8 +15,10 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
   @Input()
   ids: string[];
 
-  constructor(protected http: HttpClient, protected portofino: PortofinoService) {
-    super(http, portofino);
+  constructor(
+    protected http: HttpClient, protected portofino: PortofinoService,
+    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {
+    super(http, portofino, changeDetector, snackBar);
   }
 
   protected isEditable(property: Property): boolean {
@@ -56,6 +59,10 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
     let params = new HttpParams();
     this.ids.forEach(id => params = params.append("id", id));
     this.http.put(this.sourceUrl, object,  { params: params }).subscribe(() => this.close.emit(object));
+  }
+
+  protected doSave(object): undefined {
+    throw "Not used";
   }
 
 }

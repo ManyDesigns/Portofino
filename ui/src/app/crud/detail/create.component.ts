@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isInsertable, Property} from "../../class-accessor";
 import {FormControl} from "@angular/forms";
 import {BaseDetailComponent} from "../common.component";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'portofino-crud-create',
@@ -12,8 +13,10 @@ import {BaseDetailComponent} from "../common.component";
 })
 export class CreateComponent extends BaseDetailComponent implements OnInit {
 
-  constructor(protected http: HttpClient, protected portofino: PortofinoService) {
-    super(http, portofino);
+  constructor(
+    protected http: HttpClient, protected portofino: PortofinoService,
+    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {
+    super(http, portofino, changeDetector, snackBar);
   }
 
   protected isEditable(property: Property): boolean {
@@ -33,13 +36,8 @@ export class CreateComponent extends BaseDetailComponent implements OnInit {
     this.close.emit();
   }
 
-  save() {
-    if(this.form.invalid) {
-      this.triggerValidationForAllFields(this.form);
-      return;
-    }
-    let object = this.getObjectToSave();
-    this.http.post(this.sourceUrl, object).subscribe(() => this.close.emit(object));
+  doSave(object) {
+    return this.http.post(this.sourceUrl, object);
   }
 
 }
