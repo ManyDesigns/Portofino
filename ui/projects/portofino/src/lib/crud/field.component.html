@@ -12,6 +12,11 @@
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.label}} is required.
     </mat-error>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
+    </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix
                   (click)="$event.stopPropagation()"></mat-checkbox>
   </mat-form-field>
@@ -27,6 +32,11 @@
     </mat-autocomplete>
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.label}} is required.
+    </mat-error>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
     </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
@@ -59,6 +69,11 @@
     <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger" i18n>
       {{property.label}}: max {{control.getError('maxLength').message}}.
     </mat-error>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
+    </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
   <mat-form-field *ngIf="property.kind == 'number'" [formGroup]="form">
@@ -66,6 +81,11 @@
     <input matInput [formControlName]="property.name" [required]="isRequired()">
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.label}} is required.
+    </mat-error>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
     </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
@@ -77,12 +97,22 @@
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.label}} is required.
     </mat-error>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
+    </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
   <ng-container *ngIf="property.kind == 'boolean'" [formGroup]="form">
     <mat-checkbox [formControlName]="property.name">
       {{property.label}}
     </mat-checkbox>
+    <mat-error align="end" *ngIf="control.hasError('server-side')">
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
+    </mat-error>
   </ng-container>
   <portofino-crud-blob-field *ngIf="property.kind == 'blob'" [field]="this"></portofino-crud-blob-field>
 </ng-template>
