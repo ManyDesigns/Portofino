@@ -230,5 +230,13 @@ class ProjectsCrudAction extends CrudAction {
         );
     }
 
+    @Override
+    protected void doDelete(Object object) {
+        session.createQuery('delete from members where project = :project')
+                .setParameter('project', object.id)
+                .executeUpdate()
+        super.doDelete(object)
+    }
+
 
 }

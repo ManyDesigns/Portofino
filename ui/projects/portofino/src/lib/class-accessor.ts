@@ -114,7 +114,8 @@ export function deriveKind(property: Property) {
 
 export function getValidators(property: Property): ValidatorFn[] {
   let validators = [];
-  if (isRequired(property)) {
+  //Required on checkboxes means that they must be checked, which is not what we want
+  if (isRequired(property) && property.kind != 'boolean') {
     validators.push(Validators.required);
   }
   const maxLength = getAnnotation(property, "com.manydesigns.elements.annotations.MaxLength");

@@ -386,7 +386,13 @@ export function declareButton(info: ButtonInfo | any, target, methodName: string
     self[methodName].call(self, event);
   };
   if(!target.hasOwnProperty(BUTTONS)) {
+    const parentButtons = target[BUTTONS];
     target[BUTTONS] = {};
+    if(parentButtons) {
+      for(let list in parentButtons) {
+        target[BUTTONS][list] = parentButtons[list].slice();
+      }
+    }
   }
   if(!target[BUTTONS].hasOwnProperty(info.list)) {
     target[BUTTONS][info.list] = [];
