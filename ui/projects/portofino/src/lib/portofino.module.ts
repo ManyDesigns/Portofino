@@ -56,14 +56,16 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {ManyToManyComponent} from './many-to-many/many-to-many.component';
 import {ButtonComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
+import {FormComponent} from "./form";
 
 @NgModule({
   declarations: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
-    CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent, BlobFieldComponent, DetailComponent,
-    CreateComponent, BulkEditComponent, ManyToManyComponent,
+    FieldComponent, BlobFieldComponent, FormComponent,
     PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
-    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent
+    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
+    CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+    ManyToManyComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
@@ -86,9 +88,10 @@ import {QuillModule} from "ngx-quill";
     CrudComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
-    PageComponent, PageHeader, CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent,
-    BlobFieldComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent,
-    DefaultNavigationComponent, DefaultToolbarComponent]
+    FieldComponent, BlobFieldComponent, FormComponent,
+    PageComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
+    CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+    ManyToManyComponent]
 })
 export class PortofinoModule {
   static loginComponent() {

@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectorRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
@@ -16,6 +16,7 @@ import {debounceTime} from "rxjs/operators";
 import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
 import {MatSnackBar} from "@angular/material";
+import {Field, Form, FormComponent} from "../form";
 
 export abstract class BaseDetailComponent {
 
@@ -30,7 +31,10 @@ export abstract class BaseDetailComponent {
   @Output()
   close = new EventEmitter();
 
-  form: FormGroup;
+  readonly formDefinition = new Form();
+  readonly form = new FormGroup({});
+  @ViewChild(FormComponent)
+  formComponent: FormComponent;
   properties: Property[] = [];
   object;
   protected saving = false;
@@ -60,7 +64,7 @@ export abstract class BaseDetailComponent {
 
   protected setupForm(object) {
     this.object = object;
-    const formControls = {};
+    this.formDefinition.contents = []
     this.properties.forEach(p => {
       let value;
       const disabled = !this.isEditEnabled() || !this.isEditable(p);
@@ -81,24 +85,29 @@ export abstract class BaseDetailComponent {
       } else {
         value = object[p.name].value;
       }
-      const formState = { value: value, disabled: disabled };
-      if(this.form) {
-        this.form.get(p.name).reset(formState);
-      } else {
-        formControls[p.name] = new FormControl(formState, getValidators(p));
-      }
+      const field = new Field();
+      field.property = p;
+      field.initialState = { value: value, disabled: disabled };
+      field.editable = !disabled;
+      this.formDefinition.contents.push(field);
     });
-    if(!this.form) {
-      this.form = new FormGroup(formControls);
+    this.formDefinition.editable = this.isEditEnabled();
+    if(this.formComponent) {
+      this.formComponent.form = this.formDefinition;
     }
+  }
 
-    if(!this.isEditEnabled()) {
-      return;
+  onFormReset() {
+    if(this.isEditEnabled()) {
+      this.setupSelectionProviders();
     }
+  }
+
+  protected setupSelectionProviders() {
     this.selectionProviders.forEach(sp => {
       sp.fieldNames.forEach((name, index) => {
         const property = this.properties.find(p => p.name == name);
-        if(!property) {
+        if (!property) {
           return;
         }
         const spUrl = `${this.sourceUrl}/:selectionProvider/${sp.name}/${index}`;
@@ -110,29 +119,29 @@ export abstract class BaseDetailComponent {
           nextProperty: null,
           updateDependentOptions: () => {
             const nextProperty = property.selectionProvider.nextProperty;
-            if(nextProperty) {
+            if (nextProperty) {
               this.loadSelectionOptions(this.properties.find(p => p.name == nextProperty));
             }
           },
           options: []
         };
         const control = this.form.get(property.name);
-        if(control.enabled) {
+        if (control.enabled) {
           const value = this.object[property.name];
-          if(value && value.value != null) {
-            control.setValue({ v: value.value, l: value.displayValue });
+          if (value && value.value != null) {
+            control.setValue({v: value.value, l: value.displayValue});
           }
-          if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+          if (property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
             control.valueChanges.pipe(debounceTime(500)).subscribe(value => {
-              if(control.dirty && value != null && value.hasOwnProperty("length")) {
+              if (control.dirty && value != null && value.hasOwnProperty("length")) {
                 this.loadSelectionOptions(property, value);
               }
             });
-          } else if(index == 0) {
+          } else if (index == 0) {
             this.loadSelectionOptions(property);
           }
         }
-        if(index < sp.fieldNames.length - 1) {
+        if (index < sp.fieldNames.length - 1) {
           property.selectionProvider.nextProperty = sp.fieldNames[index + 1];
         }
       });

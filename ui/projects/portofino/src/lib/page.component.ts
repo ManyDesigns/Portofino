@@ -263,7 +263,6 @@ export abstract class Page {
   }
 
   getButtons(list: string = 'default'): ButtonInfo[] | null {
-    //TODO handle inheritance using prototype chain, either here or in @Button when registering
     const allButtons = this[BUTTONS];
     return allButtons ? allButtons[list] : null;
   }
