@@ -6,7 +6,7 @@ import {
   OnInit, TemplateRef,
   ViewChild
 } from '@angular/core';
-import {ActivatedRoute, UrlSegment} from "@angular/router";
+import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from "./content.directive";
@@ -18,6 +18,7 @@ import {of} from "rxjs/index";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Annotation, ANNOTATION_REQUIRED, ClassAccessor, getValidators, Property} from "./class-accessor";
+import {Field, Form} from "./form";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -40,7 +41,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
 
   protected subscription: Subscription;
 
-  constructor(protected route: ActivatedRoute, protected http: HttpClient,
+  constructor(protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver,
               protected portofino: PortofinoService, @Inject(NAVIGATION_COMPONENT) protected navigationComponent,
               protected authenticationService: AuthenticationService) { }
@@ -108,7 +109,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   checkAccessibility(parent: Page, child: PageChild) {
-    let dummy = new DummyPage(this.portofino, this.http, this.authenticationService);
+    let dummy = new DummyPage(this.portofino, this.http, this.router, this.authenticationService);
     dummy.parent = parent;
     this.loadPageConfiguration(parent.path + '/' + child.path).pipe(mergeMap(config => {
       dummy.configuration = config;
@@ -126,8 +127,12 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
       mergeMap(config => this.createPageComponent(config, path, parent, embed)));
   }
 
-  private loadPageConfiguration(path: string) {
-    return this.http.get<PageConfiguration>(`pages${path}/config.json`);
+  protected loadPageConfiguration(path: string) {
+    return this.http.get<PageConfiguration>(this.getConfigurationLocation(path));
+  }
+
+  protected getConfigurationLocation(path: string) {
+    return `pages${path}/config.json`;
   }
 
   protected createPageComponent(config: PageConfiguration, path: string, parent: Page, embed: boolean): Observable<Page> {
@@ -155,6 +160,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
     const component = <Page>componentRef.instance;
     component.configuration = config;
     component.path = path;
+    component.configurationLocation = this.getConfigurationLocation(path);
     const lastIndexOf = path.lastIndexOf('/');
     if (lastIndexOf >= 0) {
       component.segment = path.substring(lastIndexOf + 1);
@@ -196,7 +202,8 @@ export class PageChild {
 
 export class PageSettingsPanel {
   active: boolean;
-  form: FormGroup;
+  readonly form = new FormGroup({});
+  readonly formDefinition = new Form();
   classAccessor: ClassAccessor = {
     name: 'configuration',
     properties: [
@@ -205,6 +212,11 @@ export class PageSettingsPanel {
         type: 'string',
         label: 'Source',
         annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
+      }),
+      Object.assign(new Property(), {
+        name: 'relativeToParent',
+        type: 'boolean',
+        label: 'Relative to parent'
       })
     ],
     keyProperties: []
@@ -213,11 +225,13 @@ export class PageSettingsPanel {
   constructor(public page: Page) {}
 
   refresh() {
-    const formControls = {};
+    this.formDefinition.contents = [];
     this.classAccessor.properties.forEach(p => {
-      formControls[p.name] = new FormControl(this.page.configuration[p.name], getValidators(p));
+      const field = new Field();
+      field.property = p;
+      field.initialState = this.page.configuration[p.name];
+      this.formDefinition.contents.push(field);
     });
-    this.form = new FormGroup(formControls);
   }
 
 }
@@ -225,6 +239,7 @@ export class PageSettingsPanel {
 export abstract class Page {
 
   configuration: PageConfiguration & any;
+  configurationLocation: string;
   readonly settingsPanel = new PageSettingsPanel(this);
   path: string;
   baseUrl: string;
@@ -238,9 +253,10 @@ export abstract class Page {
   readonly page = this;
 
   protected constructor(
-    protected portofino: PortofinoService, protected http: HttpClient,
+    protected portofino: PortofinoService, protected http: HttpClient, protected router: Router,
     public authenticationService: AuthenticationService) {
-    //Declarative approach does not work for some reason.
+    //Declarative approach does not work for some reason:
+    //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
     declareButton({
       color: 'primary', icon: 'save', text: 'Save', list: 'configuration'
@@ -317,8 +333,16 @@ export abstract class Page {
   }
 
   saveConfiguration() {
-    this.settingsPanel.active = false;
-    //TODO
+    this.http.put(this.configurationLocation, this.getConfigurationToSave(this.settingsPanel.form.value)).subscribe(
+      () => {
+        this.settingsPanel.active = false;
+        this.router.navigateByUrl(this.router.url);
+      },
+      error => console.log(error))
+  }
+
+  protected getConfigurationToSave(formValue) {
+    return formValue;
   }
 
   cancelConfiguration() {
@@ -329,9 +353,9 @@ export abstract class Page {
 
 class DummyPage extends Page {
   constructor(
-    protected portofino: PortofinoService, protected http: HttpClient,
+    protected portofino: PortofinoService, protected http: HttpClient, protected router: Router,
     public authenticationService: AuthenticationService) {
-    super(portofino, http, authenticationService);
+    super(portofino, http, router, authenticationService);
   }
 }
 

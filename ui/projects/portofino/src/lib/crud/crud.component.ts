@@ -41,9 +41,9 @@ export class CrudComponent extends Page implements OnInit {
   selection: string[];
 
   constructor(
-    protected http: HttpClient, public portofino: PortofinoService,
-    public authenticationService: AuthenticationService, private router: Router) {
-    super(portofino, http, authenticationService);
+    protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
+    public authenticationService: AuthenticationService) {
+    super(portofino, http, router, authenticationService);
   }
 
   ngOnInit() {

@@ -9,8 +9,8 @@ export class ClassAccessor {
 export class Property {
   name: string;
   type: string;
-  annotations: Annotation[];
-  modifiers: string[];
+  annotations: Annotation[] = [];
+  modifiers: string[] = [];
   label: string;
   key: boolean;
   get kind() {
@@ -33,7 +33,7 @@ export function getAnnotation(property: Property, type: string): Annotation {
 }
 
 export function isBooleanProperty(property: Property) {
-  return property.type == 'java.lang.Boolean'
+  return property.type == 'java.lang.Boolean' || property.type == 'boolean'
 }
 
 export function isStringProperty(property: Property) {

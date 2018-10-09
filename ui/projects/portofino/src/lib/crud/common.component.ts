@@ -64,7 +64,7 @@ export abstract class BaseDetailComponent {
 
   protected setupForm(object) {
     this.object = object;
-    this.formDefinition.contents = []
+    this.formDefinition.contents = [];
     this.properties.forEach(p => {
       let value;
       const disabled = !this.isEditEnabled() || !this.isEditable(p);

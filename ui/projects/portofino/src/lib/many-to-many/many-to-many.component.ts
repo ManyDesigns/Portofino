@@ -6,6 +6,7 @@ import {FormControl} from "@angular/forms";
 import {MatSnackBar} from "@angular/material";
 import {Button, Operation, Page, PageConfiguration} from "../page.component";
 import {AuthenticationService} from "../security/authentication.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'portofino-many-to-many',
@@ -27,9 +28,9 @@ export class ManyToManyComponent extends Page implements OnInit {
   readonly associationsPath = "/:availableAssociations";
 
   constructor(
-    protected http: HttpClient, public portofino: PortofinoService,
+    protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
     public authenticationService: AuthenticationService, private snackBar: MatSnackBar) {
-    super(portofino, http, authenticationService);
+    super(portofino, http, router, authenticationService);
   }
 
   ngOnInit() {

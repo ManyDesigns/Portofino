@@ -14,7 +14,7 @@ export class Form {
 export class Field {
   property: Property;
   initialState: any;
-  editable: boolean;
+  editable: boolean = true;
 }
 
 export class FieldSet {
