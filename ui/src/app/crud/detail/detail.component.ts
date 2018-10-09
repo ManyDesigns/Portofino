@@ -39,6 +39,11 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     return this.editMode;
   }
 
+  protected setupForm(object): void {
+    super.setupForm(object);
+    this.formDefinition.baseUrl = this.sourceUrl + '/' + this.id;
+  }
+
   ngOnInit() {
     this.initClassAccessor();
     const objectUrl = `${this.sourceUrl}/${this.id}`;

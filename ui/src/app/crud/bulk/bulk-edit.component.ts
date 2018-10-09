@@ -21,6 +21,12 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
     super(http, portofino, changeDetector, snackBar);
   }
 
+
+  protected setupForm(object): void {
+    super.setupForm(object);
+    this.formDefinition.selectableFields = true;
+  }
+
   protected isEditable(property: Property): boolean {
     return isUpdatable(property);
   }

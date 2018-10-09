@@ -1,10 +1,9 @@
 <div fxLayout="column" fxLayoutGap="20px">
   <h2 i18n>Bulk edit</h2>
-  <form (submit)="save()" *ngIf="object" [formGroup]="form">
+  <form (submit)="save()" *ngIf="object">
     <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
-      <portofino-crud-field *ngFor="let property of properties" [property]="property" [form]="form"
-                            [enabled]="isEditEnabled() && isEditable(property)" [selectable]="true">
-      </portofino-crud-field>
+      <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
+                      fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
     </div>
     <div fxLayout="row">
       <button mat-raised-button (click)="save()" color="primary" [disabled]="!isFormValid()" i18n>

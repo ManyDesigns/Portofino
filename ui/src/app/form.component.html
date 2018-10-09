@@ -1,0 +1,14 @@
+<ng-container *ngIf="form">
+  <ng-container *ngFor="let field of form.contents" [formGroup]="controls">
+    <portofino-crud-field *ngIf="field.hasOwnProperty('property')" [property]="field.property" [form]="controls"
+                          [enabled]="form.editable && field.editable" [objectUrl]="form.baseUrl"
+                          [selectable]="form.selectableFields">
+    </portofino-crud-field>
+    <ng-container *ngIf="field.hasOwnProperty('name') && field.hasOwnProperty('contents')">
+      <fieldset>
+        <legend>{{field.label}}</legend>
+        <portofino-form [form]="field.contents" [controls]="controls.get(field.name)"></portofino-form>
+      </fieldset>
+    </ng-container>
+  </ng-container>
+</ng-container>
