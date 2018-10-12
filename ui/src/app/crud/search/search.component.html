@@ -1,6 +1,6 @@
 <div fxLayout="column" fxLayoutGap="20px">
   <div *ngIf="searchProperties.length">
-    <span i18n>Search</span>
+    <span>{{ 'Search' | translate }}</span>
     <form (submit)="search()" [formGroup]="form">
       <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
         <portofino-crud-search-field *ngFor="let field of searchProperties" [form]="form" [property]="field">
@@ -9,9 +9,9 @@
       <div fxLayout="row">
         <button mat-raised-button color="primary" (click)="search()" i18n>
           <mat-icon>search</mat-icon>
-          Search
+          {{ 'Search' | translate }}
         </button>
-        <button mat-raised-button (click)="clearSearch()" type="reset" i18n>Clear</button>
+        <button mat-raised-button (click)="clearSearch()" type="reset">{{ 'Clear' | translate }}</button>
       </div>
     </form>
   </div>

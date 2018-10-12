@@ -30,6 +30,7 @@
     "material-design-icons": "^3.0.1",
     "moment": "^2.22.2",
     "ngx-quill": "^3.4.0",
+    "@ngx-translate/core": "^10.0.2",
     "roboto-fontface": "^0.9.0",
     "rxjs": "^6.3.3",
     "zone.js": "^0.8.19"

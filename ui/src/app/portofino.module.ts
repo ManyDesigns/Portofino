@@ -49,6 +49,7 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {ManyToManyComponent} from './many-to-many/many-to-many.component';
 import {ButtonComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
+import {TranslateModule} from "@ngx-translate/core";
 
 @NgModule({
   declarations: [
@@ -64,7 +65,8 @@ import {QuillModule} from "ngx-quill";
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule,
-    RouterModule.forChild([])
+    RouterModule.forChild([]),
+    TranslateModule
   ],
   providers: [
     PortofinoService, AuthenticationService,

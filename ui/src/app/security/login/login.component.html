@@ -8,10 +8,10 @@
     <mat-form-field>
       <input matInput placeholder="Password" type="password" [(ngModel)]="password" name="password">
     </mat-form-field>
-    <button type="submit" style="display:none" i18n>Sign in</button>
+    <button type="submit" style="display:none">{{ 'Sign in' | translate }}</button>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="login()" color="primary" i18n>Sign in</button>
-  <button mat-button mat-dialog-close i18n>Cancel</button>
+  <button mat-button (click)="login()" color="primary">{{ 'Sign in' | translate }}</button>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
 </mat-dialog-actions>

@@ -3,6 +3,7 @@ import {RouterModule} from '@angular/router';
 import {PortofinoModule} from "./portofino.module";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {PageComponent} from "./page.component";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-hello',
@@ -16,7 +17,8 @@ export class HelloPortofino {}
     RouterModule.forRoot([
       { path: "start", component: HelloPortofino }, //TODO custom routes file
       { path: "**", component: PageComponent}], { onSameUrlNavigation: "reload", enableTracing: false }),
-    PortofinoModule
+    PortofinoModule,
+    TranslateModule.forRoot()
   ],
   bootstrap: [PortofinoAppComponent]
 })
