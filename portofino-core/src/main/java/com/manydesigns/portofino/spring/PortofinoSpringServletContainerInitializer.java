@@ -1,12 +1,16 @@
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoListener;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.annotation.AnnotationConfigRegistry;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -41,15 +45,9 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
 
     protected void registerContextLoaderListener(ServletContext servletContext) {
         WebApplicationContext rootAppContext = createRootApplicationContext();
-        if (rootAppContext != null) {
-            ContextLoaderListener listener = new ContextLoaderListener(rootAppContext);
-            listener.setContextInitializers(getRootApplicationContextInitializers());
-            servletContext.addListener(listener);
-        }
-        else {
-            logger.debug("No ContextLoaderListener registered, as " +
-                    "createRootApplicationContext() did not return an application context");
-        }
+        ContextLoaderListener listener = new ContextLoaderListener(rootAppContext);
+        listener.setContextInitializers(getRootApplicationContextInitializers());
+        servletContext.addListener(listener);
     }
 
     protected WebApplicationContext createRootApplicationContext() {
@@ -59,6 +57,11 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
     protected ApplicationContextInitializer<?>[] getRootApplicationContextInitializers() {
         return new ApplicationContextInitializer[] {
                 applicationContext -> {
+                    MutablePropertySources sources = applicationContext.getEnvironment().getPropertySources();
+                    Configuration configuration =
+                            (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+                    sources.addFirst(
+                            new ConfigurationPropertySource("portofino.properties", configuration));
                     AnnotationConfigRegistry annotationConfig = (AnnotationConfigRegistry) applicationContext;
                     for(Class<?> moduleClass : moduleClasses) {
                         annotationConfig.register(moduleClass);
