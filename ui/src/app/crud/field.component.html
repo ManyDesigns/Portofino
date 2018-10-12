@@ -97,7 +97,7 @@
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
       {{property.label}} is required.
     </mat-error>
-    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">
         {{error}}<br />
       </ng-container>
@@ -108,6 +108,11 @@
     <mat-checkbox [formControlName]="property.name">
       {{property.label}}
     </mat-checkbox>
+    <mat-error align="end" *ngIf="control.hasError('server-side')">
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
+    </mat-error>
   </ng-container>
   <portofino-crud-blob-field *ngIf="property.kind == 'blob'" [field]="this"></portofino-crud-blob-field>
 </ng-template>

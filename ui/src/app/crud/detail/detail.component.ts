@@ -4,6 +4,8 @@ import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../page.component";
+import {Observable} from "rxjs";
+import {MatSnackBar} from "@angular/material";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -24,8 +26,9 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   operationsPath = '/:operations';
 
   constructor(
-    protected http: HttpClient, protected portofino: PortofinoService, protected changeDetector: ChangeDetectorRef) {
-    super(http, portofino);
+    protected http: HttpClient, protected portofino: PortofinoService,
+    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {
+    super(http, portofino, changeDetector, snackBar);
   }
 
   protected isEditable(property: Property): boolean {
@@ -34,6 +37,11 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   protected isEditEnabled(): boolean {
     return this.editMode;
+  }
+
+  protected setupForm(object): void {
+    super.setupForm(object);
+    this.formDefinition.baseUrl = this.sourceUrl + '/' + this.id;
   }
 
   ngOnInit() {
@@ -68,27 +76,15 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   }
 
   save() {
-    if(this.form.invalid) {
-      this.triggerValidationForAllFields(this.form);
-      return;
+    if(!this.editMode) {
+      throw "Not in edit mode!";
     }
+    super.save();
+  }
+
+  protected doSave(object) {
     const objectUrl = `${this.sourceUrl}/${this.id}`;
-    let object = this.getObjectToSave();
-    this.http.put(objectUrl, object).subscribe(
-      () => this.close.emit(object),
-      (error) => {
-        if(error.status == 500 && error.error) {
-          for(let p in error.error) {
-            let property = error.error[p];
-            if(property.errors) {
-              let control = this.form.controls[p];
-              control.markAsTouched({ onlySelf: true });
-              control.setErrors({ 'server-side': property.errors }, { emitEvent: false });
-            }
-          }
-          this.changeDetector.detectChanges();
-        }
-      });
+    return this.http.put(objectUrl, object);
   }
 
 }

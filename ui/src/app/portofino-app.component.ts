@@ -27,6 +27,7 @@ export class ToolbarDirective {
 }
 
 export interface ToolbarComponent {
+  title: string;
   authenticationService: AuthenticationService;
 }
 
@@ -37,6 +38,7 @@ export interface ToolbarComponent {
 })
 export class DefaultToolbarComponent implements ToolbarComponent {
   constructor(public authenticationService: AuthenticationService) {}
+  title: string;
 }
 
 @Component({
@@ -71,7 +73,8 @@ export class PortofinoAppComponent implements OnInit {
     this.portofino.init();
     //Dynamically create the toolbar component
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
-    this.toolbarHost.viewContainerRef.createComponent(componentFactory);
+    const toolbar = this.toolbarHost.viewContainerRef.createComponent(componentFactory).instance as ToolbarComponent;
+    toolbar.title = this.title;
   }
 }
 

@@ -49,15 +49,17 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {ManyToManyComponent} from './many-to-many/many-to-many.component';
 import {ButtonComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
+import {FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 
 @NgModule({
   declarations: [
     PortofinoAppComponent, ButtonComponent, LoginComponent,
-    CrudComponent, SearchFieldComponent, SearchComponent, FieldComponent, BlobFieldComponent, DetailComponent,
-    CreateComponent, BulkEditComponent, ManyToManyComponent,
+    FieldComponent, BlobFieldComponent, FormComponent,
     MainContentDirective, EmbeddedContentDirective, NavigationDirective, PageComponent, DefaultNavigationComponent,
-    ToolbarDirective, DefaultToolbarComponent
+    ToolbarDirective, DefaultToolbarComponent,
+    CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+    ManyToManyComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
