@@ -1,5 +1,7 @@
 import {Component, NgModule} from '@angular/core';
-import {PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent, PortofinoComponent} from "portofino";
+import {
+  PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent,
+  PortofinoComponent, PortofinoService, AuthenticationService} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
@@ -13,17 +15,18 @@ import {
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {Router} from "@angular/router";
 import {QuillModule} from "ngx-quill";
-import {HttpClientModule} from "@angular/common/http";
+import {HttpClientModule, HttpClient} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 
 @Component({
-  selector: 'portofino-hello',
-  template: `<p>Welcome to Portofino 5!</p>`
+  selector: 'portofino-start',
+  template: `<p>Start here</p>`
 })
-export class HelloPortofino {}
+export class StartHere {}
 
 @Component({
   selector: 'custom-navigation',
@@ -34,24 +37,40 @@ export class CustomNavigation implements NavigationComponent {
 }
 
 @Component({
+  selector: 'portofino-welcome',
+  template: `
+    <portofino-default-page-layout [page]="this">
+      <ng-template #content><p>Welcome to Portofino 5!</p></ng-template>
+    </portofino-default-page-layout>`
+})
+@PortofinoComponent({ name: 'welcome' })
+export class WelcomeComponent extends Page {
+  constructor(
+    protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
+    public authenticationService: AuthenticationService) {
+    super(portofino, http, router, authenticationService);
+  }
+}
+
+@Component({
   selector: 'app-root',
-  template: `<portofino-app title="Portofino Application"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Application"></portofino-app>`
 })
 export class AppComponent {}
 
 @NgModule({
-  declarations: [AppComponent, HelloPortofino, CustomNavigation],
+  declarations: [AppComponent, StartHere, CustomNavigation, WelcomeComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
   imports: [
-    PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]),
+    PortofinoModule.withRoutes([{ path: "start", component: StartHere }]),
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule],
-  entryComponents: [ CustomNavigation ],
+  entryComponents: [ CustomNavigation, WelcomeComponent ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

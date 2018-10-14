@@ -10,14 +10,14 @@ import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from "./content.directive";
-import {Observable, Subscription} from "rxjs/index";
+import {Observable, Subscription} from "rxjs";
 import {catchError, map, mergeMap} from "rxjs/operators";
 import {ThemePalette} from "@angular/material/core/typings/common-behaviors/color";
 import {PortofinoService} from "./portofino.service";
-import {of} from "rxjs/index";
+import {of} from "rxjs";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
-import {FormControl, FormGroup} from "@angular/forms";
-import {Annotation, ANNOTATION_REQUIRED, ClassAccessor, getValidators, Property} from "./class-accessor";
+import {FormGroup} from "@angular/forms";
+import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
 import {Field, Form} from "./form";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
@@ -190,7 +190,7 @@ export class PageConfiguration {
   title: string;
   children: PageChild[];
   source: string;
-  securityCheckPath: string = '/:description';
+  securityCheckPath: string = ':description';
 }
 
 export class PageChild {
@@ -293,7 +293,7 @@ export abstract class Page {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
     return this.http.get<any>(
-      this.computeSourceUrl() + (this.configuration.securityCheckPath || '/:description'),
+      this.computeSourceUrl() + (this.configuration.securityCheckPath || ':description'),
       { headers: headers });
   }
 
@@ -333,16 +333,19 @@ export abstract class Page {
   }
 
   saveConfiguration() {
-    this.http.put(this.configurationLocation, this.getConfigurationToSave(this.settingsPanel.form.value)).subscribe(
+    const config = this.getConfigurationToSave(this.settingsPanel.form.value);
+    this.portofino.saveConfiguration(this.configurationLocation, config).subscribe(
       () => {
         this.settingsPanel.active = false;
         this.router.navigateByUrl(this.router.url);
       },
-      error => console.log(error))
+      error => console.log(error));
   }
 
   protected getConfigurationToSave(formValue) {
-    return formValue;
+    const config = Object.assign({}, this.configuration, formValue);
+    delete config.relativeToParent;
+    return config;
   }
 
   cancelConfiguration() {
@@ -367,7 +370,7 @@ class DummyPage extends Page {
 export class PageHeader {
   @Input() //Note: @Host in the constructor does not work for superclasses
   page: Page;
-  constructor(public authenticationService: AuthenticationService) {}
+  constructor(public authenticationService: AuthenticationService, public portofino: PortofinoService) {}
 }
 
 @Component({

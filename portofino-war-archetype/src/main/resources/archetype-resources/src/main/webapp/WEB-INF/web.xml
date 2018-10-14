@@ -42,7 +42,7 @@
     <context-param>
         <!-- The root of the API. It can be either a path relative to this webapp or an absolute URL. -->
         <param-name>portofino.api.root</param-name>
-        <param-value>/api/</param-value>
+        <param-value>api</param-value>
     </context-param>
 
     <servlet>

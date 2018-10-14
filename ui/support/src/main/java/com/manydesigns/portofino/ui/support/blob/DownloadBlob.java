@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.ui.support.blob;
 
 import com.manydesigns.portofino.ui.support.ApiInfo;
+import com.manydesigns.portofino.ui.support.Resource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -15,7 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path("blobs")
-public class DownloadBlob {
+public class DownloadBlob extends Resource {
 
   @Context
   protected ServletContext servletContext;
@@ -25,13 +26,7 @@ public class DownloadBlob {
 
   @GET
   public Response download(@QueryParam("path") String path, @QueryParam("token") String token) {
-    Client c = ClientBuilder.newClient();
-    String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
-    if(path.startsWith(baseUri)) {
-      path = path.substring(baseUri.length());
-    }
-    WebTarget target = c.target(baseUri);
-    Invocation.Builder req = target.path(path).request();
+    Invocation.Builder req = path(path).request();
     if(token != null) {
       req = req.header("Authorization", "Bearer " + token);
     }

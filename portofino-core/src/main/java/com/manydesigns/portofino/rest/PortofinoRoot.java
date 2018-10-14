@@ -1,7 +1,6 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
@@ -12,9 +11,13 @@ import com.manydesigns.portofino.pageactions.ActionContext;
 import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
+import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +44,9 @@ public class PortofinoRoot extends Root implements PageAction {
 
     @Context
     protected UriInfo uriInfo;
+
+    @Autowired
+    public Configuration portofinoConfiguration;
 
     protected ActionContext context;
     protected PageInstance pageInstance;
@@ -163,6 +169,7 @@ public class PortofinoRoot extends Root implements PageAction {
     @Path(":description")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
+    @RequiresPermissions(level = AccessLevel.NONE)
     public Map<String, Object> getJSONDescription() {
         Map<String, Object> description = new HashMap<String, Object>();
         description.put("superclass", getClass().getSuperclass().getName());
@@ -170,6 +177,7 @@ public class PortofinoRoot extends Root implements PageAction {
         description.put("page", pageInstance.getPage());
         description.put("path", getPath());
         description.put("children", getSubResources());
+        description.put("loginPath", portofinoConfiguration.getString("login.path"));
         return description;
     }
 }

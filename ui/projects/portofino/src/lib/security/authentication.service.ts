@@ -17,7 +17,6 @@ export class AuthenticationService {
 
   dialogRef: MatDialogRef<any>;
   currentUser: UserInfo;
-  loginPath: string = "login";
 
   constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
               private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
@@ -104,14 +103,18 @@ export class AuthenticationService {
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .set(NO_AUTH_HEADER, 'true');
     return this.http.post(
-      `${this.portofino.apiRoot}${this.loginPath}`,
+      this.loginPath,
       new HttpParams({fromObject: {"username": username, "password": password}}),
       {headers: headers}
     );
   }
 
+  get loginPath() {
+    return `${this.portofino.apiRoot}${this.portofino.loginPath}`;
+  }
+
   logout() {
-    const url = `${this.portofino.apiRoot}${this.loginPath}/${this.storage.get('sessionId')}`;
+    const url = `${this.loginPath}/${this.storage.get('sessionId')}`;
     this.http.delete(url).subscribe(value => {
       this.removeAuthenticationInfo();
       this.router.navigateByUrl(this.router.url);

@@ -68,7 +68,7 @@ public class JWTFilter extends PathMatchingFilter {
     }
 
     @Nullable
-    protected String getJSONWebToken(HttpServletRequest httpRequest) {
+    public static String getJSONWebToken(HttpServletRequest httpRequest) {
         String jwt = httpRequest.getHeader("Authorization");
         if(jwt != null && jwt.startsWith("Bearer ")) {
             jwt = jwt.substring("Bearer ".length());

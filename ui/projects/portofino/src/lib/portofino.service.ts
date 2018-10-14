@@ -7,6 +7,7 @@ export class PortofinoService {
   defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
   localApiPath = 'portofino';
+  loginPath = 'login';
 
   constructor(public http: HttpClient) { }
 
@@ -16,7 +17,14 @@ export class PortofinoService {
       return;
     }
     this.http.get<ApiInfo>(this.localApiPath).subscribe(response => {
-      this.apiRoot = response.apiRoot;
+      this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
+      if(response.loginPath) {
+        let loginPath = response.loginPath;
+        if(loginPath.startsWith('/')) {
+          loginPath = loginPath.substring(1);
+        }
+        this.loginPath = loginPath;
+      }
     }, error => {
       this.fallbackInit();
     });
@@ -24,10 +32,29 @@ export class PortofinoService {
 
   private fallbackInit() {
     this.localApiPath = null;
-    this.apiRoot = this.defaultApiRoot;
+    this.apiRoot = this.sanitizeApiRoot(this.defaultApiRoot);
+  }
+
+  private sanitizeApiRoot(apiRoot) {
+    if (!apiRoot.endsWith('/')) {
+      apiRoot += '/';
+    }
+    return apiRoot;
+  }
+
+  get localApiAvailable() {
+    return !!this.localApiPath;
+  }
+
+  saveConfiguration(path: string, config: any) {
+    if(!this.localApiAvailable) {
+      throw "Local Portofino API not available"
+    }
+    return this.http.put(`${this.localApiPath}/pages/${path}?loginPath=${this.loginPath}`, config)
   }
 }
 
 class ApiInfo {
   apiRoot: string;
+  loginPath: string;
 }
