@@ -9,10 +9,10 @@
         {{ option.l }}
       </mat-option>
     </mat-select>
-    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
-      {{property.label}} is required.
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+      {{ '_ is required.' | translate:{ label: property.label } }}
     </mat-error>
-    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">
         {{error}}<br />
       </ng-container>
@@ -30,10 +30,10 @@
         {{ option.l }}
       </mat-option>
     </mat-autocomplete>
-    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
-      {{property.label}} is required.
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+      {{ '_ is required.' | translate:{ label: property.label } }}
     </mat-error>
-    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">
         {{error}}<br />
       </ng-container>
@@ -63,13 +63,13 @@
     <mat-label>{{property.label}}</mat-label>
     <input matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="!isMultiline()" />
     <textarea matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="isMultiline()" ></textarea>
-    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
-      {{property.label}} is required. {{control.getError('required').message}}
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+      {{ '_ is required.' | translate:{ label: property.label } }}
     </mat-error>
-    <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger" i18n>
-      {{property.label}}: max {{control.getError('maxLength').message}}.
+    <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger">
+      {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxLength').message } }}
     </mat-error>
-    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">
         {{error}}<br />
       </ng-container>
@@ -79,10 +79,10 @@
   <mat-form-field *ngIf="property.kind == 'number'" [formGroup]="form">
     <mat-label>{{property.label}}</mat-label>
     <input matInput [formControlName]="property.name" [required]="isRequired()">
-    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
-      {{property.label}} is required.
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+      {{ '_ is required.' | translate:{ label: property.label } }}
     </mat-error>
-    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+    <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">
         {{error}}<br />
       </ng-container>
@@ -94,8 +94,8 @@
     <input matInput [formControlName]="property.name" [required]="isRequired()" [matDatepicker]="datepicker">
     <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
     <mat-datepicker #datepicker></mat-datepicker>
-    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger" i18n>
-      {{property.label}} is required.
+    <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+      {{ '_ is required.' | translate:{ label: property.label } }}
     </mat-error>
     <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">

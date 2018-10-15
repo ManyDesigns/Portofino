@@ -1,12 +1,12 @@
 <div fxLayout="column" fxLayoutGap="20px">
-  <h2 i18n>Bulk edit</h2>
+  <h2>{{ 'Bulk edit' | translate }}</h2>
   <form (submit)="save()" *ngIf="object">
     <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
       <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
                       fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
     </div>
     <div fxLayout="row">
-      <button mat-raised-button (click)="save()" color="primary" [disabled]="!isFormValid()" i18n>
+      <button mat-raised-button (click)="save()" color="primary" [disabled]="!isFormValid()">
         <mat-icon>save</mat-icon>
         {{ 'Save' | translate }}
       </button>

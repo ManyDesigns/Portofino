@@ -1,4 +1,4 @@
-<h4 mat-dialog-title i18n>Sign in</h4>
+<h4 mat-dialog-title>{{ 'Sign in' | translate }}</h4>
 <mat-dialog-content>
   <p *ngIf="message" style="color: red;">{{message}}</p>
   <form (submit)="login()">

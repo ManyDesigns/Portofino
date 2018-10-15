@@ -5,24 +5,24 @@
     <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
                     fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
     <div fxLayout="row" *ngIf="editMode">
-      <button mat-raised-button (click)="save()" color="primary" i18n>
+      <button mat-raised-button (click)="save()" color="primary">
         <mat-icon>save</mat-icon>
         {{ 'Save' | translate }}
       </button>
       <button mat-raised-button (click)="cancel()" type="button">{{ 'Cancel' | translate }}</button>
     </div>
     <div fxLayout="row" *ngIf="!editMode">
-      <button mat-raised-button color="primary" type="button" (click)="edit()" *ngIf="editEnabled" i18n>
+      <button mat-raised-button color="primary" type="button" (click)="edit()" *ngIf="editEnabled">
         <mat-icon>edit</mat-icon>
         {{ 'Edit' | translate }}
       </button>
-      <button mat-raised-button color="warn" type="button" (click)="delete()" *ngIf="deleteEnabled" i18n>
+      <button mat-raised-button color="warn" type="button" (click)="delete()" *ngIf="deleteEnabled">
         <mat-icon>delete</mat-icon>
-        Delete
+        {{ 'Delete' | translate }}
       </button>
-      <button mat-raised-button (click)="cancel()" type="button" i18n>
+      <button mat-raised-button (click)="cancel()" type="button">
         <mat-icon>arrow_back</mat-icon>
-        Back
+        {{ 'Back' | translate }}
       </button>
     </div>
   </form>
