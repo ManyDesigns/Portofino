@@ -8,7 +8,7 @@
         <ng-template #noUrl>
           {{control.value[0].name}}
         </ng-template>
-        <button mat-icon-button (click)="deleteBlob()" *ngIf="enabled" i18n>
+        <button mat-icon-button (click)="deleteBlob()" *ngIf="enabled">
           <mat-icon>delete</mat-icon>
         </button>
       </span>
@@ -21,11 +21,11 @@
     </div>
     <div class="mat-form-field-underline"><span class="mat-form-field-ripple"></span></div>
     <div class="mat-form-field-subscript-wrapper" *ngIf="control.hasError('required')">
-      <mat-error class="alert alert-danger" i18n>
-        {{property.label}} is required.
+      <mat-error class="alert alert-danger">
+        {{ '_ is required.' | translate:{ label: property.label } }}
       </mat-error>
     </div>
-    <div class="mat-form-field-subscript-wrapper" *ngIf="control.hasError('server-side')" class="alert alert-danger" i18n>
+    <div class="mat-form-field-subscript-wrapper" *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">
         {{error}}<br />
       </ng-container>

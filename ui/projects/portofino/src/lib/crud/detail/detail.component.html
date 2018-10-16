@@ -1,28 +1,28 @@
 <div fxLayout="column" fxLayoutGap="20px">
-  <h2 *ngIf="editMode" i18n>Edit {{id}}</h2>
-  <h2 *ngIf="!editMode" i18n>{{id}}</h2>
+  <h2 *ngIf="editMode">{{ 'Edit _' | translate:{ id: id } }}</h2>
+  <h2 *ngIf="!editMode">{{id}}</h2>
   <form (submit)="save()" *ngIf="object">
     <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
                     fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
     <div fxLayout="row" *ngIf="editMode">
-      <button mat-raised-button (click)="save()" color="primary" i18n>
+      <button mat-raised-button (click)="save()" color="primary">
         <mat-icon>save</mat-icon>
-        Save
+        {{ 'Save' | translate }}
       </button>
-      <button mat-raised-button (click)="cancel()" type="button" i18n>Cancel</button>
+      <button mat-raised-button (click)="cancel()" type="button">{{ 'Cancel' | translate }}</button>
     </div>
     <div fxLayout="row" *ngIf="!editMode">
-      <button mat-raised-button color="primary" type="button" (click)="edit()" *ngIf="editEnabled" i18n>
+      <button mat-raised-button color="primary" type="button" (click)="edit()" *ngIf="editEnabled">
         <mat-icon>edit</mat-icon>
-        Edit
+        {{ 'Edit' | translate }}
       </button>
-      <button mat-raised-button color="warn" type="button" (click)="delete()" *ngIf="deleteEnabled" i18n>
+      <button mat-raised-button color="warn" type="button" (click)="delete()" *ngIf="deleteEnabled">
         <mat-icon>delete</mat-icon>
-        Delete
+        {{ 'Delete' | translate }}
       </button>
-      <button mat-raised-button (click)="cancel()" type="button" i18n>
+      <button mat-raised-button (click)="cancel()" type="button">
         <mat-icon>arrow_back</mat-icon>
-        Back
+        {{ 'Back' | translate }}
       </button>
     </div>
   </form>

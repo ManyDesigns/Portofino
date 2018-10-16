@@ -50,6 +50,7 @@ import {ManyToManyComponent} from './many-to-many/many-to-many.component';
 import {ButtonComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
 import {FormComponent} from "./form";
+import {TranslateModule} from "@ngx-translate/core";
 
 @NgModule({
   declarations: [
@@ -66,7 +67,8 @@ import {FormComponent} from "./form";
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule,
-    RouterModule.forChild([])
+    RouterModule.forChild([]),
+    TranslateModule
   ],
   providers: [
     PortofinoService, AuthenticationService,

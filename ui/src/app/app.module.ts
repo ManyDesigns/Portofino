@@ -1,6 +1,7 @@
 import {Component, NgModule} from '@angular/core';
 import {PortofinoModule, PageComponent} from "portofino";
 import {RouterModule} from "@angular/router";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-hello',
@@ -21,7 +22,8 @@ export class AppComponent {}
       [{ path: "start", component: HelloPortofino },
               { path: "**", component: PageComponent}],
       { onSameUrlNavigation: "reload", enableTracing: false }),
-    PortofinoModule
+    PortofinoModule,
+    TranslateModule.forRoot()
   ],
   bootstrap: [AppComponent]
 })
