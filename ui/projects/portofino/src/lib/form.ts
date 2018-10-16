@@ -1,6 +1,7 @@
 import {getAnnotation, isRequired, Property} from "./class-accessor";
-import {Component, EventEmitter, Input, OnInit, Output, Type} from "@angular/core";
+import {Component, EventEmitter, Input, OnInit, Output, QueryList, Type, ViewChildren} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {FieldComponent} from "./crud/field.component";
 
 export class Form {
   contents: (Field|FieldSet|{component: Type<any>}|{html: string})[] = [];
@@ -30,6 +31,8 @@ export class FieldSet {
 export class FormComponent implements OnInit {
   @Input()
   controls: FormGroup;
+  @ViewChildren(FieldComponent)
+  fields: QueryList<FieldComponent>;
   private _form: Form;
   @Input()
   set form(form: Form) {

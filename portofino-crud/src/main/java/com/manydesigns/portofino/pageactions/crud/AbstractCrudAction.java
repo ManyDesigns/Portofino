@@ -702,7 +702,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     public boolean isBulkOperationsEnabled() {
-        return (objects != null && !objects.isEmpty()) ||
+        return (object == null) ||
                 "bulkDelete".equals(context.getEventName()) ||
                 "bulkEdit".equals(context.getEventName()) ||
                 "bulkUpdate".equals(context.getEventName());
