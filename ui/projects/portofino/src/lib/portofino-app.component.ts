@@ -11,6 +11,9 @@ import {
 } from '@angular/core';
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
+import {TranslateService} from "@ngx-translate/core";
+import {TRANSLATIONS_EN} from "./i18n/en";
+import {TRANSLATIONS_IT} from "./i18n/it";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 
@@ -53,8 +56,13 @@ export class PortofinoAppComponent implements OnInit {
   toolbarHost: ToolbarDirective;
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
-              protected componentFactoryResolver: ComponentFactoryResolver,
-              @Inject(TOOLBAR_COMPONENT) protected toolbarComponent) {}
+              protected componentFactoryResolver: ComponentFactoryResolver, translate: TranslateService,
+              @Inject(TOOLBAR_COMPONENT) protected toolbarComponent) {
+    translate.setDefaultLang('en');
+    translate.setTranslation('en', TRANSLATIONS_EN, true);
+    translate.setTranslation('it', TRANSLATIONS_IT, true);
+    translate.use(translate.getBrowserLang());
+  }
 
   ngOnInit(): void {
     if(this.apiRoot) {

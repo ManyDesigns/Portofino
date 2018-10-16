@@ -12,8 +12,8 @@
         <ng-template portofino-embedded-content></ng-template>
       </div>
     </ng-container>
-    <div *ngIf="!!error" i18n>
-      Page not found! Error: {{error}}
+    <div *ngIf="!!error">
+      {{ 'Page not found! Error: _' | translate:{ error: error } }}
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

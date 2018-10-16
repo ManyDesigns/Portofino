@@ -18,6 +18,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-hello',
@@ -60,7 +61,7 @@ export class CustomCrud extends CrudComponent {
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
-    FileInputAccessorModule, QuillModule],
+    FileInputAccessorModule, QuillModule, TranslateModule.forRoot()],
   entryComponents: [ CustomNavigation, CustomCrud ],
   bootstrap: [AppComponent]
 })

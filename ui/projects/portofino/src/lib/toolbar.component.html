@@ -2,7 +2,7 @@
   {{ title }}
   <ng-container *ngIf="authenticationService.currentUser">
     <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="authenticationService.logout()" i18n>Sign out</button>
+      <button mat-menu-item (click)="authenticationService.logout()">{{ 'Sign out' | translate }}</button>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="userMenu">
       <mat-icon>more_vert</mat-icon>
@@ -10,6 +10,6 @@
     </button>
   </ng-container>
   <ng-container *ngIf="!authenticationService.currentUser">
-    <button mat-button (click)="authenticationService.showLoginDialog()" i18n>Sign in</button>
+    <button mat-button (click)="authenticationService.showLoginDialog()">{{ 'Sign in' | translate }}</button>
   </ng-container>
 </mat-toolbar>
