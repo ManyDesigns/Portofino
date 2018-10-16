@@ -70,17 +70,6 @@
             </configuration>
             <phase>generate-resources</phase>
           </execution>
-
-          <execution>
-            <id>build-it</id>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run-script build-all -- --i18n-file src/locale/messages.it.xlf --i18n-format xlf --i18n-locale it --output-path dist/it</arguments>
-            </configuration>
-            <phase>generate-resources</phase>
-          </execution>
         </executions>
       </plugin>
 
