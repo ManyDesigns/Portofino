@@ -1,11 +1,10 @@
-import {ChangeDetectorRef, Component, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isBlob, isDateProperty, isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {MatSnackBar} from "@angular/material";
-import {FieldComponent} from "../field.component";
-import {Field, FormComponent} from "../../form";
+import {FormComponent} from "../../form";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
