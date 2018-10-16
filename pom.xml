@@ -82,7 +82,7 @@
         <commons.lang.version>2.5</commons.lang.version>
         <ehcache.version>2.10.2.2.21</ehcache.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>2.5.0</groovy.version>
+        <groovy.version>2.5.3</groovy.version>
         <guava.version>18.0</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
         <jackson.version>2.9.6</jackson.version>
@@ -426,7 +426,7 @@
                                 <configuration>
                                     <rules>
                                         <enforceBytecodeVersion>
-                                            <maxJdkVersion>1.7</maxJdkVersion>
+                                            <maxJdkVersion>1.8</maxJdkVersion>
                                         </enforceBytecodeVersion>
                                     </rules>
                                     <fail>true</fail>
@@ -437,7 +437,7 @@
                             <dependency>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>extra-enforcer-rules</artifactId>
-                                <version>1.0-beta-7</version>
+                                <version>1.0-beta-9</version>
                             </dependency>
                         </dependencies>
                     </plugin>
