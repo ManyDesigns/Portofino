@@ -1,9 +1,11 @@
-import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
-import {isBlob, isUpdatable, Property} from "../../class-accessor";
+import {isBlob, isDateProperty, isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {MatSnackBar} from "@angular/material";
+import {FieldComponent} from "../field.component";
+import {Field, FormComponent} from "../../form";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
@@ -14,6 +16,8 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
 
   @Input()
   ids: string[];
+  @ViewChild(FormComponent)
+  formComponent: FormComponent;
 
   constructor(
     protected http: HttpClient, protected portofino: PortofinoService,
@@ -54,6 +58,29 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
       const control = this.form.controls[k];
       return control.valid || !control.enabled || control.pristine;
     });
+  }
+
+  protected getObjectToSave(): any {
+    let object = {};
+    this.properties.filter(p => p.editable).forEach(p => {
+      const field = this.formComponent.fields.find(item => {
+        return item.property.name == p.name;
+      });
+      const selected = field.selector.value;
+      if(!selected) {
+          return;
+        }
+      let value = this.form.get(p.name).value;
+      if(p.selectionProvider && value) {
+          value = value.v;
+        }
+      if (isDateProperty(p) && value) {
+          object[p.name] = value.valueOf();
+        } else {
+          object[p.name] = value;
+        }
+    });
+    return object;
   }
 
   save() {

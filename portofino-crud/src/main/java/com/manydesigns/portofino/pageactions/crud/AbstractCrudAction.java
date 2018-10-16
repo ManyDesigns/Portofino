@@ -485,7 +485,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     public boolean isBulkOperationsEnabled() {
-        return objects != null && !objects.isEmpty();
+        return object == null;
     }
 
     //**************************************************************************

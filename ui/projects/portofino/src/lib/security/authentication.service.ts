@@ -17,6 +17,7 @@ export class AuthenticationService {
 
   dialogRef: MatDialogRef<any>;
   currentUser: UserInfo;
+  retryUnauthenticatedOnSessionExpiration = true;
 
   constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
               private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
@@ -30,17 +31,32 @@ export class AuthenticationService {
   request(req: HttpRequest<any>, observable: Observable<HttpEvent<any>>): Observable<HttpEvent<any>> {
     return observable.pipe(catchError((error) => {
       if (error.status === 401) {
+        const hasToken = !!this.jsonWebToken;
         this.removeAuthenticationInfo();
-        return this.askForCredentials().pipe(
-          map(result => {
-            if (!result) {
-              throw new Error("User declined login");
-            }
-          }),
-          mergeMap(_ => this.http.request(this.withAuthenticationHeader(req))));
+        if(hasToken || !this.retryUnauthenticatedOnSessionExpiration) {
+          req = req.clone({ headers: req.headers.delete("Authorization") });
+          return this.doHttpRequest(req).pipe(map(result => {
+            alert("You have been logged out because your session has expired."); //TODO proper dialog/alert
+            return result;
+          }));
+        } else {
+          return this.askForCredentials().pipe(
+            map(result => {
+              if (!result) {
+                throw new Error("User declined login");
+              }
+            }),
+            mergeMap(_ => this.doHttpRequest(this.withAuthenticationHeader(req))));
+        }
+      } else if(error.status === 403) {
+        alert("You do not have the permission to do that!"); //TODO proper dialog/alert
       }
       return throwError(error);
     }));
+  }
+
+  protected doHttpRequest(req) {
+    return this.http.request(req);
   }
 
   protected askForCredentials() {
