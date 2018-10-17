@@ -12,7 +12,7 @@ import {AbstractControl} from "@angular/forms/src/model";
 export class FieldComponent implements OnInit {
 
   @Input()
-  enabled: boolean;
+  enabled: boolean = true;
   @Input()
   property: Property;
   @Input()

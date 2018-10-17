@@ -46,9 +46,8 @@ import {
   DefaultNavigationComponent,
   DefaultPageLayout,
   NAVIGATION_COMPONENT,
-  Page,
   PageComponent,
-  PageHeader
+  PageHeader, SourceSelector
 } from './page.component';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
@@ -56,15 +55,15 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {ManyToManyComponent} from './many-to-many/many-to-many.component';
 import {ButtonComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
-import {FormComponent} from "./form";
+import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 
 @NgModule({
   declarations: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
     FieldComponent, BlobFieldComponent, FormComponent,
-    PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
-    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
+    PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective, DynamicFormComponentDirective,
+    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent, SourceSelector,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     ManyToManyComponent
   ],
@@ -86,7 +85,7 @@ import {TranslateModule} from "@ngx-translate/core";
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService }],
   entryComponents: [
-    LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent,
+    LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector,
     CrudComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,

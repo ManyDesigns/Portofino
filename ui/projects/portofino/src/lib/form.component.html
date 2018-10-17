@@ -10,5 +10,6 @@
         <portofino-form [form]="field.contents" [controls]="controls.get(field.name)"></portofino-form>
       </fieldset>
     </ng-container>
+    <ng-template portofino-dynamic-form-component [ngIf]="field.hasOwnProperty('component')"></ng-template>
   </ng-container>
 </ng-container>

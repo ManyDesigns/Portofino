@@ -1,0 +1,10 @@
+<fieldset [formGroup]="form" fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
+  <legend>{{ 'Data source' | translate }}</legend>
+  <portofino-field [property]="property" [form]="form"></portofino-field>
+  <button mat-raised-button (click)="select()" color="primary" type="button">
+    <mat-icon>folder_open</mat-icon>
+    {{ 'Select' | translate }}
+  </button>
+  <mat-checkbox [formControlName]="'relativeToParent'">{{ 'Relative to parent' | translate }}</mat-checkbox>
+</fieldset>
+

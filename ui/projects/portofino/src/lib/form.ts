@@ -1,10 +1,21 @@
 import {FieldComponent} from "./fields/field.component";
 import {getValidators, Property} from "./class-accessor";
-import {Component, EventEmitter, Input, OnInit, Output, QueryList, Type, ViewChildren} from "@angular/core";
+import {
+  AfterViewInit, ChangeDetectorRef,
+  Component,
+  ComponentFactoryResolver, Directive,
+  EventEmitter,
+  Input, NgZone,
+  OnInit,
+  Output,
+  QueryList,
+  Type,
+  ViewChildren, ViewContainerRef
+} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
 
 export class Form {
-  contents: (Field|FieldSet|{component: Type<any>}|{html: string})[] = [];
+  contents: (Field|FieldSet|{component: Type<any>, dependencies ?: object}|{html: string})[] = [];
   editable: boolean;
   /** The URL from which to download blobs and other resources. */
   baseUrl: string;
@@ -24,15 +35,28 @@ export class FieldSet {
   contents: Form;
 }
 
+@Directive({
+  selector: '[portofino-dynamic-form-component]'
+})
+export class DynamicFormComponentDirective {
+
+  constructor(public viewContainerRef: ViewContainerRef) { }
+
+}
+
 @Component({
   selector: 'portofino-form',
   templateUrl: './form.component.html'
 })
-export class FormComponent implements OnInit {
+export class FormComponent implements AfterViewInit {
   @Input()
   controls: FormGroup;
   @ViewChildren(FieldComponent)
   fields: QueryList<FieldComponent>;
+  @ViewChildren(FormComponent)
+  fieldSets: QueryList<FormComponent>;
+  @ViewChildren(DynamicFormComponentDirective)
+  dynamicComponents: QueryList<DynamicFormComponentDirective>;
   private _form: Form;
   @Input()
   set form(form: Form) {
@@ -47,7 +71,9 @@ export class FormComponent implements OnInit {
   @Output()
   formReset = new EventEmitter();
 
-  ngOnInit(): void {
+  constructor(protected componentFactoryResolver: ComponentFactoryResolver, protected changeDetector: ChangeDetectorRef) {}
+
+  ngAfterViewInit(): void {
     if(!this.controls) {
       this.controls = new FormGroup({});
     }
@@ -63,6 +89,7 @@ export class FormComponent implements OnInit {
 
   protected setupForm(form: Form, formGroup: FormGroup) {
     //TODO remove fields that are no longer present
+    let dynamicComponentIndex = 0;
     form.contents.forEach(v => {
       if (v instanceof Field) {
         const property = v.property;
@@ -75,14 +102,38 @@ export class FormComponent implements OnInit {
         }
       } else if (v instanceof FieldSet) {
         let control = formGroup.get(v.name);
-        if (!(control instanceof FormGroup)) {
+        if (control instanceof FormGroup) {
+          this.setupForm(v.contents, control as FormGroup);
+        } else {
           formGroup.removeControl(v.name);
           control = new FormGroup({});
           this.setupForm(v.contents, control as FormGroup);
           formGroup.registerControl(v.name, control);
         }
+      } else if(this.dynamicComponents && v.hasOwnProperty('component')) {
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(v['component']);
+        const viewContainerRef = this.dynamicComponents.toArray()[dynamicComponentIndex].viewContainerRef;
+        const component = viewContainerRef.createComponent(componentFactory).instance;
+        if(v['dependencies']) {
+          for(const dep in v['dependencies']) {
+            component[dep] = v['dependencies'][dep];
+          }
+        }
+        this.changeDetector.detectChanges();
       }
     });
+  }
+
+  get allFields() {
+    //TODO perhaps it would be better to return a QueryList<FieldComponent>
+    const allFields = this.fields.toArray();
+    this.fieldSets.forEach(fieldSet => {
+      const fields = fieldSet.allFields;
+      for (let f in fields) {
+        allFields.push(fields[f]);
+      }
+    });
+    return allFields;
   }
 
 }

@@ -16,9 +16,9 @@ import {ThemePalette} from "@angular/material/core/typings/common-behaviors/colo
 import {PortofinoService} from "./portofino.service";
 import {of} from "rxjs";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
-import {FormGroup} from "@angular/forms";
+import {FormControl, FormGroup} from "@angular/forms";
 import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
-import {Field, Form} from "./form";
+import {Field, Form, FormComponent} from "./form";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -200,40 +200,84 @@ export class PageChild {
   accessible: boolean;
 }
 
+@Component({
+  selector: 'portofino-page-source-selector',
+  templateUrl: 'source-selector.html'
+})
+export class SourceSelector implements OnInit {
+  @Input()
+  page: Page;
+  @Input()
+  property: Property;
+  @Input()
+  initialValue: string;
+  form: FormGroup;
+
+  constructor(public portofino: PortofinoService, protected http: HttpClient) {}
+
+  ngOnInit(): void {
+    const relativeToParent = new FormControl({
+      value: this.page.parent && !this.initialValue.startsWith('/'),
+      disabled: !this.page.parent
+    });
+    const source = new FormControl(this.initialValue);
+    this.form = new FormGroup({ source: source, relativeToParent: relativeToParent });
+    relativeToParent.valueChanges.subscribe(value => {
+      console.log('relative? ', value);
+      const parentSourceUrl = this.page.parent.computeSourceUrl() + '/';
+      if(value) {
+        source.setValue(source.value.substring((parentSourceUrl).length));
+      } else {
+        source.setValue(parentSourceUrl + source.value);
+      }
+    });
+    this.http.get(this.portofino.apiRoot + ':description')
+      .subscribe(page => console.log("Page", page));
+  }
+
+  select() {
+    //TODO implement with tree
+  }
+
+}
+
 export class PageSettingsPanel {
   active: boolean;
   readonly form = new FormGroup({});
   readonly formDefinition = new Form();
   classAccessor: ClassAccessor = {
     name: 'configuration',
-    properties: [
-      Object.assign(new Property(), {
-        name: 'source',
-        type: 'string',
-        label: 'Source',
-        annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
-      }),
-      Object.assign(new Property(), {
-        name: 'relativeToParent',
-        type: 'boolean',
-        label: 'Relative to parent'
-      })
-    ],
+    properties: [],
     keyProperties: []
   };
 
   constructor(public page: Page) {}
 
   refresh() {
-    this.formDefinition.contents = [];
+    this.formDefinition.contents = [{
+      component: SourceSelector,
+      dependencies: {
+        page: this.page,
+        property: Object.assign(new Property(), {
+          name: 'source',
+          type: 'string',
+          label: 'Path or URL',
+          annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
+        }),
+        initialValue: this.page.configuration.source
+      }
+    }];
     this.classAccessor.properties.forEach(p => {
-      const field = new Field();
-      field.property = p;
-      field.initialState = this.page.configuration[p.name];
-      this.formDefinition.contents.push(field);
+      this.createFieldForProperty(p);
     });
   }
 
+  protected createFieldForProperty(p) {
+    const field = new Field();
+    field.property = p;
+    field.initialState = this.page.configuration[p.name];
+    this.formDefinition.contents.push(field);
+  }
 }
 
 export abstract class Page {
@@ -292,8 +336,15 @@ export abstract class Page {
     if(!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
+    let sourceUrl = this.computeSourceUrl();
+    const securityCheckPath = (this.configuration.securityCheckPath || ':description');
+    if(!sourceUrl.endsWith('/') && !securityCheckPath.startsWith('/')) {
+      sourceUrl += '/';
+    } else if(sourceUrl.endsWith('/') && securityCheckPath.startsWith('/')) {
+      sourceUrl = sourceUrl.substring(0, sourceUrl.length - 1);
+    }
     return this.http.get<any>(
-      this.computeSourceUrl() + (this.configuration.securityCheckPath || ':description'),
+      sourceUrl + securityCheckPath,
       { headers: headers });
   }
 
@@ -326,8 +377,6 @@ export abstract class Page {
   }
 
   configure() {
-    this.http.get(this.portofino.apiRoot + ':description')
-      .subscribe(page => console.log("Page", page));
     this.settingsPanel.refresh();
     this.settingsPanel.active = true;
   }
@@ -368,7 +417,7 @@ class DummyPage extends Page {
   styleUrls: ['./page-header.component.css']
 })
 export class PageHeader {
-  @Input() //Note: @Host in the constructor does not work for superclasses
+  @Input()
   page: Page;
   constructor(public authenticationService: AuthenticationService, public portofino: PortofinoService) {}
 }

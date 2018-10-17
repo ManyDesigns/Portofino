@@ -62,22 +62,25 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
   protected getObjectToSave(): any {
     let object = {};
     this.properties.filter(p => p.editable).forEach(p => {
-      const field = this.formComponent.fields.find(item => {
+      const field = this.formComponent.allFields.find(item => {
         return item.property.name == p.name;
       });
       const selected = field.selector.value;
       if(!selected) {
-          return;
-        }
+        return;
+      }
       let value = this.form.get(p.name).value;
       if(p.selectionProvider && value) {
-          value = value.v;
-        }
+        value = value.v;
+      }
+      if(value == null) {
+        value = "";
+      }
       if (isDateProperty(p) && value) {
-          object[p.name] = value.valueOf();
-        } else {
-          object[p.name] = value;
-        }
+        object[p.name] = value.valueOf();
+      } else {
+        object[p.name] = value;
+      }
     });
     return object;
   }

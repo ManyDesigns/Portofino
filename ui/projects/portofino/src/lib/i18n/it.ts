@@ -14,5 +14,6 @@ export const TRANSLATIONS_IT = {
   "Save": "Save",
   "Search": "Cerca",
   "_ is required.": "{{label}} &egrave; obbligatorio.",
-  '_: max _.': "{label}: max {max}."
+  '_: max _.': "{label}: max {max}.",
+  "Select": "Seleziona"
 };
