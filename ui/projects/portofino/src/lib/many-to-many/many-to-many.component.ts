@@ -4,9 +4,10 @@ import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
 import {FormControl} from "@angular/forms";
 import {MatSnackBar} from "@angular/material";
-import {Button, Operation, Page, PageConfiguration} from "../page.component";
+import {Operation, Page, PageConfiguration} from "../page";
 import {AuthenticationService} from "../security/authentication.service";
 import {Router} from "@angular/router";
+import {Button} from "../buttons";
 
 @Component({
   selector: 'portofino-many-to-many',

@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {ButtonInfo} from "./page.component";
+import {ButtonInfo} from "./buttons";
 
 @Component({
   selector: 'portofino-button',

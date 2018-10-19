@@ -3,8 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
-import {Operation} from "../../page.component";
-import {Observable} from "rxjs";
+import {Operation} from "../../page";
 import {MatSnackBar} from "@angular/material";
 
 @Component({

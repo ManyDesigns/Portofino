@@ -5,9 +5,10 @@ import {ClassAccessor} from "../class-accessor";
 import {PortofinoComponent} from "../portofino-app.component";
 import {Router} from "@angular/router";
 import {SearchComponent} from "./search/search.component";
-import {Button, Operation, Page, PageChild, PageConfiguration} from "../page.component";
+import {Operation, Page, PageChild, PageConfiguration} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
 import {AuthenticationService} from "../security/authentication.service";
+import {Button} from "../buttons";
 
 @Component({
   selector: 'portofino-crud',

@@ -46,9 +46,8 @@ import {
   DefaultNavigationComponent,
   DefaultPageLayout,
   NAVIGATION_COMPONENT,
-  PageComponent,
   PageHeader, SourceSelector
-} from './page.component';
+} from './page';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
@@ -57,6 +56,7 @@ import {ButtonComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
 import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
+import {PageComponent} from "./page.component";
 
 @NgModule({
   declarations: [
