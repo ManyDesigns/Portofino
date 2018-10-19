@@ -25,14 +25,14 @@ import {
   MatIconModule,
   MatInputModule,
   MatMenuModule,
-  MatPaginatorModule,
+  MatPaginatorModule, MatProgressBarModule,
   MatRadioModule,
   MatSelectModule,
   MatSidenavModule,
   MatSnackBarModule,
   MatSortModule,
   MatTableModule,
-  MatToolbarModule
+  MatToolbarModule, MatTreeModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -46,7 +46,7 @@ import {
   DefaultNavigationComponent,
   DefaultPageLayout,
   NAVIGATION_COMPONENT,
-  PageHeader, SourceSelector
+  PageHeader, SourceSelector, SourceSelectorTree
 } from './page';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
@@ -63,15 +63,17 @@ import {PageComponent} from "./page.component";
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
     FieldComponent, BlobFieldComponent, FormComponent,
     PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective, DynamicFormComponentDirective,
-    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent, SourceSelector,
+    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
+    SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     ManyToManyComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
-    MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
-    MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
+    MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule,
+    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTreeModule,
+    MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule,
     RouterModule.forChild([]),
     TranslateModule
@@ -85,7 +87,7 @@ import {PageComponent} from "./page.component";
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService }],
   entryComponents: [
-    LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector,
+    LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,
     CrudComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,

@@ -19,6 +19,10 @@ export class Property {
 
   editable: boolean;
   selectionProvider: any;
+
+  static create(values: Property | any): Property {
+    return Object.assign(new Property(), values)
+  }
 }
 
 export class Annotation {

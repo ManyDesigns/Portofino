@@ -6,7 +6,7 @@ import {
 import {TokenStorageService} from "./token-storage.service";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {Observable, throwError} from "rxjs";
-import { catchError, map, mergeMap } from "rxjs/operators";
+import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
 import {Router} from "@angular/router";
 
@@ -52,7 +52,7 @@ export class AuthenticationService {
         alert("You do not have the permission to do that!"); //TODO proper dialog/alert
       }
       return throwError(error);
-    }));
+    }), share());
   }
 
   protected doHttpRequest(req) {
