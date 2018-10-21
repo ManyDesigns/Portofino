@@ -14,7 +14,10 @@
  */
 package com.manydesigns.elements.blobs;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.IOException;
 import java.io.File;
 import java.util.Enumeration;
@@ -76,4 +79,6 @@ public interface MultipartWrapper {
      * @return a FileBean object wrapping the uploaded file
      */
     FileBean getFileParameterValue(String name);
+
+    HttpServletRequestWrapper wrapRequest(HttpServletRequest request);
 }

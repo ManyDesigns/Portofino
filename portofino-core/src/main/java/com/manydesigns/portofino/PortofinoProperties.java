@@ -45,7 +45,6 @@ public final class PortofinoProperties {
     public static final String HOSTNAMES = "portofino.hostnames";
     public static final String URL_ENCODING = "url.encoding";
     public static final String URL_ENCODING_DEFAULT = "UTF-8";
-    public static final String TEMP_FILE_SERVICE_CLASS = "temp.file.service.class";
 
     //The mail address used as the from: field in email messages sent by the application (e.g. password change)
     public static final String MAIL_FROM = "mail.from";

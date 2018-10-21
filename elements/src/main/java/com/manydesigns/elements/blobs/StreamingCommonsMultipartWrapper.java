@@ -18,13 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.rest;
+package com.manydesigns.elements.blobs;
 
-import com.manydesigns.elements.blobs.FileBean;
-import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
-import com.manydesigns.elements.blobs.MultipartWrapper;
-import com.manydesigns.portofino.files.TempFile;
-import com.manydesigns.portofino.files.TempFileService;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadBase;
@@ -34,11 +29,12 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
+
+import static org.apache.commons.io.FileUtils.openOutputStream;
 
 /**
  * MultipartWrapper implementation that uses the streaming API of Commons Fileupload, avoiding the use of files.
@@ -66,10 +62,10 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
     public static class FileItem {
         public final String fileName;
         public final String contentType;
-        public final TempFile contents;
+        public final File contents;
         public final int size;
 
-        public FileItem(String fileName, String contentType, TempFile contents, int size) {
+        public FileItem(String fileName, String contentType, File contents, int size) {
             this.fileName = fileName;
             this.contentType = contentType;
             this.contents = contents;
@@ -118,8 +114,8 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
                 }
                 // Else store the file param
                 else {
-                    TempFile tempFile = TempFileService.getInstance().newTempFile(item.getContentType(), item.getName());
-                    int size = IOUtils.copy(stream, tempFile.getOutputStream());
+                    File tempFile = File.createTempFile("portofino-temp-" + item.getName(), ".temp");
+                    int size = copyInputStreamToFile(stream, tempFile);
                     FileItem fileItem = new FileItem(item.getName(), item.getContentType(), tempFile, size);
                     files.put(item.getFieldName(), fileItem);
                 }
@@ -140,6 +136,19 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
             throw ioe;
         }
 
+    }
+
+    public static int copyInputStreamToFile(InputStream source, File destination) throws IOException {
+        try {
+            FileOutputStream output = openOutputStream(destination);
+            try {
+                return IOUtils.copy(source, output);
+            } finally {
+                IOUtils.closeQuietly(output);
+            }
+        } finally {
+            IOUtils.closeQuietly(source);
+        }
     }
 
     /**
@@ -210,28 +219,20 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
 
                 @Override
                 public InputStream getInputStream() throws IOException {
-                    return item.contents.getInputStream();
+                    return new FileInputStream(item.contents);
                 }
 
                 @Override
                 public void delete() throws IOException {
-                    item.contents.dispose();
+                    item.contents.delete();
                 }
             };
         }
     }
 
-    /** Little helper class to create an enumeration as per the interface. */
-    private static class IteratorEnumeration implements Enumeration<String> {
-        Iterator<String> iterator;
-
-        /** Constructs an enumeration that consumes from the underlying iterator. */
-        IteratorEnumeration(Iterator<String> iterator) { this.iterator = iterator; }
-
-        /** Returns true if more elements can be consumed, false otherwise. */
-        public boolean hasMoreElements() { return this.iterator.hasNext(); }
-
-        /** Gets the next element out of the iterator. */
-        public String nextElement() { return this.iterator.next(); }
+    @Override
+    public HttpServletRequestWrapper wrapRequest(HttpServletRequest request) {
+        return new MultipartRequest(request, this);
     }
+
 }

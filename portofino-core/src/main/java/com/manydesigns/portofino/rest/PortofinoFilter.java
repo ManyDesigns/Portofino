@@ -22,6 +22,7 @@ package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
+import com.manydesigns.elements.blobs.StreamingCommonsMultipartWrapper;
 import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.Guarded;
@@ -98,14 +99,6 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         if(resource.getClass() != resourceInfo.getResourceClass()) {
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
-        String contentType = request.getContentType();
-        if (contentType != null && contentType.startsWith("multipart/form-data")) {
-            try {
-                buildMultipart();
-            } catch (FileUploadLimitExceededException e) {
-                logger.warn("File upload limit exceeded", e);
-            }
-        }
         fillMDC();
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
@@ -132,23 +125,6 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
         //response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
         //response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MAX_AGE + 0);
-    }
-
-    protected void buildMultipart() throws IOException, FileUploadLimitExceededException {
-        StreamingCommonsMultipartWrapper multipart = new StreamingCommonsMultipartWrapper();
-        // Figure out where the temp directory is, and store that info
-        File tempDir = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-        if (tempDir == null) {
-            String tmpDir = System.getProperty("java.io.tmpdir");
-            if (tmpDir != null) {
-                tempDir = new File(tmpDir).getAbsoluteFile();
-            } else {
-                logger.warn("The tmpdir system property was null! File uploads will probably fail.");
-            }
-        }
-        long maxPostSize = Long.MAX_VALUE;
-        multipart.build(request, tempDir, maxPostSize);
-        ElementsThreadLocals.setMultipart(multipart);
     }
 
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
