@@ -38,6 +38,10 @@ import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SecurityLogic;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
@@ -103,16 +107,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
 
     @Context
     protected UriInfo uriInfo;
-
-    //--------------------------------------------------------------------------
-    // UI
-    //--------------------------------------------------------------------------
-
-    private MultiMap embeddedPageActions;
-
-    //--------------------------------------------------------------------------
-    // Navigation
-    //--------------------------------------------------------------------------
 
     //**************************************************************************
     // Scripting
@@ -232,18 +226,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return (PageAction) super.getParent();
     }
 
-//    /**
-//     * Returns the path inside the web application of a resource relative to this action's directory.
-//     * E.g. getResourcePath("my.jsp") might return /WEB-INF/pages/this/that/my.jsp.
-//     * @param resource the path of the resource, relative to this action's directory.
-//     * @return the path of the resource, relative to the web application rootFactory.
-//     */
-//    public String getResourcePath(String resource) {
-//        FileObject resourceFile = pageInstance.getDirectory().resolveFile(resource, NameScope.FILE_SYSTEM);
-//        File appRoot = new File(serverInfo.getRealPath());
-//        return ElementsFileUtils.getRelativePath(appRoot, resourceFile);
-//    }
-
     public String getActionPath() {
         return context.getActionPath();
     }
@@ -251,10 +233,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     //--------------------------------------------------------------------------
     // Getters/Setters
     //--------------------------------------------------------------------------
-
-    public boolean isMultipartRequest() {
-        return false;
-    }
 
     public Form getPageConfigurationForm() {
         return pageConfigurationForm;
@@ -437,7 +415,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     //--------------------------------------------------------------------------
 
     /**
-     * Returns a ForwardResolution to a standard page with an error message saying that the pageaction is not properly
+     * Returns an error response with message saying that the pageaction is not properly
      * configured.
      */
     public Response pageActionNotConfigured() {
@@ -484,6 +462,20 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return result;
     }
 
+    /**
+     * Returns the list of operations that can be invoked via REST on this resource.
+     * @return the list of operations.
+     */
+    @ApiOperation(
+        nickname =
+            "com.manydesigns.portofino.pageactions.AbstractPageAction#describeOperations",
+        value =
+            "Returns the list of operations that can be invoked via REST on this resource. " +
+            "If the user doesn't have permission to invoke an operation, or a VISIBLE guard " +
+            "doesn't pass, then the operation is excluded from the result. If an ENABLED guard " +
+            "doesn't pass, the operation is included, but it is marked as not available.")
+    @ApiResponses({ @ApiResponse(
+            code = 200, message = "A list of operations (name, signature, available).")})
     @Path(":operations")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)

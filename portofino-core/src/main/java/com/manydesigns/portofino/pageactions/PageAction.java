@@ -37,6 +37,10 @@ public interface PageAction extends SecureResource {
 
     void setContext(ActionContext context);
 
+    /**
+     * Returns the action that comes before this action the the matched path.
+     * @since 5.0.0-SNAPSHOT
+     */
     PageAction getParent();
 
     /**
@@ -49,6 +53,10 @@ public interface PageAction extends SecureResource {
      */
     void setPageInstance(PageInstance pageInstance);
 
+    /**
+     * Lifecycle method invoked just before the resource method is invoked via REST.
+     * @since 5.0.0-SNAPSHOT
+     */
     void prepareForExecution();
 
 
