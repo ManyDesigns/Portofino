@@ -103,8 +103,6 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         }
     }
 
-    //TODO ability tu use a different resource context (perhaps this should be part of the RootFactory?)
-    //in order to support injection using Spring
     public static class DummyResourceContext implements ResourceContext {
         @Override
         public <T> T getResource(Class<T> resourceClass) {
