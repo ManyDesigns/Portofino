@@ -508,6 +508,17 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return result;
     }
 
+    /**
+     * Returns the configuration of this action.
+     * @return the configuration.
+     */
+    @ApiOperation(
+        nickname =
+            "com.manydesigns.portofino.pageactions.AbstractPageAction#getConfiguration",
+        value =
+            "Returns the configuration of this action. " +
+            "The actual type of the configuration object depends on the action class.")
+    @ApiResponses({ @ApiResponse(code = 200, message = "The configuration object.")})
     @Path(":configuration")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -521,23 +532,4 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         description.put("page", pageInstance.getPage());
     }
 
-    /**
-     * Returns a description of this PageAction.
-     * @since 4.2.1
-     * @return the page's description as JSON.
-     * @deprecated replaced by :description.
-     * @see #describe(Map)
-     * @see AbstractResource#getJSONDescription()
-     */
-    @Path(":page")
-    @GET
-    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    @Deprecated
-    public Map<String, Object> getPageDescription() {
-        Map<String, Object> description = new HashMap<String, Object>();
-        description.put("superclass", pageInstance.getActionClass().getSuperclass().getName());
-        description.put("class", pageInstance.getActionClass().getName());
-        description.put("page", pageInstance.getPage());
-        return description;
-    }
 }
