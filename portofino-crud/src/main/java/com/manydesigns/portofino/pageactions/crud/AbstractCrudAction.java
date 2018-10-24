@@ -2292,10 +2292,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return object;
     }
 
-    public boolean isMultipartRequest() {
-        return form != null && form.isMultipartRequest();
-    }
-
     @Deprecated
     public List<TextField> getEditableRichTextFields() {
         return FormUtil.collectEditableRichTextFields(form);

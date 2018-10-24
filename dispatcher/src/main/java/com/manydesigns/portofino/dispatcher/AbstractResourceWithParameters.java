@@ -68,6 +68,10 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
         parameters.add(pathSegment);
     }
 
+    /**
+     * Lifecycle method invoked when there are no more path parameters to process.
+     * @since 5.0.0-SNAPSHOT
+     */
     protected void parametersAcquired() throws WebApplicationException {
         if(parameters.size() < minParameters) {
             //TODO fail strategy (for mocking and introspection)
