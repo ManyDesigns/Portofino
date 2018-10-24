@@ -239,6 +239,12 @@
                 <version>${logback.version}</version>
                 <scope>compile</scope>
             </dependency>
+            <!-- Groovy -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
             <!-- Test dependencies -->
             <dependency>
                 <groupId>org.testng</groupId>
