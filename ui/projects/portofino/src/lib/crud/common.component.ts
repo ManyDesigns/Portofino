@@ -18,6 +18,7 @@ import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./cru
 import {Observable} from "rxjs";
 import {MatSnackBar} from "@angular/material";
 import {Field, Form, FormComponent} from "../form";
+import {NotificationService} from "../notifications/notification.service";
 
 export abstract class BaseDetailComponent {
 
@@ -42,7 +43,7 @@ export abstract class BaseDetailComponent {
 
   protected constructor(
     protected http: HttpClient, protected portofino: PortofinoService,
-    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {}
+    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService) {}
 
   protected initClassAccessor() {
     this.classAccessor.properties.forEach(property => {
@@ -247,7 +248,7 @@ export abstract class BaseDetailComponent {
     this.saving = true;
     if(this.form.invalid) {
       this.triggerValidationForAllFields(this.form);
-      this.snackBar.open('There are validation errors', null, { duration: 10000, verticalPosition: 'top' });
+      this.notificationService.error('There are validation errors');
       this.saving = false;
       return;
     }
@@ -271,7 +272,7 @@ export abstract class BaseDetailComponent {
             }
           }
           if(errorsFound > 0) {
-            this.snackBar.open('There are validation errors', null, { duration: 10000, verticalPosition: 'top' });
+            this.notificationService.error('There are validation errors');
             this.changeDetector.detectChanges();
           }
         }

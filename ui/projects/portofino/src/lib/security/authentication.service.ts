@@ -9,6 +9,7 @@ import {Observable, throwError} from "rxjs";
 import { catchError, map, mergeMap } from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
 import {Router} from "@angular/router";
+import {NotificationService} from "../notifications/notification.service";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 
@@ -22,7 +23,7 @@ export class AuthenticationService {
 
   constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
               private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected component,
-              protected router: Router) {
+              protected router: Router, protected notifications: NotificationService) {
     const displayName = this.storage.get('user.displayName');
     if(displayName) {
       this.currentUser = new UserInfo(displayName);
@@ -37,7 +38,7 @@ export class AuthenticationService {
         if(hasToken || !this.retryUnauthenticatedOnSessionExpiration) {
           req = req.clone({ headers: req.headers.delete("Authorization") });
           return this.doHttpRequest(req).pipe(map(result => {
-            alert("You have been logged out because your session has expired."); //TODO proper dialog/alert
+            this.notifications.warn("You have been logged out because your session has expired.").subscribe(); //TODO I18n
             return result;
           }));
         } else {
@@ -50,7 +51,7 @@ export class AuthenticationService {
             mergeMap(_ => this.doHttpRequest(this.withAuthenticationHeader(req))));
         }
       } else if(error.status === 403) {
-        alert("You do not have the permission to do that!"); //TODO proper dialog/alert
+        this.notifications.error("You do not have the permission to do that!"); //TODO I18n
       }
       return throwError(error);
     }));
@@ -78,7 +79,7 @@ export class AuthenticationService {
   public showLoginDialog() {
     this.askForCredentials().subscribe(result => {
       if(result) {
-        this.router.navigateByUrl(this.router.url);
+        this.reloadPage();
       }
     });
   }
@@ -128,8 +129,16 @@ export class AuthenticationService {
     const url = `${this.portofino.apiRoot}${this.loginPath}/${this.storage.get('sessionId')}`;
     this.http.delete(url).subscribe(value => {
       this.removeAuthenticationInfo();
-      this.router.navigateByUrl(this.router.url);
+      this.reloadPage();
     });
+  }
+
+  protected reloadPage() {
+    if (this.router.url && this.router.url != "/") {
+      this.router.navigateByUrl(this.router.url);
+    } else {
+      window.location.reload(); //TODO
+    }
   }
 }
 

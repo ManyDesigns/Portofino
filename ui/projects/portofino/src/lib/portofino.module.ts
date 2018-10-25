@@ -51,6 +51,11 @@ import {ButtonComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
 import {FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
+import {
+  MatSnackBarNotificationService,
+  NotificationService,
+  WindowAlertNotificationService
+} from "./notifications/notification.service";
 
 @NgModule({
   declarations: [
@@ -77,7 +82,8 @@ import {TranslateModule} from "@ngx-translate/core";
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
-    { provide: TokenStorageService, useClass: LocalTokenStorageService }],
+    { provide: TokenStorageService, useClass: LocalTokenStorageService },
+    { provide: NotificationService, useClass: MatSnackBarNotificationService }],
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, ManyToManyComponent],

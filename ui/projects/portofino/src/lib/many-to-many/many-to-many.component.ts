@@ -5,6 +5,7 @@ import {HttpClient} from "@angular/common/http";
 import {FormControl} from "@angular/forms";
 import {MatSnackBar} from "@angular/material";
 import {Button, Operation, Page, PageConfiguration} from "../page.component";
+import {NotificationService} from "../notifications/notification.service";
 
 @Component({
   selector: 'portofino-many-to-many',
@@ -25,7 +26,8 @@ export class ManyToManyComponent extends Page implements OnInit {
 
   readonly associationsPath = "/:availableAssociations";
 
-  constructor(protected http: HttpClient, public portofino: PortofinoService, private snackBar: MatSnackBar) {
+  constructor(
+    protected http: HttpClient, public portofino: PortofinoService, protected notificationService: NotificationService) {
     super(portofino, http);
   }
 
@@ -81,9 +83,9 @@ export class ManyToManyComponent extends Page implements OnInit {
     let body = {};
     body[this.key.key] = this.associations.filter(a => a.selected).map(a => a.key.key);
     this.http.post(this.sourceUrl, body).subscribe(_ => {
-      this.snackBar.open('Saved', null, { duration: 10000, verticalPosition: 'top' });
+      this.notificationService.info('Saved');
     }, error => {
-      this.snackBar.open('Error', null, { duration: 10000, verticalPosition: 'top' });
+      this.notificationService.error('Error');
     });
   }
 }

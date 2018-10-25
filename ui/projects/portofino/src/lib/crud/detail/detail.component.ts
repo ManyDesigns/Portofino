@@ -6,6 +6,7 @@ import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../page.component";
 import {Observable} from "rxjs";
 import {MatSnackBar} from "@angular/material";
+import {NotificationService} from "../../notifications/notification.service";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -27,8 +28,8 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   constructor(
     protected http: HttpClient, protected portofino: PortofinoService,
-    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {
-    super(http, portofino, changeDetector, snackBar);
+    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService) {
+    super(http, portofino, changeDetector, notificationService);
   }
 
   isEditable(property: Property): boolean {
