@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.ServletContext;
 import java.io.File;
 
-@Component
+@org.springframework.context.annotation.Configuration
 public class PortofinoSpringConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);

@@ -9,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.annotation.AnnotationConfigRegistry;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -68,6 +70,7 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
                     }
                     annotationConfig.register(PortofinoSpringConfiguration.class);
                     CodeBase codeBase = (CodeBase) servletContext.getAttribute(PortofinoListener.CODE_BASE_ATTRIBUTE);
+                    ((DefaultResourceLoader) applicationContext).setClassLoader(codeBase.asClassLoader());
                     try {
                         annotationConfig.register(codeBase.loadClass("SpringConfiguration"));
                     } catch (Exception e) {

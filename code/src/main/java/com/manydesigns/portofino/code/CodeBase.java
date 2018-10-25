@@ -15,4 +15,9 @@ public interface CodeBase {
     FileObject getRoot();
 
     void close();
+
+    default ClassLoader asClassLoader() {
+        return new CodeBaseClassLoader(this);
+    }
+
 }

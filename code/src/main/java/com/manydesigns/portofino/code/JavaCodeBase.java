@@ -87,7 +87,7 @@ public class JavaCodeBase implements CodeBase {
         if(parent != null) {
             return parent.loadClass(className);
         }
-        throw new ClassNotFoundException(className);
+        return getClassLoader().loadClass(className);
     }
 
     public Class loadClassFile(FileObject location, String name) throws FileSystemException, ClassNotFoundException {

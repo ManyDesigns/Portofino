@@ -70,7 +70,7 @@ public class GroovyCodeBase implements CodeBase {
         if(parent != null) {
             return parent.loadClass(className);
         }
-        throw new ClassNotFoundException(className);
+        return getClassLoader().loadClass(className);
     }
 
     public Class loadGroovyFile(FileObject fileObject) throws FileSystemException, ResourceException, ScriptException {
