@@ -5,6 +5,7 @@ import {isBlob, isDateProperty, isUpdatable, Property} from "../../class-accesso
 import {BaseDetailComponent} from "../common.component";
 import {MatSnackBar} from "@angular/material";
 import {FormComponent} from "../../form";
+import {NotificationService} from "../../notifications/notification.service";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
@@ -20,8 +21,8 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
 
   constructor(
     protected http: HttpClient, protected portofino: PortofinoService,
-    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {
-    super(http, portofino, changeDetector, snackBar);
+    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService) {
+    super(http, portofino, changeDetector, notificationService);
   }
 
   protected setupForm(object): void {

@@ -6,6 +6,7 @@ export * from './lib/buttons';
 export * from './lib/form';
 export * from './lib/fields/field.component';
 export * from './lib/fields/blob-field.component';
+export * from './lib/notifications/notification.service';
 export * from './lib/portofino-app.component';
 export * from './lib/crud/crud.component';
 export * from './lib/portofino.module';

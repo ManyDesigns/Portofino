@@ -4,6 +4,7 @@ import {PortofinoService} from "../../portofino.service";
 import {isInsertable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {MatSnackBar} from "@angular/material";
+import {NotificationService} from "../../notifications/notification.service";
 
 @Component({
   selector: 'portofino-crud-create',
@@ -14,8 +15,8 @@ export class CreateComponent extends BaseDetailComponent implements OnInit {
 
   constructor(
     protected http: HttpClient, protected portofino: PortofinoService,
-    protected changeDetector: ChangeDetectorRef, protected snackBar: MatSnackBar) {
-    super(http, portofino, changeDetector, snackBar);
+    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService) {
+    super(http, portofino, changeDetector, notificationService);
   }
 
   isEditable(property: Property): boolean {

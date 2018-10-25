@@ -25,14 +25,16 @@ import {
   MatIconModule,
   MatInputModule,
   MatMenuModule,
-  MatPaginatorModule, MatProgressBarModule,
+  MatPaginatorModule,
+  MatProgressBarModule,
   MatRadioModule,
   MatSelectModule,
   MatSidenavModule,
   MatSnackBarModule,
   MatSortModule,
   MatTableModule,
-  MatToolbarModule, MatTreeModule
+  MatToolbarModule,
+  MatTreeModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -57,6 +59,11 @@ import {QuillModule} from "ngx-quill";
 import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {PageComponent} from "./page.component";
+import {
+  MatSnackBarNotificationService,
+  NotificationService,
+  WindowAlertNotificationService
+} from "./notifications/notification.service";
 
 @NgModule({
   declarations: [
@@ -85,7 +92,8 @@ import {PageComponent} from "./page.component";
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
-    { provide: TokenStorageService, useClass: LocalTokenStorageService }],
+    { provide: TokenStorageService, useClass: LocalTokenStorageService },
+    { provide: NotificationService, useClass: MatSnackBarNotificationService }],
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,
     CrudComponent, ManyToManyComponent],
