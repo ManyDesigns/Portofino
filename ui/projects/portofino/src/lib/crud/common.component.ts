@@ -247,7 +247,7 @@ export abstract class BaseDetailComponent {
     this.saving = true;
     if(this.form.invalid) {
       this.triggerValidationForAllFields(this.form);
-      this.notificationService.error('There are validation errors');
+      this.notificationService.error('There are validation errors').subscribe();
       this.saving = false;
       return;
     }
@@ -271,7 +271,7 @@ export abstract class BaseDetailComponent {
             }
           }
           if(errorsFound > 0) {
-            this.notificationService.error('There are validation errors');
+            this.notificationService.error('There are validation errors').subscribe();
             this.changeDetector.detectChanges();
           }
         }

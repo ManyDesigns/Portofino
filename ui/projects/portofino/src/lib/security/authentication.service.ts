@@ -50,7 +50,7 @@ export class AuthenticationService {
             mergeMap(_ => this.doHttpRequest(this.withAuthenticationHeader(req))));
         }
       } else if(error.status === 403) {
-        this.notifications.error("You do not have the permission to do that!"); //TODO I18n
+        this.notifications.error("You do not have the permission to do that!").subscribe(); //TODO I18n
       }
       return throwError(error);
     }), share());
