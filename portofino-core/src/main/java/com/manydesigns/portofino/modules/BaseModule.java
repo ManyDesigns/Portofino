@@ -31,13 +31,14 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
-import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 /**
@@ -79,22 +80,7 @@ public class BaseModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 0;
-    }
-
-    @Override
-    public String getId() {
-        return "base";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -102,32 +88,17 @@ public class BaseModule implements Module {
         return "Base";
     }
 
-    @Override
-    public int install() {
-        return getMigrationVersion();
-    }
-
-    @Override
-    public void init() {
-        status = ModuleStatus.ACTIVE;
-    }
-
     @Bean
     public CacheResetListenerRegistry getCacheResetListenerRegistry() {
         return new CacheResetListenerRegistry();
     }
 
-    @Override
-    public void start() {
+    @PostConstruct
+    public void init() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

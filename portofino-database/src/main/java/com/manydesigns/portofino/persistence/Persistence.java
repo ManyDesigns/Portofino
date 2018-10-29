@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.persistence;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
@@ -48,7 +49,6 @@ import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -94,7 +94,6 @@ public class Persistence {
     protected final File appModelFile;
     protected final org.apache.commons.configuration.Configuration configuration;
 
-    @Autowired
     public CacheResetListenerRegistry cacheResetListenerRegistry;
 
     //**************************************************************************

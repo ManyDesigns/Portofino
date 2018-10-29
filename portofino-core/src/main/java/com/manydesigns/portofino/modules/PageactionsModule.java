@@ -55,6 +55,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.util.UUID;
@@ -111,22 +113,7 @@ public class PageactionsModule implements Module, ApplicationContextAware {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 10;
-    }
-
-    @Override
-    public String getId() {
-        return "pageactions";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -134,12 +121,7 @@ public class PageactionsModule implements Module, ApplicationContextAware {
         return "Pageactions";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         logger.debug("Initializing dispatcher");
         PageLogic.init(configuration);
@@ -170,7 +152,22 @@ public class PageactionsModule implements Module, ApplicationContextAware {
             configuration.setProperty("jwt.secret", jwtSecret);
         }
 
-        status = ModuleStatus.ACTIVE;
+        logger.info("Initializing Shiro environment");
+        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
+        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
+        logger.debug("Creating SecurityClassRealm");
+        try {
+            SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
+            LifecycleUtils.init(realm);
+            rsm.setRealm(realm);
+            status = ModuleStatus.STARTED;
+        } catch (Exception  e) {
+            logger.error("Security class not found or invalid; installing dummy realm", e);
+            SimpleAccountRealm realm = new SimpleAccountRealm();
+            LifecycleUtils.init(realm);
+            rsm.setRealm(realm);
+            status = ModuleStatus.FAILED;
+        }
     }
 
     @Bean
@@ -231,32 +228,7 @@ public class PageactionsModule implements Module, ApplicationContextAware {
         }
     }
 
-    @Override
-    public void start() {
-        logger.info("Initializing Shiro environment");
-        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
-        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-        logger.debug("Creating SecurityClassRealm");
-        try {
-            SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
-            LifecycleUtils.init(realm);
-            rsm.setRealm(realm);
-            status = ModuleStatus.STARTED;
-        } catch (Exception  e) {
-            logger.error("Security class not found or invalid; installing dummy realm", e);
-            SimpleAccountRealm realm = new SimpleAccountRealm();
-            LifecycleUtils.init(realm);
-            rsm.setRealm(realm);
-            status = ModuleStatus.FAILED;
-        }
-    }
-
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         logger.info("Destroying Shiro environment...");
         environmentLoader.destroyEnvironment(servletContext);

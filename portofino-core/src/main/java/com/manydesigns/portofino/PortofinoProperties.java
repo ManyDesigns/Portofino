@@ -20,6 +20,10 @@
 
 package com.manydesigns.portofino;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+
 /**
  * Keys for configuration properties.
  *
@@ -54,4 +58,13 @@ public final class PortofinoProperties {
     public static final String GROOVY_PRELOAD_CLASSES = "groovy.preloadClasses";
 
     private PortofinoProperties() {}
+
+    //Utilities
+    public static String getPortofinoVersion() {
+        try {
+            return IOUtils.toString(PortofinoProperties.class.getResourceAsStream("/portofino.version"));
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }

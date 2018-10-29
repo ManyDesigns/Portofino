@@ -32,7 +32,6 @@ import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
@@ -190,7 +189,7 @@ public class PortofinoListener extends DispatcherInitializer
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
-                lineSeparator + "--- ManyDesigns Portofino " + ModuleRegistry.getPortofinoVersion() + " started successfully" +
+                lineSeparator + "--- ManyDesigns Portofino " + PortofinoProperties.getPortofinoVersion() + " started successfully" +
                 lineSeparator + "--- Context path: {}" +
                 lineSeparator + "--- Real path: {}" +
                 lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +

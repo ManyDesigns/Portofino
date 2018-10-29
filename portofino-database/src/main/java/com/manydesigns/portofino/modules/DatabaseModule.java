@@ -20,10 +20,13 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -31,8 +34,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.event.ContextRefreshedEvent;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.io.File;
 
@@ -42,7 +51,7 @@ import java.io.File;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DatabaseModule implements Module, ApplicationContextAware {
+public class DatabaseModule implements Module, ApplicationContextAware, ApplicationListener {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -80,22 +89,7 @@ public class DatabaseModule implements Module, ApplicationContextAware {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 10;
-    }
-
-    @Override
-    public String getId() {
-        return "database";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -103,12 +97,7 @@ public class DatabaseModule implements Module, ApplicationContextAware {
         return "Database";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         status = ModuleStatus.ACTIVE;
     }
@@ -119,25 +108,18 @@ public class DatabaseModule implements Module, ApplicationContextAware {
     }
 
     @Bean
-    public Persistence getPersistence(@Autowired DatabasePlatformsRegistry databasePlatformsRegistry) {
-        return new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
+    public Persistence getPersistence(
+            @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
+            @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) {
+        Persistence persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
+        persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
+        return persistence;
     }
 
-    @Override
-    public void start() {
-        applicationContext.getBean(Persistence.class).start();
-        status = ModuleStatus.STARTED;
-    }
-
-    @Override
-    public void stop() {
-        applicationContext.getBean(Persistence.class).stop();
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         logger.info("ManyDesigns Portofino database module stopping...");
+        applicationContext.getBean(Persistence.class).stop();
         logger.info("ManyDesigns Portofino database module stopped.");
         status = ModuleStatus.DESTROYED;
     }
@@ -150,5 +132,15 @@ public class DatabaseModule implements Module, ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(@NotNull ApplicationEvent event) {
+        if(event instanceof ContextRefreshedEvent) {
+            logger.info("Starting persistence...");
+            applicationContext.getBean(Persistence.class).start();
+            status = ModuleStatus.STARTED;
+            logger.info("Persistence started.");
+        }
     }
 }

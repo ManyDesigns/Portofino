@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
 import org.apache.commons.configuration.Configuration;
 import org.quartz.Scheduler;
@@ -30,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 /*
@@ -68,22 +71,7 @@ public class QuartzModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 10;
-    }
-
-    @Override
-    public String getId() {
-        return "quartz";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -91,12 +79,7 @@ public class QuartzModule implements Module {
         return "Quartz";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         StdSchedulerFactory factory;
         try {
@@ -126,7 +109,10 @@ public class QuartzModule implements Module {
                 scheduler.getContext().put(servletCtxtKey, servletContext);
             }
 
-            status = ModuleStatus.ACTIVE;
+            if(startOnLoad) {
+                scheduler.start();
+            }
+            status = ModuleStatus.STARTED;
         } catch (Exception e) {
             logger.error("Quartz Scheduler failed to initialize", e);
         }
@@ -142,37 +128,15 @@ public class QuartzModule implements Module {
         return factory;
     }
 
-    @Override
-    public void start() {
-        try {
-            if(startOnLoad) {
-                scheduler.start();
-            }
-            status = ModuleStatus.STARTED;
-        } catch (SchedulerException e) {
-            logger.error("Could not start scheduler", e);
-        }
-    }
-
-    @Override
-    public void stop() {
-        try {
-            scheduler.pauseAll();
-        } catch (SchedulerException e) {
-            logger.warn("Cannot pause scheduler", e);
-        } finally {
-            status = ModuleStatus.STOPPED;
-        }
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         try {
             scheduler.shutdown(waitOnShutdown);
         } catch (SchedulerException e) {
-            logger.error("Could not shut scheduler down", e);
+            logger.warn("Cannot pause scheduler", e);
+        } finally {
+            status = ModuleStatus.DESTROYED;
         }
-        status = ModuleStatus.DESTROYED;
     }
 
     @Override

@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.GoogleCloudSQLDatabasePlatform;
 import com.manydesigns.portofino.liquibase.databases.GoogleCloudSQLDatabase;
 import com.manydesigns.portofino.liquibase.sqlgenerators.GoogleCloudSQLLockDatabaseChangeLogGenerator;
@@ -30,6 +31,9 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,22 +66,7 @@ public class GooglecloudsqlModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 20;
-    }
-
-    @Override
-    public String getId() {
-        return "googlecloudsql";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -85,12 +74,7 @@ public class GooglecloudsqlModule implements Module {
         return "Google Cloud SQL";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
             logger.debug("Registering Google Cloud SQL");
@@ -100,20 +84,10 @@ public class GooglecloudsqlModule implements Module {
                     new GoogleCloudSQLLockDatabaseChangeLogGenerator());
         }
         databasePlatformsRegistry.addDatabasePlatform(new GoogleCloudSQLDatabasePlatform());
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

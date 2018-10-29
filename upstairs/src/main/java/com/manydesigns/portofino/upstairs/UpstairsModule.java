@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.upstairs;
 
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.modules.Module;
-import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import org.apache.commons.vfs2.FileObject;
@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 /*
@@ -62,22 +64,7 @@ public class UpstairsModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 30;
-    }
-
-    @Override
-    public String getId() {
-        return "upstairs";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -85,12 +72,7 @@ public class UpstairsModule implements Module {
         return "\"Upstairs\" (configure, add, remove pages)";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         FileObject fileObject = null;
         try {
@@ -99,20 +81,10 @@ public class UpstairsModule implements Module {
             throw new RuntimeException(e);
         }
         PortofinoRoot.mount(fileObject, "portofino-upstairs");
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

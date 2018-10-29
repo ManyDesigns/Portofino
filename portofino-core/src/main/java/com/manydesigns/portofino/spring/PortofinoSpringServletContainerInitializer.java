@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.spring;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
@@ -59,6 +60,7 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
     protected ApplicationContextInitializer<?>[] getRootApplicationContextInitializers() {
         return new ApplicationContextInitializer[] {
                 applicationContext -> {
+                    ElementsThreadLocals.setupDefaultElementsContext();
                     MutablePropertySources sources = applicationContext.getEnvironment().getPropertySources();
                     Configuration configuration =
                             (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);

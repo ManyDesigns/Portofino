@@ -24,13 +24,15 @@ import com.manydesigns.mail.quartz.MailScheduler;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.mail.setup.MailQueueSetup;
+import com.manydesigns.portofino.PortofinoProperties;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 /*
@@ -39,7 +41,7 @@ import javax.servlet.ServletContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MailModule implements Module, InitializingBean {
+public class MailModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -66,22 +68,7 @@ public class MailModule implements Module, InitializingBean {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 20;
-    }
-
-    @Override
-    public String getId() {
-        return "mail";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -89,34 +76,10 @@ public class MailModule implements Module, InitializingBean {
         return "Mail";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
+    @PostConstruct
+    public void init() {
         mailQueueSetup = new MailQueueSetup(configuration);
         mailQueueSetup.setup();
-    }
-
-    @Bean
-    public MailQueue getMailQueue() {
-        return mailQueueSetup.getMailQueue();
-    }
-
-    @Bean
-    public MailSender getMailSender() {
-        return mailQueueSetup.getMailSender();
-    }
-
-    @Override
-    public void init() {
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         //Quartz integration (optional)
         try {
             //In classe separata per permettere al modulo di essere caricato anche in assenza di Quartz a runtime
@@ -128,14 +91,19 @@ public class MailModule implements Module, InitializingBean {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
+    }
+
+    @Bean
+    public MailQueue getMailQueue() {
+        return mailQueueSetup.getMailQueue();
+    }
+
+    @Bean
+    public MailSender getMailSender() {
+        return mailQueueSetup.getMailSender();
     }
 
     @Override
