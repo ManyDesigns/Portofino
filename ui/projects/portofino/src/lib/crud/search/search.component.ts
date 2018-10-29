@@ -62,6 +62,7 @@ export class SearchComponent implements OnInit {
       this.columnsToDisplay.push(this.selectColumnName);
     }
     this.classAccessor.properties.forEach(property => {
+      property = Object.assign(new Property(), property);
       if(!isEnabled(property)) {
         return;
       }
