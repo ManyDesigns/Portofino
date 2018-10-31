@@ -10,7 +10,7 @@
         <session-timeout>60</session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
     </welcome-file-list>
     
     <!--
@@ -28,6 +28,10 @@
         for development on your own machine. The generated war WILL NOT WORK on other machines.
          -->
     </context-param>
+
+    <listener>
+        <listener-class>com.manydesigns.portofino.ui.support.BaseHrefReplaceListener</listener-class>
+    </listener>
 
     <!-- The REST API -->
     <servlet>
