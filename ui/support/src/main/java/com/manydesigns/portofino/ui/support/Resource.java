@@ -9,21 +9,21 @@ import javax.ws.rs.core.UriInfo;
 
 public class Resource {
 
-  public static final String AUTHORIZATION_HEADER = "Authorization";
-  @Context
-  protected ServletContext servletContext;
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    @Context
+    protected ServletContext servletContext;
 
-  @Context
-  protected UriInfo uriInfo;
+    @Context
+    protected UriInfo uriInfo;
 
-  public WebTarget path(String path) {
-    Client c = ClientBuilder.newClient();
-    String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
-    if(path.startsWith(baseUri)) {
-      path = path.substring(baseUri.length());
+    public WebTarget path(String path) {
+        Client c = ClientBuilder.newClient();
+        String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
+        if (path.startsWith(baseUri)) {
+            path = path.substring(baseUri.length());
+        }
+        WebTarget target = c.target(baseUri);
+        return target.path(path);
     }
-    WebTarget target = c.target(baseUri);
-    return target.path(path);
-  }
 
 }

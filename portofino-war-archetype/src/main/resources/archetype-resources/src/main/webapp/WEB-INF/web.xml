@@ -63,4 +63,13 @@
         <url-pattern>/portofino/*</url-pattern>
     </servlet-mapping>
 
+    <filter>
+        <filter-name>AutoConfigJsonFilter</filter-name>
+        <filter-class>com.manydesigns.portofino.ui.support.pages.AutoConfigJsonFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AutoConfigJsonFilter</filter-name>
+        <url-pattern>/pages/*</url-pattern>
+    </filter-mapping>
+
 </web-app>
