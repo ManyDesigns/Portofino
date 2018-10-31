@@ -1,6 +1,6 @@
 <div fxLayout="column" fxLayoutGap="20px">
-  <h2 *ngIf="editMode">{{ 'Edit _' | translate:{ id: id } }}</h2>
-  <h2 *ngIf="!editMode">{{id}}</h2>
+  <h2 *ngIf="editMode">{{ 'Edit _' | translate:{ what: prettyName } }}</h2>
+  <h2 *ngIf="!editMode">{{prettyName}}</h2>
   <form (submit)="save()" *ngIf="object">
     <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
                     fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>

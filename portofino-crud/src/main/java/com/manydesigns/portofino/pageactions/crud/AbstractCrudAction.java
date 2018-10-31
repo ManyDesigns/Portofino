@@ -30,7 +30,6 @@ import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.*;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -158,6 +157,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractCrudAction.class);
+    public static final String PORTOFINO_PRETTY_NAME_HEADER = "X-Portofino-Pretty-Name";
 
     //--------------------------------------------------------------------------
     // Web parameters
@@ -371,7 +371,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
-        return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
+        String prettyName = safeGetPrettyName();
+        return Response.ok(jsonText)
+                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
+                .build();
     }
 
     public Response jsonEditData() throws JSONException {
@@ -382,7 +386,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
-        return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
+        String prettyName = safeGetPrettyName();
+        return Response.ok(jsonText)
+                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
+                .build();
     }
 
     public Response jsonCreateData() throws JSONException {
@@ -390,7 +398,24 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
-        return Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8").build();
+        String prettyName = safeGetPrettyName();
+        return Response.ok(jsonText)
+                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
+                .build();
+    }
+
+    public String safeGetPrettyName() {
+        try {
+            return ShortNameUtils.getName(getClassAccessor(), object);
+        } catch (Exception e) {
+            logger.debug("Could not get the pretty name of the object", e);
+            if(pk != null) {
+                return StringUtils.join(pk, "/");
+            } else {
+                return null;
+            }
+        }
     }
 
 
@@ -577,34 +602,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @param object the object.
      */
     protected void deletePostProcess(T object) {}
-
-    /**
-     * Adds an information message (using {@link SessionMessages}) after successful creation of a new record.
-     * By default, the message contains a link to the created object as well as a link for creating a new one.
-     */
-    protected void addSuccessfulSaveInfoMessage() {
-        XhtmlBuffer buffer = new XhtmlBuffer();
-
-        pk = pkHelper.generatePkStringArray(object);
-        String readUrl = context.getActionPath() + "/" + getPkForUrl(pk);
-        String prettyName = ShortNameUtils.getName(getClassAccessor(), object);
-        XhtmlBuffer linkToObjectBuffer = new XhtmlBuffer();
-        linkToObjectBuffer.writeAnchor(Util.getAbsoluteUrl(readUrl), prettyName);
-        buffer.writeNoHtmlEscape(ElementsThreadLocals.getText("object._.saved", linkToObjectBuffer));
-
-        String createUrl = Util.getAbsoluteUrl(context.getActionPath());
-        if(!createUrl.contains("?")) {
-            createUrl += "?";
-        } else {
-            createUrl += "&";
-        }
-        createUrl += "create=";
-        createUrl = appendSearchStringParamIfNecessary(createUrl);
-        buffer.write(" ");
-        buffer.writeAnchor(createUrl, ElementsThreadLocals.getText("create.another.object"));
-
-        SessionMessages.addInfoMessage(buffer);
-    }
 
     //--------------------------------------------------------------------------
     // Setup

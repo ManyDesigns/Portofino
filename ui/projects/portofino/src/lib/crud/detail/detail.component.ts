@@ -4,7 +4,6 @@ import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../page";
-import {MatSnackBar} from "@angular/material";
 import {NotificationService} from "../../notifications/notification.service";
 
 @Component({
@@ -16,6 +15,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   @Input()
   id: string;
+  prettyName: string;
   editEnabled: boolean;
   deleteEnabled: boolean;
 
@@ -47,7 +47,11 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   ngOnInit() {
     this.initClassAccessor();
     const objectUrl = `${this.sourceUrl}/${this.id}`;
-    this.http.get(objectUrl, {params: {forEdit: "true"}}).subscribe(o => this.setupForm(o));
+    this.http.get(objectUrl, {params: {forEdit: "true"}, observe: 'response'}).subscribe(resp => {
+      this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
+      console.log(resp, resp.headers.get('X-Portofino-Pretty-Name'), this.prettyName);
+      this.setupForm(resp.body);
+    });
     this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
       this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
       this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
@@ -79,7 +83,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     if(!this.editMode) {
       throw "Not in edit mode!";
     }
-    super.save();
+    return super.save();
   }
 
   protected doSave(object) {
