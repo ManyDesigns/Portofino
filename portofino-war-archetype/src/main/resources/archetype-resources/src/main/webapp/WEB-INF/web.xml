@@ -66,6 +66,10 @@
     <filter>
         <filter-name>AutoConfigJsonFilter</filter-name>
         <filter-class>com.manydesigns.portofino.ui.support.pages.AutoConfigJsonFilter</filter-class>
+        <init-param>
+            <param-name>writeGeneratedFiles</param-name>
+            <param-value>false</param-value>
+        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>AutoConfigJsonFilter</filter-name>

@@ -2,6 +2,7 @@ package com.manydesigns.portofino.ui.support.pages;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manydesigns.portofino.ui.support.ApiInfo;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -21,10 +23,11 @@ import java.util.List;
 public class AutoConfigJsonFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(AutoConfigJsonFilter.class);
+    protected boolean writeGeneratedFiles;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
+        writeGeneratedFiles = "true".equalsIgnoreCase(filterConfig.getInitParameter("writeGeneratedFiles"));
     }
 
     @Override
@@ -68,8 +71,15 @@ public class AutoConfigJsonFilter implements Filter {
                     }
                     configJson.endArray();
                     configJson.endObject();
-                    //TODO write it on the file system, perhaps conditionally to an init parameter
-                    response.getWriter().write(configJson.toString());
+                    String configJsonString = configJson.toString();
+                    if(writeGeneratedFiles) {
+                        try(FileWriter fw = new FileWriter(configJsonFile)) {
+                            fw.write(configJsonString);
+                        } catch (IOException e) {
+                            logger.warn("Could not save generated file " + configJsonFile, e);
+                        }
+                    }
+                    response.getWriter().write(configJsonString);
                     return;
                 } else {
                     logger.warn("Unknown page type: " + pageDescription.superclass);
@@ -108,4 +118,5 @@ class PageDescription {
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Page {
     public String title;
+    //TODO support old (Portofino 4) layout information for embedding
 }
