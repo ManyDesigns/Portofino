@@ -98,7 +98,7 @@ public class AutoConfigJsonFilter implements Filter {
         if("com.manydesigns.portofino.pageactions.crud.AbstractCrudAction".equals(superclass)) {
             return "crud";
         }
-        return "ex";
+        return null;
     }
 
     @Override
