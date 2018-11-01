@@ -119,10 +119,11 @@ public class OgnlUtils {
         try {
             Field field = OgnlRuntime.class.getDeclaredField(fieldName);
             field.setAccessible(true);
-            Map ognlCache = (Map) field.get(null);
-            synchronized (ognlCache) {
-                ognlCache.clear();
-            }
+            Object ognlCache = field.get(null);
+            Field cacheField = ognlCache.getClass().getDeclaredField("cache");
+            cacheField.setAccessible(true);
+            Map cache = (Map) cacheField.get(ognlCache);
+            cache.clear();
         } catch (Exception e) {
             logger.warn("Could not clear OGNL cache " + fieldName, e);
         }
