@@ -20,4 +20,5 @@ public interface CodeBase {
         return new CodeBaseClassLoader(this);
     }
 
+    void clear() throws Exception;
 }

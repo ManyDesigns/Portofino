@@ -54,8 +54,6 @@ public class SettingsAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    public static final String URL_BINDING = "/actions/admin/settings";
-
     @Autowired
     public Configuration configuration;
 

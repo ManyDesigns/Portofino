@@ -144,7 +144,7 @@ public class PortofinoRoot extends Root implements PageAction {
 
     public static void mount(FileObject fileObject, String name) {
         FileObject previous = children.putIfAbsent(name, fileObject);
-        if(previous != null) {
+        if(previous != null && !previous.equals(fileObject)) {
             throw new RuntimeException("Already mounted: " + previous);
         }
     }

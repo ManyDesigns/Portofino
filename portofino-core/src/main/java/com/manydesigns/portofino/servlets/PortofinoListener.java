@@ -194,11 +194,7 @@ public class PortofinoListener extends DispatcherInitializer
                 lineSeparator + "--- Real path: {}" +
                 lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
                 lineSeparator + SEPARATOR,
-                new String[]{
-                        serverInfo.getContextPath(),
-                        serverInfo.getRealPath()
-                }
-        );
+                (Object[]) new String[] { serverInfo.getContextPath(), serverInfo.getRealPath() });
     }
 
     @Override

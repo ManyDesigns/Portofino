@@ -37,15 +37,19 @@ public class GroovyCodeBase implements CodeBase {
         this.root = root;
         this.parent = parent;
         this.classLoader = classLoader;
+        resetGroovyScriptEngine();
+    }
+
+    public void resetGroovyScriptEngine() throws FileSystemException {
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
         try {
-            String classpath = root.getName().getPath();
+            String classpath = this.root.getName().getPath();
             cc.setClasspath(classpath);
         } catch (Exception e) {
             logger.debug("Could not set classpath", e);
         }
         cc.setRecompileGroovySource(true);
-        groovyScriptEngine = new GroovyScriptEngine(new URL[] { root.getURL() }, getClassLoader());
+        groovyScriptEngine = new GroovyScriptEngine(new URL[] { this.root.getURL() }, getClassLoader());
         groovyScriptEngine.setConfig(cc);
         groovyScriptEngine.getGroovyClassLoader().setShouldRecompile(true);
     }
@@ -90,5 +94,13 @@ public class GroovyCodeBase implements CodeBase {
     @Override
     public FileObject getRoot() {
         return root;
+    }
+
+    @Override
+    public void clear() throws Exception {
+        if(parent != null) {
+            parent.clear();
+        }
+        resetGroovyScriptEngine();
     }
 }

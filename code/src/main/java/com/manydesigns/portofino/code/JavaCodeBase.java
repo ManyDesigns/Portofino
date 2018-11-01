@@ -53,9 +53,8 @@ public class JavaCodeBase implements CodeBase {
     
     protected JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     protected DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
-    protected InMemoryFileManager fileManager =
-            new InMemoryFileManager(compiler.getStandardFileManager(diagnosticCollector, null, null));
-    protected VFSClassloader vfsClassloader = new VFSClassloader(fileManager.directory, getClassLoader());
+    protected InMemoryFileManager fileManager;
+    protected VFSClassloader vfsClassloader;
 
     protected static final Logger logger = LoggerFactory.getLogger(JavaCodeBase.class);
 
@@ -67,6 +66,15 @@ public class JavaCodeBase implements CodeBase {
         this.root = root;
         this.parent = parent;
         this.classLoader = classLoader;
+        resetFileManagerAndClassLoader();
+    }
+
+    public void resetFileManagerAndClassLoader() throws IOException {
+        if(fileManager != null) {
+            fileManager.close();
+        }
+        fileManager = new InMemoryFileManager(compiler.getStandardFileManager(diagnosticCollector, null, null));
+        vfsClassloader = new VFSClassloader(fileManager.directory, getClassLoader());
     }
 
     public JavaCodeBase(FileObject root, CodeBase parent) throws IOException {
@@ -354,5 +362,13 @@ public class JavaCodeBase implements CodeBase {
     @Override
     public FileObject getRoot() {
         return root;
+    }
+
+    @Override
+    public void clear() throws Exception {
+        if(parent != null) {
+            parent.clear();
+        }
+        resetFileManagerAndClassLoader();
     }
 }

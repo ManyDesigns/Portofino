@@ -59,15 +59,9 @@ public class DemoTTModule implements Module {
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     @Autowired
-    public ModuleRegistry moduleRegistry;
-
-    @Autowired
     public Persistence persistence;
 
     public boolean installationMode = false;
-
-    Scheduler scheduler;
-    JobKey notificationJobKey;
 
     String getModuleVersion() {
         return TT_VERSION;
@@ -123,14 +117,10 @@ public class DemoTTModule implements Module {
             session.getTransaction().commit();
         }
 
-        scheduler = StdSchedulerFactory.getDefaultScheduler();
-        notificationJobKey = scheduleJob(NotificationsJob.class, "NotificationsJob", 10, "tt");
-
         status = ModuleStatus.STARTED;
     }
 
     void stop() {
-        scheduler.deleteJob(notificationJobKey);
         status = ModuleStatus.STOPPED;
     }
 
@@ -140,28 +130,6 @@ public class DemoTTModule implements Module {
 
     ModuleStatus getStatus() {
         return status;
-    }
-
-
-    JobKey scheduleJob(Class clazz, String jobName, int pollSecInterval, String jobGroup) {
-        try {
-            JobDetail job = JobBuilder
-                    .newJob(clazz)
-                    .withIdentity(jobName + ".job", jobGroup)
-                    .build();
-
-            Trigger trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(jobName + ".trigger", jobGroup)
-                    .startAt(DateBuilder.futureDate(pollSecInterval, IntervalUnit.SECOND))
-                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(pollSecInterval))
-                    .build();
-
-            scheduler.scheduleJob(job, trigger);
-            return job.getKey();
-        } catch (Exception e) {
-            logger.error("Could not schedule " + jobName + " job", e);
-            return null
-        }
     }
 
 }

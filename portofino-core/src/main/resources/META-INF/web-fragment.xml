@@ -18,7 +18,7 @@
     <!-- Shiro -->
     <filter>
         <filter-name>ShiroFilter</filter-name>
-        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+        <filter-class>com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter</filter-class>
     </filter>
 
     <filter-mapping>

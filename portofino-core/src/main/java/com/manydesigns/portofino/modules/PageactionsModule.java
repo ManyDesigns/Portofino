@@ -33,9 +33,9 @@ import com.manydesigns.portofino.pageactions.form.FormAction;
 import com.manydesigns.portofino.pageactions.form.TableFormAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
+import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
-import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
@@ -93,7 +93,6 @@ public class PageactionsModule implements Module, ApplicationContextAware {
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
     protected ApplicationContext applicationContext;
-    protected CacheManager cacheManager;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -102,7 +101,6 @@ public class PageactionsModule implements Module, ApplicationContextAware {
     //**************************************************************************
 
     public static final String PAGES_DIRECTORY = "PAGES_DIRECTORY";
-    public static final String EHCACHE_MANAGER = "portofino.ehcache.manager";
 
     //**************************************************************************
     // Logging
@@ -125,10 +123,6 @@ public class PageactionsModule implements Module, ApplicationContextAware {
     public void init() {
         logger.debug("Initializing dispatcher");
         PageLogic.init(configuration);
-
-        logger.info("Initializing ehcache service");
-        cacheManager = CacheManager.newInstance();
-        servletContext.setAttribute(EHCACHE_MANAGER, cacheManager);
 
         File actionsDirectory = new File(applicationDirectory, "actions");
         logger.info("Pages directory: " + actionsDirectory);
@@ -155,6 +149,17 @@ public class PageactionsModule implements Module, ApplicationContextAware {
         logger.info("Initializing Shiro environment");
         WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
+        SelfRegisteringShiroFilter shiroFilter = SelfRegisteringShiroFilter.get(servletContext);
+        if(shiroFilter != null) {
+            try {
+                //when reloading the Spring context, this overwrites the filter's stale security manager.
+                shiroFilter.init();
+            } catch (Exception e) {
+                logger.error("Could not initialize the Shiro filter", e);
+                status = ModuleStatus.FAILED;
+                return;
+            }
+        }
         logger.debug("Creating SecurityClassRealm");
         try {
             SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
@@ -232,8 +237,6 @@ public class PageactionsModule implements Module, ApplicationContextAware {
     public void destroy() {
         logger.info("Destroying Shiro environment...");
         environmentLoader.destroyEnvironment(servletContext);
-        logger.info("Shutting down cache...");
-        cacheManager.shutdown();
         status = ModuleStatus.DESTROYED;
     }
 
