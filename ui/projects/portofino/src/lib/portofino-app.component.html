@@ -1,2 +1,15 @@
-<ng-template portofino-toolbar></ng-template>
-<router-outlet *ngIf="portofino.apiRoot"></router-outlet>
+<mat-sidenav-container [autosize]="true">
+  <mat-sidenav #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
+               role="navigation">
+    <ng-template portofino-navigation></ng-template>
+  </mat-sidenav>
+  <mat-sidenav-content class="app-content-content">
+
+    <ng-template portofino-toolbar></ng-template>
+
+    <div class="app-page-container">
+      <router-outlet *ngIf="portofino.apiRoot"></router-outlet>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

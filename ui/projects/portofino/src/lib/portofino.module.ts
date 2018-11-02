@@ -34,7 +34,7 @@ import {
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
-  MatTreeModule
+  MatTreeModule, MatCardModule, MatExpansionModule, MatDividerModule,MatListModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -79,11 +79,11 @@ import {
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule,
-    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTreeModule,
+    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTreeModule,MatListModule,
     MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule,
     RouterModule.forChild([]),
-    TranslateModule
+    TranslateModule,MatCardModule,MatExpansionModule,MatDividerModule
   ],
   providers: [
     PortofinoService, AuthenticationService,

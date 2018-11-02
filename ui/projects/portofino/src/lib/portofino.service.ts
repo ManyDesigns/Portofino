@@ -1,11 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+import {MatSidenav} from "@angular/material";
 
 @Injectable()
 export class PortofinoService {
 
   defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
+  sideNavOpen: boolean;
   localApiPath = 'portofino';
   loginPath = 'login';
 
@@ -51,6 +53,10 @@ export class PortofinoService {
       throw "Local Portofino API not available"
     }
     return this.http.put(`${this.localApiPath}/pages/${path}?loginPath=${this.loginPath}`, config)
+  }
+
+  public toggleSidenav(){
+    this.sideNavOpen=!this.sideNavOpen;
   }
 }
 

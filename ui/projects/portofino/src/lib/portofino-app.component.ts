@@ -14,6 +14,8 @@ import {AuthenticationService} from "./security/authentication.service";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
+import {NAVIGATION_COMPONENT, NavigationComponent} from "./page";
+import {NavigationDirective} from "./content.directive";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 
@@ -36,7 +38,7 @@ export interface ToolbarComponent {
 })
 export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
-  constructor(public authenticationService: AuthenticationService) {}
+  constructor(public authenticationService: AuthenticationService,public portofino: PortofinoService) {}
 }
 
 @Component({
@@ -55,9 +57,13 @@ export class PortofinoAppComponent implements OnInit {
   @ViewChild(ToolbarDirective)
   toolbarHost: ToolbarDirective;
 
+  @ViewChild(NavigationDirective)
+  navigationHost: NavigationDirective;
+  navigation: NavigationComponent;
+
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, translate: TranslateService,
-              @Inject(TOOLBAR_COMPONENT) protected toolbarComponent) {
+              @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,@Inject(NAVIGATION_COMPONENT) protected navigationComponent) {
     translate.setDefaultLang('en');
     translate.setTranslation('en', TRANSLATIONS_EN, true);
     translate.setTranslation('it', TRANSLATIONS_IT, true);
@@ -73,6 +79,8 @@ export class PortofinoAppComponent implements OnInit {
     //Dynamically create the toolbar component
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
     let toolbar = this.toolbarHost.viewContainerRef.createComponent(componentFactory).instance as ToolbarComponent;
+    let navigationFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
+    this.navigation = this.navigationHost.viewContainerRef.createComponent(navigationFactory).instance as NavigationComponent;
     toolbar.title = this.title;
   }
 }

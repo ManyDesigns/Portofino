@@ -9,7 +9,7 @@ import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.s
 import {ButtonInfo, BUTTONS, declareButton} from "./buttons";
 import {BehaviorSubject, merge, Observable, of} from "rxjs";
 import {catchError, map} from "rxjs/operators";
-import {MatDialog, MatDialogRef, MatTreeFlatDataSource, MatTreeFlattener} from "@angular/material";
+import {MatDialog, MatDialogRef, MatListModule} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, DataSource, SelectionChange} from "@angular/cdk/collections";
 

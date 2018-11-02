@@ -8,12 +8,12 @@ import {
 import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient} from "@angular/common/http";
-import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from "./content.directive";
+import {EmbeddedContentDirective, MainContentDirective} from "./content.directive";
 import {Observable, Subscription} from "rxjs";
 import {mergeMap} from "rxjs/operators";
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {NAVIGATION_COMPONENT, NavigationComponent, Page, PageChild, PageConfiguration} from "./page";
+import {Page, PageChild, PageConfiguration} from "./page";
 
 @Component({
   selector: 'portofino-page',
@@ -21,34 +21,27 @@ import {NAVIGATION_COMPONENT, NavigationComponent, Page, PageChild, PageConfigur
   styleUrls: ['./page.component.css']
 })
 export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
-
-  @ViewChild(NavigationDirective)
-  navigationHost: NavigationDirective;
   @ViewChild(MainContentDirective)
   contentHost: MainContentDirective;
   @ViewChild(EmbeddedContentDirective)
   embeddedContentHost: EmbeddedContentDirective;
 
   error;
-  navigation: NavigationComponent;
 
   protected subscription: Subscription;
 
   constructor(protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver,
-              protected portofino: PortofinoService, @Inject(NAVIGATION_COMPONENT) protected navigationComponent,
+              public portofino: PortofinoService,
               protected authenticationService: AuthenticationService) { }
 
   ngOnInit() {
-    //Dynamically create the navigation component
-    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
-    this.navigation = this.navigationHost.viewContainerRef.createComponent(componentFactory).instance as NavigationComponent;
+
   }
 
   ngAfterViewInit() {
     this.subscription = this.route.url.subscribe(segment => {
       this.error = null;
-      this.navigation.page = null;
       this.loadPageInPath("", null, segment, 0, false);
     });
   }
@@ -82,7 +75,6 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         //If we arrive here, there are no more children in the URL to process
         if(!embed) {
-          this.navigation.page = page;
           page.children.forEach(child => {
             this.checkAccessibility(page, child);
             if(page.allowEmbeddedComponents && child.embedded) {

@@ -1,4 +1,9 @@
-<h3>{{ 'Navigation' | translate }}</h3>
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+  <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
+</mat-toolbar>
+
+<!-- TODO make it responsive https://stackblitz.com/angular/onrlxdodyer?file=app%2Fsidenav-responsive-example.html -->
+
 <ng-container *ngIf="!!page">
   <ul *ngIf="page.parent">
     <li>
@@ -33,3 +38,51 @@
     </ul>
   </div>
 </ng-container>
+
+
+<!--<div class="mt-3 mat-elevation-z0" >
+  <mat-accordion multi="true" class="no-shadow">
+    <mat-expansion-panel class="no-shadow mat-elevation-z0">
+      <mat-expansion-panel-header fxLayout="row" >
+        <mat-panel-title >
+           Page 1
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-nav-list class="ml-0" dense>
+        <mat-list-item>
+          <a [routerLink]="'users'" routerLinkActive="active">Users</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a href="#">Vodafone Airtime</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a href="#">MTN Airtime</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a href="#">GLO Airtime</a>
+        </mat-list-item>
+      </mat-nav-list>
+    </mat-expansion-panel>
+    <mat-expansion-panel class="no-shadow my-0 mat-elevation-z0">
+      <mat-expansion-panel-header fxLayout="row" >
+        <mat-panel-title>
+          Page 2
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-nav-list class="ml-0" dense>
+        <mat-list-item>
+          <a href="#">AirtelTigo Airtime</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a href="#">Vodafone Airtime</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a href="#">MTN Airtime</a>
+        </mat-list-item>
+        <mat-list-item>
+          <a href="#">GLO Airtime</a>
+        </mat-list-item>
+      </mat-nav-list>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>-->
