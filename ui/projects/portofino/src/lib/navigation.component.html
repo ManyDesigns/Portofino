@@ -1,17 +1,21 @@
 <h3>{{ 'Navigation' | translate }}</h3>
-<ng-container *ngIf="!!page">
-  <ul *ngIf="page.parent">
+<ng-container *ngIf="!!pageService.page">
+  <ul *ngIf="pageService.page.parent">
     <li>
-      <a [routerLink]="page.parent.url" routerLinkActive="active">{{page.parent.configuration.title}}</a>
+      <a [routerLink]="pageService.page.parent.url" routerLinkActive="active">
+        {{pageService.page.parent.configuration.title}}
+      </a>
       <ul>
-        <ng-container *ngFor="let child of page.parent.children">
-          <li *ngIf="child.path != page.segment && child.accessible">
-            <a [routerLink]="page.parent.url + '/' + child.path" routerLinkActive="active">{{child.title}}</a>
+        <ng-container *ngFor="let child of pageService.page.parent.children">
+          <li *ngIf="child.path != pageService.page.segment && child.accessible">
+            <a [routerLink]="pageService.page.parent.url + '/' + child.path" routerLinkActive="active">
+              {{child.title}}
+            </a>
           </li>
-          <li *ngIf="child.path == page.segment">
-            <strong>{{page.configuration.title}}</strong>
+          <li *ngIf="child.path == pageService.page.segment">
+            <strong>{{pageService.page.configuration.title}}</strong>
             <ul>
-              <ng-container *ngFor="let child of page.children">
+              <ng-container *ngFor="let child of pageService.page.children">
                 <li *ngIf="child.accessible">
                   <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
                 </li>
@@ -22,10 +26,10 @@
       </ul>
     </li>
   </ul>
-  <div *ngIf="!page.parent">
-    <strong>{{page.configuration.title}}</strong>
+  <div *ngIf="!pageService.page.parent">
+    <strong>{{pageService.page.configuration.title}}</strong>
     <ul>
-      <ng-container *ngFor="let child of page.children">
+      <ng-container *ngFor="let child of pageService.page.children">
         <li *ngIf="child.accessible">
           <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
         </li>

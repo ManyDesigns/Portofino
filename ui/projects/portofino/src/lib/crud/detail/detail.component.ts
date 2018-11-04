@@ -49,7 +49,6 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     const objectUrl = `${this.sourceUrl}/${this.id}`;
     this.http.get(objectUrl, {params: {forEdit: "true"}, observe: 'response'}).subscribe(resp => {
       this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
-      console.log(resp, resp.headers.get('X-Portofino-Pretty-Name'), this.prettyName);
       this.setupForm(resp.body);
     });
     this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {

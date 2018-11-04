@@ -1,7 +1,7 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver, Inject,
+  ComponentFactoryResolver, EventEmitter, Inject, Injectable,
   OnDestroy,
   OnInit, ViewChild
 } from '@angular/core';
@@ -13,7 +13,7 @@ import {Observable, Subscription} from "rxjs";
 import {mergeMap} from "rxjs/operators";
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {NAVIGATION_COMPONENT, NavigationComponent, Page, PageChild, PageConfiguration} from "./page";
+import {NAVIGATION_COMPONENT, Page, PageChild, PageConfiguration, PageService} from "./page";
 
 @Component({
   selector: 'portofino-page',
@@ -29,12 +29,10 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(EmbeddedContentDirective)
   embeddedContentHost: EmbeddedContentDirective;
 
-  error;
-  navigation: NavigationComponent;
-
   protected subscription: Subscription;
 
-  constructor(protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
+  constructor(public pageService: PageService,
+              protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver,
               protected portofino: PortofinoService, @Inject(NAVIGATION_COMPONENT) protected navigationComponent,
               protected authenticationService: AuthenticationService) { }
@@ -42,13 +40,11 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit() {
     //Dynamically create the navigation component
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
-    this.navigation = this.navigationHost.viewContainerRef.createComponent(componentFactory).instance as NavigationComponent;
+    this.navigationHost.viewContainerRef.createComponent(componentFactory);
   }
 
   ngAfterViewInit() {
     this.subscription = this.route.url.subscribe(segment => {
-      this.error = null;
-      this.navigation.page = null;
       this.loadPageInPath("", null, segment, 0, false);
     });
   }
@@ -73,7 +69,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
               this.loadPageInPath(path, page, segments, i + 1, false);
               return;
             } else {
-              this.error = `Nonexistent child of ${page.url}: ${s.path}`;
+              this.pageService.notifyError(`Nonexistent child of ${page.url}: ${s.path}`);
               return;
             }
           } else {
@@ -82,7 +78,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         //If we arrive here, there are no more children in the URL to process
         if(!embed) {
-          this.navigation.page = page;
+          this.pageService.notifyPage(page);
           page.children.forEach(child => {
             this.checkAccessibility(page, child);
             if(page.allowEmbeddedComponents && child.embedded) {
@@ -112,7 +108,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private handleErrorInLoadingPage(path, error) {
     console.log("Error in loading page " + path, error);
-    this.error = error;
+    this.pageService.notifyError(error);
   }
 
   protected loadPage(path: string, parent: Page, embed: boolean): Observable<Page> {
@@ -131,7 +127,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   protected createPageComponent(config: PageConfiguration, path: string, parent: Page, embed: boolean): Observable<Page> {
     const componentType = PortofinoAppComponent.components[config.type];
     if (!componentType) {
-      this.error = "Unknown component type: " + config.type;
+      this.pageService.notifyError("Unknown component type: " + config.type);
       return new Observable<Page>();
     }
 

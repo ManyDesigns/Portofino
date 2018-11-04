@@ -48,7 +48,7 @@ import {
   DefaultNavigationComponent,
   DefaultPageLayout,
   NAVIGATION_COMPONENT,
-  PageHeader, SourceSelector, SourceSelectorTree
+  PageHeader, PageService, SourceSelector, SourceSelectorTree
 } from './page';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
@@ -85,7 +85,7 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
     TranslateModule
   ],
   providers: [
-    PortofinoService, AuthenticationService,
+    PortofinoService, AuthenticationService, PageService,
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },

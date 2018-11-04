@@ -1,4 +1,13 @@
-import {Component, ContentChild, Injectable, InjectionToken, Input, OnInit, TemplateRef} from "@angular/core";
+import {
+  Component,
+  ContentChild,
+  EventEmitter,
+  Injectable,
+  InjectionToken,
+  Input,
+  OnInit,
+  TemplateRef
+} from "@angular/core";
 import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
 import {FormControl, FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
@@ -9,14 +18,33 @@ import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.s
 import {ButtonInfo, BUTTONS, declareButton} from "./buttons";
 import {BehaviorSubject, merge, Observable, of} from "rxjs";
 import {catchError, map} from "rxjs/operators";
-import {MatDialog, MatDialogRef, MatTreeFlatDataSource, MatTreeFlattener} from "@angular/material";
+import {MatDialog, MatDialogRef} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
-import {CollectionViewer, DataSource, SelectionChange} from "@angular/cdk/collections";
+import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
-export interface NavigationComponent {
+@Injectable()
+export class PageService {
   page: Page;
+  error;
+  readonly pageLoad = new EventEmitter<Page>();
+  readonly pageLoadError = new EventEmitter<any>();
+
+  reset() {
+    this.error = null;
+    this.page = null;
+  }
+
+  notifyPage(page: Page) {
+    this.page = page;
+    this.pageLoad.emit(page);
+  }
+
+  notifyError(error) {
+    this.error = error;
+    this.pageLoadError.emit(error);
+  }
 }
 
 @Component({
@@ -24,8 +52,8 @@ export interface NavigationComponent {
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.css']
 })
-export class DefaultNavigationComponent implements NavigationComponent {
-  page: Page;
+export class DefaultNavigationComponent {
+  constructor(public pageService: PageService) {}
 }
 
 export class PageConfiguration {

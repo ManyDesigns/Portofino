@@ -3,17 +3,17 @@
     <ng-template portofino-navigation></ng-template>
   </mat-sidenav>
   <mat-sidenav-content>
-    <div *ngIf="!navigation || (!navigation.page && !error)"></div>
-    <ng-container *ngIf="!!navigation && !error">
-      <div [hidden]="!navigation.page">
+    <div *ngIf="!pageService.page && !pageService.error"></div>
+    <ng-container *ngIf="!pageService.error">
+      <div [hidden]="!pageService.page">
         <ng-template portofino-main-content></ng-template>
       </div>
-      <div [hidden]="!navigation.page || !navigation.page.allowEmbeddedComponents">
+      <div [hidden]="!pageService.page || !pageService.page.allowEmbeddedComponents">
         <ng-template portofino-embedded-content></ng-template>
       </div>
     </ng-container>
-    <div *ngIf="!!error">
-      {{ 'Page not found! Error: _' | translate:{ error: error } }}
+    <div *ngIf="!!pageService.error">
+      {{ 'Page not found! Error: _' | translate:{ error: pageService.error } }}
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
