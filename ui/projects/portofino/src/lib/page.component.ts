@@ -40,7 +40,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngAfterViewInit() {
     this.subscription = this.route.url.subscribe(segment => {
-      //TODO Alessio
+      this.pageService.reset();
       this.loadPageInPath("", null, segment, 0, false);
     });
   }

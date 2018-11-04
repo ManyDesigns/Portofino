@@ -14,7 +14,7 @@ import {AuthenticationService} from "./security/authentication.service";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
-import {NAVIGATION_COMPONENT, NavigationComponent} from "./page";
+import {NAVIGATION_COMPONENT} from "./page";
 import {NavigationDirective} from "./content.directive";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
@@ -59,7 +59,6 @@ export class PortofinoAppComponent implements OnInit {
 
   @ViewChild(NavigationDirective)
   navigationHost: NavigationDirective;
-  navigation: NavigationComponent;
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, translate: TranslateService,
@@ -80,7 +79,7 @@ export class PortofinoAppComponent implements OnInit {
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
     let toolbar = this.toolbarHost.viewContainerRef.createComponent(componentFactory).instance as ToolbarComponent;
     let navigationFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
-    this.navigation = this.navigationHost.viewContainerRef.createComponent(navigationFactory).instance as NavigationComponent;
+    this.navigationHost.viewContainerRef.createComponent(navigationFactory);
     toolbar.title = this.title;
   }
 }
