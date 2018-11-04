@@ -16,6 +16,8 @@ import {debounceTime} from "rxjs/operators";
 import {SelectionModel} from "@angular/cdk/collections";
 import {Configuration, SelectionOption, SelectionProvider} from "../crud.common";
 import {AuthenticationService} from "../../security/authentication.service";
+import {ObservableMedia} from "@angular/flex-layout";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -40,6 +42,7 @@ export class SearchComponent implements OnInit {
   results: SearchResults;
   resultsDataSource = new MatTableDataSource();
   resultProperties: Property[] = [];
+  isLoadingResults = false;
   columnsToDisplay: string[] = [];
   @Input()
   pageSize: number;
@@ -54,37 +57,50 @@ export class SearchComponent implements OnInit {
   @ContentChild("buttons")
   buttons: TemplateRef<any>;
 
-  constructor(private http: HttpClient, private portofino: PortofinoService, private auth: AuthenticationService) {}
+  constructor(private http: HttpClient, private portofino: PortofinoService,
+              private auth: AuthenticationService, public media: ObservableMedia) {}
 
   ngOnInit() {
+    this.setupForm();
+    this.setupSelectionProviders();
+    if (!this.pageSize) {
+      this.pageSize = this.configuration.rowsPerPage;
+    }
+    this.listenToMediaChanges();
+    this.search();
+  }
+
+  protected setupForm() {
     const formControls = {};
-    if(this.selectionEnabled) {
+    if (this.selectionEnabled) {
       this.columnsToDisplay.push(this.selectColumnName);
     }
     this.classAccessor.properties.forEach(property => {
       property = Object.assign(new Property(), property);
-      if(!isEnabled(property)) {
+      if (!isEnabled(property)) {
         return;
       }
-      if(isSearchable(property)) {
+      if (isSearchable(property)) {
         this.searchProperties.push(property);
         formControls[property.name] = new FormControl();
       }
-      if(isInSummary(property)) {
+      if (isInSummary(property)) {
         this.resultProperties.push(property);
         this.columnsToDisplay.push(property.name);
       }
-      if(this.resultProperties.length > 0 && !this.resultProperties.some(p => p.key)) {
+      if (this.resultProperties.length > 0 && !this.resultProperties.some(p => p.key)) {
         this.resultProperties[0].key = true;
       }
     });
 
     this.form = new FormGroup(formControls);
+  }
 
+  protected setupSelectionProviders() {
     this.selectionProviders.forEach(sp => {
       sp.fieldNames.forEach((name, index) => {
         const property = this.searchProperties.find(p => p.name == name);
-        if(!property) {
+        if (!property) {
           return;
         }
         const spUrl = `${this.sourceUrl}/:selectionProvider/${sp.name}/${index}`;
@@ -96,33 +112,44 @@ export class SearchComponent implements OnInit {
           nextProperty: null,
           updateDependentOptions: () => {
             const nextProperty = property.selectionProvider.nextProperty;
-            if(nextProperty) {
+            if (nextProperty) {
               this.loadSelectionOptions(this.searchProperties.find(p => p.name == nextProperty));
             }
           },
           options: []
         };
-        if(property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+        if (property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
           const autocomplete = this.form.get(property.name);
           autocomplete.valueChanges.pipe(debounceTime(500)).subscribe(value => {
-            if(autocomplete.dirty && value != null && value.hasOwnProperty("length")) {
+            if (autocomplete.dirty && value != null && value.hasOwnProperty("length")) {
               this.loadSelectionOptions(property, value);
             }
           });
-        } else if(index == 0) {
+        } else if (index == 0) {
           this.loadSelectionOptions(property);
         }
-        if(index < sp.fieldNames.length - 1) {
+        if (index < sp.fieldNames.length - 1) {
           property.selectionProvider.nextProperty = sp.fieldNames[index + 1];
         }
       });
     });
+  }
 
-    if(!this.pageSize) {
-      this.pageSize = this.configuration.rowsPerPage;
-    }
-
-    this.search();
+  protected listenToMediaChanges() {
+    let wasDatatableHidden = !this.isDataTable();
+    this.media.subscribe(change => {
+      let refresh = false;
+      if (this.isDataTable()) {
+        refresh = wasDatatableHidden;
+      } else {
+        refresh = !wasDatatableHidden;
+      }
+      wasDatatableHidden = !this.isDataTable();
+      if (refresh) {
+        this.page = 0;
+        this.refreshSearch();
+      }
+    });
   }
 
   protected loadSelectionOptions(property: Property, autocomplete: string = null) {
@@ -175,10 +202,16 @@ export class SearchComponent implements OnInit {
   }
 
   search() {
-    this.loadSearchResultsPage(0);
+    this.page = 0;
+    this.refreshSearch();
+  }
+
+  isDataTable() {
+    return this.media.isActive('gt-xs');
   }
 
   protected loadSearchResultsPage(page: number) {
+    this.isLoadingResults = true;
     let params = new HttpParams();
     params = this.composeSearch(params);
     params = params.set("firstResult", (page * this.pageSize).toString());
@@ -191,9 +224,17 @@ export class SearchComponent implements OnInit {
       results => {
         results.records = results['Result'];
         this.results = results;
-        this.resultsDataSource.data = this.results.records;
+        if(this.isDataTable() || !this.resultsDataSource.data) {
+          this.resultsDataSource.data = this.results.records;
+          this.selection.clear();
+        } else {
+          this.resultsDataSource.data = [... this.resultsDataSource.data, ... this.results.records];
+        }
         this.page = page;
-        this.selection.clear();
+        this.isLoadingResults = false;
+      },
+      error => {
+        this.isLoadingResults = false; //TODO notify error?
       }
     );
   }
@@ -252,6 +293,13 @@ export class SearchComponent implements OnInit {
     return params;
   }
 
+  test(index: number) {
+    const newPage = Math.round((index + 1) / this.pageSize);
+    if(newPage > this.page && !this.isLoadingResults) {
+      this.loadSearchResultsPage(newPage);
+    }
+  }
+
   loadPage(event: PageEvent) {
     this.loadSearchResultsPage(event.pageIndex);
   }
@@ -275,6 +323,8 @@ export class SearchComponent implements OnInit {
   }
 
   refreshSearch() {
+    //Infinite scrolling appends to the list rather then replace it, so we need to empty it
+    this.resultsDataSource.data = [];
     this.loadSearchResultsPage(this.page);
   }
 

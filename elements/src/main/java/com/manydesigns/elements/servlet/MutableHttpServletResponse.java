@@ -75,7 +75,7 @@ public class MutableHttpServletResponse implements HttpServletResponse {
 
     @Override
     public boolean containsHeader(String s) {
-        throw new UnsupportedOperationException();
+        return false;
     }
 
     @Override

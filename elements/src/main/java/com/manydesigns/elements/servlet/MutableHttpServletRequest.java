@@ -341,7 +341,7 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     public ServletInputStream getInputStream() throws IOException {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     public String getProtocol() {

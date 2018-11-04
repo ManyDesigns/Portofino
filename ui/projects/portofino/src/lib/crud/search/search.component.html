@@ -16,7 +16,7 @@
     </form>
   </div>
   <div class="search-results" fxLayout="column" fxLayoutGap="20px" fxLayoutAlign="start stretch">
-    <table mat-table [dataSource]="resultsDataSource"
+    <table mat-table [dataSource]="resultsDataSource" *ngIf="isDataTable()"
            matSort (matSortChange)="sort($event)"
            class="mat-elevation-z8">
       <ng-container [matColumnDef]="selectColumnName" *ngIf="selectionEnabled">
@@ -52,11 +52,34 @@
       <tr mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: columnsToDisplay"></tr>
     </table>
+    <cdk-virtual-scroll-viewport *ngIf="!isDataTable()" (scrolledIndexChange)="test($event)"
+                                 itemSize="50" style="height: 200px;"> <!--TODO autosize? -->
+      <div *cdkVirtualFor="let row of resultsDataSource" style="height: 50px; border-bottom: dashed grey 1px;"> <!-- TODO External CSS -->
+        <ng-container *ngFor="let property of resultProperties; let i = index;">
+          <span *ngIf="property.key">
+            {{property.label}}
+            <a [routerLink]="baseUrl + '/' + row.__rowKey">
+              {{row[property.name].displayValue || row[property.name].value}}
+            </a>
+          </span>
+          <span *ngIf="!property.key && i < 3">
+            {{property.label}}
+            <a *ngIf="property.kind == 'blob'" [href]="getBlobUrl(row.__rowKey, property)">
+              {{row[property.name].displayValue}}
+            </a>
+            <ng-container *ngIf="property.kind != 'blob'">
+              {{row[property.name].displayValue || row[property.name].value}}
+            </ng-container>
+          </span>
+        </ng-container>
+      </div>
+    </cdk-virtual-scroll-viewport>
     <div fxLayout="row" fxLayoutAlign="space-between center">
-      <div fxLayout="row">
+      <div fxLayout="row" fxLayout.xs="column">
         <ng-template [ngTemplateOutlet]="buttons"></ng-template>
       </div>
-      <mat-paginator [length]="results ? results.totalRecords : 0" [pageSize]="pageSize" (page)="loadPage($event)">
+      <mat-paginator *ngIf="isDataTable()"
+                     [length]="results ? results.totalRecords : 0" [pageSize]="pageSize" (page)="loadPage($event)">
       </mat-paginator>
     </div>
   </div>

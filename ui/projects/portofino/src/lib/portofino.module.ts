@@ -61,9 +61,8 @@ import {TranslateModule} from "@ngx-translate/core";
 import {PageComponent} from "./page.component";
 import {
   MatSnackBarNotificationService,
-  NotificationService,
-  WindowAlertNotificationService
-} from "./notifications/notification.service";
+  NotificationService} from "./notifications/notification.service";
+import {ScrollingModule} from "@angular/cdk/scrolling";
 
 @NgModule({
   declarations: [
@@ -80,7 +79,7 @@ import {
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule,
     MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTreeModule,
-    MatToolbarModule, MatMomentDateModule,
+    MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, QuillModule,
     RouterModule.forChild([]),
     TranslateModule
