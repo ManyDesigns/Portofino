@@ -8,7 +8,7 @@ import {
 import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {PortofinoAppComponent} from "./portofino-app.component";
 import {HttpClient} from "@angular/common/http";
-import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from "./content.directive";
+import {EmbeddedContentDirective, MainContentDirective} from "./content.directive";
 import {Observable, Subscription} from "rxjs";
 import {mergeMap} from "rxjs/operators";
 import {PortofinoService} from "./portofino.service";
@@ -21,9 +21,6 @@ import {NAVIGATION_COMPONENT, Page, PageChild, PageConfiguration, PageService} f
   styleUrls: ['./page.component.css']
 })
 export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
-
-  @ViewChild(NavigationDirective)
-  navigationHost: NavigationDirective;
   @ViewChild(MainContentDirective)
   contentHost: MainContentDirective;
   @ViewChild(EmbeddedContentDirective)
@@ -34,17 +31,16 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   constructor(public pageService: PageService,
               protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver,
-              protected portofino: PortofinoService, @Inject(NAVIGATION_COMPONENT) protected navigationComponent,
+              public portofino: PortofinoService,
               protected authenticationService: AuthenticationService) { }
 
   ngOnInit() {
-    //Dynamically create the navigation component
-    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
-    this.navigationHost.viewContainerRef.createComponent(componentFactory);
+
   }
 
   ngAfterViewInit() {
     this.subscription = this.route.url.subscribe(segment => {
+      //TODO Alessio
       this.loadPageInPath("", null, segment, 0, false);
     });
   }

@@ -5,3 +5,9 @@
 .mat-column-select {
   overflow: initial;
 }
+
+.md-search-title {
+  line-height: 28px;
+  font-size: large;
+  margin-left: 5px;
+}

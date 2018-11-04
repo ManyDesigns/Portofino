@@ -34,7 +34,7 @@ import {
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
-  MatTreeModule
+  MatTreeModule, MatCardModule, MatExpansionModule, MatDividerModule,MatListModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -76,10 +76,10 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
-    MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
-    MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule,
-    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTreeModule,
-    MatToolbarModule, MatMomentDateModule, ScrollingModule,
+    MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
+    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
+    MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
+    MatSortModule, MatTableModule, MatTreeModule,MatListModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, QuillModule,
     RouterModule.forChild([]),
     TranslateModule
