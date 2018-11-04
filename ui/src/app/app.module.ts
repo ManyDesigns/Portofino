@@ -1,5 +1,5 @@
 import {Component, NgModule} from '@angular/core';
-import {PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent, PortofinoComponent} from "portofino";
+import {PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent, PortofinoComponent} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
@@ -30,9 +30,7 @@ export class HelloPortofino {}
   selector: 'custom-navigation',
   template: `<h3>Custom navigation</h3><p><a routerLink="/start">Start here</a> </p>`
 })
-export class CustomNavigation implements NavigationComponent {
-  page: Page;
-}
+export class CustomNavigation {}
 
 @Component({
   selector: 'app-root',

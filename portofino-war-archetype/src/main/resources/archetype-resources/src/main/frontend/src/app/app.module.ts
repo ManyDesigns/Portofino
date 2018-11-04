@@ -1,6 +1,6 @@
 import {Component, NgModule} from '@angular/core';
 import {
-  PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, NavigationComponent, DefaultNavigationComponent,
+  PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent,
   PortofinoComponent, PortofinoService, AuthenticationService} from "portofino";
 import {
   MatAutocompleteModule,
@@ -33,9 +33,7 @@ export class StartHere {}
   selector: 'custom-navigation',
   template: `<h3>Custom navigation</h3><p><a routerLink="/start">Start here</a> </p>`
 })
-export class CustomNavigation implements NavigationComponent {
-  page: Page;
-}
+export class CustomNavigation {}
 
 @Component({
   selector: 'portofino-welcome',
