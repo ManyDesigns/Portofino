@@ -22,7 +22,7 @@
             <ul>
               <ng-container *ngFor="let child of pageService.page.children">
                 <li *ngIf="child.accessible">
-                  <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+                  <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">{{child.title}}</a>
                 </li>
               </ng-container>
             </ul>
@@ -36,7 +36,7 @@
     <ul>
       <ng-container *ngFor="let child of pageService.page.children">
         <li *ngIf="child.accessible">
-          <a [routerLink]="child.path" routerLinkActive="active">{{child.title}}</a>
+          <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">{{child.title}}</a>
         </li>
       </ng-container>
     </ul>

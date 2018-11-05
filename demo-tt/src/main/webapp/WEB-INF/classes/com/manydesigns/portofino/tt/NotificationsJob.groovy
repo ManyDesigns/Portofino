@@ -120,8 +120,8 @@ public class NotificationsJob implements Job {
 
                 ByteArrayServletOutputStream stream =
                     new ByteArrayServletOutputStream();
-                MutableHttpServletResponse response =
-                        new MutableHttpServletResponse(stream)
+                MutableHttpServletResponse response = new MutableHttpServletResponse(stream)
+                response.setCharacterEncoding('UTF-8')
 
                 RequestDispatcher requestDispatcher =
                         servletContext.getRequestDispatcher("/jsp/notifications/project-activity.jsp");
