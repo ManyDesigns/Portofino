@@ -53,24 +53,22 @@ public class PortofinoJobFactory extends SimpleJobFactory {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    private final ServletContext servletContext;
+    private final ApplicationContext applicationContext;
     private static final Logger logger = LoggerFactory.getLogger(PortofinoJobFactory.class);
 
-    public PortofinoJobFactory(ServletContext servletContext) {
-        this.servletContext = servletContext;
+    public PortofinoJobFactory(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     @Override
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
         final Job job = super.newJob(bundle, scheduler);
-        WebApplicationContext webApplicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        webApplicationContext.getAutowireCapableBeanFactory().autowireBean(job);
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(job);
         return jobExecutionContext -> {
             job.execute(jobExecutionContext);
             try {
                 //In a different class to make the database module optional at runtime
-                SessionCleaner.closeSessions(webApplicationContext);
+                SessionCleaner.closeSessions(applicationContext);
             } catch (NoClassDefFoundError e) {
                 logger.debug("Database module not available, not closing sessions", e);
             }

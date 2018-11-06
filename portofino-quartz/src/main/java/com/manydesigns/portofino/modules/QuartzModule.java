@@ -29,7 +29,10 @@ import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -41,7 +44,7 @@ import javax.servlet.ServletContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class QuartzModule implements Module {
+public class QuartzModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -54,6 +57,8 @@ public class QuartzModule implements Module {
 
     @Autowired
     public ServletContext servletContext;
+
+    protected ApplicationContext applicationContext;
 
     protected Scheduler scheduler;
 
@@ -91,7 +96,7 @@ public class QuartzModule implements Module {
             // Always want to get the scheduler, even if it isn't starting,
             // to make sure it is both initialized and registered.
             scheduler = factory.getScheduler();
-            scheduler.setJobFactory(new PortofinoJobFactory(servletContext));
+            scheduler.setJobFactory(new PortofinoJobFactory(applicationContext));
 
             String factoryKey = configuration.getString("quartz.servlet-context-factory-key");
             if (factoryKey == null) {
@@ -142,5 +147,10 @@ public class QuartzModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }
