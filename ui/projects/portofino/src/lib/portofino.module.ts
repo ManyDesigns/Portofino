@@ -63,6 +63,7 @@ import {
   MatSnackBarNotificationService,
   NotificationService} from "./notifications/notification.service";
 import {ScrollingModule} from "@angular/cdk/scrolling";
+import { NgxdModule } from '@ngxd/core';
 
 @NgModule({
   declarations: [
@@ -80,7 +81,7 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
     MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
     MatSortModule, MatTableModule, MatTreeModule,MatListModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
-    FileInputAccessorModule, QuillModule,
+    FileInputAccessorModule, NgxdModule, QuillModule,
     RouterModule.forChild([]),
     TranslateModule
   ],
@@ -95,7 +96,7 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
     { provide: NotificationService, useClass: MatSnackBarNotificationService }],
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,
-    CrudComponent, ManyToManyComponent],
+    CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
     FieldComponent, BlobFieldComponent, FormComponent,

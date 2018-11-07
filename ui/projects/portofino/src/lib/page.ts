@@ -15,7 +15,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, Form} from "./form";
 import {Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
-import {ButtonInfo, BUTTONS, declareButton} from "./buttons";
+import {ButtonInfo, BUTTONS, declareButton, getButtons} from "./buttons";
 import {BehaviorSubject, merge, Observable, of} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {MatDialog, MatDialogRef} from "@angular/material";
@@ -366,8 +366,7 @@ export abstract class Page {
   }
 
   getButtons(list: string = 'default'): ButtonInfo[] | null {
-    const allButtons = this[BUTTONS];
-    return allButtons ? allButtons[list] : null;
+    return getButtons(this, list);
   }
 
   prepare(): Observable<Page> {

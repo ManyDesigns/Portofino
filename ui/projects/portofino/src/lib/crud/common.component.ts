@@ -240,7 +240,7 @@ export abstract class BaseDetailComponent {
 
   }
 
-  save() {
+  save(): void {
     if(this.saving) {
       return;
     }

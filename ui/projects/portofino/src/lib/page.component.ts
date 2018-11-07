@@ -1,8 +1,7 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver, EventEmitter, Inject, Injectable,
-  OnDestroy,
+  ComponentFactoryResolver, OnDestroy,
   OnInit, ViewChild
 } from '@angular/core';
 import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
@@ -13,7 +12,7 @@ import {Observable, Subscription} from "rxjs";
 import {mergeMap} from "rxjs/operators";
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {NAVIGATION_COMPONENT, Page, PageChild, PageConfiguration, PageService} from "./page";
+import {Page, PageChild, PageConfiguration, PageService} from "./page";
 
 @Component({
   selector: 'portofino-page',

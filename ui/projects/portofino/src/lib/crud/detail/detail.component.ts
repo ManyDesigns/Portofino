@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";

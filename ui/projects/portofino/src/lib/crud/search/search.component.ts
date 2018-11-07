@@ -17,7 +17,6 @@ import {SelectionModel} from "@angular/cdk/collections";
 import {Configuration, SelectionOption, SelectionProvider} from "../crud.common";
 import {AuthenticationService} from "../../security/authentication.service";
 import {ObservableMedia} from "@angular/flex-layout";
-import {Observable} from "rxjs";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -51,6 +50,7 @@ export class SearchComponent implements OnInit {
 
   @Input()
   selectionEnabled: boolean;
+  @Input()
   selection = new SelectionModel<any>(true, []);
   readonly selectColumnName = "__select";
 
@@ -340,10 +340,6 @@ export class SearchComponent implements OnInit {
     this.isAllSelected() ?
       this.selection.clear() :
       this.resultsDataSource.data.forEach(row => this.selection.select(row));
-  }
-
-  getSelectedIds(): string[] {
-    return this.selection.selected.map(row => row.__rowKey);
   }
 
   //Blobs

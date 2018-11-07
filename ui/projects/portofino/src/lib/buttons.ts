@@ -43,3 +43,8 @@ export function Button(info: ButtonInfo | any) {
     declareButton(info, target, methodName, descriptor)
   }
 }
+
+export function getButtons(component, list: string = 'default'): ButtonInfo[] | null {
+  const allButtons = component[BUTTONS];
+  return allButtons ? allButtons[list] : null;
+}

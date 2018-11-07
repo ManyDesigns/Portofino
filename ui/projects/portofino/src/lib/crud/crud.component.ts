@@ -1,14 +1,14 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
 import {PortofinoComponent} from "../portofino-app.component";
 import {Router} from "@angular/router";
-import {SearchComponent} from "./search/search.component";
 import {Operation, Page, PageChild, PageConfiguration} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
 import {AuthenticationService} from "../security/authentication.service";
 import {Button} from "../buttons";
+import {SelectionModel} from "@angular/cdk/collections";
 
 @Component({
   selector: 'portofino-crud',
@@ -29,8 +29,9 @@ export class CrudComponent extends Page implements OnInit {
 
   @Input()
   pageSize: number;
-  @ViewChild(SearchComponent)
-  search: SearchComponent;
+  @Output()
+  readonly refreshSearch = new EventEmitter();
+  readonly selection = new SelectionModel<any>(true, []);
 
   id: string;
   view: CrudView;
@@ -38,8 +39,6 @@ export class CrudComponent extends Page implements OnInit {
   createEnabled: boolean;
   bulkEditEnabled: boolean;
   bulkDeleteEnabled: boolean;
-
-  selection: string[];
 
   constructor(
     protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
@@ -92,7 +91,7 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   @Button({
-    color: 'accent', presentIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
+    list: 'search-results', color: 'accent', presentIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
   })
   showCreate() {
     this.allowEmbeddedComponents = false;
@@ -114,16 +113,20 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   static bulkButtonsEnabled(self: CrudComponent) {
-    return self.search && self.search.getSelectedIds().length > 0;
+    return self.getSelectedIds().length > 0;
+  }
+
+  getSelectedIds(): string[] {
+    return this.selection.selected.map(row => row.__rowKey);
   }
 
   @Button({
+    list: 'search-results',
     color: 'primary', icon: 'edit', text: 'Edit',
     presentIf: CrudComponent.bulkEditPresent,
     enabledIf: CrudComponent.bulkButtonsEnabled
   })
   showBulkEdit() {
-    this.selection = this.search.getSelectedIds();
     this.allowEmbeddedComponents = false;
     this.view = CrudView.BULK_EDIT;
   }
@@ -133,14 +136,15 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   @Button({
+    list: 'search-results',
     color: 'warn', icon: 'delete', text: 'Delete',
     presentIf: CrudComponent.bulkDeletePresent,
     enabledIf: CrudComponent.bulkButtonsEnabled
   })
   bulkDelete() {
     let params = new HttpParams();
-    this.search.getSelectedIds().forEach(id => params = params.append("id", id));
-    this.http.delete(this.sourceUrl, { params: params }).subscribe(() => this.search.refreshSearch());
+    this.getSelectedIds().forEach(id => params = params.append("id", id));
+    this.http.delete(this.sourceUrl, { params: params }).subscribe(() => this.refreshSearch.emit());
   }
 
   onEditModeChange(event) {
