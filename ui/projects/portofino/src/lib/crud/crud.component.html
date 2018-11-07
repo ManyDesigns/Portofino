@@ -1,11 +1,12 @@
 <portofino-default-page-layout [page]="this">
   <ng-template #content>
     <ng-container *ngIf="isSearchView()">
-      <portofino-crud-search
+      <portofino-crud-search-holder
+        [component]="searchComponent" [context]="searchComponentContext"
         [classAccessor]="classAccessor" [pageSize]="configuration.rowsPerPage" [sourceUrl]="sourceUrl" [baseUrl]="url"
         [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled"
         [selection]="selection" [refresh]="refreshSearch" [parentButtons]="getButtons('search-results')" [parent]="page">
-      </portofino-crud-search>
+      </portofino-crud-search-holder>
     </ng-container>
     <ng-container *ngIf="isDetailView()">
       <portofino-crud-detail

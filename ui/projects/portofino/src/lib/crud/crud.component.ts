@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, Type} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
@@ -9,6 +9,7 @@ import {Configuration, SelectionProvider} from "./crud.common";
 import {AuthenticationService} from "../security/authentication.service";
 import {Button} from "../buttons";
 import {SelectionModel} from "@angular/cdk/collections";
+import {SearchComponent} from "./search/search.component";
 
 @Component({
   selector: 'portofino-crud',
@@ -39,6 +40,11 @@ export class CrudComponent extends Page implements OnInit {
   createEnabled: boolean;
   bulkEditEnabled: boolean;
   bulkDeleteEnabled: boolean;
+
+  @Input()
+  searchComponent: Type<any> = SearchComponent;
+  @Input()
+  searchComponentContext = {};
 
   constructor(
     protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
@@ -199,4 +205,17 @@ export class CrudComponent extends Page implements OnInit {
 
 export enum CrudView {
   SEARCH, DETAIL, CREATE, BULK_EDIT
+}
+
+@Component({
+  selector: 'portofino-crud-search-holder',
+  template: `<ng-container *ngxComponentOutlet="component; context: context"></ng-container>`,
+})
+export class SearchComponentHolder extends SearchComponent {
+  @Input()
+  component: Type<any>;
+  @Input()
+  context = {};
+  ngOnInit(): void {}
+  ngOnDestroy(): void {}
 }

@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {MatSidenav} from "@angular/material";
 
 @Injectable()
 export class PortofinoService {

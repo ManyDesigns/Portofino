@@ -1,14 +1,14 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ModuleWithProviders, NgModule} from '@angular/core';
+import {ModuleWithProviders, NgModule, Type} from '@angular/core';
 import {
   DefaultToolbarComponent,
   PortofinoAppComponent,
   TOOLBAR_COMPONENT,
   ToolbarDirective
 } from './portofino-app.component';
-import {CrudComponent} from './crud/crud.component';
+import {CrudComponent, SearchComponentHolder} from './crud/crud.component';
 import {PortofinoService} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {AuthenticationInterceptor, AuthenticationService, LOGIN_COMPONENT} from "./security/authentication.service";
@@ -73,6 +73,7 @@ import { NgxdModule } from '@ngxd/core';
     NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+    SearchComponentHolder,
     ManyToManyComponent
   ],
   imports: [
@@ -102,6 +103,7 @@ import { NgxdModule } from '@ngxd/core';
     FieldComponent, BlobFieldComponent, FormComponent,
     PageComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+    SearchComponentHolder,
     ManyToManyComponent]
 })
 export class PortofinoModule {
@@ -117,13 +119,10 @@ export class PortofinoModule {
     return DefaultToolbarComponent;
   }
 
-  public static withRoutes(routes: Routes): (ModuleWithProviders)[] {
+  public static withRoutes(routes: Routes): (ModuleWithProviders|Type<PortofinoModule>)[] {
     return [RouterModule.forRoot(
       [...routes, { path: "**", component: PageComponent}],
       { onSameUrlNavigation: "reload", enableTracing: false }),
-      {
-        ngModule: PortofinoModule,
-        providers: []
-      }];
+      PortofinoModule];
   }
 }

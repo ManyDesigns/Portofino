@@ -1,14 +1,28 @@
-import {Component, NgModule} from '@angular/core';
-import {PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent, PortofinoComponent} from "portofino";
+import {Component, Input, NgModule} from '@angular/core';
+import {
+  PortofinoModule, CrudComponent, SearchComponent,
+  NAVIGATION_COMPONENT, DefaultNavigationComponent, PortofinoComponent} from "portofino";
 import {
   MatAutocompleteModule,
-  MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
+  MatButtonModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatDatepickerModule,
+  MatDialogModule,
+  MatDividerModule,
+  MatExpansionModule,
   MatFormFieldModule,
-  MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule,
+  MatIconModule,
+  MatInputModule, MatListModule,
+  MatMenuModule,
+  MatPaginatorModule, MatProgressBarModule,
+  MatRadioModule,
+  MatSelectModule,
   MatSidenavModule,
   MatSnackBarModule,
   MatSortModule,
-  MatTableModule, MatToolbarModule
+  MatTableModule,
+  MatToolbarModule, MatTreeModule
 } from "@angular/material";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -19,6 +33,8 @@ import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
+import {ScrollingModule} from "@angular/cdk/scrolling";
+import {NgxdModule} from "@ngxd/core";
 
 @Component({
   selector: 'portofino-hello',
@@ -42,25 +58,38 @@ export class AppComponent {}
 export class CustomCrud extends CrudComponent {
 
   ngOnInit(): void {
-    console.log("custom");
+    console.log("Custom crud");
     super.ngOnInit();
-    this.configuration.title = 'custom';
+    this.configuration.title = 'Custom CRUD';
+    this.searchComponent = CustomSearch;
+    this.searchComponentContext = { customInput: "works!" };
+  }
+}
+
+export class CustomSearch extends SearchComponent {
+  @Input()
+  customInput;
+  ngOnInit(): void {
+    console.log("Custom search with input", this.customInput);
+    super.ngOnInit();
   }
 }
 
 @NgModule({
-  declarations: [AppComponent, HelloPortofino, CustomNavigation, CustomCrud],
+  declarations: [AppComponent, HelloPortofino, CustomNavigation, CustomCrud, CustomSearch],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
   imports: [
     PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }]),
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
-    MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
-    MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
-    MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
-    FileInputAccessorModule, QuillModule, TranslateModule.forRoot()],
-  entryComponents: [ CustomNavigation, CustomCrud ],
+    MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
+    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
+    MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
+    MatSortModule, MatTableModule, MatTreeModule,MatListModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
+    FileInputAccessorModule, NgxdModule, QuillModule,
+    TranslateModule.forRoot()],
+  entryComponents: [ CustomNavigation, CustomCrud, CustomSearch ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
