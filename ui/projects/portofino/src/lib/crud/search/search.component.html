@@ -84,7 +84,8 @@
     </cdk-virtual-scroll-viewport>
     <div fxLayout="row" fxLayoutAlign="space-between center">
       <div fxLayout="row" fxLayout.xs="column">
-        <ng-template [ngTemplateOutlet]="buttons"></ng-template>
+        <portofino-button *ngFor="let button of parentButtons" [button]="button" [component]="parent"></portofino-button>
+        <portofino-button *ngFor="let button of getButtons()" [button]="button" [component]="this"></portofino-button>
       </div>
       <mat-paginator *ngIf="isDataTable()"
                      [length]="results ? results.totalRecords : 0" [pageSize]="pageSize" (page)="loadPage($event)">

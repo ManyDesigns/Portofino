@@ -1,4 +1,4 @@
-import {Component, ContentChild, Input, OnInit, TemplateRef} from '@angular/core';
+import {Component, ContentChild, Input, OnDestroy, OnInit, TemplateRef} from '@angular/core';
 import {
   ClassAccessor,
   isDateProperty,
@@ -17,20 +17,20 @@ import {SelectionModel} from "@angular/cdk/collections";
 import {Configuration, SelectionOption, SelectionProvider} from "../crud.common";
 import {AuthenticationService} from "../../security/authentication.service";
 import {ObservableMedia} from "@angular/flex-layout";
+import {Subject, Subscription} from "rxjs";
+import {ButtonInfo, getButtons} from "../../buttons";
 
 @Component({
   selector: 'portofino-crud-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
 
   @Input()
   classAccessor: ClassAccessor;
   @Input()
   selectionProviders: SelectionProvider[];
-  @Input()
-  configuration: Configuration;
   @Input()
   sourceUrl: string;
   @Input()
@@ -53,9 +53,14 @@ export class SearchComponent implements OnInit {
   @Input()
   selection = new SelectionModel<any>(true, []);
   readonly selectColumnName = "__select";
+  @Input()
+  refresh: Subject<void>;
+  refreshSubscription: Subscription;
 
-  @ContentChild("buttons")
-  buttons: TemplateRef<any>;
+  @Input()
+  parentButtons: ButtonInfo[] = [];
+  @Input()
+  parent: any;
 
   constructor(private http: HttpClient, private portofino: PortofinoService,
               private auth: AuthenticationService, public media: ObservableMedia) {}
@@ -63,11 +68,17 @@ export class SearchComponent implements OnInit {
   ngOnInit() {
     this.setupForm();
     this.setupSelectionProviders();
-    if (!this.pageSize) {
-      this.pageSize = this.configuration.rowsPerPage;
-    }
     this.listenToMediaChanges();
     this.search();
+    if(this.refresh) {
+      this.refreshSubscription = this.refresh.subscribe(_ => this.refreshSearch())
+    }
+  }
+
+  ngOnDestroy(): void {
+    if(this.refreshSubscription) {
+      this.refreshSubscription.unsubscribe();
+    }
   }
 
   protected setupForm() {
@@ -351,6 +362,10 @@ export class SearchComponent implements OnInit {
     } else {
       return blobUrl;
     }
+  }
+
+  getButtons(list = 'default') {
+    return getButtons(this, list);
   }
 
 }
