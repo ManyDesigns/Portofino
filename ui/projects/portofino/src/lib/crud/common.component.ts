@@ -18,6 +18,7 @@ import {Observable} from "rxjs";
 import {MatSnackBar} from "@angular/material";
 import {Field, Form, FormComponent} from "../form";
 import {NotificationService} from "../notifications/notification.service";
+import {Button, ButtonInfo, getButtons} from "../buttons";
 
 export abstract class BaseDetailComponent {
 
@@ -39,6 +40,11 @@ export abstract class BaseDetailComponent {
   properties: Property[] = [];
   object;
   protected saving = false;
+
+  @Input()
+  parentButtons: ButtonInfo[] = [];
+  @Input()
+  parent: any;
 
   protected constructor(
     protected http: HttpClient, protected portofino: PortofinoService,
@@ -240,12 +246,16 @@ export abstract class BaseDetailComponent {
 
   }
 
+  @Button({
+    color: 'primary', icon: 'save', text: 'Save',
+    presentIf: BaseDetailComponent.isSaveButtonPresent, enabledIf: BaseDetailComponent.isSaveButtonEnabled
+  })
   save(): void {
     if(this.saving) {
       return;
     }
     this.saving = true;
-    if(this.form.invalid) {
+    if(!this.isFormValid()) {
       this.triggerValidationForAllFields(this.form);
       this.notificationService.error('There are validation errors').subscribe();
       this.saving = false;
@@ -278,5 +288,21 @@ export abstract class BaseDetailComponent {
       });
   }
 
+  static isSaveButtonPresent(self: BaseDetailComponent) {
+    return self.isEditEnabled();
+  }
+
+  static isSaveButtonEnabled(self: BaseDetailComponent) {
+    return self.isFormValid();
+  }
+
+  getButtons(list = 'default') {
+    return getButtons(this, list);
+  }
+
   protected abstract doSave(object): Observable<Object>;
+
+  protected isFormValid(): boolean {
+    return this.form.valid;
+  }
 }

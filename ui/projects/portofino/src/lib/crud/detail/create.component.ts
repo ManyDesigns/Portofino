@@ -4,6 +4,7 @@ import {PortofinoService} from "../../portofino.service";
 import {isInsertable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {NotificationService} from "../../notifications/notification.service";
+import {Button} from "../../buttons";
 
 @Component({
   selector: 'portofino-crud-create',
@@ -31,6 +32,7 @@ export class CreateComponent extends BaseDetailComponent implements OnInit {
     this.http.get(this.sourceUrl, {params: {newObject: "true"}}).subscribe(o => this.setupForm(o));
   }
 
+  @Button({ text: 'Cancel' })
   cancel() {
     this.close.emit();
   }

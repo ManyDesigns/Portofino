@@ -5,6 +5,7 @@ import {isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../page";
 import {NotificationService} from "../../notifications/notification.service";
+import {Button} from "../../buttons";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -57,17 +58,21 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     });
   }
 
+  @Button({ text: 'Edit', icon: 'edit', color: 'primary', presentIf: DetailComponent.isEditButtonEnabled })
   edit() {
     this.editMode = true;
     this.editModeChanges.emit(true);
     this.setupForm(this.object);
   }
 
+  @Button({ text: 'Delete', icon: 'delete', color: 'warn', presentIf: DetailComponent.isDeleteButtonEnabled })
   delete() {
     const objectUrl = `${this.sourceUrl}/${this.id}`;
     this.http.delete(objectUrl).subscribe(() => this.close.emit(this.object));
   }
 
+  @Button({ text: 'Cancel', presentIf: DetailComponent.isEditMode })
+  @Button({ text: 'Back', icon: 'arrow_back', presentIf: DetailComponent.isViewMode })
   cancel() {
     if(this.editMode) {
       this.editMode = false;
@@ -77,6 +82,23 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
       this.close.emit();
     }
   }
+
+  static isViewMode(self: DetailComponent) {
+    return !self.editMode;
+  }
+
+  static isEditMode(self: DetailComponent) {
+    return self.editMode;
+  }
+
+  static isEditButtonEnabled(self: DetailComponent) {
+    return !self.editMode && self.editEnabled;
+  }
+
+  static isDeleteButtonEnabled(self: DetailComponent) {
+    return !self.editMode && self.deleteEnabled;
+  }
+
 
   save() {
     if(!this.editMode) {

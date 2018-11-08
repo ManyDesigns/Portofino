@@ -6,6 +6,7 @@ import {BaseDetailComponent} from "../common.component";
 import {MatSnackBar} from "@angular/material";
 import {FormComponent} from "../../form";
 import {NotificationService} from "../../notifications/notification.service";
+import {Button} from "../../buttons";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
@@ -47,6 +48,7 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
     this.setupForm({});
   }
 
+  @Button({ text: 'Cancel' })
   cancel() {
     this.close.emit();
   }

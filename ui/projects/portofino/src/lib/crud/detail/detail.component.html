@@ -4,26 +4,9 @@
   <form (submit)="save()" *ngIf="object">
     <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
                     fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
-    <div fxLayout="row" *ngIf="editMode">
-      <button mat-flat-button (click)="save()" color="primary">
-        <mat-icon>save</mat-icon>
-        {{ 'Save' | translate }}
-      </button>
-      <button mat-flat-button (click)="cancel()" type="button">{{ 'Cancel' | translate }}</button>
-    </div>
-    <div fxLayout="row" *ngIf="!editMode" class="button-row">
-      <button mat-flat-button color="primary" type="button" (click)="edit()" *ngIf="editEnabled">
-        <mat-icon>edit</mat-icon>
-        {{ 'Edit' | translate }}
-      </button>
-      <button mat-flat-button color="warn" type="button" (click)="delete()" *ngIf="deleteEnabled">
-        <mat-icon>delete</mat-icon>
-        {{ 'Delete' | translate }}
-      </button>
-      <button mat-stroked-button (click)="cancel()" type="button">
-        <mat-icon>arrow_back</mat-icon>
-        {{ 'Back' | translate }}
-      </button>
+    <div fxLayout="row">
+      <portofino-button *ngFor="let button of parentButtons" [button]="button" [component]="parent"></portofino-button>
+      <portofino-button *ngFor="let button of getButtons()" [button]="button" [component]="this"></portofino-button>
     </div>
   </form>
 </div>

@@ -73,12 +73,12 @@ export class CrudComponent extends Page implements OnInit {
     this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
       classAccessor => this.http.get<Configuration>(this.sourceUrl + this.configurationPath).subscribe(
         configuration => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
-          sps => this.init(classAccessor, configuration, sps))));
-    this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
-      this.createEnabled = this.operationAvailable(ops,"POST");
-      this.bulkEditEnabled = this.operationAvailable(ops,"PUT");
-      this.bulkDeleteEnabled = this.operationAvailable(ops,"DELETE");
-    });
+          sps => this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
+            this.createEnabled = this.operationAvailable(ops,"POST");
+            this.bulkEditEnabled = this.operationAvailable(ops,"PUT");
+            this.bulkDeleteEnabled = this.operationAvailable(ops,"DELETE");
+            this.init(classAccessor, configuration, sps);
+          }))));
   }
 
   computeBaseSourceUrl() {
@@ -102,7 +102,7 @@ export class CrudComponent extends Page implements OnInit {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
     this.route.queryParams.subscribe(params => {
-      if(params.hasOwnProperty('create')) {
+      if(params.hasOwnProperty('create') && this.createEnabled) {
         this.showCreate();
       } else if(this.id) {
         this.showDetail();
@@ -120,8 +120,7 @@ export class CrudComponent extends Page implements OnInit {
     list: 'search-results', color: 'accent', presentIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
   })
   navigateToCreate() {
-    //TODO empty commands = no navigation
-    this.router.navigate(['_'], { queryParams: { create: "x" }});
+    this.router.navigate([''], { queryParams: { create: "x" }});
   }
 
   showCreate() {
