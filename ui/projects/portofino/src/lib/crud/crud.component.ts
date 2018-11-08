@@ -3,7 +3,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {PortofinoService} from "../portofino.service";
 import {ClassAccessor} from "../class-accessor";
 import {PortofinoComponent} from "../portofino-app.component";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Operation, Page, PageChild, PageConfiguration} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
 import {AuthenticationService} from "../security/authentication.service";
@@ -64,7 +64,7 @@ export class CrudComponent extends Page implements OnInit {
 
   constructor(
     protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
-    public authenticationService: AuthenticationService) {
+    public authenticationService: AuthenticationService, protected route: ActivatedRoute) {
     super(portofino, http, router, authenticationService);
   }
 
@@ -101,11 +101,15 @@ export class CrudComponent extends Page implements OnInit {
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
-    if(this.id) {
-      this.showDetail();
-    } else {
-      this.showSearch();
-    }
+    this.route.queryParams.subscribe(params => {
+      if(params.hasOwnProperty('create')) {
+        this.showCreate();
+      } else if(this.id) {
+        this.showDetail();
+      } else {
+        this.showSearch();
+      }
+    });
   }
 
   static createEnabled(self: CrudComponent) {
@@ -115,6 +119,11 @@ export class CrudComponent extends Page implements OnInit {
   @Button({
     list: 'search-results', color: 'accent', presentIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
   })
+  navigateToCreate() {
+    //TODO empty commands = no navigation
+    this.router.navigate(['_'], { queryParams: { create: "x" }});
+  }
+
   showCreate() {
     this.allowEmbeddedComponents = false;
     this.view = CrudView.CREATE;
@@ -190,7 +199,7 @@ export class CrudComponent extends Page implements OnInit {
   }
 
   goToSearch() {
-    if(this.view == CrudView.DETAIL) {
+    if(this.view == CrudView.DETAIL || this.view == CrudView.CREATE) {
       this.router.navigateByUrl(this.baseUrl);
     } else {
       this.showSearch();
