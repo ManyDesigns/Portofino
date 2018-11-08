@@ -8,7 +8,13 @@ import {
   TOOLBAR_COMPONENT,
   ToolbarDirective
 } from './portofino-app.component';
-import {CrudComponent, SearchComponentHolder} from './crud/crud.component';
+import {
+  BulkEditComponentHolder,
+  CreateComponentHolder,
+  CrudComponent,
+  DetailComponentHolder,
+  SearchComponentHolder
+} from './crud/crud.component';
 import {PortofinoService} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {AuthenticationInterceptor, AuthenticationService, LOGIN_COMPONENT} from "./security/authentication.service";
@@ -73,7 +79,7 @@ import { NgxdModule } from '@ngxd/core';
     NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    SearchComponentHolder,
+    SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
     ManyToManyComponent
   ],
   imports: [
@@ -103,7 +109,7 @@ import { NgxdModule } from '@ngxd/core';
     FieldComponent, BlobFieldComponent, FormComponent,
     PageComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    SearchComponentHolder,
+    SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
     ManyToManyComponent]
 })
 export class PortofinoModule {

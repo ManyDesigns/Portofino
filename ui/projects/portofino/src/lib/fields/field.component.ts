@@ -60,7 +60,10 @@ export class FieldComponent implements OnInit {
         this.control.markAsDirty();
       });
       this.control.valueChanges.subscribe(ch => {
-        this.selector.setValue(this.enabled);
+        if((ch !== undefined && ch !== null) ||
+           (this.selector.value !== undefined && this.selector.value !== null)) {
+          this.selector.setValue(this.enabled);
+        }
       });
     }
   }

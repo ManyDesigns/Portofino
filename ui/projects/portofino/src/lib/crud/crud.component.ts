@@ -10,6 +10,9 @@ import {AuthenticationService} from "../security/authentication.service";
 import {Button} from "../buttons";
 import {SelectionModel} from "@angular/cdk/collections";
 import {SearchComponent} from "./search/search.component";
+import {DetailComponent} from "./detail/detail.component";
+import {CreateComponent} from "./detail/create.component";
+import {BulkEditComponent} from "./bulk/bulk-edit.component";
 
 @Component({
   selector: 'portofino-crud',
@@ -41,10 +44,23 @@ export class CrudComponent extends Page implements OnInit {
   bulkEditEnabled: boolean;
   bulkDeleteEnabled: boolean;
 
+  //Sub-components, configurable
   @Input()
   searchComponent: Type<any> = SearchComponent;
   @Input()
   searchComponentContext = {};
+  @Input()
+  detailComponent: Type<any> = DetailComponent;
+  @Input()
+  detailComponentContext = {};
+  @Input()
+  createComponent: Type<any> = CreateComponent;
+  @Input()
+  createComponentContext = {};
+  @Input()
+  bulkEditComponent: Type<any> = BulkEditComponent;
+  @Input()
+  bulkEditComponentContext = {};
 
   constructor(
     protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
@@ -218,4 +234,40 @@ export class SearchComponentHolder extends SearchComponent {
   context = {};
   ngOnInit(): void {}
   ngOnDestroy(): void {}
+}
+
+@Component({
+  selector: 'portofino-crud-detail-holder',
+  template: `<ng-container *ngxComponentOutlet="component; context: context"></ng-container>`,
+})
+export class DetailComponentHolder extends DetailComponent {
+  @Input()
+  component: Type<any>;
+  @Input()
+  context = {};
+  ngOnInit(): void {}
+}
+
+@Component({
+  selector: 'portofino-crud-create-holder',
+  template: `<ng-container *ngxComponentOutlet="component; context: context"></ng-container>`,
+})
+export class CreateComponentHolder extends CreateComponent {
+  @Input()
+  component: Type<any>;
+  @Input()
+  context = {};
+  ngOnInit(): void {}
+}
+
+@Component({
+  selector: 'portofino-crud-bulk-edit-holder',
+  template: `<ng-container *ngxComponentOutlet="component; context: context"></ng-container>`,
+})
+export class BulkEditComponentHolder extends BulkEditComponent {
+  @Input()
+  component: Type<any>;
+  @Input()
+  context = {};
+  ngOnInit(): void {}
 }
