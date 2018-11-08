@@ -87,6 +87,11 @@ export function isMultiline(property: Property) {
   return annotation && annotation.properties["value"];
 }
 
+export function isPassword(property: Property) {
+  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Password");
+  return !!annotation;
+}
+
 export function isRichText(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.RichText");
   return annotation && annotation.properties["value"];

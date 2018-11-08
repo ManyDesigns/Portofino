@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {isMultiline, isRequired, isRichText, Property} from "../class-accessor";
+import {isMultiline, isPassword, isRequired, isRichText, Property} from "../class-accessor";
 import {PortofinoService} from "../portofino.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {AbstractControl} from "@angular/forms/src/model";
@@ -70,6 +70,10 @@ export class FieldComponent implements OnInit {
 
   isMultiline() {
     return isMultiline(this.property);
+  }
+
+  isPassword() {
+    return isPassword(this.property);
   }
 
   isRichText() {

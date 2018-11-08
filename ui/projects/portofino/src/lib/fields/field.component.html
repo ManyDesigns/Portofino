@@ -61,7 +61,8 @@
   </ng-container>
   <mat-form-field *ngIf="property.kind == 'string' && !isRichText()" [formGroup]="form">
     <mat-label>{{property.label}}</mat-label>
-    <input matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="!isMultiline()" />
+    <input matInput *ngIf="!isMultiline()"
+           [formControlName]="property.name" [required]="isRequired()" [type]="isPassword() ? 'password' : 'text'" />
     <textarea matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="isMultiline()" ></textarea>
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
       {{ '_ is required.' | translate:{ label: property.label } }}
