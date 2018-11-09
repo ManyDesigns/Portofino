@@ -25,7 +25,7 @@
         <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description"
                 autoincrement="false">
             <annotations>
-                <annotation type="com.manydesigns.elements.annotations.RichText">
+                <annotation type="com.manydesigns.elements.annotations.Multiline">
                     <value>true</value>
                 </annotation>
             </annotations>

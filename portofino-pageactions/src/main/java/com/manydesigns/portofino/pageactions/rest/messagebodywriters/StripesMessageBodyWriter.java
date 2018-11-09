@@ -60,9 +60,6 @@ public class StripesMessageBodyWriter implements MessageBodyWriter<Resolution> {
             @Override
             public void setWriteListener(WriteListener listener) {}
 
-            /*@Override
-            public void setWriteListener(WriteListener writeListener) {}*/
-
             @Override
             public void write(final int b) throws IOException {
                 entityStream.write(b);
