@@ -41,12 +41,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-      <dependency>
-        <groupId>com.manydesigns</groupId>
-        <artifactId>portofino-mail</artifactId>
-        <version>4.2.6-SNAPSHOT</version>
-        <scope>compile</scope>
-      </dependency>
     </dependencies>
     <build>
         <resources>
