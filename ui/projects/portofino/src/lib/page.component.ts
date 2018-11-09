@@ -25,7 +25,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(EmbeddedContentDirective)
   embeddedContentHost: EmbeddedContentDirective;
 
-  protected subscription: Subscription;
+  protected readonly subscriptions: Subscription[] = [];
 
   constructor(public pageService: PageService,
               protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
@@ -34,19 +34,27 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
               protected authenticationService: AuthenticationService) { }
 
   ngOnInit() {
-
+    const reload = () => this.reloadPage();
+    this.subscriptions.push(this.authenticationService.logins.subscribe(reload));
+    this.subscriptions.push(this.authenticationService.logouts.subscribe(reload));
   }
 
   ngAfterViewInit() {
-    this.subscription = this.route.url.subscribe(segment => {
+    this.subscriptions.push(this.route.url.subscribe(segment => {
       this.pageService.reset();
       this.loadPageInPath("", null, segment, 0, false);
-    });
+    }));
   }
 
   ngOnDestroy() {
-    if(this.subscription) {
-      this.subscription.unsubscribe();
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
+  protected reloadPage() {
+    if (this.router.url && this.router.url != "/") {
+      this.router.navigateByUrl(this.router.url);
+    } else {
+      window.location.reload(); //TODO
     }
   }
 

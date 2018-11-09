@@ -1,4 +1,4 @@
-import {Inject, Injectable, InjectionToken} from '@angular/core';
+import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
 import {
   HttpClient,
   HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpParams, HttpRequest
@@ -8,7 +8,6 @@ import {MatDialog, MatDialogRef} from "@angular/material";
 import {Observable, throwError} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
-import {Router} from "@angular/router";
 import {NotificationService} from "../notifications/notification.service";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
@@ -19,10 +18,12 @@ export class AuthenticationService {
   dialogRef: MatDialogRef<any>;
   currentUser: UserInfo;
   retryUnauthenticatedOnSessionExpiration = true;
+  readonly logins = new EventEmitter<UserInfo>();
+  readonly logouts = new EventEmitter<void>();
 
   constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
               private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
-              protected router: Router, protected notifications: NotificationService) {
+              protected notifications: NotificationService) {
     const displayName = this.storage.get('user.displayName');
     if(displayName) {
       this.currentUser = new UserInfo(displayName, this.storage.get('user.administrator') == 'true');
@@ -76,11 +77,7 @@ export class AuthenticationService {
   }
 
   public showLoginDialog() {
-    this.askForCredentials().subscribe(result => {
-      if(result) {
-        this.reloadPage();
-      }
-    });
+    this.askForCredentials().subscribe();
   }
 
   protected removeAuthenticationInfo() {
@@ -97,6 +94,7 @@ export class AuthenticationService {
     this.storage.set('user.administrator', result.administrator);
     this.storage.set('sessionId', result.portofinoSessionId);
     this.currentUser = new UserInfo(result.displayName, result.administrator);
+    this.logins.emit(this.currentUser);
   }
 
   withAuthenticationHeader(req: HttpRequest<any>) {
@@ -132,18 +130,10 @@ export class AuthenticationService {
 
   logout() {
     const url = `${this.loginPath}/${this.storage.get('sessionId')}`;
-    this.http.delete(url).subscribe(value => {
+    this.http.delete(url).subscribe(() => {
       this.removeAuthenticationInfo();
-      this.reloadPage();
+      this.logouts.emit();
     });
-  }
-
-  protected reloadPage() {
-    if (this.router.url && this.router.url != "/") {
-      this.router.navigateByUrl(this.router.url);
-    } else {
-      window.location.reload(); //TODO
-    }
   }
 
   get isAdmin() {
