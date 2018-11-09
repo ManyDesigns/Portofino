@@ -223,7 +223,11 @@ public abstract class AbstractResource implements SecureResource {
     public Collection<String> getSubResources() {
         try {
             List<String> subResources = new ArrayList<>();
-            FileObject[] children = getChildrenLocation().getChildren();
+            FileObject childrenLocation = getChildrenLocation();
+            if(childrenLocation == null || !childrenLocation.exists() || childrenLocation.getType() != FileType.FOLDER) {
+                return subResources;
+            }
+            FileObject[] children = childrenLocation.getChildren();
             for (FileObject child : children) {
                 if (child.getType() == FileType.FOLDER) {
                     subResources.add(child.getName().getBaseName());

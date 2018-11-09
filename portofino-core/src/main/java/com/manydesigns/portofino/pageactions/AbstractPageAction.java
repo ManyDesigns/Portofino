@@ -530,9 +530,11 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     protected void describe(Map<String, Object> description) {
         super.describe(description);
         description.put("page", pageInstance.getPage());
-        parameters.add("");
-        description.put("detailChildren", getSubResources());
-        parameters.remove(parameters.size() - 1);
+        if(PageActionLogic.supportsDetail(getClass())) {
+            parameters.add("");
+            description.put("detailChildren", getSubResources());
+            parameters.remove(parameters.size() - 1);
+        }
     }
 
 }
