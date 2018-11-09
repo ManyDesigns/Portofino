@@ -20,14 +20,28 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.event.ContextRefreshedEvent;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.io.File;
 
@@ -37,7 +51,7 @@ import java.io.File;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DatabaseModule implements Module {
+public class DatabaseModule implements Module, ApplicationContextAware, ApplicationListener {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -45,16 +59,17 @@ public class DatabaseModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(BaseModule.APPLICATION_DIRECTORY)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
     public File applicationDirectory;
 
-    protected Persistence persistence;
+    protected ApplicationContext applicationContext;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -62,10 +77,6 @@ public class DatabaseModule implements Module {
     // Constants
     //**************************************************************************
 
-    public static final String PERSISTENCE =
-            "com.manydesigns.portofino.modules.DatabaseModule.persistence";
-    public static final String DATABASE_PLATFORMS_REGISTRY =
-            "com.manydesigns.portofino.modules.DatabaseModule.databasePlatformsRegistry";
     //Liquibase properties
     public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
 
@@ -78,22 +89,7 @@ public class DatabaseModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 10;
-    }
-
-    @Override
-    public String getId() {
-        return "database";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -101,39 +97,29 @@ public class DatabaseModule implements Module {
         return "Database";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
-        logger.info("Initializing persistence");
-        DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
-
-        persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
-        Injections.inject(persistence, servletContext, null);
-        servletContext.setAttribute(DATABASE_PLATFORMS_REGISTRY, databasePlatformsRegistry);
-        servletContext.setAttribute(PERSISTENCE, persistence);
-
         status = ModuleStatus.ACTIVE;
     }
 
-    @Override
-    public void start() {
-        persistence.start();
-        status = ModuleStatus.STARTED;
+    @Bean
+    public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
+        return new DatabasePlatformsRegistry(configuration);
     }
 
-    @Override
-    public void stop() {
-        persistence.stop();
-        status = ModuleStatus.STOPPED;
+    @Bean
+    public Persistence getPersistence(
+            @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
+            @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) {
+        Persistence persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
+        persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
+        return persistence;
     }
 
-    @Override
+    @PreDestroy
     public void destroy() {
         logger.info("ManyDesigns Portofino database module stopping...");
+        applicationContext.getBean(Persistence.class).stop();
         logger.info("ManyDesigns Portofino database module stopped.");
         status = ModuleStatus.DESTROYED;
     }
@@ -141,5 +127,20 @@ public class DatabaseModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(@NotNull ApplicationEvent event) {
+        if(event instanceof ContextRefreshedEvent) {
+            logger.info("Starting persistence...");
+            applicationContext.getBean(Persistence.class).start();
+            status = ModuleStatus.STARTED;
+            logger.info("Persistence started.");
+        }
     }
 }

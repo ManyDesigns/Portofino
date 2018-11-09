@@ -27,7 +27,6 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;

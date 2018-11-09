@@ -20,13 +20,17 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.m2m.ManyToManyAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,10 +46,10 @@ public class CrudModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(PageactionsModule.PAGE_ACTIONS_REGISTRY)
+    @Autowired
     public PageActionRegistry pageActionRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
@@ -59,22 +63,7 @@ public class CrudModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 20;
-    }
-
-    @Override
-    public String getId() {
-        return "crud";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -82,29 +71,14 @@ public class CrudModule implements Module {
         return "CRUD";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         pageActionRegistry.register(CrudAction.class);
         pageActionRegistry.register(ManyToManyAction.class);
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

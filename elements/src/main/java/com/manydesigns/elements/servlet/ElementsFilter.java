@@ -21,6 +21,9 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
+import com.manydesigns.elements.blobs.MultipartWrapper;
+import com.manydesigns.elements.blobs.StreamingCommonsMultipartWrapper;
 import ognl.OgnlContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 
 /*
@@ -124,6 +128,16 @@ public class ElementsFilter implements Filter {
             ognlContext.put(SERVLET_CONTEXT_OGNL_ATTRIBUTE,
                     servletContextAttributeMap);
 
+            String contentType = req.getContentType();
+            if (contentType != null && contentType.startsWith("multipart/form-data")) {
+                try {
+                    MultipartWrapper multipartWrapper = buildMultipart(req);
+                    ElementsThreadLocals.setMultipart(multipartWrapper);
+                    req = multipartWrapper.wrapRequest(req);
+                } catch (FileUploadLimitExceededException e) {
+                    logger.warn("File upload limit exceeded", e);
+                }
+            }
 
             ElementsThreadLocals.setHttpServletRequest(req);
             ElementsThreadLocals.setHttpServletResponse(res);
@@ -134,5 +148,24 @@ public class ElementsFilter implements Filter {
             ElementsThreadLocals.removeElementsContext();
         }
     }
+
+    protected MultipartWrapper buildMultipart(HttpServletRequest request) throws IOException, FileUploadLimitExceededException {
+        StreamingCommonsMultipartWrapper multipart = new StreamingCommonsMultipartWrapper();
+        // Figure out where the temp directory is, and store that info
+        File tempDir = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+        if (tempDir == null) {
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            if (tmpDir != null) {
+                tempDir = new File(tmpDir).getAbsoluteFile();
+            } else {
+                logger.warn("The tmpdir system property was null! File uploads will probably fail.");
+            }
+        }
+        long maxPostSize = Long.MAX_VALUE;
+        multipart.build(request, tempDir, maxPostSize);
+        return multipart;
+    }
+
+
 
 }

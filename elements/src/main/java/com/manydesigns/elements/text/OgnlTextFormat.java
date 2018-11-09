@@ -98,8 +98,7 @@ public class OgnlTextFormat
 
         Locale locale = this.locale;
         if(locale == null) {
-            HttpServletRequest req =
-                ElementsThreadLocals.getHttpServletRequest();
+            HttpServletRequest req = ElementsThreadLocals.getHttpServletRequest();
             if(req != null) {
                 locale = req.getLocale();
             } else { //Not in a HTTP request.

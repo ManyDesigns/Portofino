@@ -20,14 +20,18 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.PostgreSQLDatabasePlatform;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.databases.PortofinoPostgresDatabase;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import liquibase.database.DatabaseFactory;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,10 +47,10 @@ public class PostgresqlModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
@@ -60,22 +64,7 @@ public class PostgresqlModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 20;
-    }
-
-    @Override
-    public String getId() {
-        return "postgresql";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -83,29 +72,14 @@ public class PostgresqlModule implements Module {
         return "PostgreSQL";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         databasePlatformsRegistry.addDatabasePlatform(new PostgreSQLDatabasePlatform());
         DatabaseFactory.getInstance().register(new PortofinoPostgresDatabase());
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

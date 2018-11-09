@@ -20,13 +20,17 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.JTDSDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.MSSqlServerDatabasePlatform;
-import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,10 +46,10 @@ public class MssqlModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
@@ -59,22 +63,7 @@ public class MssqlModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 20;
-    }
-
-    @Override
-    public String getId() {
-        return "mssql";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -82,31 +71,14 @@ public class MssqlModule implements Module {
         return "MS SQL Server";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         databasePlatformsRegistry.addDatabasePlatform(new MSSqlServerDatabasePlatform());
-
-
         databasePlatformsRegistry.addDatabasePlatform(new JTDSDatabasePlatform());
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

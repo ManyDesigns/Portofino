@@ -20,18 +20,15 @@
 
 package com.manydesigns.portofino.pageactions.crud.configuration.database;
 
-import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.util.BootstrapSizes;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -60,7 +57,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.pageactions.cru
     protected String database;
     protected String query;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     //**************************************************************************
@@ -134,7 +131,6 @@ public class CrudConfiguration extends com.manydesigns.portofino.pageactions.cru
 
     @Required
     @Multiline
-    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;

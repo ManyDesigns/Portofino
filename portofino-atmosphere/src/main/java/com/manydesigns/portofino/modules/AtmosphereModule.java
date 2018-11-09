@@ -20,12 +20,16 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.atmosphere.notifications.NotificationService;
-import com.manydesigns.portofino.di.Inject;
 import org.atmosphere.cpr.AtmosphereFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 /*
@@ -34,6 +38,7 @@ import javax.servlet.ServletContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@Component
 public class AtmosphereModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
@@ -42,7 +47,7 @@ public class AtmosphereModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
+    @Autowired
     public ServletContext servletContext;
 
     public static final String NOTIFICATION_SERVICE =
@@ -59,22 +64,7 @@ public class AtmosphereModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 20;
-    }
-
-    @Override
-    public String getId() {
-        return "atmosphere";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -82,29 +72,14 @@ public class AtmosphereModule implements Module {
         return "Atmosphere notifications";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         AtmosphereFramework framework = (AtmosphereFramework) servletContext.getAttribute("AtmosphereServlet");
         servletContext.setAttribute(NOTIFICATION_SERVICE, new NotificationService(framework));
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

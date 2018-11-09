@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.pageactions.calendar.configuration;
 
 import com.manydesigns.elements.annotations.*;
-import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
+import com.manydesigns.portofino.pageactions.PageActionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

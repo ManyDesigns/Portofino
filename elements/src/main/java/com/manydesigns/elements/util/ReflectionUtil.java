@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements.util;
 
+import com.manydesigns.elements.fields.FieldUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import org.json.JSONObject;
@@ -152,6 +153,7 @@ public class ReflectionUtil {
             js.value("public");
         }
         js.endArray();
+        js.key("label").value(FieldUtils.getLabel(accessor));
         js.key("annotations").array();
         for(Annotation ann : accessor.getAnnotations()) {
             annotationToJson(js, ann);

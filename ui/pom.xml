@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.manydesigns</groupId>
+    <artifactId>portofino</artifactId>
+    <version>5.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>portofino-angular-ui</artifactId>
+  <packaging>pom</packaging>
+  <url>http://www.manydesigns.com/</url>
+
+  <modules>
+    <module>support</module>
+  </modules>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>dist</directory>
+              <includes>
+                <include>*</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>v8.11.1</nodeVersion>
+              <npmVersion>6.0.1</npmVersion>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run-script build-all</arguments>
+            </configuration>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <webResources>
+            <resource><directory>dist/</directory></resource>
+            <resource><directory>src/webapp/</directory></resource>
+          </webResources>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

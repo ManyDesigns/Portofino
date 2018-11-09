@@ -1,0 +1,29 @@
+<portofino-default-page-layout [page]="this">
+  <ng-template #content>
+    <portofino-crud-search-holder *ngIf="isSearchView()"
+      [component]="searchComponent" [context]="searchComponentContext"
+      [classAccessor]="classAccessor" [pageSize]="configuration.rowsPerPage" [sourceUrl]="sourceUrl" [baseUrl]="url"
+      [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled"
+      [selection]="selection" [refresh]="refreshSearch"
+      [parentButtons]="getButtons('search-results')" [parent]="page">
+    </portofino-crud-search-holder>
+    <portofino-crud-detail-holder *ngIf="isDetailView()"
+      [component]="detailComponent" [context]="detailComponentContext"
+      [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+      [sourceUrl]="sourceUrl" (close)="goToSearch()" (editModeChanges)="onEditModeChange($event)"
+      [parentButtons]="getButtons('detail')" [parent]="page">
+    </portofino-crud-detail-holder>
+    <portofino-crud-create-holder *ngIf="isCreateView()"
+      [component]="createComponent" [context]="createComponentContext"
+      [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+      [sourceUrl]="sourceUrl" (close)="goToSearch()"
+      [parentButtons]="getButtons('create')" [parent]="page">
+    </portofino-crud-create-holder>
+    <portofino-crud-bulk-edit-holder *ngIf="isBulkEditView()"
+      [component]="bulkEditComponent" [context]="bulkEditComponentContext"
+      [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
+      [ids]="getSelectedIds()" [sourceUrl]="sourceUrl" (close)="goToSearch()"
+      [parentButtons]="getButtons('bulk-edit')" [parent]="page">
+    </portofino-crud-bulk-edit-holder>
+  </ng-template>
+</portofino-default-page-layout>

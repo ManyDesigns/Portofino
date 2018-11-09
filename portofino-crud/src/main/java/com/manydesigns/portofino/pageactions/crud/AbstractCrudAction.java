@@ -30,11 +30,11 @@ import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.*;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
+import com.manydesigns.elements.servlet.UrlBuilder;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
@@ -45,32 +45,24 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
-import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
-import com.manydesigns.portofino.cache.ControlsCache;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.pageactions.crud.configuration.VirtualCrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
-import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.StripesRequestWrapper;
-import net.sourceforge.stripes.exception.StripesServletException;
-import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -83,22 +75,22 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -165,6 +157,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractCrudAction.class);
+    public static final String PORTOFINO_PRETTY_NAME_HEADER = "X-Portofino-Pretty-Name";
 
     //--------------------------------------------------------------------------
     // Web parameters
@@ -215,10 +208,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public T object;
     public List<? extends T> objects;
 
-    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
-    @Inject(BaseModule.TEMPORARY_BLOB_MANAGER)
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.TEMPORARY_BLOB_MANAGER)
     protected BlobManager temporaryBlobManager;
 
     //--------------------------------------------------------------------------
@@ -278,15 +273,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected abstract void doDelete(T object);
 
-    @DefaultHandler
-    public Resolution execute() {
-        if (object == null) {
-            return doSearch();
-        } else {
-            return read();
-        }
-    }
-
     /**
      * {@link #loadObjectByPrimaryKey(java.io.Serializable)}
      * @param identifier the object identifier in String form
@@ -300,63 +286,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Search
     //**************************************************************************
 
-    @Buttons({
-            @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY, icon = Button.ICON_SEARCH),
-            @Button(list = "crud-search-form-default-button", key = "search" )
-    })
-    public Resolution search() {
-        //Not really used. Search is AJAX these days.
-        return doSearch();
-    }
-
-    /**
-     * Executes a search and forwards to the appropriate view.
-     * @return the result of {@link #getSearchView()}
-     */
-    protected Resolution doSearch() {
-        if(!isConfigured()) {
-            logger.debug("Crud not correctly configured");
-            return forwardToPageActionNotConfigured();
-        }
-
-        try {
-            executeSearch();
-            if(PageActionLogic.isEmbedded(this)) {
-                return getEmbeddedSearchView();
-            } else {
-                returnUrl = new UrlBuilder(
-                        context.getLocale(), Util.getAbsoluteUrl(context.getActionPath()), false)
-                        .toString();
-                returnUrl = appendSearchStringParamIfNecessary(returnUrl);
-                return getSearchView();
-            }
-        } catch(Exception e) {
-            logger.warn("Crud not correctly configured", e);
-            return forwardToPageActionNotConfigured();
-        }
-    }
-
-    /**
-     * Executes a search and returns the results table. This method is supposed to be called via AJAX, as it does not
-     * return a complete page, but only a fragment.
-     * @return the result of {@link #getSearchResultsPageView()}
-     */
-    public Resolution getSearchResultsPage() {
-        if(!isConfigured()) {
-            logger.debug("Crud not correctly configured");
-            return new ErrorResolution(500, "Crud not correctly configured");
-        }
-
-        try {
-            executeSearch();
-            context.getRequest().setAttribute("actionBean", this);
-            return getSearchResultsPageView();
-        } catch(Exception e) {
-            logger.warn("Crud not correctly configured", e);
-            return new ErrorResolution(500, "Crud not correctly configured");
-        }
-    }
-
     protected void executeSearch() {
         setupSearchForm();
         if(maxResults == null) {
@@ -368,7 +297,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
     }
 
-    public Resolution jsonSearchData() throws JSONException {
+    public Response jsonSearchData() throws JSONException {
         executeSearch();
 
         final long totalRecords = getTotalSearchRecords();
@@ -395,34 +324,30 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText) {
-            @Override
-            protected void applyHeaders(HttpServletResponse response) {
-                super.applyHeaders(response);
-                Integer rowsPerPage = getCrudConfiguration().getRowsPerPage();
-                if(rowsPerPage != null && totalRecords > rowsPerPage) {
-                    int firstResult = getFirstResult() != null ? getFirstResult() : 1;
-                    int currentPage = firstResult / rowsPerPage;
-                    int lastPage = (int) (totalRecords / rowsPerPage);
-                    if(totalRecords % rowsPerPage == 0) {
-                        lastPage--;
-                    }
-                    StringBuilder sb = new StringBuilder();
-                    if(currentPage > 0) {
-                        sb.append("<").append(getLinkToPage(0)).append(">; rel=\"first\", ");
-                        sb.append("<").append(getLinkToPage(currentPage - 1)).append(">; rel=\"prev\"");
-                    }
-                    if(currentPage != lastPage) {
-                        if(currentPage > 0) {
-                            sb.append(", ");
-                        }
-                        sb.append("<").append(getLinkToPage(currentPage + 1)).append(">; rel=\"next\", ");
-                        sb.append("<").append(getLinkToPage(lastPage)).append(">; rel=\"last\"");
-                    }
-                    response.setHeader("Link", sb.toString());
-                }
+        Response.ResponseBuilder builder = Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8");
+        Integer rowsPerPage = getCrudConfiguration().getRowsPerPage();
+        if(rowsPerPage != null && totalRecords > rowsPerPage) {
+            int firstResult = getFirstResult() != null ? getFirstResult() : 1;
+            int currentPage = firstResult / rowsPerPage;
+            int lastPage = (int) (totalRecords / rowsPerPage);
+            if(totalRecords % rowsPerPage == 0) {
+                lastPage--;
             }
-        };
+            StringBuilder sb = new StringBuilder();
+            if(currentPage > 0) {
+                sb.append("<").append(getLinkToPage(0)).append(">; rel=\"first\", ");
+                sb.append("<").append(getLinkToPage(currentPage - 1)).append(">; rel=\"prev\"");
+            }
+            if(currentPage != lastPage) {
+                if(currentPage > 0) {
+                    sb.append(", ");
+                }
+                sb.append("<").append(getLinkToPage(currentPage + 1)).append(">; rel=\"next\", ");
+                sb.append("<").append(getLinkToPage(lastPage)).append(">; rel=\"last\"");
+            }
+            builder.header("Link", sb.toString());
+        }
+        return builder.build();
     }
 
     /**
@@ -432,42 +357,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     public abstract long getTotalSearchRecords();
 
-    @Button(list = "crud-search-form", key = "reset.search", order = 2, type = Button.TYPE_DEFAULT, icon = Button.ICON_RELOAD )
-    public Resolution resetSearch() {
-        //Not really used. Search is AJAX these days.
-        return new RedirectResolution(context.getActionPath());
-    }
-
     //**************************************************************************
     // Read
     //**************************************************************************
 
-    public Resolution read() {
-        if(!crudConfiguration.isLargeResultSet()) {
-            setupSearchForm(); // serve per la navigazione del result set
-            loadObjects();
-            setupResultSetNavigation();
-        }
-
-        setupForm(Mode.VIEW);
-        form.readFromObject(object);
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        refreshBlobDownloadHref();
-
-        returnUrl = new UrlBuilder(
-                Locale.getDefault(), Util.getAbsoluteUrl(context.getActionPath()), false)
-                .toString();
-
-        returnUrl = appendSearchStringParamIfNecessary(returnUrl);
-
-        if(PageActionLogic.isEmbedded(this)) {
-            return getEmbeddedReadView();
-        } else {
-            return getReadView();
-        }
-    }
-
-    public Resolution jsonReadData() throws JSONException {
+    public Response jsonReadData() throws JSONException {
         if(object == null) {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
@@ -477,8 +371,54 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+        String prettyName = safeGetPrettyName();
+        return Response.ok(jsonText)
+                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
+                .build();
     }
+
+    public Response jsonEditData() throws JSONException {
+        if(object == null) {
+            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
+        }
+        preEdit();
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
+        refreshBlobDownloadHref();
+        String jsonText = FormUtil.writeToJson(form);
+        String prettyName = safeGetPrettyName();
+        return Response.ok(jsonText)
+                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
+                .build();
+    }
+
+    public Response jsonCreateData() throws JSONException {
+        preCreate();
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
+        refreshBlobDownloadHref();
+        String jsonText = FormUtil.writeToJson(form);
+        String prettyName = safeGetPrettyName();
+        return Response.ok(jsonText)
+                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
+                .build();
+    }
+
+    public String safeGetPrettyName() {
+        try {
+            return ShortNameUtils.getName(getClassAccessor(), object);
+        } catch (Exception e) {
+            logger.debug("Could not get the pretty name of the object", e);
+            if(pk != null) {
+                return StringUtils.join(pk, "/");
+            } else {
+                return null;
+            }
+        }
+    }
+
+
     //**************************************************************************
     // Form handling
     //**************************************************************************
@@ -526,60 +466,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
     }
 
-    @Button(list = "crud-search", key = "create.new", order = 1, type = Button.TYPE_SUCCESS,
-            icon = Button.ICON_PLUS + Button.ICON_WHITE)
-    @RequiresPermissions(permissions = PERMISSION_CREATE)
-    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
-    public Resolution create() {
-        preCreate();
-        form.readFromRequest(context.getRequest());
-        return getCreateView();
-    }
-
-    @Button(list = "crud-create", key = "save", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(permissions = PERMISSION_CREATE)
-    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
-    public Resolution save() {
-        preCreate();
-        form.readFromRequest(context.getRequest());
-        BlobUtils.loadBlobs(form, getTemporaryBlobManager(), false);
-        if (form.validate()) {
-            writeFormToObject();
-            if(createValidate(object)) {
-                try {
-                    doSave(object);
-                    createPostProcess(object);
-                    commitTransaction();
-                } catch (Throwable e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.warn(rootCauseMessage, e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                    saveTemporaryBlobs();
-                    return getCreateView();
-                }
-                //The object on the database was persisted. Now we can save the blobs.
-                try {
-                    BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
-                    BlobUtils.saveBlobs(form, getBlobManager());
-                } catch (IOException e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.error("Could not persist blobs!", e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                }
-                if(isPopup()) {
-                    popupCloseCallback += "(true)";
-                    return new ForwardResolution("/m/crud/popup/close.jsp");
-                } else {
-                    addSuccessfulSaveInfoMessage();
-                    return getSuccessfulSaveView();
-                }
-            }
-        } else {
-            saveTemporaryBlobs();
-        }
-        return getCreateView();
-    }
-
     protected void saveTemporaryBlobs() {
         try {
             BlobUtils.saveBlobs(form, getTemporaryBlobManager());
@@ -596,62 +482,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-    }
-
-    @Buttons({
-            @Button(list = "crud-read", key = "edit", order = 1 , icon = Button.ICON_EDIT + Button.ICON_WHITE,
-                    group = "crud", type = Button.TYPE_SUCCESS),
-            @Button(list = "crud-read-default-button", key = "search")
-    })
-    @RequiresPermissions(permissions = PERMISSION_EDIT)
-    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
-    public Resolution edit() {
-        preEdit();
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        return getEditView();
-    }
-
-    @Button(list = "crud-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(permissions = PERMISSION_EDIT)
-    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
-    public Resolution update() {
-        preEdit();
-        List<Blob> blobsBefore = getBlobsFromForm();
-        form.readFromRequest(context.getRequest());
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        BlobUtils.loadBlobs(form, getTemporaryBlobManager(), false);
-        if (form.validate()) {
-            writeFormToObject();
-            if(editValidate(object)) {
-                try {
-                    doUpdate(object);
-                    editPostProcess(object);
-                    commitTransaction();
-                } catch (Throwable e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.warn(rootCauseMessage, e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                    saveTemporaryBlobs();
-                    return getEditView();
-                }
-                try {
-                    List<Blob> blobsAfter = getBlobsFromForm();
-                    deleteOldBlobs(blobsBefore, blobsAfter);
-                    BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
-                    persistNewBlobs(blobsBefore, blobsAfter);
-                } catch (IOException e) {
-                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                    logger.error("Could not persist blobs!", e);
-                    SessionMessages.addErrorMessage(rootCauseMessage);
-                }
-
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
-                return getSuccessfulUpdateView();
-            }
-        } else {
-            saveTemporaryBlobs();
-        }
-        return getEditView();
     }
 
     protected void persistNewBlobs(List<Blob> blobsBefore, List<Blob> blobsAfter) throws IOException {
@@ -680,149 +510,21 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     public boolean isBulkOperationsEnabled() {
-        return (objects != null && !objects.isEmpty()) ||
-                "bulkDelete".equals(context.getEventName()) ||
-                "bulkEdit".equals(context.getEventName()) ||
-                "bulkUpdate".equals(context.getEventName());
-    }
-
-    @Buttons({
-            @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT),
-            @Button(list = "crud-bulk", key = "edit", order = 2, icon = Button.ICON_EDIT)
-    })
-    @Guard(test = "isBulkOperationsEnabled() && isEditEnabled()", type = GuardType.VISIBLE)
-    @RequiresPermissions(permissions = PERMISSION_EDIT)
-    public Resolution bulkEdit() {
-        if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("no.object.was.selected"));
-            return new RedirectResolution(returnUrl, false);
-        }
-
-        if (selection.length == 1) {
-            pk = selection[0].split("/");
-            String url = context.getActionPath() + "/" + getPkForUrl(pk);
-            url = appendSearchStringParamIfNecessary(url);
-            return new RedirectResolution(url)
-                    .addParameter("returnUrl", returnUrl)
-                    .addParameter("edit");
-        }
-
-        setupForm(Mode.BULK_EDIT);
-        disableBlobFields();
-        return getBulkEditView();
-    }
-
-    /**
-     * Handles a bulk update operation (typically invoked by the user submitting a bulk edit form).
-     * Note: doesn't handle blobs.
-     * @return which view to render next.
-     */
-    @Button(list = "crud-bulk-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
-    @Guard(test = "isBulkOperationsEnabled() && isEditEnabled()", type = GuardType.VISIBLE)
-    @RequiresPermissions(permissions = PERMISSION_EDIT)
-    public Resolution bulkUpdate() {
-        int updated = 0;
-        setupForm(Mode.BULK_EDIT);
-        disableBlobFields();
-        form.readFromRequest(context.getRequest());
-        if (form.validate()) {
-            for (String current : selection) {
-                loadObject(current.split("/"));
-                editSetup(object);
-                writeFormToObject();
-                if(editValidate(object)) {
-                    doUpdate(object);
-                    editPostProcess(object);
-                    updated++;
-                }
-            }
-            try {
-                commitTransaction();
-            } catch (Throwable e) {
-                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                logger.warn(rootCauseMessage, e);
-                SessionMessages.addErrorMessage(rootCauseMessage);
-                return getBulkEditView();
-            }
-            SessionMessages.addInfoMessage(
-                    ElementsThreadLocals.getText("update.of._.objects.successful", updated));
-            return getSuccessfulUpdateView();
-        } else {
-            return getBulkEditView();
-        }
+        return object == null;
     }
 
     //**************************************************************************
     // Delete
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "delete", order = 2, icon = Button.ICON_TRASH)
-    @RequiresPermissions(permissions = PERMISSION_DELETE)
-    @Guard(test = "isDeleteEnabled()", type = GuardType.VISIBLE)
-    public Resolution delete() {
-        if(deleteValidate(object)) {
-            try {
-                doDelete(object);
-                deletePostProcess(object);
-                commitTransaction();
-                deleteBlobs(object);
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.deleted.successfully"));
-            } catch (Exception e) {
-                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                logger.debug(rootCauseMessage, e);
-                SessionMessages.addErrorMessage(rootCauseMessage);
-                return read();
-            }
-        }
-        return getSuccessfulDeleteView();
-    }
-
-    @Buttons({
-            @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH),
-            @Button(list = "crud-bulk", key = "delete", order = 3, icon = Button.ICON_TRASH)
-    })
-    @Guard(test = "isBulkOperationsEnabled() && isDeleteEnabled()", type = GuardType.VISIBLE)
-    @RequiresPermissions(permissions = PERMISSION_DELETE)
-    public Resolution bulkDelete() {
-        int deleted = 0;
-        if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("no.object.was.selected"));
-            return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath())); //TODO why is this different from bulkEdit?
-        }
-        List<T> objects = new ArrayList<T>(selection.length);
-        for (String current : selection) {
-            String[] pkArr = current.split("/");
-            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
-            T obj = loadObjectByPrimaryKey(pkObject);
-            if(deleteValidate(obj)) {
-                doDelete(obj);
-                deletePostProcess(obj);
-                objects.add(obj);
-                deleted++;
-            }
-        }
-        try {
-            commitTransaction();
-            for(T obj : objects) {
-                deleteBlobs(obj);
-            }
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("_.objects.deleted.successfully", deleted));
-        } catch (Exception e) {
-            logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
-            SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
-        }
-
-        return getSuccessfulDeleteView();
-    }
-
-    //**************************************************************************
+   //**************************************************************************
     // Hooks/scripting
     //**************************************************************************
 
     public boolean isCreateEnabled() {
         return true;
     }
-
+    
     /**
      * Hook method called just after a new object has been created.
      * @param object the new object.
@@ -855,7 +557,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public boolean isEditEnabled() {
         return true;
     }
-
+    
     /**
      * Hook method called just before an object is used to populate the edit form.
      * @param object the object.
@@ -882,7 +584,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public boolean isDeleteEnabled() {
         return true;
     }
-
+    
     /**
      * Hook method called before an object is deleted.
      * @param object the object.
@@ -901,131 +603,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected void deletePostProcess(T object) {}
 
-    /**
-     * Returns the Resolution used to show the Bulk Edit page.
-     */
-    protected Resolution getBulkEditView() {
-        return new ForwardResolution("/m/crud/bulk-edit.jsp");
-    }
-
-    /**
-     * Returns the Resolution used to show the Create page.
-     */
-    protected Resolution getCreateView() { //TODO spezzare in popup/non-popup?
-        if(isPopup()) {
-            return new ForwardResolution("/m/crud/popup/create.jsp");
-        } else {
-            return new ForwardResolution("/m/crud/create.jsp");
-        }
-    }
-
-    /**
-     * Returns the Resolution used to show the effect of a successful save action.
-     * @return by default, a redirect to the returnUrl if present, to the search page otherwise.
-     */
-    protected Resolution getSuccessfulSaveView() {
-        if(StringUtils.isEmpty(returnUrl)) {
-            return new RedirectResolution(context.getActionPath());
-        } else {
-            return new RedirectResolution(returnUrl, false);
-        }
-    }
-
-    /**
-     * Returns the Resolution used to show the effect of a successful update action.
-     * @return by default, a redirect to the detail, propagating the search string.
-     */
-    protected Resolution getSuccessfulUpdateView() {
-        return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
-    }
-
-    /**
-     * Returns the Resolution used to show the effect of a successful delete action.
-     * @return by default, a redirect to the search, propagating the search string.
-     */
-    protected Resolution getSuccessfulDeleteView() {
-        return new RedirectResolution(appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
-    }
-
-    /**
-     * Adds an information message (using {@link SessionMessages}) after successful creation of a new record.
-     * By default, the message contains a link to the created object as well as a link for creating a new one.
-     */
-    protected void addSuccessfulSaveInfoMessage() {
-        XhtmlBuffer buffer = new XhtmlBuffer();
-
-        pk = pkHelper.generatePkStringArray(object);
-        String readUrl = context.getActionPath() + "/" + getPkForUrl(pk);
-        String prettyName = ShortNameUtils.getName(getClassAccessor(), object);
-        XhtmlBuffer linkToObjectBuffer = new XhtmlBuffer();
-        linkToObjectBuffer.writeAnchor(Util.getAbsoluteUrl(readUrl), prettyName);
-        buffer.writeNoHtmlEscape(ElementsThreadLocals.getText("object._.saved", linkToObjectBuffer));
-
-        String createUrl = Util.getAbsoluteUrl(context.getActionPath());
-        if(!createUrl.contains("?")) {
-            createUrl += "?";
-        } else {
-            createUrl += "&";
-        }
-        createUrl += "create=";
-        createUrl = appendSearchStringParamIfNecessary(createUrl);
-        buffer.write(" ");
-        buffer.writeAnchor(createUrl, ElementsThreadLocals.getText("create.another.object"));
-
-        SessionMessages.addInfoMessage(buffer);
-    }
-
-    /**
-     * Returns the Resolution used to show the Edit page.
-     */
-    protected Resolution getEditView() {
-        return new ForwardResolution("/m/crud/edit.jsp");
-    }
-
-    /**
-     * Returns the Resolution used to show the Read page.
-     */
-    protected Resolution getReadView() {
-        return new ForwardResolution("/m/crud/read.jsp");
-    }
-
-    /**
-     * Returns the Resolution used to show the Search page when this page is embedded in its parent.
-     */
-    protected Resolution getEmbeddedReadView() {
-        return new ForwardResolution("/m/crud/read.jsp");
-    }
-
-    /**
-     * Returns the Resolution used to show the Search page.
-     */
-    protected Resolution getSearchView() {
-        return new ForwardResolution("/m/crud/search.jsp");
-    }
-
-    /**
-     * Returns the Resolution used to show the Search page when this page is embedded in its parent.
-     */
-    protected Resolution getEmbeddedSearchView() {
-        return new ForwardResolution("/m/crud/search.jsp");
-    }
-
-    /**
-     * Returns the Resolution used to display the search results when paginating or sorting via AJAX.
-     */
-    protected Resolution getSearchResultsPageView() {
-        return new ForwardResolution("/m/crud/datatable.jsp");
-    }
-
     //--------------------------------------------------------------------------
     // Setup
     //--------------------------------------------------------------------------
-
-    @Override
-    protected boolean acceptsPathParameter() {
-        return (classAccessor != null &&
-                pageInstance.getParameters().size() < classAccessor.getKeyProperties().length);
-    }
 
     @Override
     public void setPageInstance(PageInstance pageInstance) {
@@ -1043,15 +623,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
         classAccessor = new CrudAccessor(crudConfiguration, innerAccessor);
         pkHelper = new PkHelper(classAccessor);
+        maxParameters = classAccessor.getKeyProperties().length;
     }
 
     @Override
-    public Resolution preparePage() {
+    public void parametersAcquired() {
+        super.parametersAcquired();
         if(pkHelper == null) {
-            return null;
+            return;
         }
 
-        List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
             String encoding = getUrlEncoding();
             pk = parameters.toArray(new String[parameters.size()]);
@@ -1069,7 +650,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 pkObject = pkHelper.getPrimaryKey(pk);
             } catch (Exception e) {
                 logger.warn("Invalid primary key", e);
-                return notInUseCase(context, parameters);
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
             object = loadObjectByPrimaryKey(pkObject);
             if(object != null) {
@@ -1078,19 +659,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 pageInstance.setTitle(title);
                 pageInstance.setDescription(title);
             } else {
-                return notInUseCase(context, parameters);
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
         } else {
             String title = getSearchTitle();
             pageInstance.setTitle(title);
             pageInstance.setDescription(title);
         }
-        return null;
-    }
-
-    protected Resolution notInUseCase(ActionBeanContext context, List<String> parameters) {
-        logger.debug("Not in use case: {}", crudConfiguration.getName());
-        return new NotInUseCaseResolution(StringUtils.join(parameters, "/"));
     }
 
     /**
@@ -1138,7 +713,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Computes the search URL from the current URL. In other words, it removes any /pk trailing path fragment from the
+     * Computes the search URL from the current URL. In other words, it removes any /pk trailing path segment from the
      * URL used to access the page.
      * @return the search URL.
      */
@@ -1161,9 +736,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected String generateObjectUrl(String baseUrl, Object o) {
         String[] objPk = pkHelper.generatePkStringArray(o);
         String url = baseUrl + "/" + getPkForUrl(objPk);
-        return new UrlBuilder(
-                Locale.getDefault(), appendSearchStringParamIfNecessary(url), false)
-                .toString();
+        return appendSearchStringParamIfNecessary(url);
     }
 
     /**
@@ -1281,7 +854,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         boolean isShowingKey = false;
         for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             if(tableFormBuilder.getPropertyAccessors().contains(property) &&
-                    tableFormBuilder.isPropertyVisible(property)) {
+               tableFormBuilder.isPropertyVisible(property)) {
                 isShowingKey = true;
                 break;
             }
@@ -1298,9 +871,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             logger.debug("TableForm: configuring detail link for the first visible property");
             for (PropertyAccessor property : classAccessor.getProperties()) {
                 if(tableFormBuilder.getPropertyAccessors().contains(property) &&
-                        tableFormBuilder.isPropertyVisible(property)) {
+                   tableFormBuilder.isPropertyVisible(property)) {
                     tableFormBuilder.configHrefTextFormat(
-                            property.getName(), hrefFormat);
+                        property.getName(), hrefFormat);
                     break;
                 }
             }
@@ -1323,10 +896,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             if(!PageActionLogic.isEmbedded(this)) {
                 parameters.put(SEARCH_STRING_PARAM, searchString);
             }
-            parameters.put(context.getEventName(), "");
 
+            Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
             UrlBuilder urlBuilder =
-                    new UrlBuilder(Locale.getDefault(), Util.getAbsoluteUrl(context.getActionPath()), false)
+                    new UrlBuilder(charset, Util.getAbsoluteUrl(context.getActionPath()), false)
                             .addParameters(parameters);
 
             XhtmlBuffer xb = new XhtmlBuffer();
@@ -1358,8 +931,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             parameters.put(AbstractCrudAction.SEARCH_STRING_PARAM, getSearchString());
         }
 
+        Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
         UrlBuilder urlBuilder =
-                new UrlBuilder(Locale.getDefault(), Util.getAbsoluteUrl(context.getActionPath()), false)
+                new UrlBuilder(charset, Util.getAbsoluteUrl(context.getActionPath()), false)
                         .addParameters(parameters);
         return urlBuilder.toString();
     }
@@ -1511,36 +1085,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return formBuilder;
     }
 
-    //**************************************************************************
-    // Return to parent
-    //**************************************************************************
-
-    @Button(list = "crud-read", key = "return.to.list", order = 99, icon = Button.ICON_LEFT)
-    public Resolution returnToSearch() throws Exception {
-        if (pk != null) {
-            return new RedirectResolution(
-                    appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
-        } else {
-            return new ErrorResolution(500);
-        }
-    }
-
-    @Override
-    @Buttons({
-            @Button(list = "crud-edit", key = "cancel", order = 99),
-            @Button(list = "crud-create", key = "cancel", order = 99),
-            @Button(list = "crud-bulk-edit", key = "cancel", order = 99),
-            @Button(list = "configuration", key = "cancel", order = 99)
-    })
-    public Resolution cancel() {
-        if(isPopup()) {
-            popupCloseCallback += "(false)";
-            return new ForwardResolution("/m/crud/popup/close.jsp");
-        } else {
-            return super.cancel();
-        }
-    }
-
     //--------------------------------------------------------------------------
     // Blob management
     //--------------------------------------------------------------------------
@@ -1576,9 +1120,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
                     Blob blob = ((AbstractBlobField) field).getValue();
                     if(blob != null) {
-                        UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
-                                .addParameter("downloadBlob", "")
-                                .addParameter("propertyName", field.getPropertyAccessor().getName());
+                        Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
+                        UrlBuilder urlBuilder = new UrlBuilder(charset, baseUrl, false)
+                            .addParameter("downloadBlob", "")
+                            .addParameter("propertyName", field.getPropertyAccessor().getName());
                         field.setHref(urlBuilder.toString());
                     }
                 }
@@ -1587,34 +1132,31 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public String getBlobDownloadUrl(AbstractBlobField field) {
+        Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
         UrlBuilder urlBuilder = new UrlBuilder(
-                Locale.getDefault(), Util.getAbsoluteUrl(context.getActionPath()), false)
+                charset, Util.getAbsoluteUrl(context.getActionPath()), false)
                 .addParameter("downloadBlob", "")
                 .addParameter("propertyName", field.getPropertyAccessor().getName());
         return urlBuilder.toString();
     }
 
-    @ControlsCache
-    public Resolution downloadBlob() throws IOException, NoSuchFieldException {
-        return downloadBlob(propertyName);
-    }
-
     @GET
     @Path(":blob/{propertyName}")
-    public Resolution downloadBlob(@PathParam("propertyName") String propertyName) throws IOException, NoSuchFieldException {
+    public Response downloadBlob(@PathParam("propertyName") String propertyName) throws IOException {
         if(object == null) {
-            return new ErrorResolution(Response.Status.BAD_REQUEST.getStatusCode(), "Object can not be null (this method can only be called with /objectKey)");
+            return Response.status(Response.Status.BAD_REQUEST).
+                    entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         BlobManager blobManager = getBlobManager();
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
         if(field == null) {
-            return new ErrorResolution(404);
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
         Blob blob = field.getValue();
         if(blob == null) {
-            return new ErrorResolution(404);
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
         if(blob.getInputStream() == null) {
             blobManager.loadMetadata(blob);
@@ -1627,33 +1169,40 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(request.getHeader("If-Modified-Since") != null) {
             long ifModifiedSince = request.getDateHeader("If-Modified-Since");
             if(ifModifiedSince >= lastModified) {
-                return new ErrorResolution(304); //Not modified
+                return Response.status(Response.Status.NOT_MODIFIED).build();
             }
         }
-        InputStream inputStream;
+        final InputStream inputStream;
         if(blob.getInputStream() == null) {
             inputStream = blobManager.openStream(blob);
         } else {
             inputStream = blob.getInputStream();
         }
-        StreamingResolution streamingResolution = new StreamingResolution(contentType, inputStream)
-                .setFilename(fileName)
-                .setLastModified(lastModified);
-
-        if( contentLength>0 ){
-            streamingResolution.setLength(contentLength);
+        StreamingOutput streamingOutput = output -> {
+            try {
+                IOUtils.copyLarge(inputStream, output);
+            } finally {
+                IOUtils.closeQuietly(inputStream);
+            }
+        };
+        Response.ResponseBuilder responseBuilder = Response.ok(streamingOutput).
+                type(contentType).
+                lastModified(new Date(lastModified)).
+                header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+        if(contentLength > 0) {
+            responseBuilder.header(HttpHeaders.CONTENT_LENGTH, contentLength);
         }
-
-        return streamingResolution;
+        return responseBuilder.build();
     }
 
     @PUT
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Response uploadBlob(
             @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename,
             InputStream inputStream)
-            throws IOException, NoSuchFieldException {
+            throws IOException {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
@@ -1697,7 +1246,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Response deleteBlob(
             @PathParam("propertyName") String propertyName)
-            throws IOException, NoSuchFieldException {
+            throws IOException {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
@@ -1780,7 +1329,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Configuration
     //**************************************************************************
 
-    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
+/*    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -1796,12 +1345,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         return getConfigurationView();
     }
-
-    /**
-     * Returns the Resolution used to show the configuration page.
-     */
-    protected abstract Resolution getConfigurationView();
-
+*/
     @Override
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
@@ -1811,7 +1355,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(propertyEdits != null) {
             TableFormBuilder tableFormBuilder =
                     new TableFormBuilder(CrudPropertyEdit.class)
-                            .configNRows(propertyEdits.length);
+                        .configNRows(propertyEdits.length);
             propertiesTableForm = tableFormBuilder.build();
             propertiesTableForm.setCondensed(true);
         }
@@ -1923,7 +1467,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
+    /*@Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();
@@ -1960,7 +1504,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
 
             if(selectionProviderSupport != null &&
-                    !selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
+               !selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
                 updateSelectionProviders();
             }
 
@@ -2018,7 +1562,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 propertyIterator.remove();
             }
         }
-    }
+    }*/
 
     public boolean isRequiredFieldsPresent() {
         return form.isRequiredFieldsPresent();
@@ -2028,64 +1572,64 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Selection providers
     //**************************************************************************
 
-    public Resolution jsonSelectFieldOptions() {
-        return jsonOptions(relName, prefix, true);
+    public Response jsonSelectFieldOptions() {
+        return jsonOptions(relName, prefix, labelSearch, true);
     }
 
-    public Resolution jsonSelectFieldSearchOptions() {
-        return jsonOptions(relName, searchPrefix, true);
+    public Response jsonSelectFieldSearchOptions() {
+        return jsonOptions(relName, searchPrefix, labelSearch, true);
     }
 
-    public Resolution jsonAutocompleteOptions() {
-        return jsonOptions(relName, prefix, false);
+    public Response jsonAutocompleteOptions() {
+        return jsonOptions(relName, prefix, labelSearch, false);
     }
 
-    public Resolution jsonAutocompleteSearchOptions() {
-        return jsonOptions(relName, searchPrefix, false);
+    public Response jsonAutocompleteSearchOptions() {
+        return jsonOptions(relName, searchPrefix, labelSearch, false);
     }
 
     /**
-     * Returns values to update multiple a single select or autocomplete field, in JSON form.
-     * Note that, for autocomplete fields, it expects the autocomplete value
-     * as a request parameter with the field's name. See {@link #jsonOptions(String, int, String, boolean)}.
+     * Returns values to update a single select or autocomplete field, in JSON form.
+     * See {@link #jsonOptions(String, int, String, String, boolean)}.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
+     * @param labelSearch for autocomplete fields, the text entered by the user.
      * @param prefix form prefix, to read values from the request.
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
      * this parameter; for autocomplete fields, you would likely pass false.
-     * @return a Resolution to produce the JSON.
+     * @return a Response with the JSON.
      */
     @GET
     @Path(":selectionProvider/{selectionProviderName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Resolution jsonOptions(
+    public Response jsonOptions(
             @PathParam("selectionProviderName") String selectionProviderName,
+            @QueryParam("labelSearch") String labelSearch,
             @QueryParam("prefix") String prefix,
-            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt
-    ) {
-        return jsonOptions(selectionProviderName, selectionProviderIndex, prefix, includeSelectPrompt);
+            @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
+        return jsonOptions(selectionProviderName, selectionProviderIndex, labelSearch, prefix, includeSelectPrompt);
     }
-
+    
     /**
-     * Returns values to update multiple related select fields or a single autocomplete
-     * text field, in JSON form. Note that, for autocomplete fields, it expects the autocomplete value 
-     * as a request parameter with the field's name.
+     * Returns values to update multiple related select fields or a single autocomplete text field, in JSON form.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
      * @param selectionProviderIndex index of the selection field (in case of multiple-valued selection providers,
      *                               otherwise it is always 0 and you can use
-     *                               {@link #jsonOptions(String, String, boolean)}).
+     *                               {@link #jsonOptions(String, String, String, boolean)}).
+     * @param labelSearch for autocomplete fields, the text entered by the user.
      * @param prefix form prefix, to read values from the request.
      * @param includeSelectPrompt controls if the first option is a label with no value indicating
      * what field is being selected. For combo boxes you would generally pass true as the value of
      * this parameter; for autocomplete fields, you would likely pass false.
-     * @return a Resolution to produce the JSON.
+     * @return a Response with the JSON.
      */
     @GET
     @Path(":selectionProvider/{selectionProviderName}/{selectionProviderIndex : (\\d+)}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Resolution jsonOptions(
+    public Response jsonOptions(
             @PathParam("selectionProviderName") String selectionProviderName,
             @PathParam("selectionProviderIndex") int selectionProviderIndex,
+            @QueryParam("labelSearch") String labelSearch,
             @QueryParam("prefix") String prefix,
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
@@ -2097,7 +1641,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         }
         if (crudSelectionProvider == null) {
-            return new ErrorResolution(404);
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         SelectionProvider selectionProvider = crudSelectionProvider.getSelectionProvider();
@@ -2115,17 +1659,17 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             field.setUpdatable(true);
         }
         form.readFromRequest(context.getRequest());
-
+        
         //The form only contains fields from the selection provider, so the index matches that of the field
         if(selectionProviderIndex < 0 || selectionProviderIndex >= fieldSet.size()) {
-            return new ErrorResolution(400, "Invalid index");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid index").build();
         }
         SelectField targetField = (SelectField) fieldSet.get(selectionProviderIndex);
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         logger.debug("jsonOptions: {}", text);
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, text);
+        return Response.ok(text, MimeTypes.APPLICATION_JSON_UTF8).build();
     }
 
     @GET
@@ -2275,7 +1819,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 encodedSearchString += encoded;
             } else {
                 logger.warn("Could not encode search string \"" + StringEscapeUtils.escapeJava(searchString) +
-                        "\" with encoding " + encoding);
+                            "\" with encoding " + encoding);
                 return null;
             }
         } catch (UnsupportedEncodingException e) {
@@ -2306,15 +1850,21 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     /**
      * Handles search and detail via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param searchString the search string
+     * @param firstResult pagination: the index of the first result returned by the search
+     * @param maxResults pagination: the maximum number of results returned by the search
      * @since 4.2
-     * @return search results (/) or single object (/pk) as JSON (streamed using a Stripes Resolution).
+     * @return search results (/) or single object (/pk) as JSON
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Resolution getAsJson(
+    public Response getAsJson(
             @QueryParam("searchString") String searchString,
             @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults,
-            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection) {
+            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection,
+            @QueryParam("forEdit") boolean forEdit, @QueryParam("newObject") boolean newObject) {
+        if(newObject) {
+            return jsonCreateData();
+        }
         if(object == null) {
             this.searchString = searchString;
             this.firstResult = firstResult;
@@ -2322,6 +1872,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             this.sortProperty = sortProperty;
             this.sortDirection = sortDirection;
             return jsonSearchData();
+        } else if(forEdit) {
+            return jsonEditData();
         } else {
             return jsonReadData();
         }
@@ -2377,10 +1929,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response httpPostMultipart() throws Exception {
         if(object != null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    "update not supported, PUT to /objectKey instead").build();
         }
         preCreate();
-        readFormFromMultipartRequest();
+        form.readFromRequest(context.getRequest());
         if (form.validate()) {
             writeFormToObject();
             if(createValidate(object)) {
@@ -2395,31 +1948,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     return Response.serverError().entity(e).build();
                 }
                 return objectCreated();
-            } else {
-                return Response.serverError().entity(form).build();
             }
-        } else {
-            return Response.serverError().entity(form).build();
         }
-    }
-
-    protected void readFormFromMultipartRequest() throws StripesServletException {
-        HttpServletRequest request = context.getRequest();
-        logger.error("request" + request + " - " + Arrays.asList(request.getClass().getInterfaces()));
-        if(!"POST".equals(request.getMethod())) {
-            //If method is POST, StripesFilter should have already built a multipart wrapper
-            request = new HttpServletRequestWrapper(context.getRequest()) {
-                public String getMethod() {
-                    return "POST"; //In order to fool Stripes into constructing a multipart wrapper anyway
-                }
-            };
-            request = new StripesRequestWrapper(request);
-        } else try {
-            request = StripesRequestWrapper.findStripesWrapper(request);
-        } catch (IllegalStateException e) {
-            request = new StripesRequestWrapper(request);
-        }
-        form.readFromRequest(request);
+        return Response.serverError().entity(form).build();
     }
 
     protected Response objectCreated() throws URISyntaxException {
@@ -2432,20 +1963,32 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object update via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles object update via REST; either a single object or several ones in bulk.
+     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * {@link #uploadBlob(String, String, InputStream)}.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
+     * @param ids the list of object id's (keys) to save if this is a bulk operation.
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
-     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @PUT
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response httpPutJson(String jsonObject) throws Exception {
+    @Guard(test = "isEditEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
+    public Response httpPutJson(@QueryParam("id") List<String> ids, String jsonObject) {
         if(object == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
+            return bulkUpdate(jsonObject, ids);
         }
+        if(ids != null && !ids.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    "You must either PUT a single object (/key) or PUT multiple objects (?ids=...), not both.").build();
+        }
+        return update(jsonObject);
+    }
+
+    protected Response update(String jsonObject) {
         preEdit();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
@@ -2471,7 +2014,47 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object update with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles the update of multiple objects via REST.
+     * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
+     * {@link #uploadBlob(String, String, InputStream)}.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * @param jsonObject the object (in serialized JSON form)
+     * @since 4.5-SNAPSHOT
+     * @return the updated object as JSON (in a JAX-RS Response).
+     */
+    protected Response bulkUpdate(String jsonObject, List<String> ids) {
+        List<String> idsNotUpdated = new ArrayList<>();
+        setupForm(Mode.BULK_EDIT);
+        disableBlobFields();
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            for (String id : ids) {
+                loadObject(id.split("/"));
+                editSetup(object);
+                writeFormToObject();
+                if(editValidate(object)) {
+                    doUpdate(object);
+                    editPostProcess(object);
+                } else {
+                    idsNotUpdated.add(id);
+                }
+            }
+            try {
+                commitTransaction();
+            } catch (Throwable e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                return Response.serverError().entity(e).build();
+            }
+            return Response.ok(idsNotUpdated).build();
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    /**
+     * Handles object update with attachments via REST.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      * @return the updated object as JSON (in a JAX-RS Response).
      */
@@ -2479,13 +2062,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
     public Response httpPutMultipart() throws Throwable {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
         preEdit();
         List<Blob> blobsBefore = getBlobsFromForm();
-        readFormFromMultipartRequest();
+        form.readFromRequest(context.getRequest());
         if (form.validate()) {
             writeFormToObject();
             if(editValidate(object)) {
@@ -2522,27 +2106,62 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Handles object deletion via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
+     * Handles object deletion via REST.
+     * @param ids the list of object id's (keys) to delete if this is a bulk deletion.
+     * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      */
     @DELETE
     @RequiresPermissions(permissions = PERMISSION_DELETE)
-    public void httpDelete() throws Exception {
+    @Guard(test = "isDeleteEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
+    public int httpDelete(@QueryParam("id") List<String> ids) throws Exception {
         if(object == null) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /objectKey path parameter").build());
+            return bulkDelete(ids);
         }
+        if(ids != null && !ids.isEmpty()) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+                    "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+        }
+        return delete(object);
+    }
+
+    protected int delete(T object) {
         if(deleteValidate(object)) {
             try {
                 doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);
+                return 1;
             } catch (Exception e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 throw e;
             }
+        } else {
+            return 0;
         }
+    }
+
+    protected int bulkDelete(List<String> ids) throws Exception {
+        List<T> objects = new ArrayList<T>(ids.size());
+        int deleted = 0;
+        for (String current : ids) {
+            String[] pkArr = current.split("/");
+            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
+            T obj = loadObjectByPrimaryKey(pkObject);
+            if(obj != null && deleteValidate(obj)) {
+                doDelete(obj);
+                deletePostProcess(obj);
+                objects.add(obj);
+                deleted++;
+            }
+        }
+        commitTransaction();
+        for(T obj : objects) {
+            deleteBlobs(obj);
+        }
+        return deleted;
     }
 
     /**
@@ -2668,10 +2287,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public T getObject() {
         return object;
-    }
-
-    public boolean isMultipartRequest() {
-        return form != null && form.isMultipartRequest();
     }
 
     @Deprecated

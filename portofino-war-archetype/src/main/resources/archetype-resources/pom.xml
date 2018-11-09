@@ -10,6 +10,7 @@
     <properties>
         <portofino.version>${portofinoVersion}</portofino.version>
         <portofino.application.directory>${dollar}{serverInfo:realPath}/WEB-INF</portofino.application.directory>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -100,33 +101,10 @@
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Chart pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-chart</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- Calendar pages. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-calendar</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-         <!-- Map pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-map</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
-         <!-- Gallery pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-gallery</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -137,13 +115,6 @@
         ///////////////////////////////////////////////////////////////////////
         -->
 
-        <!-- Reliable mail sender. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mail</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- javax.mail. Some application servers natively provide it. -->
         <dependency>
             <groupId>javax.mail</groupId>
@@ -154,20 +125,6 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- OpenID support. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-openid</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Support for the Atmosphere framework (push notifications). -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-atmosphere</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -189,10 +146,16 @@
         ///////////////////////////////////////////////////////////////////////
         -->
 
+        <!-- Angular UI support -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-angular-ui-support</artifactId>
+            <version>${portofino.version}</version>
+        </dependency>
         <!-- Support for page actions. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-pageactions</artifactId>
+            <artifactId>portofino-core</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -206,14 +169,7 @@
         <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-admin</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Stripes framework integration. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-stripes</artifactId>
+            <artifactId>portofino-upstairs</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -240,23 +196,17 @@
             <artifactId>resteasy-servlet-initializer</artifactId>
         </dependency>
         -->
-        <!-- Theme -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-theme</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- URL rewriting for the Angular router -->
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-            <scope>provided</scope>
+            <groupId>org.tuckey</groupId>
+            <artifactId>urlrewritefilter</artifactId>
+            <version>4.0.3</version>
         </dependency>
         <!-- Logging -->
         <dependency>
@@ -288,7 +238,53 @@
                 <version>2.6</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <webResources>
+                        <resource><directory>target/frontend/</directory></resource>
+                        <resource><directory>src/main/webapp/</directory></resource>
+                    </webResources>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <workingDirectory>src/main/frontend</workingDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v8.11.1</nodeVersion>
+                            <npmVersion>6.0.1</npmVersion>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>build-client</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run-script build</arguments>
+                        </configuration>
+                        <phase>generate-resources</phase>
+                    </execution>
+                </executions>
             </plugin>
             <!--
             To run the application in an embedded Tomcat 7:
@@ -318,7 +314,7 @@
             </resource>
         </resources>
     </build>
-    
+
     <!-- See web.xml for an explanation -->
     <profiles>
         <profile>

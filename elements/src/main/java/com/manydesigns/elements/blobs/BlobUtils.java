@@ -1,6 +1,6 @@
 package com.manydesigns.elements.blobs;
 
-import com.manydesigns.crypto.CryptoService;
+import com.manydesigns.elements.crypto.CryptoService;
 import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.fields.AbstractBlobField;
 import com.manydesigns.elements.forms.FieldSet;

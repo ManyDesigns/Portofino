@@ -50,10 +50,10 @@ public class OpenIdModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(PageactionsModule.PAGE_ACTIONS_REGISTRY)
+    @Autowired
     public PageActionRegistry pageActionRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;

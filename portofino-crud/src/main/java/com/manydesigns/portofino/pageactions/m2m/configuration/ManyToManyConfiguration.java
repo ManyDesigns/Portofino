@@ -20,19 +20,16 @@
 
 package com.manydesigns.portofino.pageactions.m2m.configuration;
 
-import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.util.BootstrapSizes;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.modules.DatabaseModule;
+import com.manydesigns.portofino.pageactions.PageActionConfiguration;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.annotation.*;
 
@@ -75,7 +72,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     protected Table actualManyTable;
     protected ViewType actualViewType;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     //**************************************************************************
@@ -180,7 +177,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     @Required
     @Multiline
-    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;
@@ -200,7 +196,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.viewType = viewType;
     }
 
-    @CssClass(BootstrapSizes.COL_SM_6)
     @XmlAttribute(required = false)
     public String getOneExpression() {
         return oneExpression;
@@ -211,7 +206,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     }
 
     @XmlAttribute(required = false)
-    @CssClass(BootstrapSizes.COL_SM_6)
     public String getOnePropertyName() {
         return onePropertyName;
     }

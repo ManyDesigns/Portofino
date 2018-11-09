@@ -23,6 +23,8 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import org.slf4j.MDC;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -37,19 +39,18 @@ public class CleanupFilter implements Filter {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
+    public void init(FilterConfig filterConfig) {}
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         try {
             chain.doFilter(request, response);
         } finally {
-            ServletContext servletContext = request.getServletContext();
-            Persistence persistence =
-                    (Persistence) servletContext.getAttribute(DatabaseModule.PERSISTENCE);
             MDC.clear();
-            if (persistence !=null && persistence.getModel() != null) {
+            ServletContext servletContext = request.getServletContext();
+            WebApplicationContext applicationContext =
+                    WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+            Persistence persistence = applicationContext.getBean(Persistence.class);
+            if (persistence.getModel() != null) {
                 persistence.closeSessions();
             }
         }

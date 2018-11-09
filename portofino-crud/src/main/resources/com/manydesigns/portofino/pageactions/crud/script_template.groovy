@@ -12,7 +12,6 @@ import com.manydesigns.portofino.pageactions.*
 import com.manydesigns.portofino.security.*
 import com.manydesigns.portofino.shiro.*
 
-import net.sourceforge.stripes.action.*
 import org.apache.shiro.*
 import org.hibernate.*
 import org.hibernate.criterion.*
@@ -66,56 +65,5 @@ class MyCrudAction extends CrudAction {
 
     protected void deletePostProcess(Object object) {}
 
-    //**************************************************************************
-    // View hooks
-    //**************************************************************************
-
-    protected Resolution getBulkEditView() {
-        super.getBulkEditView()
-    }
-
-    protected Resolution getCreateView() {
-        super.getCreateView()
-    }
-
-    protected Resolution getEditView() {
-        super.getEditView()
-    }
-
-    protected Resolution getReadView() {
-        super.getReadView()
-    }
-
-    protected Resolution getEmbeddedReadView() {
-        super.getEmbeddedReadView()
-    }
-
-    protected Resolution getSearchView() {
-        super.getSearchView()
-    }
-
-    protected Resolution getEmbeddedSearchView() {
-        super.getEmbeddedSearchView()
-    }
-
-    protected Resolution getSearchResultsPageView() {
-        super.getSearchResultsPageView()
-    }
-
-    protected Resolution getConfigurationView() {
-        super.getConfigurationView()
-    }
-
-    protected Resolution getSuccessfulSaveView() {
-        super.getSuccessfulSaveView()
-    }
-
-    protected Resolution getSuccessfulUpdateView() {
-        super.getSuccessfulUpdateView()
-    }
-
-    protected Resolution getSuccessfulDeleteView() {
-        super.getSuccessfulDeleteView()
-    }
 
 }

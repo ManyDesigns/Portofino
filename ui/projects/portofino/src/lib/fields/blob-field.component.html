@@ -1,0 +1,34 @@
+<div class="mat-form-field mat-form-field-can-float mat-form-field-should-float">
+  <div class="mat-form-field-wrapper">
+    <div class="mat-form-field-flex">
+      <span *ngIf="control.value && control.value[0]">
+        <a *ngIf="!enabled && control.value[0].code && objectUrl; else noUrl" [href]="blobUrl">
+          {{control.value[0].name}}
+        </a>
+        <ng-template #noUrl>
+          {{control.value[0].name}}
+        </ng-template>
+        <button mat-icon-button (click)="deleteBlob()" *ngIf="enabled">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </span>
+      <ng-container *ngIf="enabled">
+        <input #input type="file" [formControl]="control" [required]="isRequired() && !control.value">
+      </ng-container>
+      <span class="mat-form-field-label-wrapper">
+        <label class="mat-form-field-label">{{property.label}}</label>
+      </span>
+    </div>
+    <div class="mat-form-field-underline"><span class="mat-form-field-ripple"></span></div>
+    <div class="mat-form-field-subscript-wrapper" *ngIf="control.hasError('required')">
+      <mat-error class="alert alert-danger">
+        {{ '_ is required.' | translate:{ label: property.label } }}
+      </mat-error>
+    </div>
+    <div class="mat-form-field-subscript-wrapper" *ngIf="control.hasError('server-side')" class="alert alert-danger">
+      <ng-container *ngFor="let error of control.getError('server-side')">
+        {{error}}<br />
+      </ng-container>
+    </div>
+  </div>
+</div>

@@ -329,6 +329,7 @@ public abstract class AbstractField<T> implements Field<T> {
         if(!keyValueAccessor.has(accessor.getName())) {
             return;
         }
+        bulkChecked = true;
         Object value = keyValueAccessor.get(accessor.getName());
         if(value instanceof String) {
             setStringValue((String) value);

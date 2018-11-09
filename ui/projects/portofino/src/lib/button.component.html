@@ -1,0 +1,5 @@
+<button mat-flat-button [color]="button.color" type="button" (click)="button.action(component, $event)"
+        *ngIf="button.presentIf(component)" [disabled]="!button.enabledIf(component)">
+  <mat-icon *ngIf="button.icon">{{button.icon}}</mat-icon>
+  {{button.text | translate }}
+</button>

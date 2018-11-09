@@ -197,11 +197,17 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
         }
 
         try {
-            DateTime dateTime = Util.parseDateTime(dateTimeFormatter, stringValue, containsTime);
-            dateValue = toDate(dateTime);
-        } catch (Exception e) {
-            dateFormatError = true;
-            logger.debug("Cannot parse date: {}", stringValue);
+            long time = Long.parseLong(stringValue);
+            dateValue = toDate(time);
+        } catch (NumberFormatException e) {
+            logger.debug("Not a number, parsing with date-time format: " + stringValue, e);
+            try {
+                DateTime dateTime = Util.parseDateTime(dateTimeFormatter, stringValue, containsTime);
+                dateValue = toDate(dateTime);
+            } catch (Exception e2) {
+                dateFormatError = true;
+                logger.debug("Cannot parse date: " + stringValue, e2);
+            }
         }
     }
 

@@ -11,11 +11,11 @@ public class RepositoryRegistry {
   public static final Logger logger = LoggerFactory.getLogger(RepositoryRegistry.class);
 
   private static RepositoryRegistry instance = null;    // lazy loading
-  private Map<String,Repository> registry = null;
+  private Map<String,Repository> registry;
 
   private RepositoryRegistry() {
     synchronized(RepositoryRegistry.class) {
-      registry = new HashMap<String,Repository>();
+      registry = new HashMap<>();
     }
   }
 

@@ -20,9 +20,11 @@
 
 package com.manydesigns.elements;
 
+import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.ognl.CustomTypeConverter;
+import com.manydesigns.elements.ognl.DefaultMemberAccess;
 import ognl.DefaultTypeConverter;
 import ognl.Ognl;
 import ognl.OgnlContext;
@@ -107,6 +109,14 @@ public final class ElementsThreadLocals {
         getElementsContext().setServletContext(servletContext);
     }
 
+    public static MultipartWrapper getMultipart() {
+        return getElementsContext().getMultipart();
+    }
+
+    public static void setMultipart(MultipartWrapper multipart) {
+        getElementsContext().setMultipart(multipart);
+    }
+
     public static OgnlContext getOgnlContext() {
         return getElementsContext().getOgnlContext();
     }
@@ -121,7 +131,8 @@ public final class ElementsThreadLocals {
 
     public static void setupDefaultElementsContext() {
         CustomTypeConverter typeConverter = new CustomTypeConverter(new DefaultTypeConverter());
-        OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null, null, typeConverter);
+        OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(
+                null, new DefaultMemberAccess(true), null, typeConverter);
         TextProvider textProvider = SimpleTextProvider.create();
 
         ElementsContext elementsContext = getElementsContext();

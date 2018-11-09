@@ -1,7 +1,6 @@
 package com.manydesigns.elements;
 
-import com.manydesigns.crypto.CryptoService;
-import com.manydesigns.elements.FieldEncrypter;
+import com.manydesigns.elements.crypto.CryptoService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

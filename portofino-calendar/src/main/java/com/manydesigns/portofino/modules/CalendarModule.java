@@ -20,12 +20,17 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -33,6 +38,7 @@ import org.slf4j.LoggerFactory;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@Component
 public class CalendarModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
@@ -41,10 +47,10 @@ public class CalendarModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration configuration;
 
-    @Inject(PageactionsModule.PAGE_ACTIONS_REGISTRY)
+    @Autowired
     public PageActionRegistry pageActionRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
@@ -58,22 +64,7 @@ public class CalendarModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
-    }
-
-    @Override
-    public int getMigrationVersion() {
-        return 1;
-    }
-
-    @Override
-    public double getPriority() {
-        return 20;
-    }
-
-    @Override
-    public String getId() {
-        return "calendar";
+        return PortofinoProperties.getPortofinoVersion();
     }
 
     @Override
@@ -81,28 +72,13 @@ public class CalendarModule implements Module {
         return "Calendar";
     }
 
-    @Override
-    public int install() {
-        return 1;
-    }
-
-    @Override
+    @PostConstruct
     public void init() {
         pageActionRegistry.register(CalendarAction.class);
-        status = ModuleStatus.ACTIVE;
-    }
-
-    @Override
-    public void start() {
         status = ModuleStatus.STARTED;
     }
 
-    @Override
-    public void stop() {
-        status = ModuleStatus.STOPPED;
-    }
-
-    @Override
+    @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

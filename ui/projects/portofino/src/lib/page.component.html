@@ -1,0 +1,8 @@
+<div *ngIf="!pageService.error"></div>
+<ng-container *ngIf="!pageService.error">
+    <ng-template portofino-main-content></ng-template>
+    <ng-template portofino-embedded-content></ng-template>
+</ng-container>
+<div *ngIf="!!pageService.error" class="mat-display-2 error">
+  {{ 'Page not found! Error: _' | translate:{ error: pageService.error.message || pageService.error }  }}
+</div>

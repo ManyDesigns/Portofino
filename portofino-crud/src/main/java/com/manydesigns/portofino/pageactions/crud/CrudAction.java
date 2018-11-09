@@ -28,13 +28,11 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
+import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
@@ -51,15 +49,12 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -95,11 +90,10 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public Session session;
 
-    @Inject(DatabaseModule.PERSISTENCE)
+    @Autowired
     public Persistence persistence;
 
     protected long totalSearchRecords = -1;
-    private Object oldObject_;
 
     //**************************************************************************
     // Logging
@@ -201,15 +195,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
     // Setup
     //**************************************************************************
 
-    @Before
-    public void prepare() {
-        if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
-            session = persistence.getSession(getCrudConfiguration().getDatabase());
-            selectionProviderSupport = createSelectionProviderSupport();
-            selectionProviderSupport.setup();
-        }
-    }
-
     protected ModelSelectionProviderSupport createSelectionProviderSupport() {
         return new ModelSelectionProviderSupport(this, persistence);
     }
@@ -248,6 +233,17 @@ public class CrudAction extends AbstractCrudAction<Object> {
         }
 
         return new TableAccessor(baseTable);
+    }
+
+    @Override
+    public Object init() {
+        super.init();
+        if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
+            session = persistence.getSession(getCrudConfiguration().getDatabase());
+            selectionProviderSupport = createSelectionProviderSupport();
+            selectionProviderSupport.setup();
+        }
+        return this;
     }
 
     //**************************************************************************
@@ -296,14 +292,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 getBaseQuery(), this);
     }
 
-    //**************************************************************************
-    // Configuration
-    //**************************************************************************
-
-    protected Resolution getConfigurationView() {
-        return new ForwardResolution("/m/crud/configure.jsp");
-    }
-
     //--------------------------------------------------------------------------
     // Accessors
     //--------------------------------------------------------------------------
@@ -318,14 +306,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public CrudConfiguration getCrudConfiguration() {
         return (CrudConfiguration) crudConfiguration;
-    }
-
-    protected void editSetup(Object object) {
-        this.oldObject_ = SerializationUtils.clone((Serializable)object);
-    }
-
-    public Object getOldObject_() {
-        return this.oldObject_;
     }
 
 }

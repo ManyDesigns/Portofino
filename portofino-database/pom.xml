@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.6-SNAPSHOT</version>
+        <version>5.0-SNAPSHOT</version>
     </parent>
     <artifactId>portofino-database</artifactId>
     <packaging>jar</packaging>
@@ -33,8 +33,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>${commons.io.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>

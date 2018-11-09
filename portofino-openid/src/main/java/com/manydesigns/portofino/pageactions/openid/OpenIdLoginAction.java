@@ -77,7 +77,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     /**
      * The global configuration object. Injected.
      */
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Autowired
     public Configuration portofinoConfiguration;
 
     public String openIdUrl;

@@ -27,11 +27,11 @@ import com.manydesigns.elements.annotations.Encrypted;
 import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.blobs.FileBean;
+import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.controller.StripesRequestWrapper;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -90,7 +90,6 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
         } else {
             size = 25;
         }
-
 
         if (accessor.isAnnotationPresent(Encrypted.class)) {
             encryptionType = accessor.getAnnotation(Encrypted.class).value();
@@ -270,9 +269,8 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
     }
 
     protected void saveUpload(HttpServletRequest req) {
-        StripesRequestWrapper stripesRequest =
-            StripesRequestWrapper.findStripesWrapper(req);
-        final FileBean fileBean = stripesRequest.getFileParameterValue(inputName);
+        MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
+        final FileBean fileBean = multipart != null ? multipart.getFileParameterValue(inputName) : null;
 
         if (fileBean != null) {
             try {
