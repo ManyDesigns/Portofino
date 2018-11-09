@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2018 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -18,23 +18,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.elements.annotations;
+package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.elements.FieldEncrypter;
+import org.apache.shiro.authc.AuthenticationToken;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+/**
+ * An AuthenticationToken that represent a JSON Web Token shared with an HTTP user agent such as a browser.
+ *
+ * @author Alessio Stalla       - alessiostalla@gmail.com
+ */
+public class JSONWebToken implements AuthenticationToken {
 
-/*
-* @author Emanuele Poggi     - emanuele.poggi@manydesigns.com
-*/
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface Encrypted {
-    String copyright = "Copyright (C) 2005-2018 ManyDesigns srl";
+    protected final String token;
 
-    String value();
+    public JSONWebToken(String token) {
+        this.token = token;
+    }
 
+    @Override
+    public String getPrincipal() {
+        return token;
+    }
+
+    @Override
+    public String getCredentials() {
+        return token;
+    }
 }

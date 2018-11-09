@@ -23,6 +23,7 @@ package com.manydesigns.elements;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.ognl.CustomTypeConverter;
+import com.manydesigns.elements.ognl.DefaultMemberAccess;
 import ognl.DefaultTypeConverter;
 import ognl.Ognl;
 import ognl.OgnlContext;
@@ -121,7 +122,8 @@ public final class ElementsThreadLocals {
 
     public static void setupDefaultElementsContext() {
         CustomTypeConverter typeConverter = new CustomTypeConverter(new DefaultTypeConverter());
-        OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null, null, typeConverter);
+        OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(
+                null, new DefaultMemberAccess(true), null, typeConverter);
         TextProvider textProvider = SimpleTextProvider.create();
 
         ElementsContext elementsContext = getElementsContext();

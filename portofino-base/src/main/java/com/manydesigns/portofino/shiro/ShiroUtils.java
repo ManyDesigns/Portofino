@@ -41,9 +41,11 @@ public class ShiroUtils {
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     /**
-     * Returns the primary principal for a Subject - that is, in Portofino, the username.
+     * Returns the primary principal for a Subject - that is, in Portofino, the result of authenticating with
+     * Security.groovy, which typically is a map of user properties as loaded from the database or other authentication
+     * sources.
      * @param s the subject
-     * @return the username.
+     * @return the principal.
      */
     public static Object getPrimaryPrincipal(Subject s) {
         return getPrincipal(s, 0);

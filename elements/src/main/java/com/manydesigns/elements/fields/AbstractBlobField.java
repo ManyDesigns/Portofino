@@ -91,7 +91,6 @@ public abstract class AbstractBlobField extends AbstractField<Blob> implements M
             size = 25;
         }
 
-
         if (accessor.isAnnotationPresent(Encrypted.class)) {
             encryptionType = accessor.getAnnotation(Encrypted.class).value();
         }

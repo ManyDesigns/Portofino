@@ -472,4 +472,10 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         return null;
     }
 
+    //Servlet API 3.1 methods
+    @Override
+    public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {
+        return null;
+    }
+
 }

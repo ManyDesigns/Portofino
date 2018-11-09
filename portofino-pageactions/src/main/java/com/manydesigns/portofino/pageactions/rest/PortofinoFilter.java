@@ -98,9 +98,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
 
         fillMDC();
-        checkAuthorizations(requestContext, resource);
-        preparePage(requestContext, resource);
-        runStripesInterceptors(requestContext, resource, true);
+        if(checkAuthorizations(requestContext, resource)) {
+            preparePage(requestContext, resource);
+            runStripesInterceptors(requestContext, resource, true);
+        }
     }
 
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
@@ -166,16 +167,26 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                     requestContext.abortWith(Response.serverError().entity(resolution).build());
                 }
             }
+            Method handler = resourceInfo.getResourceMethod();
+            if(!ButtonsLogic.doGuardsPass(pageAction, handler)) {
+                requestContext.abortWith(
+                        Response.status(Response.Status.CONFLICT)
+                                .entity("The action couldn't be invoked, a guard did not pass")
+                                .build());
+                return;
+            }
         }
     }
 
-    protected void checkAuthorizations(ContainerRequestContext requestContext, Object resource) {
+    protected boolean checkAuthorizations(ContainerRequestContext requestContext, Object resource) {
         try {
             Method handler = resourceInfo.getResourceMethod();
             AUTH_CHECKER.assertAuthorized(resource, handler);
             logger.debug("Standard Shiro security check passed.");
             if(resource instanceof PageAction) {
-                checkActionBeanInvocation(requestContext, (PageAction) resource);
+                return checkActionBeanInvocation(requestContext, (PageAction) resource);
+            } else {
+                return true;
             }
         } catch (UnauthenticatedException e) {
             logger.debug("Method required authentication", e);
@@ -184,6 +195,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             logger.warn("Method invocation not authorized", e);
             requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
         }
+        return false;
     }
 
     protected void fillMDC() {
@@ -209,7 +221,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-    protected void checkActionBeanInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
+    protected boolean checkActionBeanInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
         Method handler = resourceInfo.getResourceMethod();
         List<PageInstance> pageInstancePath = new ArrayList<PageInstance>();
         PageInstance last = pageAction.getPageInstance();
@@ -225,13 +237,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                             Response.Status.FORBIDDEN :
                             Response.Status.UNAUTHORIZED;
             requestContext.abortWith(Response.status(status).build());
-        } else if(!ButtonsLogic.doGuardsPass(pageAction, handler)) {
-            requestContext.abortWith(
-                    Response.status(Response.Status.CONFLICT)
-                            .entity("The action couldn't be invoked, a guard did not pass")
-                            .build());
+            return false;
         } else {
             logger.debug("Portofino-specific security check passed");
+            return true;
         }
     }
 

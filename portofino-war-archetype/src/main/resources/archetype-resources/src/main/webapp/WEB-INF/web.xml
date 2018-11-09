@@ -1,31 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright 2005-2015 ManyDesigns srl
--->
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
       version="3.0">
     <display-name>ManyDesigns Portofino</display-name>
     <description>ManyDesigns Portofino</description>
-
-    <!-- Certain servlet 3.0 containers (e.g. Tomcat 7 before 7.0.33, Undertow) have bugs in their handling of relative
-         module ordering. To work around those, short of updating the container, you can configure here
-         the fragments to load. The following is the proper order of stock Portofino web fragments.
-         Note that the "stripes" fragment must come after every fragment that defines a servlet filter.
-    -->
-    <!--
-    <absolute-ordering>
-        <name>elements</name>
-        <name>base</name>
-        <name>pageactions</name>
-        <name>database</name>
-        <name>stripes</name>
-        <name>jersey</name>
-        - or, if using resteasy -
-        <name>resteasy</name>
-    </absolute-ordering>
-    -->
 
     <session-config>
         <session-timeout>60</session-timeout>
@@ -49,4 +28,26 @@
         for development on your own machine. The generated war WILL NOT WORK on other machines.
          -->
     </context-param>
+
+    <!-- Support for the Angular UI -->
+    <context-param>
+        <!-- The root of the API. It can be either a path relative to this webapp or an absolute URL. -->
+        <param-name>portofino.api.root</param-name>
+        <param-value>/api</param-value>
+    </context-param>
+
+    <servlet>
+        <servlet-name>Jersey Web Application</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>com.manydesigns.portofino.ui.support</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Jersey Web Application</servlet-name>
+        <url-pattern>/portofino/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>
