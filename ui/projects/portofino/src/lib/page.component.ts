@@ -61,6 +61,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
   protected loadPageInPath(path: string, parent: Page, segments: UrlSegment[], index: number, embed: boolean) {
     this.loadPage(path, parent, embed).subscribe(
       (page: Page) => {
+        page.embedded = embed;
         page.baseUrl = '/' + segments.slice(0, index).join('/');
         page.url = page.baseUrl;
         for(let i = index; i < segments.length; i++) {

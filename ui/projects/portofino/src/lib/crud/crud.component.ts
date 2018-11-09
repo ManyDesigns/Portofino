@@ -102,7 +102,7 @@ export class CrudComponent extends Page implements OnInit {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
     this.route.queryParams.subscribe(params => {
-      if(params.hasOwnProperty('create') && this.createEnabled) {
+      if(params.hasOwnProperty('create') && this.createEnabled && !this.embedded) {
         this.showCreate();
       } else if(this.id) {
         this.showDetail();
@@ -120,9 +120,13 @@ export class CrudComponent extends Page implements OnInit {
     list: 'search-results', color: 'accent', presentIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
   })
   navigateToCreate() {
-    this.router.navigate(['.'], {
-      relativeTo: this.route,
-      queryParams: { create: "x" }});
+    if(this.embedded) {
+      this.showCreate();
+    } else {
+      this.router.navigate(['.'], {
+        relativeTo: this.route,
+        queryParams: { create: "x" }});
+    }
   }
 
   showCreate() {

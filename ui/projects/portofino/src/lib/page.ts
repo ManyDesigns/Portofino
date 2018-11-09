@@ -334,6 +334,7 @@ export abstract class Page {
   segment: string;
   parent: Page;
   allowEmbeddedComponents: boolean = true;
+  embedded = false;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
