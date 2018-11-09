@@ -120,7 +120,7 @@ export class CrudComponent extends Page implements OnInit {
     list: 'search-results', color: 'accent', presentIf: CrudComponent.createEnabled, icon: 'add', text: 'Create new'
   })
   navigateToCreate() {
-    this.router.navigate([''], {
+    this.router.navigate(['.'], {
       relativeTo: this.route,
       queryParams: { create: "x" }});
   }
