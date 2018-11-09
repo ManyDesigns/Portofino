@@ -9,6 +9,7 @@
         <filter-class>
             com.manydesigns.elements.servlet.ElementsFilter
         </filter-class>
+        <async-supported>true</async-supported>
     </filter>
     <filter-mapping>
         <filter-name>elements-filter</filter-name>

@@ -13,6 +13,7 @@
         <filter-class>
             com.manydesigns.portofino.servlets.CleanupFilter
         </filter-class>
+        <async-supported>true</async-supported>
     </filter>
     <filter-mapping>
         <filter-name>cleanup-filter</filter-name>

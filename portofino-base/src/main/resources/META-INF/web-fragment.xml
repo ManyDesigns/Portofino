@@ -19,6 +19,7 @@
     <filter>
         <filter-name>ShiroFilter</filter-name>
         <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+        <async-supported>true</async-supported>
     </filter>
 
     <filter-mapping>

@@ -53,6 +53,7 @@
         <filter-class>
             net.sourceforge.stripes.controller.StripesFilter
         </filter-class>
+        <async-supported>true</async-supported>
     </filter>
 
     <filter-mapping>
@@ -67,6 +68,7 @@
     <filter>
         <filter-name>I18nFilter</filter-name>
         <filter-class>com.manydesigns.portofino.servlets.I18nFilter</filter-class>
+        <async-supported>true</async-supported>
     </filter>
 
     <filter-mapping>
@@ -80,6 +82,7 @@
         <display-name>Stripes Dynamic Mapping Filter</display-name>
         <filter-name>DynamicMappingFilter</filter-name>
         <filter-class>com.manydesigns.portofino.stripes.SimpleDynamicMappingFilter</filter-class>
+        <async-supported>true</async-supported>
     </filter>
 
     <filter-mapping>

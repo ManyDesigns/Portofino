@@ -13,6 +13,7 @@
         <filter-class>
             com.manydesigns.portofino.servlets.UTF8ResponseFilter
         </filter-class>
+        <async-supported>true</async-supported>
     </filter>
     <filter-mapping>
         <filter-name>ckeditor-filter</filter-name>
@@ -52,6 +53,7 @@
         <filter-class>
             com.manydesigns.portofino.servlets.DispatcherFilter
         </filter-class>
+        <async-supported>true</async-supported>
     </filter>
     <filter-mapping>
         <filter-name>portofino-dispatcher</filter-name>

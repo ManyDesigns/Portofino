@@ -60,6 +60,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class Persistence {
 
     public static final String APP_DBS_DIR = "dbs";
     public static final String APP_MODEL_FILE = "portofino-model.xml";
-
+    public static final String APP_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "{0}-changelog.xml";
 
     //**************************************************************************
@@ -216,7 +217,12 @@ public class Persistence {
                         relativeChangelogPath,
                         resourceAccessor,
                         lqDatabase);
-                lq.update((Contexts) null);
+
+                String[] contexts = configuration.getStringArray(APP_CONTEXT);
+
+                logger.info("Using context {}", Arrays.toString(contexts));
+                lq.update(new Contexts(contexts));
+
             } catch (Exception e) {
                 String msg = "Couldn't update database: " + schemaName;
                 logger.error(msg, e);
