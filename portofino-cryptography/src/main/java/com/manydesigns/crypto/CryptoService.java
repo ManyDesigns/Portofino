@@ -1,18 +1,17 @@
 package com.manydesigns.crypto;
 
-import org.apache.commons.codec.binary.Base64;
-
 import javax.crypto.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 public class CryptoService {
 
   //Affect resulting file size
-  private String typeAlgo = "DES/ECB/PKCS5Padding";
+  private String typeAlgo = "AES";
   private static CryptoService single;
 
   public String getTypeAlgo(){
@@ -31,12 +30,12 @@ public class CryptoService {
 
   public String encrypt(String decrypted)
     throws GeneralSecurityException, IOException {
-    return new String(Base64.encodeBase64(encrypt(decrypted.getBytes())));
+    return new String(Base64.getEncoder().encode(encrypt(decrypted.getBytes())));
   }
 
   public String decrypt(String encrypted)
     throws GeneralSecurityException, IOException {
-    return new String(decrypt(Base64.decodeBase64(encrypted.getBytes())));
+    return new String(decrypt(Base64.getDecoder().decode(encrypted.getBytes())));
   }
 
   public byte[] encrypt(byte[] decrypted)

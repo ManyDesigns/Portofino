@@ -2,16 +2,15 @@ package com.manydesigns.crypto;
 
 import org.apache.commons.configuration.Configuration;
 import javax.crypto.*;
-import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.ServletContext;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import org.apache.commons.codec.binary.Base64;
+import java.util.Arrays;
+import java.util.Base64;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +24,8 @@ public class KeyManager {
   private static final String PROPERTY_PRIVATE_KEY_DELETE="com.manydesigns.crypto.delete.key";
   private static final String PROPERTY_PASSPHRASE="com.manydesigns.crypto.passphrase";
 
-  private static final String ASYMMETRIC_ALG="AES";
-  private static final String SYMMETRIC_ALG="DES";
+  private static final String ASYMMETRIC_ALG="ASIM";
+  private static final String SYMMETRIC_ALG="SIM";
 
   private static final int PASS_MIN_LEN = 8;
 
@@ -42,7 +41,7 @@ public class KeyManager {
     if( algo==null )
       return;
 
-    Boolean autoDelete = configuration.getBoolean(PROPERTY_PRIVATE_KEY_DELETE,false);
+    boolean autoDelete = configuration.getBoolean(PROPERTY_PRIVATE_KEY_DELETE,false);
     String publicKeyPath =  configuration.getString(PROPERTY_PUBLIC_KEY);
     String privateKeyPath =  configuration.getString(PROPERTY_PRIVATE_KEY);
     String passphrasePath =  configuration.getString(PROPERTY_PASSPHRASE);
@@ -53,9 +52,12 @@ public class KeyManager {
       this.simmK = null;
     }else{
       String strK = getPassPhrase(passphrasePath);
-      DESKeySpec desKeySpec = new DESKeySpec(strK.getBytes());
-      SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(SYMMETRIC_ALG);
-      this.simmK = keyFactory.generateSecret(desKeySpec);
+      byte[] key = strK.getBytes(StandardCharsets.UTF_8);
+      MessageDigest sha = MessageDigest.getInstance("SHA-1");
+      key = sha.digest(key);
+      key = Arrays.copyOf(key, 16); // use only first 128 bit
+
+      this.simmK = new SecretKeySpec(key, "AES");
     }
 
     if( autoDelete && passphrasePath!=null ){
@@ -114,17 +116,13 @@ public class KeyManager {
   private static String getKey(String filename) throws IOException {
     // Read key from file
     String strKeyPEM = "";
-    BufferedReader br = null;
-    try {
-      br = new BufferedReader(new FileReader(filename));
+    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
       String line;
       while ((line = br.readLine()) != null) {
         strKeyPEM += line + "\n";
       }
-    }catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
-    }finally{
-      br.close();
     }
 
     return strKeyPEM;
@@ -139,11 +137,10 @@ public class KeyManager {
     String privateKeyPEM = key;
     privateKeyPEM = privateKeyPEM.replace("-----BEGIN PRIVATE KEY-----\n", "");
     privateKeyPEM = privateKeyPEM.replace("-----END PRIVATE KEY-----", "");
-    byte[] encoded = Base64.decodeBase64(privateKeyPEM.getBytes());
+    byte[] encoded = Base64.getDecoder().decode(privateKeyPEM.getBytes());
     KeyFactory kf = KeyFactory.getInstance("RSA");
     PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
-    PrivateKey privKey = kf.generatePrivate(keySpec);
-    return privKey;
+    return kf.generatePrivate(keySpec);
   }
 
   private static PublicKey getPublicKey(String filename) throws IOException, GeneralSecurityException {
@@ -155,10 +152,9 @@ public class KeyManager {
     String publicKeyPEM = key;
     publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----\n", "");
     publicKeyPEM = publicKeyPEM.replace("-----END PUBLIC KEY-----", "");
-    byte[] encoded = Base64.decodeBase64(publicKeyPEM.getBytes());
+    byte[] encoded = Base64.getDecoder().decode(publicKeyPEM.getBytes());
     KeyFactory kf = KeyFactory.getInstance("RSA");
-    PublicKey pubKey = kf.generatePublic(new X509EncodedKeySpec(encoded));
-    return pubKey;
+    return kf.generatePublic(new X509EncodedKeySpec(encoded));
   }
 
   private String getPassPhrase(String passphrasePath){

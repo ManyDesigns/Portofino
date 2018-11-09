@@ -94,8 +94,10 @@ ul.infoMessages {
     background-image: url("SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
 }
 
-.alert { box-shadow: 0px 0px 5px rgba(129, 129, 129, 0.15); }
-.alert.alert-warning { box-shadow: 0px 0px 5px rgba(222, 222, 74, 0.15); }
+/*noinspection CssRedundantUnit*/
+.alert { /*noinspection CssRedundantUnit*/
+  box-shadow: 0px 0px 5px rgba(129, 129, 129, 0.15); }
+.alert.alert-warning { box-shadow: 0 0px 5px rgba(222, 222, 74, 0.15); }
 .alert.alert-danger  { box-shadow: 0px 0px 5px rgba(220, 66, 66, 0.15);  }
 
 .alert-success, .alert-danger, .alert-info, .alert-warning {
@@ -782,7 +784,6 @@ input.tt-input {
   margin-top: 12px;
   padding: 8px 0;
   background-color: #fff;
-  border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
   -webkit-border-radius: 8px;
      -moz-border-radius: 8px;

@@ -2,7 +2,6 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page import="com.manydesigns.portofino.navigation.Navigation" %>
 <%@ page import="com.manydesigns.portofino.navigation.NavigationItem" %>
@@ -10,9 +9,6 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="org.apache.commons.codec.net.URLCodec" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration" />
 <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />

@@ -16,17 +16,27 @@
     <div class="search_results">
         <mde:write name="actionBean" property="tableForm" />
     </div>
-    <div class="pull-left">
-        <portofino:buttons list="crud-search" />
-    </div>
     <%
         Integer rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();
         long totalSearchRecords = rowsPerPage != null ? actionBean.getTotalSearchRecords() : 0;
-        if(rowsPerPage != null && totalSearchRecords > rowsPerPage) { %>
+
+        if(rowsPerPage != null && totalSearchRecords > rowsPerPage) {
+    %>
+    <div class="row">
+        <div class="col-md-12">
+            <% writeResultNumber(out, actionBean, rowsPerPage, totalSearchRecords); %>
             <ul class="pagination pagination-sm">
                 <% writePaginator(out, actionBean, rowsPerPage, totalSearchRecords); %>
             </ul>
+        </div>
+    </div>
     <%  } %>
+    <div class="row">
+        <div class="col-md-12">
+            <portofino:buttons list="crud-search" />
+        </div>
+    </div>
+
     <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
     <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
     <input type="hidden" name="eventName" value="${actionBean.context.eventName}" />
@@ -34,6 +44,17 @@
     <div style="clear: both;"></div>
 </div>
 <%!
+    private void writeResultNumber(Writer out, AbstractCrudAction actionBean, int rowsPerPage, long totalSearchRecords) {
+        long firstResult = actionBean.getFirstResult() != null ? actionBean.getFirstResult()+1 : 1;
+        long lastResult = firstResult+rowsPerPage;
+
+        if(lastResult>totalSearchRecords)
+            lastResult=totalSearchRecords;
+
+        XhtmlBuffer buf = new XhtmlBuffer(out);
+        buf.writeNoHtmlEscape(ElementsThreadLocals.getText("from._.to._.of._",firstResult,lastResult,totalSearchRecords));
+    }
+
     private void writePaginator(Writer out, AbstractCrudAction actionBean, int rowsPerPage, long totalSearchRecords) {
         int firstResult = actionBean.getFirstResult() != null ? actionBean.getFirstResult() : 0;
         int currentPage = firstResult / rowsPerPage;

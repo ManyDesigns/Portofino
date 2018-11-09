@@ -9,7 +9,6 @@
 /><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.searchTitle}"/>
-        <span class="label label-default pull-right">${actionBean.totalSearchRecords} </span>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form

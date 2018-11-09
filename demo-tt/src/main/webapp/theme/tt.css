@@ -1,6 +1,3 @@
-.ticket-read .controls {
-    font-weight: bold;
-}
 .ticket-read .controls .value {
     padding-top: 0;
 }
@@ -42,7 +39,6 @@ background: -webkit-linear-gradient(top, rgb(171, 228, 160) 0%, rgb(16, 74, 36) 
 
 a { color: #327D42; }
 a:hover { color: #1D5429; }
-.portofino-sidenav>li.nav-header { color: #1D5429;}
 li.active a  , li.active a:hover { color: #1D5429; cursor:default; }
 .portofino-sidenav>li.active  , .portofino-sidenav>li.active:hover { border-color:#1D5429;}
 .portofino-sidenav>li:hover { border-color:#1D5429; }

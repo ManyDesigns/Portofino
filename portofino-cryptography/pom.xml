@@ -5,7 +5,7 @@
     <parent>
         <artifactId>portofino</artifactId>
         <groupId>com.manydesigns</groupId>
-        <version>4.2.4</version>
+        <version>4.2.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>portofino-cryptography</artifactId>
@@ -23,12 +23,6 @@
             <artifactId>slf4j-nop</artifactId>
             <version>1.7.5</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>20041127.091804</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>

@@ -328,7 +328,7 @@ left join version_states vs on vs.id = act.version_state
                 xb.openElement("dd")
                 if (propertyAccessor.type == String.class) {
                     DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-                    LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(oldField.value, newField.value);
+                    LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(StringUtils.trimToEmpty(oldField.value), StringUtils.trimToEmpty(newField.value));
                     diffMatchPatch.diff_cleanupSemantic(diffs);
                     diff_prettyHtml(xb, diffs);
                 } else {

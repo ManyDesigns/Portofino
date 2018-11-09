@@ -54,12 +54,12 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -99,6 +99,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     public Persistence persistence;
 
     protected long totalSearchRecords = -1;
+    private Object oldObject_;
 
     //**************************************************************************
     // Logging
@@ -317,6 +318,14 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public CrudConfiguration getCrudConfiguration() {
         return (CrudConfiguration) crudConfiguration;
+    }
+
+    protected void editSetup(Object object) {
+        this.oldObject_ = SerializationUtils.clone((Serializable)object);
+    }
+
+    public Object getOldObject_() {
+        return this.oldObject_;
     }
 
 }

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.4</version>
+        <version>4.2.5</version>
     </parent>
     <artifactId>portofino-theme</artifactId>
     <packaging>jar</packaging>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>momentjs</artifactId>
-            <version>2.10.3</version>
+            <version>2.11.1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
