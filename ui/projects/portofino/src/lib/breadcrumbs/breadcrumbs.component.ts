@@ -40,6 +40,7 @@ export class BreadcrumbsComponent implements OnInit {
         this.breadcrumbList.length = 0;
         routerList = routerUrl.slice(1).split('/');
         routerList.forEach((router, index) => {
+          router = router.split('?')[0];
           this.breadcrumbList.push({
             name: router,
             path: (index === 0) ? router : `${this.breadcrumbList[index-1].path}/${router}`
