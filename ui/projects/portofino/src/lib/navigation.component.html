@@ -1,9 +1,6 @@
 <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
   <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
 </mat-toolbar>
-
-<!-- TODO make it responsive https://stackblitz.com/angular/onrlxdodyer?file=app%2Fsidenav-responsive-example.html -->
-
 <ng-container *ngIf="!!pageService.page">
   <ul *ngIf="pageService.page.parent">
     <li>

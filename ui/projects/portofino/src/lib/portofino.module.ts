@@ -40,7 +40,7 @@ import {
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
-  MatTreeModule, MatCardModule, MatExpansionModule, MatDividerModule,MatListModule
+  MatTreeModule, MatCardModule, MatExpansionModule, MatDividerModule, MatListModule, MatProgressSpinnerModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -87,7 +87,8 @@ import { NgxdModule } from '@ngxd/core';
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
     MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
-    MatSortModule, MatTableModule, MatTreeModule,MatListModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
+    MatSortModule, MatProgressSpinnerModule, MatTableModule, MatTreeModule,MatListModule, MatToolbarModule,
+    MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule,
     RouterModule.forChild([]),
     TranslateModule
