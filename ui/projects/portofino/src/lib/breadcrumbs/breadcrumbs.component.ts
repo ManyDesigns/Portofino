@@ -27,7 +27,6 @@ export class BreadcrumbsComponent implements OnInit {
     public authenticationService: AuthenticationService, public pageService: PageService) {
   }
 
-
   ngOnInit() {
     this.listenRouting();
   }
@@ -45,12 +44,7 @@ export class BreadcrumbsComponent implements OnInit {
             name: router,
             path: (index === 0) ? router : `${this.breadcrumbList[index-1].path}/${router}`
           });
-
-          /*if (index+1 !== routerList.length) {
-            target = target.children;
-          }*/
         });
-        console.log(this.breadcrumbList);
       }
     });
   }
@@ -58,7 +52,7 @@ export class BreadcrumbsComponent implements OnInit {
   getTitle(item:BreadCrumb){
     let currentPage =  this.pageService.page;
       while ( currentPage!= undefined  && currentPage!=null ) {
-        if( currentPage.url==('/'+item.path) )
+        if( currentPage.baseUrl==('/'+item.path) )
           return currentPage.configuration.title;
         currentPage=currentPage.parent
       }

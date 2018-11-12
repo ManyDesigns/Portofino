@@ -5,7 +5,7 @@
           *ngFor="let item of breadcrumbList; let i = index"
           [class.active]="i===breadcrumbList.length-1">
         <a class="breadcrumb-link" [routerLink]="item.path" *ngIf="i!==breadcrumbList.length-1">
-          {{ item.name }}
+          {{ getTitle(item) }}
         </a>
         <span class="breadcrumb-divisor" *ngIf="i!=breadcrumbList.length-1">
            <mat-icon>navigate_next</mat-icon>
