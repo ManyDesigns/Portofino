@@ -1,0 +1,17 @@
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="left center" class="breadcrumbs-bar">
+
+  <ng-container *ngIf="!!pageService.page">
+      <div class="breadcrumb-item"
+          *ngFor="let item of breadcrumbList; let i = index"
+          [class.active]="i===breadcrumbList.length-1">
+        <a class="breadcrumb-link" [routerLink]="item.path" *ngIf="i!==breadcrumbList.length-1">
+          {{ item.name }}
+        </a>
+        <span class="breadcrumb-divisor" *ngIf="i!=breadcrumbList.length-1">
+           <mat-icon>navigate_next</mat-icon>
+        </span>
+        <span class="breadcrumb-link-disabled" *ngIf="i===breadcrumbList.length-1">{{ getTitle(item) }}</span>
+      </div>
+  </ng-container>
+
+</mat-toolbar>

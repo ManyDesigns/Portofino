@@ -1,17 +1,22 @@
 <h4 mat-dialog-title>{{ 'Sign in' | translate }}</h4>
 <mat-dialog-content>
-  <p *ngIf="message" style="color: red;">{{message}}</p>
-  <form (submit)="login()">
+  <form (submit)="login()" [formGroup]="loginRecord">
     <mat-form-field>
-      <input matInput placeholder="Username" [(ngModel)]="username" name="username">
+      <input matInput placeholder="Username" [(ngModel)]="username" name="username" formControlName="username">
+      <mat-error>
+        {{message}}
+      </mat-error>
     </mat-form-field>
     <mat-form-field>
-      <input matInput placeholder="Password" type="password" [(ngModel)]="password" name="password">
+      <input matInput placeholder="Password" type="password" [(ngModel)]="password" name="password" formControlName="password">
+      <mat-error>
+        {{message}}
+      </mat-error>
     </mat-form-field>
     <button type="submit" style="display:none">{{ 'Sign in' | translate }}</button>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="login()" color="primary">{{ 'Sign in' | translate }}</button>
+  <button mat-button (click)="login()" color="accent">{{ 'Sign in' | translate }}</button>
   <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
 </mat-dialog-actions>
