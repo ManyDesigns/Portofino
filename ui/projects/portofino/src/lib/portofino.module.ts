@@ -47,6 +47,7 @@ import {FlexLayoutModule} from "@angular/flex-layout";
 import {RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './crud/search/search.component';
 import {FieldComponent} from './fields/field.component';
+import {BreadcrumbsComponent} from "./breadcrumbs/breadcrumbs.component";
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
 import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from './content.directive';
@@ -80,7 +81,7 @@ import { NgxdModule } from '@ngxd/core';
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    ManyToManyComponent
+    ManyToManyComponent,BreadcrumbsComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
