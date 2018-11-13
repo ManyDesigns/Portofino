@@ -26,7 +26,9 @@ export class AuthenticationService {
               protected notifications: NotificationService) {
     const displayName = this.storage.get('user.displayName');
     if(displayName) {
-      this.currentUser = new UserInfo(displayName, this.storage.get('user.administrator') == 'true');
+      const isAdmin = this.storage.get('user.administrator') == 'true';
+      const groups = this.storage.get('user.groups') ? this.storage.get('user.groups').split(',') : [];
+      this.currentUser = new UserInfo(displayName, isAdmin, groups);
     }
   }
 
@@ -84,6 +86,7 @@ export class AuthenticationService {
     this.storage.remove('jwt');
     this.storage.remove('user.displayName');
     this.storage.remove('user.administrator');
+    this.storage.remove('user.groups');
     this.storage.remove('sessionId');
     this.currentUser = null;
   }
@@ -92,8 +95,9 @@ export class AuthenticationService {
     this.storage.set('jwt', result.jwt);
     this.storage.set('user.displayName', result.displayName);
     this.storage.set('user.administrator', result.administrator);
+    this.storage.set('user.groups', result.groups.join(','));
     this.storage.set('sessionId', result.portofinoSessionId);
-    this.currentUser = new UserInfo(result.displayName, result.administrator);
+    this.currentUser = new UserInfo(result.displayName, result.administrator, result.groups);
     this.logins.emit(this.currentUser);
   }
 
@@ -158,7 +162,7 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 }
 
 export class UserInfo {
-  constructor(public displayName: string, public administrator: boolean) {}
+  constructor(public displayName: string, public administrator: boolean, public groups: string[]) {}
 }
 
 export const NO_AUTH_HEADER = "portofino-no-auth";

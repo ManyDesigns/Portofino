@@ -150,7 +150,21 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     public AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         Object principal = principals.getPrimaryPrincipal();
-        Set<String> groups = new HashSet<String>();
+        Set<String> groups = getGroups(principal);
+
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
+        if(groups.contains(SecurityLogic.getAdministratorsGroup(portofinoConfiguration))) {
+            info.addStringPermission("*");
+        }
+        Permission permission = new GroupPermission(groups);
+        info.setObjectPermissions(Collections.singleton(permission));
+        return info;
+    }
+
+    @Override
+    @NotNull
+    public Set<String> getGroups(Object principal) {
+        Set<String> groups = new HashSet<>();
         groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
         if (principal == null) {
             groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
@@ -160,14 +174,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         } else {
             throw new AuthorizationException("Invalid principal: " + principal);
         }
-
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
-        if(groups.contains(SecurityLogic.getAdministratorsGroup(portofinoConfiguration))) {
-            info.addStringPermission("*");
-        }
-        Permission permission = new GroupPermission(groups);
-        info.setObjectPermissions(Collections.singleton(permission));
-        return info;
+        return groups;
     }
 
     /**

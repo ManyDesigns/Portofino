@@ -124,6 +124,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
                 key("userId").value(ShiroUtils.getUserId(subject)).
                 key("displayName").value(portofinoRealm.getUserPrettyName((Serializable) subject.getPrincipal())).
                 key("administrator").value(administrator).
+                key("groups").value(portofinoRealm.getGroups(subject.getPrincipal())).
                 key("jwt").value(jwt).
             endObject();
         return stringer.toString();
