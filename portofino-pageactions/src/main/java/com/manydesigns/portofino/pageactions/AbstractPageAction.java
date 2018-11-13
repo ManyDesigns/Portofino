@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -664,7 +665,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     @Path(":buttons")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    @Deprecated
     public List getButtons() {
         HttpServletRequest request = context.getRequest();
         String list = request.getParameter("list");
@@ -710,7 +710,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         List result = new ArrayList();
         Subject subject = SecurityUtils.getSubject();
         for(Operation operation : operations) {
-            logger.trace("ButtonInfo: {}", operation);
+            logger.trace("Operation: {}", operation);
             Method handler = operation.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
@@ -753,6 +753,32 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         description.put("javaClass", pageInstance.getActionClass().getSuperclass().getName());
         description.put("groovyClass", pageInstance.getActionClass().getName());
         description.put("page", pageInstance.getPage());
+        return description;
+    }
+
+    @Path(":description")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    public Map<String, Object> getJSONDescription() {
+        List<ChildPage> childPages = getPage().getLayout().getChildPages();
+        List<String> subResources = new ArrayList<>(childPages.size());
+        for(ChildPage p : childPages) {
+            subResources.add(p.getName());
+        }
+        Map<String, Object> description = new HashMap<>();
+        description.put("superclass", getClass().getSuperclass().getName());
+        description.put("class", getClass().getName());
+        description.put("path", context.getActionPath());
+        description.put("children", subResources);
+        description.put("page", pageInstance.getPage());
+        if(PageActionLogic.supportsDetail(getClass())) {
+            List<ChildPage> detailChildPages = getPage().getDetailLayout().getChildPages();
+            List<String> detailSubResources = new ArrayList<>(detailChildPages.size());
+            for(ChildPage p : detailChildPages) {
+                detailSubResources.add(p.getName());
+            }
+            description.put("detailChildren", detailSubResources);
+        }
         return description;
     }
 }

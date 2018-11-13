@@ -32,7 +32,10 @@ import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.navigation.Navigation;
 import com.manydesigns.portofino.navigation.NavigationItem;
+import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
 import org.apache.commons.configuration.Configuration;
@@ -47,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
@@ -54,7 +58,9 @@ import java.io.IOException;
 import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -158,6 +164,34 @@ public class APIRoot {
         description.put("javaClass", APIRoot.class.getName());
         description.put("groovyClass", null);
         description.put("page", new Page());
+        return description;
+    }
+
+    /**
+     * Returns a description of the root.
+     * @since 5.0
+     * @return the page's description as JSON.
+     */
+    @Path(":description")
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @RequiresPermissions(level = AccessLevel.NONE)
+    public Map<String, Object> getJSONDescription() {
+        File pagesDirectory = (File) servletContext.getAttribute(PageactionsModule.PAGES_DIRECTORY);
+        Page rootPage = DispatcherLogic.getPage(pagesDirectory);
+        Configuration configuration = (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+        List<ChildPage> childPages = rootPage.getLayout().getChildPages();
+        List<String> subResources = new ArrayList<>(childPages.size());
+        for(ChildPage p : childPages) {
+            subResources.add(p.getName());
+        }
+        Map<String, Object> description = new HashMap<String, Object>();
+        description.put("superclass", getClass().getSuperclass().getName());
+        description.put("class", getClass().getName());
+        description.put("page", rootPage);
+        description.put("path", "");
+        description.put("children", subResources);
+        description.put("loginPath", configuration.getString("login.page"));
         return description;
     }
 
