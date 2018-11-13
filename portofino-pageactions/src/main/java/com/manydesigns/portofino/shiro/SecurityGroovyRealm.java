@@ -199,6 +199,11 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     @Override
+    public Set<String> getGroups(Object principal) {
+        return ensureDelegate().getGroups(principal);
+    }
+
+    @Override
     public String generateWebToken(Object principal) {
         return ensureDelegate().generateWebToken(principal);
     }

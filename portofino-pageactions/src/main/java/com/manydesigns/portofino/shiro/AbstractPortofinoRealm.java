@@ -149,16 +149,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     public AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         Object principal = principals.getPrimaryPrincipal();
-        Set<String> groups = new HashSet<String>();
-        groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
-        if (principal == null) {
-            groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
-        } else if (principal instanceof Serializable) {
-            groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));
-            groups.addAll(loadAuthorizationInfo((Serializable) principal));
-        } else {
-            throw new AuthorizationException("Invalid principal: " + principal);
-        }
+        Set<String> groups = getGroups(principal);
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
         if(groups.contains(SecurityLogic.getAdministratorsGroup(portofinoConfiguration))) {
@@ -195,6 +186,22 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
         groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));
         groups.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
+        return groups;
+    }
+
+    @Override
+    @NotNull
+    public Set<String> getGroups(Object principal) {
+        Set<String> groups = new HashSet<String>();
+        groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
+        if (principal == null) {
+            groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
+        } else if (principal instanceof Serializable) {
+            groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));
+            groups.addAll(loadAuthorizationInfo((Serializable) principal));
+        } else {
+            throw new AuthorizationException("Invalid principal: " + principal);
+        }
         return groups;
     }
 

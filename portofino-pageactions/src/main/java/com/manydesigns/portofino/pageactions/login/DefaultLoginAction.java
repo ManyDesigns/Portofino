@@ -39,6 +39,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatchElement;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
@@ -51,16 +52,15 @@ import org.apache.commons.collections.MultiMap;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.io.Serializable;
 
 /**
@@ -107,21 +107,38 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
             PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
             String jwt = portofinoRealm.generateWebToken(principal);
             subject.login(new JSONWebToken(jwt));
-            Session session = subject.getSession(true);
-            JSONStringer stringer = new JSONStringer();
-            stringer.
-                object().
-                    key("portofinoSessionId").value(session.getId()).
-                    key("userId").value(ShiroUtils.getUserId(subject)).
-                    key("displayName").value(portofinoRealm.getUserPrettyName((Serializable) subject.getPrincipal())).
-                    key("jwt").value(jwt).
-                endObject();
-            return stringer.toString();
+            return userInfo(subject, portofinoRealm, jwt);
         } catch (AuthenticationException e) {
             logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);
             throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
         }
-        return "{}";
+        return checkJWT();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequiresAuthentication
+    public String checkJWT() {
+        Subject subject = SecurityUtils.getSubject();
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        String jwt = JWTFilter.getJSONWebToken(context.getRequest());
+        return userInfo(subject, portofinoRealm, jwt);
+    }
+
+    public String userInfo(Subject subject, PortofinoRealm portofinoRealm, String jwt) {
+        boolean administrator = SecurityLogic.isAdministrator(portofinoConfiguration);
+        Session session = subject.getSession(true);
+        JSONStringer stringer = new JSONStringer();
+        stringer.
+                object().
+                key("portofinoSessionId").value(session.getId()).
+                key("userId").value(ShiroUtils.getUserId(subject)).
+                key("displayName").value(portofinoRealm.getUserPrettyName((Serializable) subject.getPrincipal())).
+                key("administrator").value(administrator).
+                key("groups").value(portofinoRealm.getGroups(subject.getPrincipal())).
+                key("jwt").value(jwt).
+                endObject();
+        return stringer.toString();
     }
 
     @Override
