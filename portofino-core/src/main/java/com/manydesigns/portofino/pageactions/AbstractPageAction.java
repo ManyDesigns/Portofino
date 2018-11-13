@@ -485,7 +485,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         List result = new ArrayList();
         Subject subject = SecurityUtils.getSubject();
         for(Operation operation : operations) {
-            logger.trace("ButtonInfo: {}", operation);
+            logger.trace("Operation: {}", operation);
             Method handler = operation.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
