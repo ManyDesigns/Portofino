@@ -5,9 +5,7 @@ import {
   Component,
   ComponentFactoryResolver, Directive,
   EventEmitter,
-  Input, NgZone,
-  OnInit,
-  Output,
+  Input, Output,
   QueryList,
   Type,
   ViewChildren, ViewContainerRef
@@ -24,6 +22,12 @@ export class Form {
 }
 
 export class Field {
+
+  constructor(property: Property = undefined, initialState = undefined) {
+    this.property = property;
+    this.initialState = initialState;
+  }
+
   property: Property;
   initialState: any;
   editable: boolean = true;

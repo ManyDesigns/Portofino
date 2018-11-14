@@ -294,30 +294,25 @@ export class PageSettingsPanel {
   active: boolean;
   readonly form = new FormGroup({});
   readonly formDefinition = new Form();
-  classAccessor: ClassAccessor = {
-    name: 'configuration',
-    properties: [],
-    keyProperties: []
-  };
-
   constructor(public page: Page) {}
 
   refresh() {
-    this.formDefinition.contents = [{
+    this.formDefinition.contents = [
+      this.createFieldForProperty(Property.create({
+        name: 'title', label: 'Title'
+      })), {
       name: 'source',
       component: SourceSelector,
       dependencies: { page: this.page, initialValue: this.page.configuration.source }
     }];
-    this.classAccessor.properties.forEach(p => {
-      this.createFieldForProperty(p);
-    });
+
   }
 
   protected createFieldForProperty(p) {
     const field = new Field();
     field.property = p;
     field.initialState = this.page.configuration[p.name];
-    this.formDefinition.contents.push(field);
+    return field;
   }
 }
 

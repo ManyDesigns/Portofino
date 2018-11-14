@@ -8,7 +8,7 @@ export class ClassAccessor {
 
 export class Property {
   name: string;
-  type: string;
+  type = 'string';
   annotations: Annotation[] = [];
   modifiers: string[] = [];
   label: string;
