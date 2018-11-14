@@ -17,15 +17,16 @@ public class BaseHrefReplaceListener implements ServletContextListener {
         String indexPath = sce.getServletContext().getRealPath("/index.html");
         File indexFile = new File(indexPath);
         if(indexFile.exists() && indexFile.canRead() && indexFile.canWrite()) {
-            try(FileReader reader = new FileReader(indexFile);
-                FileWriter writer = new FileWriter(indexFile)) {
+            try(FileReader reader = new FileReader(indexFile)) {
                 StringWriter fileContents = new StringWriter();
                 IOUtils.copy(reader, fileContents);
                 String newContents = fileContents.toString();
                 String regex = "<base +href *= *['\"][^'\"]*['\"] */?>";
                 String replacement = "<base href='" + sce.getServletContext().getContextPath() + "/'>";
                 newContents = newContents.replaceFirst(regex, replacement);
-                writer.write(newContents);
+                try(FileWriter writer = new FileWriter(indexFile)) {
+                    writer.write(newContents);
+                }
             } catch (IOException e) {
                 logger.warn("Could not patch index.html with the correct base href", e);
             }

@@ -15,7 +15,7 @@ import {
 import {FormControl, FormGroup} from "@angular/forms";
 
 export class Form {
-  contents: (Field|FieldSet|{component: Type<any>, dependencies ?: object}|{html: string})[] = [];
+  contents: (Field|FieldSet|{name: string, component: Type<any>, dependencies ?: object}|{html: string})[] = [];
   editable: boolean;
   /** The URL from which to download blobs and other resources. */
   baseUrl: string;
@@ -88,32 +88,36 @@ export class FormComponent implements AfterViewInit {
   }
 
   protected setupForm(form: Form, formGroup: FormGroup) {
-    //TODO remove fields that are no longer present
     let dynamicComponentIndex = 0;
+    let controlNames = [];
     form.contents.forEach(v => {
       if (v instanceof Field) {
         const property = v.property;
+        controlNames.push(property.name);
         const control = formGroup.get(property.name);
         if (control instanceof FormControl) {
           control.reset(v.initialState);
         } else {
-          formGroup.removeControl(property.name);
-          formGroup.registerControl(property.name, new FormControl(v.initialState, getValidators(property)));
+          formGroup.setControl(property.name, new FormControl(v.initialState, getValidators(property)));
         }
       } else if (v instanceof FieldSet) {
+        controlNames.push(v.name);
         let control = formGroup.get(v.name);
         if (control instanceof FormGroup) {
           this.setupForm(v.contents, control as FormGroup);
         } else {
-          formGroup.removeControl(v.name);
           control = new FormGroup({});
           this.setupForm(v.contents, control as FormGroup);
-          formGroup.registerControl(v.name, control);
+          formGroup.setControl(v.name, control);
         }
       } else if(this.dynamicComponents && v.hasOwnProperty('component')) {
+        const control = new FormGroup({});
+        controlNames.push(v['name']);
+        formGroup.setControl(v['name'], control);
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(v['component']);
         const viewContainerRef = this.dynamicComponents.toArray()[dynamicComponentIndex].viewContainerRef;
         const component = viewContainerRef.createComponent(componentFactory).instance;
+        component['form'] = control;
         if(v['dependencies']) {
           for(const dep in v['dependencies']) {
             component[dep] = v['dependencies'][dep];
@@ -122,6 +126,13 @@ export class FormComponent implements AfterViewInit {
         this.changeDetector.detectChanges();
       }
     });
+    let controlsToDelete = [];
+    for (let controlName in formGroup.controls) {
+      if(controlNames.indexOf(controlName) < 0) {
+        controlsToDelete.push(controlName);
+      }
+    }
+    controlsToDelete.forEach(name => formGroup.removeControl(name));
   }
 
   get allFields() {

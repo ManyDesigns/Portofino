@@ -242,10 +242,15 @@ export class SourceSelector implements OnInit {
   @Input()
   page: Page;
   @Input()
-  property: Property;
-  @Input()
   initialValue: string;
+  @Input()
   form: FormGroup;
+  readonly property = Property.create({
+    name: 'source',
+    type: 'string',
+    label: 'Path or URL',
+    annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
+  });
 
   constructor(public portofino: PortofinoService, protected http: HttpClient, protected dialog: MatDialog) {}
 
@@ -255,7 +260,8 @@ export class SourceSelector implements OnInit {
       disabled: !this.page.parent
     });
     const source = new FormControl(this.initialValue);
-    this.form = new FormGroup({ source: source, relativeToParent: relativeToParent });
+    this.form.addControl('source', source);
+    this.form.addControl('relativeToParent', relativeToParent);
     relativeToParent.valueChanges.subscribe(value => {
       this.updateSourceValue(value, source, source.value);
     });
@@ -298,17 +304,9 @@ export class PageSettingsPanel {
 
   refresh() {
     this.formDefinition.contents = [{
+      name: 'source',
       component: SourceSelector,
-      dependencies: {
-        page: this.page,
-        property: Property.create({
-          name: 'source',
-          type: 'string',
-          label: 'Path or URL',
-          annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
-        }),
-        initialValue: this.page.configuration.source
-      }
+      dependencies: { page: this.page, initialValue: this.page.configuration.source }
     }];
     this.classAccessor.properties.forEach(p => {
       this.createFieldForProperty(p);
@@ -426,6 +424,7 @@ export abstract class Page {
 
   saveConfiguration() {
     const config = this.getConfigurationToSave(this.settingsPanel.form.value);
+    this.configuration = config;
     this.portofino.saveConfiguration(this.configurationLocation, config).subscribe(
       () => {
         this.settingsPanel.active = false;
@@ -437,6 +436,7 @@ export abstract class Page {
   protected getConfigurationToSave(formValue) {
     const config = Object.assign({}, this.configuration, formValue);
     delete config.relativeToParent;
+    config.source = config.source.source;
     return config;
   }
 
