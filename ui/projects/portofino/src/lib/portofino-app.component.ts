@@ -9,7 +9,7 @@ import {
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import {PortofinoService} from "./portofino.service";
+import {PortofinoService, SideNavPosition} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
@@ -54,6 +54,8 @@ export class PortofinoAppComponent implements OnInit {
   title = 'Portofino';
   @Input()
   apiRoot: string;
+  @Input()
+  sideNavPosition: SideNavPosition;
   @ViewChild(ToolbarDirective)
   toolbarHost: ToolbarDirective;
 
@@ -63,13 +65,24 @@ export class PortofinoAppComponent implements OnInit {
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, translate: TranslateService,
               @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,@Inject(NAVIGATION_COMPONENT) protected navigationComponent) {
+    this.setupTranslateService(translate);
+  }
+
+  protected setupTranslateService(translate: TranslateService) {
     translate.setDefaultLang('en');
-    translate.setTranslation('en', TRANSLATIONS_EN, true);
-    translate.setTranslation('it', TRANSLATIONS_IT, true);
+    this.configureTranslations(translate);
     translate.use(translate.getBrowserLang());
   }
 
+  protected configureTranslations(translate: TranslateService) {
+    translate.setTranslation('en', TRANSLATIONS_EN, true);
+    translate.setTranslation('it', TRANSLATIONS_IT, true);
+  }
+
   ngOnInit(): void {
+    if(this.sideNavPosition) {
+      this.portofino.sideNavPosition = this.sideNavPosition;
+    }
     if(this.apiRoot) {
       this.portofino.defaultApiRoot = this.apiRoot;
       this.portofino.localApiPath = null;

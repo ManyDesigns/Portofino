@@ -6,9 +6,10 @@ export class PortofinoService {
 
   defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
-  sideNavOpen: boolean;
   localApiPath = 'portofino';
   loginPath = 'login';
+  sideNavPosition: SideNavPosition = 'page';
+  sideNavOpen: boolean;
 
   constructor(public http: HttpClient) { }
 
@@ -63,3 +64,5 @@ class ApiInfo {
   apiRoot: string;
   loginPath: string;
 }
+
+export declare type SideNavPosition = 'body' | 'page' | undefined;
