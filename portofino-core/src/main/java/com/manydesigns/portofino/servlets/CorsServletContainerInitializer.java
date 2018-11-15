@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.servlets;
 
+import com.manydesigns.portofino.rest.PortofinoFilter;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,9 @@ public class CorsServletContainerInitializer implements ServletContainerInitiali
             "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, " +
             "Access-Control-Request-Headers, Authorization, Accept-Encoding, Accept-Language, " +
             "Cache-Control, Connection, Host, Referer, User-Agent";
-    public static final String DEFAULT_EXPOSED_HEADERS = "X-Portofino-Pretty-Name"; //TODO this is used by the CRUD action. Maybe these should be configurable by modules somehow?
+    public static final String DEFAULT_EXPOSED_HEADERS =
+            "X-Portofino-Pretty-Name, " +  //TODO this is used by the CRUD action. Maybe these should be configurable by modules somehow?
+            PortofinoFilter.MESSAGE_HEADER;
 
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {

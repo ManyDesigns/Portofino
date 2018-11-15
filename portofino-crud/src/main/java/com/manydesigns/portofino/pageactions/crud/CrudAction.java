@@ -22,7 +22,7 @@ package com.manydesigns.portofino.pageactions.crud;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -270,7 +270,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
+            RequestMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
         }
     }
 

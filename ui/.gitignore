@@ -21,6 +21,3 @@ typings
 # e2e
 e2e/*.js
 e2e/*.map
-
-#pages
-src/pages/**/config.json

@@ -26,7 +26,7 @@ import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.*;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -257,7 +257,7 @@ public class ManyToManyAction extends AbstractPageAction {
         try {
             queryString = QueryUtils.mergeQuery(m2mConfiguration.getQuery(), criteria, this);
         } catch (RuntimeException e) {
-            SessionMessages.addErrorMessage("Invalid query");
+            RequestMessages.addErrorMessage("Invalid query");
             throw e;
         }
         existingAssociations =
@@ -329,10 +329,10 @@ public class ManyToManyAction extends AbstractPageAction {
             configurationForm.writeToObject(conf);
             conf.writeTo(m2mConfiguration);
             saveConfiguration(m2mConfiguration);
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
+            RequestMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
             return cancel();
         } else {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
+            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
             return new ForwardResolution("/m/crud/many2many/configure.jsp");
         }
     }*/

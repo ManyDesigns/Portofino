@@ -536,7 +536,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @param object the new object.
      * @return true if the object is to be considered valid, false otherwise. In the latter case, the
      * object will not be saved; it is suggested that the cause of the validation failure be displayed
-     * to the user (e.g. by using SessionMessages).
+     * to the user (e.g. by using RequestMessages).
      */
     protected boolean createValidate(T object) {
         return true;
@@ -569,7 +569,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @param object the object.
      * @return true if the object is to be considered valid, false otherwise. In the latter case, the
      * object will not be saved; it is suggested that the cause of the validation failure be displayed
-     * to the user (e.g. by using SessionMessages).
+     * to the user (e.g. by using RequestMessages).
      */
     protected boolean editValidate(T object) {
         return true;
@@ -590,7 +590,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @param object the object.
      * @return true if the delete operation is to be performed, false otherwise. In the latter case,
      * it is suggested that the cause of the validation failure be displayed to the user
-     * (e.g. by using SessionMessages).
+     * (e.g. by using RequestMessages).
      */
     protected boolean deleteValidate(T object) {
         return true;
@@ -1510,10 +1510,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             saveConfiguration(crudConfiguration);
 
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
+            RequestMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
             return cancel();
         } else {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
+            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
             return getConfigurationView();
         }
     }

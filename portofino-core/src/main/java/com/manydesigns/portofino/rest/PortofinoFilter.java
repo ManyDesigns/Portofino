@@ -23,6 +23,7 @@ package com.manydesigns.portofino.rest;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
 import com.manydesigns.elements.blobs.StreamingCommonsMultipartWrapper;
+import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.Guarded;
@@ -73,15 +74,13 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
+    public static final String MESSAGE_HEADER = "X-Portofino-Message";
 
     @Context
     protected ResourceInfo resourceInfo;
 
     @Context
     protected HttpServletRequest request;
-
-    @Context
-    protected HttpServletResponse response;
 
     @Context
     protected ServletContext servletContext;
@@ -104,46 +103,36 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
         checkAuthorizations(requestContext, resource);
-        addHeaders();
         if(resource instanceof PageAction) {
             PageAction pageAction = (PageAction) resource;
             pageAction.prepareForExecution();
         }
     }
 
-    protected void addHeaders() {
+    protected void addCacheHeaders(ContainerResponseContext responseContext) {
         if(resourceInfo.getResourceMethod() != null && resourceInfo.getResourceMethod().isAnnotationPresent(ControlsCache.class)) {
             return;
         }
         // Avoid caching of dynamic pages
         //HTTP 1.0
-        response.setHeader(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);
-        response.setDateHeader(ServletConstants.HTTP_EXPIRES, 0);
-
+        responseContext.getHeaders().putSingle(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);
+        responseContext.getHeaders().putSingle(ServletConstants.HTTP_EXPIRES, 0);
         //HTTP 1.1
-        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_CACHE);
-        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
-        //response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
-        //response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MAX_AGE + 0);
+        responseContext.getHeaders().add(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_CACHE);
+        responseContext.getHeaders().add(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
     }
 
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
-//        UriInfo uriInfo = requestContext.getUriInfo();
-//        if(uriInfo.getMatchedResources().isEmpty()) {
-//            return;
-//        }
-//        Object resource = uriInfo.getMatchedResources().get(0);
-//        try {
-//            if(resourceInfo == null || resourceInfo.getResourceClass() == null) {
-//                return;
-//            }
-//        } catch (Exception e) {
-//            logger.debug("Could not get resourceInfo (can happen under RestEasy)", e);
-//            return;
-//        }
-//        if(resource.getClass() != resourceInfo.getResourceClass()) {
-//            throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
-//        }
+        addCacheHeaders(responseContext);
+        for(String message : RequestMessages.consumeErrorMessages()) {
+            responseContext.getHeaders().add(MESSAGE_HEADER, "error: " + message);
+        }
+        for(String message : RequestMessages.consumeWarningMessages()) {
+            responseContext.getHeaders().add(MESSAGE_HEADER, "warning: " + message);
+        }
+        for(String message : RequestMessages.consumeInfoMessages()) {
+            responseContext.getHeaders().add(MESSAGE_HEADER, "info: " + message);
+        }
     }
 
     protected void checkAuthorizations(ContainerRequestContext requestContext, Object resource) {
