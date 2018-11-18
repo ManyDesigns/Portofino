@@ -1,22 +1,34 @@
-<ng-template *ngIf="portofino.sideNavPosition == 'page'"
-             portofino-toolbar></ng-template>
-<mat-sidenav-container [autosize]="true">
-  <mat-sidenav #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
-               role="navigation">
-    <mat-toolbar *ngIf="portofino.sideNavPosition == 'body'"
-                 color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+<ng-container *ngIf="portofino.sideNavPosition == 'page'">
+  <ng-template portofino-toolbar></ng-template>
+  <mat-drawer-container [autosize]="true">
+    <mat-drawer #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
+                 role="navigation">
       <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
-    </mat-toolbar>
-    <h3 *ngIf="portofino.sideNavPosition == 'page'"
-        class="mat-title">{{ 'Navigation' | translate }}</h3>
-    <ng-template portofino-navigation></ng-template>
-  </mat-sidenav>
-  <mat-sidenav-content class="app-content-content">
-    <ng-template *ngIf="portofino.sideNavPosition == 'body'"
-                 portofino-toolbar></ng-template>
-    <breadcrumbs></breadcrumbs>
-    <div class="app-page-container">
-      <router-outlet *ngIf="portofino.apiRoot"></router-outlet>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+      <ng-template portofino-navigation></ng-template>
+    </mat-drawer>
+    <mat-drawer-content class="app-content-content">
+      <breadcrumbs></breadcrumbs>
+      <div class="app-page-container">
+        <router-outlet *ngIf="portofino.apiRoot"></router-outlet>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</ng-container>
+<ng-container *ngIf="portofino.sideNavPosition == 'body'">
+  <mat-sidenav-container [autosize]="true">
+    <mat-sidenav #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
+                 role="navigation">
+      <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+        <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
+      </mat-toolbar>
+      <ng-template portofino-navigation></ng-template>
+    </mat-sidenav>
+    <mat-sidenav-content class="app-content-content">
+      <ng-template portofino-toolbar></ng-template>
+      <breadcrumbs></breadcrumbs>
+      <div class="app-page-container">
+        <router-outlet *ngIf="portofino.apiRoot"></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</ng-container>

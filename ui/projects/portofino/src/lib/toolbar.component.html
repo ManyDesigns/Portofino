@@ -1,17 +1,16 @@
 <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
-
   <div>
     <button title="{{ title }}" type="button" mat-icon-button
-          (click)="portofino.toggleSidenav()">
-    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-  </button>
-   {{ title }}
-    </div>
-
+            (click)="portofino.toggleSidenav()">
+      <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+    </button>
+    {{ title }}
+  </div>
   <ng-container *ngIf="authenticationService.currentUser">
     <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
       <button mat-menu-item (click)="authenticationService.logout()">
-        <mat-icon>exit_to_app</mat-icon> {{ 'Sign out' | translate }}
+        <mat-icon>exit_to_app</mat-icon>
+        {{ 'Sign out' | translate }}
       </button>
     </mat-menu>
     <button mat-button [matMenuTriggerFor]="userMenu">
@@ -19,10 +18,8 @@
       {{ authenticationService.currentUser.displayName }}
     </button>
   </ng-container>
-
   <ng-container *ngIf="!authenticationService.currentUser">
     <button mat-button (click)="authenticationService.showLoginDialog()">{{ 'Sign in' | translate }}
     </button>
   </ng-container>
-
 </mat-toolbar>

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit, ChangeDetectorRef,
   Component,
   ComponentFactoryResolver,
   Directive,
@@ -46,7 +47,7 @@ export class DefaultToolbarComponent implements ToolbarComponent {
   templateUrl: './portofino-app.component.html',
   styleUrls: ['./portofino-app.component.css']
 })
-export class PortofinoAppComponent implements OnInit {
+export class PortofinoAppComponent implements OnInit, AfterViewInit {
 
   static components: any = {};
 
@@ -64,7 +65,9 @@ export class PortofinoAppComponent implements OnInit {
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, translate: TranslateService,
-              @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,@Inject(NAVIGATION_COMPONENT) protected navigationComponent) {
+              protected changeDetector: ChangeDetectorRef,
+              @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,
+              @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {
     this.setupTranslateService(translate);
   }
 
@@ -88,12 +91,16 @@ export class PortofinoAppComponent implements OnInit {
       this.portofino.localApiPath = null;
     }
     this.portofino.init();
-    //Dynamically create the toolbar component
+  }
+
+  ngAfterViewInit(): void {
+    //Dynamically create the toolbar and navigation components
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
     let toolbar = this.toolbarHost.viewContainerRef.createComponent(componentFactory).instance as ToolbarComponent;
     let navigationFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
     this.navigationHost.viewContainerRef.createComponent(navigationFactory);
     toolbar.title = this.title;
+    this.changeDetector.detectChanges();
   }
 }
 
