@@ -76,7 +76,7 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
                     try {
                         annotationConfig.register(codeBase.loadClass("SpringConfiguration"));
                     } catch (Exception e) {
-                        logger.debug("User-defined Spring configuration not found", e);
+                        logger.info("User-defined Spring configuration not found", e);
                     }
                 }
         };

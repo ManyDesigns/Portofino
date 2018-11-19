@@ -63,26 +63,30 @@ export class CrudComponent extends Page implements OnInit {
   bulkEditComponentContext = {};
 
   constructor(
-    protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
+    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
     public authenticationService: AuthenticationService, protected route: ActivatedRoute) {
     super(portofino, http, router, authenticationService);
   }
 
   ngOnInit() {
     this.sourceUrl = this.computeBaseSourceUrl();
-    this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
-      classAccessor => this.http.get<Configuration>(this.sourceUrl + this.configurationPath).subscribe(
-        configuration => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
+    this.loadConfiguration().subscribe(
+      () => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
+        classAccessor => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
           sps => this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
-            this.createEnabled = this.operationAvailable(ops,"POST");
-            this.bulkEditEnabled = this.operationAvailable(ops,"PUT");
-            this.bulkDeleteEnabled = this.operationAvailable(ops,"DELETE");
-            this.init(classAccessor, configuration, sps);
+            this.createEnabled = this.operationAvailable(ops, "POST");
+            this.bulkEditEnabled = this.operationAvailable(ops, "PUT");
+            this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE");
+            this.init(classAccessor, sps);
           }))));
   }
 
   computeBaseSourceUrl() {
     return super.computeSourceUrl();
+  }
+
+  get configurationUrl() {
+    return this.computeBaseSourceUrl() + this.configurationPath;
   }
 
   computeSourceUrl() {
@@ -94,10 +98,9 @@ export class CrudComponent extends Page implements OnInit {
     }
   }
 
-  protected init(classAccessor, configuration, selectionProviders: SelectionProvider[]) {
+  protected init(classAccessor, selectionProviders: SelectionProvider[]) {
     this.classAccessor = classAccessor;
     this.selectionProviders = selectionProviders;
-    this.configuration = {...configuration, ...this.configuration};
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });

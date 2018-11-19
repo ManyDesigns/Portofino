@@ -12,12 +12,12 @@ import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
 import {FormControl, FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {Field, Form} from "./form";
+import {Field, FieldSet, Form} from "./form";
 import {Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {ButtonInfo, BUTTONS, declareButton, getButtons} from "./buttons";
 import {BehaviorSubject, merge, Observable, of} from "rxjs";
-import {catchError, map} from "rxjs/operators";
+import {catchError, debounceTime, map} from "rxjs/operators";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
@@ -260,6 +260,10 @@ export class SourceSelector implements OnInit {
       disabled: !this.page.parent
     });
     const source = new FormControl(this.initialValue);
+    source.valueChanges.pipe(debounceTime(1000)).subscribe(value => {
+      this.page.configuration.source = value;
+      this.page.settingsPanel.reloadConfiguration();
+    });
     this.form.addControl('source', source);
     this.form.addControl('relativeToParent', relativeToParent);
     relativeToParent.valueChanges.subscribe(value => {
@@ -285,7 +289,7 @@ export class SourceSelector implements OnInit {
       if(value) {
         this.form.get('source').setValue('/' + value.path);
       }
-    })
+    });
   }
 
 }
@@ -293,31 +297,55 @@ export class SourceSelector implements OnInit {
 export class PageSettingsPanel {
   active: boolean;
   readonly form = new FormGroup({});
-  readonly formDefinition = new Form();
+  formDefinition = new Form();
+  previousConfiguration;
+  error;
   constructor(public page: Page) {}
 
-  refresh() {
+  show() {
     this.formDefinition.contents = [
-      this.createFieldForProperty(Property.create({
-        name: 'title', label: 'Title'
-      })), {
-      name: 'source',
-      component: SourceSelector,
-      dependencies: { page: this.page, initialValue: this.page.configuration.source }
-    }];
-
+      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration),
+      {
+        name: 'source',
+        component: SourceSelector,
+        dependencies: {page: this.page, initialValue: this.page.configuration.source}
+      }];
+    this.previousConfiguration = this.page.configuration;
+    this.reloadConfiguration();
+    this.active = true;
   }
 
-  protected createFieldForProperty(p) {
-    const field = new Field();
-    field.property = p;
-    field.initialState = this.page.configuration[p.name];
-    return field;
+  hide() {
+    this.active = false;
+  }
+
+  setupConfigurationForm(ca: ClassAccessor, config: any) {
+    const index = this.formDefinition.contents.findIndex(f => f['name'] == 'configuration');
+    if(index >= 0) {
+      this.formDefinition.contents.splice(index, 1);
+    }
+    if(ca) {
+      this.formDefinition.contents.push(FieldSet.fromClassAccessor(ca, config || {}));
+    }
+    this.formDefinition = {...this.formDefinition}; //To cause the form component to reload the form
+  }
+
+  reloadConfiguration() {
+    this.page.loadConfiguration().subscribe(conf => {
+      this.page.http.get<ClassAccessor>(this.page.configurationUrl + '/classAccessor').subscribe(ca => {
+        this.setupConfigurationForm(ca, conf);
+      }, error => {
+        this.setupConfigurationForm(null, null);
+        this.error = error;
+      })
+      //this.page.settingsPanel.refreshConfiguration(); TODO
+    });
   }
 }
 
 export abstract class Page {
 
+  @Input()
   configuration: PageConfiguration & any;
   configurationLocation: string;
   readonly settingsPanel = new PageSettingsPanel(this);
@@ -334,7 +362,7 @@ export abstract class Page {
   readonly page = this;
 
   protected constructor(
-    protected portofino: PortofinoService, protected http: HttpClient, protected router: Router,
+    public portofino: PortofinoService, public http: HttpClient, protected router: Router,
     public authenticationService: AuthenticationService) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
@@ -389,19 +417,20 @@ export abstract class Page {
   }
 
   computeSourceUrl() {
-    let source = "";
-    if(!this.configuration.source || !this.configuration.source.startsWith('/') ||
-      !source.startsWith('http://') || !source.startsWith('https://')) {
+    let source = this.configuration.source || '';
+    if(source.startsWith('http://') || source.startsWith('https://')) {
+      //Absolute, leave as is
+    } else if(!source.startsWith('/')) {
       if(this.parent) {
-        source = this.parent.computeSourceUrl() + '/';
+        source = this.parent.computeSourceUrl() + '/' + source;
+      } else {
+        source = this.portofino.apiRoot + '/' + source;
       }
+    } else {
+      source = this.portofino.apiRoot + source;
     }
-    if(!source) {
-      source = this.portofino.apiRoot;
-    }
-    return (source + (this.configuration.source ? this.configuration.source : ''))
-    //replace double slash, but not in http://
-      .replace(new RegExp("([^:])//"), '$1/');
+    //replace double slash, but not in http(s)://
+    return source.replace(new RegExp("([^:])//"), '$1/');
   }
 
   operationAvailable(ops: Operation[], signature: string) {
@@ -413,8 +442,7 @@ export abstract class Page {
   }
 
   configure() {
-    this.settingsPanel.refresh();
-    this.settingsPanel.active = true;
+    this.settingsPanel.show();
   }
 
   saveConfiguration() {
@@ -422,10 +450,21 @@ export abstract class Page {
     this.configuration = config;
     this.portofino.saveConfiguration(this.configurationLocation, config).subscribe(
       () => {
-        this.settingsPanel.active = false;
+        this.settingsPanel.hide();
         this.router.navigateByUrl(this.router.url);
       },
       error => console.log(error));
+  }
+
+  get configurationUrl() {
+    return this.computeSourceUrl() + this.configurationPath;
+  }
+
+  public loadConfiguration() {
+    return this.http.get(this.configurationUrl).pipe(map(c => {
+      this.configuration = {...c, ...this.configuration};
+      return c;
+    }));
   }
 
   protected getConfigurationToSave(formValue) {
@@ -436,7 +475,8 @@ export abstract class Page {
   }
 
   cancelConfiguration() {
-    this.settingsPanel.active = false;
+    this.settingsPanel.hide();
+    this.configuration = this.settingsPanel.previousConfiguration;
   }
 
 }

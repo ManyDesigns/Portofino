@@ -20,11 +20,14 @@
 
 package com.manydesigns.portofino.pageactions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
@@ -36,6 +39,7 @@ import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SecurityLogic;
 import io.swagger.annotations.ApiModel;
@@ -48,19 +52,18 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,27 +144,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
 
     protected AbstractPageAction() {
         maxParameters = PageActionLogic.supportsDetail(getClass()) ? Integer.MAX_VALUE : 0;
-    }
-
-    //--------------------------------------------------------------------------
-    // Admin methods
-    //--------------------------------------------------------------------------
-
-    /**
-     * Utility method to save the configuration object to a file in this page's directory.
-     * @param configuration the object to save. It must be in a state that will produce a valid XML document.
-     * @return true if the object was correctly saved, false otherwise.
-     */
-    protected boolean saveConfiguration(Object configuration) {
-        try {
-            FileObject confFile = PageLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
-            logger.info("Configuration saved to " + confFile.getName().getPath());
-            return true;
-        } catch (Exception e) {
-            logger.error("Couldn't save configuration", e);
-            SessionMessages.addErrorMessage("error saving conf");
-            return false;
-        }
     }
 
     @Override
@@ -422,46 +404,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return Response.serverError().entity("page-action-not-configured").build();
     }
 
-    @Path(":buttons")
-    @GET
-    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    @Deprecated
-    public List getButtons() {
-        HttpServletRequest request = context.getRequest();
-        String list = request.getParameter("list");
-        List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass(getClass(), list);
-        List result = new ArrayList();
-        Subject subject = SecurityUtils.getSubject();
-        for(ButtonInfo button : buttons) {
-            logger.trace("ButtonInfo: {}", button);
-            Method handler = button.getMethod();
-            boolean isAdmin = SecurityLogic.isAdministrator(request);
-            if(!isAdmin &&
-               ((pageInstance != null && !SecurityLogic.hasPermissions(
-                       portofinoConfiguration, button.getMethod(), button.getFallbackClass(), pageInstance, subject)) ||
-                !SecurityLogic.satisfiesRequiresAdministrator(request, this, handler))) {
-                continue;
-            }
-            boolean visible = ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE);
-            if(!visible) {
-                continue;
-            }
-            boolean enabled = ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED);
-            Map<String, Object> buttonData = new HashMap<String, Object>();
-            buttonData.put("list", button.getButton().list());
-            buttonData.put("group", button.getButton().group());
-            buttonData.put("icon", button.getButton().icon());
-            buttonData.put("iconBefore", button.getButton().iconBefore());
-            buttonData.put("text", ElementsThreadLocals.getText(button.getButton().key()));
-            buttonData.put("order", button.getButton().order());
-            buttonData.put("type", button.getButton().type());
-            buttonData.put("method", button.getMethod().getName());
-            buttonData.put("enabled", enabled);
-            result.add(buttonData);
-        }
-        return result;
-    }
-
     /**
      * Returns the list of operations that can be invoked via REST on this resource.
      * @return the list of operations.
@@ -508,6 +450,21 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return result;
     }
 
+    @Override
+    protected void describe(Map<String, Object> description) {
+        super.describe(description);
+        description.put("page", pageInstance.getPage());
+        if(PageActionLogic.supportsDetail(getClass())) {
+            parameters.add("");
+            description.put("detailChildren", getSubResources());
+            parameters.remove(parameters.size() - 1);
+        }
+    }
+
+    ////////////////
+    // Configuration
+    ////////////////
+
     /**
      * Returns the configuration of this action.
      * @return the configuration.
@@ -526,15 +483,44 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return pageInstance.getConfiguration();
     }
 
-    @Override
-    protected void describe(Map<String, Object> description) {
-        super.describe(description);
-        description.put("page", pageInstance.getPage());
-        if(PageActionLogic.supportsDetail(getClass())) {
-            parameters.add("");
-            description.put("detailChildren", getSubResources());
-            parameters.remove(parameters.size() - 1);
+    @RequiresAdministrator
+    @PUT
+    @Path(":configuration")
+    public void setConfiguration(String configurationString) throws IOException {
+        Class<?> configurationClass = PageActionLogic.getConfigurationClass(getClass());
+        Object configuration = new ObjectMapper().readValue(configurationString, configurationClass);
+        saveConfiguration(configuration);
+    }
+
+    /**
+     * Utility method to save the configuration object to a file in this page's directory.
+     * @param configuration the object to save. It must be in a state that will produce a valid XML document.
+     * @return true if the object was correctly saved, false otherwise.
+     */
+    protected boolean saveConfiguration(Object configuration) {
+        try {
+            FileObject confFile = PageLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
+            logger.info("Configuration saved to " + confFile.getName().getPath());
+            return true;
+        } catch (Exception e) {
+            logger.error("Couldn't save configuration", e);
+            SessionMessages.addErrorMessage("error saving conf");
+            return false;
         }
+    }
+
+    @GET
+    @Path(":configuration/classAccessor")
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public String getConfigurationAccessor() {
+        Class<?> configurationClass = PageActionLogic.getConfigurationClass(getClass());
+        if(configurationClass == null) {
+            return null;
+        }
+        JavaClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(configurationClass);
+        JSONStringer jsonStringer = new JSONStringer();
+        ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
+        return jsonStringer.toString();
     }
 
 }

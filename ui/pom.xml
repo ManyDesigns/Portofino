@@ -66,23 +66,11 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run-script build-all</arguments>
+              <arguments>run-script maven-build</arguments>
             </configuration>
             <phase>generate-resources</phase>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <webResources>
-            <resource><directory>dist/</directory></resource>
-            <resource><directory>src/webapp/</directory></resource>
-          </webResources>
-        </configuration>
       </plugin>
     </plugins>
   </build>

@@ -167,7 +167,7 @@ export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
 
 class DummyPage extends Page {
   constructor(
-    protected portofino: PortofinoService, protected http: HttpClient, protected router: Router,
+    public portofino: PortofinoService, public http: HttpClient, protected router: Router,
     public authenticationService: AuthenticationService) {
     super(portofino, http, router, authenticationService);
   }

@@ -55,8 +55,20 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <!-- Angular UI support -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-angular-ui-support</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- URL rewriting for the Angular router -->
+        <dependency>
+            <groupId>org.tuckey</groupId>
+            <artifactId>urlrewritefilter</artifactId>
+            <version>4.0.3</version>
         </dependency>
         <!-- Servlet API. -->
         <dependency>
@@ -106,12 +118,77 @@
                 <version>3.2.2</version>
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <webResources>
+                        <resource><directory>target/frontend/</directory></resource>
+                        <resource><directory>src/main/webapp/</directory></resource>
+                    </webResources>
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
     </build>
 
     <profiles>
+        <profile>
+            <id>no-frontend-build</id>
+        </profile>
+        <profile>
+            <id>build-frontend</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>1.6</version>
+                        <configuration>
+                            <workingDirectory>src/main/frontend</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and npm</id>
+                                <goals>
+                                    <goal>install-node-and-npm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>v8.11.1</nodeVersion>
+                                    <npmVersion>6.0.1</npmVersion>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>npm install</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>build-client</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run-script build</arguments>
+                                </configuration>
+                                <phase>generate-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- See web.xml for an explanation -->
         <profile>
             <id>portofino-development</id>
             <properties>

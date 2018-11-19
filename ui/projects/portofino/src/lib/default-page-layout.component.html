@@ -5,6 +5,9 @@
       <ng-template [ngTemplateOutlet]="content"></ng-template>
     </ng-container>
     <ng-container *ngIf="page.settingsPanel.active">
+      <mat-error *ngIf="page.settingsPanel.error as error">
+        {{error.message ? error.message : error}}
+      </mat-error>
       <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"></portofino-form>
       <div></div>
       <portofino-button *ngFor="let button of page.getButtons('configuration')"

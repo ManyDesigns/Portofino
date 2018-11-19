@@ -30,7 +30,7 @@ export class ManyToManyComponent extends Page implements OnInit {
   readonly associationsPath = "/:availableAssociations";
 
   constructor(
-    protected http: HttpClient, public portofino: PortofinoService, protected router: Router,
+    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
     public authenticationService: AuthenticationService, protected notificationService: NotificationService) {
     super(portofino, http, router, authenticationService);
   }

@@ -1,5 +1,5 @@
 import {FieldComponent} from "./fields/field.component";
-import {getValidators, Property} from "./class-accessor";
+import {ClassAccessor, deriveKind, getValidators, Property} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
@@ -19,6 +19,20 @@ export class Form {
   baseUrl: string;
   selectableFields: boolean;
   //TODO parent form for defaults? For fieldsets
+
+  static fromClassAccessor(ca: ClassAccessor, object = {}) {
+    const form = new Form();
+    form.editable = true;
+    ca.properties.forEach(property => {
+      try {
+        form.contents.push(Field.fromProperty(property, object));
+      } catch (e) {
+        //Continue
+        console.error(e);
+      }
+    });
+    return form;
+  }
 }
 
 export class Field {
@@ -31,12 +45,31 @@ export class Field {
   property: Property;
   initialState: any;
   editable: boolean = true;
+
+  static fromProperty(property: Property | any, object = {}) {
+    if(!(property instanceof Property)) {
+      property = Property.create(property);
+    }
+    deriveKind(property); //Cause an exception to be thrown early if the type is not supported
+    return new Field(property, object[property.name]);
+  }
 }
 
 export class FieldSet {
   name: string;
   label: string;
   contents: Form;
+
+  static fromClassAccessor(ca: ClassAccessor, setup: {name?: string, label?: string, object?: any} = {}) {
+    const fieldSet = new FieldSet();
+    if(!setup) {
+      setup = { object: {}};
+    }
+    fieldSet.name = setup.name || ca.name;
+    fieldSet.label = setup.label || fieldSet.name;
+    fieldSet.contents = Form.fromClassAccessor(ca, setup.object || {});
+    return fieldSet;
+  }
 }
 
 @Directive({
