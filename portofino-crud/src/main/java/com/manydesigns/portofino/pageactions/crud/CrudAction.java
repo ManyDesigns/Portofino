@@ -268,7 +268,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             }
             objects = QueryUtils.getObjects(session, getBaseQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
-            objects=new ArrayList<Object>();
+            objects = new ArrayList<>();
             logger.warn("Incorrect Field Type", e);
             RequestMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
         }

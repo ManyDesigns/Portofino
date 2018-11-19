@@ -30,6 +30,7 @@ import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.fields.*;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
+import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.options.*;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -2094,7 +2095,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 form.readFromObject(object); //Re-read so that the full object is returned
                 Response.ResponseBuilder responseBuilder = Response.ok(form);
                 if(!blobSaved) {
-                    responseBuilder.header("X-Portofino-Blob-Warning", "Not all blobs were saved. See application logs.");
+                    RequestMessages.addWarningMessage(ElementsThreadLocals.getText("not.all.blobs.were.saved"));
                 }
                 return responseBuilder.build();
             } else {
