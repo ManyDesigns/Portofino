@@ -54,7 +54,8 @@ export function isDateProperty(property: Property) {
 
 export function isEnabled(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Enabled");
-  return annotation && annotation.properties["value"];
+  //By default, properties are enabled
+  return !annotation || annotation.properties["value"];
 }
 
 export function isUpdatable(property: Property) {

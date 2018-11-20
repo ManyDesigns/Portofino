@@ -1,11 +1,11 @@
 import {FieldComponent} from "./fields/field.component";
-import {ClassAccessor, deriveKind, getValidators, Property} from "./class-accessor";
+import {ClassAccessor, deriveKind, getValidators, isEnabled, Property} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
   ComponentFactoryResolver, Directive,
   EventEmitter,
-  Input, Output,
+  Input, OnInit, Output,
   QueryList,
   Type,
   ViewChildren, ViewContainerRef
@@ -24,6 +24,9 @@ export class Form {
     const form = new Form();
     form.editable = true;
     ca.properties.forEach(property => {
+      if(!isEnabled(property)) {
+        return;
+      }
       try {
         form.contents.push(Field.fromProperty(property, object));
       } catch (e) {
@@ -85,9 +88,18 @@ export class DynamicFormComponentDirective {
   selector: 'portofino-form',
   templateUrl: './form.component.html'
 })
-export class FormComponent implements AfterViewInit {
+export class FormComponent implements OnInit, AfterViewInit {
+  private _controls: FormGroup;
   @Input()
-  controls: FormGroup;
+  set controls(controls: FormGroup) {
+    this._controls = controls;
+    if(controls && this.form) {
+      this.reset(this.form, false);
+    }
+  }
+  get controls() {
+    return this._controls;
+  }
   @ViewChildren(FieldComponent)
   fields: QueryList<FieldComponent>;
   @ViewChildren(FormComponent)
@@ -110,17 +122,23 @@ export class FormComponent implements AfterViewInit {
 
   constructor(protected componentFactoryResolver: ComponentFactoryResolver, protected changeDetector: ChangeDetectorRef) {}
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     if(!this.controls) {
       this.controls = new FormGroup({});
     }
+  }
+
+  ngAfterViewInit(): void {
     if(this.form) {
       this.reset(this.form)
     }
   }
 
-  protected reset(form: Form) {
+  protected reset(form: Form, andControls = true) {
     this.setupForm(form, this.controls);
+    if(andControls) {
+      this.controls = Object.assign(new FormGroup({}), this.controls);
+    }
     this.formReset.emit(this);
   }
 
@@ -153,6 +171,7 @@ export class FormComponent implements AfterViewInit {
         formGroup.setControl(v['name'], control);
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(v['component']);
         const viewContainerRef = this.dynamicComponents.toArray()[dynamicComponentIndex].viewContainerRef;
+        viewContainerRef.clear();
         const component = viewContainerRef.createComponent(componentFactory).instance;
         component['form'] = control;
         if(v['dependencies']) {

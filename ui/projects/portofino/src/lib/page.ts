@@ -325,7 +325,10 @@ export class PageSettingsPanel {
       this.formDefinition.contents.splice(index, 1);
     }
     if(ca) {
-      this.formDefinition.contents.push(FieldSet.fromClassAccessor(ca, config || {}));
+      const fieldSet = FieldSet.fromClassAccessor(ca, {
+        name: 'configuration', label: 'Configuration', object: config || {}
+      });
+      this.formDefinition.contents.push(fieldSet);
     }
     this.formDefinition = {...this.formDefinition}; //To cause the form component to reload the form
   }

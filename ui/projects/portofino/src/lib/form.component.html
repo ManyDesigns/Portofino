@@ -1,9 +1,11 @@
 <ng-container *ngIf="form">
   <ng-container *ngFor="let field of form.contents" [formGroup]="controls">
-    <portofino-field *ngIf="field.hasOwnProperty('property')" [property]="field.property" [form]="controls"
-                          [enabled]="form.editable && field.editable" [objectUrl]="form.baseUrl"
-                          [selectable]="form.selectableFields">
-    </portofino-field>
+    <ng-container *ngIf="field.hasOwnProperty('property')" >
+      <portofino-field [property]="field.property" [form]="controls"
+                       [enabled]="form.editable && field.editable" [objectUrl]="form.baseUrl"
+                       [selectable]="form.selectableFields">
+      </portofino-field>
+    </ng-container>
     <ng-container *ngIf="field.hasOwnProperty('name') && field.hasOwnProperty('contents')">
       <fieldset>
         <legend>{{field.label}}</legend>

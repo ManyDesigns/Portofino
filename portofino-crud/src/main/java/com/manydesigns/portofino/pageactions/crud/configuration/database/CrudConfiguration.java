@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.crud.configuration.database;
 
+import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.database.Database;
@@ -64,7 +65,9 @@ public class CrudConfiguration extends com.manydesigns.portofino.pageactions.cru
     // Fields for wire-up
     //**************************************************************************
 
+    @Enabled(false)
     protected Table actualTable;
+    @Enabled(false)
     protected Database actualDatabase;
 
     //**************************************************************************
