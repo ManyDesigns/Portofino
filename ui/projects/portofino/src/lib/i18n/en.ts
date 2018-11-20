@@ -15,5 +15,6 @@ export const TRANSLATIONS_EN = {
   "Search": "Search",
   "_ is required.": "{{label}} is required.",
   '_: max _.': "{label}: max {max}.",
+  'Invalid date, _ expected.': "Invalid date, {{dateFormat}} expected.",
   "Select": "Select"
 };

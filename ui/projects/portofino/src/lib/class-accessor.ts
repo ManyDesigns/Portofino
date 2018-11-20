@@ -45,11 +45,13 @@ export function isStringProperty(property: Property) {
 }
 
 export function isNumericProperty(property: Property) {
-  return property.type == 'java.lang.Long' || property.type == 'java.lang.Integer'
+  return property.type == 'java.lang.Long' || property.type == 'java.lang.Integer' ||
+         property.type == 'java.lang.Float' || property.type == 'java.lang.Double' ||
+         property.type == 'number'
 }
 
 export function isDateProperty(property: Property) {
-  return property.type == 'java.util.Date' || property.type == 'java.sql.Timestamp';
+  return property.type == 'java.util.Date' || property.type == 'java.sql.Date' || property.type == 'java.sql.Timestamp';
 }
 
 export function isEnabled(property: Property) {

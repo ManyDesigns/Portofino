@@ -3,19 +3,16 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
   ClassAccessor,
-  getAnnotation, getValidators,
   isBlob,
   isDateProperty,
   isEnabled,
-  isRequired,
   Property
 } from "../class-accessor";
 import moment from 'moment-es6';
-import {AbstractControl, FormArray, FormControl, FormGroup, Validators} from "@angular/forms";
+import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
-import {MatSnackBar} from "@angular/material";
 import {Field, Form, FormComponent} from "../form";
 import {NotificationService} from "../notifications/notification.service";
 import {Button, ButtonInfo, getButtons} from "../buttons";

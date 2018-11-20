@@ -46,7 +46,7 @@ import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './crud/search/search.component';
-import {FieldComponent} from './fields/field.component';
+import {CustomDateTimeAccessor, FieldComponent} from './fields/field.component';
 import {BreadcrumbsComponent} from "./breadcrumbs/breadcrumbs.component";
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
@@ -75,7 +75,7 @@ import { NgxdModule } from '@ngxd/core';
 @NgModule({
   declarations: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
-    FieldComponent, BlobFieldComponent, FormComponent,
+    FieldComponent, BlobFieldComponent, FormComponent, CustomDateTimeAccessor,
     PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective, DynamicFormComponentDirective,
     NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
     SourceSelector, SourceSelectorTree,

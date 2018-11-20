@@ -1,8 +1,16 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {isMultiline, isPassword, isRequired, isRichText, Property} from "../class-accessor";
+import {Component, Directive, ElementRef, forwardRef, Input, OnInit, Renderer2} from '@angular/core';
+import {getAnnotation, isMultiline, isPassword, isRequired, isRichText, Property} from "../class-accessor";
 import {PortofinoService} from "../portofino.service";
-import {FormControl, FormGroup} from "@angular/forms";
+import {
+  ControlValueAccessor,
+  DefaultValueAccessor,
+  FormControl,
+  FormGroup, NG_VALIDATORS,
+  NG_VALUE_ACCESSOR, ValidationErrors,
+  Validator
+} from "@angular/forms";
 import {AbstractControl} from "@angular/forms/src/model";
+import moment from 'moment-es6'
 
 @Component({
   selector: 'portofino-field',
@@ -36,6 +44,24 @@ export class FieldComponent implements OnInit {
 
   isRequired() {
     return isRequired(this.property);
+  }
+
+  isDateOnly() {
+    const df = getAnnotation(this.property, 'com.manydesigns.elements.annotations.DateFormat');
+    //This mirrors the logic in AbstractDateField.java
+    if(!df) {
+      return true;
+    }
+    const datePattern = df.properties["value"] as string;
+    if(!datePattern) {
+      return true;
+    }
+    return datePattern.indexOf("HH") < 0 && datePattern.indexOf("mm") < 0 && datePattern.indexOf("ss") < 0;
+  }
+
+  get dateFormat() {
+    const df = getAnnotation(this.property, 'com.manydesigns.elements.annotations.DateFormat');
+    return df.properties["value"] as string;
   }
 
   trackByOptionValue(index, option) {
@@ -80,4 +106,53 @@ export class FieldComponent implements OnInit {
     return isRichText(this.property);
   }
 
+}
+
+@Directive({
+  selector: '[customDateTimeField]',
+  host: {
+    '(input)': '$any(this).handleInput($event.target.value)',
+    '(blur)': 'onTouched()',
+  },
+  providers: [
+    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CustomDateTimeAccessor ), multi: true },
+    { provide: NG_VALIDATORS, useExisting: forwardRef(() => CustomDateTimeAccessor ), multi: true }]
+})
+export class CustomDateTimeAccessor implements ControlValueAccessor, Validator {
+
+  onChange = (_: any) => {};
+  onTouched = () => {};
+
+  @Input()
+  dateFormat: string;
+
+  constructor(protected renderer: Renderer2, protected elementRef: ElementRef) {}
+
+  writeValue(value: any): void {
+    const formatted = value ? value.format(this.dateFormat) : '';
+    this.renderer.setProperty(this.elementRef.nativeElement, 'value', formatted);
+  }
+
+  registerOnChange(fn: (_: any) => void): void { this.onChange = fn; }
+  registerOnTouched(fn: () => void): void { this.onTouched = fn; }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.renderer.setProperty(this.elementRef.nativeElement, 'disabled', isDisabled);
+  }
+
+  handleInput(value: any): void {
+    this.onChange(moment(value, this.dateFormat, true));
+  }
+
+  registerOnValidatorChange(fn: () => void): void {}
+
+  validate(control: AbstractControl): ValidationErrors | null {
+    if(control.value && !control.value.isValid()) {
+      return {
+        'date-format': this.dateFormat
+      };
+    } else {
+      return null;
+    }
+  }
 }
