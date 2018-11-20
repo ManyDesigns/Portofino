@@ -37,7 +37,7 @@
     "roboto-fontface": "^0.9.0",
     "rxjs": "^6.3.3",
     "zone.js": "^0.8.26",
-    "portofino": "../../../../ui/dist/portofino/portofino-0.1.3.tgz"
+    "portofino": "0.1.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.10.0",
