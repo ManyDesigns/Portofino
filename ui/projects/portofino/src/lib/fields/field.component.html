@@ -97,7 +97,7 @@
     <mat-datepicker-toggle *ngIf="isDateOnly()" matSuffix [for]="datepicker"></mat-datepicker-toggle>
     <mat-datepicker #datepicker></mat-datepicker>
     <input *ngIf="!isDateOnly()" matInput [formControlName]="property.name" [required]="isRequired()"
-           customDateTimeField [dateFormat]="dateFormat">
+           dateTimeField [dateFormat]="dateFormat">
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
       {{ '_ is required.' | translate:{ label: property.label } }}
     </mat-error>

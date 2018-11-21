@@ -61,7 +61,14 @@ export class FieldComponent implements OnInit {
 
   get dateFormat() {
     const df = getAnnotation(this.property, 'com.manydesigns.elements.annotations.DateFormat');
-    return df.properties["value"] as string;
+    return this.convertDateFormat(df.properties["value"] as string);
+  }
+
+  protected convertDateFormat(format: string) {
+    if(!format) {
+      return format;
+    }
+    return format.replace("y", "Y").replace("d", "D");
   }
 
   trackByOptionValue(index, option) {
@@ -109,7 +116,7 @@ export class FieldComponent implements OnInit {
 }
 
 @Directive({
-  selector: '[customDateTimeField]',
+  selector: '[dateTimeField]',
   host: {
     '(input)': '$any(this).handleInput($event.target.value)',
     '(blur)': 'onTouched()',
