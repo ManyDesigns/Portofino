@@ -135,6 +135,9 @@ public class ManyToManyAction extends AbstractPageAction {
 
     @Override
     public Object init() {
+
+        preparePage();
+
         if(m2mConfiguration == null || m2mConfiguration.getActualRelationTable() == null ||
            m2mConfiguration.getActualManyTable() == null) {
             logger.error("Configuration is null or relation/many table not found (check previous log messages)");
