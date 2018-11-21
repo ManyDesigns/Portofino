@@ -61,14 +61,14 @@ export class FieldComponent implements OnInit {
 
   get dateFormat() {
     const df = getAnnotation(this.property, 'com.manydesigns.elements.annotations.DateFormat');
-    return this.convertDateFormat(df.properties["value"] as string);
+    return this.convertDateFormat(df ? df.properties["value"] as string : null);
   }
 
   protected convertDateFormat(format: string) {
     if(!format) {
-      return format;
+      return 'DD/MM/YYYY';
     }
-    return format.replace("y", "Y").replace("d", "D");
+    return format.replace(/y/g, "Y").replace(/d/g, "D");
   }
 
   trackByOptionValue(index, option) {
