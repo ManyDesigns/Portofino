@@ -28,6 +28,7 @@ import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.Guarded;
 import com.manydesigns.portofino.cache.ControlsCache;
+import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.pageactions.PageAction;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
@@ -102,11 +103,11 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
-        checkAuthorizations(requestContext, resource);
         if(resource instanceof PageAction) {
             PageAction pageAction = (PageAction) resource;
             pageAction.prepareForExecution();
         }
+        checkAuthorizations(requestContext, resource);
     }
 
     protected void addCacheHeaders(ContainerResponseContext responseContext) {
@@ -184,7 +185,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                             Response.Status.FORBIDDEN :
                             Response.Status.UNAUTHORIZED;
             requestContext.abortWith(Response.status(status).build());
-        } else if(!ButtonsLogic.doGuardsPass(pageAction, handler)) {
+        } else if(!Operations.doGuardsPass(pageAction, handler)) {
             if(pageAction instanceof Guarded) {
                 Response response = ((Guarded) pageAction).guardsFailed(handler);
                 requestContext.abortWith(response);

@@ -12,23 +12,21 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 })
 export class LoginComponent implements OnInit {
 
-  public loginRecord:       FormGroup;
+  public loginRecord: FormGroup;
   formErrors: any;
 
-  username: string;
-  password: string;
   message: string;
 
   constructor(private dialogRef: MatDialogRef<LoginComponent>, private authenticationService: AuthenticationService,
               private builder: FormBuilder) {
     this.loginRecord = this.builder.group({
-      username:              ['', Validators.required],
-      password:                  ['', Validators.required]
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     });
 
     this.formErrors = {
-      username:        {},
-      password:            {},
+      username: {},
+      password: {},
     };
   }
 
@@ -36,14 +34,15 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    this.authenticationService.login(this.username, this.password).subscribe(
+    const loginRecord = this.loginRecord;
+    this.authenticationService.login(loginRecord.get('username').value, loginRecord.get('password').value).subscribe(
       result => {
         this.dialogRef.close(result);
-        this.password = "";
+        this.loginRecord.get('password').setValue("");
       },
       error => {
         this.message = "Login failed";
-        this.password = "";
+        this.loginRecord.get('password').setValue("");
       });
   }
 

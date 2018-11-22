@@ -2,13 +2,13 @@
 <mat-dialog-content>
   <form (submit)="login()" [formGroup]="loginRecord">
     <mat-form-field>
-      <input matInput placeholder="Username" [(ngModel)]="username" name="username" formControlName="username">
+      <input matInput placeholder="Username" name="username" formControlName="username">
       <mat-error>
         {{message}}
       </mat-error>
     </mat-form-field>
     <mat-form-field>
-      <input matInput placeholder="Password" type="password" [(ngModel)]="password" name="password" formControlName="password">
+      <input matInput placeholder="Password" type="password" name="password" formControlName="password">
       <mat-error>
         {{message}}
       </mat-error>

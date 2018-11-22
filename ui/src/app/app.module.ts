@@ -35,6 +35,7 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
+import {Button} from "../../projects/portofino/src/lib/buttons";
 
 @Component({
   selector: 'portofino-hello',
@@ -63,6 +64,13 @@ export class CustomCrud extends CrudComponent {
     this.configuration.title = 'Custom CRUD';
     this.searchComponent = CustomSearch;
     this.searchComponentContext = { customInput: "works!" };
+  }
+
+  @Button({
+    list: 'search-results', text: 'Custom button'
+  })
+  hello() {
+    console.log("Custom button", this.configuration);
   }
 }
 

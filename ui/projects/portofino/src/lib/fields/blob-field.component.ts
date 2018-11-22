@@ -37,10 +37,12 @@ export class BlobFieldComponent extends FieldComponent {
   }
 
   get enabled() {
-    return this.field.enabled;
+    return this.field && this.field.enabled;
   }
 
   set enabled(enabled) {
-    this.field.enabled = enabled;
+    if(this.field) {
+      this.field.enabled = enabled;
+    }
   }
 }
