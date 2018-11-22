@@ -1,9 +1,19 @@
-import {Component, Directive, ElementRef, forwardRef, Input, OnInit, Renderer2} from '@angular/core';
+import {
+  Component,
+  Directive,
+  ElementRef,
+  forwardRef,
+  Inject,
+  InjectionToken,
+  Input,
+  OnInit,
+  Renderer2,
+  Type
+} from '@angular/core';
 import {getAnnotation, isMultiline, isPassword, isRequired, isRichText, Property} from "../class-accessor";
 import {PortofinoService} from "../portofino.service";
 import {
   ControlValueAccessor,
-  DefaultValueAccessor,
   FormControl,
   FormGroup, NG_VALIDATORS,
   NG_VALUE_ACCESSOR, ValidationErrors,
@@ -11,6 +21,8 @@ import {
 } from "@angular/forms";
 import {AbstractControl} from "@angular/forms/src/model";
 import moment from 'moment-es6'
+
+export const FIELD_FACTORY = new InjectionToken('Field Factory');
 
 @Component({
   selector: 'portofino-field',
@@ -32,8 +44,10 @@ export class FieldComponent implements OnInit {
 
   control: AbstractControl;
   selector: FormControl;
+  @Input()
+  context = {};
 
-  constructor(public portofino: PortofinoService) { }
+  constructor(public portofino: PortofinoService, @Inject(FIELD_FACTORY) public factory) { }
 
   getOptionLabel(option) {
     if (option && option.l) {

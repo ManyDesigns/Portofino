@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component} from '@angular/core';
 import {FieldComponent} from "./field.component";
 import {PortofinoService} from "../portofino.service";
 import {AuthenticationService} from "../security/authentication.service";
@@ -10,16 +10,8 @@ import {AuthenticationService} from "../security/authentication.service";
 })
 export class BlobFieldComponent extends FieldComponent {
 
-  @Input()
-  field: FieldComponent;
-
-  constructor(public portofino: PortofinoService, protected auth: AuthenticationService) {
-    super(portofino);
-  }
-
-  ngOnInit(): void {
-    Object.keys(this.field).forEach(k => this[k] = this.field[k]);
-    super.ngOnInit();
+  constructor(portofino: PortofinoService, protected auth: AuthenticationService) {
+    super(portofino, null);
   }
 
   deleteBlob() {
@@ -36,13 +28,4 @@ export class BlobFieldComponent extends FieldComponent {
     }
   }
 
-  get enabled() {
-    return this.field && this.field.enabled;
-  }
-
-  set enabled(enabled) {
-    if(this.field) {
-      this.field.enabled = enabled;
-    }
-  }
 }

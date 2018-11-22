@@ -121,5 +121,7 @@
       </ng-container>
     </mat-error>
   </ng-container>
-  <portofino-blob-field *ngIf="property.kind == 'blob'" [field]="this"></portofino-blob-field>
+  <ng-container *ngIf="factory.get(this) as component">
+    <ng-container *ngxComponentOutlet="component; context: context"></ng-container>
+  </ng-container>
 </ng-template>

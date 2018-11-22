@@ -46,7 +46,7 @@ import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './crud/search/search.component';
-import {CustomDateTimeAccessor, FieldComponent} from './fields/field.component';
+import {CustomDateTimeAccessor, FIELD_FACTORY, FieldComponent} from './fields/field.component';
 import {BreadcrumbsComponent} from "./breadcrumbs/breadcrumbs.component";
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
@@ -71,12 +71,26 @@ import {
   NotificationService} from "./notifications/notification.service";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { NgxdModule } from '@ngxd/core';
+import {FieldFactory} from "./fields/field.factory";
+
+@NgModule({
+  declarations: [
+    FieldComponent, BlobFieldComponent, CustomDateTimeAccessor,
+    FormComponent, DynamicFormComponentDirective],
+  imports: [
+    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+    MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatMomentDateModule, MatRadioModule, MatSelectModule,
+    FileInputAccessorModule, NgxdModule, QuillModule, TranslateModule.forChild()],
+  entryComponents: [BlobFieldComponent],
+  exports: [FieldComponent, BlobFieldComponent, FormComponent, CustomDateTimeAccessor]
+})
+export class PortofinoFormsModule {}
 
 @NgModule({
   declarations: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
-    FieldComponent, BlobFieldComponent, FormComponent, CustomDateTimeAccessor,
-    PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective, DynamicFormComponentDirective,
+    PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
     NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
@@ -84,22 +98,22 @@ import { NgxdModule } from '@ngxd/core';
     ManyToManyComponent,BreadcrumbsComponent
   ],
   imports: [
-    BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
+    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+    HttpClientModule, PortofinoFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
-    MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
-    MatSortModule, MatProgressSpinnerModule, MatTableModule, MatTreeModule,MatListModule, MatToolbarModule,
-    MatMomentDateModule, ScrollingModule,
-    FileInputAccessorModule, NgxdModule, QuillModule,
-    RouterModule.forChild([]),
-    TranslateModule
+    MatMomentDateModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule,
+    MatSidenavModule, MatSnackBarModule, MatSortModule, MatProgressSpinnerModule, MatTableModule, MatTreeModule,
+    MatListModule, MatToolbarModule,
+    NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
   ],
   providers: [
     PortofinoService, AuthenticationService, PageService,
+    //These are factories to avoid circular dependencies
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
-    { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
+    { provide: FIELD_FACTORY, useClass: FieldFactory },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService },
     { provide: NotificationService, useClass: MatSnackBarNotificationService }],
@@ -108,7 +122,6 @@ import { NgxdModule } from '@ngxd/core';
     CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
-    FieldComponent, BlobFieldComponent, FormComponent,
     PageComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,

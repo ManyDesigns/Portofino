@@ -1,17 +1,20 @@
 <div class="mat-form-field mat-form-field-can-float mat-form-field-should-float">
   <div class="mat-form-field-wrapper">
     <div class="mat-form-field-flex">
-      <span *ngIf="control.value && control.value[0]">
-        <a *ngIf="!enabled && control.value[0].code && objectUrl; else noUrl" [href]="blobUrl">
-          {{control.value[0].name}}
+      <span *ngIf="control.value && control.value[0] as value; else noValue">
+        <a *ngIf="!enabled && value.code && value.name && objectUrl; else noUrl" [href]="blobUrl">
+          {{value.name}}
         </a>
         <ng-template #noUrl>
-          {{control.value[0].name}}
+          {{value.name || ("Blob not found" | translate)}}
         </ng-template>
         <button mat-icon-button (click)="deleteBlob()" *ngIf="enabled">
           <mat-icon>delete</mat-icon>
         </button>
       </span>
+      <ng-template #noValue>
+        <span>{{ "No file selected" | translate }}</span>
+      </ng-template>
       <ng-container *ngIf="enabled">
         <input #input type="file" [formControl]="control" [required]="isRequired() && !control.value">
       </ng-container>
