@@ -1,14 +1,16 @@
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {FieldComponent} from "./field.component";
 import {PortofinoService} from "../portofino.service";
 import {AuthenticationService} from "../security/authentication.service";
 
 @Component({
   selector: 'portofino-blob-field',
-  templateUrl: './blob-field.component.html',
-  styleUrls: ['./blob-field.component.css']
+  templateUrl: './blob-field.component.html'
 })
 export class BlobFieldComponent extends FieldComponent {
+
+  @Input()
+  objectUrl: string;
 
   constructor(portofino: PortofinoService, protected auth: AuthenticationService) {
     super(portofino, null);

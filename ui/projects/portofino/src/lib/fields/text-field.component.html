@@ -1,0 +1,23 @@
+<ng-container *ngIf="isRichText()" [formGroup]="form">
+  <label>{{property.label}}</label>
+  <quill-editor [formControlName]="property.name" [required]="isRequired()" *ngIf="enabled"></quill-editor>
+  <span [innerHTML]="control.value" *ngIf="!enabled" class="rich-text"></span>
+</ng-container>
+<mat-form-field *ngIf="!isRichText()" [formGroup]="form">
+  <mat-label>{{property.label}}</mat-label>
+  <input matInput *ngIf="!isMultiline()"
+         [formControlName]="property.name" [required]="isRequired()" [type]="isPassword() ? 'password' : 'text'" />
+  <textarea matInput [formControlName]="property.name" [required]="isRequired()" *ngIf="isMultiline()" ></textarea>
+  <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+    {{ '_ is required.' | translate:{ label: property.label } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger">
+    {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxLength').message } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
+    <ng-container *ngFor="let error of control.getError('server-side')">
+      {{error}}<br />
+    </ng-container>
+  </mat-error>
+  <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
+</mat-form-field>

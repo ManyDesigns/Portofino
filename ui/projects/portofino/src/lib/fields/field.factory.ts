@@ -1,29 +1,40 @@
-import {Injectable, InjectionToken, Type} from "@angular/core";
+import {Injectable, Type} from "@angular/core";
 import {BlobFieldComponent} from "./blob-field.component";
 import {FieldComponent} from "./field.component";
+import {DateTimeFieldComponent} from "./date-time-field.component";
+import {BooleanFieldComponent} from "./boolean-field.component";
+import {NumberFieldComponent} from "./number-field.component";
+import {TextFieldComponent} from "./text-field.component";
+import {SelectFieldComponent} from "./select-field.component";
 
 @Injectable()
 export class FieldFactory {
 
   factories: ((_: FieldComponent) => (Type<any> | null))[] = [
-    f => {
-      if(f.property.kind == 'blob') {
-        return BlobFieldComponent;
-      } else {
-        return null;
-      }
-    }
+    f => f.property.selectionProvider ? SelectFieldComponent : null,
+    byKind('string', TextFieldComponent),
+    byKind('number', NumberFieldComponent),
+    byKind('date', DateTimeFieldComponent),
+    byKind('boolean', BooleanFieldComponent),
+    byKind('blob', BlobFieldComponent)
   ];
 
   get(f: FieldComponent): Type<any> | null {
-    let result = null;
-    this.factories.forEach(factory => {
-      const type = factory(f);
+    for(let i in this.factories) {
+      const type = this.factories[i](f);
       if(type) {
-        result = type;
+        return type;
       }
-    });
-    return result;
+    }
   }
+}
 
+export function byKind(kind: string, type: Type<any>) {
+  return f => {
+    if(f.property.kind == kind) {
+      return type;
+    } else {
+      return null;
+    }
+  }
 }

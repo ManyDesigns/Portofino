@@ -1,0 +1,53 @@
+<mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
+  <mat-label>{{property.label}}</mat-label>
+  <mat-select [formControlName]="property.name" [required]="isRequired()"
+              (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
+    <mat-option [value]="null" *ngIf="property.selectionProvider.options.length > 0"></mat-option>
+    <mat-option *ngFor="let option of property.selectionProvider.options"
+                [value]="option">
+      {{ option.l }}
+    </mat-option>
+  </mat-select>
+  <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+    {{ '_ is required.' | translate:{ label: property.label } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
+    <ng-container *ngFor="let error of control.getError('server-side')">
+      {{error}}<br />
+    </ng-container>
+  </mat-error>
+  <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix
+                (click)="$event.stopPropagation()"></mat-checkbox>
+</mat-form-field>
+<mat-form-field *ngIf="property.selectionProvider.displayMode == 'AUTOCOMPLETE'" [formGroup]="form">
+  <mat-label>{{property.label}}</mat-label>
+  <input matInput [formControlName]="property.name" [matAutocomplete]="autocomplete"
+         [required]="isRequired()" [title]="property.label">
+  <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
+    <mat-option *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
+                [value]="option">
+      {{ option.l }}
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+    {{ '_ is required.' | translate:{ label: property.label } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
+    <ng-container *ngFor="let error of control.getError('server-side')">
+      {{error}}<br />
+    </ng-container>
+  </mat-error>
+  <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
+</mat-form-field>
+<ng-container *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
+  <label>{{property.label}}</label>
+  <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector"></mat-checkbox>
+  <mat-radio-group [formControlName]="property.name" [name]="property.name"
+                   (change)="property.selectionProvider.updateDependentOptions(property)"
+                   [required]="isRequired()">
+    <mat-radio-button *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
+                      [value]="option">
+      {{ option.l }}
+    </mat-radio-button>
+  </mat-radio-group>
+</ng-container>

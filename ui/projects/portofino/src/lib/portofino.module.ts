@@ -46,7 +46,7 @@ import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './crud/search/search.component';
-import {CustomDateTimeAccessor, FIELD_FACTORY, FieldComponent} from './fields/field.component';
+import {FIELD_FACTORY, FieldComponent} from './fields/field.component';
 import {BreadcrumbsComponent} from "./breadcrumbs/breadcrumbs.component";
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
@@ -72,18 +72,29 @@ import {
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { NgxdModule } from '@ngxd/core';
 import {FieldFactory} from "./fields/field.factory";
+import {DateTimeValueAccessor, DateTimeFieldComponent} from "./fields/date-time-field.component";
+import {BooleanFieldComponent} from "./fields/boolean-field.component";
+import {NumberFieldComponent} from "./fields/number-field.component";
+import {TextFieldComponent} from "./fields/text-field.component";
+import {SelectFieldComponent} from "./fields/select-field.component";
 
 @NgModule({
   declarations: [
-    FieldComponent, BlobFieldComponent, CustomDateTimeAccessor,
+    FieldComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
+    NumberFieldComponent, SelectFieldComponent, TextFieldComponent,
     FormComponent, DynamicFormComponentDirective],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
     MatMomentDateModule, MatRadioModule, MatSelectModule,
     FileInputAccessorModule, NgxdModule, QuillModule, TranslateModule.forChild()],
-  entryComponents: [BlobFieldComponent],
-  exports: [FieldComponent, BlobFieldComponent, FormComponent, CustomDateTimeAccessor]
+  entryComponents: [
+    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent,
+    NumberFieldComponent, SelectFieldComponent, TextFieldComponent],
+  exports: [
+    FieldComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
+    NumberFieldComponent, SelectFieldComponent, TextFieldComponent,
+    FormComponent]
 })
 export class PortofinoFormsModule {}
 

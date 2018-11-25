@@ -1,0 +1,13 @@
+<mat-form-field [formGroup]="form">
+  <mat-label>{{property.label}}</mat-label>
+  <input matInput [formControlName]="property.name" [required]="isRequired()">
+  <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+    {{ '_ is required.' | translate:{ label: property.label } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
+    <ng-container *ngFor="let error of control.getError('server-side')">
+      {{error}}<br />
+    </ng-container>
+  </mat-error>
+  <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
+</mat-form-field>
