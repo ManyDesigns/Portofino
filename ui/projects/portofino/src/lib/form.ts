@@ -1,10 +1,10 @@
-import {FieldComponent, FormElement} from "./fields/field.component";
+import {FieldComponent} from "./fields/field.component";
 import {ClassAccessor, deriveKind, getValidators, isEnabled, Property} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
   ComponentFactoryResolver, ContentChildren, Directive,
-  EventEmitter, forwardRef, Host,
+  EventEmitter, Host,
   Input, OnInit, Optional, Output,
   QueryList, Type,
   ViewChildren, ViewContainerRef
@@ -50,6 +50,12 @@ export class Field {
   property: Property;
   initialState: any;
   editable: boolean = true;
+  type: Type<any>;
+  context = {};
+
+  mergeContext(context: any) {
+    return {...this.context, ...context};
+  }
 
   static fromProperty(property: Property | any, object = {}) {
     if(!(property instanceof Property)) {
@@ -88,10 +94,9 @@ export class DynamicFormComponentDirective {
 
 @Component({
   selector: 'portofino-form',
-  templateUrl: './form.component.html',
-  providers: [{ provide: FormElement, useExisting: forwardRef(() => FormComponent ) }]
+  templateUrl: './form.component.html'
 })
-export class FormComponent extends FormElement implements OnInit, AfterViewInit {
+export class FormComponent implements OnInit, AfterViewInit {
   private _controls: FormGroup;
   @Input()
   set controls(controls: FormGroup) {
@@ -120,16 +125,12 @@ export class FormComponent extends FormElement implements OnInit, AfterViewInit 
   fieldSets: QueryList<FormComponent>;
   @ViewChildren(DynamicFormComponentDirective)
   dynamicComponents: QueryList<DynamicFormComponentDirective>;
-  @ContentChildren(FormElement)
-  contentChildren: QueryList<FormElement>;
   @Output()
   formReset = new EventEmitter();
 
   constructor(
     protected componentFactoryResolver: ComponentFactoryResolver, protected changeDetector: ChangeDetectorRef,
-    @Optional() @Host() protected controlContainer: ControlContainer) {
-    super();
-  }
+    @Optional() @Host() protected controlContainer: ControlContainer) {}
 
   ngOnInit(): void {
     if(!this.controls) {

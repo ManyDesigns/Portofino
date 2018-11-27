@@ -14,19 +14,19 @@ import {TranslateModule} from "@ngx-translate/core";
 import {PortofinoFormsModule, PortofinoModule} from "./portofino.module";
 import {PortofinoService} from "./portofino.service";
 import {FieldFactory} from "./fields/field.factory";
+import {NumberFieldComponent} from "./fields/number-field.component";
 
 @Component({
   template: `
-    <portofino-form [form]="formDefinition" [formGroup]="formGroup">
-      <portofino-text-field [property]="nameProperty"></portofino-text-field>
-    </portofino-form>`
+    <portofino-form [form]="formDefinition" [formGroup]="formGroup"></portofino-form>`
 })
 class Wrapper {
   @ViewChild(FormComponent)
   formComponent;
   formGroup = new FormGroup({});
-  nameProperty = Property.create({ name: 'p1'});
-  formDefinition = new Form([new Field(this.nameProperty), new Field(Property.create({ name: 'other' }))]);
+  formDefinition = new Form([
+    new Field(Property.create({ name: 'p1'}), { value: 'v1' }),
+    Object.assign(new Field(Property.create({ name: 'p2' }), { value: 'v2' }), { type: NumberFieldComponent })]);
 }
 
 @Injectable()
@@ -61,6 +61,7 @@ describe('FormComponent', () => {
 
   it('', () => {
     expect(component.fields.length).toBe(2);
-    expect(component.contentChildren.length).toBe(1);
+    expect(component.fields.toArray()[0].field instanceof TextFieldComponent).toBeTruthy();
+    expect(component.fields.toArray()[1].field instanceof NumberFieldComponent).toBeTruthy();
   });
 });

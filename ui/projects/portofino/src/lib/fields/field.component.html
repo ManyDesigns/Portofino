@@ -1,3 +1,5 @@
-<ng-container *ngIf="factory.get(this) as component">
-  <ng-container *ngxComponentOutlet="component; context: context"></ng-container>
+<ng-container *ngIf="fieldComponentType">
+  <ng-template [ngxComponentOutlet]="fieldComponentType" [ngxComponentOutletContext]="context"
+               (ngxComponentOutletActivate)="field = $event"
+               (ngxComponentOutletDeactivate)="field = null"></ng-template>
 </ng-container>

@@ -7,7 +7,7 @@ import {
   InjectionToken,
   Input,
   OnInit, Optional,
-  Renderer2, SkipSelf
+  Renderer2, SkipSelf, Type
 } from '@angular/core';
 import {isMultiline, isPassword, isRequired, isRichText, Property} from "../class-accessor";
 import {PortofinoService} from "../portofino.service";
@@ -25,16 +25,11 @@ import moment from 'moment-es6'
 
 export const FIELD_FACTORY = new InjectionToken('Field Factory');
 
-export class FormElement {
-
-}
-
 @Component({
   selector: 'portofino-field',
-  templateUrl: './field.component.html',
-  providers: [{ provide: FormElement, useExisting: forwardRef(() => FieldComponent ) }]
+  templateUrl: './field.component.html'
 })
-export class FieldComponent extends FormElement implements OnInit {
+export class FieldComponent implements OnInit {
 
   @Input()
   enabled: boolean = true;
@@ -46,14 +41,21 @@ export class FieldComponent extends FormElement implements OnInit {
   selectable: boolean = false;
 
   control: AbstractControl;
+  @Input()
   selector: FormControl;
+
+  @Input()
+  type: Type<any>;
   @Input()
   context = {};
+  field: FieldComponent;
 
-  constructor(public portofino: PortofinoService, @Inject(FIELD_FACTORY) public factory,
-              @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer) {
-    super();
+  get fieldComponentType() {
+    return this.type ? this.type : this.factory ? this.factory.get(this) : null;
   }
+
+  constructor(@Inject(FIELD_FACTORY) public factory,
+              @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer) {}
 
   isRequired() {
     return isRequired(this.property);
@@ -72,7 +74,7 @@ export class FieldComponent extends FormElement implements OnInit {
     if(!this.control) {
       throw "No control found named " + this.property.name
     }
-    if(this.selectable && this.enabled) {
+    if(!this.selector && this.selectable && this.enabled) {
       this.selector = new FormControl();
       const validator = this.control.validator;
       this.control.clearValidators();

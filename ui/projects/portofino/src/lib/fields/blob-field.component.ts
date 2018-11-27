@@ -13,10 +13,10 @@ export class BlobFieldComponent extends FieldComponent {
   @Input()
   objectUrl: string;
 
-  constructor(portofino: PortofinoService, @Inject(FIELD_FACTORY) factory,
+  constructor(protected portofino: PortofinoService, @Inject(FIELD_FACTORY) factory,
               @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
               protected auth: AuthenticationService) {
-    super(portofino, factory, controlContainer);
+    super(factory, controlContainer);
   }
 
   deleteBlob() {
