@@ -2,18 +2,21 @@ import {
   Component,
   Directive,
   ElementRef,
-  forwardRef,
+  forwardRef, Host,
   Inject,
   InjectionToken,
   Input,
-  OnInit,
-  Renderer2} from '@angular/core';
+  OnInit, Optional,
+  Renderer2, SkipSelf
+} from '@angular/core';
 import {isMultiline, isPassword, isRequired, isRichText, Property} from "../class-accessor";
 import {PortofinoService} from "../portofino.service";
 import {
+  AbstractFormGroupDirective,
+  ControlContainer,
   ControlValueAccessor,
   FormControl,
-  FormGroup, NG_VALIDATORS,
+  FormGroup, FormGroupDirective, NG_VALIDATORS,
   NG_VALUE_ACCESSOR, ValidationErrors,
   Validator
 } from "@angular/forms";
@@ -22,11 +25,16 @@ import moment from 'moment-es6'
 
 export const FIELD_FACTORY = new InjectionToken('Field Factory');
 
+export class FormElement {
+
+}
+
 @Component({
   selector: 'portofino-field',
-  templateUrl: './field.component.html'
+  templateUrl: './field.component.html',
+  providers: [{ provide: FormElement, useExisting: forwardRef(() => FieldComponent ) }]
 })
-export class FieldComponent implements OnInit {
+export class FieldComponent extends FormElement implements OnInit {
 
   @Input()
   enabled: boolean = true;
@@ -35,22 +43,35 @@ export class FieldComponent implements OnInit {
   @Input()
   form: FormGroup;
   @Input()
-  selectable: boolean;
+  selectable: boolean = false;
 
   control: AbstractControl;
   selector: FormControl;
   @Input()
   context = {};
 
-  constructor(public portofino: PortofinoService, @Inject(FIELD_FACTORY) public factory) { }
+  constructor(public portofino: PortofinoService, @Inject(FIELD_FACTORY) public factory,
+              @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer) {
+    super();
+  }
 
   isRequired() {
     return isRequired(this.property);
   }
 
-
   ngOnInit() {
+    if(!this.form) {
+      if(this.controlContainer instanceof AbstractFormGroupDirective ||
+         this.controlContainer instanceof FormGroupDirective) {
+        this.form = this.controlContainer.control;
+      } else {
+        throw "A form must be provided to field " + this.property.name
+      }
+    }
     this.control = this.form.get(this.property.name);
+    if(!this.control) {
+      throw "No control found named " + this.property.name
+    }
     if(this.selectable && this.enabled) {
       this.selector = new FormControl();
       const validator = this.control.validator;

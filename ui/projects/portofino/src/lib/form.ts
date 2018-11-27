@@ -1,28 +1,30 @@
-import {FieldComponent} from "./fields/field.component";
+import {FieldComponent, FormElement} from "./fields/field.component";
 import {ClassAccessor, deriveKind, getValidators, isEnabled, Property} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
-  ComponentFactoryResolver, Directive,
-  EventEmitter,
-  Input, OnInit, Output,
-  QueryList,
-  Type,
+  ComponentFactoryResolver, ContentChildren, Directive,
+  EventEmitter, forwardRef, Host,
+  Input, OnInit, Optional, Output,
+  QueryList, Type,
   ViewChildren, ViewContainerRef
 } from "@angular/core";
-import {FormControl, FormGroup} from "@angular/forms";
+import {AbstractFormGroupDirective, ControlContainer, FormControl, FormGroup, FormGroupDirective} from "@angular/forms";
 
 export class Form {
   contents: (Field|FieldSet|{name: string, component: Type<any>, dependencies ?: object}|{html: string})[] = [];
-  editable: boolean;
+  editable: boolean = true;
   /** The URL from which to download blobs and other resources. */
   baseUrl: string;
-  selectableFields: boolean;
+  selectableFields: boolean = false;
   //TODO parent form for defaults? For fieldsets
+
+  constructor(contents = []) {
+    this.contents = contents;
+  }
 
   static fromClassAccessor(ca: ClassAccessor, object = {}) {
     const form = new Form();
-    form.editable = true;
     ca.properties.forEach(property => {
       if(!isEnabled(property)) {
         return;
@@ -86,9 +88,10 @@ export class DynamicFormComponentDirective {
 
 @Component({
   selector: 'portofino-form',
-  templateUrl: './form.component.html'
+  templateUrl: './form.component.html',
+  providers: [{ provide: FormElement, useExisting: forwardRef(() => FormComponent ) }]
 })
-export class FormComponent implements OnInit, AfterViewInit {
+export class FormComponent extends FormElement implements OnInit, AfterViewInit {
   private _controls: FormGroup;
   @Input()
   set controls(controls: FormGroup) {
@@ -100,12 +103,6 @@ export class FormComponent implements OnInit, AfterViewInit {
   get controls() {
     return this._controls;
   }
-  @ViewChildren(FieldComponent)
-  fields: QueryList<FieldComponent>;
-  @ViewChildren(FormComponent)
-  fieldSets: QueryList<FormComponent>;
-  @ViewChildren(DynamicFormComponentDirective)
-  dynamicComponents: QueryList<DynamicFormComponentDirective>;
   private _form: Form;
   @Input()
   set form(form: Form) {
@@ -117,14 +114,31 @@ export class FormComponent implements OnInit, AfterViewInit {
   get form(): Form {
     return this._form;
   }
+  @ViewChildren(FieldComponent)
+  fields: QueryList<FieldComponent>;
+  @ViewChildren(FormComponent)
+  fieldSets: QueryList<FormComponent>;
+  @ViewChildren(DynamicFormComponentDirective)
+  dynamicComponents: QueryList<DynamicFormComponentDirective>;
+  @ContentChildren(FormElement)
+  contentChildren: QueryList<FormElement>;
   @Output()
   formReset = new EventEmitter();
 
-  constructor(protected componentFactoryResolver: ComponentFactoryResolver, protected changeDetector: ChangeDetectorRef) {}
+  constructor(
+    protected componentFactoryResolver: ComponentFactoryResolver, protected changeDetector: ChangeDetectorRef,
+    @Optional() @Host() protected controlContainer: ControlContainer) {
+    super();
+  }
 
   ngOnInit(): void {
     if(!this.controls) {
-      this.controls = new FormGroup({});
+      if(this.controlContainer instanceof AbstractFormGroupDirective ||
+         this.controlContainer instanceof FormGroupDirective) {
+        this.controls = this.controlContainer.control;
+      } else {
+        this.controls = new FormGroup({});
+      }
     }
   }
 
