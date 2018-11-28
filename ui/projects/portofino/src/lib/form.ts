@@ -1,15 +1,15 @@
-import {FieldComponent} from "./fields/field.component";
 import {ClassAccessor, deriveKind, getValidators, isEnabled, Property} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
-  ComponentFactoryResolver, ContentChildren, Directive,
+  ComponentFactoryResolver, Directive,
   EventEmitter, Host,
   Input, OnInit, Optional, Output,
   QueryList, Type,
   ViewChildren, ViewContainerRef
 } from "@angular/core";
 import {AbstractFormGroupDirective, ControlContainer, FormControl, FormGroup, FormGroupDirective} from "@angular/forms";
+import {FieldFactoryComponent} from "./fields/field.factory";
 
 export class Form {
   contents: (Field|FieldSet|{name: string, component: Type<any>, dependencies ?: object}|{html: string})[] = [];
@@ -119,8 +119,8 @@ export class FormComponent implements OnInit, AfterViewInit {
   get form(): Form {
     return this._form;
   }
-  @ViewChildren(FieldComponent)
-  fields: QueryList<FieldComponent>;
+  @ViewChildren(FieldFactoryComponent)
+  fields: QueryList<FieldFactoryComponent>;
   @ViewChildren(FormComponent)
   fieldSets: QueryList<FormComponent>;
   @ViewChildren(DynamicFormComponentDirective)

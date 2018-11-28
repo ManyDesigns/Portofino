@@ -1,5 +1,5 @@
 import {Component, Host, Inject, Input, Optional, SkipSelf} from '@angular/core';
-import {FIELD_FACTORY, FieldComponent} from "./field.component";
+import {FieldComponent} from "./field.component";
 import {PortofinoService} from "../portofino.service";
 import {AuthenticationService} from "../security/authentication.service";
 import {ControlContainer} from "@angular/forms";
@@ -13,10 +13,9 @@ export class BlobFieldComponent extends FieldComponent {
   @Input()
   objectUrl: string;
 
-  constructor(protected portofino: PortofinoService, @Inject(FIELD_FACTORY) factory,
-              @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
-              protected auth: AuthenticationService) {
-    super(factory, controlContainer);
+  constructor(protected portofino: PortofinoService, protected auth: AuthenticationService,
+              @Optional() @Host() @SkipSelf() controlContainer: ControlContainer) {
+    super(controlContainer);
   }
 
   deleteBlob() {

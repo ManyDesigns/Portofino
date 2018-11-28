@@ -1,4 +1,4 @@
-import {Injectable, Type} from "@angular/core";
+import {Component, Injectable, Input, Type} from "@angular/core";
 import {BlobFieldComponent} from "./blob-field.component";
 import {FieldComponent} from "./field.component";
 import {DateTimeFieldComponent} from "./date-time-field.component";
@@ -26,6 +26,27 @@ export class FieldFactory {
         return type;
       }
     }
+  }
+}
+
+@Component({
+  selector: 'portofino-field',
+  templateUrl: './field.component.html'
+})
+export class FieldFactoryComponent extends FieldComponent {
+
+  @Input()
+  type: Type<any>;
+  @Input()
+  context = {};
+  field: FieldComponent;
+
+  constructor(protected factory: FieldFactory) {
+    super(null);
+  }
+
+  get fieldComponentType() {
+    return this.type ? this.type : this.factory ? this.factory.get(this) : null;
   }
 }
 
