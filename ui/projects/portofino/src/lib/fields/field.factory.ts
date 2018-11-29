@@ -1,4 +1,4 @@
-import {Component, Injectable, Input, Type} from "@angular/core";
+import {Component, Host, Injectable, Input, Optional, SkipSelf, Type} from "@angular/core";
 import {BlobFieldComponent} from "./blob-field.component";
 import {FieldComponent} from "./field.component";
 import {DateTimeFieldComponent} from "./date-time-field.component";
@@ -6,6 +6,7 @@ import {BooleanFieldComponent} from "./boolean-field.component";
 import {NumberFieldComponent} from "./number-field.component";
 import {TextFieldComponent} from "./text-field.component";
 import {SelectFieldComponent} from "./select-field.component";
+import {ControlContainer} from "@angular/forms";
 
 @Injectable()
 export class FieldFactory {
@@ -41,8 +42,8 @@ export class FieldFactoryComponent extends FieldComponent {
   context = {};
   field: FieldComponent;
 
-  constructor(protected factory: FieldFactory) {
-    super(null);
+  constructor(protected factory: FieldFactory, @Optional() @Host() @SkipSelf() controlContainer: ControlContainer) {
+    super(controlContainer);
   }
 
   get fieldComponentType() {

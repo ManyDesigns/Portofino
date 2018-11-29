@@ -26,8 +26,7 @@ export abstract class FieldComponent implements OnInit {
   @Input()
   selector: FormControl;
 
-  constructor(
-    @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer) {}
+  constructor(@Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer) {}
 
   isRequired() {
     return isRequired(this.property);
