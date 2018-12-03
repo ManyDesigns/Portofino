@@ -96,13 +96,8 @@ public class SimpleBlobManager implements BlobManager {
 
     public Properties loadMetaProperties(File metaFile) throws IOException {
         Properties metaProperties = new Properties();
-
-        InputStream metaStream = null;
-        try {
-            metaStream = new FileInputStream(metaFile);
+        try(InputStream metaStream = new FileInputStream(metaFile)) {
             metaProperties.load(metaStream);
-        } finally {
-            IOUtils.closeQuietly(metaStream);
         }
         return metaProperties;
     }

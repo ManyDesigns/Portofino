@@ -12,7 +12,8 @@
         <portofino-form [form]="content.contents" [controls]="controls.get(content.name)"></portofino-form>
       </fieldset>
     </ng-container>
-    <ng-template portofino-dynamic-form-component [ngIf]="content.hasOwnProperty('component')"></ng-template>
+    <ng-template portofino-dynamic-form-component
+                 [name]="content.name" [ngIf]="content.hasOwnProperty('component')"></ng-template>
     <div *ngIf="content.html" [innerHTML]="content.html"></div>
   </ng-container>
 </ng-container>

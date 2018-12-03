@@ -1118,14 +1118,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                         OgnlTextFormat hrefFormat = getReadURLFormat();
                         baseUrl = hrefFormat.format(obj);
                     }
-
                     Blob blob = ((AbstractBlobField) field).getValue();
                     if(blob != null) {
-                        Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
-                        UrlBuilder urlBuilder = new UrlBuilder(charset, baseUrl, false)
-                            .addParameter("downloadBlob", "")
-                            .addParameter("propertyName", field.getPropertyAccessor().getName());
-                        field.setHref(urlBuilder.toString());
+                        field.setHref(getBlobDownloadUrl(field, baseUrl));
                     }
                 }
             }
@@ -1133,11 +1128,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public String getBlobDownloadUrl(AbstractBlobField field) {
+        String baseUrl = context.getActionPath();
+        return getBlobDownloadUrl(field, baseUrl);
+    }
+
+    public String getBlobDownloadUrl(Field field, String baseUrl) {
         Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
         UrlBuilder urlBuilder = new UrlBuilder(
-                charset, Util.getAbsoluteUrl(context.getActionPath()), false)
-                .addParameter("downloadBlob", "")
-                .addParameter("propertyName", field.getPropertyAccessor().getName());
+                charset,
+                Util.getAbsoluteUrl(baseUrl + "/:blob/" + field.getPropertyAccessor().getName()),
+                false);
         return urlBuilder.toString();
     }
 
@@ -1160,7 +1160,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if(blob.getInputStream() == null) {
-            blobManager.loadMetadata(blob);
+            try {
+                blobManager.loadMetadata(blob);
+            } catch (IOException e) {
+                logger.error("Could not load blob", e);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
         }
         long contentLength = blob.getSize();
         String contentType = blob.getContentType();
@@ -1175,7 +1180,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
         final InputStream inputStream;
         if(blob.getInputStream() == null) {
-            inputStream = blobManager.openStream(blob);
+            try {
+                inputStream = blobManager.openStream(blob);
+            } catch (IOException e) {
+                logger.error("Could not load blob", e);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
         } else {
             inputStream = blob.getInputStream();
         }

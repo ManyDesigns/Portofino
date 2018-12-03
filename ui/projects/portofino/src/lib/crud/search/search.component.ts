@@ -1,4 +1,4 @@
-import {Component, ContentChild, Input, OnDestroy, OnInit, TemplateRef} from '@angular/core';
+import {AfterViewInit, Component, Injector, Input, OnDestroy, OnInit, QueryList, ViewChildren} from '@angular/core';
 import {
   ClassAccessor,
   isDateProperty,
@@ -14,11 +14,13 @@ import {PortofinoService} from "../../portofino.service";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 import {SelectionModel} from "@angular/cdk/collections";
-import {Configuration, SelectionOption, SelectionProvider} from "../crud.common";
+import {SelectionOption, SelectionProvider} from "../crud.common";
 import {AuthenticationService} from "../../security/authentication.service";
 import {ObservableMedia} from "@angular/flex-layout";
-import {Subject, Subscription} from "rxjs";
+import {Observable, of, Subject, Subscription} from "rxjs";
 import {ButtonInfo, getButtons} from "../../buttons";
+import {Type} from "@angular/core/src/type";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-crud-search',
@@ -40,9 +42,9 @@ export class SearchComponent implements OnInit, OnDestroy {
   form: FormGroup;
   results: SearchResults;
   resultsDataSource = new MatTableDataSource();
-  resultProperties: Property[] = [];
+  resultFields: SearchResultField[] = [];
   isLoadingResults = false;
-  columnsToDisplay: string[] = [];
+  datatableColumns: string[] = [];
   @Input()
   pageSize: number;
   sortInfo: Sort;
@@ -62,7 +64,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   @Input()
   parent: any;
 
-  constructor(private http: HttpClient, private portofino: PortofinoService,
+  constructor(private http: HttpClient, private portofino: PortofinoService, protected translate: TranslateService,
               private auth: AuthenticationService, public media: ObservableMedia) {}
 
   ngOnInit() {
@@ -84,9 +86,9 @@ export class SearchComponent implements OnInit, OnDestroy {
   protected setupForm() {
     const formControls = {};
     if (this.selectionEnabled) {
-      this.columnsToDisplay.push(this.selectColumnName);
+      this.datatableColumns.push(this.selectColumnName);
     }
-    this.classAccessor.properties.forEach(property => {
+    this.classAccessor.properties.forEach((property, i) => {
       property = Object.assign(new Property(), property);
       if (!isEnabled(property)) {
         return;
@@ -96,15 +98,46 @@ export class SearchComponent implements OnInit, OnDestroy {
         formControls[property.name] = new FormControl();
       }
       if (isInSummary(property)) {
-        this.resultProperties.push(property);
-        this.columnsToDisplay.push(property.name);
-      }
-      if (this.resultProperties.length > 0 && !this.resultProperties.some(p => p.key)) {
-        this.resultProperties[0].key = true;
+        const field = new SearchResultField();
+        field.name = property.name;
+        field.key = property.key;
+        field.inList = field.key || i < 3;
+        field.label = property.label;
+        if(property.kind == "blob") {
+          field.href = row => {
+            const value = row[property.name];
+            if(value.value && value.value.size && value.value.size > 0) {
+              return this.getBlobUrl(row.__rowKey, property.name);
+            } else {
+              return null;
+            }
+          };
+          field.value = row => {
+            const value = row[property.name];
+            if(value.value && value.value.size && value.value.size > 0) {
+              return of(value.displayValue);
+            } else {
+              return this.translate.get("Blob not found");
+            }
+          }
+        }
+        this.resultFields.push(field);
+        this.datatableColumns.push(property.name);
       }
     });
-
+    if (this.resultFields.length > 0 && !this.resultFields.some(f => f.key)) {
+      this.resultFields[0].key = true;
+    }
+    this.resultFields.filter(f => f.key).forEach(f => {
+      f.routerLink = row => this.baseUrl + '/' + row.__rowKey;
+      this.resultFields[0].href = null;
+    });
+    this.customizeForm(formControls);
     this.form = new FormGroup(formControls);
+  }
+
+  protected customizeForm(formControls) {
+    //Extension hook
   }
 
   protected setupSelectionProviders() {
@@ -304,7 +337,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     return params;
   }
 
-  test(index: number) {
+  handleScrolledIndexChange(index: number) {
     const newPage = Math.round((index + 1) / this.pageSize);
     if(newPage > this.page && !this.isLoadingResults) {
       this.loadSearchResultsPage(newPage);
@@ -354,8 +387,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   //Blobs
-  getBlobUrl(id: string, property: Property) {
-    const blobUrl = `${this.sourceUrl}/${id}/:blob/${property.name}`;
+  getBlobUrl(id: string, propertyName: string) {
+    const blobUrl = `${this.sourceUrl}/${id}/:blob/${propertyName}`;
     if(this.portofino.localApiPath) {
       return `${this.portofino.localApiPath}/blobs?path=${encodeURIComponent(blobUrl)}` +
         `&token=${encodeURIComponent(this.auth.jsonWebToken)}`;
@@ -375,4 +408,39 @@ export class SearchResults {
   totalRecords: number;
   startIndex: number;
   records: object[];
+}
+
+export class SearchResultField {
+  name: string;
+  label: string;
+  key = false;
+  href: (_: { __rowKey: string } | any) => string;
+  routerLink: (_: { __rowKey: string } | any) => string | any[];
+  value: (row, field: SearchResultField) => Observable<string> = SearchResultField.defaultValueFn;
+  component: Type<any>;
+  inList = false;
+
+  getValue(row) {
+    return this.value(row, this);
+  }
+
+  getRouterLink(row) {
+    if(this.routerLink) {
+      return this.routerLink(row);
+    } else {
+      return null;
+    }
+  }
+
+  getHref(row) {
+    if(this.href) {
+      return this.href(row);
+    } else {
+      return null;
+    }
+  }
+
+  static defaultValueFn(row, field: SearchResultField) {
+    return of(row[field.name].displayValue || row[field.name].value);
+  }
 }

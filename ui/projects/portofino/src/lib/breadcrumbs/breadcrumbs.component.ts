@@ -1,16 +1,14 @@
 import {PortofinoService} from "../portofino.service";
-import {ActivatedRoute, Params, Router,NavigationEnd,PRIMARY_OUTLET} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Component, OnInit} from "@angular/core";
 import {AuthenticationService} from "../security/authentication.service";
 import {PortofinoComponent} from "../portofino-app.component";
 import {PageService} from "../page";
-import {Subscription} from "rxjs";
-//import { filter } from 'rxjs/operators';
 
 export interface BreadCrumb {
   name: string;
   path: string;
-};
+}
 
 @Component({
   selector: 'breadcrumbs',

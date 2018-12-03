@@ -88,6 +88,9 @@ export class FieldSet {
 })
 export class DynamicFormComponentDirective {
 
+  @Input()
+  name: string;
+
   constructor(public viewContainerRef: ViewContainerRef) { }
 
 }
@@ -158,7 +161,6 @@ export class FormComponent implements OnInit, AfterViewInit {
   }
 
   protected setupForm(form: Form, formGroup: FormGroup) {
-    let dynamicComponentIndex = 0;
     let controlNames = [];
     form.contents.forEach(v => {
       if (v instanceof Field) {
@@ -182,10 +184,11 @@ export class FormComponent implements OnInit, AfterViewInit {
         }
       } else if(this.dynamicComponents && v.hasOwnProperty('component')) {
         const control = new FormGroup({});
-        controlNames.push(v['name']);
-        formGroup.setControl(v['name'], control);
+        const name = v['name'];
+        controlNames.push(name);
+        formGroup.setControl(name, control);
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(v['component']);
-        const viewContainerRef = this.dynamicComponents.toArray()[dynamicComponentIndex].viewContainerRef;
+        const viewContainerRef = this.dynamicComponents.find(c => c.name == name).viewContainerRef;
         viewContainerRef.clear();
         const component = viewContainerRef.createComponent(componentFactory).instance;
         component['form'] = control;
