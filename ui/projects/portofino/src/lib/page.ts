@@ -326,7 +326,7 @@ export class PageSettingsPanel {
     }
     if(ca) {
       const fieldSet = FieldSet.fromClassAccessor(ca, {
-        name: 'configuration', label: 'Configuration', object: config || {}
+        name: 'configuration', label: 'Configuration', object: config, properties: this.page.configurationProperties
       });
       this.formDefinition.contents.push(fieldSet);
     }
@@ -482,6 +482,9 @@ export abstract class Page {
     this.configuration = this.settingsPanel.previousConfiguration;
   }
 
+  get configurationProperties() {
+    return null;
+  }
 }
 
 @Component({

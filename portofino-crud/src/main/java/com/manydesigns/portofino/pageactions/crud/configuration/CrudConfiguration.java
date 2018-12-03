@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.pageactions.crud.configuration;
 
+import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.pageactions.ConfigurationWithDefaults;
@@ -17,7 +18,7 @@ import java.util.List;
 */
 
 @XmlRootElement(name = "configuration")
-@XmlType(name = "configuration",propOrder = {"name", "searchTitle","createTitle","readTitle","editTitle","variable","largeResultSet","rowsPerPage","columns","useLocalOrder","properties"})
+@XmlType(name = "configuration",propOrder = {"name", "searchTitle","createTitle","readTitle","editTitle","variable","largeResultSet","rowsPerPage","useLocalOrder","properties"})
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration implements PageActionConfiguration, ConfigurationWithDefaults {
     public static final String copyright =
@@ -37,7 +38,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     protected boolean largeResultSet;
     protected boolean useLocalOrder = false;
     protected Integer rowsPerPage;
-    protected Integer columns = 1;
 
     public CrudConfiguration() {
         properties = new ArrayList<CrudProperty>();
@@ -54,6 +54,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         @XmlElement(name="property",type=CrudProperty.class),
         @XmlElement(name="virtual-property",type=VirtualCrudProperty.class),
     })
+    @Enabled(false)
     public List<CrudProperty> getProperties() {
         return properties;
     }
@@ -113,6 +114,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.variable = variable;
     }
 
+    @Enabled(false)
     public String getActualVariable() {
         return variable != null ? variable : name;
     }
@@ -133,16 +135,6 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
 
     public void setRowsPerPage(Integer rowsPerPage) {
         this.rowsPerPage = rowsPerPage;
-    }
-
-    @Required
-    @XmlAttribute(required = false)
-    public Integer getColumns() {
-        return columns;
-    }
-
-    public void setColumns(Integer columns) {
-        this.columns = columns;
     }
 
     @XmlAttribute(required = false)

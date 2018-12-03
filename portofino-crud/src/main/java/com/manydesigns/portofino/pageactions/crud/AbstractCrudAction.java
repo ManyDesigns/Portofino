@@ -1081,7 +1081,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the form builder.
      */
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
-        formBuilder.configPrefix(prefix).configMode(mode).configNColumns(crudConfiguration.getColumns());
+        formBuilder.configPrefix(prefix).configMode(mode);
         configureFormSelectionProviders(formBuilder);
         return formBuilder;
     }
@@ -1389,16 +1389,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         crudConfigurationForm = formBuilder.build();
     }
 
-    protected void setupConfigurationForm(FormBuilder formBuilder) {
-        DefaultSelectionProvider nColumnsSelectionProvider = new DefaultSelectionProvider("columns");
-        nColumnsSelectionProvider.setDisplayMode(DisplayMode.DROPDOWN);
-        nColumnsSelectionProvider.appendRow(1, "1 column", true);
-        nColumnsSelectionProvider.appendRow(2, "2 columns", true);
-        nColumnsSelectionProvider.appendRow(3, "3 columns", true);
-        nColumnsSelectionProvider.appendRow(4, "4 columns", true);
-        nColumnsSelectionProvider.appendRow(6, "6 columns", true);
-        formBuilder.configSelectionProvider(nColumnsSelectionProvider, "columns");
-    }
+    protected void setupConfigurationForm(FormBuilder formBuilder) {}
 
     protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
         TableFormBuilder tableFormBuilder = new TableFormBuilder(CrudSelectionProviderEdit.class);

@@ -74,10 +74,7 @@ export class CrudComponent extends Page implements OnInit {
       () => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
         classAccessor => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
           sps => this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
-            this.createEnabled = this.operationAvailable(ops, "POST");
-            this.bulkEditEnabled = this.operationAvailable(ops, "PUT");
-            this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE");
-            this.init(classAccessor, sps);
+            this.init(classAccessor, sps, ops);
           }))));
   }
 
@@ -98,7 +95,10 @@ export class CrudComponent extends Page implements OnInit {
     }
   }
 
-  protected init(classAccessor, selectionProviders: SelectionProvider[]) {
+  protected init(classAccessor, selectionProviders: SelectionProvider[], ops: Operation[]) {
+    this.createEnabled = this.operationAvailable(ops, "POST");
+    this.bulkEditEnabled = this.operationAvailable(ops, "PUT");
+    this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE");
     this.classAccessor = classAccessor;
     this.selectionProviders = selectionProviders;
     this.classAccessor.properties.forEach(p => {
@@ -233,6 +233,11 @@ export class CrudComponent extends Page implements OnInit {
     } else {
       return this.configuration.children
     }
+  }
+
+  get configurationProperties() {
+    return ["name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
+            "largeResultSet", "rowsPerPage"]
   }
 }
 

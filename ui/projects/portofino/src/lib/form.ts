@@ -23,22 +23,37 @@ export class Form {
     this.contents = contents;
   }
 
-  static fromClassAccessor(ca: ClassAccessor, object = {}) {
+  static fromClassAccessor(ca: ClassAccessor, setup: FormSetup = {}) {
     const form = new Form();
-    ca.properties.forEach(property => {
-      if(!isEnabled(property)) {
-        return;
-      }
-      try {
-        form.contents.push(Field.fromProperty(property, object));
-      } catch (e) {
-        //Continue
-        console.error(e);
-      }
-    });
+    if(setup.properties) {
+      setup.properties.forEach(name => {
+        const property = ca.properties.find(p => p.name == name);
+        if(property) {
+          Form.setupProperty(form, property, setup);
+        }
+      })
+    } else {
+      ca.properties.forEach(property => {
+        Form.setupProperty(form, property, setup);
+      });
+    }
     return form;
   }
+
+  static setupProperty(form: Form, property: Property, setup) {
+    if(!isEnabled(property)) {
+      return;
+    }
+    try {
+      form.contents.push(Field.fromProperty(property, setup.object || {}));
+    } catch (e) {
+      //Continue
+      console.error(e);
+    }
+  }
 }
+
+export class FormSetup { object?: any; properties?: string[]; }
 
 export class Field {
 
@@ -66,19 +81,21 @@ export class Field {
   }
 }
 
+export class FieldSetSetup extends FormSetup { name?: string; label?: string; }
+
 export class FieldSet {
   name: string;
   label: string;
   contents: Form;
 
-  static fromClassAccessor(ca: ClassAccessor, setup: {name?: string, label?: string, object?: any} = {}) {
+  static fromClassAccessor(ca: ClassAccessor, setup: FieldSetSetup = {}) {
     const fieldSet = new FieldSet();
     if(!setup) {
       setup = { object: {}};
     }
     fieldSet.name = setup.name || ca.name;
     fieldSet.label = setup.label || fieldSet.name;
-    fieldSet.contents = Form.fromClassAccessor(ca, setup.object || {});
+    fieldSet.contents = Form.fromClassAccessor(ca, setup);
     return fieldSet;
   }
 }

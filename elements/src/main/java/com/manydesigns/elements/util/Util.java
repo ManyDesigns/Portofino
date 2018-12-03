@@ -65,8 +65,7 @@ public class Util {
 
     public static final Logger logger = LoggerFactory.getLogger(Util.class);
 
-    public static String getAbsoluteUrl(HttpServletRequest req,
-                                        String url, boolean full) {
+    public static String getAbsoluteUrl(HttpServletRequest req, String url, boolean full) {
         StringBuilder sb = new StringBuilder();
 
         Matcher matcher = pattern.matcher(url);
@@ -92,8 +91,7 @@ public class Util {
             tsb.append(scheme);
             tsb.append("://");
             tsb.append(req.getServerName());
-            if ("http".equals(scheme) && serverPort == 80 ||
-                    "https".equals(scheme) && serverPort == 443) {
+            if ("http".equals(scheme) && serverPort == 80 || "https".equals(scheme) && serverPort == 443) {
                 logger.debug("Skipping default port for scheme: {}", scheme);
             } else {
                 logger.debug("Adding port number: {}", serverPort);
@@ -111,9 +109,7 @@ public class Util {
     }
 
     public static String getAbsoluteUrl(String url, boolean full) {
-        HttpServletRequest req =
-                ElementsThreadLocals.getHttpServletRequest();
-
+        HttpServletRequest req = ElementsThreadLocals.getHttpServletRequest();
         return getAbsoluteUrl(req, url, full);
     }
 

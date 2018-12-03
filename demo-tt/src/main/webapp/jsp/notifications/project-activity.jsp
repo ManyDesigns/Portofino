@@ -2,7 +2,6 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.PortofinoProperties" %>
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="activityItem" scope="request" type="com.manydesigns.portofino.pageactions.activitystream.ActivityItem"/>
@@ -29,13 +28,13 @@
         <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px;">
             <small>
                 You received this email as a user of
-                <stripes:link href="${appUrl}">
+                <a href="${appUrl}">
                     <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
-                </stripes:link>.
+                </a>.
                 You can
-                <stripes:link href="${profileUrl}">view your profile</stripes:link>
+                <a href="${profileUrl}">view your profile</a>
                 or
-                <stripes:link href="${reviewNotificationsUrl}">change your notifications</stripes:link>
+                <a href="${reviewNotificationsUrl}">change your notifications</a>
                 at any time.
             </small>
         </div>

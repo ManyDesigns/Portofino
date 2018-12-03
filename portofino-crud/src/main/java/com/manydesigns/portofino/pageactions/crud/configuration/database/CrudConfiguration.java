@@ -59,6 +59,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.pageactions.cru
     protected String query;
 
     @Autowired
+    @Enabled(false)
     public Persistence persistence;
 
     //**************************************************************************
@@ -147,6 +148,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.pageactions.cru
     @XmlElements({
           @XmlElement(name="selectionProvider",type=SelectionProviderReference.class)
     })
+    @Enabled(false)
     public List<SelectionProviderReference> getSelectionProviders() {
         return selectionProviders;
     }
