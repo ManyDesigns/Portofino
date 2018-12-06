@@ -21,6 +21,7 @@ import {catchError, debounceTime, map} from "rxjs/operators";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
+import {WithButtons} from "./button.component";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -346,7 +347,7 @@ export class PageSettingsPanel {
   }
 }
 
-export abstract class Page {
+export abstract class Page implements WithButtons {
 
   @Input()
   configuration: PageConfiguration & any;
@@ -390,7 +391,7 @@ export abstract class Page {
     return this.children.find(c => c.path == segment);
   }
 
-  getButtons(list: string = 'default'): ButtonInfo[] | null {
+  getButtons(list = 'default') {
     return getButtons(this, list);
   }
 

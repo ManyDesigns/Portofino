@@ -60,11 +60,11 @@ import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {ManyToManyComponent} from './many-to-many/many-to-many.component';
-import {ButtonComponent} from "./button.component";
+import {ButtonComponent, ButtonsComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
 import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
-import {PageComponent} from "./page.component";
+import {ContentComponent} from "./content.component";
 import {
   MatSnackBarNotificationService,
   NotificationService} from "./notifications/notification.service";
@@ -100,8 +100,8 @@ export class PortofinoFormsModule {}
 
 @NgModule({
   declarations: [
-    PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
-    PageComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
+    PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
+    ContentComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
     NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
@@ -131,8 +131,8 @@ export class PortofinoFormsModule {}
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,
     CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent],
   exports: [
-    PortofinoAppComponent, DefaultPageLayout, ButtonComponent, LoginComponent,
-    PageComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
+    PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
+    ContentComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
     ManyToManyComponent]
@@ -152,7 +152,7 @@ export class PortofinoModule {
 
   public static withRoutes(routes: Routes): (ModuleWithProviders|Type<PortofinoModule>)[] {
     return [RouterModule.forRoot(
-      [...routes, { path: "**", component: PageComponent}],
+      [...routes, { path: "**", component: ContentComponent}],
       { onSameUrlNavigation: "reload", enableTracing: false }),
       PortofinoModule];
   }

@@ -9,7 +9,7 @@
                     fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
     <div fxLayout="row">
       <portofino-button *ngFor="let button of parentButtons" [button]="button" [component]="parent"></portofino-button>
-      <portofino-button *ngFor="let button of getButtons()" [button]="button" [component]="this"></portofino-button>
+      <portofino-buttons [component]="this"></portofino-buttons>
     </div>
   </form>
   </mat-card-content>

@@ -8,11 +8,9 @@
       <mat-error *ngIf="page.settingsPanel.error as error">
         {{error.message ? error.message : error}}
       </mat-error>
-      <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"
-                      fxLayout="row wrap" fxLayoutGap="10px grid"></portofino-form>
+      <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"></portofino-form>
       <div></div>
-      <portofino-button *ngFor="let button of page.getButtons('configuration')"
-                        [button]="button" [component]="page"></portofino-button>
+      <portofino-buttons [component]="page" list="configuration"></portofino-buttons>
     </ng-container>
   </div>
 </div>

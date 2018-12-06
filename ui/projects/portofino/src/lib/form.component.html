@@ -9,7 +9,8 @@
     <ng-container *ngIf="content.hasOwnProperty('name') && content.hasOwnProperty('contents')">
       <fieldset>
         <legend>{{content.label}}</legend>
-        <portofino-form [form]="content.contents" [controls]="controls.get(content.name)"></portofino-form>
+        <portofino-form [form]="content.contents" [controls]="controls.get(content.name)"
+                        fxLayout="row wrap" fxLayoutGap="10px grid"></portofino-form> <!-- TODO make configurable -->
       </fieldset>
     </ng-container>
     <ng-template portofino-dynamic-form-component

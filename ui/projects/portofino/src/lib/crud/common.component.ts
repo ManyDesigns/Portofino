@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
@@ -16,8 +16,9 @@ import {Observable} from "rxjs";
 import {Field, Form, FormComponent} from "../form";
 import {NotificationService} from "../notifications/notification.service";
 import {Button, ButtonInfo, getButtons} from "../buttons";
+import {WithButtons} from "../button.component";
 
-export abstract class BaseDetailComponent {
+export abstract class BaseDetailComponent implements WithButtons {
 
   @Input()
   classAccessor: ClassAccessor;

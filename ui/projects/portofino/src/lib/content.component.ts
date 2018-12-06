@@ -15,11 +15,11 @@ import {AuthenticationService} from "./security/authentication.service";
 import {Page, PageChild, PageConfiguration, PageService} from "./page";
 
 @Component({
-  selector: 'portofino-page',
-  templateUrl: './page.component.html',
-  styleUrls: ['./page.component.css']
+  selector: 'portofino-content',
+  templateUrl: './content.component.html',
+  styleUrls: ['./content.component.css']
 })
-export class PageComponent implements AfterViewInit, OnInit, OnDestroy {
+export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MainContentDirective)
   contentHost: MainContentDirective;
   @ViewChild(EmbeddedContentDirective)
