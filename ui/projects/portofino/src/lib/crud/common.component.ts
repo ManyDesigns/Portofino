@@ -3,7 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
   ClassAccessor,
-  isBlob,
+  isBlob, isBooleanProperty,
   isDateProperty,
   isEnabled,
   Property
@@ -85,7 +85,7 @@ export abstract class BaseDetailComponent implements WithButtons {
         value.name = portofinoBlob.filename;
         value.type = portofinoBlob.contentType;
         value = [value];
-      } else if(disabled && object[p.name].displayValue) {
+      } else if(disabled && !isBooleanProperty(p) && object[p.name].displayValue) {
         value = object[p.name].displayValue;
       } else {
         value = object[p.name].value;
