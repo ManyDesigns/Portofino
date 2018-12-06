@@ -58,9 +58,9 @@ export class AppComponent {}
 @PortofinoComponent({ name: 'customcrud' })
 export class CustomCrud extends CrudComponent {
 
-  ngOnInit(): void {
+  initialize(): void {
     console.log("Custom crud");
-    super.ngOnInit();
+    super.initialize();
     this.configuration.title = 'Custom CRUD';
     this.searchComponent = CustomSearch;
     this.searchComponentContext = { customInput: "works!" };

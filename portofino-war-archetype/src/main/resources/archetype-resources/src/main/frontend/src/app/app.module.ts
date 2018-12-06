@@ -24,52 +24,24 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
-  selector: 'portofino-start',
-  template: `<p>Start here</p>`
-})
-export class StartHere {}
-
-@Component({
-  selector: 'custom-navigation',
-  template: `<h3>Custom navigation</h3><p><a routerLink="/start">Start here</a> </p>`
-})
-export class CustomNavigation {}
-
-@Component({
-  selector: 'portofino-welcome',
-  template: `
-    <portofino-default-page-layout [page]="this">
-      <ng-template #content><p>Welcome to Portofino 5!</p></ng-template>
-    </portofino-default-page-layout>`
-})
-@PortofinoComponent({ name: 'welcome' })
-export class WelcomeComponent extends Page {
-  constructor(
-    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
-    public authenticationService: AuthenticationService) {
-    super(portofino, http, router, authenticationService);
-  }
-}
-
-@Component({
   selector: 'app-root',
   template: `<portofino-app appTitle="Portofino Application"></portofino-app>`
 })
 export class AppComponent {}
 
 @NgModule({
-  declarations: [AppComponent, StartHere, CustomNavigation, WelcomeComponent],
+  declarations: [AppComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
   imports: [
-    PortofinoModule.withRoutes([{ path: "start", component: StartHere }]),
+    PortofinoModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule, TranslateModule.forRoot()],
-  entryComponents: [ CustomNavigation, WelcomeComponent ],
+  entryComponents: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {
