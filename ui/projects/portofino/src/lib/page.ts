@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   ContentChild,
   EventEmitter,
@@ -6,7 +7,7 @@ import {
   InjectionToken,
   Input,
   OnInit,
-  TemplateRef
+  TemplateRef, ViewChild
 } from "@angular/core";
 import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
 import {FormControl, FormGroup} from "@angular/forms";
@@ -15,7 +16,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
-import {ButtonInfo, BUTTONS, declareButton, getButtons} from "./buttons";
+import {declareButton, getButtons} from "./buttons";
 import {BehaviorSubject, merge, Observable, of} from "rxjs";
 import {catchError, debounceTime, map} from "rxjs/operators";
 import {MatDialog, MatDialogRef} from "@angular/material";
@@ -351,7 +352,6 @@ export abstract class Page implements WithButtons {
 
   @Input()
   configuration: PageConfiguration & any;
-  configurationLocation: string;
   readonly settingsPanel = new PageSettingsPanel(this);
   path: string;
   baseUrl: string;
@@ -387,6 +387,10 @@ export abstract class Page implements WithButtons {
 
   get children(): PageChild[] {
     return this.configuration.children
+  }
+
+  get embeddedChildren() {
+    return this.children.filter(c => this.allowEmbeddedComponents && c.embedded && c.accessible);
   }
 
   getChild(segment: string) {
@@ -447,6 +451,14 @@ export abstract class Page implements WithButtons {
     return [];
   }
 
+  loadPageConfiguration(path: string) {
+    return this.http.get<PageConfiguration>(this.getConfigurationLocation(path));
+  }
+
+  protected getConfigurationLocation(path: string) {
+    return `pages${path}/config.json`;
+  }
+
   configure() {
     this.settingsPanel.show();
   }
@@ -454,12 +466,11 @@ export abstract class Page implements WithButtons {
   saveConfiguration() {
     const config = this.getConfigurationToSave(this.settingsPanel.form.value);
     this.configuration = config;
-    this.portofino.saveConfiguration(this.configurationLocation, config).subscribe(
+    this.portofino.saveConfiguration(this.getConfigurationLocation(this.path), config).subscribe(
       () => {
         this.settingsPanel.hide();
         this.router.navigateByUrl(this.router.url);
-      },
-      error => console.log(error));
+      });
   }
 
   get configurationUrl() {

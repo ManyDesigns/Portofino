@@ -1,18 +1,9 @@
 import {Directive, ViewContainerRef} from '@angular/core';
 
 @Directive({
-  selector: '[portofino-main-content]'
+  selector: '[portofino-main-page]'
 })
-export class MainContentDirective {
-
-  constructor(public viewContainerRef: ViewContainerRef) { }
-
-}
-
-@Directive({
-  selector: '[portofino-embedded-content]'
-})
-export class EmbeddedContentDirective {
+export class MainPageDirective {
 
   constructor(public viewContainerRef: ViewContainerRef) { }
 

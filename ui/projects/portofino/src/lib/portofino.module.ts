@@ -49,7 +49,7 @@ import {SearchComponent} from './crud/search/search.component';
 import {BreadcrumbsComponent} from "./breadcrumbs/breadcrumbs.component";
 import {DetailComponent} from './crud/detail/detail.component';
 import {CreateComponent} from './crud/detail/create.component';
-import {EmbeddedContentDirective, MainContentDirective, NavigationDirective} from './content.directive';
+import {MainPageDirective, NavigationDirective} from './content.directive';
 import {
   DefaultNavigationComponent,
   DefaultPageLayout,
@@ -76,6 +76,7 @@ import {BooleanFieldComponent} from "./fields/boolean-field.component";
 import {NumberFieldComponent} from "./fields/number-field.component";
 import {TextFieldComponent} from "./fields/text-field.component";
 import {SelectFieldComponent} from "./fields/select-field.component";
+import {PageFactoryComponent} from "./page.factory";
 
 @NgModule({
   declarations: [
@@ -101,7 +102,7 @@ export class PortofinoFormsModule {}
 @NgModule({
   declarations: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
-    ContentComponent, PageHeader, MainContentDirective, EmbeddedContentDirective,
+    ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective,
     NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
@@ -132,7 +133,7 @@ export class PortofinoFormsModule {}
     CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
-    ContentComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
+    ContentComponent, PageFactoryComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
     ManyToManyComponent]

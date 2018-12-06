@@ -1,8 +1,10 @@
-<div class="page">
+<div class="page" [class.embedded]="page.embedded">
   <portofino-page-header [page]="page"></portofino-page-header>
   <div class="page-body">
     <ng-container *ngIf="!page.settingsPanel.active">
       <ng-template [ngTemplateOutlet]="content"></ng-template>
+      <portofino-page *ngFor="let child of page.embeddedChildren"
+                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
     </ng-container>
     <ng-container *ngIf="page.settingsPanel.active">
       <mat-error *ngIf="page.settingsPanel.error as error">

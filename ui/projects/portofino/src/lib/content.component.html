@@ -4,8 +4,8 @@
     <mat-spinner></mat-spinner>
   </div>
   <div [hidden]="!pageService.page">
-    <ng-template portofino-main-content></ng-template>
-    <ng-template portofino-embedded-content></ng-template>
+    <ng-template portofino-main-page></ng-template>
+    <ng-template portofino-embedded-pages></ng-template>
   </div>
 </ng-container>
 <div *ngIf="!!pageService.error" class="mat-display-2 error">
