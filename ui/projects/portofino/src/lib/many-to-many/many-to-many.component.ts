@@ -16,7 +16,7 @@ import {NotificationService} from "../notifications/notification.service";
   styleUrls: ['./many-to-many.component.css']
 })
 @PortofinoComponent({ name: 'manyToMany' })
-export class ManyToManyComponent extends Page implements OnInit {
+export class ManyToManyComponent extends Page {
 
   @Input()
   configuration: PageConfiguration & any;
@@ -35,7 +35,7 @@ export class ManyToManyComponent extends Page implements OnInit {
     super(portofino, http, router, authenticationService);
   }
 
-  ngOnInit() {
+  initialize() {
     this.keySelector.valueChanges.subscribe(value => {
       this.key = value;
       const onePk = value.key;

@@ -379,6 +379,8 @@ export abstract class Page implements WithButtons {
     }, this, 'cancelConfiguration', null);
   }
 
+  initialize() {}
+
   consumePathSegment(fragment: string): boolean {
     return true;
   }

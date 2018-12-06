@@ -20,7 +20,7 @@ import {BulkEditComponent} from "./bulk/bulk-edit.component";
   styleUrls: ['./crud.component.css']
 })
 @PortofinoComponent({ name: 'crud' })
-export class CrudComponent extends Page implements OnInit {
+export class CrudComponent extends Page {
 
   @Input()
   configuration: PageConfiguration & Configuration & any;
@@ -68,7 +68,7 @@ export class CrudComponent extends Page implements OnInit {
     super(portofino, http, router, authenticationService);
   }
 
-  ngOnInit() {
+  initialize() {
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().subscribe(
       () => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(

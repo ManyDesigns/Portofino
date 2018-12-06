@@ -81,6 +81,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
           }
         }
         //If we arrive here, there are no more children in the URL to process
+        page.initialize();
         if(!embed) {
           this.pageService.notifyPage(page);
           page.children.forEach(child => {
@@ -88,12 +89,14 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
             if(page.allowEmbeddedComponents && child.embedded) {
               let newSegments = segments.slice(0, segments.length);
               newSegments.push(new UrlSegment(child.path, {}));
-              this.loadPageInPath(path + `/${child.path}`, page, newSegments, newSegments.length, true);
+              this.loadPageInPath( `${path}/${child.path}`, page, newSegments, newSegments.length, true);
             }
           });
-          if(page.parent) {
-            page.parent.children.forEach(child => {
-              this.checkAccessibility(page.parent, child);
+          if(parent) {
+            parent.children.forEach(child => {
+              if(`${parent.path}/${child.path}` != path) {
+                this.checkAccessibility(parent, child);
+              }
             });
           }
         }
@@ -104,7 +107,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   checkAccessibility(parent: Page, child: PageChild) {
     let dummy = new DummyPage(this.portofino, this.http, this.router, this.authenticationService);
     dummy.parent = parent;
-    this.loadPageConfiguration(parent.path + '/' + child.path).pipe(mergeMap(config => {
+    this.loadPageConfiguration(`${parent.path}/${child.path}`).pipe(mergeMap(config => {
       dummy.configuration = config;
       return dummy.accessPermitted;
     })).subscribe(flag => child.accessible = flag);
