@@ -207,7 +207,7 @@ export class CrudComponent extends Page {
   }
 
   goToSearch() {
-    if(this.view == CrudView.DETAIL || this.view == CrudView.CREATE) {
+    if(!this.embedded && (this.view == CrudView.DETAIL || this.view == CrudView.CREATE)) {
       this.router.navigateByUrl(this.baseUrl);
     } else {
       this.showSearch();
