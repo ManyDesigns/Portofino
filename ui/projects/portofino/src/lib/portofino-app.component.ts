@@ -12,9 +12,6 @@ import {
 } from '@angular/core';
 import {PortofinoService, SideNavPosition} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {TranslateService} from "@ngx-translate/core";
-import {TRANSLATIONS_EN} from "./i18n/en";
-import {TRANSLATIONS_IT} from "./i18n/it";
 import {NAVIGATION_COMPONENT} from "./page";
 import {NavigationDirective} from "./content.directive";
 
@@ -64,23 +61,10 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   navigationHost: NavigationDirective;
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
-              protected componentFactoryResolver: ComponentFactoryResolver, translate: TranslateService,
+              protected componentFactoryResolver: ComponentFactoryResolver,
               protected changeDetector: ChangeDetectorRef,
               @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,
-              @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {
-    this.setupTranslateService(translate);
-  }
-
-  protected setupTranslateService(translate: TranslateService) {
-    translate.setDefaultLang('en');
-    this.configureTranslations(translate);
-    translate.use(translate.getBrowserLang());
-  }
-
-  protected configureTranslations(translate: TranslateService) {
-    translate.setTranslation('en', TRANSLATIONS_EN, true);
-    translate.setTranslation('it', TRANSLATIONS_IT, true);
-  }
+              @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {}
 
   ngOnInit(): void {
     if(this.sideNavPosition) {

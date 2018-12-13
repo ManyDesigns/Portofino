@@ -77,6 +77,7 @@ import {NumberFieldComponent} from "./fields/number-field.component";
 import {TextFieldComponent} from "./fields/text-field.component";
 import {SelectFieldComponent} from "./fields/select-field.component";
 import {PageFactoryComponent} from "./page.factory";
+import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 
 @NgModule({
   declarations: [
@@ -103,6 +104,7 @@ export class PortofinoFormsModule {}
   declarations: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
     ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective,
+    LanguageSelectorComponent,
     NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,

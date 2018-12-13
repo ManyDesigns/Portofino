@@ -6,20 +6,23 @@
     </button>
     {{ title }}
   </div>
-  <ng-container *ngIf="authenticationService.currentUser">
-    <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
-      <button mat-menu-item (click)="authenticationService.logout()">
-        <mat-icon>exit_to_app</mat-icon>
-        {{ 'Sign out' | translate }}
+  <div>
+    <portofino-language-selector></portofino-language-selector>
+    <ng-container *ngIf="authenticationService.currentUser">
+      <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="authenticationService.logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          {{ 'Sign out' | translate }}
+        </button>
+      </mat-menu>
+      <button mat-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>more_vert</mat-icon>
+        {{ authenticationService.currentUser.displayName }}
       </button>
-    </mat-menu>
-    <button mat-button [matMenuTriggerFor]="userMenu">
-      <mat-icon>more_vert</mat-icon>
-      {{ authenticationService.currentUser.displayName }}
-    </button>
-  </ng-container>
-  <ng-container *ngIf="!authenticationService.currentUser">
-    <button mat-button (click)="authenticationService.showLoginDialog()">{{ 'Sign in' | translate }}
-    </button>
-  </ng-container>
+    </ng-container>
+    <ng-container *ngIf="!authenticationService.currentUser">
+      <button mat-button (click)="authenticationService.showLoginDialog()">{{ 'Sign in' | translate }}
+      </button>
+    </ng-container>
+  </div>
 </mat-toolbar>
