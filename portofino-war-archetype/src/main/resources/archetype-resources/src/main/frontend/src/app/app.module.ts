@@ -35,7 +35,7 @@ export class AppComponent {}
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
   ],
   imports: [
-    PortofinoModule,
+    PortofinoModule.withRoutes([]),
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,

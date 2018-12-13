@@ -44,7 +44,7 @@ import {
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
-import {RouterModule, Routes} from '@angular/router';
+import {ExtraOptions, RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './crud/search/search.component';
 import {BreadcrumbsComponent} from "./breadcrumbs/breadcrumbs.component";
 import {DetailComponent} from './crud/detail/detail.component';
@@ -151,10 +151,10 @@ export class PortofinoModule {
     return DefaultToolbarComponent;
   }
 
-  public static withRoutes(routes: Routes): (ModuleWithProviders|Type<PortofinoModule>)[] {
+  public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders|Type<PortofinoModule>)[] {
     return [RouterModule.forRoot(
       [...routes, { path: "**", component: ContentComponent}],
-      { onSameUrlNavigation: "reload", enableTracing: false }),
+      { onSameUrlNavigation: "reload", ...config }),
       PortofinoModule];
   }
 }

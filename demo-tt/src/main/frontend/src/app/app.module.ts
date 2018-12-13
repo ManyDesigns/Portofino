@@ -59,15 +59,14 @@ export class CustomNavigation {}
 @PortofinoComponent({ name: 'welcome' })
 export class WelcomeComponent extends Page {
   constructor(
-    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
-    public authenticationService: AuthenticationService) {
+    http: HttpClient, portofino: PortofinoService, router: Router,  authenticationService: AuthenticationService) {
     super(portofino, http, router, authenticationService);
   }
 }
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Portofino Application"></portofino-app>`
+  template: `<portofino-app appTitle="Demo-TT"></portofino-app>`
 })
 export class AppComponent {}
 

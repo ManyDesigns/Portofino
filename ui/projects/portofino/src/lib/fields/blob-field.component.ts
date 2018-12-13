@@ -25,8 +25,8 @@ export class BlobFieldComponent extends FieldComponent {
   get blobUrl() {
     const blobUrl = this.objectUrl + '/:blob/' + this.property.name;
     if(this.portofino.localApiPath) {
-      return `${this.portofino.localApiPath}/blobs?path=${encodeURIComponent(blobUrl)}` +
-             `&token=${encodeURIComponent(this.auth.jsonWebToken)}`;
+      const localApiUrl = `${this.portofino.localApiPath}/blobs?path=${encodeURIComponent(blobUrl)}`;
+      return localApiUrl + this.auth.jsonWebToken ? `&token=${encodeURIComponent(this.auth.jsonWebToken)}` : '';
     } else {
       return blobUrl;
     }

@@ -1,12 +1,5 @@
 import com.manydesigns.portofino.tt.NotificationsJob
-import org.quartz.DateBuilder
-import org.quartz.JobBuilder
-import org.quartz.JobDetail
-import org.quartz.JobKey
-import org.quartz.Scheduler
-import org.quartz.SimpleScheduleBuilder
-import org.quartz.Trigger
-import org.quartz.TriggerBuilder
+import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
 import org.springframework.context.annotation.Configuration
 

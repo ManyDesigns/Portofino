@@ -5,6 +5,6 @@
 <urlrewrite>
     <rule>
         <from>^/(?!api(/.*)?$|portofino(/.*)?$|.+[.][^/]+$).+$</from>
-        <to type="redirect">/</to>
+        <to>/</to>
     </rule>
 </urlrewrite>

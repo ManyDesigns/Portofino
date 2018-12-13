@@ -365,7 +365,7 @@ export abstract class Page implements WithButtons {
   readonly configurationPath = '/:configuration';
   readonly page = this;
 
-  protected constructor(
+  constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
     public authenticationService: AuthenticationService) {
     //Declarative approach does not work for some reason:
