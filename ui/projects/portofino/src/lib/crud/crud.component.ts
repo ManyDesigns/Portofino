@@ -104,7 +104,7 @@ export class CrudComponent extends Page {
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
-    this.route.queryParams.subscribe(params => {
+    this.subscribe(this.route.queryParams,params => {
       if(params.hasOwnProperty('create') && this.createEnabled && !this.embedded) {
         this.showCreate();
       } else if(this.id) {
@@ -112,6 +112,11 @@ export class CrudComponent extends Page {
       } else {
         this.showSearch();
       }
+    });
+    this.subscribe(this.portofino.languageChange,_ => {
+      if(this.view == CrudView.SEARCH) {
+        this.refreshSearch.emit();
+      } //else TODO
     });
   }
 

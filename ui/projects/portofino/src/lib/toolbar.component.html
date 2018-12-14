@@ -7,7 +7,7 @@
     {{ title }}
   </div>
   <div>
-    <portofino-language-selector></portofino-language-selector>
+    <portofino-language-selector *ngIf="portofino.languageKeys.length > 1"></portofino-language-selector>
     <ng-container *ngIf="authenticationService.currentUser">
       <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
         <button mat-menu-item (click)="authenticationService.logout()">

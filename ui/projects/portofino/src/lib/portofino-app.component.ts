@@ -36,7 +36,7 @@ export interface ToolbarComponent {
 })
 export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
-  constructor(public authenticationService: AuthenticationService,public portofino: PortofinoService) {}
+  constructor(public authenticationService: AuthenticationService, public portofino: PortofinoService) {}
 }
 
 @Component({

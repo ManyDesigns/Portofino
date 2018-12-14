@@ -1,8 +1,9 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
+import {BehaviorSubject} from "rxjs";
 
 @Injectable()
 export class PortofinoService {
@@ -13,7 +14,10 @@ export class PortofinoService {
   loginPath = 'login';
   sideNavPosition: SideNavPosition = 'page';
   sideNavOpen: boolean;
+
+  readonly DEFAULT_LANGUAGE = 'en';
   readonly languages = {};
+  readonly languageChange = new EventEmitter<Language>();
 
   constructor(public http: HttpClient, protected translate: TranslateService) {
     this.setupTranslateService();
@@ -45,10 +49,11 @@ export class PortofinoService {
 
   set currentLanguage(lang: Language) {
     this.translate.use(lang.key);
+    this.languageChange.emit(lang);
   }
 
   protected setupTranslateService() {
-    this.translate.setDefaultLang('en');
+    this.translate.setDefaultLang(this.DEFAULT_LANGUAGE);
     this.configureLanguage({ key: 'en', name: 'English', translations: TRANSLATIONS_EN });
     this.configureLanguage({ key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT });
     this.translate.use(this.translate.getBrowserLang());

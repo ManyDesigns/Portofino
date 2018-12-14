@@ -78,6 +78,7 @@ import {TextFieldComponent} from "./fields/text-field.component";
 import {SelectFieldComponent} from "./fields/select-field.component";
 import {PageFactoryComponent} from "./page.factory";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
+import {LanguageInterceptor} from "./i18n/language.interceptor";
 
 @NgModule({
   declarations: [
@@ -128,6 +129,7 @@ export class PortofinoFormsModule {}
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
     { provide: TokenStorageService, useClass: LocalTokenStorageService },
     { provide: NotificationService, useClass: MatSnackBarNotificationService }],
   entryComponents: [

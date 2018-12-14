@@ -5,7 +5,7 @@ import {
   EventEmitter,
   Injectable,
   InjectionToken,
-  Input,
+  Input, OnDestroy,
   OnInit,
   TemplateRef, ViewChild
 } from "@angular/core";
@@ -17,7 +17,7 @@ import {Field, FieldSet, Form} from "./form";
 import {Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {declareButton, getButtons} from "./buttons";
-import {BehaviorSubject, merge, Observable, of} from "rxjs";
+import {BehaviorSubject, merge, NextObserver, Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, debounceTime, map} from "rxjs/operators";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
@@ -83,7 +83,7 @@ class PageFlatNode {
 
 class PageTreeDataSource {
 
-  dataChange = new BehaviorSubject<PageFlatNode[]>([]);
+  readonly dataChange = new BehaviorSubject<PageFlatNode[]>([]);
 
   get data(): PageFlatNode[] { return this.dataChange.value; }
   set data(value: PageFlatNode[]) {
@@ -348,7 +348,7 @@ export class PageSettingsPanel {
   }
 }
 
-export abstract class Page implements WithButtons {
+export abstract class Page implements WithButtons, OnDestroy {
 
   @Input()
   configuration: PageConfiguration & any;
@@ -365,6 +365,8 @@ export abstract class Page implements WithButtons {
   readonly configurationPath = '/:configuration';
   readonly page = this;
 
+  protected readonly subscriptions: Subscription[] = [];
+
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
     public authenticationService: AuthenticationService) {
@@ -380,6 +382,23 @@ export abstract class Page implements WithButtons {
   }
 
   initialize() {}
+
+  subscribe<T>(
+    observable: Observable<T>, observer: PartialObserver<T> | ((value: T) => void),
+    error?: (error: any) => void, complete?: () => void): Subscription {
+    let subscription;
+    if(observer instanceof Function) {
+      subscription = observable.subscribe(observer as (value: T) => void, error, complete);
+    } else {
+      subscription = observable.subscribe(observer as PartialObserver<T>);
+    }
+    this.subscriptions.push(subscription);
+    return subscription;
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
 
   consumePathSegment(fragment: string): boolean {
     return true;
