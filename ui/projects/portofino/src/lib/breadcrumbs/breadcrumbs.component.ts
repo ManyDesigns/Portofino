@@ -53,7 +53,7 @@ export class BreadcrumbsComponent implements OnInit {
       while ( currentPage!= undefined  && currentPage!=null ) {
         if( currentPage.baseUrl==('/'+item.path) )
           return currentPage.configuration.title;
-        currentPage=currentPage.parent
+        currentPage=currentPage.parent;
       }
     return item.name;
   }

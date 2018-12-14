@@ -110,7 +110,7 @@ export class PortofinoFormsModule {}
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    ManyToManyComponent,BreadcrumbsComponent
+    ManyToManyComponent, BreadcrumbsComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
@@ -139,7 +139,7 @@ export class PortofinoFormsModule {}
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
     ContentComponent, PageFactoryComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
+    SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,BreadcrumbsComponent,
     ManyToManyComponent]
 })
 export class PortofinoModule {

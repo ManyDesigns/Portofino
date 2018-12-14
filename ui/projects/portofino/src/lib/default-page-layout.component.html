@@ -1,11 +1,13 @@
 <div class="page" [class.embedded]="page.embedded">
+  <mat-card>
   <portofino-page-header [page]="page"></portofino-page-header>
-  <div class="page-body">
+
+    <mat-card-content class="page-body">
+
     <ng-container *ngIf="!page.settingsPanel.active">
       <ng-template [ngTemplateOutlet]="content"></ng-template>
-      <portofino-page *ngFor="let child of page.embeddedChildren"
-                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
     </ng-container>
+
     <ng-container *ngIf="page.settingsPanel.active">
       <mat-error *ngIf="page.settingsPanel.error as error">
         {{error.message ? error.message : error}}
@@ -14,5 +16,11 @@
       <div></div>
       <portofino-buttons [component]="page" list="configuration"></portofino-buttons>
     </ng-container>
-  </div>
+  </mat-card-content>
+  </mat-card>
+
+  <ng-container *ngIf="!page.settingsPanel.active">
+    <portofino-page *ngFor="let child of page.embeddedChildren"
+                    [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+  </ng-container>
 </div>

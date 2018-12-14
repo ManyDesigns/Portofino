@@ -1,14 +1,18 @@
-<portofino-page-header [page]="page"></portofino-page-header><!-- TODO migrate to default layout -->
-<div fxLayout="column" fxLayoutAlign="space-between start" fxLayoutGap="20px">
-  <mat-form-field>
-    <mat-select [required]="true" [formControl]="keySelector">
-      <mat-option *ngFor="let k of keys" [value]="k">
-        {{ k.label || k.key }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-checkbox *ngFor="let assoc of associations" [(ngModel)]="assoc.selected" [disabled]="!saveEnabled">
-    {{assoc.key.label}}
-  </mat-checkbox>
-  <portofino-buttons [component]="this"></portofino-buttons>
-</div>
+<portofino-default-page-layout [page]="this">
+  <ng-template #content>
+    <div fxLayout="column" fxLayoutAlign="space-between start" fxLayoutGap="20px">
+      <mat-form-field *ngIf="keys && keys.length>1">
+        <mat-select [required]="true" [formControl]="keySelector">
+          <mat-option *ngFor="let k of keys" [value]="k">
+            {{ k.label || k.key }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-checkbox *ngFor="let assoc of associations" [(ngModel)]="assoc.selected" [disabled]="!saveEnabled">
+        {{assoc.key.label}}
+      </mat-checkbox>
+      <portofino-buttons [component]="this"></portofino-buttons>
+    </div>
+  </ng-template>
+
+</portofino-default-page-layout>
