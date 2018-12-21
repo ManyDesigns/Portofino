@@ -72,15 +72,15 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   }
 
   @Button({ text: 'Cancel', presentIf: DetailComponent.isEditMode })
-  @Button({ text: 'Back', icon: 'arrow_back', presentIf: DetailComponent.isViewMode })
   cancel() {
-    if(this.editMode) {
-      this.editMode = false;
-      this.editModeChanges.emit(false);
-      this.setupForm(this.object);
-    } else {
-      this.close.emit();
-    }
+    this.editMode = false;
+    this.editModeChanges.emit(false);
+    this.setupForm(this.object);
+  }
+
+  @Button({ text: 'Back', icon: 'arrow_back', presentIf: DetailComponent.isViewMode })
+  backToSearch() {
+    this.close.emit();
   }
 
   static isViewMode(self: DetailComponent) {
