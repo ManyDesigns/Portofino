@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "./security/authentication.service";
 import {Observable, of, throwError} from "rxjs";
 import {PortofinoAppComponent} from "./portofino-app.component";
@@ -31,11 +31,11 @@ export class PageFactoryComponent extends Page implements OnInit {
   @Input()
   path: string;
 
-  constructor(portofino: PortofinoService, http: HttpClient, router: Router,
+  constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, protected injector: Injector,
               protected viewContainerRef: ViewContainerRef) {
-    super(portofino, http, router, authenticationService);
+    super(portofino, http, router, route, authenticationService);
   }
 
   ngOnInit(): void {

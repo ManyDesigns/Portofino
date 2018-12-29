@@ -6,7 +6,7 @@ import {FormControl} from "@angular/forms";
 import {MatSnackBar} from "@angular/material";
 import {Operation, Page, PageConfiguration} from "../page";
 import {AuthenticationService} from "../security/authentication.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 
@@ -29,10 +29,9 @@ export class ManyToManyComponent extends Page {
 
   readonly associationsPath = "/:availableAssociations";
 
-  constructor(
-    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
-    public authenticationService: AuthenticationService, protected notificationService: NotificationService) {
-    super(portofino, http, router, authenticationService);
+  constructor(http: HttpClient, portofino: PortofinoService, router: Router, route: ActivatedRoute,
+              authenticationService: AuthenticationService, protected notificationService: NotificationService) {
+    super(portofino, http, router, route, authenticationService);
   }
 
   initialize() {

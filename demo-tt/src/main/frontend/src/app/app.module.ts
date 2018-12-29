@@ -57,12 +57,7 @@ export class CustomNavigation {}
     </portofino-default-page-layout>`
 })
 @PortofinoComponent({ name: 'welcome' })
-export class WelcomeComponent extends Page {
-  constructor(
-    http: HttpClient, portofino: PortofinoService, router: Router,  authenticationService: AuthenticationService) {
-    super(portofino, http, router, authenticationService);
-  }
-}
+export class WelcomeComponent extends Page {}
 
 @Component({
   selector: 'app-root',

@@ -14,7 +14,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {declareButton, getButtons} from "./buttons";
 import {BehaviorSubject, merge, NextObserver, Observable, of, PartialObserver, Subscription} from "rxjs";
@@ -208,8 +208,7 @@ export class SourceSelectorTree implements OnInit {
   }
 
   ngOnInit(): void {
-    const baseUrl = this.portofino.apiRoot;
-    this.http.get(baseUrl + ':description').subscribe((page: any) => {
+    this.http.get(this.portofino.apiRoot + ':description').subscribe((page: any) => {
       const root = new PageFlatNode("/", page.path, 0);
       root.type = page.superclass;
       this.dataSource.data = [root];
@@ -369,7 +368,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
-    public authenticationService: AuthenticationService) {
+    protected route: ActivatedRoute, public authenticationService: AuthenticationService) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
@@ -490,8 +489,17 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.getConfigurationLocation(this.path), pageConfiguration, actionConfiguration, this.computeSourceUrl()).subscribe(
       () => {
         this.settingsPanel.hide();
-        this.router.navigateByUrl(this.router.url);
+        this.reloadBaseUrl();
       });
+  }
+
+  protected reloadBaseUrl() {
+    //this.router.navigate(['.'], {relativeTo: this.route});
+    if (this.baseUrl && this.baseUrl != "/") {
+      this.router.navigateByUrl(this.baseUrl);
+    } else {
+      window.location.reload(); //TODO
+    }
   }
 
   get configurationUrl() {

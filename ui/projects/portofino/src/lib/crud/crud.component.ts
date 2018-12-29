@@ -62,12 +62,6 @@ export class CrudComponent extends Page {
   @Input()
   bulkEditComponentContext = {};
 
-  constructor(
-    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
-    public authenticationService: AuthenticationService, protected route: ActivatedRoute) {
-    super(portofino, http, router, authenticationService);
-  }
-
   initialize() {
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().subscribe(
@@ -213,7 +207,7 @@ export class CrudComponent extends Page {
 
   goToSearch() {
     if(!this.embedded && (this.view == CrudView.DETAIL || this.view == CrudView.CREATE)) {
-      this.router.navigateByUrl(this.baseUrl);
+      this.reloadBaseUrl();
     } else {
       this.showSearch();
     }

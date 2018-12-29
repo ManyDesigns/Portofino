@@ -31,7 +31,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
               protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
               public portofino: PortofinoService, protected authenticationService: AuthenticationService) {
     this.pageFactory = new PageFactoryComponent(
-      portofino, http, router, authenticationService, componentFactoryResolver, injector, null);
+      portofino, http, router, route, authenticationService, componentFactoryResolver, injector, null);
   }
 
   ngOnInit() {
@@ -107,7 +107,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   checkAccessibility(parent: Page, child: PageChild) {
-    let dummy = new DummyPage(this.portofino, this.http, this.router, this.authenticationService);
+    let dummy = new DummyPage(this.portofino, this.http, this.router, this.route, this.authenticationService);
     dummy.parent = parent;
     dummy.loadPageConfiguration(`${parent.path}/${child.path}`).pipe(mergeMap(config => {
       dummy.configuration = config;
@@ -121,10 +121,4 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
 
 }
 
-class DummyPage extends Page {
-  constructor(
-    public portofino: PortofinoService, public http: HttpClient, protected router: Router,
-    public authenticationService: AuthenticationService) {
-    super(portofino, http, router, authenticationService);
-  }
-}
+class DummyPage extends Page {}
