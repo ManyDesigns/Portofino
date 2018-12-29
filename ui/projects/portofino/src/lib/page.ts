@@ -483,9 +483,11 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   saveConfiguration() {
-    const config = this.getConfigurationToSave(this.settingsPanel.form.value);
-    this.configuration = config;
-    this.portofino.saveConfiguration(this.getConfigurationLocation(this.path), config).subscribe(
+    const pageConfiguration = this.getConfigurationToSave(this.settingsPanel.form.value);
+    const actionConfiguration = this.settingsPanel.form.get('configuration').value;
+    this.configuration = pageConfiguration;
+    this.portofino.saveConfiguration(
+      this.getConfigurationLocation(this.path), pageConfiguration, actionConfiguration, this.computeSourceUrl()).subscribe(
       () => {
         this.settingsPanel.hide();
         this.router.navigateByUrl(this.router.url);
@@ -505,9 +507,14 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   protected getConfigurationToSave(formValue) {
     const config = Object.assign({}, this.configuration, formValue);
-    delete config.relativeToParent;
-    config.source = config.source.source;
-    return config;
+    const pageConfiguration = new PageConfiguration();
+    //Reflection would be nice
+    pageConfiguration.children = config.children;
+    pageConfiguration.securityCheckPath = config.securityCheckPath;
+    pageConfiguration.source = config.source.source;
+    pageConfiguration.title = config.title;
+    pageConfiguration.type = config.type;
+    return pageConfiguration;
   }
 
   cancelConfiguration() {
