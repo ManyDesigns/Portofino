@@ -11,6 +11,9 @@
         {{error.message ? error.message : error}}
       </mat-error>
       <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"></portofino-form>
+      <ng-container *ngIf="extraConfiguration">
+        <ng-template [ngTemplateOutlet]="extraConfiguration"></ng-template>
+      </ng-container>
       <div></div>
       <portofino-buttons [component]="page" list="configuration"></portofino-buttons>
     </ng-container>

@@ -8,11 +8,21 @@ import {
   QueryList, Type,
   ViewChildren, ViewContainerRef
 } from "@angular/core";
-import {AbstractFormGroupDirective, ControlContainer, FormControl, FormGroup, FormGroupDirective} from "@angular/forms";
+import {
+  AbstractFormGroupDirective,
+  ControlContainer,
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormGroupDirective
+} from "@angular/forms";
 import {FieldFactoryComponent} from "./fields/field.factory";
 
+export type FormElement =
+  Field|FieldSet|{name: string, component: Type<any>, dependencies?: object}|{html: string}|FormList;
+
 export class Form {
-  contents: (Field|FieldSet|{name: string, component: Type<any>, dependencies ?: object}|{html: string})[] = [];
+  contents: FormElement[] = [];
   editable: boolean = true;
   /** The URL from which to download blobs and other resources. */
   baseUrl: string;
@@ -45,6 +55,7 @@ export class Form {
       return;
     }
     try {
+      //TODO if list FormList else
       form.contents.push(Field.fromProperty(property, setup.object || {}));
     } catch (e) {
       //Continue
@@ -67,6 +78,10 @@ export class Field {
   editable: boolean = true;
   type: Type<any>;
   context = {};
+
+  get name() {
+    return this.property.name;
+  }
 
   mergeContext(context: any) {
     return {...this.context, ...context};
@@ -98,6 +113,11 @@ export class FieldSet {
     fieldSet.contents = Form.fromClassAccessor(ca, setup);
     return fieldSet;
   }
+}
+
+class FormList {
+  name: string;
+  contents: Form[];
 }
 
 @Directive({
@@ -164,6 +184,7 @@ export class FormComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    //TODO efficiency - make sure to only init once
     if(this.form) {
       this.reset(this.form)
     }
@@ -181,40 +202,21 @@ export class FormComponent implements OnInit, AfterViewInit {
     let controlNames = [];
     form.contents.forEach(v => {
       if (v instanceof Field) {
-        const property = v.property;
-        controlNames.push(property.name);
-        const control = formGroup.get(property.name);
-        if (control instanceof FormControl) {
-          control.reset(v.initialState);
-        } else {
-          formGroup.setControl(property.name, new FormControl(v.initialState, getValidators(property)));
-        }
+        controlNames.push(v.name);
+        this.setupField(v, formGroup);
       } else if (v instanceof FieldSet) {
         controlNames.push(v.name);
-        let control = formGroup.get(v.name);
-        if (control instanceof FormGroup) {
-          this.setupForm(v.contents, control as FormGroup);
-        } else {
-          control = new FormGroup({});
-          this.setupForm(v.contents, control as FormGroup);
-          formGroup.setControl(v.name, control);
+        this.setupFieldSet(v, formGroup);
+      } else if(v.hasOwnProperty('component')) {
+        if(this.dynamicComponents) {
+          controlNames.push(v["name"]);
+          this.setupDynamicComponent(v, formGroup);
         }
-      } else if(this.dynamicComponents && v.hasOwnProperty('component')) {
-        const control = new FormGroup({});
-        const name = v['name'];
-        controlNames.push(name);
-        formGroup.setControl(name, control);
-        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(v['component']);
-        const viewContainerRef = this.dynamicComponents.find(c => c.name == name).viewContainerRef;
-        viewContainerRef.clear();
-        const component = viewContainerRef.createComponent(componentFactory).instance;
-        component['form'] = control;
-        if(v['dependencies']) {
-          for(const dep in v['dependencies']) {
-            component[dep] = v['dependencies'][dep];
-          }
-        }
-        this.changeDetector.detectChanges();
+      } else if(v instanceof FormList) {
+        controlNames.push(v.name);
+        this.setupFormList(v, formGroup);
+      } else if(!v.hasOwnProperty("html")) {
+        throw { message: "BUG! Unsupported form element", element: v }
       }
     });
     let controlsToDelete = [];
@@ -224,6 +226,70 @@ export class FormComponent implements OnInit, AfterViewInit {
       }
     }
     controlsToDelete.forEach(name => formGroup.removeControl(name));
+  }
+
+  protected setupFormList(v: FormList, formGroup: FormGroup) {
+    let control = formGroup.get(v.name);
+    if (control instanceof FormArray) {
+      const length = control.length;
+      const formArray = control as FormArray;
+      v.contents.forEach((f, i) => {
+        let formGroup = new FormGroup({});
+        this.setupForm(f, formGroup);
+        if(i >= formArray.length) {
+          formArray.insert(i, formGroup);
+        } else {
+          formArray.setControl(i, formGroup); //TODO maybe reuse existing?
+        }
+      });
+    } else {
+      control = new FormArray([]);
+      v.contents.forEach(f => {
+        let formGroup = new FormGroup({});
+        this.setupForm(f, formGroup);
+        (control as FormArray).push(formGroup);
+      });
+      formGroup.setControl(v.name, control);
+    }
+  }
+
+  protected setupDynamicComponent(v, formGroup: FormGroup) {
+    //TODO name -> formGroup, which is optional. If not provided, component.form = formGroup
+    const control = new FormGroup({});
+    const name = v['name'];
+    formGroup.setControl(name, control);
+    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(v['component']);
+    const viewContainerRef = this.dynamicComponents.find(c => c.name == name).viewContainerRef;
+    viewContainerRef.clear();
+    const component = viewContainerRef.createComponent(componentFactory).instance;
+    component['form'] = control;
+    if (v['dependencies']) {
+      for (const dep in v['dependencies']) {
+        component[dep] = v['dependencies'][dep];
+      }
+    }
+    this.changeDetector.detectChanges();
+  }
+
+  protected setupFieldSet(v: FieldSet, formGroup: FormGroup) {
+    let control = formGroup.get(v.name);
+    if (control instanceof FormGroup) {
+      this.setupForm(v.contents, control as FormGroup);
+    } else {
+      control = new FormGroup({});
+      this.setupForm(v.contents, control as FormGroup);
+      formGroup.setControl(v.name, control);
+    }
+  }
+
+  protected setupField(v: Field, formGroup: FormGroup) {
+    const property = v.property;
+    const control = formGroup.get(property.name);
+    if (control instanceof FormControl) {
+      control.reset(v.initialState);
+    } else {
+      formGroup.setControl(property.name, new FormControl(v.initialState, getValidators(property)));
+    }
   }
 
   get allFields() {
@@ -236,6 +302,18 @@ export class FormComponent implements OnInit, AfterViewInit {
       }
     });
     return allFields;
+  }
+
+  isField(obj) {
+    return obj instanceof Field;
+  }
+
+  isFieldSet(obj) {
+    return obj instanceof FieldSet;
+  }
+
+  isFormList(obj) {
+    return obj instanceof FormList;
   }
 
 }

@@ -62,6 +62,10 @@ export class CrudComponent extends Page {
   @Input()
   bulkEditComponentContext = {};
 
+  get rowsPerPage() {
+    return this.configuration.rowsPerPage ? this.configuration.rowsPerPage : 10;
+  }
+
   initialize() {
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().subscribe(

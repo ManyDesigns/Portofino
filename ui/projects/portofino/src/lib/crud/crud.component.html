@@ -2,7 +2,7 @@
   <ng-template #content>
     <portofino-crud-search-holder *ngIf="isSearchView()"
       [component]="searchComponent" [context]="searchComponentContext"
-      [classAccessor]="classAccessor" [pageSize]="configuration.rowsPerPage" [sourceUrl]="sourceUrl" [baseUrl]="url"
+      [classAccessor]="classAccessor" [pageSize]="rowsPerPage" [sourceUrl]="sourceUrl" [baseUrl]="url"
       [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled"
       [selection]="selection" [refresh]="refreshSearch"
       [parentButtons]="getButtons('search-results')" [parent]="page">
@@ -25,5 +25,11 @@
       [ids]="getSelectedIds()" [sourceUrl]="sourceUrl" (close)="goToSearch()"
       [parentButtons]="getButtons('bulk-edit')" [parent]="page">
     </portofino-crud-bulk-edit-holder>
+  </ng-template>
+  <ng-template #extraConfiguration>
+    <fieldset>
+      <legend>{{'Properties' | translate}}</legend>
+      TODO
+    </fieldset>
   </ng-template>
 </portofino-default-page-layout>

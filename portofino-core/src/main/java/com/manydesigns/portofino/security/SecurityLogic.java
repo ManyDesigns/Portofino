@@ -232,7 +232,7 @@ public class SecurityLogic {
         boolean isNotAdmin = !isAdministrator(request);
         boolean doesNotSatisfy = requiresAdministrator && isNotAdmin;
         if (doesNotSatisfy) {
-            logger.info("User is not an administrator");
+            logger.debug("User is not an administrator");
             return false;
         }
         return true;

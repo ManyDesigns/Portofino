@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, Optional} from '@angular/core';
 import {PortofinoComponent} from "../portofino-app.component";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
@@ -29,7 +29,7 @@ export class ManyToManyComponent extends Page {
 
   readonly associationsPath = "/:availableAssociations";
 
-  constructor(http: HttpClient, portofino: PortofinoService, router: Router, route: ActivatedRoute,
+  constructor(http: HttpClient, portofino: PortofinoService, router: Router, @Optional() route: ActivatedRoute,
               authenticationService: AuthenticationService, protected notificationService: NotificationService) {
     super(portofino, http, router, route, authenticationService);
   }

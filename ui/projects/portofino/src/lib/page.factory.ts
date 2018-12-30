@@ -4,7 +4,7 @@ import {
   ComponentFactoryResolver,
   ComponentRef,
   Injector,
-  Input, OnInit,
+  Input, OnInit, Optional,
   Type,
   ViewContainerRef
 } from "@angular/core";
@@ -31,7 +31,7 @@ export class PageFactoryComponent extends Page implements OnInit {
   @Input()
   path: string;
 
-  constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
+  constructor(portofino: PortofinoService, http: HttpClient, router: Router, @Optional() route: ActivatedRoute,
               authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, protected injector: Injector,
               protected viewContainerRef: ViewContainerRef) {

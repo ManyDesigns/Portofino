@@ -6,7 +6,7 @@ import {
   Injectable,
   InjectionToken,
   Input, OnDestroy,
-  OnInit,
+  OnInit, Optional,
   TemplateRef, ViewChild
 } from "@angular/core";
 import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
@@ -368,7 +368,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
-    protected route: ActivatedRoute, public authenticationService: AuthenticationService) {
+    @Optional() protected route: ActivatedRoute, public authenticationService: AuthenticationService) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
@@ -494,10 +494,10 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   protected reloadBaseUrl() {
-    //this.router.navigate(['.'], {relativeTo: this.route});
-    if (this.baseUrl && this.baseUrl != "/") {
+    if (this.router.url && this.router.url != "/") {
       this.router.navigateByUrl(this.baseUrl);
     } else {
+      //this.router.navigate(['.'], {relativeTo: this.route});
       window.location.reload(); //TODO
     }
   }
@@ -555,7 +555,9 @@ export class DefaultPageLayout {
   @Input()
   page: Page;
   @ContentChild("content")
-  content: TemplateRef<any>
+  content: TemplateRef<any>;
+  @ContentChild("extraConfiguration")
+  extraConfiguration: TemplateRef<any>;
 }
 
 export class Operation {
