@@ -16,7 +16,7 @@ import {debounceTime} from "rxjs/operators";
 import {SelectionModel} from "@angular/cdk/collections";
 import {SelectionOption, SelectionProvider} from "../crud.common";
 import {AuthenticationService} from "../../security/authentication.service";
-import {ObservableMedia} from "@angular/flex-layout";
+import {MediaObserver} from "@angular/flex-layout";
 import {Observable, of, Subject, Subscription} from "rxjs";
 import {ButtonInfo, getButtons} from "../../buttons";
 import {Type} from "@angular/core/src/type";
@@ -65,7 +65,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   parent: any;
 
   constructor(private http: HttpClient, private portofino: PortofinoService, protected translate: TranslateService,
-              private auth: AuthenticationService, public media: ObservableMedia) {}
+              private auth: AuthenticationService, public media: MediaObserver) {}
 
   ngOnInit() {
     this.setupForm();
@@ -181,7 +181,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   protected listenToMediaChanges() {
     let wasDatatableHidden = !this.isDataTable();
-    this.media.subscribe(change => {
+    this.media.media$.subscribe(() => {
       let refresh = false;
       if (this.isDataTable()) {
         refresh = wasDatatableHidden;
