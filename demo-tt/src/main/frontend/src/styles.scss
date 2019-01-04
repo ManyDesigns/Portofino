@@ -1,4 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~@mat-datetimepicker/core/datetimepicker/datetimepicker-theme.scss';
+
+// Using the $theme variable from the pre-built theme you can call the theming function
+@include mat-datetimepicker-theme($theme);
+
 .container {
   min-height: 100%;
 }

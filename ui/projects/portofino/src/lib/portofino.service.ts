@@ -3,7 +3,8 @@ import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
-import {BehaviorSubject} from "rxjs";
+import {DateAdapter} from "@angular/material";
+import {DatetimeAdapter} from "@mat-datetimepicker/core";
 
 @Injectable()
 export class PortofinoService {
@@ -19,7 +20,8 @@ export class PortofinoService {
   readonly languages = {};
   readonly languageChange = new EventEmitter<Language>();
 
-  constructor(public http: HttpClient, protected translate: TranslateService) {
+  constructor(public http: HttpClient, protected translate: TranslateService,
+              protected dateAdapter: DateAdapter<any>, protected datetimeAdapter: DatetimeAdapter<any>) {
     this.setupTranslateService();
   }
 
@@ -48,15 +50,21 @@ export class PortofinoService {
   }
 
   set currentLanguage(lang: Language) {
-    this.translate.use(lang.key);
+    this.setLanguage(lang.key);
     this.languageChange.emit(lang);
+  }
+
+  protected setLanguage(locale) {
+    this.translate.use(locale);
+    this.dateAdapter.setLocale(locale);
+    this.datetimeAdapter.setLocale(locale);
   }
 
   protected setupTranslateService() {
     this.translate.setDefaultLang(this.DEFAULT_LANGUAGE);
     this.configureLanguage({ key: 'en', name: 'English', translations: TRANSLATIONS_EN });
     this.configureLanguage({ key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT });
-    this.translate.use(this.translate.getBrowserLang());
+    this.setLanguage(this.translate.getBrowserLang());
   }
 
   init(): void {

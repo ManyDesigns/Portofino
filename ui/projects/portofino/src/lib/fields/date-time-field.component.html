@@ -19,11 +19,11 @@
 <mat-form-field [formGroup]="form" *ngIf="!isDateOnly()">
   <mat-label>{{property.label}}</mat-label>
   <!-- bare input field -->
-  <input matInput [formControlName]="property.name" [required]="isRequired()" dateTimeField [dateFormat]="dateFormat">
+  <!-- <input matInput [formControlName]="property.name" [required]="isRequired()" dateTimeField [dateFormat]="dateFormat"> -->
   <!-- mat datetime picker -->
-  <!--<mat-datetimepicker-toggle matSuffix [for]="datetimepicker"></mat-datetimepicker-toggle>
+  <mat-datetimepicker-toggle matSuffix [for]="datetimepicker"></mat-datetimepicker-toggle>
   <mat-datetimepicker #datetimepicker type="datetime" openOnFocus="true"></mat-datetimepicker>
-  <input matInput [formControlName]="property.name" [required]="isRequired()" [matDatetimepicker]="datetimepicker">-->
+  <input matInput [formControlName]="property.name" [required]="isRequired()" [matDatetimepicker]="datetimepicker">
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
     {{ '_ is required.' | translate:{ label: property.label } }}
   </mat-error>

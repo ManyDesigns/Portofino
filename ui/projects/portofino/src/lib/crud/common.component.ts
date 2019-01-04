@@ -8,7 +8,7 @@ import {
   isEnabled,
   Property
 } from "../class-accessor";
-import moment from 'moment-es6';
+import moment from 'moment-with-locales-es6';
 import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.common";

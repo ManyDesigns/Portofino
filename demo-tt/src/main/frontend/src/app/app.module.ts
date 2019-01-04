@@ -1,7 +1,7 @@
 import {Component, NgModule} from '@angular/core';
 import {
   PortofinoModule, Page, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, AuthenticationService} from "portofino";
+  PortofinoComponent} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -27,15 +27,18 @@ import {
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {Router} from "@angular/router";
 import {QuillModule} from "ngx-quill";
-import {HttpClientModule, HttpClient} from "@angular/common/http";
+import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
+import {registerLocaleData} from "@angular/common";
+import localeIt from "@angular/common/locales/it";
+
+registerLocaleData(localeIt);
 
 @Component({
   selector: 'portofino-start',

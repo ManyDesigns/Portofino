@@ -9,7 +9,7 @@ import {
   ValidationErrors,
   Validator
 } from "@angular/forms";
-import moment from "moment-es6";
+import moment from "moment-with-locales-es6";
 
 @Component({
   selector: 'portofino-date-time-field',

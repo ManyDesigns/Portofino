@@ -22,6 +22,10 @@ import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
+import {registerLocaleData} from "@angular/common";
+import localeIt from "@angular/common/locales/it";
+
+registerLocaleData(localeIt);
 
 @Component({
   selector: 'app-root',

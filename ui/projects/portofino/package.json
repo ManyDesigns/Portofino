@@ -31,7 +31,7 @@
     "@mat-datetimepicker/core": "3.0.0-beta.0",
     "@mat-datetimepicker/moment": "3.0.0-beta.0",
     "moment": "^2.23.0",
-    "moment-es6": "^1.0.0",
+    "moment-with-locales-es6": "^1.0.1",
     "ngx-quill": "^4.4.2",
     "quill": "^1.3.6",
     "roboto-fontface": "^0.9.0",

@@ -33,7 +33,7 @@
               {
                 "input": "node_modules/roboto-fontface/css/roboto/roboto-fontface.css"
               },
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -92,7 +92,7 @@
               {
                 "input": "node_modules/roboto-fontface/css/roboto/roboto-fontface.css"
               },
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "assets": [
               "src/assets",
@@ -185,7 +185,7 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
-      "styleext": "css"
+      "styleext": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "app"
