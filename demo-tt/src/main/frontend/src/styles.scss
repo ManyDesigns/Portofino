@@ -1,4 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/theming';
+@include mat-core();
+$app-primary: mat-palette($mat-indigo);
+$app-accent:  mat-palette($mat-pink);
+$app-warn:    mat-palette($mat-red);
+
+// Custom Sass colors vars (will be available in all the project)
+$primary: mat-color($app-primary);
+$accent: mat-color($app-accent);
+$warn: mat-color($app-warn);
+
+$theme: mat-light-theme($app-primary, $app-accent, $app-warn);
+
 @import '~@mat-datetimepicker/core/datetimepicker/datetimepicker-theme.scss';
 
 // Using the $theme variable from the pre-built theme you can call the theming function

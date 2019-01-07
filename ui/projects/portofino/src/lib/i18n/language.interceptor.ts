@@ -11,7 +11,7 @@ export class LanguageInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     req = req.clone({
       setHeaders: {
-        "Accept-Language": this.portofino.currentLanguage.key
+        "Accept-Language": this.portofino.currentLocale.key
       }
     });
     return next.handle(req);

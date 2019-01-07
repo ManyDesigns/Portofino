@@ -15,11 +15,15 @@ import {
   DetailComponentHolder,
   SearchComponentHolder
 } from './crud/crud.component';
-import {PortofinoService} from './portofino.service';
+import {LOCALE_STORAGE_SERVICE, PortofinoService} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {AuthenticationInterceptor, AuthenticationService, LOGIN_COMPONENT} from "./security/authentication.service";
+import {
+  AuthenticationInterceptor,
+  AuthenticationService,
+  LOGIN_COMPONENT,
+  TOKEN_STORAGE_SERVICE
+} from "./security/authentication.service";
 import {LoginComponent} from './security/login/login.component';
-import {LocalTokenStorageService, TokenStorageService} from "./security/token-storage.service";
 import {SearchFieldComponent} from './crud/search/search-field.component';
 import {
   MatAutocompleteModule,
@@ -81,6 +85,7 @@ import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
 import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
+import {LocalStorageService} from "ngx-store";
 
 @NgModule({
   declarations: [
@@ -132,7 +137,8 @@ export class PortofinoFormsModule {}
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
-    { provide: TokenStorageService, useClass: LocalTokenStorageService },
+    { provide: TOKEN_STORAGE_SERVICE, useClass: LocalStorageService },
+    { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: NotificationService, useClass: MatSnackBarNotificationService }],
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,

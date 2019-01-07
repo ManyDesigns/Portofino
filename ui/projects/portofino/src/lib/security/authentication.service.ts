@@ -3,14 +3,15 @@ import {
   HttpClient,
   HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpParams, HttpRequest
 } from "@angular/common/http";
-import {TokenStorageService} from "./token-storage.service";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {Observable, throwError} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
 import {NotificationService} from "../notifications/notification.service";
+import {WebStorageService} from "ngx-store";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
+export const TOKEN_STORAGE_SERVICE = new InjectionToken('JSON Web Token Storage');
 
 @Injectable()
 export class AuthenticationService {
@@ -21,7 +22,8 @@ export class AuthenticationService {
   readonly logins = new EventEmitter<UserInfo>();
   readonly logouts = new EventEmitter<void>();
 
-  constructor(private http: HttpClient, protected dialog: MatDialog, protected storage: TokenStorageService,
+  constructor(private http: HttpClient, protected dialog: MatDialog,
+              @Inject(TOKEN_STORAGE_SERVICE) protected storage: WebStorageService,
               private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
               protected notifications: NotificationService) {
     const displayName = this.storage.get('user.displayName');

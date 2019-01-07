@@ -111,7 +111,7 @@ export class CrudComponent extends Page {
         this.showSearch();
       }
     });
-    this.subscribe(this.portofino.languageChange,_ => {
+    this.subscribe(this.portofino.localeChange, _ => {
       if(this.view == CrudView.SEARCH) {
         this.refreshSearch.emit();
       } //else TODO
