@@ -1,12 +1,9 @@
-import {Component, EventEmitter, Input, OnInit, Output, Type} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
-import {PortofinoService} from "../portofino.service";
+import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 import {ClassAccessor} from "../class-accessor";
 import {PortofinoComponent} from "../portofino-app.component";
-import {ActivatedRoute, Router} from "@angular/router";
-import {Operation, Page, PageChild, PageConfiguration} from "../page";
+import {Operation, Page, PageChild, PageConfiguration, PageSettingsPanel} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
-import {AuthenticationService} from "../security/authentication.service";
 import {Button} from "../buttons";
 import {SelectionModel} from "@angular/cdk/collections";
 import {SearchComponent} from "./search/search.component";
@@ -78,10 +75,6 @@ export class CrudComponent extends Page {
 
   computeBaseSourceUrl() {
     return super.computeSourceUrl();
-  }
-
-  get configurationUrl() {
-    return this.computeBaseSourceUrl() + this.configurationPath;
   }
 
   computeSourceUrl() {
@@ -238,9 +231,28 @@ export class CrudComponent extends Page {
     }
   }
 
+  //Configuration
+
+  get configurationUrl() {
+    return this.computeBaseSourceUrl() + this.configurationPath;
+  }
+
   get configurationProperties() {
     return ["name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
             "largeResultSet", "rowsPerPage"]
+  }
+
+  protected getPageSettingsPanel(): PageSettingsPanel {
+    return new CrudPageSettingsPanel(this);
+  }
+
+  protected getConfigurationToSave(formValue): PageConfiguration {
+    const configurationToSave = super.getConfigurationToSave(formValue) as any;
+    configurationToSave.properties = (<CrudPageSettingsPanel>this.settingsPanel).properties.map(p => {
+      return { property: p };
+    });
+    console.log("aaa", configurationToSave);
+    return configurationToSave;
   }
 }
 
@@ -295,4 +307,20 @@ export class BulkEditComponentHolder extends BulkEditComponent {
   @Input()
   context = {};
   ngOnInit(): void {}
+}
+
+export class CrudPageSettingsPanel extends PageSettingsPanel {
+
+  properties = [];
+
+  protected setupConfigurationForm(ca: ClassAccessor, config: any) {
+    super.setupConfigurationForm(ca, config);
+    config.properties.forEach(p => {
+      this.properties.push({
+        enabled: p.property.enabled, name: p.property.name, label: p.property.name,
+        insertable: p.property.insertable, updatable: p.property.updatable,
+        inSummary: p.property.inSummary, searchable: p.property.searchable
+      });
+    })
+  }
 }

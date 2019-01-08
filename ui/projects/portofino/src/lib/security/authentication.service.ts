@@ -26,11 +26,9 @@ export class AuthenticationService {
               @Inject(TOKEN_STORAGE_SERVICE) protected storage: WebStorageService,
               private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
               protected notifications: NotificationService) {
-    const displayName = this.storage.get('user.displayName');
-    if(displayName) {
-      const isAdmin = this.storage.get('user.administrator') == 'true';
-      const groups = this.storage.get('user.groups') ? this.storage.get('user.groups').split(',') : [];
-      this.currentUser = new UserInfo(displayName, isAdmin, groups);
+    const userInfo = this.storage.get('user');
+    if(userInfo) {
+      this.currentUser = new UserInfo(userInfo.displayName, userInfo.isAdmin, userInfo.groups);
     }
   }
 
@@ -86,18 +84,18 @@ export class AuthenticationService {
 
   protected removeAuthenticationInfo() {
     this.storage.remove('jwt');
-    this.storage.remove('user.displayName');
-    this.storage.remove('user.administrator');
-    this.storage.remove('user.groups');
+    this.storage.remove('user');
     this.storage.remove('sessionId');
     this.currentUser = null;
   }
 
   protected setAuthenticationInfo(result) {
     this.storage.set('jwt', result.jwt);
-    this.storage.set('user.displayName', result.displayName);
-    this.storage.set('user.administrator', result.administrator);
-    this.storage.set('user.groups', result.groups.join(','));
+    this.storage.set('user', {
+      displayName: result.displayName,
+      administrator: result.administrator,
+      groups: result.groups
+    });
     this.storage.set('sessionId', result.portofinoSessionId);
     this.currentUser = new UserInfo(result.displayName, result.administrator, result.groups);
     this.logins.emit(this.currentUser);

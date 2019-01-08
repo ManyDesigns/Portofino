@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   ContentChild,
   EventEmitter,
@@ -7,8 +6,7 @@ import {
   InjectionToken,
   Input, OnDestroy,
   OnInit, Optional,
-  TemplateRef, ViewChild
-} from "@angular/core";
+  TemplateRef} from "@angular/core";
 import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
 import {FormControl, FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
@@ -17,7 +15,7 @@ import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {declareButton, getButtons} from "./buttons";
-import {BehaviorSubject, merge, NextObserver, Observable, of, PartialObserver, Subscription} from "rxjs";
+import {BehaviorSubject, merge, Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, debounceTime, map} from "rxjs/operators";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
@@ -320,7 +318,7 @@ export class PageSettingsPanel {
     this.active = false;
   }
 
-  setupConfigurationForm(ca: ClassAccessor, config: any) {
+  protected setupConfigurationForm(ca: ClassAccessor, config: any) {
     const index = this.formDefinition.contents.findIndex(f => f['name'] == 'configuration');
     if(index >= 0) {
       this.formDefinition.contents.splice(index, 1);
@@ -351,7 +349,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   @Input()
   configuration: PageConfiguration & any;
-  readonly settingsPanel = new PageSettingsPanel(this);
+  readonly settingsPanel = this.getPageSettingsPanel();
   path: string;
   baseUrl: string;
   url: string;
@@ -381,6 +379,10 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   initialize() {}
+
+  protected getPageSettingsPanel() {
+    return new PageSettingsPanel(this);
+  }
 
   subscribe<T>(
     observable: Observable<T>, observer: PartialObserver<T> | ((value: T) => void),
