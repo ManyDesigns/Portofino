@@ -122,15 +122,15 @@ export class PortofinoService {
     return !!this.localApiPath;
   }
 
-  saveConfiguration(path: string, pageConfiguration: any, actionConfiguration: any, actionPath: string) {
+  saveConfiguration(path: string, pageConfiguration: any, actionConfiguration: any, actionConfigurationPath: string) {
     if(!this.localApiAvailable) {
       throw "Local Portofino API not available"
     }
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     data.append("actionConfiguration", JSON.stringify(actionConfiguration));
-    data.append("actionPath", actionPath);
-    return this.http.put(`${this.localApiPath}/pages/${path}?loginPath=${this.loginPath}`, data);
+    data.append("actionConfigurationPath", actionConfigurationPath);
+    return this.http.put(`${this.localApiPath}/${path}?loginPath=${this.loginPath}`, data);
   }
 
   public toggleSidenav(){

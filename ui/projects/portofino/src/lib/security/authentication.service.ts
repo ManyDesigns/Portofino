@@ -28,7 +28,7 @@ export class AuthenticationService {
               protected notifications: NotificationService) {
     const userInfo = this.storage.get('user');
     if(userInfo) {
-      this.currentUser = new UserInfo(userInfo.displayName, userInfo.isAdmin, userInfo.groups);
+      this.currentUser = new UserInfo(userInfo.displayName, userInfo.administrator, userInfo.groups);
     }
   }
 
@@ -85,7 +85,6 @@ export class AuthenticationService {
   protected removeAuthenticationInfo() {
     this.storage.remove('jwt');
     this.storage.remove('user');
-    this.storage.remove('sessionId');
     this.currentUser = null;
   }
 
@@ -96,7 +95,6 @@ export class AuthenticationService {
       administrator: result.administrator,
       groups: result.groups
     });
-    this.storage.set('sessionId', result.portofinoSessionId);
     this.currentUser = new UserInfo(result.displayName, result.administrator, result.groups);
     this.logins.emit(this.currentUser);
   }
@@ -133,7 +131,7 @@ export class AuthenticationService {
   }
 
   logout() {
-    const url = `${this.loginPath}/${this.storage.get('sessionId')}`;
+    const url = `${this.loginPath}`;
     this.http.delete(url).subscribe(() => {
       this.removeAuthenticationInfo();
       this.logouts.emit();

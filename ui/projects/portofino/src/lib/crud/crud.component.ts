@@ -246,12 +246,9 @@ export class CrudComponent extends Page {
     return new CrudPageSettingsPanel(this);
   }
 
-  protected getConfigurationToSave(formValue): PageConfiguration {
-    const configurationToSave = super.getConfigurationToSave(formValue) as any;
-    configurationToSave.properties = (<CrudPageSettingsPanel>this.settingsPanel).properties.map(p => {
-      return { property: p };
-    });
-    console.log("aaa", configurationToSave);
+  protected getActionConfigurationToSave(): any {
+    const configurationToSave = super.getActionConfigurationToSave();
+    configurationToSave.properties = (<CrudPageSettingsPanel>this.settingsPanel).properties;
     return configurationToSave;
   }
 }
@@ -317,7 +314,7 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
     super.setupConfigurationForm(ca, config);
     config.properties.forEach(p => {
       this.properties.push({
-        enabled: p.property.enabled, name: p.property.name, label: p.property.name,
+        enabled: p.property.enabled, name: p.property.name, label: p.property.label,
         insertable: p.property.insertable, updatable: p.property.updatable,
         inSummary: p.property.inSummary, searchable: p.property.searchable
       });
