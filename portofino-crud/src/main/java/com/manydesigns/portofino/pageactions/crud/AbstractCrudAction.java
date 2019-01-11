@@ -122,7 +122,6 @@ import java.util.regex.Pattern;
  * the corresponding primary key). As any other page, crud pages can have children, and they always prevail over
  * the object key: a crud page with a child named &quot;child&quot; will never attempt to load an object with key
  * &quot;child&quot;.</p>
- * <!-- TODO popup mode -->
  *
  * @param <T> the types of objects that this crud can handle.
  *
@@ -213,20 +212,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.TEMPORARY_BLOB_MANAGER)
-    protected BlobManager temporaryBlobManager;
-
     //--------------------------------------------------------------------------
     // Configuration
     //--------------------------------------------------------------------------
 
     public CrudConfiguration crudConfiguration;
     public Form crudConfigurationForm;
-    public TableForm propertiesTableForm;
-    public CrudPropertyEdit[] propertyEdits;
     public TableForm selectionProvidersForm;
-    public CrudSelectionProviderEdit[] selectionProviderEdits;
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -369,14 +361,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         setupForm(Mode.VIEW);
         form.readFromObject(object);
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        refreshBlobDownloadHref();
-        String jsonText = FormUtil.writeToJson(form);
-        String prettyName = safeGetPrettyName();
-        return Response.ok(jsonText)
-                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
-                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
-                .build();
+        return jsonFormData();
     }
 
     public Response jsonEditData() throws JSONException {
@@ -384,18 +369,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
         preEdit();
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        refreshBlobDownloadHref();
-        String jsonText = FormUtil.writeToJson(form);
-        String prettyName = safeGetPrettyName();
-        return Response.ok(jsonText)
-                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
-                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
-                .build();
+        return jsonFormData();
     }
 
     public Response jsonCreateData() throws JSONException {
         preCreate();
+        return jsonFormData();
+    }
+
+    public Response jsonFormData() {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
@@ -418,7 +400,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         }
     }
-
 
     //**************************************************************************
     // Form handling
@@ -465,14 +446,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         object = (T) classAccessor.newInstance();
         createSetup(object);
         form.readFromObject(object);
-    }
-
-    protected void saveTemporaryBlobs() {
-        try {
-            BlobUtils.saveBlobs(form, getTemporaryBlobManager());
-        } catch (IOException e1) {
-            logger.warn("Could not save temporary blobs", e1);
-        }
     }
 
     //**************************************************************************
@@ -1282,10 +1255,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return blobManager;
     }
 
-    public BlobManager getTemporaryBlobManager() {
-        return temporaryBlobManager;
-    }
-
     /**
      * Removes all the file blobs associated with the object from the file system.
      * @param object the persistent object.
@@ -1340,47 +1309,42 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Configuration
     //**************************************************************************
 
-/*    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution configure() {
-        prepareConfigurationForms();
-
-        crudConfigurationForm.readFromObject(crudConfiguration);
-        if(propertyEdits != null) {
-            propertiesTableForm.readFromObject(propertyEdits);
-        }
-
-        if(selectionProviderEdits != null) {
-            selectionProvidersForm.readFromObject(selectionProviderEdits);
-        }
-
-        return getConfigurationView();
-    }
-*/
-    @Override
-    protected void prepareConfigurationForms() {
-        super.prepareConfigurationForms();
-
-        setupPropertyEdits();
-
-        if(propertyEdits != null) {
-            TableFormBuilder tableFormBuilder =
-                    new TableFormBuilder(CrudPropertyEdit.class)
-                        .configNRows(propertyEdits.length);
-            propertiesTableForm = tableFormBuilder.build();
-            propertiesTableForm.setCondensed(true);
-        }
-
-        if(selectionProviderSupport != null) {
-            Map<List<String>, Collection<String>> selectionProviderNames =
-                    selectionProviderSupport.getAvailableSelectionProviderNames();
-            if(!selectionProviderNames.isEmpty()) {
-                setupSelectionProviderEdits();
-                setupSelectionProvidersForm(selectionProviderNames);
+    @GET
+    @Path(":allSelectionProviders")
+    @Produces(MediaType.APPLICATION_JSON)
+    public CrudSelectionProviderEdit[] getAllSelectionProviders() {
+        Map<List<String>, Collection<String>> availableSelectionProviders =
+                selectionProviderSupport.getAvailableSelectionProviderNames();
+        CrudSelectionProviderEdit[] selectionProviderEdits =
+                new CrudSelectionProviderEdit[availableSelectionProviders.size()];
+        int i = 0;
+        for(Map.Entry<List<String>, Collection<String>> entry : availableSelectionProviders.entrySet()) {
+            CrudSelectionProviderEdit selectionProviderEdit = new CrudSelectionProviderEdit();
+            selectionProviderEdits[i] = selectionProviderEdit;
+            String[] fieldNames = entry.getKey().toArray(new String[entry.getKey().size()]);
+            selectionProviderEdit.fieldNames = fieldNames;
+            selectionProviderEdit.availableSelectionProviders = entry.getValue();
+            selectionProviderEdit.displayModeName = DisplayMode.DROPDOWN.name();
+            selectionProviderEdit.searchDisplayModeName = SearchDisplayMode.DROPDOWN.name();
+            for(CrudSelectionProvider cp : selectionProviderSupport.getCrudSelectionProviders()) {
+                if(Arrays.equals(cp.fieldNames, fieldNames)) {
+                    SelectionProvider selectionProvider = cp.getSelectionProvider();
+                    if(selectionProvider != null) {
+                        selectionProviderEdit.selectionProviderName = selectionProvider.getName();
+                        DisplayMode displayMode = selectionProvider.getDisplayMode();
+                        if(displayMode != null) {
+                            selectionProviderEdit.displayModeName = displayMode.name();
+                        }
+                        SearchDisplayMode searchDisplayMode = selectionProvider.getSearchDisplayMode();
+                        if(searchDisplayMode != null) {
+                            selectionProviderEdit.searchDisplayModeName = searchDisplayMode.name();
+                        }
+                    }
+                }
             }
+            i++;
         }
-
-        buildConfigurationForm();
+        return selectionProviderEdits;
     }
 
     protected void buildConfigurationForm() {
@@ -1390,84 +1354,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void setupConfigurationForm(FormBuilder formBuilder) {}
-
-    protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
-        TableFormBuilder tableFormBuilder = new TableFormBuilder(CrudSelectionProviderEdit.class);
-        tableFormBuilder.configNRows(selectionProviderNames.size());
-        for(int i = 0; i < selectionProviderEdits.length; i++) {
-            Collection<String> availableProviders =
-                    selectionProviderNames.get(Arrays.asList(selectionProviderEdits[i].fieldNames));
-            if(availableProviders == null || availableProviders.size() == 0) {
-                continue;
-            }
-            DefaultSelectionProvider selectionProvider =
-                    new DefaultSelectionProvider(selectionProviderEdits[i].columns);
-            selectionProvider.appendRow(null, "None", true);
-            for(String spName : availableProviders) {
-                selectionProvider.appendRow(spName, spName, true);
-            }
-            tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
-        }
-        selectionProvidersForm = tableFormBuilder.build();
-        selectionProvidersForm.setCondensed(true);
-    }
-
-    protected void setupPropertyEdits() {
-        if(classAccessor == null) {
-            return;
-        }
-        PropertyAccessor[] propertyAccessors = classAccessor.getProperties();
-        propertyEdits = new CrudPropertyEdit[propertyAccessors.length];
-        for (int i = 0; i < propertyAccessors.length; i++) {
-            CrudPropertyEdit edit = new CrudPropertyEdit();
-            PropertyAccessor propertyAccessor = propertyAccessors[i];
-            edit.name = propertyAccessor.getName();
-            com.manydesigns.elements.annotations.Label labelAnn =
-                    propertyAccessor.getAnnotation(com.manydesigns.elements.annotations.Label.class);
-            edit.label = labelAnn != null ? labelAnn.value() : null;
-            Enabled enabledAnn = propertyAccessor.getAnnotation(Enabled.class);
-            edit.enabled = enabledAnn != null && enabledAnn.value();
-            InSummary inSummaryAnn = propertyAccessor.getAnnotation(InSummary.class);
-            edit.inSummary = inSummaryAnn != null && inSummaryAnn.value();
-            Insertable insertableAnn = propertyAccessor.getAnnotation(Insertable.class);
-            edit.insertable = insertableAnn != null && insertableAnn.value();
-            Updatable updatableAnn = propertyAccessor.getAnnotation(Updatable.class);
-            edit.updatable = updatableAnn != null && updatableAnn.value();
-            Searchable searchableAnn = propertyAccessor.getAnnotation(Searchable.class);
-            edit.searchable = searchableAnn != null && searchableAnn.value();
-            propertyEdits[i] = edit;
-        }
-    }
-
-    protected void setupSelectionProviderEdits() {
-        Map<List<String>, Collection<String>> availableSelectionProviders =
-                selectionProviderSupport.getAvailableSelectionProviderNames();
-        selectionProviderEdits = new CrudSelectionProviderEdit[availableSelectionProviders.size()];
-        int i = 0;
-        for(List<String> key : availableSelectionProviders.keySet()) {
-            selectionProviderEdits[i] = new CrudSelectionProviderEdit();
-            String[] fieldNames = key.toArray(new String[key.size()]);
-            selectionProviderEdits[i].fieldNames = fieldNames;
-            selectionProviderEdits[i].columns = StringUtils.join(fieldNames, ", ");
-            for(CrudSelectionProvider cp : selectionProviderSupport.getCrudSelectionProviders()) {
-                if(Arrays.equals(cp.fieldNames, fieldNames)) {
-                    SelectionProvider selectionProvider = cp.getSelectionProvider();
-                    if(selectionProvider != null) {
-                        selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
-                        selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
-                        selectionProviderEdits[i].searchDisplayMode = selectionProvider.getSearchDisplayMode();
-                        selectionProviderEdits[i].createNewHref = selectionProvider.getCreateNewValueHref();
-                        selectionProviderEdits[i].createNewText = selectionProvider.getCreateNewValueText();
-                    } else {
-                        selectionProviderEdits[i].selectionProvider = null;
-                        selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;
-                        selectionProviderEdits[i].searchDisplayMode = SearchDisplayMode.DROPDOWN;
-                    }
-                }
-            }
-            i++;
-        }
-    }
 
     /*@Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
@@ -1675,7 +1561,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @GET
-    @Path(":selectionProviders")
+    @Path(":selectionProviders") //For Portofino 4 compatibility
+    @Produces(MediaType.APPLICATION_JSON)
+    public List legacySelectionProviders() {
+        return selectionProviders();
+    }
+
+    @GET
+    @Path(":selectionProvider")
     @Produces(MediaType.APPLICATION_JSON)
     @SuppressWarnings("unchecked")
     public List selectionProviders() {
@@ -2306,10 +2199,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public void setCrudConfigurationForm(Form crudConfigurationForm) {
         this.crudConfigurationForm = crudConfigurationForm;
-    }
-
-    public TableForm getPropertiesTableForm() {
-        return propertiesTableForm;
     }
 
     public Form getForm() {

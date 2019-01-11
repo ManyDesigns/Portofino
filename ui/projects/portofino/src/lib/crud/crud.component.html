@@ -50,5 +50,43 @@
         </tr>
       </table>
     </fieldset>
+    <fieldset>
+      <legend>{{'Selection providers' | translate}}</legend>
+      <table class="mat-table">
+        <tr class="mat-header-row">
+          <th class="mat-header-cell">{{'Properties' | translate}}</th>
+          <th class="mat-header-cell">{{'Selection Provider' | translate}}</th>
+          <th class="mat-header-cell">{{'Display Mode' | translate}}</th>
+          <th class="mat-header-cell">{{'Search Display Mode' | translate}}</th>
+        </tr>
+        <tr *ngFor="let sp of settingsPanel['selectionProviders']" class="mat-row">
+          <td class="mat-cell">
+            {{sp.fieldNames.join(", ")}}
+          </td>
+          <td class="mat-cell">
+            <mat-select [(ngModel)]="sp.selectionProviderName">
+              <mat-option [value]="null">{{"None" | translate}}</mat-option>
+              <mat-option *ngFor="let option of sp.availableSelectionProviders" [value]="option">{{option}}</mat-option>
+            </mat-select>
+          </td>
+          <td class="mat-cell">
+            <mat-select [(ngModel)]="sp.displayModeName">
+              <mat-option value="DROPDOWN">{{"Drop down" | translate}}</mat-option>
+              <mat-option value="RADIO">{{"Radio buttons" | translate}}</mat-option>
+              <mat-option value="AUTOCOMPLETE">{{"Autocomplete" | translate}}</mat-option>
+            </mat-select>
+          </td>
+          <td class="mat-cell">
+            <mat-select [(ngModel)]="sp.searchDisplayModeName">
+              <mat-option value="DROPDOWN">{{"Drop down" | translate}}</mat-option>
+              <mat-option value="RADIO">{{"Radio buttons" | translate}}</mat-option>
+              <mat-option value="AUTOCOMPLETE">{{"Autocomplete" | translate}}</mat-option>
+              <mat-option value="MULTIPLESELECT">{{"Multiple select" | translate}}</mat-option>
+              <mat-option value="CHECKBOX">{{"Check boxes" | translate}}</mat-option>
+            </mat-select>
+          </td>
+        </tr>
+      </table>
+    </fieldset>
   </ng-template>
 </portofino-default-page-layout>

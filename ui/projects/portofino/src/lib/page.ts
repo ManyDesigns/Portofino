@@ -520,6 +520,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     const config = Object.assign({}, this.configuration, formValue);
     const pageConfiguration = new PageConfiguration();
     //Reflection would be nice
+    console.log("uh?", config);
     pageConfiguration.children = config.children;
     pageConfiguration.securityCheckPath = config.securityCheckPath;
     pageConfiguration.source = config.source.source;

@@ -248,7 +248,17 @@ export class CrudComponent extends Page {
 
   protected getActionConfigurationToSave(): any {
     const configurationToSave = super.getActionConfigurationToSave();
-    configurationToSave.properties = (<CrudPageSettingsPanel>this.settingsPanel).properties;
+    const settingsPanel = (<CrudPageSettingsPanel>this.settingsPanel);
+    configurationToSave.properties = settingsPanel.properties;
+    configurationToSave.selectionProviders = settingsPanel.selectionProviders.map(sp => {
+      const enabled = sp.selectionProviderName != null;
+      return {
+        enabled: enabled,
+        selectionProviderName: enabled ? sp.selectionProviderName : sp.availableSelectionProviders ? sp.availableSelectionProviders[0] : null,
+        displayModeName: sp.displayModeName,
+        searchDisplayModeName: sp.searchDisplayModeName
+      }
+    });
     return configurationToSave;
   }
 }
@@ -309,9 +319,19 @@ export class BulkEditComponentHolder extends BulkEditComponent {
 export class CrudPageSettingsPanel extends PageSettingsPanel {
 
   properties = [];
+  selectionProviders = [];
 
   protected setupConfigurationForm(ca: ClassAccessor, config: any) {
     super.setupConfigurationForm(ca, config);
+    this.properties = [];
+    this.selectionProviders = [];
+    if(!config) {
+      return;
+    }
+    const crud = this.page as CrudComponent;
+    crud.http.get<any>(crud.sourceUrl + '/:allSelectionProviders').subscribe(sps => {
+      this.selectionProviders = sps;
+    });
     config.properties.forEach(p => {
       this.properties.push({
         enabled: p.property.enabled, name: p.property.name, label: p.property.label,

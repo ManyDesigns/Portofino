@@ -30,12 +30,15 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
+import com.manydesigns.portofino.pageactions.crud.configuration.database.SelectionProviderReference;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -214,6 +217,27 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")
                 .configSelectionProvider(databaseSelectionProvider, "database");
+    }
+
+    @Override
+    protected boolean saveConfiguration(Object configuration) {
+        CrudConfiguration crudConfiguration = (CrudConfiguration) configuration;
+        List<SelectionProviderReference> sps = new ArrayList<>(crudConfiguration.getSelectionProviders());
+        crudConfiguration.getSelectionProviders().clear();
+        crudConfiguration.persistence = persistence;
+        crudConfiguration.init();
+        sps.forEach(sp -> {
+            ForeignKey fk = DatabaseLogic.findForeignKeyByName(
+                    crudConfiguration.getActualTable(), sp.getSelectionProviderName());
+            if(fk != null) {
+                sp.setForeignKeyName(sp.getSelectionProviderName());
+                sp.setSelectionProviderName(null);
+            }
+            if(sp.getSelectionProviderName() != null || sp.getForeignKeyName() != null) {
+                crudConfiguration.getSelectionProviders().add(sp);
+            }
+        });
+        return super.saveConfiguration(crudConfiguration);
     }
 
     @Override

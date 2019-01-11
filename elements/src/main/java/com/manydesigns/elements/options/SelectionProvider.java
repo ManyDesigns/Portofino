@@ -40,6 +40,8 @@ public interface SelectionProvider {
 
     void ensureActive(Object... values);
 
+    @Deprecated
     String getCreateNewValueHref();
+    @Deprecated
     String getCreateNewValueText();
 }

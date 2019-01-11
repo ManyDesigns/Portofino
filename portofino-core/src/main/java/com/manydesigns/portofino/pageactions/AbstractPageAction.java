@@ -287,41 +287,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return pageConfigurationForm.validate();
     }
 
-//    /**
-//     * Updates the page with values from the page configuration. Can be called to re-use the standard page
-//     * configuration form. Should be called only after validatePageConfiguration() returned true.
-//     * @return true iff the page was correctly saved.
-//     */
-//    protected boolean updatePageConfiguration() {
-//        EditPage edit = new EditPage();
-//        pageConfigurationForm.writeToObject(edit);
-//        Page page = pageInstance.getPage();
-//        page.setTitle(edit.title);
-//        page.setDescription(edit.description);
-//        page.getLayout().setTemplate(edit.template);
-//        page.getDetailLayout().setTemplate(edit.detailTemplate);
-//        try {
-//            File pageFile = PageLogic.savePage(pageInstance.getDirectory(), page);
-//            logger.info("Page saved to " + pageFile.getAbsolutePath());
-//        } catch (Exception e) {
-//            logger.error("Couldn't save page", e);
-//            return false; //TODO handle return value + script + session msg
-//        }
-//        if(edit.applyTemplateRecursively) {
-//            FileFilter filter = new FileFilter() {
-//                public boolean accept(File pathname) {
-//                    return pathname.isDirectory();
-//                }
-//            };
-//            updateTemplate(pageInstance.getDirectory(), filter, edit);
-//        }
-//        Subject subject = SecurityUtils.getSubject();
-//        if(SecurityLogic.hasPermissions(portofinoConfiguration, getPageInstance(), subject, AccessLevel.DEVELOP)) {
-//            updateScript();
-//        }
-//        return true;
-//    }
-
     //--------------------------------------------------------------------------
     // Scripting
     //--------------------------------------------------------------------------
