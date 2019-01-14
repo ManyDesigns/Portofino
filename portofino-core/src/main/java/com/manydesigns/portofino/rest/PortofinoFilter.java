@@ -75,6 +75,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
+    public final static Logger accessLogger = LoggerFactory.getLogger("com.manydesigns.portofino.access");
     public static final String MESSAGE_HEADER = "X-Portofino-Message";
 
     @Context
@@ -108,6 +109,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             pageAction.prepareForExecution();
         }
         checkAuthorizations(requestContext, resource);
+        accessLogger.info(requestContext.getMethod());
     }
 
     protected void addCacheHeaders(ContainerResponseContext responseContext) {
