@@ -15,6 +15,7 @@ export * from './lib/fields/text-field.component';
 export * from './lib/fields/field.factory';
 export * from './lib/notifications/notification.service';
 export * from './lib/portofino-app.component';
+export * from './lib/page.factory';
 export * from './lib/crud/crud.component';
 export * from './lib/crud/common.component';
 export * from './lib/crud/detail/create.component';

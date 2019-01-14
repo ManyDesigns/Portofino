@@ -18,16 +18,48 @@ export class Property {
   }
 
   editable: boolean;
-  selectionProvider: any;
+  selectionProvider: SelectionProvider;
 
   static create(values: Property | any): Property {
     return Object.assign(new Property(), values)
+  }
+
+  required(value: boolean = true): Property {
+    const annotation = getAnnotation(this, ANNOTATION_REQUIRED);
+    if(annotation) {
+      annotation.properties[0] = value;
+    } else {
+      this.annotations.push(new Annotation(ANNOTATION_REQUIRED, [value]));
+    }
+    return this;
   }
 }
 
 export class Annotation {
   type: string;
-  properties: object[];
+  properties: any[];
+
+constructor(type?: string, properties?: any[]) {
+    this.type = type;
+    this.properties = properties;
+  }
+}
+
+export class SelectionProvider {
+  name: string;
+  index: number;
+  displayMode: string;
+  url: string;
+  nextProperty: string;
+  updateDependentOptions: () => void;
+  loadOptions: (value?: string) => void;
+  options: SelectionOption[];
+}
+
+export class SelectionOption {
+  v: string;
+  l: string;
+  s: boolean;
 }
 
 export const ANNOTATION_REQUIRED = "com.manydesigns.elements.annotations.Required";

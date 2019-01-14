@@ -67,6 +67,7 @@ export class PageConfiguration {
 export class PageChild {
   path: string;
   title: string;
+  icon: string;
   embedded: boolean;
   accessible: boolean;
 }
@@ -303,12 +304,12 @@ export class PageSettingsPanel {
 
   show() {
     this.formDefinition.contents = [
-      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration),
+      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration)/*,
       {
         name: 'source',
         component: SourceSelector,
         dependencies: {page: this.page, initialValue: this.page.configuration.source}
-      }];
+      }*/];
     this.previousConfiguration = this.page.configuration;
     this.reloadConfiguration();
     this.active = true;
@@ -522,7 +523,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     //Reflection would be nice
     pageConfiguration.children = config.children;
     pageConfiguration.securityCheckPath = config.securityCheckPath;
-    pageConfiguration.source = config.source.source;
+    pageConfiguration.source = config.source; //config.source.source;
     pageConfiguration.title = config.title;
     pageConfiguration.type = config.type;
     return pageConfiguration;

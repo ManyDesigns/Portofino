@@ -1,9 +1,8 @@
 import {Component, Input, OnInit, Optional} from '@angular/core';
-import {PortofinoComponent} from "../portofino-app.component";
+import {PortofinoComponent} from "../page.factory";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
 import {FormControl} from "@angular/forms";
-import {MatSnackBar} from "@angular/material";
 import {Operation, Page, PageConfiguration} from "../page";
 import {AuthenticationService} from "../security/authentication.service";
 import {ActivatedRoute, Router} from "@angular/router";

@@ -7,6 +7,18 @@
     {{ title }}
   </div>
   <div>
+    <ng-container *ngIf="authenticationService.isAdmin">
+      <mat-menu #pagesMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="pageService.createPage()">
+          <mat-icon>add</mat-icon>
+          {{ 'Add page' | translate }}
+        </button>
+      </mat-menu>
+      <button mat-button [matMenuTriggerFor]="pagesMenu">
+        <mat-icon>more_vert</mat-icon>
+        {{ 'Pages' | translate }}
+      </button>
+    </ng-container>
     <portofino-language-selector *ngIf="portofino.locales.length > 1"></portofino-language-selector>
     <ng-container *ngIf="authenticationService.currentUser">
       <mat-menu #userMenu="matMenu" [overlapTrigger]="false">

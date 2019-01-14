@@ -8,6 +8,7 @@
         <ng-container *ngFor="let child of pageService.page.parent.children">
           <li *ngIf="child.path != pageService.page.segment && child.accessible">
             <a [routerLink]="pageService.page.parent.url + '/' + child.path" routerLinkActive="active">
+              <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
               {{child.title}}
             </a>
           </li>
@@ -16,7 +17,10 @@
             <ul>
               <ng-container *ngFor="let child of pageService.page.children">
                 <li *ngIf="child.accessible">
-                  <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">{{child.title}}</a>
+                  <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
+                    <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+                    {{child.title}}
+                  </a>
                 </li>
               </ng-container>
             </ul>
@@ -30,7 +34,10 @@
     <ul>
       <ng-container *ngFor="let child of pageService.page.children">
         <li *ngIf="child.accessible">
-          <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">{{child.title}}</a>
+          <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
+            <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+            {{child.title}}
+          </a>
         </li>
       </ng-container>
     </ul>

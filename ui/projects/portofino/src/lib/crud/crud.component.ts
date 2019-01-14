@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {ClassAccessor} from "../class-accessor";
-import {PortofinoComponent} from "../portofino-app.component";
+import {PortofinoComponent} from "../page.factory";
 import {Operation, Page, PageChild, PageConfiguration, PageSettingsPanel} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
 import {Button} from "../buttons";

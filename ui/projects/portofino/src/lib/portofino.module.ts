@@ -86,6 +86,7 @@ import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
 import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
 import {LocalStorageService} from "ngx-store";
+import {CreatePageComponent, PageCrudService} from "./pages/page-crud.service";
 
 @NgModule({
   declarations: [
@@ -113,11 +114,12 @@ export class PortofinoFormsModule {}
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
     ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective,
     LanguageSelectorComponent,
-    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent,
+    NavigationDirective, DefaultNavigationComponent, ToolbarDirective, DefaultToolbarComponent, BreadcrumbsComponent,
     SourceSelector, SourceSelectorTree,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    ManyToManyComponent,BreadcrumbsComponent
+    ManyToManyComponent,
+    CreatePageComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
@@ -130,7 +132,7 @@ export class PortofinoFormsModule {}
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
   ],
   providers: [
-    PortofinoService, AuthenticationService, PageService,
+    PortofinoService, AuthenticationService, PageService, PageCrudService,
     //These are factories to avoid circular dependencies
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
@@ -142,6 +144,7 @@ export class PortofinoFormsModule {}
     { provide: NotificationService, useClass: MatSnackBarNotificationService }],
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,
+    CreatePageComponent,
     CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,

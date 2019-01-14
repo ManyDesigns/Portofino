@@ -2,7 +2,7 @@
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
     <mat-label>{{property.label}}</mat-label>
     <mat-select [formControlName]="property.name" [required]="isRequired()"
-                (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
+                (selectionChange)="property.selectionProvider.updateDependentOptions()">
       <mat-option [value]="null" *ngIf="property.selectionProvider.options.length > 0"></mat-option>
       <mat-option *ngFor="let option of property.selectionProvider.options"
                   [value]="option">
@@ -44,7 +44,7 @@
     <label>{{property.label}}</label>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector"></mat-checkbox>
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
-                     (change)="property.selectionProvider.updateDependentOptions(property)"
+                     (change)="property.selectionProvider.updateDependentOptions()"
                      [required]="isRequired()">
       <mat-radio-button *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
                         [value]="option">

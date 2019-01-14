@@ -2,7 +2,7 @@ import {PortofinoService} from "../portofino.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Component, OnInit} from "@angular/core";
 import {AuthenticationService} from "../security/authentication.service";
-import {PortofinoComponent} from "../portofino-app.component";
+import {PortofinoComponent} from "../page.factory";
 import {PageService} from "../page";
 
 export interface BreadCrumb {

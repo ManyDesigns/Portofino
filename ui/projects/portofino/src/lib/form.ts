@@ -29,7 +29,7 @@ export class Form {
   selectableFields: boolean = false;
   //TODO parent form for defaults? For fieldsets
 
-  constructor(contents = []) {
+  constructor(contents: FormElement[] = []) {
     this.contents = contents;
   }
 

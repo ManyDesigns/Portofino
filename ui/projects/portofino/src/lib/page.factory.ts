@@ -22,6 +22,8 @@ import {map, mergeMap} from "rxjs/operators";
 })
 export class PageFactoryComponent extends Page implements OnInit {
 
+  static components: any = {};
+
   @Input()
   parent: Page;
   @Input()
@@ -69,7 +71,7 @@ export class PageFactoryComponent extends Page implements OnInit {
   }
 
   create(config: PageConfiguration, path: string, parent: Page): Observable<ComponentRef<any>> {
-    const componentType = PortofinoAppComponent.components[config.type];
+    const componentType = PageFactoryComponent.components[config.type];
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
@@ -88,4 +90,10 @@ export class PageFactoryComponent extends Page implements OnInit {
     return component.prepare().pipe(map(_ => componentRef));
   }
 
+}
+
+export function PortofinoComponent(info: { name: string }) {
+  return function(target) {
+    PageFactoryComponent.components[info.name] = target;
+  };
 }

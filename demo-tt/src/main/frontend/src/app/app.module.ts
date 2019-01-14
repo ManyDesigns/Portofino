@@ -56,7 +56,17 @@ export class CustomNavigation {}
   selector: 'portofino-welcome',
   template: `
     <portofino-default-page-layout [page]="this">
-      <ng-template #content><p>Welcome to Portofino 5!</p></ng-template>
+      <ng-template #content>
+        <p>Welcome to the Portofino 5 demo application "demo-tt"!</p>
+        <p>
+          Use the navigation button
+          <button title="{{ 'Navigation' | translate }}" type="button" mat-icon-button
+                  (click)="portofino.toggleSidenav()">
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+          to explore the app.
+        </p>
+      </ng-template>
     </portofino-default-page-layout>`
 })
 @PortofinoComponent({ name: 'welcome' })

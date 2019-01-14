@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Injector, Input, OnDestroy, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {
   ClassAccessor,
   isDateProperty,
@@ -6,15 +6,14 @@ import {
   isInSummary,
   isNumericProperty,
   isSearchable,
-  Property
+  Property, SelectionOption
 } from "../../class-accessor";
 import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
-import {debounceTime} from "rxjs/operators";
 import {SelectionModel} from "@angular/cdk/collections";
-import {SelectionOption, SelectionProvider} from "../crud.common";
+import {SelectionProvider} from "../crud.common";
 import {AuthenticationService} from "../../security/authentication.service";
 import {MediaObserver} from "@angular/flex-layout";
 import {Observable, of, Subject, Subscription} from "rxjs";
@@ -64,8 +63,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   @Input()
   parent: any;
 
-  constructor(private http: HttpClient, private portofino: PortofinoService, protected translate: TranslateService,
-              private auth: AuthenticationService, public media: MediaObserver) {}
+  constructor(protected http: HttpClient, protected portofino: PortofinoService, protected translate: TranslateService,
+              protected auth: AuthenticationService, public media: MediaObserver) {}
 
   ngOnInit() {
     this.setupForm();
@@ -160,18 +159,11 @@ export class SearchComponent implements OnInit, OnDestroy {
               this.loadSelectionOptions(this.searchProperties.find(p => p.name == nextProperty));
             }
           },
+          loadOptions: value => {
+            this.loadSelectionOptions(property, value);
+          },
           options: []
         };
-        if (property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
-          const autocomplete = this.form.get(property.name);
-          autocomplete.valueChanges.pipe(debounceTime(500)).subscribe(value => {
-            if (autocomplete.dirty && value != null && value.hasOwnProperty("length")) {
-              this.loadSelectionOptions(property, value);
-            }
-          });
-        } else if (index == 0) {
-          this.loadSelectionOptions(property);
-        }
         if (index < sp.fieldNames.length - 1) {
           property.selectionProvider.nextProperty = sp.fieldNames[index + 1];
         }
@@ -203,13 +195,13 @@ export class SearchComponent implements OnInit, OnDestroy {
       if(autocomplete) {
         params = params.set(`labelSearch`, autocomplete);
       } else {
-        this.setSelectOptions(property, []);
+        this.setSelectionOptions(property, []);
         return;
       }
     }
     this.http.get<SelectionOption[]>(url, { params: params }).subscribe(
       options => {
-        this.setSelectOptions(property, options);
+        this.setSelectionOptions(property, options);
         if(property.selectionProvider.displayMode == 'CHECKBOX') {
           const controls = [];
           for(let i = 0; i < options.length; i++) {
@@ -220,7 +212,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
   }
 
-  private setSelectOptions(property: Property, options) {
+  protected setSelectionOptions(property: Property, options: SelectionOption[]) {
     property.selectionProvider.options = options;
     this.clearDependentSelectionValues(property);
     const selected = options.find(o => o.s);
