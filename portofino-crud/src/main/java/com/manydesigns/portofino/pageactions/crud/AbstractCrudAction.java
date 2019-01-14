@@ -437,20 +437,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return Whitelist.basic();
     }
 
-    //**************************************************************************
-    // Create/Save
-    //**************************************************************************
-
     protected void preCreate() {
         setupForm(Mode.CREATE);
         object = (T) classAccessor.newInstance();
         createSetup(object);
         form.readFromObject(object);
     }
-
-    //**************************************************************************
-    // Edit/Update
-    //**************************************************************************
 
     protected void preEdit() {
         setupForm(Mode.EDIT);
@@ -479,19 +471,20 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    //**************************************************************************
-    // Bulk Edit/Update
-    //**************************************************************************
-
     public boolean isBulkOperationsEnabled() {
         return object == null;
     }
 
-    //**************************************************************************
-    // Delete
-    //**************************************************************************
+    @Override
+    public List describeOperations() {
+        List operations = super.describeOperations();
+        Map<String, String> bulkOperations = new HashMap<>();
+        bulkOperations.put("name", "Bulk operations");
+        bulkOperations.put("available", String.valueOf(isBulkOperationsEnabled()));
+        return operations;
+    }
 
-   //**************************************************************************
+    //**************************************************************************
     // Hooks/scripting
     //**************************************************************************
 

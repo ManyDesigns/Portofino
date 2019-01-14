@@ -87,9 +87,10 @@ export class CrudComponent extends Page {
   }
 
   protected init(classAccessor, selectionProviders: SelectionProvider[], ops: Operation[]) {
+    const bulkOpsEnabled = ops.some(op => op.name == "Bulk operations" && op.available);
     this.createEnabled = this.operationAvailable(ops, "POST");
-    this.bulkEditEnabled = this.operationAvailable(ops, "PUT");
-    this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE");
+    this.bulkEditEnabled = this.operationAvailable(ops, "PUT") && bulkOpsEnabled;
+    this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE") && bulkOpsEnabled;
     this.classAccessor = classAccessor;
     this.selectionProviders = selectionProviders;
     this.classAccessor.properties.forEach(p => {
