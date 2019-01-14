@@ -29,7 +29,7 @@ registerLocaleData(localeIt);
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Portofino Application"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Application" apiRoot="http://localhost:8080/api/"></portofino-app>`
 })
 export class AppComponent {}
 

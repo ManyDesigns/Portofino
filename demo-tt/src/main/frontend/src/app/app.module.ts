@@ -64,7 +64,7 @@ export class WelcomeComponent extends Page {}
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT"></portofino-app>`
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
 })
 export class AppComponent {}
 

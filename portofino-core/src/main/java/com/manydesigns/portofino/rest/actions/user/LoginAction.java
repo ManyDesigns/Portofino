@@ -143,7 +143,13 @@ public abstract class LoginAction extends AbstractPageAction {
 
     @Path("{sessionId}")
     @DELETE
-    public void logout(@Deprecated @PathParam("sessionId") String sessionId) {
+    @Deprecated
+    public void logout(@PathParam("sessionId") String sessionId) {
+        logout();
+    }
+
+    @DELETE
+    public void logout() {
         Subject subject = SecurityUtils.getSubject();
         subject.logout();
         logger.info("User logout");
