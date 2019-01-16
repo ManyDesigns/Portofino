@@ -9,6 +9,7 @@
         <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
                         fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
         <div fxLayout="row">
+          <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
           <portofino-button *ngFor="let button of parentButtons"
                             [button]="button" [component]="parent"></portofino-button>
           <portofino-buttons [component]="this"></portofino-buttons>

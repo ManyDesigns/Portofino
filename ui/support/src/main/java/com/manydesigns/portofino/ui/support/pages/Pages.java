@@ -40,27 +40,56 @@ public class Pages extends Resource {
     @Context
     protected UriInfo uriInfo;
 
+    @POST
+    @Path("{path:.+}")
+    public Response createPage(
+        @PathParam("path") String path, @HeaderParam(AUTHORIZATION_HEADER) String auth,
+        @QueryParam("loginPath") String loginPath) {
+        checkPathAndAuth(path, auth, loginPath);
+        MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
+        //TODO create new page instead
+        Response response = saveActionConfiguration(
+            auth,
+            multipart.getParameterValues("actionConfigurationPath")[0],
+            multipart.getParameterValues("actionConfiguration")[0]);
+        if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+            saveConfigJson("pages/" + path, multipart.getParameterValues("pageConfiguration")[0]);
+        }
+        return response;
+    }
+
     @PUT
     @Path("{path:.+}")
-    public Response savePage(
+    public Response updatePageAndConfiguration(
         @PathParam("path") String path, @HeaderParam(AUTHORIZATION_HEADER) String auth,
-        @QueryParam("loginPath") String loginPath) throws IOException { //TODO should the login path be asked once and then cached?
-        if (!checkAdmin(loginPath, auth)) {
-            return Response.status(auth != null ? Response.Status.UNAUTHORIZED : Response.Status.FORBIDDEN).build();
+        @QueryParam("loginPath") String loginPath) { //TODO should the login path be asked once and then cached?
+        checkPathAndAuth(path, auth, loginPath);
+        MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
+        Response response = saveActionConfiguration(
+            auth,
+            multipart.getParameterValues("actionConfigurationPath")[0],
+            multipart.getParameterValues("actionConfiguration")[0]);
+        if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+            saveConfigJson("pages/" + path, multipart.getParameterValues("pageConfiguration")[0]);
         }
-        //TODO put to the backend too and/or check the JWT
+        return response;
+    }
+
+    public void checkPathAndAuth(String path, String auth, String loginPath) {
         if (path.contains("..") || !path.endsWith("config.json")) {
-            return Response.status(Response.Status.BAD_REQUEST)
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
                 .entity("Invalid config.json path")
                 .type(MediaType.TEXT_PLAIN_TYPE)
-                .build();
+                .build());
         }
-        path = "pages/" + path;
+        if (!checkAdmin(loginPath, auth)) {
+            //Must be explicitly checked because the action configuration path comes as a parameter and could be anything
+            throw new WebApplicationException(
+                Response.status(auth != null ? Response.Status.UNAUTHORIZED : Response.Status.FORBIDDEN).build());
+        }
+    }
 
-        MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
-        String pageConfiguration = multipart.getParameterValues("pageConfiguration")[0];
-        String configPath = servletContext.getRealPath(path);
-        String actionConfigurationPath = multipart.getParameterValues("actionConfigurationPath")[0];
+    public Response saveActionConfiguration(String auth, String actionConfigurationPath, String actionConfiguration) {
         String apiRootUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
         if(actionConfigurationPath.startsWith(apiRootUri)) {
             actionConfigurationPath = actionConfigurationPath.substring(apiRootUri.length());
@@ -71,7 +100,13 @@ public class Pages extends Resource {
                 .type(MediaType.TEXT_PLAIN_TYPE)
                 .build();
         }
+        Invocation.Builder req = path(actionConfigurationPath).request();
+        req = req.header(AUTHORIZATION_HEADER, auth);
+        return req.put(Entity.entity(actionConfiguration, MediaType.APPLICATION_JSON_TYPE));
+    }
 
+    public void saveConfigJson(String path, String pageConfiguration) {
+        String configPath = servletContext.getRealPath(path);
         File file = new File(configPath);
         try (FileWriter fw = new FileWriter(file)) {
             fw.write(pageConfiguration);
@@ -80,11 +115,6 @@ public class Pages extends Resource {
             logger.error("Could not save config to " + path, e);
             throw new WebApplicationException(e.getMessage(), e);
         }
-        String actionConfiguration = multipart.getParameterValues("actionConfiguration")[0];
-        Invocation.Builder req = path(actionConfigurationPath).request();
-        req = req.header(AUTHORIZATION_HEADER, auth);
-        Response response = req.put(Entity.entity(actionConfiguration, MediaType.APPLICATION_JSON_TYPE));
-        return response;
     }
 
     protected boolean checkAdmin(String loginPath, String authorization) {
@@ -97,6 +127,5 @@ public class Pages extends Resource {
         }
         return false;
     }
-
 
 }

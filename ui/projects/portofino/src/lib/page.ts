@@ -59,9 +59,10 @@ export class DefaultNavigationComponent {
 export class PageConfiguration {
   type: string;
   title: string;
-  children: PageChild[];
   source: string;
   securityCheckPath: string = ':description';
+  children: PageChild[] = [];
+  icon?: string;
 }
 
 export class PageChild {
@@ -249,7 +250,7 @@ export class SourceSelector implements OnInit {
     name: 'source',
     type: 'string',
     label: 'Path or URL',
-    annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
+    annotations: [{ type: ANNOTATION_REQUIRED, properties: {value: true} }]
   });
 
   constructor(public portofino: PortofinoService, protected http: HttpClient, protected dialog: MatDialog) {}
@@ -485,11 +486,18 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   saveConfiguration() {
+    if (!this.portofino.localApiAvailable) {
+      throw "Local Portofino API not available"
+    }
     const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
     const actionConfiguration = this.getActionConfigurationToSave();
     this.configuration = pageConfiguration;
-    this.portofino.saveConfiguration(
-      this.getConfigurationLocation(this.path), pageConfiguration, actionConfiguration, this.configurationUrl).subscribe(
+    let data = new FormData();
+    data.append("pageConfiguration", JSON.stringify(pageConfiguration));
+    data.append("actionConfiguration", JSON.stringify(actionConfiguration));
+    data.append("actionConfigurationPath", this.configurationUrl);
+    const path = this.getConfigurationLocation(this.path);
+    this.http.put(`${this.portofino.localApiPath}/${path}?loginPath=${this.portofino.loginPath}`, data).subscribe(
       () => {
         this.settingsPanel.hide();
         this.reloadBaseUrl();

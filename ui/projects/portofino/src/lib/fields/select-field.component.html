@@ -1,7 +1,7 @@
 <ng-container *ngIf="enabled">
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
     <mat-label>{{property.label}}</mat-label>
-    <mat-select [formControlName]="property.name" [required]="isRequired()"
+    <mat-select [formControlName]="property.name" [required]="required"
                 (selectionChange)="property.selectionProvider.updateDependentOptions()">
       <mat-option [value]="null" *ngIf="property.selectionProvider.options.length > 0"></mat-option>
       <mat-option *ngFor="let option of property.selectionProvider.options"
@@ -23,7 +23,7 @@
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'AUTOCOMPLETE'" [formGroup]="form">
     <mat-label>{{property.label}}</mat-label>
     <input matInput [formControlName]="property.name" [matAutocomplete]="autocomplete"
-           [required]="isRequired()" [title]="property.label">
+           [required]="required" [title]="property.label">
     <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
       <mat-option *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
                   [value]="option">
@@ -45,7 +45,7 @@
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector"></mat-checkbox>
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
                      (change)="property.selectionProvider.updateDependentOptions()"
-                     [required]="isRequired()">
+                     [required]="required">
       <mat-radio-button *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
                         [value]="option">
         {{ option.l }}
