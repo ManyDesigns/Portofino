@@ -9,6 +9,7 @@ import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
 import {NotificationService} from "../notifications/notification.service";
 import {WebStorageService} from "ngx-store";
+import {TranslateService} from "@ngx-translate/core";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 export const TOKEN_STORAGE_SERVICE = new InjectionToken('JSON Web Token Storage');
@@ -25,7 +26,7 @@ export class AuthenticationService {
   constructor(private http: HttpClient, protected dialog: MatDialog,
               @Inject(TOKEN_STORAGE_SERVICE) protected storage: WebStorageService,
               private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
-              protected notifications: NotificationService) {
+              protected notifications: NotificationService, protected translate: TranslateService) {
     const userInfo = this.storage.get('user');
     if(userInfo) {
       this.currentUser = new UserInfo(userInfo.displayName, userInfo.administrator, userInfo.groups);
@@ -40,7 +41,9 @@ export class AuthenticationService {
         if(hasToken || !this.retryUnauthenticatedOnSessionExpiration) {
           req = req.clone({ headers: req.headers.delete("Authorization") });
           return this.doHttpRequest(req).pipe(map(result => {
-            this.notifications.warn("You have been logged out because your session has expired.").subscribe(); //TODO I18n
+            this.translate.get("You have been logged out because your session has expired.")
+              .pipe(mergeMap(m => this.notifications.warn(m)))
+              .subscribe();
             return result;
           }));
         } else {
@@ -50,10 +53,12 @@ export class AuthenticationService {
                 throw new Error("User declined login");
               }
             }),
-            mergeMap(_ => this.doHttpRequest(this.withAuthenticationHeader(req))));
+            mergeMap(() => this.doHttpRequest(this.withAuthenticationHeader(req))));
         }
       } else if(error.status === 403) {
-        this.notifications.error("You do not have the permission to do that!").subscribe(); //TODO I18n
+        this.translate.get("You do not have the permission to do that!")
+          .pipe(mergeMap(m => this.notifications.error(m)))
+          .subscribe();
       }
       return throwError(error);
     }), share());

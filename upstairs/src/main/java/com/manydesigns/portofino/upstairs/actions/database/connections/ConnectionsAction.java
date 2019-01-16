@@ -10,10 +10,8 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
-import com.manydesigns.portofino.model.database.JndiConnectionProvider;
+import com.manydesigns.elements.util.FormUtil;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -22,6 +20,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +61,7 @@ public class ConnectionsAction extends AbstractPageAction {
     @GET
     @Path("{databaseName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Form describeConnection(@PathParam("databaseName") String databaseName) {
+    public String describeConnection(@PathParam("databaseName") String databaseName) throws Exception {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         ConnectionProviderDetail cp = new ConnectionProviderDetail(connectionProvider);
         Form form = new FormBuilder(ConnectionProviderDetail.class).build();
@@ -68,8 +69,33 @@ public class ConnectionsAction extends AbstractPageAction {
         if (ConnectionProvider.STATUS_CONNECTED.equals(connectionProvider.getStatus())) {
             //TODO configureDetected();
         }
-        //TODO schema select
-        return form;
+        JSONStringer js = new JSONStringer();
+        js.object();
+        FormUtil.writeToJson(form, js);
+        js.key("schemas").array();
+        Connection conn = connectionProvider.acquireConnection();
+        logger.debug("Reading database metadata");
+        DatabaseMetaData metadata = conn.getMetaData();
+        List<String[]> schemaNamesFromDb =
+                connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
+        List<Schema> selectedSchemas = connectionProvider.getDatabase().getSchemas();
+        for(String[] schemaName : schemaNamesFromDb) {
+            boolean selected = false;
+            for(Schema schema : selectedSchemas) {
+                if(schemaName[1].equalsIgnoreCase(schema.getSchema())) {
+                    selected = true;
+                    break;
+                }
+            }
+            js.object();
+            js.key("catalog").value(schemaName[0]);
+            js.key("name").value(schemaName[1]);
+            js.key("selected").value(selected);
+            js.endObject();
+        }
+        js.endArray();
+        js.endObject();
+        return js.toString();
     }
 
     @PUT
