@@ -134,11 +134,15 @@ public class FormUtil {
     public static String writeToJson(Form form) {
         JSONStringer js = new JSONStringer();
         js.object();
-        List<Field> fields = new ArrayList<Field>();
-        collectVisibleFields(form, fields);
-        fieldsToJson(js, fields);
+        writeToJson(form, js);
         js.endObject();
         return js.toString();
+    }
+
+    public static void writeToJson(Form form, JSONStringer js) {
+        List<Field> fields = new ArrayList<>();
+        collectVisibleFields(form, fields);
+        fieldsToJson(js, fields);
     }
 
     public static Form readFromJson(Form form, JSONObject jsonObject) {
