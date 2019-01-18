@@ -50,8 +50,6 @@ public class PageInstance {
     protected final Class<? extends PageAction> actionClass;
     protected Object configuration;
     protected PageAction actionBean;
-    protected String title;
-    protected String description;
     protected boolean prepared;
 
     public static final String DETAIL = "_detail";
@@ -69,8 +67,6 @@ public class PageInstance {
         this.page = page;
         this.actionClass = actionClass;
         parameters = new ArrayList<String>();
-        this.title = page.getTitle();
-        this.description = page.getDescription();
     }
 
     public PageInstance copy() {
@@ -79,8 +75,6 @@ public class PageInstance {
         pageInstance.parameters.addAll(parameters);
         pageInstance.configuration = configuration;
         pageInstance.actionBean = actionBean;
-        pageInstance.title = title;
-        pageInstance.description = description;
         return pageInstance;
     }
 
@@ -166,11 +160,6 @@ public class PageInstance {
         return parent;
     }
 
-    public Page getChildPage(String name) throws Exception {
-        FileObject childDirectory = getChildPageDirectory(name);
-        return PageLogic.getPage(childDirectory);
-    }
-
     public FileObject getChildPageDirectory(String name) {
         FileObject baseDir = getChildrenDirectory();
         try {
@@ -194,22 +183,6 @@ public class PageInstance {
 
     public String getName() {
         return directory.getName().getBaseName();
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
 }

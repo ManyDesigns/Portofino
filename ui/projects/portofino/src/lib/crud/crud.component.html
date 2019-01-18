@@ -1,5 +1,6 @@
 <portofino-default-page-layout [page]="this">
   <ng-template #content>
+    <mat-error *ngIf="error">Error: {{error|json}}</mat-error>
     <portofino-crud-search-holder *ngIf="isSearchView()"
       [component]="searchComponent" [context]="searchComponentContext"
       [classAccessor]="classAccessor" [pageSize]="rowsPerPage" [sourceUrl]="sourceUrl" [baseUrl]="url"

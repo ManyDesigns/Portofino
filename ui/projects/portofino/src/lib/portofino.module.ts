@@ -86,7 +86,7 @@ import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
 import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
 import {LocalStorageService} from "ngx-store";
-import {CreatePageComponent, PageCrudService} from "./pages/page-crud.service";
+import {CreatePageComponent, DeletePageComponent, PageCrudService} from "./pages/page-crud.service";
 
 @NgModule({
   declarations: [
@@ -119,7 +119,7 @@ export class PortofinoFormsModule {}
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
     ManyToManyComponent,
-    CreatePageComponent
+    CreatePageComponent, DeletePageComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
@@ -144,7 +144,7 @@ export class PortofinoFormsModule {}
     { provide: NotificationService, useClass: MatSnackBarNotificationService }],
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,
-    CreatePageComponent,
+    CreatePageComponent, DeletePageComponent,
     CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,

@@ -11,7 +11,11 @@
       <mat-menu #pagesMenu="matMenu" [overlapTrigger]="false">
         <button mat-menu-item (click)="pageCrudService.showCreatePageDialog()">
           <mat-icon>add</mat-icon>
-          {{ 'Add page' | translate }}
+          {{ 'Add' | translate }}
+        </button>
+        <button mat-menu-item (click)="pageCrudService.confirmDeletePage()">
+          <mat-icon>delete</mat-icon>
+          {{ 'Delete' | translate }}
         </button>
       </mat-menu>
       <button mat-button [matMenuTriggerFor]="pagesMenu">

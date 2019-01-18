@@ -36,9 +36,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
     }
     
     @Override
-    public void beforeScan(Reader reader, Swagger swagger) {
-
-    }
+    public void beforeScan(Reader reader, Swagger swagger) {}
 
     @Override
     public void afterScan(Reader reader, Swagger swagger) {

@@ -622,16 +622,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             object = loadObjectByPrimaryKey(pkObject);
             if(object != null) {
                 ognlContext.put(crudConfiguration.getActualVariable(), object);
-                String title = getReadTitle();
-                pageInstance.setTitle(title);
-                pageInstance.setDescription(title);
             } else {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-        } else {
-            String title = getSearchTitle();
-            pageInstance.setTitle(title);
-            pageInstance.setDescription(title);
         }
     }
 
@@ -2070,44 +2063,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //--------------------------------------------------------------------------
     // Accessors
     //--------------------------------------------------------------------------
-
-    public String getReadTitle() {
-        String title = crudConfiguration.getReadTitle();
-        if(StringUtils.isEmpty(title)) {
-            return ShortNameUtils.getName(getClassAccessor(), object);
-        } else {
-            OgnlTextFormat textFormat = OgnlTextFormat.create(title);
-            return textFormat.format(this);
-        }
-    }
-
-    public String getSearchTitle() {
-        String title = crudConfiguration.getSearchTitle();
-        if(StringUtils.isBlank(title)) {
-            title = getPage().getTitle();
-        }
-        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-        return textFormat.format(this);
-    }
-
-    public String getEditTitle() {
-        String title = crudConfiguration.getEditTitle();
-        if(StringUtils.isEmpty(title)) {
-            return ShortNameUtils.getName(getClassAccessor(), object);
-        } else {
-            OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-            return textFormat.format(this);
-        }
-    }
-
-    public String getCreateTitle() {
-        String title = crudConfiguration.getCreateTitle();
-        if(StringUtils.isBlank(title)) {
-            title = getPage().getTitle();
-        }
-        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-        return textFormat.format(this);
-    }
 
     public CrudConfiguration getCrudConfiguration() {
         return crudConfiguration;

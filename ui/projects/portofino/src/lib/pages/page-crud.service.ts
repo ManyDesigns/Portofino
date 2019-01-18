@@ -8,32 +8,61 @@ import {FormGroup} from "@angular/forms";
 import {PageFactoryComponent} from "../page.factory";
 import {PageConfiguration, PageService} from "../page";
 import {throwError} from "rxjs";
+import {TranslateService} from "@ngx-translate/core";
+import {mergeMap, tap} from "rxjs/operators";
+import {Router} from "@angular/router";
 
 @Injectable()
 export class PageCrudService {
 
   constructor(
-    protected portofino: PortofinoService, protected pageService: PageService,
-    protected http: HttpClient, protected dialog: MatDialog) {}
+    protected portofino: PortofinoService, protected pageService: PageService, protected http: HttpClient,
+    protected dialog: MatDialog, protected router: Router, protected translate: TranslateService) {}
 
   showCreatePageDialog() {
     this.dialog.open(CreatePageComponent);
   }
 
-  savePage(page: PageConfiguration) {
-    //TODO child/sibling/top
-    let parentPage = this.pageService.page;
+  confirmDeletePage() {
+    this.dialog.open(DeletePageComponent);
+  }
+
+  savePage(page: PageConfiguration & { position: {v: string, l: string} }) {
+    let parentPage;
+    const position = page.position.v;
+    if(position == 'CHILD') {
+      parentPage = this.pageService.page;
+    } else if(position == 'SIBLING') {
+      parentPage = this.pageService.page.parent;
+    }  else if(position == 'TOP') {
+      parentPage = this.pageService.page.root;
+    } else {
+      return throwError("Unsupported position: " + position)
+    }
+    delete page.position;
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
-    const form = new FormData();
-    form.append('parentActionPath', parentPage.computeSourceUrl());
-    form.append('childrenProperty', parentPage.childrenProperty);
-    form.append('actionDefinition', JSON.stringify({
-      segment: page.source,
-      actionClassName: PageFactoryComponent.components[page.type].defaultActionClass
-    }));
-    form.append('pageConfiguration', JSON.stringify(page));
-    console.log("a", PageFactoryComponent.components, page.type);
-    return this.http.post(`${this.portofino.localApiPath}/${path}?loginPath=${this.portofino.loginPath}`, form);
+    const reloadPageConfiguration = () => parentPage.loadConfiguration(); //Update the navigation
+    return this.http.post(`${this.portofino.localApiPath}/${path}`, page, { params: {
+        actionPath: `${parentPage.computeSourceUrl()}/${page.source}`,
+        actionClass: PageFactoryComponent.components[page.type].defaultActionClass,
+        childrenProperty: parentPage.childrenProperty,
+        loginPath: this.portofino.loginPath
+      }}).pipe(tap(reloadPageConfiguration));
+  }
+
+  deletePage() {
+    const page = this.pageService.page;
+    const parentPage = page.parent;
+    if(!parentPage) {
+      return this.translate.get("You cannot delete the root page.").pipe(mergeMap(s => throwError(s)));
+    }
+    const path = page.getConfigurationLocation();
+    const goUpOnePage = () => this.router.navigateByUrl(parentPage.url);
+    return this.http.delete(`${this.portofino.localApiPath}/${path}`, { params: {
+        actionPath: page.computeSourceUrl(),
+        childrenProperty: parentPage.childrenProperty,
+        loginPath: this.portofino.loginPath
+      }}).pipe(tap(goUpOnePage));
   }
 
   get available() {
@@ -46,6 +75,7 @@ export class PageCrudService {
   template: `
     <h4 mat-dialog-title>{{ 'Add new page' | translate }}</h4>
     <mat-dialog-content>
+      <mat-error *ngIf="error">{{error|translate}}</mat-error>
       <form (submit)="save()">
         <portofino-form [form]="form" [controls]="controls"></portofino-form>
         <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
@@ -68,12 +98,21 @@ export class CreatePageComponent {
     new Field(Property.create({ name: "type", type: "string", label: "Type" }).required().withSelectionProvider({
       options: this.getPageTypes()
     })),
+    new Field(Property.create({ name: "position", type: "string", label: "Position" }).required().withSelectionProvider({
+      options: [
+        {v: 'CHILD', l: this.translate.instant("As a child of the current page")},
+        {v: 'SIBLING', l: this.translate.instant("As a sibling of the current page")},
+        {v: 'TOP', l: this.translate.instant("At the top level")}]
+    })),
+    { html: '<br />' },
     new Field(Property.create({ name: "title", type: "string", label: "Title" }).required()),
     new Field(Property.create({ name: "icon", type: "string", label: "Icon" }))
   ]);
   readonly controls = new FormGroup({});
+  error: any;
 
-  constructor(protected dialog: MatDialogRef<CreatePageComponent>, protected pageCrud: PageCrudService) {}
+  constructor(protected dialog: MatDialogRef<CreatePageComponent>, protected pageCrud: PageCrudService,
+              protected translate: TranslateService) {}
 
   protected getPageTypes() {
     const types = [];
@@ -90,6 +129,57 @@ export class CreatePageComponent {
   save() {
     const page = Object.assign(new PageConfiguration(), this.controls.value);
     page.type = this.controls.value.type.v;
-    this.pageCrud.savePage(page).subscribe(() => this.dialog.close()); //TODO handle error
+    this.pageCrud.savePage(page).subscribe(
+      () => this.dialog.close(),
+      error => {
+        if(typeof error === 'string') {
+          this.error = error;
+        } else {
+          this.error = "Error";
+          console.error(error);
+        }
+      });
+  }
+}
+
+@Component({
+  template: `
+    <h4 mat-dialog-title>{{ 'Confirm page deletion' | translate }}</h4>
+    <mat-dialog-content>
+      <mat-error *ngIf="error">{{error|translate}}</mat-error>
+      <p>{{"Delete the current page?"|translate}}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button color="primary" (click)="delete()">
+        <mat-icon>delete</mat-icon>
+        {{'Delete'|translate}}
+      </button>
+      <button mat-button (click)="cancel()">
+        <mat-icon>close</mat-icon>
+        {{'Cancel'|translate}}
+      </button>
+    </mat-dialog-actions>`
+})
+export class DeletePageComponent {
+  error: any;
+
+  constructor(protected dialog: MatDialogRef<CreatePageComponent>, protected pageCrud: PageCrudService,
+              protected translate: TranslateService) {}
+
+  cancel() {
+    this.dialog.close();
+  }
+
+  delete() {
+    this.pageCrud.deletePage().subscribe(
+      () => this.dialog.close(),
+      error => {
+        if(typeof error === 'string') {
+          this.error = error;
+        } else {
+          this.error = "Error";
+          console.error(error);
+        }
+      });
   }
 }

@@ -10,6 +10,7 @@ import {SearchComponent} from "./search/search.component";
 import {DetailComponent} from "./detail/detail.component";
 import {CreateComponent} from "./detail/create.component";
 import {BulkEditComponent} from "./bulk/bulk-edit.component";
+import {mergeMap} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-crud',
@@ -59,18 +60,32 @@ export class CrudComponent extends Page {
   @Input()
   bulkEditComponentContext = {};
 
+  error: any;
+
   get rowsPerPage() {
     return this.configuration.rowsPerPage ? this.configuration.rowsPerPage : 10;
   }
 
   initialize() {
     this.sourceUrl = this.computeBaseSourceUrl();
-    this.loadConfiguration().subscribe(
-      () => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
-        classAccessor => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
-          sps => this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
-            this.init(classAccessor, sps, ops);
-          }))));
+    this.loadConfiguration().pipe(
+      mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath)),
+      mergeMap(classAccessor => {
+        this.classAccessor = classAccessor;
+        return this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath);
+      }),
+      mergeMap(sps => {
+        this.selectionProviders = sps;
+        return this.http.get<Operation[]>(this.sourceUrl + this.operationsPath);
+      })).subscribe(
+        ops => {
+        const bulkOpsEnabled = ops.some(op => op.name == "Bulk operations" && op.available);
+        this.createEnabled = this.operationAvailable(ops, "POST");
+        this.bulkEditEnabled = this.operationAvailable(ops, "PUT") && bulkOpsEnabled;
+        this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE") && bulkOpsEnabled;
+        this.init();
+      },
+      error => this.error = error);
   }
 
   computeBaseSourceUrl() {
@@ -86,13 +101,7 @@ export class CrudComponent extends Page {
     }
   }
 
-  protected init(classAccessor, selectionProviders: SelectionProvider[], ops: Operation[]) {
-    const bulkOpsEnabled = ops.some(op => op.name == "Bulk operations" && op.available);
-    this.createEnabled = this.operationAvailable(ops, "POST");
-    this.bulkEditEnabled = this.operationAvailable(ops, "PUT") && bulkOpsEnabled;
-    this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE") && bulkOpsEnabled;
-    this.classAccessor = classAccessor;
-    this.selectionProviders = selectionProviders;
+  protected init() {
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });

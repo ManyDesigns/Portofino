@@ -23,40 +23,27 @@ package com.manydesigns.portofino.pageactions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.MimeTypes;
-import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.dispatcher.AbstractResource;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
-import com.manydesigns.portofino.pageactions.admin.PageDefinition;
-import com.manydesigns.portofino.pageactions.registry.ActionInfo;
 import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
-import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
-import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SecurityLogic;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import ognl.OgnlContext;
-import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -73,13 +60,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Convenient abstract base class for PageActions. It has fields to hold values of properties specified by the
@@ -171,7 +157,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         } catch (PageNotActiveException e) {
             logger.debug("page.xml not found or not valid", e);
             page = new Page();
-            page.setTitle("");
             page.init();
         }
         PageInstance pageInstance = new PageInstance(
@@ -196,8 +181,9 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     public void prepareForExecution() {}
 
     @Override
-    protected void parametersAcquired() throws WebApplicationException {
-        pageInstance.getParameters().addAll(parameters);
+    public void consumeParameter(String pathSegment) {
+        super.consumeParameter(pathSegment);
+        pageInstance.getParameters().add(pathSegment);
     }
 
     @Override
@@ -205,7 +191,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         if(parameters.isEmpty()) {
             return getLocation();
         } else {
-            return getLocation().getChild(PageInstance.DETAIL);
+            return getLocation().resolveFile(PageInstance.DETAIL);
         }
     }
 
@@ -242,55 +228,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
 
     public Page getPage() {
         return getPageInstance().getPage();
-    }
-
-    //--------------------------------------------------------------------------
-    // Page configuration
-    //--------------------------------------------------------------------------
-
-    /**
-     * Sets up the Elements form(s) 
-     */
-    protected void prepareConfigurationForms() {
-        Page page = pageInstance.getPage();
-
-        PageInstance parent = pageInstance.getParent();
-        assert parent != null;
-
-        FormBuilder formBuilder = new FormBuilder(EditPage.class)
-                .configPrefix(CONF_FORM_PREFIX)
-                .configFields(PageActionLogic.supportsDetail(getClass()) ?
-                              PAGE_CONFIGURATION_FIELDS :
-                              PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
-                .configFieldSetNames("Page");
-
-        pageConfigurationForm = formBuilder.build();
-        EditPage edit = new EditPage();
-        edit.id = page.getId();
-        edit.title = page.getTitle();
-        edit.description = page.getDescription();
-        pageConfigurationForm.readFromObject(edit);
-//
-//        if(script == null) {
-//            prepareScript();
-//        }
-    }
-
-    /**
-     * Reads the page configuration form values from the request. Can be called to re-use the standard page
-     * configuration form.
-     */
-    protected void readPageConfigurationFromRequest() {
-        pageConfigurationForm.readFromRequest(context.getRequest());
-    }
-
-    /**
-     * Validates the page configuration form values. Can be called to re-use the standard page
-     * configuration form.
-     * @return true iff the form was valid.
-     */
-    protected boolean validatePageConfiguration() {
-        return pageConfigurationForm.validate();
     }
 
     //--------------------------------------------------------------------------
@@ -506,70 +443,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
             return false;
         }
         return true;
-    }
-
-    @POST
-    @Consumes("application/vnd.com.manydesigns.portofino.action+json")
-    @RequiresAdministrator
-    public void createPage(PageDefinition def) throws Exception {
-        String pageClassName = def.actionClassName;
-        Class actionClass = codeBase.loadClass(pageClassName);
-        ActionInfo info = actionRegistry.getInfo(actionClass);
-        String scriptTemplate = info.scriptTemplate;
-        Class<?> configurationClass = info.configurationClass;
-        boolean supportsDetail = info.supportsDetail;
-
-        String className = RandomUtil.createRandomId();
-        if(Character.isDigit(className.charAt(0))) {
-            className = "_" + className;
-        }
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ognlContext.put("generatedClassName", className);
-        ognlContext.put("pageClassName", pageClassName);
-        String script = OgnlTextFormat.format(scriptTemplate, this);
-
-        Page page = new Page();
-        Object configuration = null;
-        if(configurationClass != null) {
-            configuration = ReflectionUtil.newInstance(configurationClass);
-            if(configuration instanceof ConfigurationWithDefaults) {
-                ((ConfigurationWithDefaults) configuration).setupDefaults();
-            }
-        }
-        page.init();
-
-        String segment = def.segment;
-        PageInstance parentPageInstance = pageInstance;
-        FileObject directory = parentPageInstance.getChildPageDirectory(segment);
-
-        if (!checkPermissionsOnTargetPage(parentPageInstance)) {
-            Response.Status status =
-                    SecurityUtils.getSubject().isAuthenticated() ?
-                            Response.Status.FORBIDDEN :
-                            Response.Status.UNAUTHORIZED;
-            throw new WebApplicationException(status);
-        }
-
-        if(directory.exists()) {
-            logger.error("Can't create page - directory {} exists", directory.getName().getPath());
-            throw new WebApplicationException("error.creating.page.the.directory.already.exists");
-        }
-        directory.createFolder();
-        logger.debug("Creating the new child page in directory: {}", directory);
-        PageLogic.savePage(directory, page);
-        if(configuration != null) {
-            PageLogic.saveConfiguration(directory, configuration);
-        }
-        FileObject groovyScriptFile = directory.resolveFile("action.groovy");
-        groovyScriptFile.createFile();
-        try(Writer w = new OutputStreamWriter(groovyScriptFile.getContent().getOutputStream())) {
-            w.write(script);
-        }
-        if(supportsDetail) {
-            FileObject detailDir = directory.resolveFile(PageInstance.DETAIL);
-            logger.debug("Creating _detail directory: {}", detailDir);
-            detailDir.createFolder();
-        }
     }
 
 }

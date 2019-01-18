@@ -103,7 +103,7 @@ public abstract class AbstractResource implements SecureResource {
     }
 
     protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
-        FileObject child = getChildrenLocation().getChild(pathSegment);
+        FileObject child = getChildrenLocation().resolveFile(pathSegment);
         checkChildLocation(pathSegment, child);
         return child;
     }

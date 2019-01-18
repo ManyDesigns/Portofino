@@ -88,7 +88,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     protected ServletContext servletContext;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         UriInfo uriInfo = requestContext.getUriInfo();
         if(uriInfo.getMatchedResources().isEmpty()) {
             return;

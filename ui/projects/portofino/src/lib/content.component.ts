@@ -41,9 +41,9 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.subscriptions.push(this.route.url.subscribe(segment => {
+    this.subscriptions.push(this.route.url.subscribe(segments => {
       this.pageService.reset();
-      this.loadPageInPath("", null, segment, 0);
+      this.loadPageInPath("", null, segments, 0);
     }));
   }
 
