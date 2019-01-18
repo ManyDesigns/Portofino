@@ -26,6 +26,7 @@ export class PageCrudService {
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
     const form = new FormData();
     form.append('parentActionPath', parentPage.computeSourceUrl());
+    form.append('childrenProperty', parentPage.childrenProperty);
     form.append('actionDefinition', JSON.stringify({
       segment: page.source,
       actionClassName: PageFactoryComponent.components[page.type].defaultActionClass

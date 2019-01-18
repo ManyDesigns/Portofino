@@ -224,11 +224,11 @@ export class CrudComponent extends Page {
     return false;
   }
 
-  get children(): PageChild[] {
+  get childrenProperty(): string {
     if(this.id) {
-      return this.configuration.detailChildren || []
+      return "detailChildren";
     } else {
-      return this.configuration.children
+      return "children";
     }
   }
 

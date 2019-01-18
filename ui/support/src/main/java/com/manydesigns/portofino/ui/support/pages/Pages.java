@@ -1,21 +1,15 @@
 package com.manydesigns.portofino.ui.support.pages;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.blobs.FileBean;
 import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.portofino.ui.support.ApiInfo;
 import com.manydesigns.portofino.ui.support.Resource;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -24,10 +18,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Path("pages")
@@ -54,8 +50,38 @@ public class Pages extends Resource {
         Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
         Response response = request.post(Entity.entity(actionDefinition, mediaType));
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            saveConfigJson("pages/" + path, multipart.getParameterValues("pageConfiguration")[0]);
-            //TODO save parent page to add child
+            String pageConfigurationString = multipart.getParameterValues("pageConfiguration")[0];
+            String childrenProperty = multipart.getParameterValues("childrenProperty")[0];
+            saveConfigJson("pages/" + path, pageConfigurationString);
+            ObjectMapper mapper = new ObjectMapper();
+            String configPath = servletContext.getRealPath("pages/" + path);
+            File pageDirectory = new File(configPath).getParentFile();
+            File parentDirectory = pageDirectory.getParentFile();
+            Map<String, Object> parentConfig;
+            File parentConfigFile = new File(parentDirectory, "config.json");
+            try (FileReader fr = new FileReader(parentConfigFile)) {
+                String parentConfigString = IOUtils.toString(fr);
+                parentConfig = mapper.readValue(parentConfigString, Map.class);
+                Map pageConfiguration = mapper.readValue(pageConfigurationString, Map.class);
+                List<Map> children = (List<Map>) parentConfig.get(childrenProperty);
+                if(children == null) {
+                    children = new ArrayList<>();
+                    parentConfig.put(childrenProperty, children);
+                }
+                Map<String, Object> child = new HashMap<>();
+                child.put("path", pageDirectory.getName());
+                child.put("title", pageConfiguration.get("title"));
+                children.add(child);
+            } catch (IOException e) {
+                logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
+                throw new WebApplicationException(e.getMessage(), e);
+            }
+            try (FileWriter fw = new FileWriter(parentConfigFile)) {
+                mapper.writerFor(Map.class).writeValue(fw, parentConfig);
+            } catch (IOException e) {
+                logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
+                throw new WebApplicationException(e.getMessage(), e);
+            }
         }
         return response;
     }

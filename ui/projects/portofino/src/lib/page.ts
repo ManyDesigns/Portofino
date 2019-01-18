@@ -408,7 +408,11 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   get children(): PageChild[] {
-    return this.configuration.children
+    return this.configuration[this.childrenProperty] || []
+  }
+
+  get childrenProperty(): string {
+    return "children";
   }
 
   get embeddedChildren() {
