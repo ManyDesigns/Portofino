@@ -39,7 +39,7 @@ export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
   constructor(
     public authenticationService: AuthenticationService, public portofino: PortofinoService,
-    public pageService: PageCrudService) {}
+    public pageCrudService: PageCrudService) {}
 }
 
 @Component({
@@ -73,7 +73,6 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
     }
     if(this.apiRoot) {
       this.portofino.defaultApiRoot = this.apiRoot;
-      this.portofino.localApiPath = null;
     }
     this.portofino.init();
   }

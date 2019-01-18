@@ -7,9 +7,9 @@
     {{ title }}
   </div>
   <div>
-    <ng-container *ngIf="authenticationService.isAdmin && portofino.localApiAvailable">
+    <ng-container *ngIf="authenticationService.isAdmin && pageCrudService.available">
       <mat-menu #pagesMenu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item (click)="pageService.showCreatePageDialog()">
+        <button mat-menu-item (click)="pageCrudService.showCreatePageDialog()">
           <mat-icon>add</mat-icon>
           {{ 'Add page' | translate }}
         </button>

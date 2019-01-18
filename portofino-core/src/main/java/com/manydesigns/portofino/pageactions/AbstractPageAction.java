@@ -26,18 +26,27 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResource;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
+import com.manydesigns.portofino.pageactions.admin.PageDefinition;
+import com.manydesigns.portofino.pageactions.registry.ActionInfo;
+import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
+import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
+import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -46,6 +55,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import ognl.OgnlContext;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
@@ -63,7 +73,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,17 +107,15 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     // Properties
     //--------------------------------------------------------------------------
 
-    /**
-     * The PageInstance property. Injected.
-     */
+    /** The PageInstance property. Injected. */
     public PageInstance pageInstance;
-
-    /**
-     * The global configuration object. Injected.
-     */
+    /** The global configuration object. Injected. */
     @Autowired
     public Configuration portofinoConfiguration;
-
+    @Autowired
+    protected CodeBase codeBase;
+    @Autowired
+    protected ActionRegistry actionRegistry;
     @Context
     protected UriInfo uriInfo;
 
@@ -185,9 +193,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     }
 
     @Override
-    public void prepareForExecution() {
-
-    }
+    public void prepareForExecution() {}
 
     @Override
     protected void parametersAcquired() throws WebApplicationException {
@@ -486,6 +492,84 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         JSONStringer jsonStringer = new JSONStringer();
         ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
         return jsonStringer.toString();
+    }
+
+    //Page create/delete/move etc.
+    protected boolean checkPermissionsOnTargetPage(PageInstance targetPageInstance) {
+        return checkPermissionsOnTargetPage(targetPageInstance, AccessLevel.DEVELOP);
+    }
+
+    protected boolean checkPermissionsOnTargetPage(PageInstance targetPageInstance, AccessLevel accessLevel) {
+        Subject subject = SecurityUtils.getSubject();
+        if(!SecurityLogic.hasPermissions(portofinoConfiguration, targetPageInstance, subject, accessLevel)) {
+            logger.warn("User not authorized modify page {}", targetPageInstance);
+            return false;
+        }
+        return true;
+    }
+
+    @POST
+    @Consumes("application/vnd.com.manydesigns.portofino.action+json")
+    @RequiresAdministrator
+    public void createPage(PageDefinition def) throws Exception {
+        String pageClassName = def.actionClassName;
+        Class actionClass = codeBase.loadClass(pageClassName);
+        ActionInfo info = actionRegistry.getInfo(actionClass);
+        String scriptTemplate = info.scriptTemplate;
+        Class<?> configurationClass = info.configurationClass;
+        boolean supportsDetail = info.supportsDetail;
+
+        String className = RandomUtil.createRandomId();
+        if(Character.isDigit(className.charAt(0))) {
+            className = "_" + className;
+        }
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        ognlContext.put("generatedClassName", className);
+        ognlContext.put("pageClassName", pageClassName);
+        String script = OgnlTextFormat.format(scriptTemplate, this);
+
+        Page page = new Page();
+        Object configuration = null;
+        if(configurationClass != null) {
+            configuration = ReflectionUtil.newInstance(configurationClass);
+            if(configuration instanceof ConfigurationWithDefaults) {
+                ((ConfigurationWithDefaults) configuration).setupDefaults();
+            }
+        }
+        page.init();
+
+        String segment = def.segment;
+        PageInstance parentPageInstance = pageInstance;
+        FileObject directory = parentPageInstance.getChildPageDirectory(segment);
+
+        if (!checkPermissionsOnTargetPage(parentPageInstance)) {
+            Response.Status status =
+                    SecurityUtils.getSubject().isAuthenticated() ?
+                            Response.Status.FORBIDDEN :
+                            Response.Status.UNAUTHORIZED;
+            throw new WebApplicationException(status);
+        }
+
+        if(directory.exists()) {
+            logger.error("Can't create page - directory {} exists", directory.getName().getPath());
+            throw new WebApplicationException("error.creating.page.the.directory.already.exists");
+        }
+        directory.createFolder();
+        logger.debug("Creating the new child page in directory: {}", directory);
+        PageLogic.savePage(directory, page);
+        if(configuration != null) {
+            PageLogic.saveConfiguration(directory, configuration);
+        }
+        FileObject groovyScriptFile = directory.resolveFile("action.groovy");
+        groovyScriptFile.createFile();
+        try(Writer w = new OutputStreamWriter(groovyScriptFile.getContent().getOutputStream())) {
+            w.write(script);
+        }
+        if(supportsDetail) {
+            FileObject detailDir = directory.resolveFile(PageInstance.DETAIL);
+            logger.debug("Creating _detail directory: {}", detailDir);
+            detailDir.createFolder();
+        }
     }
 
 }

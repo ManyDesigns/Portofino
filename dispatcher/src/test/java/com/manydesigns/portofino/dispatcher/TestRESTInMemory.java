@@ -51,7 +51,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
     @Path("test")
     public static class TestResource {
         public final ResourceResolvers resourceResolver = new ResourceResolvers();
-        public final Root root;
+        public final Resource root;
         
         @Context
         protected ResourceContext resourceContext;

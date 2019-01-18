@@ -174,7 +174,7 @@ public class PageInstance {
     public FileObject getChildPageDirectory(String name) {
         FileObject baseDir = getChildrenDirectory();
         try {
-            return baseDir.getChild(name);
+            return baseDir.resolveFile(name);
         } catch (FileSystemException e) {
             throw new RuntimeException(e);
         }

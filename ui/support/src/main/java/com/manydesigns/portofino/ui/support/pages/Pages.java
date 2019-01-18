@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 @Path("pages")
@@ -47,13 +48,14 @@ public class Pages extends Resource {
         @QueryParam("loginPath") String loginPath) {
         checkPathAndAuth(path, auth, loginPath);
         MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
-        //TODO create new page instead
-        Response response = saveActionConfiguration(
-            auth,
-            multipart.getParameterValues("actionConfigurationPath")[0],
-            multipart.getParameterValues("actionConfiguration")[0]);
+        String actionDefinition = multipart.getParameterValues("actionDefinition")[0];
+        String actionPath = multipart.getParameterValues("parentActionPath")[0];
+        String mediaType = "application/vnd.com.manydesigns.portofino.action+json";
+        Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
+        Response response = request.post(Entity.entity(actionDefinition, mediaType));
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
             saveConfigJson("pages/" + path, multipart.getParameterValues("pageConfiguration")[0]);
+            //TODO save parent page to add child
         }
         return response;
     }
@@ -108,6 +110,7 @@ public class Pages extends Resource {
     public void saveConfigJson(String path, String pageConfiguration) {
         String configPath = servletContext.getRealPath(path);
         File file = new File(configPath);
+        file.getParentFile().mkdirs();
         try (FileWriter fw = new FileWriter(file)) {
             fw.write(pageConfiguration);
             logger.info("Saved page configuration to " + file.getAbsolutePath());

@@ -7,6 +7,7 @@ import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
 import {PageFactoryComponent} from "../page.factory";
 import {PageConfiguration, PageService} from "../page";
+import {throwError} from "rxjs";
 
 @Injectable()
 export class PageCrudService {
@@ -16,13 +17,26 @@ export class PageCrudService {
     protected http: HttpClient, protected dialog: MatDialog) {}
 
   showCreatePageDialog() {
-    this.dialog.open(CreatePageComponent).afterClosed().subscribe(page => {
-      if(!page) {
-        return;
-      }
-      const path = this.pageService.page.path;
-      this.http.post(`${this.portofino.localApiPath}/pages${path}?loginPath=${this.portofino.loginPath}`, page);
-    });
+    this.dialog.open(CreatePageComponent);
+  }
+
+  savePage(page: PageConfiguration) {
+    //TODO child/sibling/top
+    let parentPage = this.pageService.page;
+    const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
+    const form = new FormData();
+    form.append('parentActionPath', parentPage.computeSourceUrl());
+    form.append('actionDefinition', JSON.stringify({
+      segment: page.source,
+      actionClassName: PageFactoryComponent.components[page.type].defaultActionClass
+    }));
+    form.append('pageConfiguration', JSON.stringify(page));
+    console.log("a", PageFactoryComponent.components, page.type);
+    return this.http.post(`${this.portofino.localApiPath}/${path}?loginPath=${this.portofino.loginPath}`, form);
+  }
+
+  get available() {
+    return this.portofino.localApiAvailable && !!this.pageService.page
   }
 
 }
@@ -58,7 +72,7 @@ export class CreatePageComponent {
   ]);
   readonly controls = new FormGroup({});
 
-  constructor(protected dialog: MatDialogRef<CreatePageComponent>) {}
+  constructor(protected dialog: MatDialogRef<CreatePageComponent>, protected pageCrud: PageCrudService) {}
 
   protected getPageTypes() {
     const types = [];
@@ -73,6 +87,8 @@ export class CreatePageComponent {
   }
 
   save() {
-    this.dialog.close(Object.assign(new PageConfiguration(), this.controls.value));
+    const page = Object.assign(new PageConfiguration(), this.controls.value);
+    page.type = this.controls.value.type.v;
+    this.pageCrud.savePage(page).subscribe(() => this.dialog.close()); //TODO handle error
   }
 }

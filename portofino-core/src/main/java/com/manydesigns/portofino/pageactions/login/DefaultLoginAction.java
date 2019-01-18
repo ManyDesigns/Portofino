@@ -55,6 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.Serializable;
 
 /**
@@ -99,7 +100,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
             return userInfo(subject, portofinoRealm, jwt);
         } catch (AuthenticationException e) {
             logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);
-            throw new WebApplicationException(HttpServletResponse.SC_UNAUTHORIZED);
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
         return checkJWT();
     }
@@ -111,6 +112,10 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
         Subject subject = SecurityUtils.getSubject();
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         String jwt = JWTFilter.getJSONWebToken(context.getRequest());
+        if(jwt == null) {
+            subject.logout();
+            throw new WebApplicationException(Response.Status.FORBIDDEN);
+        }
         return userInfo(subject, portofinoRealm, jwt);
     }
 

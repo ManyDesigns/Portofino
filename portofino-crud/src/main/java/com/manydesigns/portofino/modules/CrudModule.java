@@ -23,7 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.m2m.ManyToManyAction;
-import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
+import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class CrudModule implements Module {
     public Configuration configuration;
 
     @Autowired
-    public PageActionRegistry pageActionRegistry;
+    public ActionRegistry actionRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -73,8 +73,8 @@ public class CrudModule implements Module {
 
     @PostConstruct
     public void init() {
-        pageActionRegistry.register(CrudAction.class);
-        pageActionRegistry.register(ManyToManyAction.class);
+        actionRegistry.register(CrudAction.class);
+        actionRegistry.register(ManyToManyAction.class);
         status = ModuleStatus.STARTED;
     }
 

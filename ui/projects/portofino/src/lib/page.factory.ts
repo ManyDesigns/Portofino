@@ -75,7 +75,7 @@ export class PageFactoryComponent extends Page implements OnInit {
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
-    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
+    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType.type);
     let componentRef = componentFactory.create(this.injector);
     const component = <Page>componentRef.instance;
     component.configuration = config;
@@ -92,8 +92,8 @@ export class PageFactoryComponent extends Page implements OnInit {
 
 }
 
-export function PortofinoComponent(info: { name: string }) {
+export function PortofinoComponent(info: { name: string, defaultActionClass?: string }) {
   return function(target) {
-    PageFactoryComponent.components[info.name] = target;
+    PageFactoryComponent.components[info.name] = Object.assign({ type: target }, info);
   };
 }

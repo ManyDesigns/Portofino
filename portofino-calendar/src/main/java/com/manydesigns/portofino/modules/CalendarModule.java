@@ -22,7 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
-import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
+import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class CalendarModule implements Module {
     public Configuration configuration;
 
     @Autowired
-    public PageActionRegistry pageActionRegistry;
+    public ActionRegistry actionRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -74,7 +74,7 @@ public class CalendarModule implements Module {
 
     @PostConstruct
     public void init() {
-        pageActionRegistry.register(CalendarAction.class);
+        actionRegistry.register(CalendarAction.class);
         status = ModuleStatus.STARTED;
     }
 

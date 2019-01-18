@@ -26,7 +26,7 @@ package com.manydesigns.portofino.pageactions.registry;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PageActionInfo {
+public class ActionInfo {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
@@ -36,7 +36,7 @@ public class PageActionInfo {
     public final boolean supportsDetail;
     public final String description;
 
-    public PageActionInfo
+    public ActionInfo
             (Class<?> actionClass, Class<?> configurationClass, String scriptTemplate,
              boolean supportsDetail, String description) {
         this.actionClass = actionClass;

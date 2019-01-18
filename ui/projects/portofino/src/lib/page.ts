@@ -477,7 +477,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     return this.http.get<PageConfiguration>(this.getConfigurationLocation(path));
   }
 
-  protected getConfigurationLocation(path: string) {
+  getConfigurationLocation(path: string = this.path) {
     return `pages${path}/config.json`;
   }
 

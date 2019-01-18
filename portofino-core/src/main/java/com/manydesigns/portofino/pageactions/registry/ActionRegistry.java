@@ -33,29 +33,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PageActionRegistry implements Iterable<PageActionInfo> {
+public class ActionRegistry implements Iterable<ActionInfo> {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    protected final List<PageActionInfo> registry = new CopyOnWriteArrayList<PageActionInfo>();
+    protected final List<ActionInfo> registry = new CopyOnWriteArrayList<ActionInfo>();
 
-    public PageActionInfo register(Class<?> actionClass) {
+    public ActionInfo register(Class<?> actionClass) {
         String descriptionKey = PageActionLogic.getDescriptionKey(actionClass);
         Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionClass);
         String scriptTemplate = PageActionLogic.getScriptTemplate(actionClass);
         boolean supportsDetail = PageActionLogic.supportsDetail(actionClass);
-        PageActionInfo info = new PageActionInfo(actionClass, configurationClass, scriptTemplate,
+        ActionInfo info = new ActionInfo(actionClass, configurationClass, scriptTemplate,
                                                  supportsDetail, descriptionKey);
         registry.add(info);
         return info;
     }
 
-    public Iterator<PageActionInfo> iterator() {
+    public Iterator<ActionInfo> iterator() {
         return registry.iterator();
     }
 
-    public PageActionInfo getInfo(Class<? extends PageAction> actionClass) {
-        for(PageActionInfo info : registry) {
+    public ActionInfo getInfo(Class<? extends PageAction> actionClass) {
+        for(ActionInfo info : registry) {
             if(info.actionClass == actionClass) {
                 return info;
             }

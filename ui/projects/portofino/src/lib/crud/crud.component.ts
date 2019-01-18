@@ -16,7 +16,7 @@ import {BulkEditComponent} from "./bulk/bulk-edit.component";
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.css']
 })
-@PortofinoComponent({ name: 'crud' })
+@PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.pageactions.crud.CrudAction" })
 export class CrudComponent extends Page {
 
   @Input()
