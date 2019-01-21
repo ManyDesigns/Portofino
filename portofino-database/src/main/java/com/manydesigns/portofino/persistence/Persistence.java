@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.persistence;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
@@ -33,6 +32,7 @@ import com.manydesigns.portofino.persistence.hibernate.HibernateConfig;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
+import io.reactivex.subjects.BehaviorSubject;
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
@@ -94,6 +94,11 @@ public class Persistence {
     protected final File appDbsDir;
     protected final File appModelFile;
     protected final org.apache.commons.configuration.Configuration configuration;
+    public final BehaviorSubject<Status> status = BehaviorSubject.create();
+
+    public enum Status {
+        STARTING, STARTED, STOPPING, STOPPED
+    }
 
     public CacheResetListenerRegistry cacheResetListenerRegistry;
 
@@ -421,13 +426,16 @@ public class Persistence {
     //**************************************************************************
 
     public void start() {
+        status.onNext(Status.STARTING);
         loadXmlModel();
         for(Database database : model.getDatabases()) {
             runLiquibase(database);
         }
+        status.onNext(Status.STARTED);
     }
 
     public void stop() {
+        status.onNext(Status.STOPPING);
         for(HibernateDatabaseSetup setup : setups.values()) {
             //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
             //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
@@ -438,6 +446,7 @@ public class Persistence {
                     database.getConnectionProvider();
             connectionProvider.shutdown();
         }
+        status.onNext(Status.STOPPED);
     }
 
     //**************************************************************************
