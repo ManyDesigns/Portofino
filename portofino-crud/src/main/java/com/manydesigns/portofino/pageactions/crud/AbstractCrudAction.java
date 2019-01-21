@@ -1341,102 +1341,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected void setupConfigurationForm(FormBuilder formBuilder) {}
 
-    /*@Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution updateConfiguration() {
-        prepareConfigurationForms();
-
-        crudConfigurationForm.readFromObject(crudConfiguration);
-
-        readPageConfigurationFromRequest();
-
-        crudConfigurationForm.readFromRequest(context.getRequest());
-
-        boolean valid = crudConfigurationForm.validate();
-        valid = validatePageConfiguration() && valid;
-
-        if(propertiesTableForm != null) {
-            propertiesTableForm.readFromObject(propertyEdits);
-            propertiesTableForm.readFromRequest(context.getRequest());
-            valid = propertiesTableForm.validate() && valid;
-        }
-
-        if(selectionProvidersForm != null) {
-            selectionProvidersForm.readFromRequest(context.getRequest());
-            valid = selectionProvidersForm.validate() && valid;
-        }
-
-        if (valid) {
-            updatePageConfiguration();
-            if(crudConfiguration == null) {
-                crudConfiguration = new CrudConfiguration();
-            }
-            crudConfigurationForm.writeToObject(crudConfiguration);
-
-            if(propertiesTableForm != null) {
-                updateProperties();
-            }
-
-            if(selectionProviderSupport != null &&
-               !selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
-                updateSelectionProviders();
-            }
-
-            saveConfiguration(crudConfiguration);
-
-            RequestMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
-            return cancel();
-        } else {
-            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
-            return getConfigurationView();
-        }
+    @Override
+    protected boolean saveConfiguration(Object configuration) {
+        return super.saveConfiguration(configuration); //TODO fill properties from the database here when the config is new, or the query changes, etc.?
     }
-
-    protected void updateSelectionProviders() {
-        selectionProvidersForm.writeToObject(selectionProviderEdits);
-        selectionProviderSupport.clearSelectionProviders();
-        for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
-            List<String> key = Arrays.asList(sp.fieldNames);
-            if(sp.selectionProvider == null) {
-                selectionProviderSupport.disableSelectionProvider(key);
-            } else {
-                selectionProviderSupport.configureSelectionProvider(
-                        key, sp.selectionProvider, sp.displayMode, sp.searchDisplayMode,
-                        StringUtils.trimToNull(sp.createNewHref), sp.createNewText);
-            }
-        }
-    }
-
-    protected void updateProperties() {
-        propertiesTableForm.writeToObject(propertyEdits);
-
-        List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
-        List<CrudProperty> properties = crudConfiguration.getProperties();
-        for (CrudPropertyEdit edit : propertyEdits) {
-            CrudProperty crudProperty = findProperty(edit.name, properties);
-            if(crudProperty == null) {
-                crudProperty = new CrudProperty();
-                properties.add(crudProperty);
-            }
-
-            crudProperty.setName(edit.name);
-            crudProperty.setLabel(edit.label);
-            crudProperty.setInSummary(edit.inSummary);
-            crudProperty.setSearchable(edit.searchable);
-            crudProperty.setEnabled(edit.enabled);
-            crudProperty.setInsertable(edit.insertable);
-            crudProperty.setUpdatable(edit.updatable);
-
-            newProperties.add(crudProperty);
-        }
-        Iterator<CrudProperty> propertyIterator = properties.iterator();
-        while (propertyIterator.hasNext()) {
-            CrudProperty property = propertyIterator.next();
-            if(!(property instanceof VirtualCrudProperty) && !newProperties.contains(property)) {
-                propertyIterator.remove();
-            }
-        }
-    }*/
 
     public boolean isRequiredFieldsPresent() {
         return form.isRequiredFieldsPresent();

@@ -47,7 +47,7 @@ export class PageCrudService {
         actionClass: PageFactoryComponent.components[page.type].defaultActionClass,
         childrenProperty: parentPage.childrenProperty,
         loginPath: this.portofino.loginPath
-      }}).pipe(tap(reloadPageConfiguration));
+      }}).pipe(mergeMap(reloadPageConfiguration));
   }
 
   deletePage() {

@@ -490,7 +490,8 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   getConfigurationLocation(path: string = this.path) {
-    return `pages${path}/config.json`;
+    //replace double slash, but not in http(s)://
+    return `pages${path}/config.json`.replace(new RegExp("([^:])//"), '$1/');
   }
 
   configure() {
