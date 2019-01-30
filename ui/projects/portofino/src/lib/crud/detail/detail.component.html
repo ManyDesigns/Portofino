@@ -15,6 +15,9 @@
           <portofino-buttons [component]="this"></portofino-buttons>
         </div>
       </form>
+      <mat-error *ngIf="!object">
+        {{ '_ not found' | translate:{ what: id } }}
+      </mat-error>
     </mat-card-content>
   </mat-card>
 </div>

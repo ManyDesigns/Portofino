@@ -8,6 +8,8 @@ export const TRANSLATIONS_EN = {
   "Bulk edit": "Bulk edit",
   "Clear": "Clear",
   "Delete": "Delete",
+  "_ not found": "{{what}} not found",
+  "Not found": "Not found",
   "Edit _": "Edit {{what}}",
   "Edit": "Edit",
   "New": "New",
