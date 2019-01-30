@@ -427,6 +427,15 @@ export abstract class Page implements WithButtons, OnDestroy {
     return this.children.filter(c => this.allowEmbeddedComponents && c.embedded && c.accessible);
   }
 
+  get title() {
+    let title = this.configuration.title;
+    if(!title && this.parent) {
+      let pageChild = this.parent.children.find(c => c.path == this.segment);
+      title = pageChild.title
+    }
+    return title;
+  }
+
   getChild(segment: string) {
     return this.children.find(c => c.path == segment);
   }
