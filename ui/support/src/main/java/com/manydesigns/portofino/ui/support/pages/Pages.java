@@ -29,6 +29,7 @@ import java.util.*;
 public class Pages extends Resource {
 
     private static final Logger logger = LoggerFactory.getLogger(Pages.class);
+    public static final String PORTOFINO_PAGE_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.page-move";
 
     @Context
     protected ServletContext servletContext;
@@ -39,10 +40,10 @@ public class Pages extends Resource {
     @POST
     @Path("{path:.+}")
     public Response createPageAndAction(
-        @PathParam("path") String path, @HeaderParam(AUTHORIZATION_HEADER) String auth,
-        @QueryParam("loginPath") String loginPath, @QueryParam("actionClass") String actionClass,
-        @QueryParam("actionPath") String actionPath, @QueryParam("childrenProperty") String childrenProperty,
-        String pageConfigurationString) {
+        @HeaderParam(AUTHORIZATION_HEADER) String auth,
+        @PathParam("path") String path, @QueryParam("loginPath") String loginPath,
+        @QueryParam("actionClass") String actionClass, @QueryParam("actionPath") String actionPath,
+        @QueryParam("childrenProperty") String childrenProperty, String pageConfigurationString) {
         checkPathAndAuth(path, auth, loginPath);
         actionPath = getActionPath(actionPath);
         Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
@@ -56,14 +57,10 @@ public class Pages extends Resource {
             Map<String, Object> parentConfig;
             File parentConfigFile = new File(parentDirectory, "config.json");
             try (FileReader fr = new FileReader(parentConfigFile)) {
+                Map pageConfiguration = mapper.readValue(pageConfigurationString, Map.class);
                 String parentConfigString = IOUtils.toString(fr);
                 parentConfig = mapper.readValue(parentConfigString, Map.class);
-                Map pageConfiguration = mapper.readValue(pageConfigurationString, Map.class);
-                List<Map> children = (List<Map>) parentConfig.get(childrenProperty);
-                if(children == null) {
-                    children = new ArrayList<>();
-                    parentConfig.put(childrenProperty, children);
-                }
+                List<Map> children = ensureChildren(parentConfig, childrenProperty);
                 Map<String, Object> child = new HashMap<>();
                 child.put("path", pageDirectory.getName());
                 child.put("title", pageConfiguration.get("title"));
@@ -72,26 +69,32 @@ public class Pages extends Resource {
                 logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
                 throw new WebApplicationException(e.getMessage(), e);
             }
-            try (FileWriter fw = new FileWriter(parentConfigFile)) {
-                mapper.writerFor(Map.class).writeValue(fw, parentConfig);
-            } catch (IOException e) {
-                logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
-                throw new WebApplicationException(e.getMessage(), e);
-            }
+            writeConfig(mapper, parentConfig, parentConfigFile);
         }
         return response;
+    }
+
+    @NotNull
+    public List<Map> ensureChildren(Map<String, Object> config, String childrenProperty) {
+        List<Map> children = (List<Map>) config.get(childrenProperty);
+        if (children == null) {
+            children = new ArrayList<>();
+            config.put(childrenProperty, children);
+        }
+        return children;
     }
 
     @PUT
     @Path("{path:.+}")
     public Response updatePageAndConfiguration(
-        @PathParam("path") String path, @HeaderParam(AUTHORIZATION_HEADER) String auth,
+        @HeaderParam(AUTHORIZATION_HEADER) String auth,
+        @PathParam("path") String path, @QueryParam("actionConfigurationPath") String actionConfigurationPath,
         @QueryParam("loginPath") String loginPath) { //TODO should the login path be asked once and then cached?
         checkPathAndAuth(path, auth, loginPath);
         MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
         Response response = saveActionConfiguration(
             auth,
-            multipart.getParameterValues("actionConfigurationPath")[0],
+            actionConfigurationPath,
             multipart.getParameterValues("actionConfiguration")[0]);
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
             saveConfigJson("pages/" + path, multipart.getParameterValues("pageConfiguration")[0]);
@@ -135,14 +138,102 @@ public class Pages extends Resource {
                 logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
                 throw new WebApplicationException(e.getMessage(), e);
             }
-            try (FileWriter fw = new FileWriter(parentConfigFile)) {
-                mapper.writerFor(Map.class).writeValue(fw, parentConfig);
-            } catch (IOException e) {
-                logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
-                throw new WebApplicationException(e.getMessage(), e);
+            writeConfig(mapper, parentConfig, parentConfigFile);
+        }
+        return response;
+    }
+
+    @POST
+    @Path("{destinationPath:.+}")
+    @Consumes(PORTOFINO_PAGE_MOVE_TYPE)
+    public Response movePageAndAction(
+        @HeaderParam(AUTHORIZATION_HEADER) String auth,
+        @PathParam("destinationPath") String destinationPath, @QueryParam("loginPath") String loginPath,
+        @QueryParam("sourceActionPath") String sourceActionPath,
+        @QueryParam("destinationActionParent") String destinationActionParent,
+        @QueryParam("detail") boolean detail,
+        String sourcePath) throws IOException {
+        checkPathAndAuth(destinationPath, auth, loginPath);
+        sourceActionPath = getActionPath(sourceActionPath);
+        File destConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
+        String segment = destConfigFile.getParentFile().getName();
+        String destinationActionPath = getActionPath(destinationActionParent + (detail ? "/_detail" : ":") + "/" + segment);
+        Invocation.Builder request = path(destinationActionPath).request().header(AUTHORIZATION_HEADER, auth);
+        Response response = request.post(Entity.entity(sourceActionPath, PORTOFINO_PAGE_MOVE_TYPE));
+        if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+            File sourceConfigFile = new File(servletContext.getRealPath("pages/" + sourcePath));
+            if(destConfigFile.getParentFile().mkdirs()) {
+                movePage(sourceConfigFile, destConfigFile, detail ? "detailChildren" : "children");
+            } else {
+                throw new WebApplicationException("Could not create " + destConfigFile.getAbsolutePath());
             }
         }
         return response;
+    }
+
+    public void movePage(File sourceConfigFile, File destConfigFile, String childrenProperty) throws IOException {
+        FileUtils.moveFile(sourceConfigFile, destConfigFile);
+
+        ObjectMapper mapper = new ObjectMapper();
+        Map originalChild;
+
+        Map<String, Object> parentSourceConfig;
+        File sourceDirectory = sourceConfigFile.getParentFile();
+        File parentSourceConfigFile = new File(sourceDirectory.getParentFile(), "config.json");
+        try (FileReader fr = new FileReader(parentSourceConfigFile)) {
+            String parentConfigString = IOUtils.toString(fr);
+            parentSourceConfig = mapper.readValue(parentConfigString, Map.class);
+            List<Map> children = (List<Map>) parentSourceConfig.get("children");
+            originalChild = removeChild(sourceDirectory.getName(), children);
+            if(originalChild == null) {
+                children = (List<Map>) parentSourceConfig.get("detailChildren");
+                originalChild = removeChild(sourceDirectory.getName(), children);
+            }
+        } catch (IOException e) {
+            logger.error("Could not save config to " + parentSourceConfigFile.getAbsolutePath(), e);
+            throw new WebApplicationException(e.getMessage(), e);
+        }
+        writeConfig(mapper, parentSourceConfig, parentSourceConfigFile);
+
+        Map<String, Object> parentDestConfig;
+        File destDirectory = destConfigFile.getParentFile();
+        File parentDestConfigFile = new File(destDirectory.getParentFile(), "config.json");
+        try (FileReader fr = new FileReader(parentDestConfigFile)) {
+            String parentConfigString = IOUtils.toString(fr);
+            parentDestConfig = mapper.readValue(parentConfigString, Map.class);
+            List<Map> children = ensureChildren(parentDestConfig, childrenProperty);
+            Map<String, Object> child = new HashMap<>();
+            child.putAll(originalChild);
+            child.put("path", destDirectory.getName());
+            children.add(child);
+        } catch (IOException e) {
+            logger.error("Could not save config to " + parentDestConfigFile.getAbsolutePath(), e);
+            throw new WebApplicationException(e.getMessage(), e);
+        }
+        writeConfig(mapper, parentDestConfig, parentDestConfigFile);
+    }
+
+    public void writeConfig(ObjectMapper mapper, Map<String, Object> config, File configFile) {
+        try (FileWriter fw = new FileWriter(configFile)) {
+            mapper.writerFor(Map.class).writeValue(fw, config);
+        } catch (IOException e) {
+            logger.error("Could not save config to " + configFile.getAbsolutePath(), e);
+            throw new WebApplicationException(e.getMessage(), e);
+        }
+    }
+
+    public Map removeChild(String name, List<Map> children) {
+        if(children != null) {
+            Iterator<Map> iterator = children.iterator();
+            while (iterator.hasNext()) {
+                Map child = iterator.next();
+                if(name.equals(child.get("path"))) {
+                    iterator.remove();
+                    return child;
+                }
+            }
+        }
+        return null;
     }
 
     @NotNull
@@ -193,7 +284,7 @@ public class Pages extends Resource {
             fw.write(pageConfiguration);
             logger.info("Saved page configuration to " + file.getAbsolutePath());
         } catch (IOException e) {
-            logger.error("Could not save config to " + path, e);
+            logger.error("Could not save config to " + file.getAbsolutePath(), e);
             throw new WebApplicationException(e.getMessage(), e);
         }
     }

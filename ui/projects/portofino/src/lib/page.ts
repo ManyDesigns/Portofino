@@ -508,9 +508,13 @@ export abstract class Page implements WithButtons, OnDestroy {
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     data.append("actionConfiguration", JSON.stringify(actionConfiguration));
-    data.append("actionConfigurationPath", this.configurationUrl);
     const path = this.getConfigurationLocation(this.path);
-    this.http.put(`${this.portofino.localApiPath}/${path}?loginPath=${this.portofino.loginPath}`, data).subscribe(
+    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
+      params: {
+        actionConfigurationPath: this.configurationUrl,
+        loginPath: this.portofino.loginPath
+      }
+    }).subscribe(
       () => {
         this.settingsPanel.hide();
         this.reloadBaseUrl();

@@ -43,7 +43,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   ngAfterViewInit() {
     this.subscriptions.push(this.route.url.subscribe(segments => {
       this.pageService.reset();
-      this.loadPageInPath("", null, segments, 0);
+      this.loadAndDisplayPage(segments);
     }));
   }
 
@@ -59,29 +59,10 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  protected loadPageInPath(path: string, parent: Page, segments: UrlSegment[], index: number) {
-    this.loadPage(path, parent).subscribe(
+  protected loadAndDisplayPage(segments: UrlSegment[]) {
+    this.pageFactory.load(segments).subscribe(
       componentRef => {
-        let page = <Page>componentRef.instance;
-        page.baseUrl = '/' + segments.slice(0, index).join('/');
-        page.url = page.baseUrl;
-        for(let i = index; i < segments.length; i++) {
-          let s = segments[i];
-          if (page.consumePathSegment(s.path)) {
-            path += `/${s.path}`;
-            let child = page.getChild(s.path);
-            if(child) {
-              this.loadPageInPath(path, page, segments, i + 1);
-              return;
-            } else {
-              this.pageService.notifyError(`Nonexistent child of ${page.url}: ${s.path}`);
-              return;
-            }
-          } else {
-            page.url += `/${s.path}`;
-          }
-        }
-        //If we arrive here, there are no more children in the URL to process
+        const page = componentRef.instance;
         page.initialize();
         let viewContainerRef = this.contentHost.viewContainerRef;
         viewContainerRef.clear(); //Remove main component;
@@ -90,20 +71,16 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
         page.children.forEach(child => {
           this.checkAccessibility(page, child);
         });
+        const parent = page.parent;
         if(parent) {
           parent.children.forEach(child => {
-            if(`${parent.path}/${child.path}` != path) {
+            if(`${parent.path}/${child.path}` != page.path) {
               this.checkAccessibility(parent, child);
             }
           });
         }
       },
-      error => this.handleErrorInLoadingPage(path, error));
-  }
-
-  protected loadPage(path: string, parent: Page): Observable<ComponentRef<any>> {
-    return this.pageFactory.loadPageConfiguration(path).pipe(mergeMap(config =>
-      this.pageFactory.create(config, path, parent)));
+      error => this.pageService.notifyError(error));
   }
 
   checkAccessibility(parent: Page, child: PageChild) {
@@ -113,10 +90,6 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
       dummy.configuration = config;
       return dummy.accessPermitted;
     })).subscribe(flag => child.accessible = flag);
-  }
-
-  private handleErrorInLoadingPage(path, error) {
-    this.pageService.notifyError(error);
   }
 
 }
