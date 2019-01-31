@@ -2,7 +2,7 @@
   <ul *ngIf="pageService.page.parent">
     <li>
       <a [routerLink]="pageService.page.parent.url" routerLinkActive="active">
-        {{pageService.page.parent.configuration.title}}
+        {{pageService.page.parent.title}}
       </a>
       <ul>
         <ng-container *ngFor="let child of pageService.page.parent.children">
@@ -13,7 +13,7 @@
             </a>
           </li>
           <li *ngIf="child.path == pageService.page.segment">
-            <strong>{{pageService.page.configuration.title}}</strong>
+            <strong>{{pageService.page.title}}</strong>
             <ul>
               <ng-container *ngFor="let child of pageService.page.children">
                 <li *ngIf="child.accessible">
@@ -30,7 +30,7 @@
     </li>
   </ul>
   <div *ngIf="!pageService.page.parent">
-    <strong>{{pageService.page.configuration.title}}</strong>
+    <strong>{{pageService.page.title}}</strong>
     <ul>
       <ng-container *ngFor="let child of pageService.page.children">
         <li *ngIf="child.accessible">

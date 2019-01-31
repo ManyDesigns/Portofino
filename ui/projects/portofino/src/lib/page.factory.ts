@@ -87,7 +87,7 @@ export class PageFactoryComponent extends Page implements OnInit {
       component.segment = path;
     }
     component.parent = parent;
-    return component.prepare().pipe(map(_ => componentRef));
+    return component.prepare().pipe(map(() => componentRef));
   }
 
   load(segments: UrlSegment[]) {
