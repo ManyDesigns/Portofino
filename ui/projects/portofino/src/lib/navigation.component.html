@@ -1,45 +1,39 @@
-<ng-container *ngIf="!!pageService.page">
-  <ul *ngIf="pageService.page.parent">
-    <li>
-      <a [routerLink]="pageService.page.parent.url" routerLinkActive="active">
-        {{pageService.page.parent.title}}
+<div *ngIf="!!pageService.page">
+  <mat-nav-list *ngIf="pageService.page.parent">
+    <a mat-list-item [routerLink]="pageService.page.parent.url" routerLinkActive="active">
+      {{pageService.page.parent.title}}
+    </a>
+    <div *ngFor="let child of pageService.page.parent.children">
+      <a mat-list-item
+         *ngIf="child.path != pageService.page.segment && child.accessible"
+         [routerLink]="pageService.page.parent.url + '/' + child.path" routerLinkActive="active">
+        <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+        {{child.title}}
       </a>
-      <ul>
-        <ng-container *ngFor="let child of pageService.page.parent.children">
-          <li *ngIf="child.path != pageService.page.segment && child.accessible">
-            <a [routerLink]="pageService.page.parent.url + '/' + child.path" routerLinkActive="active">
-              <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
-              {{child.title}}
-            </a>
-          </li>
-          <li *ngIf="child.path == pageService.page.segment">
-            <strong>{{pageService.page.title}}</strong>
-            <ul>
-              <ng-container *ngFor="let child of pageService.page.children">
-                <li *ngIf="child.accessible">
-                  <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
-                    <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
-                    {{child.title}}
-                  </a>
-                </li>
-              </ng-container>
-            </ul>
-          </li>
-        </ng-container>
-      </ul>
-    </li>
-  </ul>
-  <div *ngIf="!pageService.page.parent">
-    <h4>{{pageService.page.title}}</h4>
-    <ul>
-      <ng-container *ngFor="let child of pageService.page.children">
-        <li *ngIf="child.accessible">
-          <a [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
+      <div *ngIf="child.path == pageService.page.segment">
+        <a mat-list-item><strong>{{pageService.page.title}}</strong></a>
+        <ng-container *ngFor="let child of pageService.page.children">
+          <a mat-list-item
+             *ngIf="child.accessible"
+             [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
             <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
             {{child.title}}
           </a>
-        </li>
+        </ng-container>
+      </div>
+    </div>
+  </mat-nav-list>
+  <div *ngIf="!pageService.page.parent">
+    <a mat-list-item><strong>{{pageService.page.title}}</strong></a>
+    <mat-nav-list>
+      <ng-container *ngFor="let child of pageService.page.children">
+        <a mat-list-item
+           *ngIf="child.accessible"
+           [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
+          <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+          {{child.title}}
+        </a>
       </ng-container>
-    </ul>
+    </mat-nav-list>
   </div>
-</ng-container>
+</div>
