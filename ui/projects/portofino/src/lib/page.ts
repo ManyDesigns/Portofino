@@ -431,9 +431,20 @@ export abstract class Page implements WithButtons, OnDestroy {
     let title = this.configuration.title;
     if(!title && this.parent) {
       let pageChild = this.parent.children.find(c => c.path == this.segment);
-      title = pageChild.title
+      if(pageChild) {
+        title = pageChild.title;
+      }
     }
     return title;
+  }
+
+  get icon() {
+    if(this.parent) {
+      let pageChild = this.parent.children.find(c => c.path == this.segment);
+      return pageChild ? pageChild.icon : null;
+    } else {
+      return null;
+    }
   }
 
   getChild(segment: string) {

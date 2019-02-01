@@ -30,7 +30,7 @@
     </li>
   </ul>
   <div *ngIf="!pageService.page.parent">
-    <strong>{{pageService.page.title}}</strong>
+    <h4>{{pageService.page.title}}</h4>
     <ul>
       <ng-container *ngFor="let child of pageService.page.children">
         <li *ngIf="child.accessible">
