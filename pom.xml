@@ -94,9 +94,10 @@
         <commons.lang.version>2.5</commons.lang.version>
         <ehcache.version>2.10.5</ehcache.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>2.5.2</groovy.version>
+        <groovy.version>2.5.4</groovy.version>
         <guava.version>19.0</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
+        <jackson.version>2.9.6</jackson.version>
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
@@ -115,7 +116,7 @@
         <quartz.version>2.2.3</quartz.version>
         <resteasy.version>3.0.15.Final</resteasy.version>
         <servlet.api.version>3.1.0</servlet.api.version>
-        <shiro.version>1.3.2</shiro.version>
+        <shiro.version>1.4.0</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <stax.version>1.2.0</stax.version>
         <stripes.version>1.6.0</stripes.version>
@@ -196,17 +197,33 @@
                 </exclusions>
                 <scope>compile</scope>
             </dependency>
+            <!-- Web -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${servlet.api.version}</version>
                 <scope>provided</scope>
             </dependency>
+
             <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${javax.ws.rs.api.version}</version>
             </dependency>
+            <!-- Utilities -->
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons.lang.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <!-- Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -236,6 +253,12 @@
                 <artifactId>logback-core</artifactId>
                 <version>${logback.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            <!-- Groovy -->
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.version}</version>
             </dependency>
             <!-- Test dependencies -->
             <dependency>
@@ -385,7 +408,7 @@
                                 <link>http://www.joda.org/joda-time/apidocs/</link>
                                 <link>https://docs.oracle.com/javaee/6/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -link http://shiro.apache.org/static/1.3.2/apidocs/ -link https://stripesframework.ci.cloudbees.com/job/Stripes%201.6.0/javadoc/ -link https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/ -link https://docs.jboss.org/hibernate/orm/4.3/javadocs/ -link http://docs.groovy-lang.org/latest/html/api/ -link http://www.joda.org/joda-time/apidocs/ -link http://docs.oracle.com/javase/6/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
+                                -link http://shiro.apache.org/static/1.4.0/apidocs/ -link https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/ -link https://docs.jboss.org/hibernate/orm/4.3/javadocs/ -link http://docs.groovy-lang.org/latest/html/api/ -link http://www.joda.org/joda-time/apidocs/ -link http://docs.oracle.com/javase/6/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
@@ -436,7 +459,7 @@
                             <dependency>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>extra-enforcer-rules</artifactId>
-                                <version>1.0-beta-7</version>
+                                <version>1.0-beta-9</version>
                             </dependency>
                         </dependencies>
                     </plugin>
