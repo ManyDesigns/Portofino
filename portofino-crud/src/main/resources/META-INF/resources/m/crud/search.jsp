@@ -41,6 +41,12 @@
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             <div class="portofino-datatable"></div>
 
+            <div class="row">
+                <div class="col-md-12">
+                    <portofino:buttons list="crud-search" />
+                </div>
+            </div>
+
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

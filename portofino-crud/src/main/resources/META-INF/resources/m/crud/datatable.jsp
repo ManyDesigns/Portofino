@@ -31,11 +31,6 @@
         </div>
     </div>
     <%  } %>
-    <div class="row">
-        <div class="col-md-12">
-            <portofino:buttons list="crud-search" />
-        </div>
-    </div>
 
     <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
     <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
