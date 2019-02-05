@@ -21,23 +21,16 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.FieldEncrypter;
-import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import javax.servlet.http.HttpServletRequest;
 
 /*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+ * @author Emanuele Poggi     - emanuele.poggi@manydesigns.com
+ * @author Marco Stanizzi       - marco.stanizzi@manydesigns.com
+ */
 public class EncryptedTextSearchField extends TextSearchField {
-    public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
 
     private FieldEncrypter encrypter;
 
@@ -47,7 +40,7 @@ public class EncryptedTextSearchField extends TextSearchField {
 
     public EncryptedTextSearchField(PropertyAccessor accessor) {
         this(accessor, null,null);
-    }//TODO default encrypter
+    }
 
     public EncryptedTextSearchField(PropertyAccessor accessor, String prefix, String classPath) {
         super(accessor, prefix);
@@ -66,7 +59,12 @@ public class EncryptedTextSearchField extends TextSearchField {
 
     @Override
     public void readFromRequest(HttpServletRequest req) {
-        value = encrypter.encrypt(StringUtils.trimToNull(req.getParameter(inputName)));
+        value = StringUtils.trimToNull(req.getParameter(inputName));
     }
 
+    public void configureCriteria(Criteria criteria) {
+        if (value != null) {
+            criteria.ilike(accessor, encrypter.encrypt(value), matchMode);
+        }
+    }
 }
