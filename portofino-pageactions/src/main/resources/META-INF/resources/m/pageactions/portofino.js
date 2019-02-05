@@ -108,6 +108,7 @@ function setupDatePicker(dateFieldId, dateFormat) {
         return;
     }
     var dateField = $(dateFieldId);
+    dateField.attr("autocomplete","off");
     var config = {
         format: dateFormat.replace(/y/g, "Y").replace(/d/g, "D"),
         useCurrent: false,
