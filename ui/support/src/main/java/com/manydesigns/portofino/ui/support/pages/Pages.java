@@ -154,10 +154,13 @@ public class Pages extends Resource {
         @QueryParam("detail") boolean detail,
         String sourcePath) throws IOException {
         checkPathAndAuth(destinationPath, auth, loginPath);
-        sourceActionPath = getActionPath(sourceActionPath);
+        String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
+        if (sourceActionPath.startsWith(baseUri)) {
+            sourceActionPath = sourceActionPath.substring(baseUri.length());
+        }
         File destConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
         String segment = destConfigFile.getParentFile().getName();
-        String destinationActionPath = getActionPath(destinationActionParent + (detail ? "/_detail" : ":") + "/" + segment);
+        String destinationActionPath = getActionPath(destinationActionParent + (detail ? "_detail/" : "") + segment);
         Invocation.Builder request = path(destinationActionPath).request().header(AUTHORIZATION_HEADER, auth);
         Response response = request.post(Entity.entity(sourceActionPath, PORTOFINO_PAGE_MOVE_TYPE));
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {

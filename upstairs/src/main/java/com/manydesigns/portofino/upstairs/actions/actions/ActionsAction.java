@@ -4,6 +4,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -16,7 +17,9 @@ import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 
 import javax.ws.rs.*;
@@ -28,6 +31,8 @@ import java.util.Map;
 
 @RequiresAdministrator
 public class ActionsAction extends AbstractPageAction {
+
+    public static final String PORTOFINO_PAGE_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.page-move";
 
     public ActionsAction() {
         minParameters = 0;
@@ -51,10 +56,9 @@ public class ActionsAction extends AbstractPageAction {
     public void create(String actionClassName) throws Exception {
         String actionPath = StringUtils.join(parameters.subList(0, parameters.size() - 1), "/");
         String segment = parameters.get(parameters.size() - 1);
-        PageAction parent = (PageAction) getResource(actionPath);
-        if(parent == null) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        }
+        PageInstance parentPageInstance = getPageInstance(actionPath);
+        PageAction parent = parentPageInstance.getActionBean();
+
         Class actionClass = codeBase.loadClass(actionClassName);
         ActionInfo info = actionRegistry.getInfo(actionClass);
         String scriptTemplate = info.scriptTemplate;
@@ -79,8 +83,6 @@ public class ActionsAction extends AbstractPageAction {
             }
         }
         page.init();
-        PageInstance parentPageInstance = parent.getPageInstance();
-        checkPermissions(parentPageInstance);
 
         FileObject directory = parentPageInstance.getChildPageDirectory(segment);
         if(directory.exists()) {
@@ -105,20 +107,49 @@ public class ActionsAction extends AbstractPageAction {
         }
     }
 
+    @POST
+    @Consumes(PORTOFINO_PAGE_MOVE_TYPE)
+    public void move(String sourceActionPath) throws FileSystemException {
+        String actionPath = StringUtils.join(parameters.subList(0, parameters.size() - 1), "/");
+        String segment = parameters.get(parameters.size() - 1);
+        copyOrMovePage(sourceActionPath, actionPath, segment, true);
+    }
+
     @DELETE
     public void delete() throws Exception {
         String actionPath = StringUtils.join(parameters, "/");
+        PageInstance pageInstance = getPageInstance(actionPath);
+        FileObject directory = pageInstance.getDirectory();
+        if(!directory.exists()) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        directory.deleteAll();
+    }
+
+    public PageInstance getPageInstance(String actionPath) {
         PageAction action = (PageAction) getResource(actionPath);
         if(action == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         PageInstance pageInstance = action.getPageInstance();
         checkPermissions(pageInstance);
-        FileObject directory = pageInstance.getDirectory();
-        if(!directory.exists()) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        return pageInstance;
+    }
+
+    protected void copyOrMovePage(
+            String sourceActionPath, String destinationParentActionPath, String segment, boolean move) throws FileSystemException {
+        PageInstance sourcePageInstance = getPageInstance(sourceActionPath);
+        PageInstance destinationParentPageInstance = getPageInstance(destinationParentActionPath);
+        FileObject newChild = destinationParentPageInstance.getChildPageDirectory(segment);
+
+        if(move) {
+            if(sourceActionPath.equals("/") || sourceActionPath.isEmpty()) {
+                throw new WebApplicationException("Cannot move the root action!");
+            }
+            sourcePageInstance.getDirectory().moveTo(newChild);
+        } else {
+            newChild.copyFrom(sourcePageInstance.getDirectory(), new AllFileSelector());
         }
-        directory.deleteAll();
     }
 
     public void checkPermissions(PageInstance pageInstance) {
@@ -133,6 +164,9 @@ public class ActionsAction extends AbstractPageAction {
 
     public Resource getResource(String actionPath) {
         Resource resource = getRoot();
+        if(actionPath.isEmpty()) {
+            return resource;
+        }
         String[] pathSegments = actionPath.split("/");
         for(String segment : pathSegments) {
             if(resource instanceof WithParameters) {
@@ -154,6 +188,8 @@ public class ActionsAction extends AbstractPageAction {
                 WithParameters withParameters = (WithParameters) resource;
                 if(withParameters.getParameters().size() < withParameters.getMaxParameters()) {
                     withParameters.consumeParameter(segment);
+                } else {
+                    return null;
                 }
             } else {
                 return null;

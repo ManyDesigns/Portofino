@@ -494,7 +494,11 @@ export abstract class Page implements WithButtons, OnDestroy {
       source = this.portofino.apiRoot + source;
     }
     //replace double slash, but not in http(s)://
-    return source.replace(new RegExp("([^:])//"), '$1/');
+    source = source.replace(new RegExp("([^:])//"), '$1/');
+    while (source.endsWith("/"))  {
+      source = source.substring(0, source.length - 1);
+    }
+    return source;
   }
 
   operationAvailable(ops: Operation[], signature: string) {

@@ -85,19 +85,22 @@ export class PageCrudService {
     }
     const path = page.getConfigurationLocation();
     const goUpOnePage = () => this.router.navigateByUrl(parentPage.url); //TODO could navigate to the destination instead, but needs to handle detail
-    const sanitizedDestination = moveInstruction.destination; //TODO
-    const destPath = sanitizedDestination.split("/");
+    let sanitizedDestination = moveInstruction.destination; //TODO
+    while(sanitizedDestination.startsWith('/')) {
+      sanitizedDestination = sanitizedDestination.substring(1);
+    }
+    const destPath = sanitizedDestination.split("/").filter(s => s.length > 0);
     const segments = destPath.slice(0, destPath.length - 1).map(s => new UrlSegment(s, {}));
     return this.pageFactory.load(segments).pipe(mergeMap(newParent => {
-      return this.http.post(`${this.portofino.localApiPath}/${sanitizedDestination}/config.json`, path, {
+      return this.http.post(`${this.portofino.localApiPath}/pages/${sanitizedDestination}/config.json`, path, {
         headers: {
           "Content-Type": "application/vnd.com.manydesigns.portofino.page-move"
         },
         params: {
           sourceActionPath: `${page.computeSourceUrl()}`,
-          detail: moveInstruction.detail + "",
+          detail: !!moveInstruction.detail + "",
           loginPath: this.portofino.loginPath,
-          newActionParent: newParent.instance.computeSourceUrl()
+          destinationActionParent: newParent.instance.computeSourceUrl()
         }}).pipe(mergeMap(goUpOnePage));
     }));
   }
