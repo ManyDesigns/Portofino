@@ -147,8 +147,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public final static String SEARCH_STRING_PARAM = "searchString";
-    public final static String prefix = "";
-    public final static String searchPrefix = prefix + "search_";
+    public String prefix = "";
+    public String searchPrefix = prefix + "search_";
 
     //**************************************************************************
     // Permissions

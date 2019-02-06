@@ -248,15 +248,16 @@ public abstract class LoginAction extends AbstractActionBean {
 
     @Path("{sessionId}")
     @DELETE
+    @Deprecated
     public void logout(@PathParam("sessionId") String sessionId) {
+        logoutREST();
+    }
+
+    @DELETE
+    public void logoutREST() {
         Subject subject = SecurityUtils.getSubject();
-        Session session = subject.getSession(false);
-        if(session != null && session.getId().equals(sessionId)) {
-            subject.logout();
-            logger.info("User logout");
-        } else {
-            logger.debug("Unnecessary call to logout");
-        }
+        subject.logout();
+        logger.info("User logout");
     }
 
     public Resolution logout() {
