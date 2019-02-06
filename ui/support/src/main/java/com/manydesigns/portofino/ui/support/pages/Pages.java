@@ -154,21 +154,23 @@ public class Pages extends Resource {
         @QueryParam("detail") boolean detail,
         String sourcePath) throws IOException {
         checkPathAndAuth(destinationPath, auth, loginPath);
+        checkPath(sourcePath);
         String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
         if (sourceActionPath.startsWith(baseUri)) {
             sourceActionPath = sourceActionPath.substring(baseUri.length());
         }
         File destConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
-        String segment = destConfigFile.getParentFile().getName();
-        String destinationActionPath = getActionPath(destinationActionParent + (detail ? "_detail/" : "") + segment);
+        String[] segments = sourceActionPath.split("/");
+        String segment = segments[segments.length - 1];
+        String destinationActionPath = getActionPath(destinationActionParent + (detail ? "/_detail/" : "/") + segment);
         Invocation.Builder request = path(destinationActionPath).request().header(AUTHORIZATION_HEADER, auth);
         Response response = request.post(Entity.entity(sourceActionPath, PORTOFINO_PAGE_MOVE_TYPE));
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            File sourceConfigFile = new File(servletContext.getRealPath("pages/" + sourcePath));
+            File sourceConfigFile = new File(servletContext.getRealPath(sourcePath));
             if(destConfigFile.getParentFile().mkdirs()) {
                 movePage(sourceConfigFile, destConfigFile, detail ? "detailChildren" : "children");
             } else {
-                throw new WebApplicationException("Could not create " + destConfigFile.getAbsolutePath());
+                throw new WebApplicationException("Could not create " + destConfigFile.getParentFile().getAbsolutePath());
             }
         }
         return response;
@@ -250,16 +252,20 @@ public class Pages extends Resource {
     }
 
     public void checkPathAndAuth(String path, String auth, String loginPath) {
+        checkPath(path);
+        if (!checkAdmin(loginPath, auth)) {
+            //Must be explicitly checked because the action configuration path comes as a parameter and could be anything
+            throw new WebApplicationException(
+                Response.status(auth != null ? Response.Status.UNAUTHORIZED : Response.Status.FORBIDDEN).build());
+        }
+    }
+
+    public void checkPath(String path) {
         if (path.contains("..") || !path.endsWith("config.json")) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
                 .entity("Invalid config.json path")
                 .type(MediaType.TEXT_PLAIN_TYPE)
                 .build());
-        }
-        if (!checkAdmin(loginPath, auth)) {
-            //Must be explicitly checked because the action configuration path comes as a parameter and could be anything
-            throw new WebApplicationException(
-                Response.status(auth != null ? Response.Status.UNAUTHORIZED : Response.Status.FORBIDDEN).build());
         }
     }
 
