@@ -25,7 +25,7 @@
         <ng-template mat-tab-label>
           {{'Permissions'|translate}}
         </ng-template>
-        <table>
+        <table *ngIf="page.settingsPanel.permissions">
           <tr>
             <th>{{'Group'|translate}}</th>
             <th>{{'Access level'|translate}}</th>
@@ -35,8 +35,8 @@
             <td>{{group.name}}</td>
             <td>
               <mat-select [(ngModel)]="group.level">
-                <mat-option>
-                  {{'Inherited (_)' | translate:{level: group.actualAccessLevel}}}
+                <mat-option value="inherited">
+                  {{'Inherited (_)' | translate:{ level: group.actualAccessLevel} }}
                 </mat-option>
                 <mat-option *ngFor="let level of page.settingsPanel.accessLevels" [value]="level">
                   {{level}}
@@ -44,7 +44,7 @@
               </mat-select>
             </td>
             <td *ngFor="let perm of page.settingsPanel.permissions.permissions">
-              <mat-checkbox [(ngModel)]="group.permissionMap[perm]">{{'permission: ' + perm | translate}}</mat-checkbox>
+              <mat-checkbox *ngIf="group.permissionMap" [(ngModel)]="group.permissionMap[perm]">{{'permission: ' + perm | translate}}</mat-checkbox>
             </td>
           </tr>
         </table>

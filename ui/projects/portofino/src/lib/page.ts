@@ -308,18 +308,16 @@ export class PageSettingsPanel {
 
   show() {
     this.formDefinition.contents = [
-      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration)/*,
-      {
-        name: 'source',
-        component: SourceSelector,
-        dependencies: {page: this.page, initialValue: this.page.configuration.source}
-      }*/];
+      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration)];
     this.previousConfiguration = this.page.configuration;
     this.reloadConfiguration();
     const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
     this.page.http.get<Permissions>(permissionsUrl).subscribe(p => {
       this.permissions = p;
       this.permissions.groups.forEach(g => {
+        if(!g.level) {
+          g.level = "inherited";
+        }
         g.permissionMap = {};
         g.permissions.forEach(p => { g.permissionMap[p] = true; });
       });
@@ -611,6 +609,18 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   savePermissions() {
     const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
+    this.settingsPanel.groups.forEach(g => {
+      if(g.level == "inherited") {
+        g.level = null;
+      }
+      g.permissions = [];
+      for(let p in g.permissionMap) {
+        if(g.permissionMap[p]) {
+          g.permissions.push(p);
+        }
+      }
+      delete g.permissionMap;
+    });
     this.page.http.put(permissionsUrl, this.settingsPanel.groups).subscribe(() => {
       this.settingsPanel.hide();
     });
@@ -663,5 +673,5 @@ export class Group {
   level: string;
   actualAccessLevel: string;
   permissions: string[];
-  permissionMap: any;
+  permissionMap: {[name: string]: boolean};
 }

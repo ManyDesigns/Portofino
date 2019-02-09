@@ -450,7 +450,8 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         List<Group> existingGroups = getPage().getPermissions().getGroups();
         existingGroups.clear();
         existingGroups.addAll(groups);
-        PageLogic.savePage(pageInstance);
+        FileObject saved = PageLogic.savePage(pageInstance);
+        logger.info("Saved permissions to " + saved.getName().getPath());
     }
 
     public String[] getSupportedPermissions() {
