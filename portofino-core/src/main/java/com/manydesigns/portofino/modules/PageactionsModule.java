@@ -26,12 +26,11 @@ import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
-import com.manydesigns.portofino.pages.PageLogic;
-import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.form.FormAction;
 import com.manydesigns.portofino.pageactions.form.TableFormAction;
+import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
+import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -179,11 +178,9 @@ public class PageactionsModule implements Module, ApplicationContextAware {
     public ActionRegistry getPageActionRegistry() {
         logger.debug("Creating pageactions registry");
         ActionRegistry actionRegistry = new ActionRegistry();
-        actionRegistry.register(ActivityStreamAction.class);
         actionRegistry.register(CustomAction.class);
         actionRegistry.register(FormAction.class);
         actionRegistry.register(TableFormAction.class);
-        //actionRegistry.register(TextAction.class);
         return actionRegistry;
     }
 

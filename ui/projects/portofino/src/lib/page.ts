@@ -300,7 +300,10 @@ export class PageSettingsPanel {
   readonly form = new FormGroup({});
   formDefinition = new Form();
   previousConfiguration;
+  permissions: Permissions;
   error;
+  readonly accessLevels = ["NONE", "VIEW", "EDIT", "DEVELOP", "DENY"];
+
   constructor(public page: Page) {}
 
   show() {
@@ -313,11 +316,23 @@ export class PageSettingsPanel {
       }*/];
     this.previousConfiguration = this.page.configuration;
     this.reloadConfiguration();
+    const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
+    this.page.http.get<Permissions>(permissionsUrl).subscribe(p => {
+      this.permissions = p;
+      this.permissions.groups.forEach(g => {
+        g.permissionMap = {};
+        g.permissions.forEach(p => { g.permissionMap[p] = true; });
+      });
+    });
     this.active = true;
   }
 
   hide() {
     this.active = false;
+  }
+
+  get groups() {
+    return this.permissions.groups.sort((g1, g2) => g1.name.localeCompare(g2.name));
   }
 
   protected setupConfigurationForm(ca: ClassAccessor, config: any) {
@@ -362,6 +377,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
+  readonly permissionsPath = '/:permissions';
   readonly page = this;
 
   protected readonly subscriptions: Subscription[] = [];
@@ -378,6 +394,12 @@ export abstract class Page implements WithButtons, OnDestroy {
     declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'configuration'
     }, this, 'cancelConfiguration', null);
+    declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'permissions'
+    }, this, 'savePermissions', null);
+    declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'permissions'
+    }, this, 'cancelPermissions', null);
   }
 
   initialize() {}
@@ -505,10 +527,6 @@ export abstract class Page implements WithButtons, OnDestroy {
     return ops.some(op => op.signature == signature && op.available);
   }
 
-  get supportedSourceTypes(): string[] {
-    return [];
-  }
-
   loadPageConfiguration(path: string) {
     return this.http.get<PageConfiguration>(this.getConfigurationLocation(path));
   }
@@ -543,6 +561,11 @@ export abstract class Page implements WithButtons, OnDestroy {
         this.settingsPanel.hide();
         this.reloadBaseUrl();
       });
+  }
+
+  cancelConfiguration() {
+    this.configuration = this.settingsPanel.previousConfiguration;
+    this.settingsPanel.hide();
   }
 
   protected reloadBaseUrl() {
@@ -582,13 +605,19 @@ export abstract class Page implements WithButtons, OnDestroy {
     return this.settingsPanel.form.get('configuration').value;
   }
 
-  cancelConfiguration() {
-    this.settingsPanel.hide();
-    this.configuration = this.settingsPanel.previousConfiguration;
-  }
-
   get configurationProperties() {
     return null;
+  }
+
+  savePermissions() {
+    const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
+    this.page.http.put(permissionsUrl, this.settingsPanel.groups).subscribe(() => {
+      this.settingsPanel.hide();
+    });
+  }
+
+  cancelPermissions() {
+    this.settingsPanel.hide();
   }
 }
 
@@ -622,4 +651,17 @@ export class Operation {
   signature: string;
   parameters: string[];
   available: boolean;
+}
+
+export class Permissions {
+  groups: Group[];
+  permissions: string[];
+}
+
+export class Group {
+  name: string;
+  level: string;
+  actualAccessLevel: string;
+  permissions: string[];
+  permissionMap: any;
 }

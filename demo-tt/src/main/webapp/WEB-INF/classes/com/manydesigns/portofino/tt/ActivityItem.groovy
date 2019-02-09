@@ -1,3 +1,5 @@
+package com.manydesigns.portofino.tt
+
 /*
  * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
@@ -18,8 +20,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.pageactions.activitystream;
-
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -27,18 +27,13 @@ import com.manydesigns.elements.xml.XhtmlFragment;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ActivityItem implements XhtmlFragment {
+class ActivityItem implements XhtmlFragment {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 

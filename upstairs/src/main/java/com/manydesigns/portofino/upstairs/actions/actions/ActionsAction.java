@@ -14,13 +14,16 @@ import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.registry.ActionInfo;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
+import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.security.SecurityLogic;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -160,6 +163,20 @@ public class ActionsAction extends AbstractPageAction {
                             Response.Status.UNAUTHORIZED;
             throw new WebApplicationException(status);
         }
+    }
+
+    //Page create/delete/move etc.
+    protected boolean checkPermissionsOnTargetPage(PageInstance targetPageInstance) {
+        return checkPermissionsOnTargetPage(targetPageInstance, AccessLevel.DEVELOP);
+    }
+
+    protected boolean checkPermissionsOnTargetPage(PageInstance targetPageInstance, AccessLevel accessLevel) {
+        Subject subject = SecurityUtils.getSubject();
+        if(!SecurityLogic.hasPermissions(portofinoConfiguration, targetPageInstance, subject, accessLevel)) {
+            logger.warn("User not authorized modify page {}", targetPageInstance);
+            return false;
+        }
+        return true;
     }
 
     public Resource getResource(String actionPath) {

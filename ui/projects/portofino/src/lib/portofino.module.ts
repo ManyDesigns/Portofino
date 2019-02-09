@@ -44,7 +44,13 @@ import {
   MatSortModule,
   MatTableModule,
   MatToolbarModule,
-  MatTreeModule, MatCardModule, MatExpansionModule, MatDividerModule, MatListModule, MatProgressSpinnerModule
+  MatTreeModule,
+  MatCardModule,
+  MatExpansionModule,
+  MatDividerModule,
+  MatListModule,
+  MatProgressSpinnerModule,
+  MatTabsModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -127,8 +133,8 @@ export class PortofinoFormsModule {}
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
     MatMomentDateModule, MatMomentDatetimeModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule,
-    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatProgressSpinnerModule, MatTableModule,
-    MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
+    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatProgressSpinnerModule, MatTabsModule,
+    MatTableModule, MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
   ],
   providers: [

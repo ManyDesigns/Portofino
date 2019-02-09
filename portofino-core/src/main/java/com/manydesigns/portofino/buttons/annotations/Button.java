@@ -35,6 +35,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
+@Deprecated
 public @interface Button {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";

@@ -96,10 +96,10 @@ public class PageLogic {
         if(!pageFile.exists()) {
             pageFile.createFile();
         }
-        OutputStream outputStream = pageFile.getContent().getOutputStream();
-        marshaller.marshal(page, outputStream);
-        pageCache.invalidate(pageFile);
-        IOUtils.closeQuietly(outputStream);
+        try(OutputStream outputStream = pageFile.getContent().getOutputStream()) {
+            marshaller.marshal(page, outputStream);
+            pageCache.invalidate(pageFile);
+        }
         return pageFile;
     }
 

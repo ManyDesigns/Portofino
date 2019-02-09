@@ -6,16 +6,50 @@
       <portofino-page *ngFor="let child of page.embeddedChildren"
                       [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
     </ng-container>
-    <ng-container *ngIf="page.settingsPanel.active">
-      <mat-error *ngIf="page.settingsPanel.error as error">
-        {{error.message ? error.message : error}}
-      </mat-error>
-      <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"></portofino-form>
-      <ng-container *ngIf="extraConfiguration">
-        <ng-template [ngTemplateOutlet]="extraConfiguration"></ng-template>
-      </ng-container>
-      <div></div>
-      <portofino-buttons [component]="page" list="configuration"></portofino-buttons>
-    </ng-container>
+    <mat-tab-group *ngIf="page.settingsPanel.active">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{'Configuration'|translate}}
+        </ng-template>
+        <mat-error *ngIf="page.settingsPanel.error as error">
+          {{error.message ? error.message : error}}
+        </mat-error>
+        <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"></portofino-form>
+        <ng-container *ngIf="extraConfiguration">
+          <ng-template [ngTemplateOutlet]="extraConfiguration"></ng-template>
+        </ng-container>
+        <div></div>
+        <portofino-buttons [component]="page" list="configuration"></portofino-buttons>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{'Permissions'|translate}}
+        </ng-template>
+        <table>
+          <tr>
+            <th>{{'Group'|translate}}</th>
+            <th>{{'Access level'|translate}}</th>
+            <th [colSpan]="page.settingsPanel.permissions.permissions.length">{{'Permissions'|translate}}</th>
+          </tr>
+          <tr *ngFor="let group of page.settingsPanel.groups">
+            <td>{{group.name}}</td>
+            <td>
+              <mat-select [(ngModel)]="group.level">
+                <mat-option>
+                  {{'Inherited (_)' | translate:{level: group.actualAccessLevel}}}
+                </mat-option>
+                <mat-option *ngFor="let level of page.settingsPanel.accessLevels" [value]="level">
+                  {{level}}
+                </mat-option>
+              </mat-select>
+            </td>
+            <td *ngFor="let perm of page.settingsPanel.permissions.permissions">
+              <mat-checkbox [(ngModel)]="group.permissionMap[perm]">{{'permission: ' + perm | translate}}</mat-checkbox>
+            </td>
+          </tr>
+        </table>
+        <portofino-buttons [component]="page" list="permissions"></portofino-buttons>
+      </mat-tab>
+    </mat-tab-group>
   </div>
 </div>

@@ -1,6 +1,12 @@
+import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.tt.NotificationsJob
+import com.manydesigns.portofino.tt.TtUtils
+import org.hibernate.Session
 import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 
 import javax.annotation.PostConstruct
@@ -12,10 +18,19 @@ class SpringConfiguration {
     Scheduler scheduler
     JobKey notificationJobKey
 
+    @Autowired
+    Persistence persistence
+
+    private static final Logger logger = LoggerFactory.getLogger(SpringConfiguration)
+
     @PostConstruct
     void scheduleJobs() {
         scheduler = StdSchedulerFactory.getDefaultScheduler()
         notificationJobKey = scheduleJob(NotificationsJob, "NotificationsJob", 10, "tt")
+
+        persistence.status.subscribe({ status ->
+            logger.info("Persistence status: ${status}")
+        })
     }
 
     @PreDestroy

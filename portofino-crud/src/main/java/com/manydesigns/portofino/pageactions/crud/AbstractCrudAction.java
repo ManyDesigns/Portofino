@@ -23,15 +23,16 @@ package com.manydesigns.portofino.pageactions.crud;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.fields.*;
-import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.RequestMessages;
-import com.manydesigns.elements.options.*;
+import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
@@ -43,8 +44,6 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.buttons.ButtonInfo;
-import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -57,7 +56,6 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
@@ -67,7 +65,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,8 +82,10 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.*;
-import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -292,11 +291,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public Response jsonSearchData() throws JSONException {
         executeSearch();
-
         final long totalRecords = getTotalSearchRecords();
 
-        setupTableForm(Mode.VIEW);
-        BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
         JSONStringer js = new JSONStringer();
         js.object()
                 .key("recordsReturned")
@@ -901,45 +897,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(tableForm.getRows().length > 0 && isTableFormSelectable());
         tableForm.setCondensed(true);
 
         return tableForm;
     }
-
-    public Boolean isTableFormSelectable() {
-        List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass(getClass(), "crud-bulk");
-        Boolean selectable = false ;
-        if(buttons == null) {
-            logger.trace("buttons == null");
-        } else {
-            logger.trace("There are " + buttons.size() + " buttons");
-            for(ButtonInfo button : buttons) {
-                logger.trace("ButtonInfo: {}", button);
-                Method handler = button.getMethod();
-                boolean isAdmin = SecurityLogic.isAdministrator(context.getRequest());
-                if(!isAdmin &&
-                        ((pageInstance != null && !SecurityLogic.hasPermissions(
-                                portofinoConfiguration, button.getMethod(), button.getFallbackClass(), pageInstance, SecurityUtils.getSubject())) ||
-                                !SecurityLogic.satisfiesRequiresAdministrator(context.getRequest(), this, handler))) {
-                    continue;
-                }
-
-                if( ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE)
-                        && ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED)
-                        ) {
-                    logger.trace("Visible " + button.getButton().key());
-                    logger.trace("Guards passed");
-                    selectable = true ;
-                    break;
-                } else {
-                    logger.trace("Guards do not pass");
-                }
-            }
-        }
-        return selectable;
-    }
-
 
     protected TableFormBuilder createTableFormBuilder() {
         return new TableFormBuilder(classAccessor);
@@ -1149,10 +1110,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             inputStream = blob.getInputStream();
         }
         StreamingOutput streamingOutput = output -> {
-            try {
-                IOUtils.copyLarge(inputStream, output);
-            } finally {
-                IOUtils.closeQuietly(inputStream);
+            try(InputStream i = inputStream) {
+                IOUtils.copyLarge(i, output);
             }
         };
         Response.ResponseBuilder responseBuilder = Response.ok(streamingOutput).
