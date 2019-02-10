@@ -43,6 +43,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.pageService.notifyPageLoaded(this);
+    this.settingsPanel.show(); //Only for loading and saving permissions. It is not actually visible.
   }
 
   ngAfterViewInit(): void {

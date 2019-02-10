@@ -11,4 +11,26 @@
       </div>
     </form>
   </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Permissions'|translate}}
+    </ng-template>
+    <table *ngIf="settingsPanel.permissions">
+      <tr>
+        <th>{{'Group'|translate}}</th>
+        <th>{{'Access level'|translate}}</th>
+      </tr>
+      <tr *ngFor="let group of settingsPanel.groups">
+        <td>{{group.name}}</td>
+        <td>
+          <mat-select [(ngModel)]="group.level">
+            <mat-option *ngFor="let level of settingsPanel.accessLevels" [value]="level">
+              {{level}}
+            </mat-option>
+          </mat-select>
+        </td>
+      </tr>
+    </table>
+    <portofino-buttons [component]="this" list="permissions"></portofino-buttons>
+  </mat-tab>
 </mat-tab-group>

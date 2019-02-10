@@ -613,7 +613,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   savePermissions() {
-    const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
+    const permissionsUrl = this.computeSourceUrl() + this.permissionsPath;
     this.settingsPanel.groups.forEach(g => {
       if(g.level == "inherited") {
         g.level = null;
@@ -626,7 +626,7 @@ export abstract class Page implements WithButtons, OnDestroy {
       }
       delete g.permissionMap;
     });
-    this.page.http.put(permissionsUrl, this.settingsPanel.groups).subscribe(() => {
+    this.http.put(permissionsUrl, this.settingsPanel.groups).subscribe(() => {
       this.settingsPanel.hide();
     });
   }
