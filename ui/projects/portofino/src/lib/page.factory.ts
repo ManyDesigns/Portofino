@@ -90,6 +90,14 @@ export class PageFactoryComponent extends Page implements OnInit {
     return component.prepare().pipe(map(() => componentRef));
   }
 
+  loadPath(path: string) {
+    const segments = path.split("/")
+      .filter(s => s.length > 0)
+      .slice(0, path.length - 1)
+      .map(s => new UrlSegment(s, {}));
+    return this.load(segments);
+  }
+
   load(segments: UrlSegment[]) {
     return this.loadChild("", null, segments, 0);
   }

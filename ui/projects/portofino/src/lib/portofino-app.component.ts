@@ -14,7 +14,7 @@ import {PortofinoService, SideNavPosition} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
 import {NAVIGATION_COMPONENT} from "./page";
 import {NavigationDirective} from "./content.directive";
-import {PageCrudService} from "./pages/page-crud.service";
+import {PageCrudService} from "./administration/page-crud.service";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 

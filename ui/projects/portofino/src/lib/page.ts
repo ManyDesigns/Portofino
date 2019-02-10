@@ -28,7 +28,8 @@ export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 export class PageService {
   page: Page;
   error;
-  readonly pageLoad = new EventEmitter<Page>();
+  readonly pageLoad = new EventEmitter<Page | string>();
+  readonly pageLoaded = new EventEmitter<Page>();
   readonly pageLoadError = new EventEmitter<any>();
 
   reset() {
@@ -36,9 +37,13 @@ export class PageService {
     this.page = null;
   }
 
-  notifyPage(page: Page) {
-    this.page = page;
+  loadPage(page: Page | string) {
     this.pageLoad.emit(page);
+  }
+
+  notifyPageLoaded(page: Page) {
+    this.page = page;
+    this.pageLoaded.emit(page);
   }
 
   notifyError(error) {

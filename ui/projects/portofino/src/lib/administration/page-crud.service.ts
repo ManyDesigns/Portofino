@@ -89,9 +89,7 @@ export class PageCrudService {
     while(sanitizedDestination.startsWith('/')) {
       sanitizedDestination = sanitizedDestination.substring(1);
     }
-    const destPath = sanitizedDestination.split("/").filter(s => s.length > 0);
-    const segments = destPath.slice(0, destPath.length - 1).map(s => new UrlSegment(s, {}));
-    return this.pageFactory.load(segments).pipe(mergeMap(newParent => {
+    return this.pageFactory.loadPath(sanitizedDestination).pipe(mergeMap(newParent => {
       return this.http.post(`${this.portofino.localApiPath}/pages/${sanitizedDestination}/config.json`, path, {
         headers: {
           "Content-Type": "application/vnd.com.manydesigns.portofino.page-move"

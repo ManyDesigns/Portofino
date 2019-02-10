@@ -12,6 +12,8 @@ public class Settings {
     @Label("Application version")
     public String appVersion;
 
+    public String loginPath;
+
     @Required
     @Label("Preload Groovy pages at startup")
     public boolean preloadGroovyPages;

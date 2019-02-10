@@ -92,7 +92,8 @@ import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
 import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
 import {LocalStorageService} from "ngx-store";
-import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./pages/page-crud.service";
+import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
+import {UpstairsComponent} from "./administration/upstairs.component";
 
 @NgModule({
   declarations: [
@@ -125,7 +126,8 @@ export class PortofinoFormsModule {}
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
     ManyToManyComponent,
-    CreatePageComponent, DeletePageComponent, MovePageComponent
+    CreatePageComponent, DeletePageComponent, MovePageComponent,
+    UpstairsComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
@@ -151,7 +153,8 @@ export class PortofinoFormsModule {}
   entryComponents: [
     LoginComponent, DefaultNavigationComponent, DefaultToolbarComponent, SourceSelector, SourceSelectorTree,
     CreatePageComponent, DeletePageComponent, MovePageComponent,
-    CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent],
+    CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent, ManyToManyComponent,
+    UpstairsComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
     ContentComponent, PageFactoryComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
@@ -174,7 +177,9 @@ export class PortofinoModule {
 
   public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders|Type<PortofinoModule>)[] {
     return [RouterModule.forRoot(
-      [...routes, { path: "**", component: ContentComponent}],
+      [...routes,
+              { path: "portofino-upstairs", component: UpstairsComponent },
+              { path: "**", component: ContentComponent}],
       { onSameUrlNavigation: "reload", ...config }),
       PortofinoModule];
   }

@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
@@ -142,7 +143,7 @@ public class PortofinoRoot extends AbstractPageAction {
         description.put("page", pageInstance.getPage());
         description.put("path", getPath());
         description.put("children", getSubResources());
-        description.put("loginPath", portofinoConfiguration.getString("login.path"));
+        description.put("loginPath", portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH));
         return description;
     }
 

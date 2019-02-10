@@ -76,12 +76,12 @@ export class WelcomeComponent extends Page {}
   selector: 'app-root',
   template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
 })
-export class AppComponent {}
+export class DemoTTAppComponent {}
 
 @NgModule({
-  declarations: [AppComponent, StartHere, CustomNavigation, WelcomeComponent],
+  declarations: [DemoTTAppComponent, StartHere, CustomNavigation, WelcomeComponent],
   providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
+    { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
   ],
   imports: [
     PortofinoModule.withRoutes([{ path: "start", component: StartHere }]),
@@ -93,9 +93,9 @@ export class AppComponent {}
     FileInputAccessorModule, NgxdModule, QuillModule,
     TranslateModule.forRoot()],
   entryComponents: [ CustomNavigation, WelcomeComponent ],
-  bootstrap: [AppComponent]
+  bootstrap: [DemoTTAppComponent]
 })
-export class AppModule {
+export class DemoTTAppModule {
   static navigation() {
     return DefaultNavigationComponent
     //return CustomNavigation

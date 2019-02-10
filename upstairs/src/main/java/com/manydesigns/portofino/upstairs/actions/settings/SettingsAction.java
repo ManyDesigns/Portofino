@@ -72,6 +72,7 @@ public class SettingsAction extends AbstractPageAction {
         Settings settings = new Settings();
         settings.appName = configuration.getString(PortofinoProperties.APP_NAME);
         settings.appVersion = configuration.getString(PortofinoProperties.APP_VERSION);
+        settings.loginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
         settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false);
         settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false);
         Form form = new FormBuilder(Settings.class).build();
@@ -107,6 +108,7 @@ public class SettingsAction extends AbstractPageAction {
                 form.writeToObject(settings);
                 configuration.setProperty(PortofinoProperties.APP_NAME, settings.appName);
                 configuration.setProperty(PortofinoProperties.APP_VERSION, settings.appVersion);
+                configuration.setProperty(PortofinoProperties.LOGIN_PATH, settings.loginPath);
                 if(!settings.preloadGroovyPages ||
                    configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES) != null) {
                     configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES, settings.preloadGroovyPages);

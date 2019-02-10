@@ -38,6 +38,9 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
     const reload = () => this.reloadPage();
     this.subscriptions.push(this.authenticationService.logins.subscribe(reload));
     this.subscriptions.push(this.authenticationService.logouts.subscribe(reload));
+    this.subscriptions.push(this.pageService.pageLoad.subscribe(page => {
+
+    }));
   }
 
   ngAfterViewInit() {
@@ -61,26 +64,28 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
 
   protected loadAndDisplayPage(segments: UrlSegment[]) {
     this.pageFactory.load(segments).subscribe(
-      componentRef => {
-        const page = componentRef.instance;
-        page.initialize();
-        let viewContainerRef = this.contentHost.viewContainerRef;
-        viewContainerRef.clear(); //Remove main component;
-        viewContainerRef.insert(componentRef.hostView);
-        this.pageService.notifyPage(page);
-        page.children.forEach(child => {
-          this.checkAccessibility(page, child);
-        });
-        const parent = page.parent;
-        if(parent) {
-          parent.children.forEach(child => {
-            if(`${parent.path}/${child.path}` != page.path) {
-              this.checkAccessibility(parent, child);
-            }
-          });
-        }
-      },
+      componentRef => { this.displayPage(componentRef); },
       error => this.pageService.notifyError(error));
+  }
+
+  protected displayPage(componentRef: ComponentRef<Page>) {
+    const page = componentRef.instance;
+    page.initialize();
+    let viewContainerRef = this.contentHost.viewContainerRef;
+    viewContainerRef.clear(); //Remove main component;
+    viewContainerRef.insert(componentRef.hostView);
+    this.pageService.notifyPageLoaded(page);
+    page.children.forEach(child => {
+      this.checkAccessibility(page, child);
+    });
+    const parent = page.parent;
+    if (parent) {
+      parent.children.forEach(child => {
+        if (`${parent.path}/${child.path}` != page.path) {
+          this.checkAccessibility(parent, child);
+        }
+      });
+    }
   }
 
   checkAccessibility(parent: Page, child: PageChild) {

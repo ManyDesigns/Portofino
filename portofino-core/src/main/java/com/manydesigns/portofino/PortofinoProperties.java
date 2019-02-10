@@ -23,6 +23,7 @@ package com.manydesigns.portofino;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Keys for configuration properties.
@@ -44,6 +45,7 @@ public final class PortofinoProperties {
     public static final String BLOBS_DIR_PATH = "blobs.dir.path";
     public static final String APP_NAME = "app.name";
     public static final String APP_VERSION = "app.version";
+    public static final String LOGIN_PATH = "login.path";
 
     //Server config
     public static final String HOSTNAMES = "portofino.hostnames";
@@ -62,7 +64,7 @@ public final class PortofinoProperties {
     //Utilities
     public static String getPortofinoVersion() {
         try {
-            return IOUtils.toString(PortofinoProperties.class.getResourceAsStream("/portofino.version"));
+            return IOUtils.toString(PortofinoProperties.class.getResourceAsStream("/portofino.version"), Charset.forName("UTF-8"));
         } catch (IOException e) {
             return null;
         }
