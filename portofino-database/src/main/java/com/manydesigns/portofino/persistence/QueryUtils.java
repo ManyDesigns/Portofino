@@ -56,6 +56,7 @@ import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -581,7 +582,10 @@ public class QueryUtils {
         Query query = session.createQuery(queryString);
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
-                query.setParameter(String.valueOf(i + 1), parameters[i]);
+                if (parameters[i] instanceof Collection) {
+                    query.setParameterList(String.valueOf(i + 1), (Collection) parameters[i]);
+                } else
+                    query.setParameter(String.valueOf(i + 1), parameters[i]);
             }
         }
 
