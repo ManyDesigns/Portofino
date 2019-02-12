@@ -296,14 +296,19 @@ public class ManyToManyAction extends AbstractPageAction {
         existingAssociations =
                 QueryUtils.runHqlQuery(session, queryString.getQueryString(), queryString.getParameters());
         availableAssociations = new ArrayList<Object>();
-        String manyQueryString = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getHql();
-        if(manyQueryString == null) {
-            throw new RuntimeException("Couldn't determine many query");
+
+        String databaseName = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getToDatabase();
+        String hql = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getHql();
+
+         if (!StringUtils.isEmpty(hql)) {
+            Session selectionProviderSession = persistence.getSession(databaseName);
+
+            QueryStringWithParameters manyQuery = QueryUtils.mergeQuery(hql, null, this);
+            potentiallyAvailableAssociations =QueryUtils.runHqlQuery(selectionProviderSession, manyQuery.getQueryString(), manyQuery.getParameters());
+        }else{
+             throw new RuntimeException("Couldn't determine many query");
         }
-        QueryStringWithParameters manyQuery =
-                QueryUtils.mergeQuery(manyQueryString, null, this);
-        potentiallyAvailableAssociations =
-                QueryUtils.runHqlQuery(session, manyQuery.getQueryString(), manyQuery.getParameters());
+
         PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
         //TODO handle manyKeyProperties.length > 1
         PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
