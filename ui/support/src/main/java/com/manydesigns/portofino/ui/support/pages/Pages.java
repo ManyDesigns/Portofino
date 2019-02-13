@@ -92,14 +92,19 @@ public class Pages extends Resource {
         @QueryParam("loginPath") String loginPath) { //TODO should the login path be asked once and then cached?
         checkPathAndAuth(path, auth, loginPath);
         MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
-        Response response = saveActionConfiguration(
-            auth,
-            actionConfigurationPath,
-            multipart.getParameterValues("actionConfiguration")[0]);
-        if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            saveConfigJson("pages/" + path, multipart.getParameterValues("pageConfiguration")[0]);
+        String[] actionConfigurationParameter = multipart.getParameterValues("actionConfiguration");
+        String pageConfiguration = multipart.getParameterValues("pageConfiguration")[0];
+        String pageConfigurationPath = "pages/" + path;
+        if(actionConfigurationParameter != null) {
+            Response response = saveActionConfiguration(auth, actionConfigurationPath, actionConfigurationParameter[0]);
+            if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+                saveConfigJson(pageConfigurationPath, pageConfiguration);
+            }
+            return response;
+        } else {
+            saveConfigJson(pageConfigurationPath, pageConfiguration);
+            return Response.ok().build();
         }
-        return response;
     }
 
     @DELETE

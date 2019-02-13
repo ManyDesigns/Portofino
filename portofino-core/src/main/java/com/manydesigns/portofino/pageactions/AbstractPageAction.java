@@ -420,7 +420,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         List<Group> allGroups = new ArrayList<>(getPage().getPermissions().getGroups());
         Set<String> possibleGroups = ShiroUtils.getPortofinoRealm().getGroups();
         for(String group : possibleGroups) {
-            if(!allGroups.stream().anyMatch(g -> group.equals(g.getName()))) {
+            if(allGroups.stream().noneMatch(g -> group.equals(g.getName()))) {
                 Group emptyGroup = new Group();
                 emptyGroup.setName(group);
                 allGroups.add(emptyGroup);
@@ -464,7 +464,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         if(supportsPermissions != null && supportsPermissions.value().length > 0) {
             return supportsPermissions.value();
         } else {
-            return null;
+            return new String[0];
         }
     }
 

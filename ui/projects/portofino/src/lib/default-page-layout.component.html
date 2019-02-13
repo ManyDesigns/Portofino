@@ -50,6 +50,24 @@
         </table>
         <portofino-buttons [component]="page" list="permissions"></portofino-buttons>
       </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{'Children'|translate}}
+        </ng-template>
+        <table *ngIf="page.settingsPanel.permissions">
+          <tr>
+            <th>{{'Segment'|translate}}</th>
+            <th>{{'Title'|translate}}</th>
+            <th>{{'Embedded'|translate}}</th>
+          </tr>
+          <tr *ngFor="let child of page.children">
+            <td>{{child.path}}</td>
+            <td>{{child.title}}</td>
+            <td><mat-checkbox [(ngModel)]="child.embedded"></mat-checkbox></td>
+          </tr>
+        </table>
+        <portofino-buttons [component]="page" list="children"></portofino-buttons>
+      </mat-tab>
     </mat-tab-group>
   </div>
 </div>

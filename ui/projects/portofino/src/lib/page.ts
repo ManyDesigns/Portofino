@@ -403,6 +403,12 @@ export abstract class Page implements WithButtons, OnDestroy {
     declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'permissions'
     }, this, 'cancelPermissions', null);
+    declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'children'
+    }, this, 'saveChildren', null);
+    declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'children'
+    }, this, 'cancelChildren', null);
   }
 
   initialize() {}
@@ -598,7 +604,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     //Reflection would be nice
     pageConfiguration.children = config.children;
     pageConfiguration.securityCheckPath = config.securityCheckPath;
-    pageConfiguration.source = config.source; //config.source.source;
+    pageConfiguration.source = config.source;
     pageConfiguration.title = config.title;
     pageConfiguration.type = config.type;
     return pageConfiguration;
@@ -632,6 +638,27 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   cancelPermissions() {
+    this.settingsPanel.hide();
+  }
+
+  saveChildren() {
+    if (!this.portofino.localApiAvailable) {
+      throw "Local Portofino API not available"
+    }
+    const pageConfiguration = this.getPageConfigurationToSave({});
+    this.configuration = pageConfiguration;
+    let data = new FormData();
+    data.append("pageConfiguration", JSON.stringify(pageConfiguration));
+    const path = this.getConfigurationLocation(this.path);
+    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
+      params: { loginPath: this.portofino.loginPath }}).subscribe(
+      () => {
+        this.settingsPanel.hide();
+        this.reloadBaseUrl();
+      });
+  }
+
+  cancelChildren() {
     this.settingsPanel.hide();
   }
 }
