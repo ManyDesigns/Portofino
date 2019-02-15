@@ -2,6 +2,6 @@
   "title": "Projects",
   "type": "crud",
   "children": [],
-  "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": false }],
+  "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": false, "showInNavigation": true }],
   "source": "projects"
 }

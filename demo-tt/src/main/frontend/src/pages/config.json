@@ -1,6 +1,6 @@
 {
   "title": "Home",
   "type": "welcome",
-  "children": [{"path": "projects", "title": "Projects", "embedded": false }],
+  "children": [{"path": "projects", "title": "Projects", "embedded": false, "showInNavigation": true }],
   "source": ""
 }

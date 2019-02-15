@@ -64,6 +64,7 @@ public class Pages extends Resource {
                 Map<String, Object> child = new HashMap<>();
                 child.put("path", pageDirectory.getName());
                 child.put("title", pageConfiguration.get("title"));
+                child.put("showInNavigation", true);
                 children.add(child);
             } catch (IOException e) {
                 logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);

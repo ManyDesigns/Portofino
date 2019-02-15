@@ -2,6 +2,6 @@
   "title": "Tickets",
   "type": "crud",
   "children": [],
-  "detailChildren": [{"path": "attachments", "title": "attachments"}],
+  "detailChildren": [{"path": "attachments", "title": "attachments", "showInNavigation": true}],
   "source": "tickets"
 }

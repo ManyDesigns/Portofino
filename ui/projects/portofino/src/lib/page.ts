@@ -75,6 +75,7 @@ export class PageChild {
   title: string;
   icon: string;
   embedded: boolean;
+  showInNavigation: boolean;
   accessible: boolean;
 }
 
