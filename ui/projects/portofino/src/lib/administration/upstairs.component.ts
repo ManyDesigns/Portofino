@@ -9,7 +9,7 @@ import {
 } from "@angular/core";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {Page, PageConfiguration, PageService} from "../page";
+import {Page, PageConfiguration, PageService, Permissions} from "../page";
 import {map} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
@@ -30,6 +30,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   @ViewChild("settingsFormComponent")
   settingsFormComponent: FormComponent;
 
+  connectionProviders: ConnectionProviderSummary[];
+
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService) {
     super(portofino, http, router, route, authenticationService);
@@ -43,11 +45,23 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.pageService.notifyPageLoaded(this);
-    this.settingsPanel.show(); //Only for loading and saving permissions. It is not actually visible.
+    this.settingsPanel.loadPermissions();
+    this.loadConnectionProviders();
+    this.loadDatabasePlatforms();
   }
 
   ngAfterViewInit(): void {
     this.resetSettings();
+  }
+
+  loadConnectionProviders() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
+    this.page.http.get<ConnectionProviderSummary[]>(url).subscribe(s => { this.connectionProviders = s; });
+  }
+
+  loadDatabasePlatforms() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/platforms`;
+    this.page.http.get<any>(url).subscribe(s => { console.log(s) });
   }
 
   @Button({ list: "settings", text: "Save", color: "primary" })
@@ -66,3 +80,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
 }
 
+class ConnectionProviderSummary {
+  name: string;
+  status: string;
+  description: string;
+}

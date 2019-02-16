@@ -28,12 +28,16 @@ public class PlatformsAction extends AbstractPageAction {
     protected Persistence persistence;
 
     @GET
-    public Map<String, DatabasePlatform> listDatabasePlatforms() {
+    public Map<String, Map<String, String>> listDatabasePlatforms() {
         DatabasePlatformsRegistry manager = persistence.getDatabasePlatformsRegistry();
         DatabasePlatform[] platforms = manager.getDatabasePlatforms();
-        Map<String, DatabasePlatform> platformMap = new HashMap<>();
+        Map<String, Map<String, String>> platformMap = new HashMap<>();
         for (DatabasePlatform platform : platforms) {
-            platformMap.put(platform.getClass().getName(), platform);
+            Map<String, String> desc = new HashMap<>();
+            desc.put("description", platform.getDescription());
+            desc.put("standardDriverClassName", platform.getStandardDriverClassName());
+            desc.put("status", platform.getStatus());
+            platformMap.put(platform.getClass().getName(), desc);
         }
         return platformMap;
     }

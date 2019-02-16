@@ -317,18 +317,24 @@ export class PageSettingsPanel {
       Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration)];
     this.previousConfiguration = this.page.configuration;
     this.reloadConfiguration();
+    this.loadPermissions();
+    this.active = true;
+  }
+
+  loadPermissions() {
     const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
     this.page.http.get<Permissions>(permissionsUrl).subscribe(p => {
       this.permissions = p;
       this.permissions.groups.forEach(g => {
-        if(!g.level) {
+        if (!g.level) {
           g.level = "inherited";
         }
         g.permissionMap = {};
-        g.permissions.forEach(p => { g.permissionMap[p] = true; });
+        g.permissions.forEach(p => {
+          g.permissionMap[p] = true;
+        });
       });
     });
-    this.active = true;
   }
 
   hide() {

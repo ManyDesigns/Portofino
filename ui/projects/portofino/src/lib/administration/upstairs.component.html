@@ -33,4 +33,23 @@
     </table>
     <portofino-buttons [component]="this" list="permissions"></portofino-buttons>
   </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Database connections'|translate}}
+    </ng-template>
+    <table *ngIf="connectionProviders">
+      <tr>
+        <th>{{'Name'|translate}}</th>
+        <th>{{'Description'|translate}}</th>
+        <th>{{'Status'|translate}}</th>
+      </tr>
+      <tr *ngFor="let conn of connectionProviders">
+        <td>{{conn.name}}</td>
+        <td>{{conn.description}}</td>
+        <td>{{conn.status | translate}}</td>
+      </tr>
+    </table>
+    <portofino-buttons [component]="this" list="connections"></portofino-buttons>
+    <h3>{{'Available database platforms' | translate}}</h3>
+  </mat-tab>
 </mat-tab-group>
