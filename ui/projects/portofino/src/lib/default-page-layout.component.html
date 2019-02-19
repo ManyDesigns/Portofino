@@ -58,12 +58,19 @@
           <tr>
             <th>{{'Segment'|translate}}</th>
             <th>{{'Title'|translate}}</th>
+            <th>{{'Icon'|translate}}</th>
             <th>{{'Embedded'|translate}}</th>
             <th>{{'Show in navigation'|translate}}</th>
           </tr>
           <tr *ngFor="let child of page.children">
             <td>{{child.path}}</td>
             <td>{{child.title}}</td>
+            <td>
+              <mat-form-field>
+                <input matInput [(ngModel)]="child.icon" />
+                <mat-icon matSuffix *ngIf="child.icon">{{child.icon}}</mat-icon>
+              </mat-form-field>
+            </td>
             <td><mat-checkbox [(ngModel)]="child.embedded"></mat-checkbox></td>
             <td><mat-checkbox [(ngModel)]="child.showInNavigation"></mat-checkbox></td>
           </tr>

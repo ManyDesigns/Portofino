@@ -37,19 +37,48 @@
     <ng-template mat-tab-label>
       {{'Database connections'|translate}}
     </ng-template>
-    <table *ngIf="connectionProviders">
-      <tr>
-        <th>{{'Name'|translate}}</th>
-        <th>{{'Description'|translate}}</th>
-        <th>{{'Status'|translate}}</th>
-      </tr>
-      <tr *ngFor="let conn of connectionProviders">
-        <td>{{conn.name}}</td>
-        <td>{{conn.description}}</td>
-        <td>{{conn.status | translate}}</td>
-      </tr>
-    </table>
-    <portofino-buttons [component]="this" list="connections"></portofino-buttons>
-    <h3>{{'Available database platforms' | translate}}</h3>
+    <ng-container *ngIf="!connectionProvider">
+      <table *ngIf="connectionProviders">
+        <tr>
+          <th>{{'Name'|translate}}</th>
+          <th>{{'Description'|translate}}</th>
+          <th>{{'Status'|translate}}</th>
+        </tr>
+        <tr *ngFor="let conn of connectionProviders">
+          <td><a href="javascript:void(0)" (click)="openConnectionProvider(conn);">{{conn.name}}</a></td>
+          <td>{{conn.description}}</td>
+          <td>{{conn.status | translate}}</td>
+        </tr>
+      </table>
+      <portofino-buttons [component]="this" list="connections"></portofino-buttons>
+      <h3>{{'Available database platforms' | translate}}</h3>
+      <table *ngIf="databasePlatforms">
+        <tr>
+          <th>{{'Description'|translate}}</th>
+          <th>{{'Standard driver class name'|translate}}</th>
+          <th>{{'Status'|translate}}</th>
+        </tr>
+        <tr *ngFor="let platform of databasePlatforms">
+          <td>{{platform.description}}</td>
+          <td>{{platform.standardDriverClassName}}</td>
+          <td>{{platform.status | translate}}</td>
+        </tr>
+      </table>
+    </ng-container>
+    <ng-container *ngIf="connectionProvider">
+      <form>
+        <mat-form-field>
+          <mat-label>{{'Name'|translate}}</mat-label>
+          <input matInput required [(ngModel)]="connectionProvider.databaseName.value"
+                 [disabled]="!isEditConnectionProvider" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Driver'|translate}}</mat-label>
+          <input matInput required [(ngModel)]="connectionProvider.driver.value"
+                 [disabled]="!isEditConnectionProvider" />
+        </mat-form-field>
+        <div><portofino-buttons [component]="this" list="connection"></portofino-buttons></div>
+      </form>
+    </ng-container>
   </mat-tab>
 </mat-tab-group>

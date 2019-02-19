@@ -1,15 +1,12 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver,
-  Injectable,
-  Injector,
   OnInit,
   ViewChild
 } from "@angular/core";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {Page, PageConfiguration, PageService, Permissions} from "../page";
+import {Page, PageService} from "../page";
 import {map} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
@@ -31,6 +28,9 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   settingsFormComponent: FormComponent;
 
   connectionProviders: ConnectionProviderSummary[];
+  connectionProvider: ConnectionProviderDetails;
+  isEditConnectionProvider = false;
+  databasePlatforms: DatabasePlatform[];
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService) {
@@ -59,9 +59,44 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     this.page.http.get<ConnectionProviderSummary[]>(url).subscribe(s => { this.connectionProviders = s; });
   }
 
+  openConnectionProvider(conn: ConnectionProviderSummary) {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${conn.name}`;
+    this.page.http.get<ConnectionProviderDetails>(url).subscribe(c => { this.connectionProvider = c; });
+  }
+
+  @Button({ list: "connection", text: "Edit", color: "primary", presentIf: UpstairsComponent.isViewConnectionProvider })
+  editConnectionProvider() {
+    this.isEditConnectionProvider = true;
+  }
+
+  static isEditConnectionProvider(self: UpstairsComponent) {
+    return self.isEditConnectionProvider;
+  }
+
+  static isViewConnectionProvider(self: UpstairsComponent) {
+    return !self.isEditConnectionProvider;
+  }
+
+  @Button({ list: "connection", text: "Save", color: "primary", icon: "save", presentIf: UpstairsComponent.isEditConnectionProvider })
+  saveConnectionProvider() {
+    //TODO
+    this.isEditConnectionProvider = false;
+  }
+
+  @Button({ list: "connection", text: "Cancel" })
+  closeConnectionProvider() {
+    this.isEditConnectionProvider = false;
+    this.connectionProvider = null;
+  }
+
   loadDatabasePlatforms() {
     const url = `${this.portofino.apiRoot}portofino-upstairs/database/platforms`;
-    this.page.http.get<any>(url).subscribe(s => { console.log(s) });
+    this.page.http.get<{ [name: string]: DatabasePlatform }>(url).subscribe(d => {
+      this.databasePlatforms = [];
+      for (let k in d) {
+        this.databasePlatforms.push(d[k]);
+      }
+    });
   }
 
   @Button({ list: "settings", text: "Save", color: "primary" })
@@ -84,4 +119,26 @@ class ConnectionProviderSummary {
   name: string;
   status: string;
   description: string;
+}
+
+class ConnectionProviderDetails {
+  databaseName: { value: string };
+  driver: { value: string };
+  errorMessage: { value: string };
+  falseString: { value: string };
+  hibernateDialect: { value: string };
+  jndiResource: { value: string };
+  lastTested: { value: number; displayValue: string };
+  password: { value: string };
+  schemas: { catalog: string; name: string; selected: boolean }[];
+  status: { value: string };
+  trueString: { value: string };
+  user: { value: string };
+  username: { value: string };
+}
+
+class DatabasePlatform {
+  description: string;
+  standardDriverClassName: string;
+  status: string;
 }

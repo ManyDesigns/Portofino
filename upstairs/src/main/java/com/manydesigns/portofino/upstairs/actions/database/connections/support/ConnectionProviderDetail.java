@@ -67,6 +67,9 @@ public class ConnectionProviderDetail {
     @FieldSize(50)
     @Required
     public String getDriver() {
+        if(jdbcConnectionProvider == null) {
+            return null;
+        }
         return jdbcConnectionProvider.getDriver();
     }
 
@@ -78,6 +81,9 @@ public class ConnectionProviderDetail {
     @Required
     @Label("connection URL")
     public String getUrl() {
+        if(jdbcConnectionProvider == null) {
+            return null;
+        }
         return jdbcConnectionProvider.getActualUrl();
     }
 
@@ -86,6 +92,9 @@ public class ConnectionProviderDetail {
     }
 
     public String getUsername() {
+        if(jdbcConnectionProvider == null) {
+            return null;
+        }
         return jdbcConnectionProvider.getActualUsername();
     }
 
@@ -95,6 +104,9 @@ public class ConnectionProviderDetail {
 
     @Password
     public String getPassword() {
+        if(jdbcConnectionProvider == null) {
+            return null;
+        }
         return jdbcConnectionProvider.getActualPassword();
     }
 
@@ -104,6 +116,9 @@ public class ConnectionProviderDetail {
 
     @Required
     public String getJndiResource() {
+        if(jndiConnectionProvider == null) {
+            return null;
+        }
         return jndiConnectionProvider.getJndiResource();
     }
 
