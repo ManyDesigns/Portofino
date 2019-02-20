@@ -79,8 +79,10 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   @Button({ list: "connection", text: "Save", color: "primary", icon: "save", presentIf: UpstairsComponent.isEditConnectionProvider })
   saveConnectionProvider() {
-    //TODO
-    this.isEditConnectionProvider = false;
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.connectionProvider.databaseName.value}`;
+    this.page.http.put(url, this.connectionProvider).subscribe(() => {
+      this.isEditConnectionProvider = false;
+    });
   }
 
   @Button({ list: "connection", text: "Cancel" })
@@ -133,6 +135,7 @@ class ConnectionProviderDetails {
   schemas: { catalog: string; name: string; selected: boolean }[];
   status: { value: string };
   trueString: { value: string };
+  url: { value: string };
   user: { value: string };
   username: { value: string };
 }

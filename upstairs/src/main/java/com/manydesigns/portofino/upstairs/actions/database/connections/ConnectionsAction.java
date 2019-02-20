@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.upstairs.actions.database.connections;
 
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
@@ -95,7 +97,15 @@ public class ConnectionsAction extends AbstractPageAction {
     public Response saveConnection(@PathParam("databaseName") String databaseName) {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         ConnectionProviderDetail cp = new ConnectionProviderDetail(connectionProvider);
-        Form form = new FormBuilder(ConnectionProviderDetail.class).build();
+        Form form = new FormBuilder(ConnectionProviderDetail.class).configMode(Mode.EDIT).build();
+        if(cp.getJndiResource() != null) {
+            Field jndiResource = form.findFieldByPropertyName("jndiResource");
+            form.get(0).clear();
+            form.get(0).add(jndiResource);
+        } else {
+            Field jndiResource = form.findFieldByPropertyName("jndiResource");
+            form.get(0).remove(jndiResource);
+        }
         form.readFromObject(cp);
         form.readFromRequest(context.getRequest());
         //TODO schema select

@@ -67,17 +67,50 @@
     </ng-container>
     <ng-container *ngIf="connectionProvider">
       <form>
-        <mat-form-field>
-          <mat-label>{{'Name'|translate}}</mat-label>
-          <input matInput required [(ngModel)]="connectionProvider.databaseName.value"
-                 [disabled]="!isEditConnectionProvider" />
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{'Driver'|translate}}</mat-label>
-          <input matInput required [(ngModel)]="connectionProvider.driver.value"
-                 [disabled]="!isEditConnectionProvider" />
-        </mat-form-field>
-        <div><portofino-buttons [component]="this" list="connection"></portofino-buttons></div>
+        <ng-container *ngIf="!connectionProvider.jndiResource.value">
+          <mat-form-field>
+            <mat-label>{{'Name'|translate}}</mat-label>
+            <input name="name" matInput required [(ngModel)]="connectionProvider.databaseName.value"
+                   [disabled]="true" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Driver'|translate}}</mat-label>
+            <input name="driver" matInput required [(ngModel)]="connectionProvider.driver.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Connection URL'|translate}}</mat-label>
+            <input name="url" matInput required [(ngModel)]="connectionProvider.url.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Username'|translate}}</mat-label>
+            <input name="username" matInput [(ngModel)]="connectionProvider.username.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Password'|translate}}</mat-label>
+            <input name="password" type="password" matInput [(ngModel)]="connectionProvider.password.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Hibernate dialect'|translate}}</mat-label>
+            <input name="dialect" matInput [(ngModel)]="connectionProvider.hibernateDialect.value"
+                   [disabled]="!isEditConnectionProvider" />
+            <mat-hint>{{'leave empty to use default'|translate}}</mat-hint>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'True string'|translate}}</mat-label>
+            <input name="true-string" matInput [(ngModel)]="connectionProvider.trueString.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'False string'|translate}}</mat-label>
+            <input name="false-string" matInput [(ngModel)]="connectionProvider.falseString.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <div><portofino-buttons [component]="this" list="connection"></portofino-buttons></div>
+        </ng-container>
       </form>
     </ng-container>
   </mat-tab>

@@ -147,6 +147,7 @@ public class ConnectionProviderDetail {
         }
     }
 
+    @Updatable(false)
     public String getErrorMessage() {
         if(jdbcConnectionProvider != null) {
             return jdbcConnectionProvider.getErrorMessage();
@@ -157,6 +158,7 @@ public class ConnectionProviderDetail {
         }
     }
 
+    @Updatable(false)
     public String getStatus() {
         if(jdbcConnectionProvider != null) {
             return jdbcConnectionProvider.getStatus();
@@ -167,6 +169,7 @@ public class ConnectionProviderDetail {
         }
     }
 
+    @Updatable(false)
     public Date getLastTested() {
         if(jdbcConnectionProvider != null) {
             return jdbcConnectionProvider.getLastTested();
