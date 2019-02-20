@@ -9,7 +9,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.6</version>
+    <version>4.2.7-SNAPSHOT</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
@@ -94,7 +94,7 @@
         <commons.lang.version>2.5</commons.lang.version>
         <ehcache.version>2.10.5</ehcache.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>2.5.4</groovy.version>
+        <groovy.version>2.5.6</groovy.version>
         <guava.version>19.0</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
         <jackson.version>2.9.6</jackson.version> <!-- >=2.8.10 for current jersey version -->
