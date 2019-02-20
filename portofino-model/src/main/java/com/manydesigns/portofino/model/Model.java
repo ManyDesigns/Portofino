@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -45,7 +46,7 @@ public class Model {
     // Fields
     //**************************************************************************
 
-    protected final ArrayList<Database> databases;
+    protected final LinkedList<Database> databases;
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -54,7 +55,7 @@ public class Model {
     //**************************************************************************
 
     public Model() {
-        this.databases = new ArrayList<Database>();
+        this.databases = new LinkedList<Database>();
     }
 
     //**************************************************************************
