@@ -50,7 +50,7 @@ export class MatSnackBarNotificationService extends NotificationService {
 @Injectable()
 export class NotificationInterceptor implements HttpInterceptor {
 
-  readonly headerRegex = /([^:]+): (.+)/.compile()
+  readonly headerRegex = /^([^:]+?): (.+?)$/g;
 
   constructor(protected notificationService: NotificationService) {}
 
@@ -60,7 +60,7 @@ export class NotificationInterceptor implements HttpInterceptor {
         let messages = value.headers.getAll("X-Portofino-Message") || [];
         messages.forEach(message => {
           const result = this.headerRegex.exec(message);
-          if(result) {
+          if(result && result.length > 0) {
             const type = result[1];
             const mess = result[2];
             switch (type) {

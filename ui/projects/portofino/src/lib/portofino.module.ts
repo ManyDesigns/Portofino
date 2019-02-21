@@ -76,8 +76,9 @@ import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {ContentComponent} from "./content.component";
 import {
-  MatSnackBarNotificationService,
-  NotificationService} from "./notifications/notification.service";
+  MatSnackBarNotificationService, NotificationInterceptor,
+  NotificationService
+} from "./notifications/notification.service";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { NgxdModule } from '@ngxd/core';
 import {FieldFactory, FieldFactoryComponent} from "./fields/field.factory";
@@ -147,6 +148,7 @@ export class PortofinoFormsModule {}
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },
     { provide: TOKEN_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: NotificationService, useClass: MatSnackBarNotificationService }],

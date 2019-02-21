@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
@@ -189,12 +191,29 @@ public class ConnectionsAction extends AbstractPageAction {
         return selectableSchemas;
     }
 
+    @DELETE
+    @Path("{databaseName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void deleteConnection(@PathParam("databaseName") String databaseName) throws IOException, JAXBException {
+        Database database =
+                DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+        if (database == null) {
+            throw new WebApplicationException("Delete failed. Connection provider not found: " + databaseName);
+        } else {
+            persistence.getModel().getDatabases().remove(database);
+            persistence.initModel();
+            persistence.saveXmlModel();
+            logger.info("Database {} deleted", databaseName);
+        }
+    }
+
     @POST
     @Path("{databaseName}/:synchronize")
     public void synchronize(@PathParam("databaseName") String databaseName) throws Exception {
         persistence.syncDataModel(databaseName);
         persistence.initModel();
         persistence.saveXmlModel();
+        RequestMessages.addInfoMessage("Model synchronized");
     }
 
 

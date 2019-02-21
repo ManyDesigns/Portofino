@@ -85,6 +85,23 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     });
   }
 
+  @Button({ list: "connection", text: "Delete", color: "warn", icon: "delete", presentIf: UpstairsComponent.isViewConnectionProvider })
+  deleteConnectionProvider() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.connectionProvider.databaseName.value}`;
+    this.page.http.delete(url).subscribe(() => {
+      this.isEditConnectionProvider = false;
+      this.connectionProviders = this.connectionProviders.filter(
+        c => c.name != this.connectionProvider.databaseName.value);
+      this.connectionProvider = null;
+    });
+  }
+
+  @Button({ list: "connection", text: "Synchronize", icon: "refresh", presentIf: UpstairsComponent.isViewConnectionProvider })
+  synchronizeConnectionProvider() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.connectionProvider.databaseName.value}/:synchronize`;
+    this.page.http.post(url, {}).subscribe(() => {});
+  }
+
   @Button({ list: "connection", text: "Cancel" })
   closeConnectionProvider() {
     this.isEditConnectionProvider = false;
