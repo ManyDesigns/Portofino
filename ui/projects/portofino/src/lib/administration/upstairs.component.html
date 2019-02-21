@@ -109,8 +109,25 @@
             <input name="false-string" matInput [(ngModel)]="connectionProvider.falseString.value"
                    [disabled]="!isEditConnectionProvider" />
           </mat-form-field>
-          <div><portofino-buttons [component]="this" list="connection"></portofino-buttons></div>
         </ng-container>
+        <mat-divider></mat-divider>
+        <h3>{{'Schemas'|translate}}</h3>
+        {{connectionProvider.schemas|json}}
+        <table>
+          <tr>
+            <th></th>
+            <th>{{'Schema'|translate}}</th>
+            <th>{{'Schema name'|translate}}</th>
+          </tr>
+          <tr *ngFor="let schema of connectionProvider.schemas">
+            <td><mat-checkbox [(ngModel)]="schema.selected"
+                              name="selected" [disabled]="!isEditConnectionProvider"></mat-checkbox></td>
+            <td>{{schema.schema}}</td>
+            <td><input matInput [(ngModel)]="schema.name"
+                       name="schemaName" [disabled]="!isEditConnectionProvider"/></td>
+          </tr>
+        </table>
+        <div><portofino-buttons [component]="this" list="connection"></portofino-buttons></div>
       </form>
     </ng-container>
   </mat-tab>

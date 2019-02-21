@@ -245,7 +245,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                         break;
                     }
                 }
-                SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1],schemaName[1], selected);
+                SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], schemaName[1], selected);
                 selectableSchemas.add(schema);
             }
             schemasForm = new TableFormBuilder(SelectableSchema.class)

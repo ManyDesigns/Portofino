@@ -132,7 +132,7 @@ class ConnectionProviderDetails {
   jndiResource: { value: string };
   lastTested: { value: number; displayValue: string };
   password: { value: string };
-  schemas: { catalog: string; name: string; selected: boolean }[];
+  schemas: { catalog: string; name: string; schema: string; selected: boolean }[];
   status: { value: string };
   trueString: { value: string };
   url: { value: string };
