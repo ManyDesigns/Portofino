@@ -171,7 +171,6 @@ class PageTreeDataSource {
   }
 }
 
-
 @Component({
   selector: 'portofino-page-source-selector-tree',
   template: `

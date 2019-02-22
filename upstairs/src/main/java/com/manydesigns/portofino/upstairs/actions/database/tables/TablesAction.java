@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.upstairs.actions.database.tables;
 
 import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.model.database.Schema;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.*;
@@ -28,6 +31,20 @@ public class TablesAction extends AbstractPageAction {
 
     @Autowired
     protected Persistence persistence;
+
+    @Path("{db}/{schema}")
+    @GET
+    public List<Map> getTables(@PathParam("db") String db, @PathParam("schema") String schema) {
+        Schema schemaObj = DatabaseLogic.findSchemaByName(persistence.getModel(), db, schema);
+        List<Map> tables = new ArrayList<>();
+        if(schemaObj == null) {
+            return tables;
+        }
+        schemaObj.getTables().forEach(table -> {
+            tables.add(createLeaf(table.getTableName(), table.getActualEntityName()));
+        });
+        return tables;
+    }
 
     @GET
     public List<Map> getTables() {

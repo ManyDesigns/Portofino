@@ -67,12 +67,19 @@
     </ng-container>
     <ng-container *ngIf="connectionProvider">
       <form>
-        <ng-container *ngIf="!connectionProvider.jndiResource.value">
+        <mat-form-field>
+          <mat-label>{{'Name'|translate}}</mat-label>
+          <input name="name" matInput required [(ngModel)]="connectionProvider.databaseName.value"
+                 [disabled]="true" />
+        </mat-form-field>
+        <ng-container *ngIf="connectionProvider.jndiResource.value">
           <mat-form-field>
-            <mat-label>{{'Name'|translate}}</mat-label>
-            <input name="name" matInput required [(ngModel)]="connectionProvider.databaseName.value"
-                   [disabled]="true" />
+            <mat-label>{{'JNDI Resource'|translate}}</mat-label>
+            <input name="jndiResource" matInput required [(ngModel)]="connectionProvider.jndiResource.value"
+                   [disabled]="!isEditConnectionProvider" />
           </mat-form-field>
+        </ng-container>
+        <ng-container *ngIf="!connectionProvider.jndiResource.value">
           <mat-form-field>
             <mat-label>{{'Driver'|translate}}</mat-label>
             <input name="driver" matInput required [(ngModel)]="connectionProvider.driver.value"
@@ -118,16 +125,36 @@
             <th>{{'Schema'|translate}}</th>
             <th>{{'Schema name'|translate}}</th>
           </tr>
-          <tr *ngFor="let schema of connectionProvider.schemas">
+          <tr *ngFor="let schema of connectionProvider.schemas; let i = index;">
             <td><mat-checkbox [(ngModel)]="schema.selected"
-                              name="selected" [disabled]="!isEditConnectionProvider"></mat-checkbox></td>
+                              name="selected{{i}}" [disabled]="!isEditConnectionProvider"></mat-checkbox></td>
             <td>{{schema.schema}}</td>
             <td><input matInput [(ngModel)]="schema.name"
-                       name="schemaName" [disabled]="!isEditConnectionProvider"/></td>
+                       name="schemaName{{i}}" [disabled]="!isEditConnectionProvider"/></td>
           </tr>
         </table>
         <div><portofino-buttons [component]="this" list="connection"></portofino-buttons></div>
       </form>
     </ng-container>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Tables'|translate}}
+    </ng-template>
+    <mat-tree [dataSource]="tableTreeDataSource" [treeControl]="tableTreeControl">
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
+        <a href="javascript:void(0)">{{node.displayName}}</a>
+      </mat-tree-node>
+      <mat-tree-node *matTreeNodeDef="let node;when: isExpandable" matTreeNodePadding>
+        <button mat-icon-button matTreeNodeToggle
+                [attr.aria-label]="'toggle ' + node.name">
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{tableTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+          </mat-icon>
+        </button>
+        {{node.displayName}}
+        <mat-progress-bar *ngIf="node.loading" mode="indeterminate"></mat-progress-bar>
+      </mat-tree-node>
+    </mat-tree>
   </mat-tab>
 </mat-tab-group>

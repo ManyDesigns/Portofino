@@ -15,6 +15,9 @@ import {Property} from "../class-accessor";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
+import {BehaviorSubject, merge, Observable} from "rxjs";
+import {FlatTreeControl} from "@angular/cdk/tree";
+import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 
 @Component({
   selector: 'portofino-upstairs',
@@ -34,6 +37,9 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   isEditConnectionProvider = false;
   databasePlatforms: DatabasePlatform[];
 
+  tableTreeControl: FlatTreeControl<TableFlatNode>;
+  tableTreeDataSource: TableTreeDataSource;
+
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService,
               protected notificationService: NotificationService, protected translate: TranslateService) {
@@ -44,7 +50,15 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     route.url.pipe(map(segments => segments.join(''))).subscribe(url => {
       this.url = url;
     });
+    this.tableTreeControl = new FlatTreeControl<TableFlatNode>(this._getLevel, this._isExpandable);
+    this.tableTreeDataSource = new TableTreeDataSource(this.tableTreeControl, http, portofino.apiRoot);
   }
+
+  private _getLevel = (node: TableFlatNode) => node.level;
+
+  private _isExpandable = (node: TableFlatNode) => { return node.expandable || this.tableTreeControl.isExpanded(node) };
+
+  isExpandable = (_: number, node: TableFlatNode) => { return this._isExpandable(node); };
 
   ngOnInit(): void {
     this.pageService.notifyPageLoaded(this);
@@ -59,7 +73,10 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   loadConnectionProviders() {
     const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
-    this.page.http.get<ConnectionProviderSummary[]>(url).subscribe(s => { this.connectionProviders = s; });
+    this.page.http.get<ConnectionProviderSummary[]>(url).subscribe(s => {
+      this.connectionProviders = s;
+      this.tableTreeDataSource.data = s.map(c => new TableFlatNode(c.name, null, null));
+    });
   }
 
   openConnectionProvider(conn: ConnectionProviderSummary) {
@@ -174,4 +191,113 @@ class DatabasePlatform {
   description: string;
   standardDriverClassName: string;
   status: string;
+}
+
+class TableFlatNode {
+  loading = false;
+  readonly children: TableFlatNode[] = [];
+  constructor(public db: string, public schema: {name: string, liquibase: boolean }, public table: string) {}
+
+  get level() {
+    if(this.table) {
+      return 2;
+    } else if(this.schema) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  get expandable() {
+    return !this.table;
+  }
+
+  get displayName() {
+    if(this.table) return this.table;
+    if(this.schema) return this.schema.name;
+    if(this.db) return this.db;
+  }
+}
+
+class TableTreeDataSource {
+
+  readonly dataChange = new BehaviorSubject<TableFlatNode[]>([]);
+
+  get data(): TableFlatNode[] { return this.dataChange.value; }
+  set data(value: TableFlatNode[]) {
+    this.treeControl.dataNodes = value;
+    this.dataChange.next(value);
+  }
+
+  constructor(private treeControl: FlatTreeControl<TableFlatNode>, private http: HttpClient, private apiRoot: string) {}
+
+  connect(collectionViewer: CollectionViewer): Observable<TableFlatNode[]> {
+    this.treeControl.expansionModel.changed.subscribe(change => {
+      if ((change as SelectionChange<TableFlatNode>).added ||
+        (change as SelectionChange<TableFlatNode>).removed) {
+        this.handleTreeControl(change as SelectionChange<TableFlatNode>);
+      }
+    });
+
+    return merge(collectionViewer.viewChange, this.dataChange).pipe(map(() => this.data));
+  }
+
+  /** Handle expand/collapse behaviors */
+  handleTreeControl(change: SelectionChange<TableFlatNode>) {
+    if (change.added) {
+      change.added.forEach(node => this.toggleNode(node, true));
+    }
+    if (change.removed) {
+      change.removed.slice().reverse().forEach(node => this.toggleNode(node, false));
+    }
+  }
+
+  /**
+   * Toggle the node, remove from display list
+   */
+  toggleNode(node: TableFlatNode, expand: boolean) {
+    const index = this.data.indexOf(node);
+    if (!node.expandable || index < 0) {
+      return;
+    }
+    if(expand) {
+      if(node.children.length > 0) {
+        //Already loaded
+        this.data.splice(index + 1, 0, ...node.children);
+        this.dataChange.next(this.data);
+      } else {
+        this.loadNode(node, index);
+      }
+    } else {
+      let count = 0;
+      for (let i = index + 1; i < this.data.length && this.data[i].level > node.level; i++, count++) {}
+      this.data.splice(index + 1, count);
+      this.dataChange.next(this.data);
+    }
+  }
+
+  protected loadNode(node: TableFlatNode, index) {
+    node.loading = true;
+    if(node.schema) {
+      const url = `${this.apiRoot}portofino-upstairs/database/tables/${node.db}/${node.schema.name}`;
+      this.http.get(url).subscribe((tables: any[]) => {
+        tables.forEach(table => {
+          node.children.push(new TableFlatNode(node.db, node.schema, table.name));
+        });
+        this.data.splice(index + 1, 0, ...node.children);
+        node.loading = false;
+        this.dataChange.next(this.data);
+      });
+    } else {
+      const url = `${this.apiRoot}portofino-upstairs/database/connections/${node.db}`;
+      this.http.get<ConnectionProviderDetails>(url).subscribe(c => {
+        c.schemas.forEach(schema => {
+          node.children.push(new TableFlatNode(node.db, { name: schema.schema, liquibase: false }, null)); //TODO
+        });
+        this.data.splice(index + 1, 0, ...node.children);
+        node.loading = false;
+        this.dataChange.next(this.data);
+      });
+    }
+  }
 }

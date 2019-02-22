@@ -31,9 +31,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +84,12 @@ public class ConnectionsAction extends AbstractPageAction {
             js.key("name").value(schema.schemaName);
             js.key("schema").value(schema.schema);
             js.key("selected").value(schema.selected);
+
+            String changelogFileNameTemplate = "{0}-changelog.xml";
+            String changelogFileName = MessageFormat.format(
+                    changelogFileNameTemplate, databaseName + "-" + schema.schema);
+            File changelogFile = new File(persistence.getAppDbsDir(), changelogFileName);
+            js.key("liquibase").value(changelogFile.isFile());
             js.endObject();
         }
         js.endArray();
