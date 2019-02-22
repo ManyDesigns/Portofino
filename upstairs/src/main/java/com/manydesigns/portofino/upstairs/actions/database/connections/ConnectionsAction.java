@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.upstairs.actions.database.connections;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
@@ -8,6 +9,7 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.json.JsonKeyValueAccessor;
 import com.manydesigns.elements.messages.RequestMessages;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -137,17 +139,23 @@ public class ConnectionsAction extends AbstractPageAction {
             String schemaName = schema.getString("schema").toLowerCase();
             if(selected) {
                 if(selectedSchemaNames.contains(schemaName)) {
-                    for(Schema aSchema : database.getSchemas()) {
-                        if(aSchema.getSchema().equalsIgnoreCase(schemaName)) {
-                            aSchema.setSchemaName(schema.getString("name"));
+                    for(Schema modelSchema : database.getSchemas()) {
+                        if(modelSchema.getSchema().equalsIgnoreCase(schemaName)) {
+                            if(!schema.isNull("name")) {
+                                modelSchema.setSchemaName(schema.getString("name"));
+                            }
                             break;
                         }
                     }
                 } else {
                     Schema modelSchema = new Schema();
-                    modelSchema.setCatalog(schema.getString("catalog"));
-                    modelSchema.setSchemaName(schema.getString("name"));
-                    modelSchema.setSchema(schema.getString("schema"));
+                    if(!schema.isNull("catalog")) {
+                        modelSchema.setCatalog(schema.getString("catalog"));
+                    }
+                    if(!schema.isNull("name")) {
+                        modelSchema.setSchemaName(schema.getString("name"));
+                    }
+                    modelSchema.setSchema(schemaName);
                     modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
                 }
@@ -216,5 +224,12 @@ public class ConnectionsAction extends AbstractPageAction {
         RequestMessages.addInfoMessage("Model synchronized");
     }
 
+    @POST
+    @Path("{databaseName}/:test")
+    public String[] test(@PathParam("databaseName") String databaseName) {
+        ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
+        connectionProvider.init(persistence.getDatabasePlatformsRegistry());
+        return new String[] { connectionProvider.getStatus(), connectionProvider.getErrorMessage() };
+    }
 
 }

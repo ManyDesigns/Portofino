@@ -13,6 +13,8 @@ import {AuthenticationService} from "../security/authentication.service";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
 import {Button} from "../buttons";
+import {NotificationService} from "../notifications/notification.service";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-upstairs',
@@ -33,7 +35,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   databasePlatforms: DatabasePlatform[];
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
-              authenticationService: AuthenticationService, protected pageService: PageService) {
+              authenticationService: AuthenticationService, protected pageService: PageService,
+              protected notificationService: NotificationService, protected translate: TranslateService) {
     super(portofino, http, router, route, authenticationService);
     this.configuration = {
       title: "Upstairs"
@@ -93,6 +96,16 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       this.connectionProviders = this.connectionProviders.filter(
         c => c.name != this.connectionProvider.databaseName.value);
       this.connectionProvider = null;
+    });
+  }
+
+  @Button({ list: "connection", text: "Test", icon: "flash_on", presentIf: UpstairsComponent.isViewConnectionProvider })
+  testConnectionProvider() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.connectionProvider.databaseName.value}/:test`;
+    this.page.http.post<string[]>(url, {}).subscribe(status => {
+      if(status[0] == 'connected') {
+        this.notificationService.info(this.translate.instant("Connection tested successfully"));
+      }
     });
   }
 
