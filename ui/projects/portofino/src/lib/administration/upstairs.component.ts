@@ -56,7 +56,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   private _getLevel = (node: TableFlatNode) => node.level;
 
-  private _isExpandable = (node: TableFlatNode) => { return node.expandable || this.tableTreeControl.isExpanded(node) };
+  private _isExpandable = (node: TableFlatNode) => { return node.expandable };
 
   isExpandable = (_: number, node: TableFlatNode) => { return this._isExpandable(node); };
 
@@ -269,6 +269,9 @@ class TableTreeDataSource {
         this.loadNode(node, index);
       }
     } else {
+      if(!node.schema) {
+        node.children.forEach(n => { this.toggleNode(n, false); });
+      }
       let count = 0;
       for (let i = index + 1; i < this.data.length && this.data[i].level > node.level; i++, count++) {}
       this.data.splice(index + 1, count);

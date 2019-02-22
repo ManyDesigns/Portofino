@@ -43,6 +43,7 @@ public class TablesAction extends AbstractPageAction {
         schemaObj.getTables().forEach(table -> {
             tables.add(createLeaf(table.getTableName(), table.getActualEntityName()));
         });
+        tables.sort(Comparator.comparing(o -> ((String) o.get("name"))));
         return tables;
     }
 
