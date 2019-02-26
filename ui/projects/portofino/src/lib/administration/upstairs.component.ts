@@ -39,14 +39,14 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   tableTreeControl: FlatTreeControl<TableFlatNode>;
   tableTreeDataSource: TableTreeDataSource;
+  tableInfo: any;
+  column: any;
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService,
               protected notificationService: NotificationService, protected translate: TranslateService) {
     super(portofino, http, router, route, authenticationService);
-    this.configuration = {
-      title: "Upstairs"
-    };
+    this.configuration = { title: "Upstairs" };
     route.url.pipe(map(segments => segments.join(''))).subscribe(url => {
       this.url = url;
     });
@@ -160,6 +160,50 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       this.settingsFormComponent.controls.get('appName').setValue(settings.appName.value);
       this.settingsFormComponent.controls.get('loginPath').setValue(settings.loginPath.value);
     });
+  }
+
+  editTable(table: TableFlatNode) {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${table.db}/${table.schema.name}/${table.table}`;
+    this.http.get(url).subscribe(tableInfo => {
+      this.tableInfo = tableInfo;
+      this.tableInfo.db = table.db;
+      this.tableInfo.schema = table.schema.name;
+      this.prepareTableInfo();
+    });
+  }
+
+  private prepareTableInfo() {
+    this.tableInfo.table.column.forEach(c => {
+      if (!c.javaType) {
+        c.javaType = "default";
+      }
+    });
+  }
+
+  @Button({ list: "table", text: "Save", color: "primary" })
+  saveTable() {
+    const table = this.tableInfo.table;
+    table.column.forEach(c => {
+      if(c.javaType == "default") {
+        c.javaType = null;
+      }
+    });
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${table.tableName}`;
+    this.http.put(url, this.tableInfo.table).subscribe(
+      () => {
+        this.prepareTableInfo();
+        this.notificationService.info(this.translate.instant("Table saved"));
+        }, () => { this.prepareTableInfo(); });
+  }
+
+  @Button({ list: "table", text: "Cancel" })
+  cancelTable() {
+    this.tableInfo = null;
+  }
+
+  editColumn(column, index) {
+    this.column = column;
+    this.column.index = index;
   }
 
 }

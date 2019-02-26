@@ -141,9 +141,9 @@
     <ng-template mat-tab-label>
       {{'Tables'|translate}}
     </ng-template>
-    <mat-tree [dataSource]="tableTreeDataSource" [treeControl]="tableTreeControl">
+    <mat-tree [dataSource]="tableTreeDataSource" [treeControl]="tableTreeControl" *ngIf="!tableInfo">
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
-        <a href="javascript:void(0)">{{node.displayName}}</a>
+        <a href="javascript:void(0)" (click)="editTable(node)">{{node.displayName}}</a>
       </mat-tree-node>
       <mat-tree-node *matTreeNodeDef="let node;when: isExpandable" matTreeNodePadding>
         <button mat-icon-button matTreeNodeToggle
@@ -156,5 +156,109 @@
         <mat-progress-bar *ngIf="node.loading" mode="indeterminate"></mat-progress-bar>
       </mat-tree-node>
     </mat-tree>
+    <mat-card *ngIf="tableInfo && !column">
+      <mat-card-title>{{tableInfo.table.tableName}}</mat-card-title>
+      <mat-card-content>
+        <mat-tab-group>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              {{'Table and columns'|translate}}
+            </ng-template>
+            <mat-form-field>
+              <mat-label>{{'Entity name'|translate}}</mat-label>
+              <input matInput [(ngModel)]="tableInfo.table.entityName" />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Short name'|translate}}</mat-label>
+              <input matInput [(ngModel)]="tableInfo.table.shortName" />
+            </mat-form-field>
+            <fieldset>
+              <legend>{{'Columns'|translate}}</legend>
+              <table>
+                <tr>
+                  <th>{{'Name'|translate}}</th>
+                  <th>{{'Property name'|translate}}</th>
+                  <th>{{'Class'|translate}}</th>
+                  <th>{{'Type'|translate}}</th>
+                  <th>{{'Length'|translate}}</th>
+                  <th>{{'Scale'|translate}}</th>
+                  <th>{{'Nullable'|translate}}</th>
+                </tr>
+                <tr *ngFor="let column of tableInfo.table.column; let i = index;">
+                  <td><a href="javascript:void(0)" (click)="editColumn(column, i);">{{column.columnName}}</a></td>
+                  <td><input matInput [(ngModel)]="column.propertyName" /></td>
+                  <td style="min-width: 100px;">
+                    <mat-select [(ngModel)]="column.javaType">
+                      <mat-option value="default">Auto ({{tableInfo.types[i].default.simpleName}})</mat-option>
+                      <mat-option *ngFor="let type of tableInfo.types[i].types" [value]="type.name">
+                        {{type.simpleName}}
+                      </mat-option>
+                    </mat-select>
+                  </td>
+                  <td>{{column.columnType}} (JDBC: {{column.jdbcType}})</td>
+                  <td>{{column.length}}</td>
+                  <td>{{column.scale}}</td>
+                  <td>{{column.nullable}}</td>
+                </tr>
+              </table>
+            </fieldset>
+            <div><portofino-buttons [component]="this" list="table"></portofino-buttons></div>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              {{'Foreign keys and selection providers'|translate}}
+            </ng-template>
+            TODO
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="column">
+      <mat-card-title>{{column.columnName}}</mat-card-title>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>{{'Column name'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.columnName" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Property name'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.propertyName" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Java Type'|translate}}</mat-label>
+          <mat-select [(ngModel)]="column.javaType">
+            <mat-option value="default">Auto ({{tableInfo.types[column.index].default.simpleName}})</mat-option>
+            <mat-option *ngFor="let type of tableInfo.types[column.index].types" [value]="type.name">
+              {{type.simpleName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Type'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.columnType" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'JDBC Type'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.jdbcType" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Length'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.length" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Scale'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.scale" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Nullable'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.nullable" disabled />
+        </mat-form-field>
+        <fieldset>
+          <legend>{{'Annotations'|translate}}</legend>
+          TODO
+        </fieldset>
+        <div><portofino-buttons [component]="this" list="column"></portofino-buttons></div>
+      </mat-card-content>
+    </mat-card>
   </mat-tab>
 </mat-tab-group>
