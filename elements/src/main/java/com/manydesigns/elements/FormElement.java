@@ -32,6 +32,10 @@ public interface FormElement extends Element {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
+    String getName();
+
+    Object getValue();
+
     Mode getMode();
 
     String getLabel();

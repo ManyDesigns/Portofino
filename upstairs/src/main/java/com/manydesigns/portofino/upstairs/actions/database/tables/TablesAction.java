@@ -1,11 +1,17 @@
 package com.manydesigns.portofino.upstairs.actions.database.tables;
 
+import com.manydesigns.elements.reflection.MutableClassAccessor;
+import com.manydesigns.elements.reflection.MutablePropertyAccessor;
+import com.manydesigns.elements.util.FormUtil;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -14,10 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -115,12 +123,11 @@ public class TablesAction extends AbstractPageAction {
             }
             Integer precision = column.getLength();
             Class[] javaTypes = type.getAvailableJavaTypes(precision);
-            Integer scale = column.getScale();
             Map info = new HashMap();
             info.put("type", type);
 
             //Default
-            Class defaultJavaType = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), precision, scale);
+            Class defaultJavaType = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), precision, column.getScale());
             if(defaultJavaType == null) {
                 defaultJavaType = Object.class;
             }
@@ -131,13 +138,15 @@ public class TablesAction extends AbstractPageAction {
             List availableTypes = new ArrayList();
             info.put("types", availableTypes);
             //Existing
-            try {
-                Class existingType = Class.forName(column.getJavaType());
-                if(!ArrayUtils.contains(javaTypes, existingType)) {
-                    availableTypes.add(describeType(existingType));
+            if(column.getJavaType() != null) {
+                try {
+                    Class existingType = Class.forName(column.getJavaType());
+                    if (!ArrayUtils.contains(javaTypes, existingType)) {
+                        availableTypes.add(describeType(existingType));
+                    }
+                } catch (Exception e) {
+                    logger.error("Invalid Java type", e);
                 }
-            } catch (Exception e) {
-                logger.error("Invalid Java type", e);
             }
             for (Class c : javaTypes) {
                 availableTypes.add(describeType(c));
@@ -165,6 +174,65 @@ public class TablesAction extends AbstractPageAction {
         }
         persistence.initModel();
         persistence.saveXmlModel();
+    }
+
+    @Path("{db}/{schema}/{table}/{column}")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void saveColumn(
+            @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
+            @PathParam("column") String columnName, ColumnAndAnnotations column) throws IOException, JAXBException {
+        Column existing = DatabaseLogic.findColumnByName(persistence.getModel(), db, schema, tableName, columnName);
+        if(existing == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        Table table = existing.getTable();
+        BeanUtils.copyProperties(column.getColumn(), existing);
+        existing.setTable(table);
+        persistence.initModel();
+        persistence.saveXmlModel();
+    }
+
+    @Path("{db}/{schema}/{table}/{column}/:annotations/{typeName}")
+    @GET
+    public String getApplicableAnnotations(
+            @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
+            @PathParam("column") String columnName, @PathParam("typeName") String typeName) throws ClassNotFoundException {
+        Class type;
+        if("default".equals(typeName)) {
+            Column column = DatabaseLogic.findColumnByName(persistence.getModel(), db, schema, tableName, columnName);
+            if(column == null) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+            type = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), column.getLength(), column.getScale());
+        } else {
+            type = Class.forName(typeName);
+        }
+        MutableClassAccessor classAccessor = new MutableClassAccessor();
+        if(Number.class.isAssignableFrom(type)) {
+            classAccessor.addProperty(new MutablePropertyAccessor("fieldSize", Integer.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("minValue", BigDecimal.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("maxValue", BigDecimal.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("decimalFormat", String.class));
+        } else if(String.class.equals(type)) {
+            classAccessor.addProperty(new MutablePropertyAccessor("fieldSize", Integer.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("typeOfContent", String.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("stringFormat", String.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("regexp", String.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("highlightLinks", Boolean.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("fileBlob", Boolean.class));
+        } else if(Date.class.isAssignableFrom(type)) {
+            classAccessor.addProperty(new MutablePropertyAccessor("fieldSize", Integer.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("dateFormat", String.class));
+
+        } else if(byte[].class.isAssignableFrom(type)) {
+            classAccessor.addProperty(new MutablePropertyAccessor("databaseBlobContentTypeProperty", String.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("databaseBlobFileNameProperty", String.class));
+            classAccessor.addProperty(new MutablePropertyAccessor("databaseBlobTimestampProperty", String.class));
+        }
+        JSONStringer jsonStringer = new JSONStringer();
+        ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
+        return jsonStringer.toString();
     }
 
     protected Map describeType(Class type) {

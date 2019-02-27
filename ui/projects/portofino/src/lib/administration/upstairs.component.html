@@ -226,7 +226,7 @@
         </mat-form-field>
         <mat-form-field>
           <mat-label>{{'Java Type'|translate}}</mat-label>
-          <mat-select [(ngModel)]="column.javaType">
+          <mat-select [(ngModel)]="column.javaType" (valueChange)="changeType(column, $event)">
             <mat-option value="default">Auto ({{tableInfo.types[column.index].default.simpleName}})</mat-option>
             <mat-option *ngFor="let type of tableInfo.types[column.index].types" [value]="type.name">
               {{type.simpleName}}
@@ -255,7 +255,7 @@
         </mat-form-field>
         <fieldset>
           <legend>{{'Annotations'|translate}}</legend>
-          TODO
+          <portofino-form [form]="annotationsForm" [controls]="annotations"></portofino-form>
         </fieldset>
         <div><portofino-buttons [component]="this" list="column"></portofino-buttons></div>
       </mat-card-content>

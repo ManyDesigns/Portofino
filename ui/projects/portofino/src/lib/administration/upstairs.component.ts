@@ -11,13 +11,14 @@ import {map} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {Field, Form, FormComponent} from "../form";
-import {Property} from "../class-accessor";
+import {ClassAccessor, Property} from "../class-accessor";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
 import {BehaviorSubject, merge, Observable} from "rxjs";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
+import {FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'portofino-upstairs',
@@ -41,6 +42,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   tableTreeDataSource: TableTreeDataSource;
   tableInfo: any;
   column: any;
+  annotationsForm: Form;
+  readonly annotations = new FormGroup({});
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService,
@@ -180,7 +183,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     });
   }
 
-  @Button({ list: "table", text: "Save", color: "primary" })
+  @Button({ list: "table", text: "Save", icon: "save", color: "primary" })
   saveTable() {
     const table = this.tableInfo.table;
     table.column.forEach(c => {
@@ -204,6 +207,31 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   editColumn(column, index) {
     this.column = column;
     this.column.index = index;
+    this.changeType(this.column, this.column.javaType);
+  }
+
+  @Button({ list: "column", text: "Save", icon: "save", color: "primary" })
+  saveColumn() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${this.tableInfo.table.tableName}/${this.column.columnName}`;
+    const column = Object.assign({}, this.column);
+    delete column.index;
+    if(column.javaType == "default") {
+      column.javaType = null;
+    }
+    this.http.put(url, { column: column, annotations: this.annotations.value }).subscribe(
+      () => { this.notificationService.info(this.translate.instant("Column saved")); });
+  }
+
+  @Button({ list: "column", text: "Cancel" })
+  cancelColumn() {
+    this.column = null;
+  }
+
+  changeType(column, newType) {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${this.tableInfo.table.tableName}/${this.column.columnName}/:annotations/${newType}`;
+    this.http.get<ClassAccessor>(url).subscribe(c => {
+      this.annotationsForm = Form.fromClassAccessor(c);
+    });
   }
 
 }
