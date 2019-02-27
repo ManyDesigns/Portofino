@@ -2051,19 +2051,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution jsonSelectFieldOptions() {
-        return jsonOptions(relName, prefix, labelSearch, true);
+        return jsonOptions(relName, labelSearch ,prefix , true);
     }
 
     public Resolution jsonSelectFieldSearchOptions() {
-        return jsonOptions(relName, searchPrefix, labelSearch, true);
+        return jsonOptions(relName, labelSearch,searchPrefix, true);
     }
 
     public Resolution jsonAutocompleteOptions() {
-        return jsonOptions(relName, prefix, labelSearch, false);
+        return jsonOptions(relName, labelSearch, prefix,  false);
     }
 
     public Resolution jsonAutocompleteSearchOptions() {
-        return jsonOptions(relName, searchPrefix, labelSearch, false);
+        return jsonOptions(relName, labelSearch, searchPrefix,  false);
     }
 
     /**
