@@ -7,7 +7,7 @@ import {
   Input, OnDestroy,
   OnInit, Optional,
   TemplateRef} from "@angular/core";
-import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
+import {ANNOTATION_REQUIRED, ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormControl, FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
@@ -360,7 +360,9 @@ export class PageSettingsPanel {
 
   reloadConfiguration() {
     this.page.loadConfiguration().subscribe(conf => {
-      this.page.http.get<ClassAccessor>(this.page.configurationUrl + '/classAccessor').subscribe(ca => {
+      this.page.http.get<ClassAccessor>(this.page.configurationUrl + '/classAccessor')
+        .pipe(loadClassAccessor)
+        .subscribe(ca => {
         this.setupConfigurationForm(ca, conf);
       }, error => {
         this.setupConfigurationForm(null, null);

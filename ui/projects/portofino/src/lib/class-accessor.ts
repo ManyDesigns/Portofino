@@ -1,9 +1,30 @@
 import {ValidatorFn, Validators} from "@angular/forms";
+import {map} from "rxjs/operators";
+
+export const loadClassAccessor = map((c: ClassAccessor) => { c.initSelectionProviders(); return c; });
 
 export class ClassAccessor {
   name: string;
   properties: Property[];
   keyProperties: string[];
+
+  initSelectionProviders() {
+    this.properties.forEach(p => {
+      const select = getAnnotation(p, "com.manydesigns.elements.annotations.Select");
+      if (select) {
+        p.selectionProvider = Object.assign(new SelectionProvider(), {displayMode: select.properties.displayMode});
+        for (let i in select.properties.values) {
+          p.selectionProvider.options.push({v: select.properties.values[i], l: select.properties.labels[i], s: false});
+        }
+      }
+    });
+  }
+
+  static create(values: ClassAccessor | any): ClassAccessor {
+    const ca = Object.assign(new ClassAccessor(), values);
+    ca.initSelectionProviders();
+    return ca;
+  }
 }
 
 export class Property {

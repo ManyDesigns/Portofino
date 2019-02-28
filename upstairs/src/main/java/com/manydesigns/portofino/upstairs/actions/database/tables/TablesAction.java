@@ -1,16 +1,28 @@
 package com.manydesigns.portofino.upstairs.actions.database.tables;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.MapKeyValueAccessor;
+import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.impl.SelectImpl;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.messages.RequestMessages;
+import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +30,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -26,7 +37,9 @@ import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -37,6 +50,35 @@ import java.util.*;
 public class TablesAction extends AbstractPageAction {
 
     private static final Logger logger = LoggerFactory.getLogger(TablesAction.class);
+    public static final String DATE_FORMAT = DateFormat.class.getName();
+    public static final String DECIMAL_FORMAT = DecimalFormat.class.getName();
+    public static final String FIELD_SIZE = FieldSize.class.getName();
+    public static final String FILE_BLOB = FileBlob.class.getName();
+    public static final String HIGHLIGHT_LINKS = HighlightLinks.class.getName();
+    public static final String MIN_INT_VALUE = MinIntValue.class.getName();
+    public static final String MIN_DECIMAL_VALUE = MinDecimalValue.class.getName();
+    public static final String MAX_INT_VALUE = MaxIntValue.class.getName();
+    public static final String MAX_DECIMAL_VALUE = MaxDecimalValue.class.getName();
+    public static final String MULTILINE = Multiline.class.getName();
+    public static final String REGEXP = RegExp.class.getName();
+    public static final String RICH_TEXT = RichText.class.getName();
+    public static final String EMAIL = Email.class.getName();
+    public static final String PASSWORD = Password.class.getName();
+    public static final String CAP = CAP.class.getName();
+    public static final String PARTITA_IVA = PartitaIva.class.getName();
+    public static final String CODICE_FISCALE = CodiceFiscale.class.getName();
+    public static final String PHONE = Phone.class.getName();
+    public static final String ENCRYPTED = Encrypted.class.getName();
+    public static final Map<String, String> TYPE_OF_CONTENT = new HashMap<>();
+    static {
+        TYPE_OF_CONTENT.put(EMAIL, "Email");
+        TYPE_OF_CONTENT.put(PASSWORD, "Password");
+        TYPE_OF_CONTENT.put(CAP, "CAP/ZIP");
+        TYPE_OF_CONTENT.put(PARTITA_IVA, "Partita IVA");
+        TYPE_OF_CONTENT.put(CODICE_FISCALE, "Codice Fiscale");
+        TYPE_OF_CONTENT.put(PHONE, "Phone");
+        TYPE_OF_CONTENT.put(ENCRYPTED, "Encrypted");
+    }
 
     @Autowired
     protected Persistence persistence;
@@ -181,34 +223,187 @@ public class TablesAction extends AbstractPageAction {
     @Consumes(MediaType.APPLICATION_JSON)
     public void saveColumn(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
-            @PathParam("column") String columnName, ColumnAndAnnotations column) throws IOException, JAXBException {
+            @PathParam("column") String columnName, ColumnAndAnnotations column) throws Exception {
         Column existing = DatabaseLogic.findColumnByName(persistence.getModel(), db, schema, tableName, columnName);
         if(existing == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         Table table = existing.getTable();
-        BeanUtils.copyProperties(column.getColumn(), existing);
-        existing.setTable(table);
-        persistence.initModel();
-        persistence.saveXmlModel();
+        Class type = getColumnType(existing, existing.getJavaType());
+        Form annotationsForm = new FormBuilder(getApplicableAnnotations(type)).build();
+        MapKeyValueAccessor annotationsAccessor = new MapKeyValueAccessor(column.getAnnotations());
+        annotationsForm.readFrom(annotationsAccessor);
+        if(annotationsForm.validate()) {
+            BeanUtils.copyProperties(column.getColumn(), existing);
+            existing.setTable(table);
+            existing.getAnnotations().clear();
+            Set<Map.Entry<String, ?>> set = column.getAnnotations().entrySet();
+            set.forEach(e -> {
+                if(e.getValue() != null) {
+                    Annotation a;
+                    String value = e.getValue().toString();
+                    switch (e.getKey()) {
+                        case "dateFormat":
+                            try {
+                                new SimpleDateFormat(value);
+                            } catch (IllegalArgumentException ex) {
+                                logger.error("Invalid date format: " + value, ex);
+                                RequestMessages.addErrorMessage("Invalid date format: " + value); //TODO I18n
+                                break;
+                            }
+                            a = new Annotation(DATE_FORMAT);
+                            a.getValues().add(value);
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "decimalFormat":
+                            try {
+                                new java.text.DecimalFormat(value);
+                            } catch (IllegalArgumentException ex) {
+                                logger.error("Invalid decimal format: " + value, ex);
+                                RequestMessages.addErrorMessage("Invalid decimal format: " + value); //TODO I18n
+                                break;
+                            }
+                            a = new Annotation(DECIMAL_FORMAT);
+                            a.getValues().add(value);
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "fieldSize":
+                            a = new Annotation(FIELD_SIZE);
+                            a.getValues().add(value);
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "fileBlob":
+                            if(Boolean.TRUE.equals(e.getValue())) {
+                                a = new Annotation(FILE_BLOB);
+                                existing.getAnnotations().add(a);
+                            }
+                            break;
+                        case "highlightLinks":
+                            a = new Annotation(HIGHLIGHT_LINKS);
+                            a.getValues().add(value);
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "minValue":
+                            if(type == Integer.class || type == Long.class || type == BigInteger.class) {
+                                a = new Annotation(MIN_INT_VALUE);
+                            } else {
+                                a = new Annotation(MIN_DECIMAL_VALUE);
+                            }
+                            a.getValues().add(value);
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "maxValue":
+                            if(type == Integer.class || type == Long.class || type == BigInteger.class) {
+                                a = new Annotation(MAX_INT_VALUE);
+                            } else {
+                                a = new Annotation(MAX_DECIMAL_VALUE);
+                            }
+                            a.getValues().add(value);
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "regexp":
+                            a = new Annotation(REGEXP);
+                            a.getValues().add(value);
+                            a.getValues().add("elements.error.field.regexp.format"); //Default error message
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "stringFormat":
+                            a = new Annotation(((Map)e.getValue()).get("v").toString());
+                            existing.getAnnotations().add(a);
+                            break;
+                        case "typeOfContent":
+                            a = new Annotation(((Map)e.getValue()).get("v").toString());
+                            a.getValues().add("true");
+                            existing.getAnnotations().add(a);
+                            break;
+                        default:
+                            String msg = "Unsupported annotation: " + e.getKey();
+                            logger.error(msg);
+                            RequestMessages.addErrorMessage(msg); //TODO i18n
+                    }
+                }
+            });
+            persistence.initModel();
+            persistence.saveXmlModel();
+        } else {
+            throw new WebApplicationException(Response.serverError().entity(annotationsForm).build());
+        }
     }
 
     @Path("{db}/{schema}/{table}/{column}/:annotations/{typeName}")
     @GET
-    public String getApplicableAnnotations(
+    public String getAnnotations(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
             @PathParam("column") String columnName, @PathParam("typeName") String typeName) throws ClassNotFoundException {
-        Class type;
-        if("default".equals(typeName)) {
-            Column column = DatabaseLogic.findColumnByName(persistence.getModel(), db, schema, tableName, columnName);
-            if(column == null) {
-                throw new WebApplicationException(Response.Status.NOT_FOUND);
-            }
-            type = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), column.getLength(), column.getScale());
-        } else {
-            type = Class.forName(typeName);
+        Column column = DatabaseLogic.findColumnByName(persistence.getModel(), db, schema, tableName, columnName);
+        if(column == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
+        Class type = getColumnType(column, typeName);
+        MutableClassAccessor classAccessor = getApplicableAnnotations(type);
+        JSONStringer jsonStringer = new JSONStringer();
+        jsonStringer.object();
+        jsonStringer.key("classAccessor");
+        ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
+        jsonStringer.key("annotations");
+        jsonStringer.object();
+        column.getAnnotations().forEach(a -> {
+            String annType = a.getType();
+            if(DATE_FORMAT.equals(annType)) {
+                jsonStringer.key("dateFormat");
+            } else if(DECIMAL_FORMAT.equals(annType)) {
+                jsonStringer.key("decimalFormat");
+            } else if(FIELD_SIZE.equals(annType)) {
+                jsonStringer.key("fieldSize");
+            } else if(FILE_BLOB.equals(annType)) {
+                jsonStringer.key("fileBlob");
+            } else if(HIGHLIGHT_LINKS.equals(annType)) {
+                jsonStringer.key("highlightLinks");
+            } else if(MIN_INT_VALUE.equals(annType)) {
+                jsonStringer.key("minValue");
+            } else if(MIN_DECIMAL_VALUE.equals(annType)) {
+                jsonStringer.key("minValue");
+            } else if(MAX_INT_VALUE.equals(annType)) {
+                jsonStringer.key("maxValue");
+            } else if(MAX_DECIMAL_VALUE.equals(annType)) {
+                jsonStringer.key("maxValue");
+            } else if(MULTILINE.equals(annType)) {
+                jsonStringer.key("stringFormat").value(MULTILINE);
+                return;
+            } else if(REGEXP.equals(annType)) {
+                jsonStringer.key("regexp");
+            } else if(RICH_TEXT.equals(annType)) {
+                jsonStringer.key("stringFormat").value(RICH_TEXT);
+                return;
+            } else if(TYPE_OF_CONTENT.keySet().contains(annType)) {
+                jsonStringer.key("typeOfContent");
+                jsonStringer.object();
+                jsonStringer.key("v").value(annType);
+                jsonStringer.key("l").value(TYPE_OF_CONTENT.get(annType));
+                jsonStringer.key("s").value(true);
+                jsonStringer.endObject();
+            } else {
+                String msg = "Unsupported annotation: " + annType;
+                logger.error(msg);
+                RequestMessages.addErrorMessage(msg); //TODO i18n
+                return;
+            }
+            if(!a.getValues().isEmpty()) {
+                jsonStringer.value(a.getValues().get(0));
+            }
+
+        });
+        jsonStringer.endObject();
+        jsonStringer.endObject();
+        return jsonStringer.toString();
+    }
+
+    @NotNull
+    public MutableClassAccessor getApplicableAnnotations(Class type) {
         MutableClassAccessor classAccessor = new MutableClassAccessor();
+        if(type == null) {
+            return classAccessor;
+        }
         if(Number.class.isAssignableFrom(type)) {
             classAccessor.addProperty(new MutablePropertyAccessor("fieldSize", Integer.class));
             classAccessor.addProperty(new MutablePropertyAccessor("minValue", BigDecimal.class));
@@ -216,11 +411,23 @@ public class TablesAction extends AbstractPageAction {
             classAccessor.addProperty(new MutablePropertyAccessor("decimalFormat", String.class));
         } else if(String.class.equals(type)) {
             classAccessor.addProperty(new MutablePropertyAccessor("fieldSize", Integer.class));
-            classAccessor.addProperty(new MutablePropertyAccessor("typeOfContent", String.class));
-            classAccessor.addProperty(new MutablePropertyAccessor("stringFormat", String.class));
             classAccessor.addProperty(new MutablePropertyAccessor("regexp", String.class));
             classAccessor.addProperty(new MutablePropertyAccessor("highlightLinks", Boolean.class));
             classAccessor.addProperty(new MutablePropertyAccessor("fileBlob", Boolean.class));
+            SelectImpl select = new SelectImpl(
+                    DisplayMode.DROPDOWN, SearchDisplayMode.DROPDOWN,
+                    new String[] {
+                            EMAIL, PASSWORD, CAP, PARTITA_IVA, CODICE_FISCALE, PHONE, ENCRYPTED
+                    }, new String[] {
+                            "Email", "Password", "CAP/ZIP", "Partita IVA", "Codice Fiscale", "Phone", "Encrypted"
+                    }, true);
+            classAccessor.addProperty(new MutablePropertyAccessor("stringFormat", String.class).configureAnnotation(select));
+            select = new SelectImpl(
+                    DisplayMode.DROPDOWN, SearchDisplayMode.DROPDOWN,
+                    new String[] {MULTILINE, RICH_TEXT},
+                    new String[] { "Multiline", "Rich text" },
+                    true);
+            classAccessor.addProperty(new MutablePropertyAccessor("typeOfContent", String.class).configureAnnotation(select));
         } else if(Date.class.isAssignableFrom(type)) {
             classAccessor.addProperty(new MutablePropertyAccessor("fieldSize", Integer.class));
             classAccessor.addProperty(new MutablePropertyAccessor("dateFormat", String.class));
@@ -230,9 +437,17 @@ public class TablesAction extends AbstractPageAction {
             classAccessor.addProperty(new MutablePropertyAccessor("databaseBlobFileNameProperty", String.class));
             classAccessor.addProperty(new MutablePropertyAccessor("databaseBlobTimestampProperty", String.class));
         }
-        JSONStringer jsonStringer = new JSONStringer();
-        ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
-        return jsonStringer.toString();
+        return classAccessor;
+    }
+
+    public Class getColumnType(Column column, String typeName) throws ClassNotFoundException {
+        Class type;
+        if("default".equals(typeName) || typeName == null) {
+            type = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), column.getLength(), column.getScale());
+        } else {
+            type = Class.forName(typeName);
+        }
+        return type;
     }
 
     protected Map describeType(Class type) {

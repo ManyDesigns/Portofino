@@ -1,4 +1,4 @@
-import {ClassAccessor, deriveKind, getValidators, isEnabled, Property} from "./class-accessor";
+import {ClassAccessor, deriveKind, getAnnotation, getValidators, isEnabled, Property} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,

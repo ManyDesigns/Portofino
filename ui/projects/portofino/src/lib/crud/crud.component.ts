@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
-import {ClassAccessor} from "../class-accessor";
+import {ClassAccessor, loadClassAccessor} from "../class-accessor";
 import {PortofinoComponent} from "../page.factory";
 import {Operation, Page, PageChild, PageConfiguration, PageSettingsPanel} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
@@ -69,7 +69,7 @@ export class CrudComponent extends Page {
   initialize() {
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().pipe(
-      mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath)),
+      mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).pipe(loadClassAccessor)),
       mergeMap(classAccessor => {
         this.classAccessor = classAccessor;
         return this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath);
