@@ -286,9 +286,29 @@ export class FormComponent implements OnInit, AfterViewInit {
     const property = v.property;
     const control = formGroup.get(property.name);
     if (control instanceof FormControl) {
-      control.reset(v.initialState);
+      control.reset(this.computeInitialState(v));
     } else {
-      formGroup.setControl(property.name, new FormControl(v.initialState, getValidators(property)));
+      formGroup.setControl(property.name, new FormControl(this.computeInitialState(v), getValidators(property)));
+    }
+  }
+
+  protected computeInitialState(v: Field) {
+    const selectionProvider = v.property.selectionProvider;
+    if(v.initialState && selectionProvider && selectionProvider.options && selectionProvider.options.length > 0) {
+      let valueToFind;
+      if(v.initialState.hasOwnProperty("value")) {
+        valueToFind = v.initialState.value.v;
+      } else {
+        valueToFind = v.initialState.v;
+      }
+      const selectedOption = selectionProvider.options.find(o => o.v == valueToFind);
+      if(v.initialState.hasOwnProperty("value")) {
+        return Object.assign({}, v.initialState, { value: selectedOption });
+      } else {
+        return selectedOption;
+      }
+    } else {
+      return v.initialState;
     }
   }
 

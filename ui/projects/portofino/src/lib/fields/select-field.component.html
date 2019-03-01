@@ -4,7 +4,7 @@
     <mat-select [formControlName]="property.name" [required]="required"
                 (selectionChange)="property.selectionProvider.updateDependentOptions()">
       <mat-option [value]="null" *ngIf="property.selectionProvider.options.length > 0"></mat-option>
-      <mat-option *ngFor="let option of property.selectionProvider.options"
+      <mat-option *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
                   [value]="option">
         {{ option.l }}
       </mat-option>

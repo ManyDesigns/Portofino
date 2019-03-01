@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.upstairs.actions.database.tables;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.MapKeyValueAccessor;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.annotations.impl.SelectImpl;
@@ -11,7 +10,6 @@ import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
-import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.*;
@@ -20,7 +18,6 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONStringer;
@@ -29,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Nullable;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -69,15 +65,15 @@ public class TablesAction extends AbstractPageAction {
     public static final String CODICE_FISCALE = CodiceFiscale.class.getName();
     public static final String PHONE = Phone.class.getName();
     public static final String ENCRYPTED = Encrypted.class.getName();
-    public static final Map<String, String> TYPE_OF_CONTENT = new HashMap<>();
+    public static final Map<String, String> STRING_FORMAT = new HashMap<>();
     static {
-        TYPE_OF_CONTENT.put(EMAIL, "Email");
-        TYPE_OF_CONTENT.put(PASSWORD, "Password");
-        TYPE_OF_CONTENT.put(CAP, "CAP/ZIP");
-        TYPE_OF_CONTENT.put(PARTITA_IVA, "Partita IVA");
-        TYPE_OF_CONTENT.put(CODICE_FISCALE, "Codice Fiscale");
-        TYPE_OF_CONTENT.put(PHONE, "Phone");
-        TYPE_OF_CONTENT.put(ENCRYPTED, "Encrypted");
+        STRING_FORMAT.put(EMAIL, "Email");
+        STRING_FORMAT.put(PASSWORD, "Password");
+        STRING_FORMAT.put(CAP, "CAP/ZIP");
+        STRING_FORMAT.put(PARTITA_IVA, "Partita IVA");
+        STRING_FORMAT.put(CODICE_FISCALE, "Codice Fiscale");
+        STRING_FORMAT.put(PHONE, "Phone");
+        STRING_FORMAT.put(ENCRYPTED, "Encrypted");
     }
 
     @Autowired
@@ -368,20 +364,31 @@ public class TablesAction extends AbstractPageAction {
             } else if(MAX_DECIMAL_VALUE.equals(annType)) {
                 jsonStringer.key("maxValue");
             } else if(MULTILINE.equals(annType)) {
-                jsonStringer.key("stringFormat").value(MULTILINE);
+                jsonStringer.key("typeOfContent");
+                jsonStringer.object();
+                jsonStringer.key("v").value(annType);
+                jsonStringer.key("l").value("Multiline");
+                jsonStringer.key("s").value(true);
+                jsonStringer.endObject();
                 return;
             } else if(REGEXP.equals(annType)) {
                 jsonStringer.key("regexp");
             } else if(RICH_TEXT.equals(annType)) {
-                jsonStringer.key("stringFormat").value(RICH_TEXT);
-                return;
-            } else if(TYPE_OF_CONTENT.keySet().contains(annType)) {
                 jsonStringer.key("typeOfContent");
                 jsonStringer.object();
                 jsonStringer.key("v").value(annType);
-                jsonStringer.key("l").value(TYPE_OF_CONTENT.get(annType));
+                jsonStringer.key("l").value("Rich text");
                 jsonStringer.key("s").value(true);
                 jsonStringer.endObject();
+                return;
+            } else if(STRING_FORMAT.keySet().contains(annType)) {
+                jsonStringer.key("stringFormat");
+                jsonStringer.object();
+                jsonStringer.key("v").value(annType);
+                jsonStringer.key("l").value(STRING_FORMAT.get(annType));
+                jsonStringer.key("s").value(true);
+                jsonStringer.endObject();
+                return;
             } else {
                 String msg = "Unsupported annotation: " + annType;
                 logger.error(msg);

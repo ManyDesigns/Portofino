@@ -230,12 +230,13 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   changeType(column, newType) {
     const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${this.tableInfo.table.tableName}/${this.column.columnName}/:annotations/${newType}`;
     this.http.get<{ classAccessor: ClassAccessor, annotations: any}>(url).subscribe(c => {
-      this.annotationsForm = Form.fromClassAccessor(ClassAccessor.create(c.classAccessor));
-      this.annotationsForm.contents.forEach(f => {
+      const form = Form.fromClassAccessor(ClassAccessor.create(c.classAccessor));
+      form.contents.forEach(f => {
         if(f instanceof Field) {
           f.initialState = c.annotations[f.name];
         }
       });
+      this.annotationsForm = form;
     });
   }
 
