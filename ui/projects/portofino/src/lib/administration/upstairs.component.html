@@ -139,6 +139,38 @@
   </mat-tab>
   <mat-tab>
     <ng-template mat-tab-label>
+      {{'Wizard'|translate}}
+    </ng-template>
+    <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
+      <mat-step [completed]="wizard.connectionProvider">
+        <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
+        <mat-form-field>
+          <mat-label>{{'Use an existing database connection' | translate}}</mat-label>
+          <mat-select [(ngModel)]="wizard.connectionProvider">
+            <mat-option></mat-option>
+            <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <label>{{'or create a new one (choose its type)'}}</label>
+        <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider">
+          <mat-radio-button value="jdbc">JDBC</mat-radio-button>
+          <mat-radio-button value="jndi">JNDI</mat-radio-button>
+        </mat-radio-group>
+        <fieldset>
+          <legend>{{'Connection parameters' | translate}}</legend>
+          <ng-container *ngIf="wizard.newConnectionType == 'jdbc'">jdbc</ng-container>
+          <ng-container *ngIf="wizard.newConnectionType == 'jndi'">jndi</ng-container>
+        </fieldset>
+      </mat-step>
+      <mat-step [editable]="wizard.connectionProvider">
+
+      </mat-step>
+      <mat-step *ngIf="wizard.connectionProvider">3</mat-step>
+      <mat-step>4</mat-step>
+    </mat-horizontal-stepper>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
       {{'Tables'|translate}}
     </ng-template>
     <mat-tree [dataSource]="tableTreeDataSource" [treeControl]="tableTreeControl" *ngIf="!tableInfo">

@@ -45,6 +45,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   annotationsForm: Form;
   readonly annotations = new FormGroup({});
 
+  wizard: any = { newConnectionType: 'jdbc' };
+
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService,
               protected notificationService: NotificationService, protected translate: TranslateService) {
@@ -238,6 +240,10 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       });
       this.annotationsForm = form;
     });
+  }
+
+  wizardStep(event) {
+    console.log("event", event);
   }
 
 }
