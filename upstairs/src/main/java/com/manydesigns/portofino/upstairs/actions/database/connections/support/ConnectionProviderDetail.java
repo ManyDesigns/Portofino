@@ -28,7 +28,7 @@ public class ConnectionProviderDetail {
     public ConnectionProviderDetail(ConnectionProvider connectionProvider) {
         this.database = connectionProvider.getDatabase();
         DatabasePlatform databasePlatform = connectionProvider.getDatabasePlatform();
-        this.databasePlatform = databasePlatform.getClass().getName();
+        this.databasePlatform = databasePlatform != null ? databasePlatform.getClass().getName() : null;
         if(connectionProvider instanceof JdbcConnectionProvider) {
             jdbcConnectionProvider = (JdbcConnectionProvider) connectionProvider;
         } else if(connectionProvider instanceof JndiConnectionProvider) {
@@ -124,6 +124,17 @@ public class ConnectionProviderDetail {
 
     public void setJndiResource(String jndiResource) {
         jndiConnectionProvider.setJndiResource(jndiResource);
+    }
+
+    @Updatable(false)
+    public String getDescription() {
+        if(jdbcConnectionProvider != null) {
+            return jdbcConnectionProvider.getDescription();
+        } else if(jndiConnectionProvider != null) {
+            return jndiConnectionProvider.getDescription();
+        } else {
+            return null;
+        }
     }
 
     @Label("Hibernate dialect (leave empty to use default)")

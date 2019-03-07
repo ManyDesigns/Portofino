@@ -330,7 +330,7 @@ public abstract class AbstractField<T> implements Field<T> {
         if(value instanceof String) {
             setStringValue((String) value);
         } else {
-            setValue(maybeConvertValue(value));
+                setValue(maybeConvertValue(value));
         }
     }
 

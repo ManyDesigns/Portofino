@@ -33,11 +33,14 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * @author Alessio Stalla - alessiostalla@gmail.com
@@ -97,11 +100,54 @@ public class ConnectionsAction extends AbstractPageAction {
         return js.toString();
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createConnection(String jsonInput) {
+        JSONObject jsonObject = new JSONObject(jsonInput);
+        Database database = new Database();
+        database.setDatabaseName(jsonObject.getJSONObject("databaseName").getString("value"));
+        ConnectionProvider connectionProvider;
+        if(jsonObject.getJSONObject("jndiResource").isNull("value")) {
+            JdbcConnectionProvider jdbcConnectionProvider = new JdbcConnectionProvider();
+            //Fill with dummy values so the form overwrites them (and doesn't try to write on the Configuration which
+            //is not available and anyway should not be modified right now)
+            jdbcConnectionProvider.setUrl("replace me");
+            jdbcConnectionProvider.setUsername("replace me");
+            jdbcConnectionProvider.setPassword("replace me");
+            connectionProvider = jdbcConnectionProvider;
+        } else {
+            connectionProvider = new JndiConnectionProvider();
+        }
+        connectionProvider.setDatabase(database);
+        database.setConnectionProvider(connectionProvider);
+        return saveConnectionProvider(connectionProvider, jsonObject, this::doCreateConnectionProvider);
+    }
+
+    protected Response doCreateConnectionProvider(ConnectionProvider connectionProvider, Form form) {
+        String databaseName = connectionProvider.getDatabase().getDatabaseName();
+        if(persistence.getConnectionProvider(databaseName) != null) {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+        persistence.getModel().getDatabases().add(connectionProvider.getDatabase());
+        persistence.initModel();
+        try {
+            persistence.saveXmlModel();
+            return Response.created(new URI(getActionPath() + "/" + databaseName)).entity(form).build();
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+    }
+
     @PUT
     @Path("{databaseName}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response saveConnection(@PathParam("databaseName") String databaseName, String jsonInput) {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
+        return saveConnectionProvider(connectionProvider, new JSONObject(jsonInput), this::doSaveConnectionProvider);
+    }
+
+    public Response saveConnectionProvider(
+            ConnectionProvider connectionProvider, JSONObject jsonObject, BiFunction<ConnectionProvider, Form, Response> handler) {
         ConnectionProviderDetail cp = new ConnectionProviderDetail(connectionProvider);
         Form form = new FormBuilder(ConnectionProviderDetail.class).configMode(Mode.EDIT).build();
         if(cp.getJndiResource() != null) {
@@ -113,25 +159,28 @@ public class ConnectionsAction extends AbstractPageAction {
             form.get(0).remove(jndiResource);
         }
         form.readFromObject(cp);
-        JSONObject jsonObject = new JSONObject(jsonInput);
         FormUtil.readFromJson(form, jsonObject);
         if(form.validate()) {
-            JSONArray schemasJson = jsonObject.getJSONArray("schemas");
-            updateSchemas(connectionProvider, schemasJson);
-            form.writeToObject(cp);
-            try {
-                connectionProvider.init(persistence.getDatabasePlatformsRegistry());
-                persistence.initModel();
-                persistence.saveXmlModel();
-                return Response.ok(form).build();
-            } catch (Exception e) {
-                String msg = "Cannot save model: " + ExceptionUtils.getRootCauseMessage(e);
-                logger.error(msg, e);
-                RequestMessages.addErrorMessage(msg);
-                return Response.serverError().entity(form).build();
+            if(jsonObject.has("schemas")) {
+                JSONArray schemasJson = jsonObject.getJSONArray("schemas");
+                updateSchemas(connectionProvider, schemasJson);
             }
+            form.writeToObject(cp);
+            return handler.apply(connectionProvider, form);
+        } else {
+            return Response.serverError().entity(form).build();
         }
-        return Response.serverError().entity(form).build();
+    }
+
+    public Response doSaveConnectionProvider(ConnectionProvider connectionProvider, Form form) {
+        connectionProvider.init(persistence.getDatabasePlatformsRegistry());
+        persistence.initModel();
+        try {
+            persistence.saveXmlModel();
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+        return Response.ok(form).build();
     }
 
     public void updateSchemas(ConnectionProvider connectionProvider, JSONArray schemasJson) {

@@ -45,7 +45,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   annotationsForm: Form;
   readonly annotations = new FormGroup({});
 
-  wizard: any = { newConnectionType: 'jdbc' };
+  wizard: { connectionProvider: ConnectionProviderSummary } | any = { newConnectionType: 'jdbc' };
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService,
@@ -243,7 +243,32 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   wizardStep(event) {
-    console.log("event", event);
+    if(event.selectedIndex == 1) {
+      if(this.wizard.connectionProvider) {
+        const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}`;
+        this.http.get<ConnectionProviderDetails>(url).subscribe(c => {
+          this.wizard.schemas = c.schemas;
+        });
+      } else {
+        const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
+        const conn = new ConnectionProviderDetails();
+        conn.databaseName = { value: this.wizard.databaseName };
+        conn.jndiResource = { value: this.wizard.jndiResource };
+        conn.driver = { value: this.wizard.driver.standardDriverClassName };
+        conn.url = { value: this.wizard.connectionUrl };
+        conn.username = { value: this.wizard.username };
+        conn.password = { value: this.wizard.password };
+        this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
+          const summary = new ConnectionProviderSummary();
+          summary.name = c.databaseName.value;
+          summary.status = c.status.value;
+          this.connectionProviders.push(summary);
+          this.wizard.connectionProvider = summary;
+          this.wizard.schemas = c.schemas;
+          this.notificationService.info(this.translate.instant("Database created."));
+        })
+      }
+    }
   }
 
 }
