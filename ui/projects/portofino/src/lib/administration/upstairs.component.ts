@@ -266,8 +266,11 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
           this.wizard.connectionProvider = summary;
           this.wizard.schemas = c.schemas;
           this.notificationService.info(this.translate.instant("Database created."));
-        })
+        });
       }
+    } else if(event.selectedIndex == 2) {
+      const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}/schemas`;
+      this.http.put(url, this.wizard.schemas).subscribe(() => {});
     }
   }
 

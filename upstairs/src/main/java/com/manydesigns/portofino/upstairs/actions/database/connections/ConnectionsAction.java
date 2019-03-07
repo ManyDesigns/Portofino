@@ -1,15 +1,10 @@
 package com.manydesigns.portofino.upstairs.actions.database.connections;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.elements.forms.TableFormBuilder;
-import com.manydesigns.elements.json.JsonKeyValueAccessor;
 import com.manydesigns.elements.messages.RequestMessages;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -18,7 +13,6 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderDetail;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderSummary;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,7 +34,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 /**
  * @author Alessio Stalla - alessiostalla@gmail.com
@@ -181,6 +174,20 @@ public class ConnectionsAction extends AbstractPageAction {
             throw new WebApplicationException(e);
         }
         return Response.ok(form).build();
+    }
+
+    @PUT
+    @Path("{databaseName}/schemas")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void selectSchemas(@PathParam("databaseName") String databaseName, String jsonInput) throws Exception {
+        ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
+        if(connectionProvider == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        updateSchemas(connectionProvider, new JSONArray(jsonInput));
+        persistence.initModel();
+        persistence.saveXmlModel();
+        logger.info("Schemas for database {} updated", databaseName);
     }
 
     public void updateSchemas(ConnectionProvider connectionProvider, JSONArray schemasJson) {

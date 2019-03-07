@@ -161,42 +161,63 @@
           <form #step0Form="ngForm">
             <mat-form-field>
               <mat-label>{{'Database name' | translate}}</mat-label>
-              <input matInput [(ngModel)]="wizard.databaseName" required name="databaseName">
+              <input matInput [(ngModel)]="wizard.databaseName" required name="databaseName"
+                     [disabled]="wizard.connectionProvider">
             </mat-form-field>
             <ng-container *ngIf="wizard.newConnectionType == 'jdbc'">
               <mat-form-field>
                 <mat-label>{{'Driver' | translate}}</mat-label>
-                <mat-select [(ngModel)]="wizard.driver" required name="driver">
+                <mat-select [(ngModel)]="wizard.driver" required name="driver"
+                            [disabled]="wizard.connectionProvider">
                   <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
                 </mat-select>
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{'Connection URL' | translate}}</mat-label>
-                <input matInput [(ngModel)]="wizard.connectionUrl" required name="connectionUrl">
+                <input matInput [(ngModel)]="wizard.connectionUrl" required name="connectionUrl"
+                       [disabled]="wizard.connectionProvider">
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{'Username' | translate}}</mat-label>
-                <input matInput [(ngModel)]="wizard.username" name="username">
+                <input matInput [(ngModel)]="wizard.username" name="username"
+                       [disabled]="wizard.connectionProvider">
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{'Username' | translate}}</mat-label>
-                <input matInput type="password" [(ngModel)]="wizard.password" name="password">
+                <input matInput type="password" [(ngModel)]="wizard.password" name="password"
+                       [disabled]="wizard.connectionProvider">
               </mat-form-field>
             </ng-container>
             <ng-container *ngIf="wizard.newConnectionType == 'jndi'">
               <mat-form-field>
                 <mat-label>{{'JNDI resource' | translate}}</mat-label>
-                <input matInput [(ngModel)]="wizard.jndiResource" required name="jndiResource">
+                <input matInput [(ngModel)]="wizard.jndiResource" required name="jndiResource"
+                       [disabled]="wizard.connectionProvider">
               </mat-form-field>
             </ng-container>
           </form>
-          <button mat-button matStepperNext>{{'Next' | translate}}</button>
         </fieldset>
+        <button mat-button matStepperNext>{{'Next' | translate}}</button>
       </mat-step>
       <mat-step [editable]="wizard.connectionProvider">
-
+        <ng-template matStepLabel>{{'Select the database schema(s) to import' | translate}}</ng-template>
+        <h3>{{'Found schemas:'|translate}}</h3>
+        <table>
+          <tr>
+            <th></th>
+            <th>{{'Schema'|translate}}</th>
+            <th>{{'Schema name'|translate}}</th>
+          </tr>
+          <tr *ngFor="let schema of wizard.schemas; let i = index;">
+            <td><mat-checkbox [(ngModel)]="schema.selected"
+                              name="selected{{i}}"></mat-checkbox></td>
+            <td>{{schema.schema}}</td>
+            <td><input matInput [(ngModel)]="schema.name" name="schemaName{{i}}"/></td>
+          </tr>
+        </table>
+        <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
+        <button mat-button matStepperNext>{{'Next' | translate}}</button>
       </mat-step>
-      <mat-step *ngIf="wizard.connectionProvider">3</mat-step>
       <mat-step>4</mat-step>
     </mat-horizontal-stepper>
   </mat-tab>
