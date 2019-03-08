@@ -218,7 +218,33 @@
         <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
         <button mat-button matStepperNext>{{'Next' | translate}}</button>
       </mat-step>
-      <mat-step>4</mat-step>
+      <mat-step>
+        <ng-template matStepLabel>{{'Configure user management' | translate}}</ng-template>
+        <mat-card>{{"Warning: if you don't leave the fields below empty, the Security.groovy file will be overwritten."|translate}}</mat-card>
+        <fieldset>
+          <legend>{{'Users and groups tables'|translate}}</legend>
+          <mat-form-field>
+            <mat-label>{{'Users table' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.usersTable">
+              <mat-option *ngFor="let table of wizard.tables" [value]="table">{{table.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Groups table' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.groupsTable">
+              <mat-option *ngFor="let table of wizard.tables" [value]="table">{{table.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'User-group link table' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.userGroupTable">
+              <mat-option *ngFor="let table of wizard.tables" [value]="table">{{table.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </fieldset>
+        <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
+        <button mat-button matStepperNext>{{'Next' | translate}}</button>
+      </mat-step>
     </mat-horizontal-stepper>
   </mat-tab>
   <mat-tab>

@@ -348,6 +348,15 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
         insertable: p.property.insertable, updatable: p.property.updatable,
         inSummary: p.property.inSummary, searchable: p.property.searchable
       });
-    })
+    });
+    crud.classAccessor.properties.forEach(p => {
+      if(!this.properties.find(p2 => p2.name == p.name)) {
+        this.properties.push({
+          enabled: p.key, name: p.name, label: p.label,
+          insertable: false, updatable: false,
+          inSummary: false, searchable: false
+        });
+      }
+    });
   }
 }

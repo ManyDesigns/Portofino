@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.upstairs.actions.database.connections;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
@@ -13,6 +15,7 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderDetail;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderSummary;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
+import com.manydesigns.portofino.upstairs.actions.database.connections.support.TableInfo;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,8 +34,7 @@ import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 
 /**
@@ -179,7 +181,7 @@ public class ConnectionsAction extends AbstractPageAction {
     @PUT
     @Path("{databaseName}/schemas")
     @Produces(MediaType.APPLICATION_JSON)
-    public void selectSchemas(@PathParam("databaseName") String databaseName, String jsonInput) throws Exception {
+    public List<TableInfo> selectSchemas(@PathParam("databaseName") String databaseName, String jsonInput) throws Exception {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         if(connectionProvider == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -188,6 +190,58 @@ public class ConnectionsAction extends AbstractPageAction {
         persistence.initModel();
         persistence.saveXmlModel();
         logger.info("Schemas for database {} updated", databaseName);
+        return determineRoots(connectionProvider.getDatabase().getSchemas());
+    }
+
+    protected List<TableInfo> determineRoots(List<Schema> schemas) {
+        List<TableInfo> roots = new ArrayList<>();
+        Multimap<Table, Reference> children = ArrayListMultimap.create();
+        for(Schema schema : schemas) {
+            for(Table table : schema.getTables()) {
+                roots.add(new TableInfo(table));
+            }
+        }
+        for(Iterator<TableInfo> it = roots.iterator(); it.hasNext();) {
+            TableInfo tableInfo = it.next();
+            Table table = tableInfo.table;
+
+            if(table.getPrimaryKey() == null) {
+                it.remove();
+                continue;
+            }
+
+            if(!table.getForeignKeys().isEmpty()) {
+                for(ForeignKey fk : table.getForeignKeys()) {
+                    for(Reference ref : fk.getReferences()) {
+                        Column column = ref.getActualToColumn();
+                        if(column.getTable() != table) {
+                            children.put(column.getTable(), ref);
+                            //TODO potrebbe essere un ciclo nel grafo...
+                            tableInfo.root = false;
+                        }
+                    }
+                }
+            }
+            if(!table.getSelectionProviders().isEmpty()) {
+                for(ModelSelectionProvider sp : table.getSelectionProviders()) {
+                    for(Reference ref : sp.getReferences()) {
+                        Column column = ref.getActualToColumn();
+                        if(column != null && column.getTable() != table) {
+                            children.put(column.getTable(), ref);
+                            //TODO potrebbe essere un ciclo nel grafo...
+                            tableInfo.root = false;
+                        }
+                    }
+                }
+            }
+        }
+        roots.forEach(i -> {
+            Collection<Reference> c = children.get(i.table);
+            if(c != null) {
+                i.children.addAll(c);
+            }
+        });
+        return roots;
     }
 
     public void updateSchemas(ConnectionProvider connectionProvider, JSONArray schemasJson) {

@@ -52,7 +52,6 @@ import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -1300,11 +1299,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected void setupConfigurationForm(FormBuilder formBuilder) {}
 
-    @Override
-    protected boolean saveConfiguration(Object configuration) {
-        return super.saveConfiguration(configuration); //TODO fill properties from the database here when the config is new, or the query changes, etc.?
-    }
-
     public boolean isRequiredFieldsPresent() {
         return form.isRequiredFieldsPresent();
     }
@@ -1450,21 +1444,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected String getUrlEncoding() {
         return portofinoConfiguration.getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
-    }
-
-    /**
-     * Searches in a list of properties for a property with a given name.
-     * @param name the name of the properties.
-     * @param properties the list to search.
-     * @return the property with the given name, or null if it couldn't be found.
-     */
-    protected CrudProperty findProperty(String name, List<CrudProperty> properties) {
-        for(CrudProperty p : properties) {
-            if(p.getName().equals(name)) {
-                return p;
-            }
-        }
-        return null;
     }
 
     /**

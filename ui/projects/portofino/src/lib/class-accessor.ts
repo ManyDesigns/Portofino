@@ -1,7 +1,17 @@
 import {ValidatorFn, Validators} from "@angular/forms";
 import {map} from "rxjs/operators";
 
-export const loadClassAccessor = map((c: ClassAccessor) => { c.initSelectionProviders(); return c; });
+export const loadClassAccessor = map((c: ClassAccessor) => {
+  if(!c) {
+    return c;
+  }
+  if(c.initSelectionProviders) {
+    c.initSelectionProviders();
+    return c;
+  } else {
+    return ClassAccessor.create(c);
+  }
+});
 
 export class ClassAccessor {
   name: string;
