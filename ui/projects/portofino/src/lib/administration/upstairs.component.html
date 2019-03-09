@@ -318,7 +318,28 @@
             <ng-template mat-tab-label>
               {{'Foreign keys and selection providers'|translate}}
             </ng-template>
-            TODO
+            <fieldset>
+              <legend>{{'Foreign keys'|translate}}</legend>
+              <table>
+                <tr>
+                  <th>{{'Name'|translate}}</th>
+                  <th>{{'Property name (one side)'|translate}}</th>
+                  <th>{{'Property name (many side)'|translate}}</th>
+                  <th>{{'Columns'|translate}}</th>
+                  <th>{{'Referenced table'|translate}}</th>
+                  <th>{{'Referenced columns'|translate}}</th>
+                </tr>
+                <tr *ngFor="let fk of tableInfo.table.foreignKey">
+                  <td>{{fk.name}}</td>
+                  <td><input matInput [(ngModel)]="fk.onePropertyName"></td>
+                  <td><input matInput [(ngModel)]="fk.manyPropertyName"></td>
+                  <td>{{getFromColumns(fk)}}</td>
+                  <td>{{getReferencedTableName(fk, tableInfo)}}</td>
+                  <td>{{getToColumns(fk)}}</td>
+                </tr>
+              </table>
+              TODO
+            </fieldset>
           </mat-tab>
         </mat-tab-group>
       </mat-card-content>

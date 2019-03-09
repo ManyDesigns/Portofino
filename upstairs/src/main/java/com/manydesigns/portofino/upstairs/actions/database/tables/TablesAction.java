@@ -326,7 +326,7 @@ public class TablesAction extends AbstractPageAction {
         }
     }
 
-    @Path("{db}/{schema}/{table}/{column}/:annotations/{typeName}")
+    @Path("{db}/{schema}/{table}/{column}/annotations/{typeName}")
     @GET
     public String getAnnotations(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,

@@ -230,7 +230,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   changeType(column, newType) {
-    const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${this.tableInfo.table.tableName}/${this.column.columnName}/:annotations/${newType}`;
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${this.tableInfo.table.tableName}/${this.column.columnName}/annotations/${newType}`;
     this.http.get<{ classAccessor: ClassAccessor, annotations: any}>(url).subscribe(c => {
       const form = Form.fromClassAccessor(ClassAccessor.create(c.classAccessor));
       form.contents.forEach(f => {
@@ -240,6 +240,24 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       });
       this.annotationsForm = form;
     });
+  }
+
+  getFromColumns(fk) {
+    return fk.reference.map(r => r.fromColumn);
+  }
+
+  getToColumns(fk) {
+    return fk.reference.map(r => r.toColumn);
+  }
+
+  getReferencedTableName(fk, tableInfo) {
+    let prefix = "";
+    if(fk.toDatabase != tableInfo.db) {
+      prefix += `${fk.toDatabase}.${fk.toSchema}.`;
+    } else if(fk.toSchema != tableInfo.schema) {
+      prefix += `${fk.toSchema}.`;
+    }
+    return prefix + fk.toTable;
   }
 
   wizardStep(event) {
