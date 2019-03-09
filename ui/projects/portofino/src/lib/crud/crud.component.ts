@@ -352,9 +352,9 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
     crud.classAccessor.properties.forEach(p => {
       if(!this.properties.find(p2 => p2.name == p.name)) {
         this.properties.push({
-          enabled: p.key, name: p.name, label: p.label,
+          enabled: p.key, name: p.name, label: null,
           insertable: false, updatable: false,
-          inSummary: false, searchable: false
+          inSummary: p.key, searchable: false
         });
       }
     });

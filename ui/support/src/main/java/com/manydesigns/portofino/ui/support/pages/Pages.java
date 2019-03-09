@@ -165,7 +165,7 @@ public class Pages extends Resource {
         if (sourceActionPath.startsWith(baseUri)) {
             sourceActionPath = sourceActionPath.substring(baseUri.length());
         }
-        File destConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
+        File destParentConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
         String[] segments = sourceActionPath.split("/");
         String segment = segments[segments.length - 1];
         String destinationActionPath = getActionPath(destinationActionParent + (detail ? "/_detail/" : "/") + segment);
@@ -173,10 +173,13 @@ public class Pages extends Resource {
         Response response = request.post(Entity.entity(sourceActionPath, PORTOFINO_PAGE_MOVE_TYPE));
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
             File sourceConfigFile = new File(servletContext.getRealPath(sourcePath));
-            if(destConfigFile.getParentFile().mkdirs()) {
-                movePage(sourceConfigFile, destConfigFile, detail ? "detailChildren" : "children");
+            File destParentConfigDir = destParentConfigFile.getParentFile();
+            if(destParentConfigDir.isDirectory() || destParentConfigDir.mkdirs()) {
+                File destConfigDir = new File(destParentConfigDir, segment);
+                destConfigDir.mkdirs();
+                movePage(sourceConfigFile, new File(destConfigDir, "config.json"), detail ? "detailChildren" : "children");
             } else {
-                throw new WebApplicationException("Could not create " + destConfigFile.getParentFile().getAbsolutePath());
+                throw new WebApplicationException("Could not create " + destParentConfigDir.getAbsolutePath());
             }
         }
         return response;
