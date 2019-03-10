@@ -243,11 +243,11 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   getFromColumns(fk) {
-    return fk.reference.map(r => r.fromColumn);
+    return fk.reference.map(r => r.fromColumn).join(", ");
   }
 
   getToColumns(fk) {
-    return fk.reference.map(r => r.toColumn);
+    return fk.reference.map(r => r.toColumn).join(", ");
   }
 
   getReferencedTableName(fk, tableInfo) {

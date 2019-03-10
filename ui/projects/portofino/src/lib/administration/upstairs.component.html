@@ -338,7 +338,24 @@
                   <td>{{getToColumns(fk)}}</td>
                 </tr>
               </table>
-              TODO
+            </fieldset>
+            <fieldset>
+              <legend>{{'Selection providers'|translate}}</legend>
+              <table>
+                <tr>
+                  <th>{{'Name'|translate}}</th>
+                  <th>{{'Columns'|translate}}</th>
+                  <th>{{'Database'|translate}}</th>
+                  <th>{{'Query'|translate}}</th>
+                </tr>
+                <tr *ngFor="let q of tableInfo.table.query">
+                  <td>{{q.name}}</td>
+                  <td>{{getFromColumns(q)}}</td>
+                  <td>{{q.toDatabase}}</td>
+                  <td *ngIf="q.hql"><strong>HQL</strong> {{q.hql}}</td>
+                  <td *ngIf="q.sql"><strong>SQL</strong> {{q.sql}}</td>
+                </tr>
+              </table>
             </fieldset>
           </mat-tab>
         </mat-tab-group>
