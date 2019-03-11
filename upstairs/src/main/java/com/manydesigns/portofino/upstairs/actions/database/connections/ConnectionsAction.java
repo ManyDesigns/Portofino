@@ -190,7 +190,9 @@ public class ConnectionsAction extends AbstractPageAction {
         persistence.initModel();
         persistence.saveXmlModel();
         logger.info("Schemas for database {} updated", databaseName);
-        return determineRoots(connectionProvider.getDatabase().getSchemas());
+        List<TableInfo> tableInfos = determineRoots(connectionProvider.getDatabase().getSchemas());
+        tableInfos.sort(Comparator.comparing(t -> t.table.getQualifiedName()));
+        return tableInfos;
     }
 
     protected List<TableInfo> determineRoots(List<Schema> schemas) {

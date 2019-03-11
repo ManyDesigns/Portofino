@@ -45,7 +45,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   annotationsForm: Form;
   readonly annotations = new FormGroup({});
 
-  wizard: { connectionProvider: ConnectionProviderSummary } | any = { newConnectionType: 'jdbc' };
+  wizard: { connectionProvider: ConnectionProviderSummary } | any =
+    { newConnectionType: 'jdbc', strategy: "automatic" };
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService,
@@ -178,7 +179,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   private prepareTableInfo() {
-    this.tableInfo.table.column.forEach(c => {
+    this.tableInfo.table.columns.forEach(c => {
       if (!c.javaType) {
         c.javaType = "default";
       }
@@ -188,7 +189,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   @Button({ list: "table", text: "Save", icon: "save", color: "primary" })
   saveTable() {
     const table = this.tableInfo.table;
-    table.column.forEach(c => {
+    table.columns.forEach(c => {
       if(c.javaType == "default") {
         c.javaType = null;
       }
@@ -260,6 +261,23 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     return prefix + fk.toTable;
   }
 
+  tableName(table) {
+    let prefix = "";
+    //TODO multiple configured databases. Portofino 4 did not display this information.
+    if(this.wizard.schemas && this.wizard.schemas.filter(s => s.selected).length > 1) {
+      prefix += `${table.schemaName}.`;
+    }
+    return prefix + table.tableName;
+  }
+
+  trackByColumnName(index, column) {
+    return column.columnName;
+  }
+
+  trackByTableName(index, table) {
+    return table.table.tableName;
+  }
+
   wizardStep(event) {
     if(event.selectedIndex == 1) {
       if(this.wizard.connectionProvider) {
@@ -288,8 +306,15 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       }
     } else if(event.selectedIndex == 2) {
       const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}/schemas`;
-      this.http.put(url, this.wizard.schemas).subscribe(() => {});
+      this.http.put<any[]>(url, this.wizard.schemas).subscribe(tables => {
+        tables.forEach(t => { t.selected = t.root; });
+        this.wizard.tables = tables;
+      });
     }
+  }
+
+  generateApplication(wizard) {
+    console.log("wiz", wizard);
   }
 
 }

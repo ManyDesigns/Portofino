@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model.database;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
@@ -182,11 +183,13 @@ public class Table implements ModelObject, Annotated {
     }
 
     @Required
+    @JsonProperty
     public String getDatabaseName() {
         return schema.getDatabaseName();
     }
 
     @Required
+    @JsonProperty
     public String getSchemaName() {
         return schema.getSchema();
     }
@@ -214,6 +217,7 @@ public class Table implements ModelObject, Annotated {
     @XmlElementWrapper(name="columns")
     @XmlElement(name = "column",
             type = Column.class)
+    @JsonProperty("columns")
     public List<Column> getColumns() {
         return columns;
     }
