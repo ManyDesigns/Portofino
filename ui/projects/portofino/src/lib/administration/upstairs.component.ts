@@ -314,7 +314,10 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   generateApplication(wizard) {
-    console.log("wiz", wizard);
+    const url = `${this.portofino.apiRoot}portofino-upstairs/application`;
+    this.http.post(url, wizard).subscribe(() => {
+      this.notificationService.info(this.translate.instant("Application created."))
+    });
   }
 
 }

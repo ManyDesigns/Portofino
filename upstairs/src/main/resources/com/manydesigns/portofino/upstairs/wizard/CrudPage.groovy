@@ -1,3 +1,5 @@
+package com.manydesigns.portofino.upstairs.appwizard
+
 import javax.servlet.*
 
 import com.manydesigns.elements.messages.*
