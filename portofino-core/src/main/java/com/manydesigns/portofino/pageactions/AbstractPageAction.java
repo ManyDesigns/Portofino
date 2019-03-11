@@ -23,30 +23,26 @@ package com.manydesigns.portofino.pageactions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.buttons.ButtonInfo;
-import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
-import com.manydesigns.portofino.dispatcher.AbstractResource;
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
+import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
+import com.manydesigns.portofino.pages.Group;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
-import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.security.SecurityLogic;
-import io.swagger.annotations.ApiModel;
+import com.manydesigns.portofino.pages.Permissions;
+import com.manydesigns.portofino.security.*;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -65,11 +61,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Convenient abstract base class for PageActions. It has fields to hold values of properties specified by the
@@ -87,27 +80,19 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     public static final String copyright =
         "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "title", "description", "template", "detailTemplate", "applyTemplateRecursively"}};
-    public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "title", "description", "template", "applyTemplateRecursively"}};
-    public static final String CONF_FORM_PREFIX = "config";
-
     //--------------------------------------------------------------------------
     // Properties
     //--------------------------------------------------------------------------
 
-    /**
-     * The PageInstance property. Injected.
-     */
+    /** The PageInstance property. Injected. */
     public PageInstance pageInstance;
-
-    /**
-     * The global configuration object. Injected.
-     */
+    /** The global configuration object. Injected. */
     @Autowired
     public Configuration portofinoConfiguration;
-
+    @Autowired
+    protected CodeBase codeBase;
+    @Autowired
+    protected ActionRegistry actionRegistry;
     @Context
     protected UriInfo uriInfo;
 
@@ -123,11 +108,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     //**************************************************************************
     // Page configuration
     //**************************************************************************
-
-    /**
-     * The Form to configure standard page settings.
-     */
-    public Form pageConfigurationForm;
 
     /**
      * The context object holds various elements of contextual information such
@@ -163,7 +143,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         } catch (PageNotActiveException e) {
             logger.debug("page.xml not found or not valid", e);
             page = new Page();
-            page.setTitle("");
             page.init();
         }
         PageInstance pageInstance = new PageInstance(
@@ -185,13 +164,12 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     }
 
     @Override
-    public void prepareForExecution() {
-
-    }
+    public void prepareForExecution() {}
 
     @Override
-    protected void parametersAcquired() throws WebApplicationException {
-        pageInstance.getParameters().addAll(parameters);
+    public void consumeParameter(String pathSegment) {
+        super.consumeParameter(pathSegment);
+        pageInstance.getParameters().add(pathSegment);
     }
 
     @Override
@@ -199,7 +177,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         if(parameters.isEmpty()) {
             return getLocation();
         } else {
-            return getLocation().getChild(PageInstance.DETAIL);
+            return getLocation().resolveFile(PageInstance.DETAIL);
         }
     }
 
@@ -216,14 +194,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     // Getters/Setters
     //--------------------------------------------------------------------------
 
-    public Form getPageConfigurationForm() {
-        return pageConfigurationForm;
-    }
-
-    public void setPageConfigurationForm(Form pageConfigurationForm) {
-        this.pageConfigurationForm = pageConfigurationForm;
-    }
-
     @Override
     public PageInstance getPageInstance() {
         return pageInstance;
@@ -237,90 +207,6 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     public Page getPage() {
         return getPageInstance().getPage();
     }
-
-    //--------------------------------------------------------------------------
-    // Page configuration
-    //--------------------------------------------------------------------------
-
-    /**
-     * Sets up the Elements form(s) 
-     */
-    protected void prepareConfigurationForms() {
-        Page page = pageInstance.getPage();
-
-        PageInstance parent = pageInstance.getParent();
-        assert parent != null;
-
-        FormBuilder formBuilder = new FormBuilder(EditPage.class)
-                .configPrefix(CONF_FORM_PREFIX)
-                .configFields(PageActionLogic.supportsDetail(getClass()) ?
-                              PAGE_CONFIGURATION_FIELDS :
-                              PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
-                .configFieldSetNames("Page");
-
-        pageConfigurationForm = formBuilder.build();
-        EditPage edit = new EditPage();
-        edit.id = page.getId();
-        edit.title = page.getTitle();
-        edit.description = page.getDescription();
-        pageConfigurationForm.readFromObject(edit);
-//
-//        if(script == null) {
-//            prepareScript();
-//        }
-    }
-
-    /**
-     * Reads the page configuration form values from the request. Can be called to re-use the standard page
-     * configuration form.
-     */
-    protected void readPageConfigurationFromRequest() {
-        pageConfigurationForm.readFromRequest(context.getRequest());
-    }
-
-    /**
-     * Validates the page configuration form values. Can be called to re-use the standard page
-     * configuration form.
-     * @return true iff the form was valid.
-     */
-    protected boolean validatePageConfiguration() {
-        return pageConfigurationForm.validate();
-    }
-
-//    /**
-//     * Updates the page with values from the page configuration. Can be called to re-use the standard page
-//     * configuration form. Should be called only after validatePageConfiguration() returned true.
-//     * @return true iff the page was correctly saved.
-//     */
-//    protected boolean updatePageConfiguration() {
-//        EditPage edit = new EditPage();
-//        pageConfigurationForm.writeToObject(edit);
-//        Page page = pageInstance.getPage();
-//        page.setTitle(edit.title);
-//        page.setDescription(edit.description);
-//        page.getLayout().setTemplate(edit.template);
-//        page.getDetailLayout().setTemplate(edit.detailTemplate);
-//        try {
-//            File pageFile = PageLogic.savePage(pageInstance.getDirectory(), page);
-//            logger.info("Page saved to " + pageFile.getAbsolutePath());
-//        } catch (Exception e) {
-//            logger.error("Couldn't save page", e);
-//            return false; //TODO handle return value + script + session msg
-//        }
-//        if(edit.applyTemplateRecursively) {
-//            FileFilter filter = new FileFilter() {
-//                public boolean accept(File pathname) {
-//                    return pathname.isDirectory();
-//                }
-//            };
-//            updateTemplate(pageInstance.getDirectory(), filter, edit);
-//        }
-//        Subject subject = SecurityUtils.getSubject();
-//        if(SecurityLogic.hasPermissions(portofinoConfiguration, getPageInstance(), subject, AccessLevel.DEVELOP)) {
-//            updateScript();
-//        }
-//        return true;
-//    }
 
     //--------------------------------------------------------------------------
     // Scripting
@@ -436,11 +322,11 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
                             !SecurityLogic.satisfiesRequiresAdministrator(request, this, handler))) {
                 continue;
             }
-            boolean visible = ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE);
+            boolean visible = Operations.doGuardsPass(this, handler, GuardType.VISIBLE);
             if(!visible) {
                 continue;
             }
-            boolean available = ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED);
+            boolean available = Operations.doGuardsPass(this, handler, GuardType.ENABLED);
             Map<String, Object> operationInfo = new HashMap<>();
             operationInfo.put("name", operation.getName());
             operationInfo.put("signature", operation.getSignature());
@@ -521,6 +407,65 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         JSONStringer jsonStringer = new JSONStringer();
         ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
         return jsonStringer.toString();
+    }
+
+    ////////////////
+    // Configuration
+    ////////////////
+
+    @GET
+    @Path(":permissions")
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public Map<String, Object> getActionPermissions() {
+        List<Group> allGroups = new ArrayList<>(getPage().getPermissions().getGroups());
+        Set<String> possibleGroups = ShiroUtils.getPortofinoRealm().getGroups();
+        for(String group : possibleGroups) {
+            if(allGroups.stream().noneMatch(g -> group.equals(g.getName()))) {
+                Group emptyGroup = new Group();
+                emptyGroup.setName(group);
+                allGroups.add(emptyGroup);
+            }
+        }
+        PageInstance parentPageInstance = getPageInstance().getParent();
+        allGroups.forEach(g -> {
+            if(g.getAccessLevel() == null) {
+                if(parentPageInstance != null) {
+                    Permissions parentPermissions =
+                            SecurityLogic.calculateActualPermissions(parentPageInstance);
+                    g.setActualAccessLevel(parentPermissions.getActualLevels().get(g.getName()));
+                }
+            }
+        });
+        Map<String, Object> result = new HashMap<>();
+        result.put("groups", allGroups);
+        result.put("permissions", getSupportedPermissions());
+        return result;
+    }
+
+    @RequiresAdministrator
+    @PUT
+    @Path(":permissions")
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    public void setActionPermissions(List<Group> groups) throws Exception {
+        List<Group> existingGroups = getPage().getPermissions().getGroups();
+        existingGroups.clear();
+        existingGroups.addAll(groups);
+        FileObject saved = PageLogic.savePage(pageInstance);
+        logger.info("Saved permissions to " + saved.getName().getPath());
+    }
+
+    public String[] getSupportedPermissions() {
+        Class<?> actualActionClass = getPageInstance().getActionClass();
+        SupportsPermissions supportsPermissions = actualActionClass.getAnnotation(SupportsPermissions.class);
+        while(supportsPermissions == null && actualActionClass.getSuperclass() != Object.class) {
+            actualActionClass = actualActionClass.getSuperclass();
+            supportsPermissions = actualActionClass.getAnnotation(SupportsPermissions.class);
+        }
+        if(supportsPermissions != null && supportsPermissions.value().length > 0) {
+            return supportsPermissions.value();
+        } else {
+            return new String[0];
+        }
     }
 
 }

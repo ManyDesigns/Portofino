@@ -51,7 +51,7 @@ public class Column implements ModelObject, Annotated {
     protected Table table;
     protected String columnName;
     protected int jdbcType;
-    protected String  columnType;
+    protected String columnType;
     protected boolean nullable;
     protected boolean autoincrement;
     protected Integer length;

@@ -18,12 +18,12 @@
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
             "assets": [
-                "src/assets",
-                "src/pages",
+              "src/assets",
+              "src/pages",
               "src/favicon.ico"
             ],
-              "styles": [
-                  {
+            "styles": [
+              {
                 "input": "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
               },
               {
@@ -32,7 +32,7 @@
               {
                 "input": "node_modules/roboto-fontface/css/roboto/roboto-fontface.css"
               },
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -134,7 +134,7 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
-      "styleext": "css"
+      "styleext": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "app"

@@ -28,6 +28,9 @@ import com.manydesigns.elements.fields.MultipartRequestField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -139,8 +142,7 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
         for (FormElement current : this) {
             if (current instanceof MultipartRequestField) {
                 MultipartRequestField field = (MultipartRequestField) current;
-                if(!field.getMode().isView
-                        (field.isInsertable(), field.isUpdatable())) {
+                if(!field.getMode().isView(field.isInsertable(), field.isUpdatable())) {
                     return true;
                 }
             }
@@ -158,5 +160,13 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
         for (FormElement current : this) {
             current.writeTo(accessor);
         }
+    }
+
+    public Map<String, Object> getValue() {
+        Map<String, Object> value = new HashMap<>();
+        for (FormElement current : this) {
+            value.put(current.getName(), current.getValue());
+        }
+        return value;
     }
 }

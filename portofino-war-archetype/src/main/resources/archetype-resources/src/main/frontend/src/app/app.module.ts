@@ -22,10 +22,14 @@ import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
+import {registerLocaleData} from "@angular/common";
+import localeIt from "@angular/common/locales/it";
+
+registerLocaleData(localeIt);
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Portofino Application"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Application" apiRoot="http://localhost:8080/api/"></portofino-app>`
 })
 export class AppComponent {}
 

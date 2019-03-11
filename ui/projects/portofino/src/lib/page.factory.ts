@@ -4,13 +4,13 @@ import {
   ComponentFactoryResolver,
   ComponentRef,
   Injector,
-  Input, OnInit,
+  Input, OnInit, Optional,
   Type,
   ViewContainerRef
 } from "@angular/core";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {AuthenticationService} from "./security/authentication.service";
 import {Observable, of, throwError} from "rxjs";
 import {PortofinoAppComponent} from "./portofino-app.component";
@@ -22,6 +22,8 @@ import {map, mergeMap} from "rxjs/operators";
 })
 export class PageFactoryComponent extends Page implements OnInit {
 
+  static components: any = {};
+
   @Input()
   parent: Page;
   @Input()
@@ -31,11 +33,11 @@ export class PageFactoryComponent extends Page implements OnInit {
   @Input()
   path: string;
 
-  constructor(portofino: PortofinoService, http: HttpClient, router: Router,
+  constructor(portofino: PortofinoService, http: HttpClient, router: Router, @Optional() route: ActivatedRoute,
               authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, protected injector: Injector,
               protected viewContainerRef: ViewContainerRef) {
-    super(portofino, http, router, authenticationService);
+    super(portofino, http, router, route, authenticationService);
   }
 
   ngOnInit(): void {
@@ -69,11 +71,11 @@ export class PageFactoryComponent extends Page implements OnInit {
   }
 
   create(config: PageConfiguration, path: string, parent: Page): Observable<ComponentRef<any>> {
-    const componentType = PortofinoAppComponent.components[config.type];
+    const componentType = PageFactoryComponent.components[config.type];
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
-    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType);
+    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType.type);
     let componentRef = componentFactory.create(this.injector);
     const component = <Page>componentRef.instance;
     component.configuration = config;
@@ -85,7 +87,50 @@ export class PageFactoryComponent extends Page implements OnInit {
       component.segment = path;
     }
     component.parent = parent;
-    return component.prepare().pipe(map(_ => componentRef));
+    return component.prepare().pipe(map(() => componentRef));
   }
 
+  loadPath(path: string) {
+    const segments = path.split("/")
+      .filter(s => s.length > 0)
+      .slice(0, path.length - 1)
+      .map(s => new UrlSegment(s, {}));
+    return this.load(segments);
+  }
+
+  load(segments: UrlSegment[]) {
+    return this.loadChild("", null, segments, 0);
+  }
+
+  protected loadChild(path: string, parent: Page, segments: UrlSegment[], index: number): Observable<ComponentRef<Page>> {
+    return this.loadPageConfiguration(path).pipe(
+      mergeMap(config => this.create(config, path, parent)),
+      mergeMap(componentRef => {
+        const page = <Page>componentRef.instance;
+        page.baseUrl = '/' + segments.slice(0, index).join('/');
+        page.url = page.baseUrl;
+        for (let i = index; i < segments.length; i++) {
+          let s = segments[i];
+          if (page.consumePathSegment(s.path)) {
+            path += `/${s.path}`;
+            let child = page.getChild(s.path);
+            if (child) {
+              return this.loadChild(path, page, segments, i + 1);
+            } else {
+              return throwError(`Nonexistent child of ${page.url}: ${s.path}`);
+            }
+          } else {
+            page.url += `/${s.path}`;
+          }
+        }
+        return of(componentRef);
+      }));
+  }
+
+}
+
+export function PortofinoComponent(info: { name: string, defaultActionClass?: string }) {
+  return function(target) {
+    PageFactoryComponent.components[info.name] = Object.assign({ type: target }, info);
+  };
 }

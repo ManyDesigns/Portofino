@@ -1,26 +1,82 @@
 <div class="page" [class.embedded]="page.embedded">
-  <mat-card>
   <portofino-page-header [page]="page"></portofino-page-header>
-
-    <mat-card-content class="page-body">
-
+  <div class="page-body">
     <ng-container *ngIf="!page.settingsPanel.active">
       <ng-template [ngTemplateOutlet]="content"></ng-template>
+      <portofino-page *ngFor="let child of page.embeddedChildren"
+                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
     </ng-container>
-
-    <ng-container *ngIf="page.settingsPanel.active">
-      <mat-error *ngIf="page.settingsPanel.error as error">
-        {{error.message ? error.message : error}}
-      </mat-error>
-      <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"></portofino-form>
-      <div></div>
-      <portofino-buttons [component]="page" list="configuration"></portofino-buttons>
-    </ng-container>
-  </mat-card-content>
-  </mat-card>
-
-  <ng-container *ngIf="!page.settingsPanel.active">
-    <portofino-page *ngFor="let child of page.embeddedChildren"
-                    [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
-  </ng-container>
+    <mat-tab-group *ngIf="page.settingsPanel.active">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{'Configuration'|translate}}
+        </ng-template>
+        <mat-error *ngIf="page.settingsPanel.error as error">
+          {{error.message ? error.message : error}}
+        </mat-error>
+        <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"></portofino-form>
+        <ng-container *ngIf="extraConfiguration">
+          <ng-template [ngTemplateOutlet]="extraConfiguration"></ng-template>
+        </ng-container>
+        <div></div>
+        <portofino-buttons [component]="page" list="configuration"></portofino-buttons>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{'Permissions'|translate}}
+        </ng-template>
+        <table *ngIf="page.settingsPanel.permissions">
+          <tr>
+            <th>{{'Group'|translate}}</th>
+            <th>{{'Access level'|translate}}</th>
+            <th [colSpan]="page.settingsPanel.permissions.permissions.length">{{'Permissions'|translate}}</th>
+          </tr>
+          <tr *ngFor="let group of page.settingsPanel.groups">
+            <td>{{group.name}}</td>
+            <td>
+              <mat-select [(ngModel)]="group.level">
+                <mat-option value="inherited">
+                  {{'Inherited (_)' | translate:{ level: group.actualAccessLevel} }}
+                </mat-option>
+                <mat-option *ngFor="let level of page.settingsPanel.accessLevels" [value]="level">
+                  {{level}}
+                </mat-option>
+              </mat-select>
+            </td>
+            <td *ngFor="let perm of page.settingsPanel.permissions.permissions">
+              <mat-checkbox *ngIf="group.permissionMap" [(ngModel)]="group.permissionMap[perm]">{{'permission: ' + perm | translate}}</mat-checkbox>
+            </td>
+          </tr>
+        </table>
+        <portofino-buttons [component]="page" list="permissions"></portofino-buttons>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{'Children'|translate}}
+        </ng-template>
+        <table>
+          <tr>
+            <th>{{'Segment'|translate}}</th>
+            <th>{{'Title'|translate}}</th>
+            <th>{{'Icon'|translate}}</th>
+            <th>{{'Embedded'|translate}}</th>
+            <th>{{'Show in navigation'|translate}}</th>
+          </tr>
+          <tr *ngFor="let child of page.children">
+            <td>{{child.path}}</td>
+            <td>{{child.title}}</td>
+            <td>
+              <mat-form-field>
+                <input matInput [(ngModel)]="child.icon" />
+                <mat-icon matSuffix *ngIf="child.icon">{{child.icon}}</mat-icon>
+              </mat-form-field>
+            </td>
+            <td><mat-checkbox [(ngModel)]="child.embedded"></mat-checkbox></td>
+            <td><mat-checkbox [(ngModel)]="child.showInNavigation"></mat-checkbox></td>
+          </tr>
+        </table>
+        <portofino-buttons [component]="page" list="children"></portofino-buttons>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>

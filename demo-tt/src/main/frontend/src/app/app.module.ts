@@ -1,7 +1,7 @@
 import {Component, NgModule} from '@angular/core';
 import {
   PortofinoModule, Page, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, AuthenticationService} from "portofino";
+  PortofinoComponent} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -27,15 +27,18 @@ import {
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {Router} from "@angular/router";
 import {QuillModule} from "ngx-quill";
-import {HttpClientModule, HttpClient} from "@angular/common/http";
+import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
+import {registerLocaleData} from "@angular/common";
+import localeIt from "@angular/common/locales/it";
+
+registerLocaleData(localeIt);
 
 @Component({
   selector: 'portofino-start',
@@ -53,27 +56,32 @@ export class CustomNavigation {}
   selector: 'portofino-welcome',
   template: `
     <portofino-default-page-layout [page]="this">
-      <ng-template #content><p>Welcome to Portofino 5!</p></ng-template>
+      <ng-template #content>
+        <p>Welcome to the Portofino 5 demo application "demo-tt"!</p>
+        <p>
+          Use the navigation button
+          <button title="{{ 'Navigation' | translate }}" type="button" mat-icon-button
+                  (click)="portofino.toggleSidenav()">
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+          to explore the app.
+        </p>
+      </ng-template>
     </portofino-default-page-layout>`
 })
 @PortofinoComponent({ name: 'welcome' })
-export class WelcomeComponent extends Page {
-  constructor(
-    http: HttpClient, portofino: PortofinoService, router: Router,  authenticationService: AuthenticationService) {
-    super(portofino, http, router, authenticationService);
-  }
-}
+export class WelcomeComponent extends Page {}
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT"></portofino-app>`
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
 })
-export class AppComponent {}
+export class DemoTTAppComponent {}
 
 @NgModule({
-  declarations: [AppComponent, StartHere, CustomNavigation, WelcomeComponent],
+  declarations: [DemoTTAppComponent, StartHere, CustomNavigation, WelcomeComponent],
   providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
+    { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
   ],
   imports: [
     PortofinoModule.withRoutes([{ path: "start", component: StartHere }]),
@@ -85,9 +93,9 @@ export class AppComponent {}
     FileInputAccessorModule, NgxdModule, QuillModule,
     TranslateModule.forRoot()],
   entryComponents: [ CustomNavigation, WelcomeComponent ],
-  bootstrap: [AppComponent]
+  bootstrap: [DemoTTAppComponent]
 })
-export class AppModule {
+export class DemoTTAppModule {
   static navigation() {
     return DefaultNavigationComponent
     //return CustomNavigation

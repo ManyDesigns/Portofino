@@ -26,7 +26,10 @@ import com.manydesigns.elements.annotations.Required;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /*
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -36,92 +39,20 @@ import javax.xml.bind.annotation.*;
  */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.NONE)
-@XmlType(propOrder = {"title","titleKey","description", "id", "permissions"})
 public class Page {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected String id;
-    protected String title;
-    protected String titleKey;
-    protected String description;
     protected Permissions permissions;
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger = LoggerFactory.getLogger(Page.class);
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
 
     public Page() {
         permissions = new Permissions();
     }
 
-    //**************************************************************************
-    // Reset / init
-    //**************************************************************************
-
     public void init() {
-        assert title != null;
-
-        if (description == null) {
-            description = "";
-        }
         if(permissions != null) {
             permissions.init();
         }
-    }
-
-    //**************************************************************************
-    // Getters/Setters
-    //**************************************************************************
-
-    @XmlAttribute(required = true)
-    @Required
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @XmlAttribute(required = true)
-    @Required
-    @FieldSize(50)
-    public String getTitle() {
-        return titleKey==null?title: ElementsThreadLocals.getText(titleKey);
-    }
-
-    @XmlAttribute(required = false)
-    @FieldSize(50)
-    public String getTitleKey() {
-        return titleKey;
-    }
-
-    public void setTitleKey(String titleKey) {
-        this.titleKey = titleKey;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @XmlAttribute(required = false)
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @XmlElement()

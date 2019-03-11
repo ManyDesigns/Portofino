@@ -1,23 +1,21 @@
 import {
-  AfterViewInit,
   Component,
   ContentChild,
   EventEmitter,
   Injectable,
   InjectionToken,
   Input, OnDestroy,
-  OnInit,
-  TemplateRef, ViewChild
-} from "@angular/core";
-import {ANNOTATION_REQUIRED, ClassAccessor, Property} from "./class-accessor";
+  OnInit, Optional,
+  TemplateRef} from "@angular/core";
+import {ANNOTATION_REQUIRED, ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormControl, FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {declareButton, getButtons} from "./buttons";
-import {BehaviorSubject, merge, NextObserver, Observable, of, PartialObserver, Subscription} from "rxjs";
+import {BehaviorSubject, merge, Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, debounceTime, map} from "rxjs/operators";
 import {MatDialog, MatDialogRef} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
@@ -30,7 +28,8 @@ export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 export class PageService {
   page: Page;
   error;
-  readonly pageLoad = new EventEmitter<Page>();
+  readonly pageLoad = new EventEmitter<Page | string>();
+  readonly pageLoaded = new EventEmitter<Page>();
   readonly pageLoadError = new EventEmitter<any>();
 
   reset() {
@@ -38,9 +37,13 @@ export class PageService {
     this.page = null;
   }
 
-  notifyPage(page: Page) {
-    this.page = page;
+  loadPage(page: Page | string) {
     this.pageLoad.emit(page);
+  }
+
+  notifyPageLoaded(page: Page) {
+    this.page = page;
+    this.pageLoaded.emit(page);
   }
 
   notifyError(error) {
@@ -52,7 +55,7 @@ export class PageService {
 @Component({
   selector: 'portofino-default-navigation',
   templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.css']
+  styleUrls: ['./navigation.component.scss']
 })
 export class DefaultNavigationComponent {
   constructor(public pageService: PageService) {}
@@ -61,15 +64,18 @@ export class DefaultNavigationComponent {
 export class PageConfiguration {
   type: string;
   title: string;
-  children: PageChild[];
   source: string;
   securityCheckPath: string = ':description';
+  children: PageChild[] = [];
+  icon?: string;
 }
 
 export class PageChild {
   path: string;
   title: string;
+  icon: string;
   embedded: boolean;
+  showInNavigation: boolean;
   accessible: boolean;
 }
 
@@ -165,7 +171,6 @@ class PageTreeDataSource {
   }
 }
 
-
 @Component({
   selector: 'portofino-page-source-selector-tree',
   template: `
@@ -208,8 +213,7 @@ export class SourceSelectorTree implements OnInit {
   }
 
   ngOnInit(): void {
-    const baseUrl = this.portofino.apiRoot;
-    this.http.get(baseUrl + ':description').subscribe((page: any) => {
+    this.http.get(this.portofino.apiRoot + ':description').subscribe((page: any) => {
       const root = new PageFlatNode("/", page.path, 0);
       root.type = page.superclass;
       this.dataSource.data = [root];
@@ -251,7 +255,7 @@ export class SourceSelector implements OnInit {
     name: 'source',
     type: 'string',
     label: 'Path or URL',
-    annotations: [{ type: ANNOTATION_REQUIRED, properties: [true] }]
+    annotations: [{ type: ANNOTATION_REQUIRED, properties: {value: true} }]
   });
 
   constructor(public portofino: PortofinoService, protected http: HttpClient, protected dialog: MatDialog) {}
@@ -301,27 +305,46 @@ export class PageSettingsPanel {
   readonly form = new FormGroup({});
   formDefinition = new Form();
   previousConfiguration;
+  permissions: Permissions;
   error;
+  readonly accessLevels = ["NONE", "VIEW", "EDIT", "DEVELOP", "DENY"];
+
   constructor(public page: Page) {}
 
   show() {
     this.formDefinition.contents = [
-      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration),
-      {
-        name: 'source',
-        component: SourceSelector,
-        dependencies: {page: this.page, initialValue: this.page.configuration.source}
-      }];
+      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration)];
     this.previousConfiguration = this.page.configuration;
     this.reloadConfiguration();
+    this.loadPermissions();
     this.active = true;
+  }
+
+  loadPermissions() {
+    const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
+    this.page.http.get<Permissions>(permissionsUrl).subscribe(p => {
+      this.permissions = p;
+      this.permissions.groups.forEach(g => {
+        if (!g.level) {
+          g.level = "inherited";
+        }
+        g.permissionMap = {};
+        g.permissions.forEach(p => {
+          g.permissionMap[p] = true;
+        });
+      });
+    });
   }
 
   hide() {
     this.active = false;
   }
 
-  setupConfigurationForm(ca: ClassAccessor, config: any) {
+  get groups() {
+    return this.permissions.groups.sort((g1, g2) => g1.name.localeCompare(g2.name));
+  }
+
+  protected setupConfigurationForm(ca: ClassAccessor, config: any) {
     const index = this.formDefinition.contents.findIndex(f => f['name'] == 'configuration');
     if(index >= 0) {
       this.formDefinition.contents.splice(index, 1);
@@ -337,7 +360,9 @@ export class PageSettingsPanel {
 
   reloadConfiguration() {
     this.page.loadConfiguration().subscribe(conf => {
-      this.page.http.get<ClassAccessor>(this.page.configurationUrl + '/classAccessor').subscribe(ca => {
+      this.page.http.get<ClassAccessor>(this.page.configurationUrl + '/classAccessor')
+        .pipe(loadClassAccessor)
+        .subscribe(ca => {
         this.setupConfigurationForm(ca, conf);
       }, error => {
         this.setupConfigurationForm(null, null);
@@ -352,7 +377,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   @Input()
   configuration: PageConfiguration & any;
-  readonly settingsPanel = new PageSettingsPanel(this);
+  readonly settingsPanel = this.getPageSettingsPanel();
   path: string;
   baseUrl: string;
   url: string;
@@ -363,13 +388,14 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
+  readonly permissionsPath = '/:permissions';
   readonly page = this;
 
   protected readonly subscriptions: Subscription[] = [];
 
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
-    public authenticationService: AuthenticationService) {
+    @Optional() protected route: ActivatedRoute, public authenticationService: AuthenticationService) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
@@ -379,9 +405,25 @@ export abstract class Page implements WithButtons, OnDestroy {
     declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'configuration'
     }, this, 'cancelConfiguration', null);
+    declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'permissions'
+    }, this, 'savePermissions', null);
+    declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'permissions'
+    }, this, 'cancelPermissions', null);
+    declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'children'
+    }, this, 'saveChildren', null);
+    declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'children'
+    }, this, 'cancelChildren', null);
   }
 
   initialize() {}
+
+  protected getPageSettingsPanel() {
+    return new PageSettingsPanel(this);
+  }
 
   subscribe<T>(
     observable: Observable<T>, observer: PartialObserver<T> | ((value: T) => void),
@@ -404,12 +446,44 @@ export abstract class Page implements WithButtons, OnDestroy {
     return true;
   }
 
+  get root(): Page {
+    if(this.parent) {
+      return this.parent.root;
+    } else {
+      return this;
+    }
+  }
+
   get children(): PageChild[] {
-    return this.configuration.children
+    return this.configuration[this.childrenProperty] || []
+  }
+
+  get childrenProperty(): string {
+    return "children";
   }
 
   get embeddedChildren() {
     return this.children.filter(c => this.allowEmbeddedComponents && c.embedded && c.accessible);
+  }
+
+  get title() {
+    let title = this.configuration.title;
+    if(!title && this.parent) {
+      let pageChild = this.parent.children.find(c => c.path == this.segment);
+      if(pageChild) {
+        title = pageChild.title;
+      }
+    }
+    return title;
+  }
+
+  get icon() {
+    if(this.parent) {
+      let pageChild = this.parent.children.find(c => c.path == this.segment);
+      return pageChild ? pageChild.icon : null;
+    } else {
+      return null;
+    }
   }
 
   getChild(segment: string) {
@@ -459,23 +533,24 @@ export abstract class Page implements WithButtons, OnDestroy {
       source = this.portofino.apiRoot + source;
     }
     //replace double slash, but not in http(s)://
-    return source.replace(new RegExp("([^:])//"), '$1/');
+    source = source.replace(new RegExp("([^:])//"), '$1/');
+    while (source.endsWith("/"))  {
+      source = source.substring(0, source.length - 1);
+    }
+    return source;
   }
 
   operationAvailable(ops: Operation[], signature: string) {
     return ops.some(op => op.signature == signature && op.available);
   }
 
-  get supportedSourceTypes(): string[] {
-    return [];
-  }
-
   loadPageConfiguration(path: string) {
     return this.http.get<PageConfiguration>(this.getConfigurationLocation(path));
   }
 
-  protected getConfigurationLocation(path: string) {
-    return `pages${path}/config.json`;
+  getConfigurationLocation(path: string = this.path) {
+    //replace double slash, but not in http(s)://
+    return `pages${path}/config.json`.replace(new RegExp("([^:])//"), '$1/');
   }
 
   configure() {
@@ -483,13 +558,40 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   saveConfiguration() {
-    const config = this.getConfigurationToSave(this.settingsPanel.form.value);
-    this.configuration = config;
-    this.portofino.saveConfiguration(this.getConfigurationLocation(this.path), config).subscribe(
+    if (!this.portofino.localApiAvailable) {
+      throw "Local Portofino API not available"
+    }
+    const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
+    const actionConfiguration = this.getActionConfigurationToSave();
+    this.configuration = pageConfiguration;
+    let data = new FormData();
+    data.append("pageConfiguration", JSON.stringify(pageConfiguration));
+    data.append("actionConfiguration", JSON.stringify(actionConfiguration));
+    const path = this.getConfigurationLocation(this.path);
+    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
+      params: {
+        actionConfigurationPath: this.configurationUrl,
+        loginPath: this.portofino.loginPath
+      }
+    }).subscribe(
       () => {
         this.settingsPanel.hide();
-        this.router.navigateByUrl(this.router.url);
+        this.reloadBaseUrl();
       });
+  }
+
+  cancelConfiguration() {
+    this.configuration = this.settingsPanel.previousConfiguration;
+    this.settingsPanel.hide();
+  }
+
+  protected reloadBaseUrl() {
+    if (this.router.url && this.router.url != "/") {
+      this.router.navigateByUrl(this.baseUrl);
+    } else {
+      //this.router.navigate(['.'], {relativeTo: this.route});
+      window.location.reload(); //TODO
+    }
   }
 
   get configurationUrl() {
@@ -503,20 +605,69 @@ export abstract class Page implements WithButtons, OnDestroy {
     }));
   }
 
-  protected getConfigurationToSave(formValue) {
+  //TODO refactor into page settings panel
+  protected getPageConfigurationToSave(formValue) {
     const config = Object.assign({}, this.configuration, formValue);
-    delete config.relativeToParent;
-    config.source = config.source.source;
-    return config;
+    const pageConfiguration = new PageConfiguration();
+    //Reflection would be nice
+    pageConfiguration.children = config.children;
+    pageConfiguration.securityCheckPath = config.securityCheckPath;
+    pageConfiguration.source = config.source;
+    pageConfiguration.title = config.title;
+    pageConfiguration.type = config.type;
+    return pageConfiguration;
   }
 
-  cancelConfiguration() {
-    this.settingsPanel.hide();
-    this.configuration = this.settingsPanel.previousConfiguration;
+  protected getActionConfigurationToSave() {
+    return this.settingsPanel.form.get('configuration').value;
   }
 
   get configurationProperties() {
     return null;
+  }
+
+  savePermissions() {
+    const permissionsUrl = this.computeSourceUrl() + this.permissionsPath;
+    this.settingsPanel.groups.forEach(g => {
+      if(g.level == "inherited") {
+        g.level = null;
+      }
+      g.permissions = [];
+      for(let p in g.permissionMap) {
+        if(g.permissionMap[p]) {
+          g.permissions.push(p);
+        }
+      }
+      delete g.permissionMap;
+    });
+    this.http.put(permissionsUrl, this.settingsPanel.groups).subscribe(() => {
+      this.settingsPanel.hide();
+    });
+  }
+
+  cancelPermissions() {
+    this.settingsPanel.hide();
+  }
+
+  saveChildren() {
+    if (!this.portofino.localApiAvailable) {
+      throw "Local Portofino API not available"
+    }
+    const pageConfiguration = this.getPageConfigurationToSave({});
+    this.configuration = pageConfiguration;
+    let data = new FormData();
+    data.append("pageConfiguration", JSON.stringify(pageConfiguration));
+    const path = this.getConfigurationLocation(this.path);
+    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
+      params: { loginPath: this.portofino.loginPath }}).subscribe(
+      () => {
+        this.settingsPanel.hide();
+        this.reloadBaseUrl();
+      });
+  }
+
+  cancelChildren() {
+    this.settingsPanel.hide();
   }
 }
 
@@ -540,7 +691,9 @@ export class DefaultPageLayout {
   @Input()
   page: Page;
   @ContentChild("content")
-  content: TemplateRef<any>
+  content: TemplateRef<any>;
+  @ContentChild("extraConfiguration")
+  extraConfiguration: TemplateRef<any>;
 }
 
 export class Operation {
@@ -548,4 +701,17 @@ export class Operation {
   signature: string;
   parameters: string[];
   available: boolean;
+}
+
+export class Permissions {
+  groups: Group[];
+  permissions: string[];
+}
+
+export class Group {
+  name: string;
+  level: string;
+  actualAccessLevel: string;
+  permissions: string[];
+  permissionMap: {[name: string]: boolean};
 }

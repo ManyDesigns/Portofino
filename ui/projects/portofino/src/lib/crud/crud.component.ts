@@ -1,25 +1,23 @@
-import {Component, EventEmitter, Input, OnInit, Output, Type} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
-import {PortofinoService} from "../portofino.service";
-import {ClassAccessor} from "../class-accessor";
-import {PortofinoComponent} from "../portofino-app.component";
-import {ActivatedRoute, Router} from "@angular/router";
-import {Operation, Page, PageChild, PageConfiguration} from "../page";
+import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
+import {ClassAccessor, loadClassAccessor} from "../class-accessor";
+import {PortofinoComponent} from "../page.factory";
+import {Operation, Page, PageChild, PageConfiguration, PageSettingsPanel} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
-import {AuthenticationService} from "../security/authentication.service";
 import {Button} from "../buttons";
 import {SelectionModel} from "@angular/cdk/collections";
 import {SearchComponent} from "./search/search.component";
 import {DetailComponent} from "./detail/detail.component";
 import {CreateComponent} from "./detail/create.component";
 import {BulkEditComponent} from "./bulk/bulk-edit.component";
+import {mergeMap} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-crud',
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.css']
 })
-@PortofinoComponent({ name: 'crud' })
+@PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.pageactions.crud.CrudAction" })
 export class CrudComponent extends Page {
 
   @Input()
@@ -62,28 +60,36 @@ export class CrudComponent extends Page {
   @Input()
   bulkEditComponentContext = {};
 
-  constructor(
-    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
-    public authenticationService: AuthenticationService, protected route: ActivatedRoute) {
-    super(portofino, http, router, authenticationService);
+  error: any;
+
+  get rowsPerPage() {
+    return this.configuration.rowsPerPage ? this.configuration.rowsPerPage : 10;
   }
 
   initialize() {
     this.sourceUrl = this.computeBaseSourceUrl();
-    this.loadConfiguration().subscribe(
-      () => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).subscribe(
-        classAccessor => this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath).subscribe(
-          sps => this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
-            this.init(classAccessor, sps, ops);
-          }))));
+    this.loadConfiguration().pipe(
+      mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).pipe(loadClassAccessor)),
+      mergeMap(classAccessor => {
+        this.classAccessor = classAccessor;
+        return this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath);
+      }),
+      mergeMap(sps => {
+        this.selectionProviders = sps;
+        return this.http.get<Operation[]>(this.sourceUrl + this.operationsPath);
+      })).subscribe(
+        ops => {
+        const bulkOpsEnabled = ops.some(op => op.name == "Bulk operations" && op.available);
+        this.createEnabled = this.operationAvailable(ops, "POST");
+        this.bulkEditEnabled = this.operationAvailable(ops, "PUT") && bulkOpsEnabled;
+        this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE") && bulkOpsEnabled;
+        this.init();
+      },
+      error => this.error = error);
   }
 
   computeBaseSourceUrl() {
     return super.computeSourceUrl();
-  }
-
-  get configurationUrl() {
-    return this.computeBaseSourceUrl() + this.configurationPath;
   }
 
   computeSourceUrl() {
@@ -95,12 +101,7 @@ export class CrudComponent extends Page {
     }
   }
 
-  protected init(classAccessor, selectionProviders: SelectionProvider[], ops: Operation[]) {
-    this.createEnabled = this.operationAvailable(ops, "POST");
-    this.bulkEditEnabled = this.operationAvailable(ops, "PUT");
-    this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE");
-    this.classAccessor = classAccessor;
-    this.selectionProviders = selectionProviders;
+  protected init() {
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
@@ -113,7 +114,7 @@ export class CrudComponent extends Page {
         this.showSearch();
       }
     });
-    this.subscribe(this.portofino.languageChange,_ => {
+    this.subscribe(this.portofino.localeChange, _ => {
       if(this.view == CrudView.SEARCH) {
         this.refreshSearch.emit();
       } //else TODO
@@ -213,7 +214,7 @@ export class CrudComponent extends Page {
 
   goToSearch() {
     if(!this.embedded && (this.view == CrudView.DETAIL || this.view == CrudView.CREATE)) {
-      this.router.navigateByUrl(this.baseUrl);
+      this.reloadBaseUrl();
     } else {
       this.showSearch();
     }
@@ -232,17 +233,43 @@ export class CrudComponent extends Page {
     return false;
   }
 
-  get children(): PageChild[] {
+  get childrenProperty(): string {
     if(this.id) {
-      return this.configuration.detailChildren || []
+      return "detailChildren";
     } else {
-      return this.configuration.children
+      return "children";
     }
+  }
+
+  //Configuration
+
+  get configurationUrl() {
+    return this.computeBaseSourceUrl() + this.configurationPath;
   }
 
   get configurationProperties() {
     return ["name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
             "largeResultSet", "rowsPerPage"]
+  }
+
+  protected getPageSettingsPanel(): PageSettingsPanel {
+    return new CrudPageSettingsPanel(this);
+  }
+
+  protected getActionConfigurationToSave(): any {
+    const configurationToSave = super.getActionConfigurationToSave();
+    const settingsPanel = (<CrudPageSettingsPanel>this.settingsPanel);
+    configurationToSave.properties = settingsPanel.properties;
+    configurationToSave.selectionProviders = settingsPanel.selectionProviders.map(sp => {
+      const enabled = sp.selectionProviderName != null;
+      return {
+        enabled: enabled,
+        selectionProviderName: enabled ? sp.selectionProviderName : sp.availableSelectionProviders ? sp.availableSelectionProviders[0] : null,
+        displayModeName: sp.displayModeName,
+        searchDisplayModeName: sp.searchDisplayModeName
+      }
+    });
+    return configurationToSave;
   }
 }
 
@@ -297,4 +324,39 @@ export class BulkEditComponentHolder extends BulkEditComponent {
   @Input()
   context = {};
   ngOnInit(): void {}
+}
+
+export class CrudPageSettingsPanel extends PageSettingsPanel {
+
+  properties = [];
+  selectionProviders = [];
+
+  protected setupConfigurationForm(ca: ClassAccessor, config: any) {
+    super.setupConfigurationForm(ca, config);
+    this.properties = [];
+    this.selectionProviders = [];
+    if(!config) {
+      return;
+    }
+    const crud = this.page as CrudComponent;
+    crud.http.get<any>(crud.sourceUrl + '/:allSelectionProviders').subscribe(sps => {
+      this.selectionProviders = sps;
+    });
+    config.properties.forEach(p => {
+      this.properties.push({
+        enabled: p.property.enabled, name: p.property.name, label: p.property.label,
+        insertable: p.property.insertable, updatable: p.property.updatable,
+        inSummary: p.property.inSummary, searchable: p.property.searchable
+      });
+    });
+    crud.classAccessor.properties.forEach(p => {
+      if(!this.properties.find(p2 => p2.name == p.name)) {
+        this.properties.push({
+          enabled: p.key, name: p.name, label: null,
+          insertable: false, updatable: false,
+          inSummary: p.key, searchable: false
+        });
+      }
+    });
+  }
 }

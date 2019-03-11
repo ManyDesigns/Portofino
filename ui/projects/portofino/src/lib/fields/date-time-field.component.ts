@@ -9,7 +9,7 @@ import {
   ValidationErrors,
   Validator
 } from "@angular/forms";
-import moment from "moment-es6";
+import moment from "moment-with-locales-es6";
 
 @Component({
   selector: 'portofino-date-time-field',
@@ -23,7 +23,7 @@ export class DateTimeFieldComponent extends FieldComponent {
     if(!df) {
       return true;
     }
-    const datePattern = df.properties["value"] as string;
+    const datePattern = df.properties.value as string;
     if(!datePattern) {
       return true;
     }
@@ -32,7 +32,7 @@ export class DateTimeFieldComponent extends FieldComponent {
 
   get dateFormat() {
     const df = getAnnotation(this.property, 'com.manydesigns.elements.annotations.DateFormat');
-    return this.convertDateFormat(df ? df.properties["value"] as string : null);
+    return this.convertDateFormat(df ? df.properties.value as string : null);
   }
 
   protected convertDateFormat(format: string) {

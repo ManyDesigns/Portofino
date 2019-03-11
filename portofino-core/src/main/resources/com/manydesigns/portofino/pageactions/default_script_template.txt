@@ -10,7 +10,7 @@ import org.hibernate.*
 import org.hibernate.criterion.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class %{#generatedClassName} extends %{#pageClassName} {
+class %{#generatedClassName} extends %{#actionClassName} {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here

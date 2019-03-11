@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.dispatcher.web;
 
+import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
 import org.apache.commons.configuration2.Configuration;
@@ -38,8 +39,8 @@ public class ApplicationRoot extends DocumentedApiRoot {
     }
 
     @Path("")
-    public Root start() throws Exception {
-        Root root = rootFactory.createRoot();
+    public Object start() throws Exception {
+        Resource root = rootFactory.createRoot();
         resourceContext.initResource(root);
         return root.init();
     }

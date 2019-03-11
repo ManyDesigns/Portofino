@@ -1,9 +1,13 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
-import {BehaviorSubject} from "rxjs";
+import {DateAdapter} from "@angular/material";
+import {DatetimeAdapter} from "@mat-datetimepicker/core";
+import {WebStorageService} from "ngx-store";
+
+export const LOCALE_STORAGE_SERVICE = new InjectionToken('Locale Storage');
 
 @Injectable()
 export class PortofinoService {
@@ -15,48 +19,72 @@ export class PortofinoService {
   sideNavPosition: SideNavPosition = 'page';
   sideNavOpen: boolean;
 
-  readonly DEFAULT_LANGUAGE = 'en';
-  readonly languages = {};
-  readonly languageChange = new EventEmitter<Language>();
+  readonly DEFAULT_LOCALE = 'en';
+  readonly localeDefinitions = {};
+  readonly localeChange = new EventEmitter<Locale>();
 
-  constructor(public http: HttpClient, protected translate: TranslateService) {
+  constructor(public http: HttpClient, protected translate: TranslateService,
+              @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,
+              protected dateAdapter: DateAdapter<any>, protected datetimeAdapter: DatetimeAdapter<any>) {
     this.setupTranslateService();
   }
 
-  configureLanguage(lang: Language) {
-    this.languages[lang.key] = lang;
+  configureLocale(lang: Locale) {
+    this.localeDefinitions[lang.key] = lang;
     if(lang.translations) {
       this.translate.setTranslation(lang.key, lang.translations, true);
     }
   }
 
   removeLanguage(key: string) {
-    delete this.languages[key];
+    delete this.localeDefinitions[key];
     this.translate.resetLang(key);
   }
 
-  get languageKeys() {
+  get locales() {
     const keys = [];
-    for(let k in this.languages) {
+    for(let k in this.localeDefinitions) {
       keys.push(k);
     }
     return keys;
   }
 
-  get currentLanguage(): Language {
-    return this.languages[this.translate.currentLang];
+  get currentLocale(): Locale {
+    return this.localeDefinitions[this.translate.currentLang];
   }
 
-  set currentLanguage(lang: Language) {
-    this.translate.use(lang.key);
-    this.languageChange.emit(lang);
+  set currentLocale(lang: Locale) {
+    this.setLocale(lang.key);
+    this.localeChange.emit(lang);
+  }
+
+  protected setLocale(locale) {
+    this.translate.use(locale);
+    this.dateAdapter.setLocale(locale);
+    this.datetimeAdapter.setLocale(locale);
+    this.storage.set('locale', locale);
   }
 
   protected setupTranslateService() {
-    this.translate.setDefaultLang(this.DEFAULT_LANGUAGE);
-    this.configureLanguage({ key: 'en', name: 'English', translations: TRANSLATIONS_EN });
-    this.configureLanguage({ key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT });
-    this.translate.use(this.translate.getBrowserLang());
+    this.translate.setDefaultLang(this.DEFAULT_LOCALE);
+    this.configureLocale({ key: 'en', name: 'English', translations: TRANSLATIONS_EN });
+    this.configureLocale({ key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT });
+    this.setLocale(this.getInitialLocale());
+  }
+
+  protected getInitialLocale() {
+    let locale = this.storage.get('locale');
+    const predicate = e => e == locale;
+    if (!this.locales.find(predicate)) {
+      locale = this.translate.getBrowserLang();
+    }
+    if (!this.locales.find(predicate)) {
+      locale = this.translate.getDefaultLang();
+    }
+    if (!this.locales.find(predicate)) {
+      locale = this.locales[0];
+    }
+    return locale;
   }
 
   init(): void {
@@ -94,13 +122,6 @@ export class PortofinoService {
     return !!this.localApiPath;
   }
 
-  saveConfiguration(path: string, config: any) {
-    if(!this.localApiAvailable) {
-      throw "Local Portofino API not available"
-    }
-    return this.http.put(`${this.localApiPath}/pages/${path}?loginPath=${this.loginPath}`, config)
-  }
-
   public toggleSidenav(){
     this.sideNavOpen=!this.sideNavOpen;
   }
@@ -113,4 +134,4 @@ class ApiInfo {
 
 export declare type SideNavPosition = 'body' | 'page' | undefined;
 
-export declare type Language = { key: string, name: string, translations?: Object };
+export declare type Locale = { key: string, name: string, translations?: Object };

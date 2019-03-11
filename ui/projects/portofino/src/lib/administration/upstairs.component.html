@@ -1,0 +1,412 @@
+<mat-tab-group>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Settings'|translate}}
+    </ng-template>
+    <form (submit)="saveSettings()">
+      <portofino-form #settingsFormComponent [form]="settingsForm"></portofino-form>
+      <div fxLayout="row">
+        <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+        <portofino-buttons [component]="this" list="settings"></portofino-buttons>
+      </div>
+    </form>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Permissions'|translate}}
+    </ng-template>
+    <table *ngIf="settingsPanel.permissions">
+      <tr>
+        <th>{{'Group'|translate}}</th>
+        <th>{{'Access level'|translate}}</th>
+      </tr>
+      <tr *ngFor="let group of settingsPanel.groups">
+        <td>{{group.name}}</td>
+        <td>
+          <mat-select [(ngModel)]="group.level">
+            <mat-option *ngFor="let level of settingsPanel.accessLevels" [value]="level">
+              {{level}}
+            </mat-option>
+          </mat-select>
+        </td>
+      </tr>
+    </table>
+    <portofino-buttons [component]="this" list="permissions"></portofino-buttons>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Database connections'|translate}}
+    </ng-template>
+    <ng-container *ngIf="!connectionProvider">
+      <table *ngIf="connectionProviders">
+        <tr>
+          <th>{{'Name'|translate}}</th>
+          <th>{{'Description'|translate}}</th>
+          <th>{{'Status'|translate}}</th>
+        </tr>
+        <tr *ngFor="let conn of connectionProviders">
+          <td><a href="javascript:void(0)" (click)="openConnectionProvider(conn);">{{conn.name}}</a></td>
+          <td>{{conn.description}}</td>
+          <td>{{conn.status | translate}}</td>
+        </tr>
+      </table>
+      <portofino-buttons [component]="this" list="connections"></portofino-buttons>
+      <h3>{{'Available database platforms' | translate}}</h3>
+      <table *ngIf="databasePlatforms">
+        <tr>
+          <th>{{'Description'|translate}}</th>
+          <th>{{'Standard driver class name'|translate}}</th>
+          <th>{{'Status'|translate}}</th>
+        </tr>
+        <tr *ngFor="let platform of databasePlatforms">
+          <td>{{platform.description}}</td>
+          <td>{{platform.standardDriverClassName}}</td>
+          <td>{{platform.status | translate}}</td>
+        </tr>
+      </table>
+    </ng-container>
+    <ng-container *ngIf="connectionProvider">
+      <form>
+        <mat-form-field>
+          <mat-label>{{'Name'|translate}}</mat-label>
+          <input name="name" matInput required [(ngModel)]="connectionProvider.databaseName.value"
+                 [disabled]="true" />
+        </mat-form-field>
+        <ng-container *ngIf="connectionProvider.jndiResource.value">
+          <mat-form-field>
+            <mat-label>{{'JNDI Resource'|translate}}</mat-label>
+            <input name="jndiResource" matInput required [(ngModel)]="connectionProvider.jndiResource.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+        </ng-container>
+        <ng-container *ngIf="!connectionProvider.jndiResource.value">
+          <mat-form-field>
+            <mat-label>{{'Driver'|translate}}</mat-label>
+            <input name="driver" matInput required [(ngModel)]="connectionProvider.driver.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Connection URL'|translate}}</mat-label>
+            <input name="url" matInput required [(ngModel)]="connectionProvider.url.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Username'|translate}}</mat-label>
+            <input name="username" matInput [(ngModel)]="connectionProvider.username.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Password'|translate}}</mat-label>
+            <input name="password" type="password" matInput [(ngModel)]="connectionProvider.password.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Hibernate dialect'|translate}}</mat-label>
+            <input name="dialect" matInput [(ngModel)]="connectionProvider.hibernateDialect.value"
+                   [disabled]="!isEditConnectionProvider" />
+            <mat-hint>{{'leave empty to use default'|translate}}</mat-hint>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'True string'|translate}}</mat-label>
+            <input name="true-string" matInput [(ngModel)]="connectionProvider.trueString.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'False string'|translate}}</mat-label>
+            <input name="false-string" matInput [(ngModel)]="connectionProvider.falseString.value"
+                   [disabled]="!isEditConnectionProvider" />
+          </mat-form-field>
+        </ng-container>
+        <mat-divider></mat-divider>
+        <h3>{{'Schemas'|translate}}</h3>
+        <table>
+          <tr>
+            <th></th>
+            <th>{{'Schema'|translate}}</th>
+            <th>{{'Schema name'|translate}}</th>
+          </tr>
+          <tr *ngFor="let schema of connectionProvider.schemas; let i = index;">
+            <td><mat-checkbox [(ngModel)]="schema.selected"
+                              name="selected{{i}}" [disabled]="!isEditConnectionProvider"></mat-checkbox></td>
+            <td>{{schema.schema}}</td>
+            <td><input matInput [(ngModel)]="schema.name"
+                       name="schemaName{{i}}" [disabled]="!isEditConnectionProvider"/></td>
+          </tr>
+        </table>
+        <div><portofino-buttons [component]="this" list="connection"></portofino-buttons></div>
+      </form>
+    </ng-container>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Wizard'|translate}}
+    </ng-template>
+    <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
+      <mat-step [stepControl]="step0Form.control">
+        <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
+        <mat-form-field>
+          <mat-label>{{'Use an existing database connection' | translate}}</mat-label>
+          <mat-select [(ngModel)]="wizard.connectionProvider">
+            <mat-option></mat-option>
+            <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <label>{{'or create a new one (choose its type)'}}</label>
+        <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider">
+          <mat-radio-button value="jdbc">JDBC</mat-radio-button>
+          <mat-radio-button value="jndi">JNDI</mat-radio-button>
+        </mat-radio-group>
+        <fieldset>
+          <legend>{{'Connection parameters' | translate}}</legend>
+          <form #step0Form="ngForm">
+            <mat-form-field>
+              <mat-label>{{'Database name' | translate}}</mat-label>
+              <input matInput [(ngModel)]="wizard.databaseName" required name="databaseName"
+                     [disabled]="wizard.connectionProvider">
+            </mat-form-field>
+            <ng-container *ngIf="wizard.newConnectionType == 'jdbc'">
+              <mat-form-field>
+                <mat-label>{{'Driver' | translate}}</mat-label>
+                <mat-select [(ngModel)]="wizard.driver" required name="driver"
+                            [disabled]="wizard.connectionProvider">
+                  <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{'Connection URL' | translate}}</mat-label>
+                <input matInput [(ngModel)]="wizard.connectionUrl" required name="connectionUrl"
+                       [disabled]="wizard.connectionProvider">
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{'Username' | translate}}</mat-label>
+                <input matInput [(ngModel)]="wizard.username" name="username"
+                       [disabled]="wizard.connectionProvider">
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>{{'Username' | translate}}</mat-label>
+                <input matInput type="password" [(ngModel)]="wizard.password" name="password"
+                       [disabled]="wizard.connectionProvider">
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngIf="wizard.newConnectionType == 'jndi'">
+              <mat-form-field>
+                <mat-label>{{'JNDI resource' | translate}}</mat-label>
+                <input matInput [(ngModel)]="wizard.jndiResource" required name="jndiResource"
+                       [disabled]="wizard.connectionProvider">
+              </mat-form-field>
+            </ng-container>
+          </form>
+        </fieldset>
+        <button mat-button matStepperNext>{{'Next' | translate}}</button>
+      </mat-step>
+      <mat-step [editable]="wizard.connectionProvider">
+        <ng-template matStepLabel>{{'Select the database schema(s) to import' | translate}}</ng-template>
+        <h3>{{'Found schemas:'|translate}}</h3>
+        <table>
+          <tr>
+            <th></th>
+            <th>{{'Schema'|translate}}</th>
+            <th>{{'Schema name'|translate}}</th>
+          </tr>
+          <tr *ngFor="let schema of wizard.schemas; let i = index;">
+            <td><mat-checkbox [(ngModel)]="schema.selected"
+                              name="selected{{i}}"></mat-checkbox></td>
+            <td>{{schema.schema}}</td>
+            <td><input matInput [(ngModel)]="schema.name" name="schemaName{{i}}"/></td>
+          </tr>
+        </table>
+        <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
+        <button mat-button matStepperNext>{{'Next' | translate}}</button>
+      </mat-step>
+      <mat-step>
+        <ng-template matStepLabel>{{'Configure user management' | translate}}</ng-template>
+        <mat-card>{{"Warning: if you don't leave the fields below empty, the Security.groovy file will be overwritten."|translate}}</mat-card>
+        <fieldset>
+          <legend>{{'Users and groups tables'|translate}}</legend>
+          <mat-form-field>
+            <mat-label>{{'Users table' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.usersTable">
+              <mat-option *ngFor="let table of wizard.tables" [value]="table">{{table.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Groups table' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.groupsTable">
+              <mat-option *ngFor="let table of wizard.tables" [value]="table">{{table.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'User-group link table' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.userGroupTable">
+              <mat-option *ngFor="let table of wizard.tables" [value]="table">{{table.name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </fieldset>
+        <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
+        <button mat-button matStepperNext>{{'Next' | translate}}</button>
+      </mat-step>
+    </mat-horizontal-stepper>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Tables'|translate}}
+    </ng-template>
+    <mat-tree [dataSource]="tableTreeDataSource" [treeControl]="tableTreeControl" *ngIf="!tableInfo">
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
+        <a href="javascript:void(0)" (click)="editTable(node)">{{node.displayName}}</a>
+      </mat-tree-node>
+      <mat-tree-node *matTreeNodeDef="let node;when: isExpandable" matTreeNodePadding>
+        <button mat-icon-button matTreeNodeToggle
+                [attr.aria-label]="'toggle ' + node.name">
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{tableTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+          </mat-icon>
+        </button>
+        {{node.displayName}}
+        <mat-progress-bar *ngIf="node.loading" mode="indeterminate"></mat-progress-bar>
+      </mat-tree-node>
+    </mat-tree>
+    <mat-card *ngIf="tableInfo && !column">
+      <mat-card-title>{{tableInfo.table.tableName}}</mat-card-title>
+      <mat-card-content>
+        <mat-tab-group>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              {{'Table and columns'|translate}}
+            </ng-template>
+            <mat-form-field>
+              <mat-label>{{'Entity name'|translate}}</mat-label>
+              <input matInput [(ngModel)]="tableInfo.table.entityName" />
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Short name'|translate}}</mat-label>
+              <input matInput [(ngModel)]="tableInfo.table.shortName" />
+            </mat-form-field>
+            <fieldset>
+              <legend>{{'Columns'|translate}}</legend>
+              <table>
+                <tr>
+                  <th>{{'Name'|translate}}</th>
+                  <th>{{'Property name'|translate}}</th>
+                  <th>{{'Class'|translate}}</th>
+                  <th>{{'Type'|translate}}</th>
+                  <th>{{'Length'|translate}}</th>
+                  <th>{{'Scale'|translate}}</th>
+                  <th>{{'Nullable'|translate}}</th>
+                </tr>
+                <tr *ngFor="let column of tableInfo.table.column; let i = index;">
+                  <td><a href="javascript:void(0)" (click)="editColumn(column, i);">{{column.columnName}}</a></td>
+                  <td><input matInput [(ngModel)]="column.propertyName" /></td>
+                  <td style="min-width: 100px;">
+                    <mat-select [(ngModel)]="column.javaType">
+                      <mat-option value="default">Auto ({{tableInfo.types[i].default.simpleName}})</mat-option>
+                      <mat-option *ngFor="let type of tableInfo.types[i].types" [value]="type.name">
+                        {{type.simpleName}}
+                      </mat-option>
+                    </mat-select>
+                  </td>
+                  <td>{{column.columnType}} (JDBC: {{column.jdbcType}})</td>
+                  <td>{{column.length}}</td>
+                  <td>{{column.scale}}</td>
+                  <td>{{column.nullable}}</td>
+                </tr>
+              </table>
+            </fieldset>
+            <div><portofino-buttons [component]="this" list="table"></portofino-buttons></div>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              {{'Foreign keys and selection providers'|translate}}
+            </ng-template>
+            <fieldset>
+              <legend>{{'Foreign keys'|translate}}</legend>
+              <table>
+                <tr>
+                  <th>{{'Name'|translate}}</th>
+                  <th>{{'Property name (one side)'|translate}}</th>
+                  <th>{{'Property name (many side)'|translate}}</th>
+                  <th>{{'Columns'|translate}}</th>
+                  <th>{{'Referenced table'|translate}}</th>
+                  <th>{{'Referenced columns'|translate}}</th>
+                </tr>
+                <tr *ngFor="let fk of tableInfo.table.foreignKey">
+                  <td>{{fk.name}}</td>
+                  <td><input matInput [(ngModel)]="fk.onePropertyName"></td>
+                  <td><input matInput [(ngModel)]="fk.manyPropertyName"></td>
+                  <td>{{getFromColumns(fk)}}</td>
+                  <td>{{getReferencedTableName(fk, tableInfo)}}</td>
+                  <td>{{getToColumns(fk)}}</td>
+                </tr>
+              </table>
+            </fieldset>
+            <fieldset>
+              <legend>{{'Selection providers'|translate}}</legend>
+              <table>
+                <tr>
+                  <th>{{'Name'|translate}}</th>
+                  <th>{{'Columns'|translate}}</th>
+                  <th>{{'Database'|translate}}</th>
+                  <th>{{'Query'|translate}}</th>
+                </tr>
+                <tr *ngFor="let q of tableInfo.table.query">
+                  <td>{{q.name}}</td>
+                  <td>{{getFromColumns(q)}}</td>
+                  <td>{{q.toDatabase}}</td>
+                  <td *ngIf="q.hql"><strong>HQL</strong> {{q.hql}}</td>
+                  <td *ngIf="q.sql"><strong>SQL</strong> {{q.sql}}</td>
+                </tr>
+              </table>
+            </fieldset>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="column">
+      <mat-card-title>{{column.columnName}}</mat-card-title>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>{{'Column name'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.columnName" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Property name'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.propertyName" />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Java Type'|translate}}</mat-label>
+          <mat-select [(ngModel)]="column.javaType" (valueChange)="changeType(column, $event)">
+            <mat-option value="default">Auto ({{tableInfo.types[column.index].default.simpleName}})</mat-option>
+            <mat-option *ngFor="let type of tableInfo.types[column.index].types" [value]="type.name">
+              {{type.simpleName}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Type'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.columnType" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'JDBC Type'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.jdbcType" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Length'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.length" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Scale'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.scale" disabled />
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Nullable'|translate}}</mat-label>
+          <input matInput [(ngModel)]="column.nullable" disabled />
+        </mat-form-field>
+        <fieldset>
+          <legend>{{'Annotations'|translate}}</legend>
+          <portofino-form [form]="annotationsForm" [controls]="annotations"></portofino-form>
+        </fieldset>
+        <div><portofino-buttons [component]="this" list="column"></portofino-buttons></div>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+</mat-tab-group>

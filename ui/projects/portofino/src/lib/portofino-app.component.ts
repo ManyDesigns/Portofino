@@ -14,6 +14,7 @@ import {PortofinoService, SideNavPosition} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
 import {NAVIGATION_COMPONENT} from "./page";
 import {NavigationDirective} from "./content.directive";
+import {PageCrudService} from "./administration/page-crud.service";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 
@@ -36,7 +37,9 @@ export interface ToolbarComponent {
 })
 export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
-  constructor(public authenticationService: AuthenticationService, public portofino: PortofinoService) {}
+  constructor(
+    public authenticationService: AuthenticationService, public portofino: PortofinoService,
+    public pageCrudService: PageCrudService) {}
 }
 
 @Component({
@@ -45,8 +48,6 @@ export class DefaultToolbarComponent implements ToolbarComponent {
   styleUrls: ['./portofino-app.component.css']
 })
 export class PortofinoAppComponent implements OnInit, AfterViewInit {
-
-  static components: any = {};
 
   @Input('appTitle')
   title = 'Portofino';
@@ -72,7 +73,6 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
     }
     if(this.apiRoot) {
       this.portofino.defaultApiRoot = this.apiRoot;
-      this.portofino.localApiPath = null;
     }
     this.portofino.init();
   }
@@ -86,10 +86,4 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
     toolbar.title = this.title;
     this.changeDetector.detectChanges();
   }
-}
-
-export function PortofinoComponent(info: { name: string }) {
-  return function(target) {
-    PortofinoAppComponent.components[info.name] = target;
-  };
 }

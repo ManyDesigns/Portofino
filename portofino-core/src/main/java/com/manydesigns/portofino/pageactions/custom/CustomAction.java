@@ -20,19 +20,13 @@
 
 package com.manydesigns.portofino.pageactions.custom;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.core.Response;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

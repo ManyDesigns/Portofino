@@ -67,12 +67,12 @@ public class MutableClassAccessor extends AbstractAnnotatedAccessor implements C
 
     @Override
     public PropertyAccessor[] getProperties() {
-        return (PropertyAccessor[]) properties.toArray();
+        return properties.toArray(new PropertyAccessor[0]);
     }
 
     @Override
     public PropertyAccessor[] getKeyProperties() {
-        return (PropertyAccessor[]) keyProperties.toArray();
+        return keyProperties.toArray(new PropertyAccessor[0]);
     }
 
     @Override

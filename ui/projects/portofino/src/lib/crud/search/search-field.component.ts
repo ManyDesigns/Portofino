@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Property} from "../../class-accessor";
 import {PortofinoService} from "../../portofino.service";
 import {FormGroup} from "@angular/forms";
+import {debounceTime} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-crud-search-field',
@@ -12,9 +13,10 @@ export class SearchFieldComponent implements OnInit {
 
   @Input()
   property: Property;
-
   @Input()
   form: FormGroup;
+  @Input()
+  debounceTime = 500;
 
   constructor(public portofino: PortofinoService) { }
 
@@ -22,6 +24,19 @@ export class SearchFieldComponent implements OnInit {
     return option ? option.l : null;
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if (this.property.selectionProvider) {
+      if (this.property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
+        const control = this.form.get(this.property.name);
+        control.valueChanges.pipe(debounceTime(this.debounceTime)).subscribe(value => {
+          if (control.dirty && value != null && value.hasOwnProperty("length")) {
+            this.property.selectionProvider.loadOptions(value);
+          }
+        });
+      } else if(this.property.selectionProvider.index == 0) {
+        this.property.selectionProvider.loadOptions();
+      }
+    }
+  }
 
 }

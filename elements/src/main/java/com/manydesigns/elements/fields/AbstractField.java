@@ -75,8 +75,6 @@ public abstract class AbstractField<T> implements Field<T> {
     protected boolean forceNewRow = false;
     protected int colSpan = 1;
     protected String help;
-    @NotNull
-    protected String fieldCssClass;
 
     protected List<String> errors = new ArrayList<String>();
 
@@ -166,18 +164,17 @@ public abstract class AbstractField<T> implements Field<T> {
             colSpan = accessor.getAnnotation(ColSpan.class).value();
             logger.debug("ColSpan annotation present with value: " + colSpan);
         }
-
-        if (accessor.isAnnotationPresent(CssClass.class)) {
-            String[] cssClasses = accessor.getAnnotation(CssClass.class).value();
-            fieldCssClass = StringUtils.join(cssClasses, " ");
-        } else {
-            fieldCssClass = "";
-        }
     }
 
     //**************************************************************************
     // Implementation of Element
     //**************************************************************************
+
+
+    @Override
+    public String getName() {
+        return getPropertyAccessor().getName();
+    }
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (isReadOnly()) {
@@ -226,7 +223,6 @@ public abstract class AbstractField<T> implements Field<T> {
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
-        xb.addAttribute("class", INPUT_CONTAINER_CSS_CLASS + " " + fieldCssClass);
     }
 
     public boolean isValid() {
@@ -334,7 +330,7 @@ public abstract class AbstractField<T> implements Field<T> {
         if(value instanceof String) {
             setStringValue((String) value);
         } else {
-            setValue(maybeConvertValue(value));
+                setValue(maybeConvertValue(value));
         }
     }
 
@@ -445,14 +441,6 @@ public abstract class AbstractField<T> implements Field<T> {
 
     public boolean hasRequiredFields() {
         return required && !isReadOnly();
-    }
-
-    public @NotNull String getFieldCssClass() {
-        return fieldCssClass;
-    }
-
-    public void setFieldCssClass(@NotNull String fieldCssClass) {
-        this.fieldCssClass = fieldCssClass;
     }
 
     public boolean isEnabled() {

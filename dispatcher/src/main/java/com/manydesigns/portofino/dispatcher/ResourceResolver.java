@@ -34,11 +34,11 @@ public interface ResourceResolver {
     boolean supports(Class<?> type);
     
     boolean supports(String extension);
-    
+
     FileObject resolve(FileObject location) throws FileSystemException;
-    
+
     FileObject resolve(FileObject location, String name) throws FileSystemException;
-    
+
     <T> T resolve(FileObject location, Class<T> type) throws Exception;
 
     <T> T resolve(FileObject location, String name, Class<T> type) throws Exception;

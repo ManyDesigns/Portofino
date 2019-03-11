@@ -1,9 +1,40 @@
 import {ValidatorFn, Validators} from "@angular/forms";
+import {map} from "rxjs/operators";
+
+export const loadClassAccessor = map((c: ClassAccessor) => {
+  if(!c) {
+    return c;
+  }
+  if(c.initSelectionProviders) {
+    c.initSelectionProviders();
+    return c;
+  } else {
+    return ClassAccessor.create(c);
+  }
+});
 
 export class ClassAccessor {
   name: string;
   properties: Property[];
   keyProperties: string[];
+
+  initSelectionProviders() {
+    this.properties.forEach(p => {
+      const select = getAnnotation(p, "com.manydesigns.elements.annotations.Select");
+      if (select) {
+        p.selectionProvider = Object.assign(new SelectionProvider(), {displayMode: select.properties.displayMode});
+        for (let i in select.properties.values) {
+          p.selectionProvider.options.push({v: select.properties.values[i], l: select.properties.labels[i], s: false});
+        }
+      }
+    });
+  }
+
+  static create(values: ClassAccessor | any): ClassAccessor {
+    const ca = Object.assign(new ClassAccessor(), values);
+    ca.initSelectionProviders();
+    return ca;
+  }
 }
 
 export class Property {
@@ -18,16 +49,53 @@ export class Property {
   }
 
   editable: boolean;
-  selectionProvider: any;
+  selectionProvider: SelectionProvider;
 
   static create(values: Property | any): Property {
     return Object.assign(new Property(), values)
+  }
+
+  required(value: boolean = true): Property {
+    const annotation = getAnnotation(this, ANNOTATION_REQUIRED);
+    if(annotation) {
+      annotation.properties.value = value;
+    } else {
+      this.annotations.push(new Annotation(ANNOTATION_REQUIRED, {value: value}));
+    }
+    return this;
+  }
+
+  withSelectionProvider(sp: SelectionProvider | any) {
+    this.selectionProvider = Object.assign(new SelectionProvider(), sp);
+    return this;
   }
 }
 
 export class Annotation {
   type: string;
-  properties: object[];
+  properties: any;
+
+constructor(type?: string, properties?: any) {
+    this.type = type;
+    this.properties = properties;
+  }
+}
+
+export class SelectionProvider {
+  name?: string;
+  index: number = 0;
+  displayMode: string = "DROPDOWN";
+  url?: string;
+  nextProperty?: string;
+  updateDependentOptions: () => void = () => {};
+  loadOptions: (value?: string) => void = () => {};
+  options: SelectionOption[] = [];
+}
+
+export class SelectionOption {
+  v: string;
+  l: string;
+  s: boolean;
 }
 
 export const ANNOTATION_REQUIRED = "com.manydesigns.elements.annotations.Required";
@@ -57,37 +125,37 @@ export function isDateProperty(property: Property) {
 export function isEnabled(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Enabled");
   //By default, properties are enabled
-  return !annotation || annotation.properties["value"];
+  return !annotation || annotation.properties.value;
 }
 
 export function isUpdatable(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Updatable");
-  return annotation && annotation.properties["value"];
+  return annotation && annotation.properties.value;
 }
 
 export function isInsertable(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Insertable");
-  return annotation && annotation.properties["value"];
+  return annotation && annotation.properties.value;
 }
 
 export function isSearchable(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Searchable");
-  return annotation && annotation.properties["value"];
+  return annotation && annotation.properties.value;
 }
 
 export function isInSummary(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.InSummary");
-  return annotation && annotation.properties["value"];
+  return annotation && annotation.properties.value;
 }
 
 export function isRequired(property: Property) {
   const annotation = getAnnotation(property, ANNOTATION_REQUIRED);
-  return annotation && annotation.properties["value"];
+  return annotation && annotation.properties.value;
 }
 
 export function isMultiline(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.Multiline");
-  return annotation && annotation.properties["value"];
+  return annotation && annotation.properties.value;
 }
 
 export function isPassword(property: Property) {
@@ -97,7 +165,7 @@ export function isPassword(property: Property) {
 
 export function isRichText(property: Property) {
   const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.RichText");
-  return annotation && annotation.properties["value"];
+  return annotation && annotation.properties.value;
 }
 
 export function isBlob(property: Property) {
@@ -132,19 +200,19 @@ export function getValidators(property: Property): ValidatorFn[] {
   }
   const maxLength = getAnnotation(property, "com.manydesigns.elements.annotations.MaxLength");
   if (maxLength) {
-    validators.push(Validators.maxLength(maxLength.properties["value"]));
+    validators.push(Validators.maxLength(maxLength.properties.value));
   }
   const maxValue =
     getAnnotation(property, "com.manydesigns.elements.annotations.MaxDecimalValue") ||
     getAnnotation(property, "com.manydesigns.elements.annotations.MaxIntValue");
   if (maxValue) {
-    validators.push(Validators.max(maxValue.properties["value"]));
+    validators.push(Validators.max(maxValue.properties.value));
   }
   const minValue =
     getAnnotation(property, "com.manydesigns.elements.annotations.MinDecimalValue") ||
     getAnnotation(property, "com.manydesigns.elements.annotations.MinIntValue");
   if (minValue) {
-    validators.push(Validators.max(minValue.properties["value"]));
+    validators.push(Validators.max(minValue.properties.value));
   }
   return validators;
 }

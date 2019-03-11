@@ -1,12 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {PortofinoComponent} from "../portofino-app.component";
+import {Component, Input, OnInit, Optional} from '@angular/core';
+import {PortofinoComponent} from "../page.factory";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
 import {FormControl} from "@angular/forms";
-import {MatSnackBar} from "@angular/material";
 import {Operation, Page, PageConfiguration} from "../page";
 import {AuthenticationService} from "../security/authentication.service";
-import {Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 
@@ -29,10 +28,9 @@ export class ManyToManyComponent extends Page {
 
   readonly associationsPath = "/:availableAssociations";
 
-  constructor(
-    public http: HttpClient, public portofino: PortofinoService, protected router: Router,
-    public authenticationService: AuthenticationService, protected notificationService: NotificationService) {
-    super(portofino, http, router, authenticationService);
+  constructor(http: HttpClient, portofino: PortofinoService, router: Router, @Optional() route: ActivatedRoute,
+              authenticationService: AuthenticationService, protected notificationService: NotificationService) {
+    super(portofino, http, router, route, authenticationService);
   }
 
   initialize() {

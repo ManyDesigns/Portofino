@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@Deprecated
 public class ButtonInfo {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";

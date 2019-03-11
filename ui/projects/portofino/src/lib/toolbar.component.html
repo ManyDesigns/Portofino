@@ -7,7 +7,34 @@
     {{ title }}
   </div>
   <div>
-    <portofino-language-selector *ngIf="portofino.languageKeys.length > 1"></portofino-language-selector>
+    <ng-container *ngIf="authenticationService.isAdmin">
+      <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
+        <a mat-menu-item routerLink="/portofino-upstairs">
+          <mat-icon>settings</mat-icon>
+          {{ 'Upstairs' | translate }}
+        </a>
+        <ng-container *ngIf="pageCrudService.available">
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="pageCrudService.showCreatePageDialog()">
+            <mat-icon>add</mat-icon>
+            {{ 'Add page' | translate }}
+          </button>
+          <button mat-menu-item (click)="pageCrudService.confirmDeletePage()">
+            <mat-icon>delete</mat-icon>
+            {{ 'Delete page' | translate }}
+          </button>
+          <button mat-menu-item (click)="pageCrudService.showMovePageDialog()">
+            <mat-icon>forward</mat-icon>
+            {{ 'Move page' | translate }}
+          </button>
+        </ng-container>
+      </mat-menu>
+      <button mat-button [matMenuTriggerFor]="adminMenu">
+        <mat-icon>more_vert</mat-icon>
+        {{ 'Administration' | translate }}
+      </button>
+    </ng-container>
+    <portofino-language-selector *ngIf="portofino.locales.length > 1"></portofino-language-selector>
     <ng-container *ngIf="authenticationService.currentUser">
       <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
         <button mat-menu-item (click)="authenticationService.logout()">

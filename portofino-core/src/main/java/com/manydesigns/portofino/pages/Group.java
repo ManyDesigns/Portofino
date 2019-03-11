@@ -20,6 +20,9 @@
 
 package com.manydesigns.portofino.pages;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.apache.commons.lang.StringUtils;
 
@@ -69,6 +72,7 @@ public class Group {
     //**************************************************************************
 
     @XmlElement(name = "permission", type = String.class)
+    @JsonProperty("permissions")
     public Set<String> getPermissions() {
         return permissions;
     }
@@ -91,7 +95,12 @@ public class Group {
         this.accessLevel = accessLevel;
     }
 
+    @JsonProperty
     public AccessLevel getActualAccessLevel() {
         return actualAccessLevel;
+    }
+
+    public void setActualAccessLevel(AccessLevel actualAccessLevel) {
+        this.actualAccessLevel = actualAccessLevel;
     }
 }

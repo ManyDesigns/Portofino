@@ -24,7 +24,6 @@ public class PortofinoSpringConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
     public static final String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
     public static final String APPLICATION_DIRECTORY = "applicationDirectory";
-    public static final String TEMPORARY_BLOB_MANAGER = "temporaryBlobManager";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
 
     protected ServletContext servletContext;
@@ -53,17 +52,6 @@ public class PortofinoSpringConfiguration {
     @Autowired
     public void setServletContext(ServletContext servletContext) {
         this.servletContext = servletContext;
-    }
-
-    @Bean(name = TEMPORARY_BLOB_MANAGER)
-    public BlobManager getTemporaryBlobManager(@Autowired ServletContext servletContext) {
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        String tmdDirName = servletContext.getContextPath().replace("/", "-");
-        File tempBlobsDir = new File(tmpDir, "portofino-blobs" + tmdDirName);
-        logger.info("Temporary blobs directory: " + tempBlobsDir.getAbsolutePath());
-        String metaFilenamePattern = "blob-{0}.properties";
-        String dataFilenamePattern = "blob-{0}.data";
-        return new HierarchicalBlobManager(tempBlobsDir, metaFilenamePattern, dataFilenamePattern);
     }
 
     @Bean(name = DEFAULT_BLOB_MANAGER)

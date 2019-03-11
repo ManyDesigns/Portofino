@@ -28,7 +28,7 @@ export abstract class FieldComponent implements OnInit {
 
   constructor(@Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer) {}
 
-  isRequired() {
+  get required() {
     return isRequired(this.property);
   }
 

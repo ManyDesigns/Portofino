@@ -24,6 +24,8 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SearchDisplayMode;
 
+import java.util.Collection;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -34,24 +36,9 @@ public class CrudSelectionProviderEdit {
     public static final String copyright =
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
-    @Updatable(false)
-    public String columns;
-
-    @Select(nullOption = false)
-    public String selectionProvider;
-
-    @Select(nullOption = false)
-    @Required
-    public DisplayMode displayMode;
-
-    @Select(nullOption = false)
-    @Required
-    public SearchDisplayMode searchDisplayMode;
-
-    @InSummary(false) //Per non includere in TableForm
+    public String selectionProviderName;
+    public String displayModeName;
+    public String searchDisplayModeName;
     public String[] fieldNames;
-
-    public String createNewHref;
-
-    public String createNewText;
+    public Collection<String> availableSelectionProviders;
 }

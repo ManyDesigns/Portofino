@@ -53,10 +53,10 @@ public class Permissions {
     //**************************************************************************
 
     public Permissions() {
-        groups = new ArrayList<Group>();
+        groups = new ArrayList<>();
 
-        actualLevels = new HashMap<String, AccessLevel>();
-        actualPermissions = new HashMap<String, Set<String>>();
+        actualLevels = new HashMap<>();
+        actualPermissions = new HashMap<>();
     }
 
     public void init() {

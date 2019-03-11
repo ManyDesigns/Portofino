@@ -1,11 +1,29 @@
-<mat-form-field [formGroup]="form">
+<mat-form-field [formGroup]="form" *ngIf="isDateOnly()">
   <mat-label>{{property.label}}</mat-label>
-  <input *ngIf="isDateOnly()"
-         matInput [formControlName]="property.name" [required]="isRequired()" [matDatepicker]="datepicker">
-  <mat-datepicker-toggle *ngIf="isDateOnly()" matSuffix [for]="datepicker"></mat-datepicker-toggle>
+  <input matInput [formControlName]="property.name" [required]="required" [matDatepicker]="datepicker">
+  <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
   <mat-datepicker #datepicker></mat-datepicker>
-  <input *ngIf="!isDateOnly()" matInput [formControlName]="property.name" [required]="isRequired()"
-         dateTimeField [dateFormat]="dateFormat">
+  <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
+    {{ '_ is required.' | translate:{ label: property.label } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('date-format')" class="alert alert-danger">
+    {{ 'Invalid date, _ expected.' | translate:{ dateFormat: control.getError('date-format') } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
+    <ng-container *ngFor="let error of control.getError('server-side')">
+      {{error}}<br />
+    </ng-container>
+  </mat-error>
+  <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
+</mat-form-field>
+<mat-form-field [formGroup]="form" *ngIf="!isDateOnly()">
+  <mat-label>{{property.label}}</mat-label>
+  <!-- bare input field -->
+  <!-- <input matInput [formControlName]="property.name" [required]="isRequired()" dateTimeField [dateFormat]="dateFormat"> -->
+  <!-- mat datetime picker -->
+  <mat-datetimepicker-toggle matSuffix [for]="datetimepicker"></mat-datetimepicker-toggle>
+  <mat-datetimepicker #datetimepicker type="datetime" openOnFocus="true"></mat-datetimepicker>
+  <input matInput [formControlName]="property.name" [required]="required" [matDatetimepicker]="datetimepicker">
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
     {{ '_ is required.' | translate:{ label: property.label } }}
   </mat-error>

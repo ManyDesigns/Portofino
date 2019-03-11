@@ -74,7 +74,7 @@ public class UpstairsModule implements Module {
 
     @PostConstruct
     public void init() {
-        FileObject fileObject = null;
+        FileObject fileObject;
         try {
             fileObject = VFS.getManager().resolveFile("res:com/manydesigns/portofino/upstairs/actions");
         } catch (FileSystemException e) {

@@ -43,16 +43,16 @@ public class Root extends AbstractResource {
 
     protected ResourceResolver resourceResolver;
     
-    public static Root get(FileObject location, ResourceResolver resourceResolver) throws Exception {
+    public static Resource get(FileObject location, ResourceResolver resourceResolver) throws Exception {
         if(!location.exists() || location.getType() != FileType.FOLDER) {
             throw new FileNotFolderException(location);
         }
-        Root root;
+        Resource root;
         Class rootClass = resourceResolver.resolve(location, Class.class);
         if(rootClass != null) {
-            if (Root.class.isAssignableFrom(rootClass)) {
+            if (Resource.class.isAssignableFrom(rootClass)) {
                 Constructor constructor = rootClass.getConstructor(FileObject.class, ResourceResolver.class);
-                root = (Root) constructor.newInstance(location, resourceResolver);
+                root = (Resource) constructor.newInstance(location, resourceResolver);
             } else {
                 logger.warn(rootClass + " defined in " + location + " does not extend Root, ignoring");
                 root = new Root(location, resourceResolver);

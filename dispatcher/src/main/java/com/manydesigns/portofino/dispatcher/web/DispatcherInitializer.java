@@ -2,6 +2,7 @@ package com.manydesigns.portofino.dispatcher.web;
 
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
+import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.configuration.WritableCompositeConfiguration;
@@ -141,7 +142,7 @@ public class DispatcherInitializer implements ServletContextListener {
         addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver", codeBase, true);
     }
 
-    protected Root getRoot(FileObject actionsDirectory, ResourceResolvers resourceResolver) throws Exception {
+    protected Resource getRoot(FileObject actionsDirectory, ResourceResolvers resourceResolver) throws Exception {
         return Root.get(actionsDirectory, resourceResolver);
     }
 

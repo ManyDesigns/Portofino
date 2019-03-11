@@ -143,15 +143,16 @@ public abstract class LoginAction extends AbstractPageAction {
 
     @Path("{sessionId}")
     @DELETE
+    @Deprecated
     public void logout(@PathParam("sessionId") String sessionId) {
+        logout();
+    }
+
+    @DELETE
+    public void logout() {
         Subject subject = SecurityUtils.getSubject();
-        Session session = subject.getSession(false);
-        if(session != null && session.getId().equals(sessionId)) {
-            subject.logout();
-            logger.info("User logout");
-        } else {
-            logger.debug("Unnecessary call to logout");
-        }
+        subject.logout();
+        logger.info("User logout");
     }
 
     //**************************************************************************

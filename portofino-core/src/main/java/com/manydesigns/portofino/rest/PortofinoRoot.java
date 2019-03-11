@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
@@ -28,37 +29,33 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class PortofinoRoot extends Root implements PageAction {
+public class PortofinoRoot extends AbstractPageAction {
 
     @Context
     protected ServletContext servletContext;
-
     @Context
     protected HttpServletResponse response;
 
-    @Context
-    protected UriInfo uriInfo;
-
-    @Autowired
-    public Configuration portofinoConfiguration;
-
-    protected ActionContext context;
-    protected PageInstance pageInstance;
+    protected ResourceResolver resourceResolver;
 
     protected static final ConcurrentMap<String, FileObject> children = new ConcurrentHashMap<>();
 
     protected PortofinoRoot(FileObject location, ResourceResolver resourceResolver) {
-        super(location, resourceResolver);
+        setLocation(location);
+        this.resourceResolver = resourceResolver;
     }
 
     public static PortofinoRoot get(FileObject location, ResourceResolver resourceResolver) throws Exception {
-        Root root = Root.get(location, resourceResolver);
+        Resource root = Root.get(location, resourceResolver);
         if (!(root instanceof PortofinoRoot)) {
             if(!root.getClass().equals(Root.class)) {
                 logger.warn(root + " defined in " + location + " does not extend PortofinoRoot, ignoring");
@@ -84,14 +81,6 @@ public class PortofinoRoot extends Root implements PageAction {
     }
 
     @Override
-    protected void initSubResource(Resource resource) {
-        super.initSubResource(resource);
-        if(resource instanceof PageAction) {
-            AbstractPageAction.initPageAction((PageAction) resource, getPageInstance(), uriInfo);
-        }
-    }
-
-    @Override
     public PortofinoRoot init() {
         super.init();
         Page rootPage = PageLogic.getPage(location);
@@ -106,29 +95,6 @@ public class PortofinoRoot extends Root implements PageAction {
         setContext(context);
         return this;
     }
-
-    @Override
-    public ActionContext getContext() {
-        return context;
-    }
-
-    @Override
-    public void setContext(ActionContext context) {
-        this.context = context;
-    }
-
-    @Override
-    public PageInstance getPageInstance() {
-        return pageInstance;
-    }
-
-    @Override
-    public void setPageInstance(PageInstance pageInstance) {
-        this.pageInstance = pageInstance;
-    }
-
-    @Override
-    public void prepareForExecution() {}
 
     @Override
     public PageAction getParent() {
@@ -177,7 +143,35 @@ public class PortofinoRoot extends Root implements PageAction {
         description.put("page", pageInstance.getPage());
         description.put("path", getPath());
         description.put("children", getSubResources());
-        description.put("loginPath", portofinoConfiguration.getString("login.path"));
+        description.put("loginPath", portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH));
         return description;
     }
+
+    @Override
+    public void setParent(Resource parent) {
+        throw new UnsupportedOperationException("Cannot set the parent of the root");
+    }
+
+    @Override
+    public String getPath() {
+        return "";
+    }
+
+    @Override
+    public ResourceResolver getResourceResolver() {
+        return resourceResolver;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response homeJSON() throws URISyntaxException {
+        return Response.temporaryRedirect(new URI("swagger.json")).build();
+    }
+
+    @GET
+    @Produces("application/yaml")
+    public Response homeYAML() throws URISyntaxException {
+        return Response.temporaryRedirect(new URI("swagger.yaml")).build();
+    }
+
 }

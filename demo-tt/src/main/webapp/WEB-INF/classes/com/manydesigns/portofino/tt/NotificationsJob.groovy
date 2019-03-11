@@ -39,7 +39,6 @@ import com.manydesigns.mail.queue.model.Recipient
 import com.manydesigns.mail.queue.model.Recipient.Type
 import com.manydesigns.mail.setup.MailProperties
 import com.manydesigns.portofino.i18n.I18nUtils
-import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
 import org.apache.commons.configuration.Configuration

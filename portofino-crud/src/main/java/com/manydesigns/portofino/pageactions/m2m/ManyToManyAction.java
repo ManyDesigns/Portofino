@@ -122,7 +122,7 @@ public class ManyToManyAction extends AbstractPageAction {
     public Persistence persistence;
 
     public Response preparePage() {
-        if(!pageInstance.getParameters().isEmpty()) {
+        if(!parameters.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         m2mConfiguration = (ManyToManyConfiguration) pageInstance.getConfiguration();
@@ -340,9 +340,7 @@ public class ManyToManyAction extends AbstractPageAction {
         }
     }*/
 
-    @Override
     protected void prepareConfigurationForms() {
-        super.prepareConfigurationForms();
         FormBuilder formBuilder = new FormBuilder(ConfigurationForm.class);
         if(m2mConfiguration != null && m2mConfiguration.getActualRelationTable() != null) {
             formBuilder.configFields(

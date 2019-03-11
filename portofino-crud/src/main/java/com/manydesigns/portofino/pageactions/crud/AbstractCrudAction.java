@@ -23,15 +23,16 @@ package com.manydesigns.portofino.pageactions.crud;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.fields.*;
-import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.RequestMessages;
-import com.manydesigns.elements.options.*;
+import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
@@ -43,8 +44,6 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.buttons.ButtonInfo;
-import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -53,11 +52,9 @@ import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
@@ -67,7 +64,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.shiro.SecurityUtils;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,8 +81,10 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.*;
-import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -122,7 +120,6 @@ import java.util.regex.Pattern;
  * the corresponding primary key). As any other page, crud pages can have children, and they always prevail over
  * the object key: a crud page with a child named &quot;child&quot; will never attempt to load an object with key
  * &quot;child&quot;.</p>
- * <!-- TODO popup mode -->
  *
  * @param <T> the types of objects that this crud can handle.
  *
@@ -213,20 +210,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.TEMPORARY_BLOB_MANAGER)
-    protected BlobManager temporaryBlobManager;
-
     //--------------------------------------------------------------------------
     // Configuration
     //--------------------------------------------------------------------------
 
     public CrudConfiguration crudConfiguration;
     public Form crudConfigurationForm;
-    public TableForm propertiesTableForm;
-    public CrudPropertyEdit[] propertyEdits;
     public TableForm selectionProvidersForm;
-    public CrudSelectionProviderEdit[] selectionProviderEdits;
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -300,11 +290,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public Response jsonSearchData() throws JSONException {
         executeSearch();
-
         final long totalRecords = getTotalSearchRecords();
 
-        setupTableForm(Mode.VIEW);
-        BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
         JSONStringer js = new JSONStringer();
         js.object()
                 .key("recordsReturned")
@@ -369,14 +356,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         setupForm(Mode.VIEW);
         form.readFromObject(object);
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        refreshBlobDownloadHref();
-        String jsonText = FormUtil.writeToJson(form);
-        String prettyName = safeGetPrettyName();
-        return Response.ok(jsonText)
-                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
-                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
-                .build();
+        return jsonFormData();
     }
 
     public Response jsonEditData() throws JSONException {
@@ -384,18 +364,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
         preEdit();
-        BlobUtils.loadBlobs(form, getBlobManager(), false);
-        refreshBlobDownloadHref();
-        String jsonText = FormUtil.writeToJson(form);
-        String prettyName = safeGetPrettyName();
-        return Response.ok(jsonText)
-                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
-                .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
-                .build();
+        return jsonFormData();
     }
 
     public Response jsonCreateData() throws JSONException {
         preCreate();
+        return jsonFormData();
+    }
+
+    public Response jsonFormData() {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         String jsonText = FormUtil.writeToJson(form);
@@ -418,7 +395,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         }
     }
-
 
     //**************************************************************************
     // Form handling
@@ -456,28 +432,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return Whitelist.basic();
     }
 
-    //**************************************************************************
-    // Create/Save
-    //**************************************************************************
-
     protected void preCreate() {
         setupForm(Mode.CREATE);
         object = (T) classAccessor.newInstance();
         createSetup(object);
         form.readFromObject(object);
     }
-
-    protected void saveTemporaryBlobs() {
-        try {
-            BlobUtils.saveBlobs(form, getTemporaryBlobManager());
-        } catch (IOException e1) {
-            logger.warn("Could not save temporary blobs", e1);
-        }
-    }
-
-    //**************************************************************************
-    // Edit/Update
-    //**************************************************************************
 
     protected void preEdit() {
         setupForm(Mode.EDIT);
@@ -506,19 +466,20 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    //**************************************************************************
-    // Bulk Edit/Update
-    //**************************************************************************
-
     public boolean isBulkOperationsEnabled() {
         return object == null;
     }
 
-    //**************************************************************************
-    // Delete
-    //**************************************************************************
+    @Override
+    public List describeOperations() {
+        List operations = super.describeOperations();
+        Map<String, String> bulkOperations = new HashMap<>();
+        bulkOperations.put("name", "Bulk operations");
+        bulkOperations.put("available", String.valueOf(isBulkOperationsEnabled()));
+        return operations;
+    }
 
-   //**************************************************************************
+    //**************************************************************************
     // Hooks/scripting
     //**************************************************************************
 
@@ -656,16 +617,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             object = loadObjectByPrimaryKey(pkObject);
             if(object != null) {
                 ognlContext.put(crudConfiguration.getActualVariable(), object);
-                String title = getReadTitle();
-                pageInstance.setTitle(title);
-                pageInstance.setDescription(title);
             } else {
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
-        } else {
-            String title = getSearchTitle();
-            pageInstance.setTitle(title);
-            pageInstance.setDescription(title);
         }
     }
 
@@ -942,45 +896,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(tableForm.getRows().length > 0 && isTableFormSelectable());
         tableForm.setCondensed(true);
 
         return tableForm;
     }
-
-    public Boolean isTableFormSelectable() {
-        List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass(getClass(), "crud-bulk");
-        Boolean selectable = false ;
-        if(buttons == null) {
-            logger.trace("buttons == null");
-        } else {
-            logger.trace("There are " + buttons.size() + " buttons");
-            for(ButtonInfo button : buttons) {
-                logger.trace("ButtonInfo: {}", button);
-                Method handler = button.getMethod();
-                boolean isAdmin = SecurityLogic.isAdministrator(context.getRequest());
-                if(!isAdmin &&
-                        ((pageInstance != null && !SecurityLogic.hasPermissions(
-                                portofinoConfiguration, button.getMethod(), button.getFallbackClass(), pageInstance, SecurityUtils.getSubject())) ||
-                                !SecurityLogic.satisfiesRequiresAdministrator(context.getRequest(), this, handler))) {
-                    continue;
-                }
-
-                if( ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE)
-                        && ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED)
-                        ) {
-                    logger.trace("Visible " + button.getButton().key());
-                    logger.trace("Guards passed");
-                    selectable = true ;
-                    break;
-                } else {
-                    logger.trace("Guards do not pass");
-                }
-            }
-        }
-        return selectable;
-    }
-
 
     protected TableFormBuilder createTableFormBuilder() {
         return new TableFormBuilder(classAccessor);
@@ -1190,10 +1109,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             inputStream = blob.getInputStream();
         }
         StreamingOutput streamingOutput = output -> {
-            try {
-                IOUtils.copyLarge(inputStream, output);
-            } finally {
-                IOUtils.closeQuietly(inputStream);
+            try(InputStream i = inputStream) {
+                IOUtils.copyLarge(i, output);
             }
         };
         Response.ResponseBuilder responseBuilder = Response.ok(streamingOutput).
@@ -1282,10 +1199,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return blobManager;
     }
 
-    public BlobManager getTemporaryBlobManager() {
-        return temporaryBlobManager;
-    }
-
     /**
      * Removes all the file blobs associated with the object from the file system.
      * @param object the persistent object.
@@ -1340,47 +1253,42 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Configuration
     //**************************************************************************
 
-/*    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution configure() {
-        prepareConfigurationForms();
-
-        crudConfigurationForm.readFromObject(crudConfiguration);
-        if(propertyEdits != null) {
-            propertiesTableForm.readFromObject(propertyEdits);
-        }
-
-        if(selectionProviderEdits != null) {
-            selectionProvidersForm.readFromObject(selectionProviderEdits);
-        }
-
-        return getConfigurationView();
-    }
-*/
-    @Override
-    protected void prepareConfigurationForms() {
-        super.prepareConfigurationForms();
-
-        setupPropertyEdits();
-
-        if(propertyEdits != null) {
-            TableFormBuilder tableFormBuilder =
-                    new TableFormBuilder(CrudPropertyEdit.class)
-                        .configNRows(propertyEdits.length);
-            propertiesTableForm = tableFormBuilder.build();
-            propertiesTableForm.setCondensed(true);
-        }
-
-        if(selectionProviderSupport != null) {
-            Map<List<String>, Collection<String>> selectionProviderNames =
-                    selectionProviderSupport.getAvailableSelectionProviderNames();
-            if(!selectionProviderNames.isEmpty()) {
-                setupSelectionProviderEdits();
-                setupSelectionProvidersForm(selectionProviderNames);
+    @GET
+    @Path(":allSelectionProviders")
+    @Produces(MediaType.APPLICATION_JSON)
+    public CrudSelectionProviderEdit[] getAllSelectionProviders() {
+        Map<List<String>, Collection<String>> availableSelectionProviders =
+                selectionProviderSupport.getAvailableSelectionProviderNames();
+        CrudSelectionProviderEdit[] selectionProviderEdits =
+                new CrudSelectionProviderEdit[availableSelectionProviders.size()];
+        int i = 0;
+        for(Map.Entry<List<String>, Collection<String>> entry : availableSelectionProviders.entrySet()) {
+            CrudSelectionProviderEdit selectionProviderEdit = new CrudSelectionProviderEdit();
+            selectionProviderEdits[i] = selectionProviderEdit;
+            String[] fieldNames = entry.getKey().toArray(new String[entry.getKey().size()]);
+            selectionProviderEdit.fieldNames = fieldNames;
+            selectionProviderEdit.availableSelectionProviders = entry.getValue();
+            selectionProviderEdit.displayModeName = DisplayMode.DROPDOWN.name();
+            selectionProviderEdit.searchDisplayModeName = SearchDisplayMode.DROPDOWN.name();
+            for(CrudSelectionProvider cp : selectionProviderSupport.getCrudSelectionProviders()) {
+                if(Arrays.equals(cp.fieldNames, fieldNames)) {
+                    SelectionProvider selectionProvider = cp.getSelectionProvider();
+                    if(selectionProvider != null) {
+                        selectionProviderEdit.selectionProviderName = selectionProvider.getName();
+                        DisplayMode displayMode = selectionProvider.getDisplayMode();
+                        if(displayMode != null) {
+                            selectionProviderEdit.displayModeName = displayMode.name();
+                        }
+                        SearchDisplayMode searchDisplayMode = selectionProvider.getSearchDisplayMode();
+                        if(searchDisplayMode != null) {
+                            selectionProviderEdit.searchDisplayModeName = searchDisplayMode.name();
+                        }
+                    }
+                }
             }
+            i++;
         }
-
-        buildConfigurationForm();
+        return selectionProviderEdits;
     }
 
     protected void buildConfigurationForm() {
@@ -1390,181 +1298,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void setupConfigurationForm(FormBuilder formBuilder) {}
-
-    protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
-        TableFormBuilder tableFormBuilder = new TableFormBuilder(CrudSelectionProviderEdit.class);
-        tableFormBuilder.configNRows(selectionProviderNames.size());
-        for(int i = 0; i < selectionProviderEdits.length; i++) {
-            Collection<String> availableProviders =
-                    selectionProviderNames.get(Arrays.asList(selectionProviderEdits[i].fieldNames));
-            if(availableProviders == null || availableProviders.size() == 0) {
-                continue;
-            }
-            DefaultSelectionProvider selectionProvider =
-                    new DefaultSelectionProvider(selectionProviderEdits[i].columns);
-            selectionProvider.appendRow(null, "None", true);
-            for(String spName : availableProviders) {
-                selectionProvider.appendRow(spName, spName, true);
-            }
-            tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
-        }
-        selectionProvidersForm = tableFormBuilder.build();
-        selectionProvidersForm.setCondensed(true);
-    }
-
-    protected void setupPropertyEdits() {
-        if(classAccessor == null) {
-            return;
-        }
-        PropertyAccessor[] propertyAccessors = classAccessor.getProperties();
-        propertyEdits = new CrudPropertyEdit[propertyAccessors.length];
-        for (int i = 0; i < propertyAccessors.length; i++) {
-            CrudPropertyEdit edit = new CrudPropertyEdit();
-            PropertyAccessor propertyAccessor = propertyAccessors[i];
-            edit.name = propertyAccessor.getName();
-            com.manydesigns.elements.annotations.Label labelAnn =
-                    propertyAccessor.getAnnotation(com.manydesigns.elements.annotations.Label.class);
-            edit.label = labelAnn != null ? labelAnn.value() : null;
-            Enabled enabledAnn = propertyAccessor.getAnnotation(Enabled.class);
-            edit.enabled = enabledAnn != null && enabledAnn.value();
-            InSummary inSummaryAnn = propertyAccessor.getAnnotation(InSummary.class);
-            edit.inSummary = inSummaryAnn != null && inSummaryAnn.value();
-            Insertable insertableAnn = propertyAccessor.getAnnotation(Insertable.class);
-            edit.insertable = insertableAnn != null && insertableAnn.value();
-            Updatable updatableAnn = propertyAccessor.getAnnotation(Updatable.class);
-            edit.updatable = updatableAnn != null && updatableAnn.value();
-            Searchable searchableAnn = propertyAccessor.getAnnotation(Searchable.class);
-            edit.searchable = searchableAnn != null && searchableAnn.value();
-            propertyEdits[i] = edit;
-        }
-    }
-
-    protected void setupSelectionProviderEdits() {
-        Map<List<String>, Collection<String>> availableSelectionProviders =
-                selectionProviderSupport.getAvailableSelectionProviderNames();
-        selectionProviderEdits = new CrudSelectionProviderEdit[availableSelectionProviders.size()];
-        int i = 0;
-        for(List<String> key : availableSelectionProviders.keySet()) {
-            selectionProviderEdits[i] = new CrudSelectionProviderEdit();
-            String[] fieldNames = key.toArray(new String[key.size()]);
-            selectionProviderEdits[i].fieldNames = fieldNames;
-            selectionProviderEdits[i].columns = StringUtils.join(fieldNames, ", ");
-            for(CrudSelectionProvider cp : selectionProviderSupport.getCrudSelectionProviders()) {
-                if(Arrays.equals(cp.fieldNames, fieldNames)) {
-                    SelectionProvider selectionProvider = cp.getSelectionProvider();
-                    if(selectionProvider != null) {
-                        selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
-                        selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
-                        selectionProviderEdits[i].searchDisplayMode = selectionProvider.getSearchDisplayMode();
-                        selectionProviderEdits[i].createNewHref = selectionProvider.getCreateNewValueHref();
-                        selectionProviderEdits[i].createNewText = selectionProvider.getCreateNewValueText();
-                    } else {
-                        selectionProviderEdits[i].selectionProvider = null;
-                        selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;
-                        selectionProviderEdits[i].searchDisplayMode = SearchDisplayMode.DROPDOWN;
-                    }
-                }
-            }
-            i++;
-        }
-    }
-
-    /*@Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution updateConfiguration() {
-        prepareConfigurationForms();
-
-        crudConfigurationForm.readFromObject(crudConfiguration);
-
-        readPageConfigurationFromRequest();
-
-        crudConfigurationForm.readFromRequest(context.getRequest());
-
-        boolean valid = crudConfigurationForm.validate();
-        valid = validatePageConfiguration() && valid;
-
-        if(propertiesTableForm != null) {
-            propertiesTableForm.readFromObject(propertyEdits);
-            propertiesTableForm.readFromRequest(context.getRequest());
-            valid = propertiesTableForm.validate() && valid;
-        }
-
-        if(selectionProvidersForm != null) {
-            selectionProvidersForm.readFromRequest(context.getRequest());
-            valid = selectionProvidersForm.validate() && valid;
-        }
-
-        if (valid) {
-            updatePageConfiguration();
-            if(crudConfiguration == null) {
-                crudConfiguration = new CrudConfiguration();
-            }
-            crudConfigurationForm.writeToObject(crudConfiguration);
-
-            if(propertiesTableForm != null) {
-                updateProperties();
-            }
-
-            if(selectionProviderSupport != null &&
-               !selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
-                updateSelectionProviders();
-            }
-
-            saveConfiguration(crudConfiguration);
-
-            RequestMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
-            return cancel();
-        } else {
-            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
-            return getConfigurationView();
-        }
-    }
-
-    protected void updateSelectionProviders() {
-        selectionProvidersForm.writeToObject(selectionProviderEdits);
-        selectionProviderSupport.clearSelectionProviders();
-        for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
-            List<String> key = Arrays.asList(sp.fieldNames);
-            if(sp.selectionProvider == null) {
-                selectionProviderSupport.disableSelectionProvider(key);
-            } else {
-                selectionProviderSupport.configureSelectionProvider(
-                        key, sp.selectionProvider, sp.displayMode, sp.searchDisplayMode,
-                        StringUtils.trimToNull(sp.createNewHref), sp.createNewText);
-            }
-        }
-    }
-
-    protected void updateProperties() {
-        propertiesTableForm.writeToObject(propertyEdits);
-
-        List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
-        List<CrudProperty> properties = crudConfiguration.getProperties();
-        for (CrudPropertyEdit edit : propertyEdits) {
-            CrudProperty crudProperty = findProperty(edit.name, properties);
-            if(crudProperty == null) {
-                crudProperty = new CrudProperty();
-                properties.add(crudProperty);
-            }
-
-            crudProperty.setName(edit.name);
-            crudProperty.setLabel(edit.label);
-            crudProperty.setInSummary(edit.inSummary);
-            crudProperty.setSearchable(edit.searchable);
-            crudProperty.setEnabled(edit.enabled);
-            crudProperty.setInsertable(edit.insertable);
-            crudProperty.setUpdatable(edit.updatable);
-
-            newProperties.add(crudProperty);
-        }
-        Iterator<CrudProperty> propertyIterator = properties.iterator();
-        while (propertyIterator.hasNext()) {
-            CrudProperty property = propertyIterator.next();
-            if(!(property instanceof VirtualCrudProperty) && !newProperties.contains(property)) {
-                propertyIterator.remove();
-            }
-        }
-    }*/
 
     public boolean isRequiredFieldsPresent() {
         return form.isRequiredFieldsPresent();
@@ -1675,7 +1408,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @GET
-    @Path(":selectionProviders")
+    @Path(":selectionProviders") //For Portofino 4 compatibility
+    @Produces(MediaType.APPLICATION_JSON)
+    public List legacySelectionProviders() {
+        return selectionProviders();
+    }
+
+    @GET
+    @Path(":selectionProvider")
     @Produces(MediaType.APPLICATION_JSON)
     @SuppressWarnings("unchecked")
     public List selectionProviders() {
@@ -1704,21 +1444,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected String getUrlEncoding() {
         return portofinoConfiguration.getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
-    }
-
-    /**
-     * Searches in a list of properties for a property with a given name.
-     * @param name the name of the properties.
-     * @param properties the list to search.
-     * @return the property with the given name, or null if it couldn't be found.
-     */
-    protected CrudProperty findProperty(String name, List<CrudProperty> properties) {
-        for(CrudProperty p : properties) {
-            if(p.getName().equals(name)) {
-                return p;
-            }
-        }
-        return null;
     }
 
     /**
@@ -2185,44 +1910,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Accessors
     //--------------------------------------------------------------------------
 
-    public String getReadTitle() {
-        String title = crudConfiguration.getReadTitle();
-        if(StringUtils.isEmpty(title)) {
-            return ShortNameUtils.getName(getClassAccessor(), object);
-        } else {
-            OgnlTextFormat textFormat = OgnlTextFormat.create(title);
-            return textFormat.format(this);
-        }
-    }
-
-    public String getSearchTitle() {
-        String title = crudConfiguration.getSearchTitle();
-        if(StringUtils.isBlank(title)) {
-            title = getPage().getTitle();
-        }
-        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-        return textFormat.format(this);
-    }
-
-    public String getEditTitle() {
-        String title = crudConfiguration.getEditTitle();
-        if(StringUtils.isEmpty(title)) {
-            return ShortNameUtils.getName(getClassAccessor(), object);
-        } else {
-            OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-            return textFormat.format(this);
-        }
-    }
-
-    public String getCreateTitle() {
-        String title = crudConfiguration.getCreateTitle();
-        if(StringUtils.isBlank(title)) {
-            title = getPage().getTitle();
-        }
-        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-        return textFormat.format(this);
-    }
-
     public CrudConfiguration getCrudConfiguration() {
         return crudConfiguration;
     }
@@ -2306,10 +1993,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public void setCrudConfigurationForm(Form crudConfigurationForm) {
         this.crudConfigurationForm = crudConfigurationForm;
-    }
-
-    public TableForm getPropertiesTableForm() {
-        return propertiesTableForm;
     }
 
     public Form getForm() {

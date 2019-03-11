@@ -1,17 +1,22 @@
 <ng-container *ngIf="form">
   <ng-container *ngFor="let content of form.contents" [formGroup]="controls">
-    <ng-container *ngIf="content.hasOwnProperty('property')" >
+    <ng-container *ngIf="isField(content)" >
       <portofino-field [property]="content.property" [type]="content.type"
                        [enabled]="form.editable && content.editable" [selectable]="form.selectableFields"
                        [context]="content.mergeContext({ objectUrl: form.baseUrl })">
       </portofino-field>
     </ng-container>
-    <ng-container *ngIf="content.hasOwnProperty('name') && content.hasOwnProperty('contents')">
+    <ng-container *ngIf="isFieldSet(content)">
       <fieldset>
         <legend>{{content.label}}</legend>
         <portofino-form [form]="content.contents" [controls]="controls.get(content.name)"
                         fxLayout="row wrap" fxLayoutGap="10px grid"></portofino-form> <!-- TODO make configurable -->
       </fieldset>
+    </ng-container>
+    <ng-container *ngIf="isFormList(content)">
+      <portofino-form *ngFor="let form of content.contents; let i = index;"
+                      [form]="form" [controls]="$any(controls.get(content.name)).at(i)"
+                      fxLayout="row wrap" fxLayoutGap="10px grid"></portofino-form> <!-- TODO make configurable -->
     </ng-container>
     <ng-template portofino-dynamic-form-component
                  [name]="content.name" [ngIf]="content.hasOwnProperty('component')"></ng-template>

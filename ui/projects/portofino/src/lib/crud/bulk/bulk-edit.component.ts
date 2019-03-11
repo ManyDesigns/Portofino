@@ -3,7 +3,6 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isBlob, isDateProperty, isUpdatable, Property} from "../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
-import {MatSnackBar} from "@angular/material";
 import {FormComponent} from "../../form";
 import {NotificationService} from "../../notifications/notification.service";
 import {Button} from "../../buttons";

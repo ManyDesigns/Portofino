@@ -36,9 +36,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
     }
     
     @Override
-    public void beforeScan(Reader reader, Swagger swagger) {
-
-    }
+    public void beforeScan(Reader reader, Swagger swagger) {}
 
     @Override
     public void afterScan(Reader reader, Swagger swagger) {
@@ -46,7 +44,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         try {
             //TODO actions should be put in a special "inspection mode" to avoid checks (e.g. not-in-use-case),
             //hitting the DB or services, etc.
-            Root root = rootFactory.createRoot();
+            Resource root = rootFactory.createRoot();
             root.setResourceContext(getResourceContext());
             new DepthFirstVisitor((ResourceVisitor) node -> {
                 try {

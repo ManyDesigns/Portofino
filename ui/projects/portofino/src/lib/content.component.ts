@@ -31,19 +31,22 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
               protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
               public portofino: PortofinoService, protected authenticationService: AuthenticationService) {
     this.pageFactory = new PageFactoryComponent(
-      portofino, http, router, authenticationService, componentFactoryResolver, injector, null);
+      portofino, http, router, route, authenticationService, componentFactoryResolver, injector, null);
   }
 
   ngOnInit() {
     const reload = () => this.reloadPage();
     this.subscriptions.push(this.authenticationService.logins.subscribe(reload));
     this.subscriptions.push(this.authenticationService.logouts.subscribe(reload));
+    this.subscriptions.push(this.pageService.pageLoad.subscribe(page => {
+
+    }));
   }
 
   ngAfterViewInit() {
-    this.subscriptions.push(this.route.url.subscribe(segment => {
+    this.subscriptions.push(this.route.url.subscribe(segments => {
       this.pageService.reset();
-      this.loadPageInPath("", null, segment, 0);
+      this.loadAndDisplayPage(segments);
     }));
   }
 
@@ -59,55 +62,34 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  protected loadPageInPath(path: string, parent: Page, segments: UrlSegment[], index: number) {
-    this.loadPage(path, parent).subscribe(
-      componentRef => {
-        let page = <Page>componentRef.instance;
-        page.baseUrl = '/' + segments.slice(0, index).join('/');
-        page.url = page.baseUrl;
-        for(let i = index; i < segments.length; i++) {
-          let s = segments[i];
-          if (page.consumePathSegment(s.path)) {
-            path += `/${s.path}`;
-            let child = page.getChild(s.path);
-            if(child) {
-              this.loadPageInPath(path, page, segments, i + 1);
-              return;
-            } else {
-              this.pageService.notifyError(`Nonexistent child of ${page.url}: ${s.path}`);
-              return;
-            }
-          } else {
-            page.url += `/${s.path}`;
-          }
-        }
-        //If we arrive here, there are no more children in the URL to process
-        page.initialize();
-        let viewContainerRef = this.contentHost.viewContainerRef;
-        viewContainerRef.clear(); //Remove main component;
-        viewContainerRef.insert(componentRef.hostView);
-        this.pageService.notifyPage(page);
-        page.children.forEach(child => {
-          this.checkAccessibility(page, child);
-        });
-        if(parent) {
-          parent.children.forEach(child => {
-            if(`${parent.path}/${child.path}` != path) {
-              this.checkAccessibility(parent, child);
-            }
-          });
-        }
-      },
-      error => this.handleErrorInLoadingPage(path, error));
+  protected loadAndDisplayPage(segments: UrlSegment[]) {
+    this.pageFactory.load(segments).subscribe(
+      componentRef => { this.displayPage(componentRef); },
+      error => this.pageService.notifyError(error));
   }
 
-  protected loadPage(path: string, parent: Page): Observable<ComponentRef<any>> {
-    return this.pageFactory.loadPageConfiguration(path).pipe(mergeMap(config =>
-      this.pageFactory.create(config, path, parent)));
+  protected displayPage(componentRef: ComponentRef<Page>) {
+    const page = componentRef.instance;
+    page.initialize();
+    let viewContainerRef = this.contentHost.viewContainerRef;
+    viewContainerRef.clear(); //Remove main component;
+    viewContainerRef.insert(componentRef.hostView);
+    this.pageService.notifyPageLoaded(page);
+    page.children.forEach(child => {
+      this.checkAccessibility(page, child);
+    });
+    const parent = page.parent;
+    if (parent) {
+      parent.children.forEach(child => {
+        if (`${parent.path}/${child.path}` != page.path) {
+          this.checkAccessibility(parent, child);
+        }
+      });
+    }
   }
 
   checkAccessibility(parent: Page, child: PageChild) {
-    let dummy = new DummyPage(this.portofino, this.http, this.router, this.authenticationService);
+    let dummy = new DummyPage(this.portofino, this.http, this.router, this.route, this.authenticationService);
     dummy.parent = parent;
     dummy.loadPageConfiguration(`${parent.path}/${child.path}`).pipe(mergeMap(config => {
       dummy.configuration = config;
@@ -115,16 +97,6 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
     })).subscribe(flag => child.accessible = flag);
   }
 
-  private handleErrorInLoadingPage(path, error) {
-    this.pageService.notifyError(error);
-  }
-
 }
 
-class DummyPage extends Page {
-  constructor(
-    public portofino: PortofinoService, public http: HttpClient, protected router: Router,
-    public authenticationService: AuthenticationService) {
-    super(portofino, http, router, authenticationService);
-  }
-}
+class DummyPage extends Page {}

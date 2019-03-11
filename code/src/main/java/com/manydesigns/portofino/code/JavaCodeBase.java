@@ -183,19 +183,21 @@ public class JavaCodeBase implements CodeBase {
 
         @Override
         protected Class<?> findClass(String name) throws ClassNotFoundException {
-            InputStream inputStream = null;
-            try {
-                if(fileObject.getType() == FileType.FILE) {
-                    inputStream = fileObject.getContent().getInputStream();
-                } else {
-                    inputStream = fileObject.resolveFile(classNameToPath(name) + ".class").getContent().getInputStream();
+            synchronized (fileObject) {
+                InputStream inputStream = null;
+                try {
+                    if (fileObject.getType() == FileType.FILE) {
+                        inputStream = fileObject.getContent().getInputStream();
+                    } else {
+                        inputStream = fileObject.resolveFile(classNameToPath(name) + ".class").getContent().getInputStream();
+                    }
+                    byte[] code = IOUtils.toByteArray(inputStream);
+                    return defineClass(name, code);
+                } catch (Exception e) {
+                    throw new ClassNotFoundException(name, e);
+                } finally {
+                    IOUtils.closeQuietly(inputStream);
                 }
-                byte[] code = IOUtils.toByteArray(inputStream);
-                return defineClass(name, code);
-            } catch (Exception e) {
-                throw new ClassNotFoundException(name, e);
-            } finally {
-                IOUtils.closeQuietly(inputStream);
             }
         }
 

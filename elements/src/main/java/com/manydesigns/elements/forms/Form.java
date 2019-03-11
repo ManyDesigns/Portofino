@@ -20,11 +20,15 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -80,6 +84,14 @@ public class Form extends AbstractCompositeElement<FieldSet> {
         for (FieldSet current : this) {
             current.writeTo(accessor);
         }
+    }
+
+    public Map<String, Object> getValue() {
+        Map<String, Object> value = new HashMap<>();
+        for (FieldSet current : this) {
+            value.put(current.getName(), current.getValue());
+        }
+        return value;
     }
 
 }

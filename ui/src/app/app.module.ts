@@ -35,6 +35,10 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
+import {registerLocaleData} from "@angular/common";
+import localeIt from "@angular/common/locales/it";
+
+registerLocaleData(localeIt);
 
 @Component({
   selector: 'portofino-hello',

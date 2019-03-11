@@ -6,12 +6,11 @@ import {
   isBlob, isBooleanProperty,
   isDateProperty,
   isEnabled,
-  Property
+  Property, SelectionOption
 } from "../class-accessor";
-import moment from 'moment-es6';
+import moment from 'moment-with-locales-es6';
 import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
-import {debounceTime} from "rxjs/operators";
-import {BlobFile, Configuration, SelectionOption, SelectionProvider} from "./crud.common";
+import {BlobFile, Configuration, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
 import {Field, Form, FormComponent} from "../form";
 import {NotificationService} from "../notifications/notification.service";
@@ -128,6 +127,9 @@ export abstract class BaseDetailComponent implements WithButtons {
               this.loadSelectionOptions(this.properties.find(p => p.name == nextProperty));
             }
           },
+          loadOptions: value => {
+            this.loadSelectionOptions(property, value);
+          },
           options: []
         };
         const control = this.form.get(property.name);
@@ -135,15 +137,6 @@ export abstract class BaseDetailComponent implements WithButtons {
           const value = this.object[property.name];
           if (value && value.value != null) {
             control.setValue({v: value.value, l: value.displayValue});
-          }
-          if (property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
-            control.valueChanges.pipe(debounceTime(500)).subscribe(value => {
-              if (control.dirty && value != null && value.hasOwnProperty("length")) {
-                this.loadSelectionOptions(property, value);
-              }
-            });
-          } else if (index == 0) {
-            this.loadSelectionOptions(property);
           }
         }
         if (index < sp.fieldNames.length - 1) {
@@ -160,17 +153,17 @@ export abstract class BaseDetailComponent implements WithButtons {
       if(autocomplete) {
         params = params.set(`labelSearch`, autocomplete);
       } else {
-        this.setSelectOptions(property, []);
+        this.setSelectionOptions(property, []);
         return;
       }
     }
     this.http.get<SelectionOption[]>(url, { params: params }).subscribe(
       options => {
-        this.setSelectOptions(property, options);
+        this.setSelectionOptions(property, options);
       });
   }
 
-  protected setSelectOptions(property: Property, options) {
+  protected setSelectionOptions(property: Property, options: SelectionOption[]) {
     property.selectionProvider.options = options;
     this.clearDependentSelectionValues(property);
     let selected = options.find(o => o.s);

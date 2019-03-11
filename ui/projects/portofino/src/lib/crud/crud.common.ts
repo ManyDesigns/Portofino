@@ -1,3 +1,5 @@
+import {SelectionOption} from "../class-accessor";
+
 export class Configuration {
   rowsPerPage: number;
 }
@@ -8,12 +10,6 @@ export class SelectionProvider {
   displayMode: string;
   searchDisplayMode: string;
   options: SelectionOption[];
-}
-
-export class SelectionOption {
-  v: string;
-  l: string;
-  s: boolean;
 }
 
 export class BlobFile {

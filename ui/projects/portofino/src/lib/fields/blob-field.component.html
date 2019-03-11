@@ -16,7 +16,7 @@
         <span>{{ "No file selected" | translate }}</span>
       </ng-template>
       <ng-container *ngIf="enabled">
-        <input #input type="file" [formControl]="control" [required]="isRequired() && !control.value">
+        <input #input type="file" [formControl]="control" [required]="required && !control.value">
       </ng-container>
       <span class="mat-form-field-label-wrapper">
         <label class="mat-form-field-label">{{property.label}}</label>

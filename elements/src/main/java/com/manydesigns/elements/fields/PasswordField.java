@@ -143,7 +143,6 @@ public class PasswordField extends TextField {
                 }
                 xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CSS_CLASS);
                 xb.openElement("div");
-                xb.addAttribute("class", INPUT_CONTAINER_CSS_CLASS + " " + fieldCssClass);
                 // print out confirmation input field
                 valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
             }

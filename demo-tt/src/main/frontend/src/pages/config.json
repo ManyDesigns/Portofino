@@ -1,7 +1,6 @@
 {
-  "title": "Projects",
-  "type": "crud",
-  "children": [],
-  "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": false }],
-  "source": "projects"
+  "title": "Home",
+  "type": "welcome",
+  "children": [{"path": "projects", "title": "Projects", "embedded": false, "showInNavigation": true }],
+  "source": ""
 }

@@ -34,7 +34,6 @@ import com.manydesigns.elements.forms.FieldSet
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.reflection.PropertyAccessor
 import com.manydesigns.elements.xml.XhtmlBuffer
-import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
 import com.sksamuel.diffpatch.DiffMatchPatch
 import com.sksamuel.diffpatch.DiffMatchPatch.Diff
 import org.apache.commons.lang.ObjectUtils

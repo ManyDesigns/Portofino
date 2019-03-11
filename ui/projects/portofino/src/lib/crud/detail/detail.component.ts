@@ -6,6 +6,7 @@ import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../page";
 import {NotificationService} from "../../notifications/notification.service";
 import {Button} from "../../buttons";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -28,7 +29,8 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   constructor(
     protected http: HttpClient, protected portofino: PortofinoService,
-    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService) {
+    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService,
+    protected translateService: TranslateService) {
     super(http, portofino, changeDetector, notificationService);
   }
 
@@ -51,6 +53,8 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     this.http.get(objectUrl, {params: {forEdit: "true"}, observe: 'response'}).subscribe(resp => {
       this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
       this.setupForm(resp.body);
+    }, () => {
+      this.translateService.get("Not found").subscribe(t => this.prettyName = t);
     });
     this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
       this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
@@ -92,13 +96,12 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   }
 
   static isEditButtonEnabled(self: DetailComponent) {
-    return !self.editMode && self.editEnabled;
+    return !self.editMode && self.editEnabled && self.object;
   }
 
   static isDeleteButtonEnabled(self: DetailComponent) {
-    return !self.editMode && self.deleteEnabled;
+    return !self.editMode && self.deleteEnabled && self.object;
   }
-
 
   save() {
     if(!this.editMode) {

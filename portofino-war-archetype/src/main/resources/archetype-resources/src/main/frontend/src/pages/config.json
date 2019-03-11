@@ -1,6 +1,6 @@
 {
   "title": "Welcome",
-  "type": "welcome",
+  "type": "crud",
   "children": [],
   "source": "/"
 }

@@ -1,7 +1,7 @@
 <ng-container *ngIf="property.selectionProvider; else simple">
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'DROPDOWN'" [formGroup]="form">
     <mat-select [formControlName]="property.name" [placeholder]="property.label"
-                (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
+                (selectionChange)="property.selectionProvider.updateDependentOptions()">
       <mat-option [value]="null" *ngIf="property.selectionProvider.options.length > 0"></mat-option>
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
@@ -19,7 +19,7 @@
   <ng-container *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
     <label>{{property.label}}</label>
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
-                     (change)="property.selectionProvider.updateDependentOptions(property)">
+                     (change)="property.selectionProvider.updateDependentOptions()">
       <mat-radio-button *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
       </mat-radio-button>
@@ -27,7 +27,7 @@
   </ng-container>
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'MULTIPLESELECT'" [formGroup]="form">
     <mat-select [formControlName]="property.name" [placeholder]="property.label" [multiple]="true"
-                (selectionChange)="property.selectionProvider.updateDependentOptions(property)">
+                (selectionChange)="property.selectionProvider.updateDependentOptions()">
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
       </mat-option>

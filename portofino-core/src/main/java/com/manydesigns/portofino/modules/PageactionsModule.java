@@ -26,12 +26,11 @@ import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.pages.PageLogic;
-import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.form.FormAction;
 import com.manydesigns.portofino.pageactions.form.TableFormAction;
-import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
+import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
+import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -176,15 +175,13 @@ public class PageactionsModule implements Module, ApplicationContextAware {
     }
 
     @Bean
-    public PageActionRegistry getPageActionRegistry() {
+    public ActionRegistry getPageActionRegistry() {
         logger.debug("Creating pageactions registry");
-        PageActionRegistry pageActionRegistry = new PageActionRegistry();
-        pageActionRegistry.register(ActivityStreamAction.class);
-        pageActionRegistry.register(CustomAction.class);
-        pageActionRegistry.register(FormAction.class);
-        pageActionRegistry.register(TableFormAction.class);
-        //pageActionRegistry.register(TextAction.class);
-        return pageActionRegistry;
+        ActionRegistry actionRegistry = new ActionRegistry();
+        actionRegistry.register(CustomAction.class);
+        actionRegistry.register(FormAction.class);
+        actionRegistry.register(TableFormAction.class);
+        return actionRegistry;
     }
 
     protected void preloadPageActions(File directory) {

@@ -96,10 +96,10 @@ public class PageLogic {
         if(!pageFile.exists()) {
             pageFile.createFile();
         }
-        OutputStream outputStream = pageFile.getContent().getOutputStream();
-        marshaller.marshal(page, outputStream);
-        pageCache.invalidate(pageFile);
-        IOUtils.closeQuietly(outputStream);
+        try(OutputStream outputStream = pageFile.getContent().getOutputStream()) {
+            marshaller.marshal(page, outputStream);
+            pageCache.invalidate(pageFile);
+        }
         return pageFile;
     }
 
@@ -269,17 +269,14 @@ public class PageLogic {
     }
 
     protected static FileObject getPageFile(FileObject directory) throws FileSystemException {
-        return directory.getChild("page.xml");
+        return directory.resolveFile("page.xml");
     }
 
     public static Page loadPage(FileObject key) throws Exception {
-        InputStream fileInputStream = key.getContent().getInputStream();
-        try {
+        try(InputStream fileInputStream = key.getContent().getInputStream()) {
             Page page = loadPage(fileInputStream);
             page.init();
             return page;
-        } finally {
-            IOUtils.closeQuietly(fileInputStream);
         }
     }
 
@@ -308,11 +305,14 @@ public class PageLogic {
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        FileObject configurationFile = directory.getChild("configuration.xml");
-        OutputStream outputStream = configurationFile.getContent().getOutputStream();
-        marshaller.marshal(configuration, outputStream);
-        configurationCache.invalidate(configurationFile);
-        IOUtils.closeQuietly(outputStream);
+        FileObject configurationFile = directory.resolveFile("configuration.xml");
+        if(!configurationFile.exists()) {
+            configurationFile.createFile();
+        }
+        try(OutputStream outputStream = configurationFile.getContent().getOutputStream()) {
+            marshaller.marshal(configuration, outputStream);
+            configurationCache.invalidate(configurationFile);
+        }
         return configurationFile;
     }
 
