@@ -15,7 +15,7 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderDetail;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderSummary;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
-import com.manydesigns.portofino.upstairs.actions.database.connections.support.TableInfo;
+import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.json.JSONArray;
 import org.json.JSONObject;
