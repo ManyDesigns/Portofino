@@ -227,21 +227,21 @@
             <mat-label>{{'Users table' | translate}}</mat-label>
             <mat-select [(ngModel)]="wizard.usersTable">
               <mat-option></mat-option>
-              <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table.table">{{tableName(table.table)}}</mat-option>
+              <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field>
             <mat-label>{{'Groups table' | translate}}</mat-label>
             <mat-select [(ngModel)]="wizard.groupsTable">
               <mat-option></mat-option>
-              <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table.table">{{tableName(table.table)}}</mat-option>
+              <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
             </mat-select>
           </mat-form-field>
           <mat-form-field>
             <mat-label>{{'User-group link table' | translate}}</mat-label>
             <mat-select [(ngModel)]="wizard.userGroupTable">
               <mat-option></mat-option>
-              <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table.table">{{tableName(table.table)}}</mat-option>
+              <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
             </mat-select>
           </mat-form-field>
         </fieldset>
@@ -252,47 +252,47 @@
               <mat-label>{{'User id property' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.userIdProperty" required name="userIdProperty">
                 <mat-option></mat-option>
-                <mat-option *ngFor="let c of wizard.usersTable.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+                <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field>
               <mat-label>{{'User name property' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.userNameProperty" required name="userNameProperty">
                 <mat-option></mat-option>
-                <mat-option *ngFor="let c of wizard.usersTable.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+                <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field>
               <mat-label>{{'User password property' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.userPasswordProperty" required name="userPasswordProperty">
                 <mat-option></mat-option>
-                <mat-option *ngFor="let c of wizard.usersTable.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+                <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field>
               <mat-label>{{'Encryption Algorithm' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.encryptionAlgorithm" required name="encryptionAlgorithm">
-                <mat-option value="plaintext:plaintext">{{'Plain text'|translate}}</mat-option>
-                <mat-option value="MD5:base64">{{'MD5 (Base64 encoded)'|translate}}</mat-option>
-                <mat-option value="MD5:hex">{{'MD5 (Hex encoded)'|translate}}</mat-option>
-                <mat-option value="SHA-1:base64">{{'SHA-1 (Base64 encoded)'|translate}}</mat-option>
-                <mat-option value="SHA-1:hex">{{'SHA-1 (Hex encoded)'|translate}}</mat-option>
                 <mat-option value="SHA-256:base64">{{'SHA-256 (Base64 encoded)'|translate}}</mat-option>
                 <mat-option value="SHA-256:hex">{{'SHA-256 (Hex encoded)'|translate}}</mat-option>
+                <mat-option value="SHA-1:base64">{{'SHA-1 (Base64 encoded)'|translate}}</mat-option>
+                <mat-option value="SHA-1:hex">{{'SHA-1 (Hex encoded)'|translate}}</mat-option>
+                <mat-option value="MD5:base64">{{'MD5 (Base64 encoded)'|translate}}</mat-option>
+                <mat-option value="MD5:hex">{{'MD5 (Hex encoded)'|translate}}</mat-option>
+                <mat-option value="plaintext:plaintext">{{'Plain text'|translate}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field>
               <mat-label>{{'Email property' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.userEmailProperty" name="userEmailProperty">
                 <mat-option></mat-option>
-                <mat-option *ngFor="let c of wizard.usersTable.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+                <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field>
               <mat-label>{{'Token property' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.userTokenProperty" name="userTokenProperty">
                 <mat-option></mat-option>
-                <mat-option *ngFor="let c of wizard.usersTable.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+                <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
               </mat-select>
             </mat-form-field>
             <ng-container *ngIf="wizard.groupsTable && wizard.userGroupTable">
@@ -301,28 +301,28 @@
                 <mat-label>{{'Group id property' | translate}}</mat-label>
                 <mat-select [(ngModel)]="wizard.groupIdProperty" required name="groupIdProperty">
                   <mat-option></mat-option>
-                  <mat-option *ngFor="let c of wizard.groupsTable.columns" [value]="c">{{c.columnName}}</mat-option>
+                  <mat-option *ngFor="let c of wizard.groupsTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
                 </mat-select>
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{'Group name property' | translate}}</mat-label>
                 <mat-select [(ngModel)]="wizard.groupNameProperty" required name="groupNameProperty">
                   <mat-option></mat-option>
-                  <mat-option *ngFor="let c of wizard.groupsTable.columns" [value]="c">{{c.columnName}}</mat-option>
+                  <mat-option *ngFor="let c of wizard.groupsTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
                 </mat-select>
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{'Group link property' | translate}}</mat-label>
                 <mat-select [(ngModel)]="wizard.groupLinkProperty" required name="groupLinkProperty">
                   <mat-option></mat-option>
-                  <mat-option *ngFor="let c of wizard.userGroupTable.columns" [value]="c">{{c.columnName}}</mat-option>
+                  <mat-option *ngFor="let c of wizard.userGroupTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
                 </mat-select>
               </mat-form-field>
               <mat-form-field>
                 <mat-label>{{'User link property' | translate}}</mat-label>
                 <mat-select [(ngModel)]="wizard.userLinkProperty" required name="userLinkProperty">
                   <mat-option></mat-option>
-                  <mat-option *ngFor="let c of wizard.userGroupTable.columns" [value]="c">{{c.columnName}}</mat-option>
+                  <mat-option *ngFor="let c of wizard.userGroupTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
                 </mat-select>
               </mat-form-field>
               <mat-form-field>
@@ -351,7 +351,7 @@
           </tr>
           <tr *ngFor="let table of wizard.tables">
             <td><mat-checkbox [(ngModel)]="table.selected"></mat-checkbox></td>
-            <td>{{tableName(table.table)}}</td>
+            <td>{{tableName(table)}}</td>
           </tr>
         </table>
         <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>

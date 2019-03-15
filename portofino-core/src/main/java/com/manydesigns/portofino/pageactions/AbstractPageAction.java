@@ -23,6 +23,7 @@ package com.manydesigns.portofino.pageactions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.MimeTypes;
@@ -390,7 +391,7 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
             return true;
         } catch (Exception e) {
             logger.error("Couldn't save configuration", e);
-            SessionMessages.addErrorMessage("error saving conf");
+            RequestMessages.addErrorMessage("error saving conf");
             return false;
         }
     }

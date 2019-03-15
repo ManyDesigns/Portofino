@@ -9,16 +9,21 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.Annotation;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageInstance;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
+import com.manydesigns.portofino.pages.Group;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.PageLogic;
+import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.upstairs.ModuleInfo;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
 import com.manydesigns.portofino.upstairs.actions.support.WizardInfo;
@@ -27,9 +32,12 @@ import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +48,6 @@ import org.springframework.core.io.DefaultResourceLoader;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileWriter;
 import java.sql.*;
@@ -117,7 +124,8 @@ public class UpstairsAction extends AbstractPageAction {
 
     @POST
     @Path("application")
-    public void createApplication(WizardInfo wizard) throws Exception {
+    public List<Map> createApplication(WizardInfo wizard) throws Exception {
+        List<Map> createdPages = new ArrayList<>();
         String strategy = wizard.strategy;
         switch (strategy) {
             case "automatic":
@@ -129,68 +137,102 @@ public class UpstairsAction extends AbstractPageAction {
                     throw new WebApplicationException("The database does not exist: " + databaseName);
                 }
                 TemplateEngine engine = new SimpleTemplateEngine();
-                Template template = engine.createTemplate(UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudPage.groovy"));
+                Template template = engine.createTemplate(
+                        UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudPage.groovy"));
+                String userPasswordColumn = null;
+                Table userTable = getTable(wizard.usersTable);
+                Column usersPasswordProperty = wizard.userPasswordProperty;
+                if(usersPasswordProperty != null) {
+                    userPasswordColumn = usersPasswordProperty.getColumnName();
+                }
+                boolean userCrudCreated = false;
                 for(TableInfo tableInfo : tables) {
                     if(tableInfo.selected) {
                         Table tableRef = tableInfo.table;
                         String tableName = tableRef.getTableName();
-                        Table table = DatabaseLogic.findTableByName(persistence.getModel(), databaseName, tableRef.getSchemaName(), tableName);
+                        Table table = DatabaseLogic.findTableByName(persistence.getModel(), databaseName, tableInfo.schema, tableName);
                         if(table == null) {
                             logger.warn("Table not found: {}", tableRef.getQualifiedName());
                             RequestMessages.addErrorMessage("Table not found: " + tableRef.getQualifiedName());
                             continue;
                         }
+                        if(table == userTable) {
+                            userCrudCreated = true;
+                        }
                         File dir = new File(actionsDirectory, table.getActualEntityName());
-                        //depth = 1;
-                        String userTableName = null, userPasswordColumn = null;
-                        Table usersTable = wizard.usersTable;
-                        if(usersTable != null) {
-                            userTableName = usersTable.getQualifiedName();
-                        }
-                        Column usersPasswordProperty = wizard.userPasswordProperty;
-                        if(usersPasswordProperty != null) {
-                            userPasswordColumn = usersPasswordProperty.getColumnName();
-                        }
-                        createCrudPage(database.getConnectionProvider(), dir, table, template, userTableName, userPasswordColumn);
+                        createCrudPage(database.getConnectionProvider(), dir, table, template, userTable, userPasswordColumn, createdPages);
                     }
                 }
-                /*if(userTable != null) {
-                    setupUserPages(childPages, template);
-                }*/
+                if(userTable != null) {
+                    if(!userCrudCreated) {
+                        File dir = new File(actionsDirectory, userTable.getActualEntityName());
+                        createCrudPage(database.getConnectionProvider(), dir, userTable, template, userTable, userPasswordColumn, createdPages);
+                    }
+                    setupUserPages(database.getConnectionProvider(), template, userTable, createdPages);
+                    try {
+                        String userEmailProperty = getColumnName(wizard.userEmailProperty);
+                        String userTokenProperty = getColumnName(wizard.userTokenProperty);
+                        setupUsers(
+                                database.getConnectionProvider(), userTable, wizard.userIdProperty.getColumnName(),
+                                wizard.userNameProperty.getColumnName(), userPasswordColumn, userEmailProperty,
+                                userTokenProperty, getTable(wizard.groupsTable), getColumnName(wizard.groupIdProperty),
+                                getColumnName(wizard.groupNameProperty), getTable(wizard.userGroupTable),
+                                getColumnName(wizard.groupLinkProperty), getColumnName(wizard.userLinkProperty),
+                                wizard.adminGroupName, wizard.encryptionAlgorithm);
+                    } catch (Exception e) {
+                        logger.error("Couldn't configure users", e);
+                        RequestMessages.addWarningMessage(ElementsThreadLocals.getText("couldnt.set.up.user.management._", e));
+                    }
+                }
                 break;
             case "none":
                 break;
             default:
                 throw new WebApplicationException("Invalid strategy: " + strategy);
         }
+        return createdPages;
     }
 
-    protected void createCrudPage(
+    @Nullable
+    public String getColumnName(Column column) {
+        String userTokenProperty = null;
+        if (column != null) {
+            userTokenProperty = column.getColumnName();
+        }
+        return userTokenProperty;
+    }
+
+    protected Table getTable(TableInfo tableInfo) {
+        if(tableInfo == null) {
+            return null;
+        }
+        return DatabaseLogic.findTableByName(persistence.getModel(), tableInfo.database, tableInfo.schema, tableInfo.table.getTableName());
+    }
+
+    protected Page createCrudPage(
             ConnectionProvider connectionProvider, File dir, Table table, Template template,
-            String userTableName, String userPasswordColumn) throws Exception {
+            Table userTable, String userPasswordColumn, List<Map> createdPages) throws Exception {
         String query = "from " + table.getActualEntityName() + " order by id desc";
         HashMap<String, String> bindings = new HashMap<>();
         bindings.put("parentName", "");
         bindings.put("parentProperty", "nothing");
         bindings.put("linkToParentProperty", NO_LINK_TO_PARENT);
-        createCrudPage(connectionProvider, dir, table, query, template, bindings, userTableName, userPasswordColumn, 1);
+        return createCrudPage(connectionProvider, dir, table, query, template, bindings, userTable, userPasswordColumn, createdPages, 1);
     }
 
-    protected void createCrudPage(
+    protected Page createCrudPage(
             ConnectionProvider connectionProvider,
             File dir, Table table, String query,
-            Template template, Map<String, String> bindings, String userTableName, String userPasswordColumn, int depth)
+            Template template, Map<String, String> bindings, Table userTable, String userPasswordColumn, List<Map> createdPages, int depth)
             throws Exception {
         if(dir.exists()) {
             RequestMessages.addWarningMessage(
                     ElementsThreadLocals.getText("directory.exists.page.not.created._", dir.getAbsolutePath()));
-            return;
         } else if(dir.mkdirs()) {
             logger.info("Creating CRUD page {}", dir.getAbsolutePath());
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(table.getDatabaseName());
             configuration.setupDefaults();
-
             configuration.setQuery(query);
             String variable = table.getActualEntityName();
             configuration.setVariable(variable);
@@ -201,20 +243,12 @@ public class UpstairsAction extends AbstractPageAction {
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
-                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, userTableName, userPasswordColumn);
+                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, userTable, userPasswordColumn);
             }
 
             FileObject directory = VFS.getManager().toFileObject(dir);
             PageLogic.saveConfiguration(directory, configuration);
             Page page = new Page();
-
-            Collection<Reference> references = children.get(table);
-            if(references != null && depth < maxDepth) {
-                for(Reference ref : references) {
-                    createChildCrudPage(dir, template, variable, references, ref, pages, depth);
-                }
-            }
-
             PageLogic.savePage(directory, page);
             File actionFile = new File(dir, "action.groovy");
             try(FileWriter fileWriter = new FileWriter(actionFile)) {
@@ -228,16 +262,102 @@ public class UpstairsAction extends AbstractPageAction {
                 RequestMessages.addWarningMessage(
                         ElementsThreadLocals.getText("couldnt.create.directory", detailDir.getAbsolutePath()));
             }
+
+            String path = dir.getName();
+            File parent = dir.getParentFile();
+            for(int i = 1; i < depth; i++) {
+                path =  parent.getName() + "/" + path;
+                parent = parent.getParentFile().getParentFile(); //two because of _detail
+            }
+            Map<String, String> pageInfo = new HashMap<>();
+            pageInfo.put("path", path);
+            pageInfo.put("type", "crud");
+            pageInfo.put("title", Util.guessToWords(dir.getName()));
+            createdPages.add(pageInfo);
+
+            if(depth < maxDepth) {
+                List<Reference> children = computeChildren(table);
+                for(Reference ref : children) {
+                    createChildCrudPage(connectionProvider, dir, template, variable, children, ref, userTable, userPasswordColumn, createdPages, depth);
+                }
+            }
+            return page;
         } else {
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
             RequestMessages.addWarningMessage(
                     ElementsThreadLocals.getText("couldnt.create.directory", dir.getAbsolutePath()));
         }
+        return null;
+    }
+
+    protected List<Reference> computeChildren(Table table) {
+        List<Reference> children = new ArrayList<>();
+        table.getSchema().getDatabase().getAllTables().forEach(t -> {
+            if(t.equals(table)) {
+                return; //Skip self references
+            }
+            t.getForeignKeys().forEach(f -> {
+                if(f.getToTable().equals(table)) {
+                    children.addAll(f.getReferences());
+                }
+            });
+            t.getSelectionProviders().forEach(p -> {
+                for(Reference ref : p.getReferences()) {
+                    Column column = ref.getActualToColumn();
+                    if(column != null && column.getTable().equals(table)) {
+                        children.add(ref);
+                    }
+                }
+            });
+        });
+        return children;
+    }
+
+    protected void createChildCrudPage(
+            ConnectionProvider connectionProvider,
+            File dir, Template template, String parentName, Collection<Reference> references,
+            Reference ref, Table userTable, String userPasswordColumn, List<Map> createdPages, int depth)
+            throws Exception {
+        Column fromColumn = ref.getActualFromColumn();
+        Table fromTable = fromColumn.getTable();
+        String entityName = fromTable.getActualEntityName();
+        String parentProperty = ref.getActualToColumn().getActualPropertyName();
+        String linkToParentProperty = fromColumn.getActualPropertyName();
+        String childQuery =
+                "from " + entityName +
+                        " where " + linkToParentProperty +
+                        " = %{#" + parentName + "." + parentProperty + "}" +
+                        " order by id desc";
+        String childDirName = entityName;
+        boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
+        if(multipleRoles) {
+            childDirName += "-as-" + linkToParentProperty;
+        }
+        File childDir = new File(new File(dir, PageInstance.DETAIL), childDirName);
+
+        Map<String, String> bindings = new HashMap<>();
+        bindings.put("parentName", parentName);
+        bindings.put("parentProperty", parentProperty);
+        bindings.put("linkToParentProperty", linkToParentProperty);
+
+        createCrudPage(
+                connectionProvider, childDir, fromTable, childQuery, template, bindings, userTable, userPasswordColumn, createdPages, depth + 1);
+    }
+
+    protected boolean isMultipleRoles(Table fromTable, Reference ref, Collection<Reference> references) {
+        boolean multipleRoles = false;
+        for(Reference ref2 : references) {
+            if(ref2 != ref && ref2.getActualFromColumn().getTable().equals(fromTable)) {
+                multipleRoles = true;
+                break;
+            }
+        }
+        return multipleRoles;
     }
 
     protected int setupColumn
             (ConnectionProvider connectionProvider, Column column, CrudConfiguration configuration,
-             int columnsInSummary, String linkToParentProperty, String userTableName, String userPasswordColumn) {
+             int columnsInSummary, String linkToParentProperty, Table userTable, String userPasswordColumn) {
 
         if(column.getActualJavaType() == null) {
             logger.debug("Column without a javaType, skipping: {}", column.getQualifiedName());
@@ -250,9 +370,7 @@ public class UpstairsAction extends AbstractPageAction {
                 !(linkToParentProperty != NO_LINK_TO_PARENT &&
                         column.getActualPropertyName().equals(linkToParentProperty))
                         && !isUnsupportedProperty(column);
-        boolean propertyIsUserPassword =
-                table.getQualifiedName().equals(userTableName) &&
-                column.getColumnName().equals(userPasswordColumn);
+        boolean propertyIsUserPassword = table == userTable && column.getColumnName().equals(userPasswordColumn);
         boolean inPk = DatabaseLogic.isInPk(column);
         boolean inFk = DatabaseLogic.isInFk(column);
         boolean inSummary =
@@ -324,9 +442,7 @@ public class UpstairsAction extends AbstractPageAction {
         if(detectedBooleanColumns.contains(column)) {
             return;
         }
-        if(column.getJdbcType() == Types.INTEGER ||
-                column.getJdbcType() == Types.DECIMAL ||
-                column.getJdbcType() == Types.NUMERIC) {
+        if(column.getJdbcType() == Types.INTEGER || column.getJdbcType() == Types.DECIMAL || column.getJdbcType() == Types.NUMERIC) {
             logger.info(
                     "Detecting whether numeric column " + column.getQualifiedName() + " is boolean by examining " +
                             "its values...");
@@ -337,14 +453,11 @@ public class UpstairsAction extends AbstractPageAction {
             try {
                 connection = connectionProvider.acquireConnection();
                 liquibase.database.Database implementation =
-                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
-                                new JdbcConnection(connection));
+                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
                 String sql =
                         "select count(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
                                 "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-                PreparedStatement statement =
-                        connection.prepareStatement(
-                                sql);
+                PreparedStatement statement = connection.prepareStatement(sql);
                 setQueryTimeout(statement, 1);
                 statement.setMaxRows(1);
                 ResultSet rs = statement.executeQuery();
@@ -362,9 +475,7 @@ public class UpstairsAction extends AbstractPageAction {
                 sql =
                         "select distinct(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
                                 "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-                statement =
-                        connection.prepareStatement(
-                                sql);
+                statement = connection.prepareStatement(sql);
                 setQueryTimeout(statement, 1);
                 statement.setMaxRows(3);
                 rs = statement.executeQuery();
@@ -473,6 +584,100 @@ public class UpstairsAction extends AbstractPageAction {
             return ((Number) object).longValue();
         } else {
             return null;
+        }
+    }
+
+    protected void setupUserPages(
+            ConnectionProvider connectionProvider, Template template, Table userTable, List<Map> createdPages) throws Exception {
+        Configuration conf = portofinoConfiguration;
+        List<Reference> references = computeChildren(userTable);
+        if(references != null) {
+            for(Reference ref : references) {
+                Column fromColumn = ref.getActualFromColumn();
+                Column toColumn = ref.getActualToColumn();
+                Table fromTable = fromColumn.getTable();
+                Table toTable = toColumn.getTable();
+                String entityName = fromTable.getActualEntityName();
+                List<Column> pkColumns = toTable.getPrimaryKey().getColumns();
+                if(!pkColumns.contains(toColumn)) {
+                    continue;
+                }
+                String linkToUserProperty = fromColumn.getActualPropertyName();
+                String childQuery =
+                        "from " + entityName +
+                                " where " + linkToUserProperty +
+                                " = %{#securityUtils.primaryPrincipal.id}" +
+                                " order by id desc";
+                String dirName = "my-" + entityName;
+                boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
+                if(multipleRoles) {
+                    dirName += "-as-" + linkToUserProperty;
+                }
+                File dir = new File(actionsDirectory, dirName);
+
+                Map<String, String> bindings = new HashMap<>();
+                bindings.put("parentName", "securityUtils");
+                bindings.put("parentProperty", "primaryPrincipal.id");
+                bindings.put("linkToParentProperty", linkToUserProperty);
+
+                Page page = createCrudPage(
+                        connectionProvider, dir, fromTable, childQuery, template, bindings, null, null,
+                        createdPages, 1);
+                if(page != null) {
+                    Group group = new Group();
+                    group.setName(SecurityLogic.getAnonymousGroup(conf));
+                    group.setAccessLevel(AccessLevel.DENY.name());
+                    Permissions permissions = new Permissions();
+                    permissions.getGroups().add(group);
+                    page.setPermissions(permissions);
+                    PageLogic.savePage(VFS.getManager().toFileObject(dir), page);
+                }
+            }
+        }
+    }
+
+    protected void setupUsers(
+            ConnectionProvider connectionProvider,
+            Table userTable, String userIdProperty, String userNameProperty, String userPasswordProperty,
+            String userEmailProperty, String userTokenProperty,
+            Table groupTable, String groupIdProperty, String groupNameProperty,
+            Table userGroupTable, String groupLinkProperty, String userLinkProperty, String adminGroupName,
+            String encryptionAlgorithm) throws Exception {
+        TemplateEngine engine = new SimpleTemplateEngine();
+        Template template = engine.createTemplate(
+                UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/Security.groovy"));
+        Map<String, String> bindings = new HashMap<String, String>();
+        bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
+        bindings.put("userTableEntityName", userTable.getActualEntityName());
+        bindings.put("userIdProperty", userIdProperty);
+        bindings.put("userNameProperty", userNameProperty);
+        bindings.put("passwordProperty", userPasswordProperty);
+        bindings.put("userEmailProperty", userEmailProperty);
+        bindings.put("userTokenProperty", userTokenProperty);
+
+        bindings.put("groupTableEntityName", groupTable != null ? groupTable.getActualEntityName() : "");
+        bindings.put("groupIdProperty", StringUtils.defaultString(groupIdProperty));
+        bindings.put("groupNameProperty", StringUtils.defaultString(groupNameProperty));
+
+        bindings.put("userGroupTableEntityName",
+                userGroupTable != null ? userGroupTable.getActualEntityName() : "");
+        bindings.put("groupLinkProperty", StringUtils.defaultString(groupLinkProperty));
+        bindings.put("userLinkProperty", StringUtils.defaultString(userLinkProperty));
+        bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
+
+        bindings.put("hashIterations", "1");
+        String[] algoAndEncoding = encryptionAlgorithm.split(":");
+        bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
+        if(algoAndEncoding[1].equals("plaintext")) {
+            bindings.put("hashFormat", "null");
+        } else if(algoAndEncoding[1].equals("hex")) {
+            bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
+        } else if(algoAndEncoding[1].equals("base64")) {
+            bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
+        }
+        File codeBaseRoot = new File(actionsDirectory.getParentFile(), "classes");
+        try(FileWriter fw = new FileWriter(new File(codeBaseRoot, "Security.groovy"))) {
+            template.make(bindings).writeTo(fw);
         }
     }
 

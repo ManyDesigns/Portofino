@@ -100,12 +100,12 @@ public class Table implements ModelObject, Annotated {
     // DatamodelObject implementation
     //**************************************************************************
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getQualifiedName() {
         if(schema == null || schema.getQualifiedName() == null) {
             return tableName;
         }
-        return MessageFormat.format("{0}.{1}",
-                schema.getQualifiedName(), tableName);
+        return MessageFormat.format("{0}.{1}", schema.getQualifiedName(), tableName);
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
@@ -183,13 +183,11 @@ public class Table implements ModelObject, Annotated {
     }
 
     @Required
-    @JsonProperty
     public String getDatabaseName() {
         return schema.getDatabaseName();
     }
 
     @Required
-    @JsonProperty
     public String getSchemaName() {
         return schema.getSchema();
     }

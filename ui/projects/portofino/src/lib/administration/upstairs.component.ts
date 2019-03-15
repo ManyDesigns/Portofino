@@ -267,7 +267,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     if(this.wizard.schemas && this.wizard.schemas.filter(s => s.selected).length > 1) {
       prefix += `${table.schemaName}.`;
     }
-    return prefix + table.tableName;
+    return prefix + table.table.tableName;
   }
 
   trackByColumnName(index, column) {

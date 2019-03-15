@@ -212,27 +212,23 @@ public class ConnectionsAction extends AbstractPageAction {
                 continue;
             }
 
-            if(!table.getForeignKeys().isEmpty()) {
-                for(ForeignKey fk : table.getForeignKeys()) {
-                    for(Reference ref : fk.getReferences()) {
-                        Column column = ref.getActualToColumn();
-                        if(column.getTable() != table) {
-                            children.put(column.getTable(), ref);
-                            //TODO potrebbe essere un ciclo nel grafo...
-                            tableInfo.root = false;
-                        }
+            for(ForeignKey fk : table.getForeignKeys()) {
+                for(Reference ref : fk.getReferences()) {
+                    Column column = ref.getActualToColumn();
+                    if(column.getTable() != table) {
+                        children.put(column.getTable(), ref);
+                        //TODO potrebbe essere un ciclo nel grafo...
+                        tableInfo.root = false;
                     }
                 }
             }
-            if(!table.getSelectionProviders().isEmpty()) {
-                for(ModelSelectionProvider sp : table.getSelectionProviders()) {
-                    for(Reference ref : sp.getReferences()) {
-                        Column column = ref.getActualToColumn();
-                        if(column != null && column.getTable() != table) {
-                            children.put(column.getTable(), ref);
-                            //TODO potrebbe essere un ciclo nel grafo...
-                            tableInfo.root = false;
-                        }
+            for(ModelSelectionProvider sp : table.getSelectionProviders()) {
+                for(Reference ref : sp.getReferences()) {
+                    Column column = ref.getActualToColumn();
+                    if(column != null && column.getTable() != table) {
+                        children.put(column.getTable(), ref);
+                        //TODO potrebbe essere un ciclo nel grafo...
+                        tableInfo.root = false;
                     }
                 }
             }
