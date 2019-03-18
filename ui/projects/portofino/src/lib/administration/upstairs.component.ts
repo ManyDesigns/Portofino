@@ -6,8 +6,8 @@ import {
 } from "@angular/core";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {Page, PageService} from "../page";
-import {map} from "rxjs/operators";
+import {Page, PageConfiguration, PageService} from "../page";
+import {map, mergeMap} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {Field, Form, FormComponent} from "../form";
@@ -15,7 +15,7 @@ import {ClassAccessor, Property} from "../class-accessor";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
-import {BehaviorSubject, merge, Observable} from "rxjs";
+import {BehaviorSubject, from, merge, Observable} from "rxjs";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {FormGroup} from "@angular/forms";
@@ -315,8 +315,29 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   generateApplication(wizard) {
     const url = `${this.portofino.apiRoot}portofino-upstairs/application`;
-    this.http.post(url, wizard).subscribe(() => {
-      this.notificationService.info(this.translate.instant("Application created."))
+    this.http.post(url, wizard).subscribe((actions: { path: string, type: string, title: string, detail: boolean }[]) => {
+      if(this.portofino.localApiPath) {
+        from(actions).pipe(mergeMap(a => {
+          const segments = a.path.split("/").filter(s => s && (s != "_detail"));
+          let confPath = "/" + segments.join("/");
+          confPath = this.getConfigurationLocation(confPath);
+          const page = new PageConfiguration();
+          page.source = segments[segments.length - 1];
+          page.type = a.type;
+          page.title = a.title;
+          return this.http.post(`${this.portofino.localApiPath}/${confPath}`, page, {
+            params: {
+              childrenProperty: a.detail ? "detailChildren" : "children",
+              loginPath: this.portofino.loginPath
+            }
+          });
+        }, 1)).subscribe( //Note concurrent: 1. It is necessary for calls to be executed sequentially.
+          () => {},
+          error => this.notificationService.info("Error " + error), //TODO describe, I18n
+          () => this.notificationService.info(this.translate.instant("Application created.")));
+      } else {
+        this.notificationService.info(this.translate.instant("Local API not available. Only the application backend has been created."));
+      }
     });
   }
 

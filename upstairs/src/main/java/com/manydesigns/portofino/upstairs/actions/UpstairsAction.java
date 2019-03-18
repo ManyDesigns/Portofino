@@ -264,13 +264,14 @@ public class UpstairsAction extends AbstractPageAction {
             }
 
             String path = dir.getName();
-            File parent = dir.getParentFile();
+            File parent = dir.getParentFile().getParentFile(); //two because of _detail
             for(int i = 1; i < depth; i++) {
-                path =  parent.getName() + "/" + path;
-                parent = parent.getParentFile().getParentFile(); //two because of _detail
+                path =  parent.getName() + "/" + PageInstance.DETAIL + "/" + path;
+                parent = parent.getParentFile().getParentFile();
             }
-            Map<String, String> pageInfo = new HashMap<>();
+            Map<String, Object> pageInfo = new HashMap<>();
             pageInfo.put("path", path);
+            pageInfo.put("detail", true);
             pageInfo.put("type", "crud");
             pageInfo.put("title", Util.guessToWords(dir.getName()));
             createdPages.add(pageInfo);
