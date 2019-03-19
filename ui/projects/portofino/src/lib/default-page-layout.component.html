@@ -54,6 +54,7 @@
         <ng-template mat-tab-label>
           {{'Children'|translate}}
         </ng-template>
+        <mat-error *ngIf="!page.portofino.localApiAvailable">{{'Local API not available.' | translate}}</mat-error>
         <table>
           <tr>
             <th>{{'Segment'|translate}}</th>

@@ -314,6 +314,7 @@ export class PageSettingsPanel {
   show() {
     this.formDefinition.contents = [
       Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration)];
+    this.formDefinition.editable = this.page.portofino.localApiAvailable;
     this.previousConfiguration = this.page.configuration;
     this.reloadConfiguration();
     this.loadPermissions();
@@ -412,7 +413,7 @@ export abstract class Page implements WithButtons, OnDestroy {
       icon: 'arrow_back', text: 'Cancel', list: 'permissions'
     }, this, 'cancelPermissions', null);
     declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'children'
+      color: 'primary', icon: 'save', text: 'Save', list: 'children', enabledIf: () => this.portofino.localApiAvailable
     }, this, 'saveChildren', null);
     declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'children'
@@ -558,26 +559,29 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   saveConfiguration() {
-    if (!this.portofino.localApiAvailable) {
-      throw "Local Portofino API not available"
-    }
-    const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
     const actionConfiguration = this.getActionConfigurationToSave();
-    this.configuration = pageConfiguration;
-    let data = new FormData();
-    data.append("pageConfiguration", JSON.stringify(pageConfiguration));
-    data.append("actionConfiguration", JSON.stringify(actionConfiguration));
     const path = this.getConfigurationLocation(this.path);
-    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
-      params: {
-        actionConfigurationPath: this.configurationUrl,
-        loginPath: this.portofino.loginPath
-      }
-    }).subscribe(
-      () => {
+    if (this.portofino.localApiAvailable) {
+      const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
+      this.configuration = pageConfiguration;
+      let data = new FormData();
+      data.append("pageConfiguration", JSON.stringify(pageConfiguration));
+      data.append("actionConfiguration", JSON.stringify(actionConfiguration));
+      this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
+        params: {
+          actionConfigurationPath: this.configurationUrl,
+          loginPath: this.portofino.loginPath
+        }
+      }).subscribe(() => {
         this.settingsPanel.hide();
         this.reloadBaseUrl();
       });
+    } else {
+      this.http.put(`${this.configurationUrl}`, actionConfiguration).subscribe(() => {
+        this.settingsPanel.hide();
+        this.reloadBaseUrl();
+      });
+    }
   }
 
   cancelConfiguration() {

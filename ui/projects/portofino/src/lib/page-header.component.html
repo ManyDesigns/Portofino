@@ -1,7 +1,7 @@
 <h2 fxLayout="row" fxLayoutAlign="space-between center" class="mat-headline">
   {{page.title}}
   <button mat-icon-button (click)="page.configure()" color="primary"
-          *ngIf="!page.settingsPanel.active && authenticationService.isAdmin && portofino.localApiAvailable">
+          *ngIf="!page.settingsPanel.active && authenticationService.isAdmin">
     <mat-icon>settings</mat-icon>
   </button>
 </h2>
