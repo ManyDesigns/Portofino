@@ -45,34 +45,43 @@ public class Pages extends Resource {
         @QueryParam("actionClass") String actionClass, @QueryParam("actionPath") String actionPath,
         @QueryParam("childrenProperty") String childrenProperty, String pageConfigurationString) {
         checkPathAndAuth(path, auth, loginPath);
-        actionPath = getActionPath(actionPath);
-        Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
-        Response response = request.post(Entity.text(actionClass));
-        if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            saveConfigJson("pages/" + path, pageConfigurationString);
-            ObjectMapper mapper = new ObjectMapper();
-            String configPath = servletContext.getRealPath("pages/" + path);
-            File pageDirectory = new File(configPath).getParentFile();
-            File parentDirectory = pageDirectory.getParentFile();
-            Map<String, Object> parentConfig;
-            File parentConfigFile = new File(parentDirectory, "config.json");
-            try (FileReader fr = new FileReader(parentConfigFile)) {
-                Map pageConfiguration = mapper.readValue(pageConfigurationString, Map.class);
-                String parentConfigString = IOUtils.toString(fr);
-                parentConfig = mapper.readValue(parentConfigString, Map.class);
-                List<Map> children = ensureChildren(parentConfig, childrenProperty);
-                Map<String, Object> child = new HashMap<>();
-                child.put("path", pageDirectory.getName());
-                child.put("title", pageConfiguration.get("title"));
-                child.put("showInNavigation", true);
-                children.add(child);
-            } catch (IOException e) {
-                logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
-                throw new WebApplicationException(e.getMessage(), e);
+        if(actionPath != null && actionClass != null) {
+            actionPath = getActionPath(actionPath);
+            Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
+            Response response = request.post(Entity.text(actionClass));
+            if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+                createPage(path, childrenProperty, pageConfigurationString);
             }
-            writeConfig(mapper, parentConfig, parentConfigFile);
+            return response;
+        } else {
+            createPage(path, childrenProperty, pageConfigurationString);
+            return Response.ok().build();
         }
-        return response;
+    }
+
+    public void createPage(String path, String childrenProperty, String pageConfigurationString) {
+        saveConfigJson("pages/" + path, pageConfigurationString);
+        ObjectMapper mapper = new ObjectMapper();
+        String configPath = servletContext.getRealPath("pages/" + path);
+        File pageDirectory = new File(configPath).getParentFile();
+        File parentDirectory = pageDirectory.getParentFile();
+        Map<String, Object> parentConfig;
+        File parentConfigFile = new File(parentDirectory, "config.json");
+        try (FileReader fr = new FileReader(parentConfigFile)) {
+            Map pageConfiguration = mapper.readValue(pageConfigurationString, Map.class);
+            String parentConfigString = IOUtils.toString(fr);
+            parentConfig = mapper.readValue(parentConfigString, Map.class);
+            List<Map> children = ensureChildren(parentConfig, childrenProperty);
+            Map<String, Object> child = new HashMap<>();
+            child.put("path", pageDirectory.getName());
+            child.put("title", pageConfiguration.get("title"));
+            child.put("showInNavigation", true);
+            children.add(child);
+        } catch (IOException e) {
+            logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
+            throw new WebApplicationException(e.getMessage(), e);
+        }
+        writeConfig(mapper, parentConfig, parentConfigFile);
     }
 
     @NotNull

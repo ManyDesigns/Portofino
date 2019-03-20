@@ -50,6 +50,8 @@ public class CorsServletContainerInitializer implements ServletContainerInitiali
             corsFilter.setInitParameter("cors.allowed.methods", allowedMethods);
             if(!StringUtils.isEmpty(allowedOrigins)) {
                 corsFilter.setInitParameter("cors.allowed.origins", allowedOrigins);
+            } else {
+                corsFilter.setInitParameter("cors.allowed.origins", "*");
             }
             corsFilter.addMappingForUrlPatterns(null, false, "/*");
             corsFilterInstalled = true;

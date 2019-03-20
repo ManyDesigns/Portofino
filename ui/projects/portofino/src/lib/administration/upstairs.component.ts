@@ -6,8 +6,8 @@ import {
 } from "@angular/core";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {Page, PageService} from "../page";
-import {map} from "rxjs/operators";
+import {Page, PageConfiguration, PageService} from "../page";
+import {map, mergeMap} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {Field, Form, FormComponent} from "../form";
@@ -15,7 +15,7 @@ import {ClassAccessor, Property} from "../class-accessor";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
-import {BehaviorSubject, merge, Observable} from "rxjs";
+import {BehaviorSubject, from, merge, Observable} from "rxjs";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {FormGroup} from "@angular/forms";
@@ -45,7 +45,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   annotationsForm: Form;
   readonly annotations = new FormGroup({});
 
-  wizard: { connectionProvider: ConnectionProviderSummary } | any = { newConnectionType: 'jdbc' };
+  wizard: { connectionProvider: ConnectionProviderSummary } | any =
+    { newConnectionType: 'jdbc', strategy: "automatic" };
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, protected pageService: PageService,
@@ -178,7 +179,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   private prepareTableInfo() {
-    this.tableInfo.table.column.forEach(c => {
+    this.tableInfo.table.columns.forEach(c => {
       if (!c.javaType) {
         c.javaType = "default";
       }
@@ -188,7 +189,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   @Button({ list: "table", text: "Save", icon: "save", color: "primary" })
   saveTable() {
     const table = this.tableInfo.table;
-    table.column.forEach(c => {
+    table.columns.forEach(c => {
       if(c.javaType == "default") {
         c.javaType = null;
       }
@@ -260,6 +261,23 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     return prefix + fk.toTable;
   }
 
+  tableName(table) {
+    let prefix = "";
+    //TODO multiple configured databases. Portofino 4 did not display this information.
+    if(this.wizard.schemas && this.wizard.schemas.filter(s => s.selected).length > 1) {
+      prefix += `${table.schemaName}.`;
+    }
+    return prefix + table.table.tableName;
+  }
+
+  trackByColumnName(index, column) {
+    return column.columnName;
+  }
+
+  trackByTableName(index, table) {
+    return table.table.tableName;
+  }
+
   wizardStep(event) {
     if(event.selectedIndex == 1) {
       if(this.wizard.connectionProvider) {
@@ -288,8 +306,39 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       }
     } else if(event.selectedIndex == 2) {
       const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}/schemas`;
-      this.http.put(url, this.wizard.schemas).subscribe(() => {});
+      this.http.put<any[]>(url, this.wizard.schemas).subscribe(tables => {
+        tables.forEach(t => { t.selected = t.root; });
+        this.wizard.tables = tables;
+      });
     }
+  }
+
+  generateApplication(wizard) {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/application`;
+    this.http.post(url, wizard).subscribe((actions: { path: string, type: string, title: string, detail: boolean }[]) => {
+      if(this.portofino.localApiPath) {
+        from(actions).pipe(mergeMap(a => {
+          const segments = a.path.split("/").filter(s => s && (s != "_detail"));
+          let confPath = "/" + segments.join("/");
+          confPath = this.getConfigurationLocation(confPath);
+          const page = new PageConfiguration();
+          page.source = segments[segments.length - 1];
+          page.type = a.type;
+          page.title = a.title;
+          return this.http.post(`${this.portofino.localApiPath}/${confPath}`, page, {
+            params: {
+              childrenProperty: a.detail ? "detailChildren" : "children",
+              loginPath: this.portofino.loginPath
+            }
+          });
+        }, 1)).subscribe( //Note concurrent: 1. It is necessary for calls to be executed sequentially.
+          () => {},
+          error => this.notificationService.info("Error " + error), //TODO describe, I18n
+          () => this.notificationService.info(this.translate.instant("Application created.")));
+      } else {
+        this.notificationService.info(this.translate.instant("Local API not available. Only the application backend has been created."));
+      }
+    });
   }
 
 }

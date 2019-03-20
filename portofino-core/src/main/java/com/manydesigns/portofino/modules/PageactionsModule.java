@@ -96,12 +96,6 @@ public class PageactionsModule implements Module, ApplicationContextAware {
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    public static final String PAGES_DIRECTORY = "PAGES_DIRECTORY";
-
-    //**************************************************************************
     // Logging
     //**************************************************************************
 
@@ -135,7 +129,6 @@ public class PageactionsModule implements Module, ApplicationContextAware {
             logger.info("Preloading Groovy classes");
             preloadClasses(codeBase.getRoot());
         }
-        servletContext.setAttribute(PAGES_DIRECTORY, actionsDirectory);
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
 

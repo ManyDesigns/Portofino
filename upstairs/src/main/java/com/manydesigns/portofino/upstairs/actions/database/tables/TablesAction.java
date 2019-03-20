@@ -205,6 +205,7 @@ public class TablesAction extends AbstractPageAction {
         }
         existing.setEntityName(table.getEntityName());
         existing.setJavaClass(table.getJavaClass());
+        existing.setShortName(table.getShortName());
         for(Column column : table.getColumns()) {
             Column c2 = DatabaseLogic.findColumnByName(existing, column.getColumnName());
             BeanUtils.copyProperties(column, c2);

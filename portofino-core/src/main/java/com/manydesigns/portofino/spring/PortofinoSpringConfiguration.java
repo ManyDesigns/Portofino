@@ -23,6 +23,7 @@ public class PortofinoSpringConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
     public static final String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
+    public static final String ACTIONS_DIRECTORY = "actionsDirectory";
     public static final String APPLICATION_DIRECTORY = "applicationDirectory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
 
@@ -37,6 +38,14 @@ public class PortofinoSpringConfiguration {
     @Bean(name = APPLICATION_DIRECTORY)
     public File getApplicationDirectory() {
         return (File) getServletContext().getAttribute(BaseModule.APPLICATION_DIRECTORY);
+    }
+
+    @Bean(name = ACTIONS_DIRECTORY)
+    public File getApplicationDirectory(
+            @Autowired @Qualifier(PORTOFINO_CONFIGURATION) Configuration configuration,
+            @Autowired @Qualifier(APPLICATION_DIRECTORY) File applicationDirectory) {
+        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
+        return new File(applicationDirectory, actionsDirectory);
     }
 
     @Bean

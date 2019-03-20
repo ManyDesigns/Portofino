@@ -1,3 +1,5 @@
+package com.manydesigns.portofino.upstairs.appwizard
+
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.di.Inject
