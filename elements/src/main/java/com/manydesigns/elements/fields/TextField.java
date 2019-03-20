@@ -29,7 +29,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -192,16 +191,6 @@ public class TextField extends AbstractTextField<String> {
             xb.closeElement("a");
         }
         xb.closeElement("div");
-    }
-
-    public String getDisplayValue() {
-        String escapedText;
-        if(richText) {
-            escapedText = stringValue;
-        } else {
-            escapedText = StringEscapeUtils.escapeHtml(stringValue);
-        }
-        return escapedText;
     }
 
     public String getValue() {

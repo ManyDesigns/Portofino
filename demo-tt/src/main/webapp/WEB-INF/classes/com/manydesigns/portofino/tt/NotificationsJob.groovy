@@ -122,6 +122,8 @@ public class NotificationsJob implements Job {
                 MutableHttpServletResponse response = new MutableHttpServletResponse(stream)
                 response.setCharacterEncoding('UTF-8')
 
+                //TODO
+                return
                 RequestDispatcher requestDispatcher =
                         servletContext.getRequestDispatcher("/jsp/notifications/project-activity.jsp");
                 requestDispatcher.include(request, response);

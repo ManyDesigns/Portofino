@@ -145,7 +145,7 @@ export class PortofinoFormsModule {}
   exports: [
     DefaultPageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
     ContentComponent, PageFactoryComponent, PageHeader,
-    DefaultNavigationComponent, DefaultToolbarComponent]
+    DefaultNavigationComponent, NavigationDirective, DefaultToolbarComponent, ToolbarDirective]
 })
 export class PortofinoPagesModule {}
 
