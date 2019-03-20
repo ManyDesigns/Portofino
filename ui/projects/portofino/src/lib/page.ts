@@ -171,7 +171,7 @@ class PageTreeDataSource {
   }
 }
 
-@Component({
+/*@Component({
   selector: 'portofino-page-source-selector-tree',
   template: `
     <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
@@ -201,7 +201,7 @@ class PageTreeDataSource {
     <button mat-button color="primary" (click)="confirmAndClose()">{{ 'Ok' | translate }}</button>
     <button mat-button (click)="cancelAndClose()">{{ 'Cancel' | translate }}</button>
   `
-})
+})*/
 export class SourceSelectorTree implements OnInit {
   treeControl: FlatTreeControl<PageFlatNode>;
   dataSource: PageTreeDataSource;
@@ -240,10 +240,19 @@ export class SourceSelectorTree implements OnInit {
 
 }
 
-@Component({
+/*@Component({
   selector: 'portofino-page-source-selector',
-  templateUrl: 'source-selector.html'
-})
+  template: `
+    <fieldset [formGroup]="form" fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
+      <legend>{{ 'Data source' | translate }}</legend>
+      <portofino-field [property]="property" [form]="form"></portofino-field>
+      <button mat-flat-button (click)="select()" color="primary" type="button">
+        <mat-icon>folder_open</mat-icon>
+        {{ 'Select' | translate }}
+      </button>
+      <!--<mat-checkbox [formControlName]="'relativeToParent'">{{ 'Relative to parent' | translate }}</mat-checkbox>-->
+    </fieldset>`
+})*/
 export class SourceSelector implements OnInit {
   @Input()
   page: Page;
