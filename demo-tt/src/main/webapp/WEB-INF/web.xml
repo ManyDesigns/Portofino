@@ -28,6 +28,16 @@
         for development on your own machine. The generated war WILL NOT WORK on other machines.
          -->
     </context-param>
+    
+    <context-param>
+        <param-name>cors.allowed.origins</param-name>
+        <param-value>*</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>cors.exposed.headers</param-name>
+        <param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
+    </context-param>
 
     <listener>
         <listener-class>com.manydesigns.portofino.ui.support.BaseHrefReplaceListener</listener-class>
