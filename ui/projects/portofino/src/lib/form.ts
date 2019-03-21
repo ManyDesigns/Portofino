@@ -296,12 +296,12 @@ export class FormComponent implements OnInit, AfterViewInit {
     const selectionProvider = v.property.selectionProvider;
     let initialState = v.initialState;
     const disabled = !this.form.editable || !v.editable;
-    if(initialState.hasOwnProperty("value")) {
+    if(initialState && initialState.hasOwnProperty("value")) {
       initialState = Object.assign({}, initialState, { disabled: disabled });
     } else {
       initialState = { value: initialState, disabled: disabled };
     }
-    if(initialState && selectionProvider && selectionProvider.options && selectionProvider.options.length > 0) {
+    if(initialState.value && selectionProvider && selectionProvider.options && selectionProvider.options.length > 0) {
       const selectedOption = selectionProvider.options.find(o => o.v == initialState.value.v);
       return Object.assign(initialState, { value: selectedOption });
     } else {

@@ -25,15 +25,17 @@
         <ng-template mat-tab-label>
           {{'Permissions'|translate}}
         </ng-template>
-        <table *ngIf="page.settingsPanel.permissions">
-          <tr>
-            <th>{{'Group'|translate}}</th>
-            <th>{{'Access level'|translate}}</th>
-            <th [colSpan]="page.settingsPanel.permissions.permissions.length">{{'Permissions'|translate}}</th>
+        <table *ngIf="page.settingsPanel.permissions" class="mat-table">
+          <tr class="mat-header-row">
+            <th class="mat-header-cell">{{'Group'|translate}}</th>
+            <th class="mat-header-cell">{{'Access level'|translate}}</th>
+            <th [colSpan]="page.settingsPanel.permissions.permissions.length" class="mat-header-cell">
+              {{'Permissions'|translate}}
+            </th>
           </tr>
-          <tr *ngFor="let group of page.settingsPanel.groups">
-            <td>{{group.name}}</td>
-            <td>
+          <tr *ngFor="let group of page.settingsPanel.groups" class="mat-row">
+            <td class="mat-cell">{{group.name}}</td>
+            <td class="mat-cell">
               <mat-select [(ngModel)]="group.level">
                 <mat-option value="inherited">
                   {{'Inherited (_)' | translate:{ level: group.actualAccessLevel} }}
@@ -43,7 +45,7 @@
                 </mat-option>
               </mat-select>
             </td>
-            <td *ngFor="let perm of page.settingsPanel.permissions.permissions">
+            <td *ngFor="let perm of page.settingsPanel.permissions.permissions" class="mat-cell">
               <mat-checkbox *ngIf="group.permissionMap" [(ngModel)]="group.permissionMap[perm]">{{'permission: ' + perm | translate}}</mat-checkbox>
             </td>
           </tr>
@@ -55,25 +57,25 @@
           {{'Children'|translate}}
         </ng-template>
         <mat-error *ngIf="!page.portofino.localApiAvailable">{{'Local API not available.' | translate}}</mat-error>
-        <table>
-          <tr>
-            <th>{{'Segment'|translate}}</th>
-            <th>{{'Title'|translate}}</th>
-            <th>{{'Icon'|translate}}</th>
-            <th>{{'Embedded'|translate}}</th>
-            <th>{{'Show in navigation'|translate}}</th>
+        <table class="mat-table">
+          <tr class="mat-header-row">
+            <th class="mat-header-cell">{{'Segment'|translate}}</th>
+            <th class="mat-header-cell">{{'Title'|translate}}</th>
+            <th class="mat-header-cell">{{'Icon'|translate}}</th>
+            <th class="mat-header-cell">{{'Embedded'|translate}}</th>
+            <th class="mat-header-cell">{{'Show in navigation'|translate}}</th>
           </tr>
-          <tr *ngFor="let child of page.children">
-            <td>{{child.path}}</td>
-            <td>{{child.title}}</td>
-            <td>
+          <tr *ngFor="let child of page.children" class="mat-row">
+            <td class="mat-cell">{{child.path}}</td>
+            <td class="mat-cell">{{child.title}}</td>
+            <td class="mat-cell">
               <mat-form-field>
                 <input matInput [(ngModel)]="child.icon" />
                 <mat-icon matSuffix *ngIf="child.icon">{{child.icon}}</mat-icon>
               </mat-form-field>
             </td>
-            <td><mat-checkbox [(ngModel)]="child.embedded"></mat-checkbox></td>
-            <td><mat-checkbox [(ngModel)]="child.showInNavigation"></mat-checkbox></td>
+            <td class="mat-cell"><mat-checkbox [(ngModel)]="child.embedded"></mat-checkbox></td>
+            <td class="mat-cell"><mat-checkbox [(ngModel)]="child.showInNavigation"></mat-checkbox></td>
           </tr>
         </table>
         <portofino-buttons [component]="page" list="children"></portofino-buttons>

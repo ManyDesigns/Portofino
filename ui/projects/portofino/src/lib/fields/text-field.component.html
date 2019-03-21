@@ -6,9 +6,8 @@
 <mat-form-field *ngIf="!isRichText()" [formGroup]="form">
   <mat-label>{{property.label}}</mat-label>
   <input matInput *ngIf="!isMultiline()"
-         [formControlName]="property.name" [required]="required" [type]="isPassword() ? 'password' : 'text'"
-         [disabled]="!enabled"/>
-  <textarea matInput [formControlName]="property.name" [required]="required" *ngIf="isMultiline()" [disabled]="!enabled"></textarea>
+         [formControlName]="property.name" [required]="required" [type]="isPassword() ? 'password' : 'text'" />
+  <textarea matInput [formControlName]="property.name" [required]="required" *ngIf="isMultiline()"></textarea>
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
     {{ '_ is required.' | translate:{ label: property.label } }}
   </mat-error>

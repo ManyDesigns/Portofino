@@ -4,7 +4,7 @@
             (click)="portofino.toggleSidenav()">
       <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
     </button>
-    {{ title }}
+    <a routerLink="/">{{ title | translate}}</a>
   </div>
   <div>
     <ng-container *ngIf="authenticationService.isAdmin">

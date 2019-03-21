@@ -15,14 +15,14 @@
     <ng-template mat-tab-label>
       {{'Permissions'|translate}}
     </ng-template>
-    <table *ngIf="settingsPanel.permissions">
-      <tr>
-        <th>{{'Group'|translate}}</th>
-        <th>{{'Access level'|translate}}</th>
+    <table *ngIf="settingsPanel.permissions" class="mat-table">
+      <tr class="mat-header-row">
+        <th class="mat-header-cell">{{'Group'|translate}}</th>
+        <th class="mat-header-cell">{{'Access level'|translate}}</th>
       </tr>
-      <tr *ngFor="let group of settingsPanel.groups">
-        <td>{{group.name}}</td>
-        <td>
+      <tr *ngFor="let group of settingsPanel.groups" class="mat-row">
+        <td class="mat-cell">{{group.name}}</td>
+        <td class="mat-cell">
           <mat-select [(ngModel)]="group.level">
             <mat-option *ngFor="let level of settingsPanel.accessLevels" [value]="level">
               {{level}}
@@ -38,27 +38,27 @@
       {{'Database connections'|translate}}
     </ng-template>
     <ng-container *ngIf="!connectionProvider">
-      <table *ngIf="connectionProviders">
-        <tr>
-          <th>{{'Name'|translate}}</th>
-          <th>{{'Description'|translate}}</th>
-          <th>{{'Status'|translate}}</th>
+      <table *ngIf="connectionProviders" class="mat-table">
+        <tr class="mat-header-row">
+          <th class="mat-header-cell">{{'Name'|translate}}</th>
+          <th class="mat-header-cell">{{'Description'|translate}}</th>
+          <th class="mat-header-cell">{{'Status'|translate}}</th>
         </tr>
-        <tr *ngFor="let conn of connectionProviders">
-          <td><a href="javascript:void(0)" (click)="openConnectionProvider(conn);">{{conn.name}}</a></td>
-          <td>{{conn.description}}</td>
-          <td>{{conn.status | translate}}</td>
+        <tr *ngFor="let conn of connectionProviders" class="mat-row">
+          <td class="mat-cell"><a href="javascript:void(0)" (click)="openConnectionProvider(conn);">{{conn.name}}</a></td>
+          <td class="mat-cell">{{conn.description}}</td>
+          <td class="mat-cell">{{conn.status | translate}}</td>
         </tr>
       </table>
       <portofino-buttons [component]="this" list="connections"></portofino-buttons>
       <h3>{{'Available database platforms' | translate}}</h3>
-      <table *ngIf="databasePlatforms">
-        <tr>
-          <th>{{'Description'|translate}}</th>
-          <th>{{'Standard driver class name'|translate}}</th>
-          <th>{{'Status'|translate}}</th>
+      <table *ngIf="databasePlatforms" class="mat-table">
+        <tr class="mat-header-row">
+          <th class="mat-header-cell">{{'Description'|translate}}</th>
+          <th class="mat-header-cell">{{'Standard driver class name'|translate}}</th>
+          <th class="mat-header-cell">{{'Status'|translate}}</th>
         </tr>
-        <tr *ngFor="let platform of databasePlatforms">
+        <tr *ngFor="let platform of databasePlatforms" class="mat-row">
           <td>{{platform.description}}</td>
           <td>{{platform.standardDriverClassName}}</td>
           <td>{{platform.status | translate}}</td>
@@ -119,17 +119,17 @@
         </ng-container>
         <mat-divider></mat-divider>
         <h3>{{'Schemas'|translate}}</h3>
-        <table>
-          <tr>
-            <th></th>
-            <th>{{'Schema'|translate}}</th>
-            <th>{{'Schema name'|translate}}</th>
+        <table class="mat-table">
+          <tr class="mat-header-row">
+            <th class="mat-header-cell"></th>
+            <th class="mat-header-cell">{{'Schema'|translate}}</th>
+            <th class="mat-header-cell">{{'Schema name'|translate}}</th>
           </tr>
-          <tr *ngFor="let schema of connectionProvider.schemas; let i = index;">
-            <td><mat-checkbox [(ngModel)]="schema.selected"
+          <tr *ngFor="let schema of connectionProvider.schemas; let i = index;" class="mat-row">
+            <td class="mat-cell"><mat-checkbox [(ngModel)]="schema.selected"
                               name="selected{{i}}" [disabled]="!isEditConnectionProvider"></mat-checkbox></td>
-            <td>{{schema.schema}}</td>
-            <td><input matInput [(ngModel)]="schema.name"
+            <td class="mat-cell">{{schema.schema}}</td>
+            <td class="mat-cell"><input matInput [(ngModel)]="schema.name"
                        name="schemaName{{i}}" [disabled]="!isEditConnectionProvider"/></td>
           </tr>
         </table>
@@ -202,17 +202,17 @@
       <mat-step [editable]="wizard.connectionProvider">
         <ng-template matStepLabel>{{'Select the database schema(s) to import' | translate}}</ng-template>
         <h3>{{'Found schemas:'|translate}}</h3>
-        <table>
-          <tr>
-            <th></th>
-            <th>{{'Schema'|translate}}</th>
-            <th>{{'Schema name'|translate}}</th>
+        <table class="mat-table">
+          <tr class="mat-header-row">
+            <th class="mat-header-cell"></th>
+            <th class="mat-header-cell">{{'Schema'|translate}}</th>
+            <th class="mat-header-cell">{{'Schema name'|translate}}</th>
           </tr>
-          <tr *ngFor="let schema of wizard.schemas; let i = index;">
-            <td><mat-checkbox [(ngModel)]="schema.selected"
+          <tr *ngFor="let schema of wizard.schemas; let i = index;" class="mat-row">
+            <td class="mat-cell"><mat-checkbox [(ngModel)]="schema.selected"
                               name="selected{{i}}"></mat-checkbox></td>
-            <td>{{schema.schema}}</td>
-            <td><input matInput [(ngModel)]="schema.name" name="schemaName{{i}}"/></td>
+            <td class="mat-cell">{{schema.schema}}</td>
+            <td class="mat-cell"><input matInput [(ngModel)]="schema.name" name="schemaName{{i}}"/></td>
           </tr>
         </table>
         <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
@@ -344,14 +344,14 @@
           <mat-radio-button value="none">{{"Don't generate any page"|translate}}</mat-radio-button>
         </mat-radio-group>
         <div></div>
-        <table *ngIf="wizard.strategy == 'manual'">
-          <tr>
-            <th></th>
-            <th>{{'Table name'|translate}}</th>
+        <table *ngIf="wizard.strategy == 'manual'" class="mat-table">
+          <tr class="mat-header-row">
+            <th class="mat-header-cell"></th>
+            <th class="mat-header-cell">{{'Table name'|translate}}</th>
           </tr>
-          <tr *ngFor="let table of wizard.tables">
-            <td><mat-checkbox [(ngModel)]="table.selected"></mat-checkbox></td>
-            <td>{{tableName(table)}}</td>
+          <tr *ngFor="let table of wizard.tables" class="mat-row">
+            <td class="mat-cell"><mat-checkbox [(ngModel)]="table.selected"></mat-checkbox></td>
+            <td class="mat-cell">{{tableName(table)}}</td>
           </tr>
         </table>
         <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
@@ -396,20 +396,20 @@
             </mat-form-field>
             <fieldset>
               <legend>{{'Columns'|translate}}</legend>
-              <table>
-                <tr>
-                  <th>{{'Name'|translate}}</th>
-                  <th>{{'Property name'|translate}}</th>
-                  <th>{{'Class'|translate}}</th>
-                  <th>{{'Type'|translate}}</th>
-                  <th>{{'Length'|translate}}</th>
-                  <th>{{'Scale'|translate}}</th>
-                  <th>{{'Nullable'|translate}}</th>
+              <table class="mat-table">
+                <tr class="mat-header-row">
+                  <th class="mat-header-cell">{{'Name'|translate}}</th>
+                  <th class="mat-header-cell">{{'Property name'|translate}}</th>
+                  <th class="mat-header-cell">{{'Class'|translate}}</th>
+                  <th class="mat-header-cell">{{'Type'|translate}}</th>
+                  <th class="mat-header-cell">{{'Length'|translate}}</th>
+                  <th class="mat-header-cell">{{'Scale'|translate}}</th>
+                  <th class="mat-header-cell">{{'Nullable'|translate}}</th>
                 </tr>
-                <tr *ngFor="let column of tableInfo.table.columns; let i = index;">
-                  <td><a href="javascript:void(0)" (click)="editColumn(column, i);">{{column.columnName}}</a></td>
-                  <td><input matInput [(ngModel)]="column.propertyName" /></td>
-                  <td style="min-width: 100px;">
+                <tr *ngFor="let column of tableInfo.table.columns; let i = index;" class="mat-row">
+                  <td class="mat-cell"><a href="javascript:void(0)" (click)="editColumn(column, i);">{{column.columnName}}</a></td>
+                  <td class="mat-cell"><input matInput [(ngModel)]="column.propertyName" /></td>
+                  <td class="mat-cell" style="min-width: 100px;">
                     <mat-select [(ngModel)]="column.javaType">
                       <mat-option value="default">Auto ({{tableInfo.types[i].default.simpleName}})</mat-option>
                       <mat-option *ngFor="let type of tableInfo.types[i].types" [value]="type.name">
@@ -417,10 +417,10 @@
                       </mat-option>
                     </mat-select>
                   </td>
-                  <td>{{column.columnType}} (JDBC: {{column.jdbcType}})</td>
-                  <td>{{column.length}}</td>
-                  <td>{{column.scale}}</td>
-                  <td>{{column.nullable}}</td>
+                  <td class="mat-cell">{{column.columnType}} (JDBC: {{column.jdbcType}})</td>
+                  <td class="mat-cell">{{column.length}}</td>
+                  <td class="mat-cell">{{column.scale}}</td>
+                  <td class="mat-cell">{{column.nullable}}</td>
                 </tr>
               </table>
             </fieldset>
@@ -432,40 +432,40 @@
             </ng-template>
             <fieldset>
               <legend>{{'Foreign keys'|translate}}</legend>
-              <table>
-                <tr>
-                  <th>{{'Name'|translate}}</th>
-                  <th>{{'Property name (one side)'|translate}}</th>
-                  <th>{{'Property name (many side)'|translate}}</th>
-                  <th>{{'Columns'|translate}}</th>
-                  <th>{{'Referenced table'|translate}}</th>
-                  <th>{{'Referenced columns'|translate}}</th>
+              <table class="mat-table">
+                <tr class="mat-header-row">
+                  <th class="mat-header-cell">{{'Name'|translate}}</th>
+                  <th class="mat-header-cell">{{'Property name (one side)'|translate}}</th>
+                  <th class="mat-header-cell">{{'Property name (many side)'|translate}}</th>
+                  <th class="mat-header-cell">{{'Columns'|translate}}</th>
+                  <th class="mat-header-cell">{{'Referenced table'|translate}}</th>
+                  <th class="mat-header-cell">{{'Referenced columns'|translate}}</th>
                 </tr>
-                <tr *ngFor="let fk of tableInfo.table.foreignKey">
-                  <td>{{fk.name}}</td>
-                  <td><input matInput [(ngModel)]="fk.onePropertyName"></td>
-                  <td><input matInput [(ngModel)]="fk.manyPropertyName"></td>
-                  <td>{{getFromColumns(fk)}}</td>
-                  <td>{{getReferencedTableName(fk, tableInfo)}}</td>
-                  <td>{{getToColumns(fk)}}</td>
+                <tr *ngFor="let fk of tableInfo.table.foreignKey" class="mat-row">
+                  <td class="mat-cell">{{fk.name}}</td>
+                  <td class="mat-cell"><input matInput [(ngModel)]="fk.onePropertyName"></td>
+                  <td class="mat-cell"><input matInput [(ngModel)]="fk.manyPropertyName"></td>
+                  <td class="mat-cell">{{getFromColumns(fk)}}</td>
+                  <td class="mat-cell">{{getReferencedTableName(fk, tableInfo)}}</td>
+                  <td class="mat-cell">{{getToColumns(fk)}}</td>
                 </tr>
               </table>
             </fieldset>
             <fieldset>
               <legend>{{'Selection providers'|translate}}</legend>
-              <table>
-                <tr>
-                  <th>{{'Name'|translate}}</th>
-                  <th>{{'Columns'|translate}}</th>
-                  <th>{{'Database'|translate}}</th>
-                  <th>{{'Query'|translate}}</th>
+              <table class="mat-table">
+                <tr class="mat-header-row">
+                  <th class="mat-header-cell">{{'Name'|translate}}</th>
+                  <th class="mat-header-cell">{{'Columns'|translate}}</th>
+                  <th class="mat-header-cell">{{'Database'|translate}}</th>
+                  <th class="mat-header-cell">{{'Query'|translate}}</th>
                 </tr>
-                <tr *ngFor="let q of tableInfo.table.query">
-                  <td>{{q.name}}</td>
-                  <td>{{getFromColumns(q)}}</td>
-                  <td>{{q.toDatabase}}</td>
-                  <td *ngIf="q.hql"><strong>HQL</strong> {{q.hql}}</td>
-                  <td *ngIf="q.sql"><strong>SQL</strong> {{q.sql}}</td>
+                <tr *ngFor="let q of tableInfo.table.query" class="mat-row">
+                  <td class="mat-cell">{{q.name}}</td>
+                  <td class="mat-cell">{{getFromColumns(q)}}</td>
+                  <td class="mat-cell">{{q.toDatabase}}</td>
+                  <td *ngIf="q.hql" class="mat-cell"><strong>HQL</strong> {{q.hql}}</td>
+                  <td *ngIf="q.sql" class="mat-cell"><strong>SQL</strong> {{q.sql}}</td>
                 </tr>
               </table>
               TODO
