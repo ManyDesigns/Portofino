@@ -1,10 +1,10 @@
-<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center" class="mat-elevation-z6">
   <div>
     <button title="{{ title }}" type="button" mat-icon-button
             (click)="portofino.toggleSidenav()">
       <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
     </button>
-    <a routerLink="/">{{ title | translate}}</a>
+    <a mat-button routerLink="/"><span>{{ title | translate}}</span></a>
   </div>
   <div>
     <ng-container *ngIf="authenticationService.isAdmin">

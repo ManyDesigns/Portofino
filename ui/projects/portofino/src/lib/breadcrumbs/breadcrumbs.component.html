@@ -1,5 +1,4 @@
-<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="left center" class="breadcrumbs-bar">
-
+<mat-toolbar fxLayout="row" fxLayoutAlign="left center" class="breadcrumbs-bar">
   <ng-container *ngIf="!!pageService.page">
       <div class="breadcrumb-item"
           *ngFor="let item of breadcrumbList; let i = index"
@@ -13,5 +12,4 @@
         <span class="breadcrumb-link-disabled" *ngIf="i===breadcrumbList.length-1">{{ getTitle(item) }}</span>
       </div>
   </ng-container>
-
 </mat-toolbar>
