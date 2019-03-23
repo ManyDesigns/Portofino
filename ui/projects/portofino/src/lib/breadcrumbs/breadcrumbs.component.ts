@@ -2,7 +2,6 @@ import {PortofinoService} from "../portofino.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {Component, OnInit} from "@angular/core";
 import {AuthenticationService} from "../security/authentication.service";
-import {PortofinoComponent} from "../portofino-app.component";
 import {PageService} from "../page";
 
 export interface BreadCrumb {
@@ -15,7 +14,6 @@ export interface BreadCrumb {
   templateUrl: 'breadcrumbs.component.html',
   styleUrls: ['./breadcrumbs.component.css']
 })
-@PortofinoComponent({name: 'breadcrumbs'})
 export class BreadcrumbsComponent implements OnInit {
 
   breadcrumbList: Array<any> = [];
