@@ -69,9 +69,10 @@ public class ConnectionsAction extends AbstractPageAction {
         ConnectionProviderDetail cp = new ConnectionProviderDetail(connectionProvider);
         Form form = new FormBuilder(ConnectionProviderDetail.class).build();
         form.readFromObject(cp);
-        if (ConnectionProvider.STATUS_CONNECTED.equals(connectionProvider.getStatus())) {
-            //TODO configureDetected();
-        }
+        return connectionWithSchemas(databaseName, connectionProvider, form);
+    }
+
+    public String connectionWithSchemas(String databaseName, ConnectionProvider connectionProvider, Form form) throws Exception {
         JSONStringer js = new JSONStringer();
         js.object();
         FormUtil.writeToJson(form, js);
@@ -97,7 +98,7 @@ public class ConnectionsAction extends AbstractPageAction {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createConnection(String jsonInput) {
+    public Response createConnection(String jsonInput) throws Exception {
         JSONObject jsonObject = new JSONObject(jsonInput);
         Database database = new Database();
         database.setDatabaseName(jsonObject.getJSONObject("databaseName").getString("value"));
@@ -126,9 +127,13 @@ public class ConnectionsAction extends AbstractPageAction {
         persistence.getModel().getDatabases().add(connectionProvider.getDatabase());
         persistence.initModel();
         try {
+            String connectionsWithSchemas =
+                    connectionWithSchemas(connectionProvider.getDatabase().getDatabaseName(), connectionProvider, form);
             persistence.saveXmlModel();
-            return Response.created(new URI(getActionPath() + "/" + databaseName)).entity(form).build();
+            return Response.created(new URI(getActionPath() + "/" + databaseName)).entity(connectionsWithSchemas).build();
         } catch (Exception e) {
+            persistence.getModel().getDatabases().remove(connectionProvider.getDatabase());
+            persistence.initModel();
             throw new WebApplicationException(e);
         }
     }
@@ -142,7 +147,8 @@ public class ConnectionsAction extends AbstractPageAction {
     }
 
     public Response saveConnectionProvider(
-            ConnectionProvider connectionProvider, JSONObject jsonObject, BiFunction<ConnectionProvider, Form, Response> handler) {
+            ConnectionProvider connectionProvider, JSONObject jsonObject,
+            BiFunction<ConnectionProvider, Form, Response> handler) {
         ConnectionProviderDetail cp = new ConnectionProviderDetail(connectionProvider);
         Form form = new FormBuilder(ConnectionProviderDetail.class).configMode(Mode.EDIT).build();
         if(cp.getJndiResource() != null) {
@@ -172,10 +178,12 @@ public class ConnectionsAction extends AbstractPageAction {
         persistence.initModel();
         try {
             persistence.saveXmlModel();
+            String connectionsWithSchemas =
+                    connectionWithSchemas(connectionProvider.getDatabase().getDatabaseName(), connectionProvider, form);
+            return Response.ok(connectionsWithSchemas).build();
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
-        return Response.ok(form).build();
     }
 
     @PUT
@@ -187,6 +195,7 @@ public class ConnectionsAction extends AbstractPageAction {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         updateSchemas(connectionProvider, new JSONArray(jsonInput));
+        persistence.syncDataModel(databaseName);
         persistence.initModel();
         persistence.saveXmlModel();
         logger.info("Schemas for database {} updated", databaseName);

@@ -194,6 +194,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
         c.javaType = null;
       }
     });
+    this.tableInfo.table.query.forEach(q => this.cancelSelectionProvider(q));
     const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${table.tableName}`;
     this.http.put(url, this.tableInfo.table).subscribe(
       () => {
@@ -243,8 +244,8 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     });
   }
 
-  getFromColumns(fk) {
-    return fk.reference.map(r => r.fromColumn).join(", ");
+  getFromColumns(sp) {
+    return sp.reference.map(r => r.fromColumn).join(", ");
   }
 
   getToColumns(fk) {
@@ -276,6 +277,43 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   trackByTableName(index, table) {
     return table.table.tableName;
+  }
+
+  editSelectionProvider(sp) {
+    sp.beingEdited = Object.assign({}, sp);
+    sp.columns = this.getFromColumns(sp);
+  }
+
+  deleteSelectionProvider(sp) {
+    this.tableInfo.table.query = this.tableInfo.table.query.filter(q => q != sp);
+  }
+
+  saveSelectionProvider(sp) {
+    sp.beingEdited = false;
+    delete sp.new;
+    if(sp.columns) {
+      sp.reference = [];
+      const columns = sp.columns.split(',');
+      columns.forEach(c => { sp.reference.push({ fromColumn: c.trim() }); });
+    }
+    delete sp.columns;
+  }
+
+  cancelSelectionProvider(sp) {
+    if(sp.new) {
+      this.deleteSelectionProvider(sp);
+      return;
+    }
+    if(sp.beingEdited) {
+      const old = sp.beingEdited;
+      delete sp.beingEdited;
+      Object.assign(sp, old);
+      delete sp.columns;
+    }
+  }
+
+  addSelectionProvider() {
+    this.tableInfo.table.query.push({ new: true, beingEdited: true });
   }
 
   wizardStep(event) {
@@ -338,6 +376,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       } else {
         this.notificationService.info(this.translate.instant("Local API not available. Only the application backend has been created."));
       }
+      setTimeout(() => { this.router.navigateByUrl("/"); }, 5000);
     });
   }
 

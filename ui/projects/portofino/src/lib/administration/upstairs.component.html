@@ -424,7 +424,6 @@
                 </tr>
               </table>
             </fieldset>
-            <div><portofino-buttons [component]="this" list="table"></portofino-buttons></div>
           </mat-tab>
           <mat-tab>
             <ng-template mat-tab-label>
@@ -459,19 +458,50 @@
                   <th class="mat-header-cell">{{'Columns'|translate}}</th>
                   <th class="mat-header-cell">{{'Database'|translate}}</th>
                   <th class="mat-header-cell">{{'Query'|translate}}</th>
+                  <th class="mat-header-cell"></th>
                 </tr>
                 <tr *ngFor="let q of tableInfo.table.query" class="mat-row">
-                  <td class="mat-cell">{{q.name}}</td>
-                  <td class="mat-cell">{{getFromColumns(q)}}</td>
-                  <td class="mat-cell">{{q.toDatabase}}</td>
-                  <td *ngIf="q.hql" class="mat-cell"><strong>HQL</strong> {{q.hql}}</td>
-                  <td *ngIf="q.sql" class="mat-cell"><strong>SQL</strong> {{q.sql}}</td>
+                  <ng-container *ngIf="!q.beingEdited">
+                    <td class="mat-cell">{{q.name}}</td>
+                    <td class="mat-cell">{{getFromColumns(q)}}</td>
+                    <td class="mat-cell">{{q.toDatabase}}</td>
+                    <td *ngIf="q.hql" class="mat-cell"><strong>HQL</strong> {{q.hql}}</td>
+                    <td *ngIf="q.sql" class="mat-cell"><strong>SQL</strong> {{q.sql}}</td>
+                    <td class="mat-cell">
+                      <button mat-icon-button color="primary" (click)="editSelectionProvider(q)"><mat-icon>edit</mat-icon></button>
+                      <button mat-icon-button (click)="deleteSelectionProvider(q)"><mat-icon>delete</mat-icon></button>
+                    </td>
+                  </ng-container>
+                  <ng-container *ngIf="q.beingEdited">
+                    <td class="mat-cell">
+                      <mat-form-field>
+                        <input matInput [(ngModel)]="q.name" />
+                      </mat-form-field>
+                    </td>
+                    <td class="mat-cell">
+                      <mat-form-field>
+                        <input matInput [(ngModel)]="q.columns" />
+                      </mat-form-field>
+                    </td>
+                    <td class="mat-cell">
+                      <mat-form-field>
+                        <input matInput [(ngModel)]="q.toDatabase" />
+                      </mat-form-field>
+                    </td>
+                    <td *ngIf="q.hql" class="mat-cell"><strong>HQL</strong> {{q.hql}}</td>
+                    <td *ngIf="q.sql" class="mat-cell"><strong>SQL</strong> {{q.sql}}</td>
+                    <td class="mat-cell">
+                      <button mat-icon-button color="primary" (click)="saveSelectionProvider(q)"><mat-icon>save</mat-icon></button>
+                      <button mat-icon-button (click)="cancelSelectionProvider(q)"><mat-icon>cancel</mat-icon></button>
+                    </td>
+                  </ng-container>
                 </tr>
               </table>
               TODO
             </fieldset>
           </mat-tab>
         </mat-tab-group>
+        <div><portofino-buttons [component]="this" list="table"></portofino-buttons></div>
       </mat-card-content>
     </mat-card>
     <mat-card *ngIf="column">

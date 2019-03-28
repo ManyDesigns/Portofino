@@ -161,8 +161,7 @@ public class SecurityLogic {
             (Configuration conf, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
         Object principal = subject.getPrincipal();
         if(principal != null) {
-            String administratorsGroup = getAdministratorsGroup(conf);
-            if(isUserInGroup(administratorsGroup)) {
+            if(isAdministrator(conf)) {
                 return true;
             }
             PagePermission pagePermission = new PagePermission(configuration, level, permissions);
@@ -194,11 +193,6 @@ public class SecurityLogic {
         return new GroupPermission(groups).implies(pagePermission);
     }
 
-    public static boolean isUserInGroup(String groupId) {
-        Subject subject = SecurityUtils.getSubject();
-        return subject.hasRole(groupId);
-    }
-
     public static boolean isAdministrator(ServletRequest request) {
         ServletContext servletContext = ElementsThreadLocals.getServletContext();
         Configuration conf =
@@ -208,7 +202,8 @@ public class SecurityLogic {
 
     public static boolean isAdministrator(Configuration conf) {
         String administratorsGroup = getAdministratorsGroup(conf);
-        return isUserInGroup(administratorsGroup);
+        Subject subject = SecurityUtils.getSubject();
+        return subject.isAuthenticated() && subject.hasRole(administratorsGroup);
     }
 
     public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, Object actionBean, Method handler) {

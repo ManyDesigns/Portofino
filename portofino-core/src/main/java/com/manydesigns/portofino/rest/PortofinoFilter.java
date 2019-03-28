@@ -207,7 +207,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         public void assertAuthorized(final Object resource, final Method handler) throws AuthorizationException {
             super.assertAuthorized(new MethodInvocation() {
                 @Override
-                public Object proceed() throws Throwable {
+                public Object proceed() {
                     return null;
                 }
 
