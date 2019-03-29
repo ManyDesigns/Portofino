@@ -1,6 +1,7 @@
 <div *ngIf="!!pageService.page">
   <mat-nav-list *ngIf="pageService.page.parent">
     <a mat-list-item [routerLink]="pageService.page.parent.url" routerLinkActive="active">
+      <mat-icon *ngIf="pageService.page.parent.icon">{{pageService.page.parent.icon}}</mat-icon>
       {{pageService.page.parent.title | translate}}
     </a>
     <div *ngFor="let child of pageService.page.parent.children">
@@ -11,7 +12,12 @@
         {{child.title | translate}}
       </a>
       <div *ngIf="child.path == pageService.page.segment">
-        <a mat-list-item><strong>{{pageService.page.title | translate}}</strong></a>
+        <a mat-list-item>
+          <strong>
+            <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
+            {{pageService.page.title | translate}}
+          </strong>
+        </a>
         <ng-container *ngFor="let child of pageService.page.children">
           <a mat-list-item
              *ngIf="child.accessible && child.showInNavigation"
@@ -24,7 +30,10 @@
     </div>
   </mat-nav-list>
   <div *ngIf="!pageService.page.parent">
-    <a mat-list-item><strong>{{pageService.page.title | translate}}</strong></a>
+    <a mat-list-item>
+      <strong>
+        <mat-icon *ngIf="pageService.page.parent.icon">{{pageService.page.parent.icon}}</mat-icon>
+        {{pageService.page.title | translate}}</strong></a>
     <mat-nav-list>
       <ng-container *ngFor="let child of pageService.page.children">
         <a mat-list-item

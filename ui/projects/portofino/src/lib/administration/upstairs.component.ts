@@ -296,6 +296,9 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       const columns = sp.columns.split(',');
       columns.forEach(c => { sp.reference.push({ fromColumn: c.trim() }); });
     }
+    if(sp.hql && sp.sql) {
+      delete sp.sql;
+    }
     delete sp.columns;
   }
 

@@ -488,8 +488,18 @@
                         <input matInput [(ngModel)]="q.toDatabase" />
                       </mat-form-field>
                     </td>
-                    <td *ngIf="q.hql" class="mat-cell"><strong>HQL</strong> {{q.hql}}</td>
-                    <td *ngIf="q.sql" class="mat-cell"><strong>SQL</strong> {{q.sql}}</td>
+                    <td *ngIf="q.hql || q.new" class="mat-cell">
+                      <mat-form-field>
+                        <mat-label>HQL</mat-label>
+                        <input matInput [(ngModel)]="q.hql" />
+                      </mat-form-field>
+                    </td>
+                    <td *ngIf="q.sql || q.new" class="mat-cell">
+                      <mat-form-field>
+                        <mat-label>SQL</mat-label>
+                        <input matInput [(ngModel)]="q.sql" />
+                      </mat-form-field>
+                    </td>
                     <td class="mat-cell">
                       <button mat-icon-button color="primary" (click)="saveSelectionProvider(q)"><mat-icon>save</mat-icon></button>
                       <button mat-icon-button (click)="cancelSelectionProvider(q)"><mat-icon>cancel</mat-icon></button>
@@ -497,7 +507,9 @@
                   </ng-container>
                 </tr>
               </table>
-              TODO
+              <button mat-icon-button (click)="addSelectionProvider()">
+                <mat-icon>add</mat-icon>
+              </button>
             </fieldset>
           </mat-tab>
         </mat-tab-group>
@@ -551,5 +563,11 @@
         <div><portofino-buttons [component]="this" list="column"></portofino-buttons></div>
       </mat-card-content>
     </mat-card>
+  </mat-tab>
+  <mat-tab>
+    <ng-template mat-tab-label>
+      {{'Misc'|translate}}
+    </ng-template>
+    <portofino-buttons [component]="this" list="misc"></portofino-buttons>
   </mat-tab>
 </mat-tab-group>
