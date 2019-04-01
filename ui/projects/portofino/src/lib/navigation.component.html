@@ -32,7 +32,7 @@
   <div *ngIf="!pageService.page.parent">
     <a mat-list-item>
       <strong>
-        <mat-icon *ngIf="pageService.page.parent.icon">{{pageService.page.parent.icon}}</mat-icon>
+        <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
         {{pageService.page.title | translate}}</strong></a>
     <mat-nav-list>
       <ng-container *ngFor="let child of pageService.page.children">

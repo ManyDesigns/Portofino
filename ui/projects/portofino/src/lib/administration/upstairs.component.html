@@ -488,16 +488,26 @@
                         <input matInput [(ngModel)]="q.toDatabase" />
                       </mat-form-field>
                     </td>
-                    <td *ngIf="q.hql || q.new" class="mat-cell">
+                    <td *ngIf="q.hql && !q.new" class="mat-cell">
                       <mat-form-field>
                         <mat-label>HQL</mat-label>
                         <input matInput [(ngModel)]="q.hql" />
                       </mat-form-field>
                     </td>
-                    <td *ngIf="q.sql || q.new" class="mat-cell">
+                    <td *ngIf="q.sql && !q.new" class="mat-cell">
                       <mat-form-field>
                         <mat-label>SQL</mat-label>
                         <input matInput [(ngModel)]="q.sql" />
+                      </mat-form-field>
+                    </td>
+                    <td *ngIf="q.new" class="mat-cell">
+                      <mat-form-field>
+                        <mat-label>HQL</mat-label>
+                        <textarea matInput [(ngModel)]="q.hql"></textarea>
+                      </mat-form-field>
+                      <mat-form-field>
+                        <mat-label>SQL</mat-label>
+                        <textarea matInput [(ngModel)]="q.sql"></textarea>
                       </mat-form-field>
                     </td>
                     <td class="mat-cell">

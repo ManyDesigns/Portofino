@@ -200,7 +200,10 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       () => {
         this.prepareTableInfo();
         this.notificationService.info(this.translate.instant("Table saved"));
-        }, () => { this.prepareTableInfo(); });
+        }, () => {
+        this.notificationService.error(this.translate.instant("Table not saved"));
+        this.prepareTableInfo();
+      });
   }
 
   @Button({ list: "table", text: "Cancel" })
@@ -289,17 +292,17 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   saveSelectionProvider(sp) {
-    sp.beingEdited = false;
+    delete sp.beingEdited;
     delete sp.new;
     if(sp.columns) {
       sp.reference = [];
       const columns = sp.columns.split(',');
       columns.forEach(c => { sp.reference.push({ fromColumn: c.trim() }); });
     }
+    delete sp.columns;
     if(sp.hql && sp.sql) {
       delete sp.sql;
     }
-    delete sp.columns;
   }
 
   cancelSelectionProvider(sp) {
