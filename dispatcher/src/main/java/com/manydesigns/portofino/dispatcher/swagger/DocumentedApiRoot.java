@@ -1,8 +1,6 @@
 package com.manydesigns.portofino.dispatcher.swagger;
 
-import com.manydesigns.portofino.dispatcher.Resource;
-import com.manydesigns.portofino.dispatcher.Root;
-import com.manydesigns.portofino.dispatcher.RootFactory;
+import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.dispatcher.visitor.DepthFirstVisitor;
 import com.manydesigns.portofino.dispatcher.visitor.ResourceVisitor;
 import io.swagger.annotations.Api;
@@ -73,31 +71,34 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         }
 
         public Swagger readSubResource(Resource resource) {
-            String path = resource.getPath();
             ArrayList<Parameter> parameters = new ArrayList<>();
-            int paramCount = 0;
-            while (path.contains("{requiredPathParameter}")) {
-                String name = "requiredPathParameter_" + paramCount;
-                path = path.replaceFirst("\\{requiredPathParameter}", "{" + name + "}");
-                PathParameter parameter = new PathParameter();
-                parameter.setName(name);
-                parameter.setRequired(true);
-                parameters.add(parameter);
-                paramCount++;
-            }
-            paramCount = 0;
-            while (path.contains("{optionalPathParameter}")) {
-                String name = "optionalPathParameter_" + paramCount;
-                path = path.replaceFirst("\\{optionalPathParameter}", "{" + name + "}");
-                PathParameter parameter = new PathParameter();
-                parameter.setName(name);
-                parameter.setRequired(false);
-                parameters.add(parameter);
-                paramCount++;
-            }
+            String path = calculateResourcePath(resource, parameters);
 
             return read(resource.getClass(), path, null, true, new String[0], new String[0],
                     new HashMap<>(), parameters);
+        }
+
+        public String calculateResourcePath(Resource resource, ArrayList<Parameter> parameters) {
+            String path;
+            if(resource.getParent() != null) {
+                path = calculateResourcePath(resource.getParent(), parameters);
+                path += "/" + resource.getSegment();
+            } else {
+                path = "";
+            }
+            if(resource instanceof WithParameters) {
+                WithParameters wp = (WithParameters) resource;
+                for(int i = 0; i < wp.getParameters().size(); i++) {
+                    boolean required = i < wp.getMinParameters();
+                    String name = wp.getParameterName(i);
+                    path += "{" + name + "}";
+                    PathParameter parameter = new PathParameter();
+                    parameter.setName(name);
+                    parameter.setRequired(required);
+                    parameters.add(parameter);
+                }
+            }
+            return path;
         }
     }
 

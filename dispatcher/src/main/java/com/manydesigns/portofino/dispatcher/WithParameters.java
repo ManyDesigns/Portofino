@@ -10,4 +10,6 @@ public interface WithParameters {
     List<String> getParameters();
 
     void consumeParameter(String pathSegment);
+
+    String getParameterName(int index);
 }

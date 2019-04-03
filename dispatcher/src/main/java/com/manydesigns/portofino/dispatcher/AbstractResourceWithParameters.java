@@ -102,4 +102,13 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
     public List<String> getParameters() {
         return parameters;
     }
+
+    @Override
+    public String getParameterName(int index) {
+        if(index < getMinParameters()) {
+            return "requiredPathParameter_" + index;
+        } else {
+            return "optionalPathParameter_" + index;
+        }
+    }
 }

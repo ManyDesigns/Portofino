@@ -591,6 +591,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @Override
+    public String getParameterName(int index) {
+        if(classAccessor == null) {
+            return super.getParameterName(index);
+        }
+        return classAccessor.getName() + "_" + classAccessor.getKeyProperties()[index].getName();
+    }
+
+    @Override
     public void parametersAcquired() {
         super.parametersAcquired();
         if(pkHelper == null) {
