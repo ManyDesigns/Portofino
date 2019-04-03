@@ -59,6 +59,8 @@ import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import ognl.OgnlContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -1062,7 +1064,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @GET
     @Path(":blob/{propertyName}")
-    public Response downloadBlob(@PathParam("propertyName") String propertyName) throws IOException {
+    @ApiOperation(value = "Downloads the contents of a blob property", response = byte[].class)
+    public Response downloadBlob(
+            @ApiParam(value = "The name of the property", required = true)
+            @PathParam("propertyName") String propertyName) {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).
                     entity("Object can not be null (this method can only be called with /objectKey)").build();
@@ -1127,8 +1132,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
+    @ApiOperation(value = "Upload a blob property")
     public Response uploadBlob(
-            @PathParam("propertyName") String propertyName, @QueryParam("filename") String filename,
+            @ApiParam(value = "The name of the property", required = true)
+            @PathParam("propertyName") String propertyName,
+            @ApiParam(value = "The name of uploaded file")
+            @QueryParam("filename") String filename,
             InputStream inputStream)
             throws IOException {
         if(object == null) {
@@ -1172,7 +1181,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @DELETE
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @ApiOperation(value = "Delete the contents of a blob property")
     public Response deleteBlob(
+            @ApiParam(value = "The name of the property", required = true)
             @PathParam("propertyName") String propertyName)
             throws IOException {
         if(object == null) {
@@ -1265,7 +1276,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         for(Map.Entry<List<String>, Collection<String>> entry : availableSelectionProviders.entrySet()) {
             CrudSelectionProviderEdit selectionProviderEdit = new CrudSelectionProviderEdit();
             selectionProviderEdits[i] = selectionProviderEdit;
-            String[] fieldNames = entry.getKey().toArray(new String[entry.getKey().size()]);
+            String[] fieldNames = entry.getKey().toArray(new String[0]);
             selectionProviderEdit.fieldNames = fieldNames;
             selectionProviderEdit.availableSelectionProviders = entry.getValue();
             selectionProviderEdit.displayModeName = DisplayMode.DROPDOWN.name();
