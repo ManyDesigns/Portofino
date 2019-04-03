@@ -80,7 +80,7 @@ public class Persistence {
     public static final String APP_DBS_DIR = "dbs";
     public static final String APP_MODEL_FILE = "portofino-model.xml";
     public static final String APP_CONTEXT = "liquibase.context";
-    public final static String changelogFileNameTemplate = "{0}-changelog.xml";
+    public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
 
     //**************************************************************************
     // Fields
@@ -91,7 +91,6 @@ public class Persistence {
     protected final Map<String, HibernateDatabaseSetup> setups;
 
     protected final File appDir;
-    protected final File appDbsDir;
     protected final File appModelFile;
     protected final org.apache.commons.configuration.Configuration configuration;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
@@ -120,20 +119,10 @@ public class Persistence {
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
 
-        appDbsDir = new File(appDir, APP_DBS_DIR);
-        logger.info("Application dbs dir: {}",
-                appDbsDir.getAbsolutePath());
-        boolean result = ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appDbsDir);
-
         appModelFile = new File(appDir, APP_MODEL_FILE);
-        logger.info("Application model file: {}",
-                appModelFile.getAbsolutePath());
+        logger.info("Application model file: {}", appModelFile.getAbsolutePath());
 
-        if (!result) {
-            throw new Error("Could not initialize application");
-        }
-
-        setups = new HashMap<String, HibernateDatabaseSetup>();
+        setups = new HashMap<>();
     }
 
     //**************************************************************************
@@ -181,23 +170,19 @@ public class Persistence {
         }
     }
 
-    protected File getModelDirectory() {
+    public File getModelDirectory() {
         return new File(appModelFile.getParentFile(), FilenameUtils.getBaseName(appModelFile.getName()));
     }
 
-    protected void runLiquibase(Database database) {
+    public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
         ResourceAccessor resourceAccessor =
                 new FileSystemResourceAccessor(appDir.getAbsolutePath());
         ConnectionProvider connectionProvider =
                 database.getConnectionProvider();
-        String databaseName = database.getDatabaseName();
         for(Schema schema : database.getSchemas()) {
             String schemaName = schema.getSchemaName();
-            String changelogFileName =
-                    MessageFormat.format(
-                            changelogFileNameTemplate, databaseName + "-" + schemaName);
-            File changelogFile = new File(appDbsDir, changelogFileName);
+            File changelogFile = getLiquibaseChangelogFile(schema);
             if(!changelogFile.isFile()) {
                 logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
                 continue;
@@ -212,10 +197,6 @@ public class Persistence {
                 lqDatabase.setDefaultSchemaName(schema.getSchema());
                 String relativeChangelogPath =
                         ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
-                if(new File(relativeChangelogPath).isAbsolute()) {
-                    logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
-                            appDbsDir, appDir);
-                }
                 Liquibase lq = new Liquibase(
                         relativeChangelogPath,
                         resourceAccessor,
@@ -253,12 +234,7 @@ public class Persistence {
                 File schemaDir = new File(databaseDir, schema.getSchemaName());
                 if(schemaDir.isDirectory() || schemaDir.mkdirs()) {
                     logger.debug("Schema directory {} exists", schemaDir);
-                    File[] tableFiles = schemaDir.listFiles(new FilenameFilter() {
-                        @Override
-                        public boolean accept(File dir, String name) {
-                            return name.endsWith(".table.xml");
-                        }
-                    });
+                    File[] tableFiles = schemaDir.listFiles((dir, name) -> name.endsWith(".table.xml"));
                     for(File tableFile : tableFiles) {
                         if(!tableFile.delete()) {
                             logger.warn("Could not delete table file {}", tableFile.getAbsolutePath());
@@ -457,8 +433,10 @@ public class Persistence {
         return getPortofinoProperties().getString(PortofinoProperties.APP_NAME);
     }
 
-    public File getAppDbsDir() {
-        return appDbsDir;
+    public File getLiquibaseChangelogFile(Schema schema) {
+        File dbDir = new File(getModelDirectory(), schema.getDatabaseName());
+        File schemaDir = new File(dbDir, schema.getSchemaName());
+        return new File(schemaDir, changelogFileNameTemplate);
     }
 
     public File getAppModelFile() {

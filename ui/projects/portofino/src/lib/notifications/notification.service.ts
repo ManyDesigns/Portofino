@@ -5,6 +5,7 @@ import {Type} from "@angular/core/src/type";
 import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {AuthenticationService, NO_AUTH_HEADER} from "../security/authentication.service";
+import {TranslateService} from "@ngx-translate/core";
 
 export enum NotificationLevel {
   INFO, WARN, ERROR
@@ -38,12 +39,12 @@ export class MatSnackBarNotificationService extends NotificationService {
 
   configuration: MatSnackBarConfig = { duration: 10000, verticalPosition: 'bottom' }; //TODO injection token?
 
-  constructor(protected snackBar: MatSnackBar) {
+  constructor(protected snackBar: MatSnackBar, protected translate: TranslateService) {
     super();
   }
 
   show(message: string, level: NotificationLevel) {
-    return this.snackBar.open(message, null, this.configuration).afterOpened();
+    return this.snackBar.open(message, this.translate.instant('Ok'), this.configuration).afterOpened();
   }
 }
 

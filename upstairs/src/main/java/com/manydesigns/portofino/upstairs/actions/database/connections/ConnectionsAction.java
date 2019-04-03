@@ -84,10 +84,8 @@ public class ConnectionsAction extends AbstractPageAction {
             js.key("schema").value(schema.schema);
             js.key("selected").value(schema.selected);
 
-            String changelogFileNameTemplate = "{0}-changelog.xml";
-            String changelogFileName = MessageFormat.format(
-                    changelogFileNameTemplate, databaseName + "-" + schema.schema);
-            File changelogFile = new File(persistence.getAppDbsDir(), changelogFileName);
+            Schema dbSchema = DatabaseLogic.findSchemaByName(persistence.getModel(), databaseName, schema.schemaName);
+            File changelogFile = persistence.getLiquibaseChangelogFile(dbSchema);
             js.key("liquibase").value(changelogFile.isFile());
             js.endObject();
         }

@@ -114,10 +114,7 @@ public class TablesAction extends AbstractPageAction {
                 lastSchema = null;
             }
             if(!table.getSchemaName().equals(lastSchema)) {
-                String changelogFileNameTemplate = "{0}-changelog.xml";
-                String changelogFileName = MessageFormat.format(
-                        changelogFileNameTemplate, table.getDatabaseName() + "-" + table.getSchemaName());
-                File changelogFile = new File(persistence.getAppDbsDir(), changelogFileName);
+                File changelogFile = persistence.getLiquibaseChangelogFile(table.getSchema());
                 String schemaDescr = table.getSchemaName();
 
                 lastSchema = table.getSchemaName();
