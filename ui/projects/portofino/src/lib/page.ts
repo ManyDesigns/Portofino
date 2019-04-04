@@ -558,6 +558,10 @@ export abstract class Page implements WithButtons, OnDestroy {
     return this.http.get<PageConfiguration>(this.getConfigurationLocation(path));
   }
 
+  loadChildConfiguration(child: PageChild) {
+    return this.loadPageConfiguration(`${this.path}/${child.path}`);
+  }
+
   getConfigurationLocation(path: string = this.path) {
     //replace double slash, but not in http(s)://
     return `pages${path}/config.json`.replace(new RegExp("([^:])//"), '$1/');

@@ -1,4 +1,4 @@
-import {Page, PageConfiguration, PageService} from "./page";
+import {Page, PageChild, PageConfiguration, PageService} from "./page";
 import {
   Component,
   ComponentFactoryResolver,
@@ -99,11 +99,13 @@ export class PageFactoryComponent extends Page implements OnInit {
   }
 
   load(segments: UrlSegment[]) {
-    return this.loadChild("", null, segments, 0);
+    return this.loadPage(null, null, segments, 0);
   }
 
-  protected loadChild(path: string, parent: Page, segments: UrlSegment[], index: number): Observable<ComponentRef<Page>> {
-    return this.loadPageConfiguration(path).pipe(
+  protected loadPage(parent: Page, child: PageChild, segments: UrlSegment[], index: number): Observable<ComponentRef<Page>> {
+    const path = parent ? `${parent.path}/${child.path}` : "";
+    const pageConfiguration = parent ? parent.loadChildConfiguration(child) : this.loadPageConfiguration(path);
+    return pageConfiguration.pipe(
       mergeMap(config => this.create(config, path, parent)),
       mergeMap(componentRef => {
         const page = <Page>componentRef.instance;
@@ -112,10 +114,9 @@ export class PageFactoryComponent extends Page implements OnInit {
         for (let i = index; i < segments.length; i++) {
           let s = segments[i];
           if (page.consumePathSegment(s.path)) {
-            path += `/${s.path}`;
             let child = page.getChild(s.path);
             if (child) {
-              return this.loadChild(path, page, segments, i + 1);
+              return this.loadPage(page, child, segments, i + 1);
             } else {
               return throwError(`Nonexistent child of ${page.url}: ${s.path}`);
             }
