@@ -144,8 +144,9 @@
     <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
       <mat-step [stepControl]="step0Form.control">
         <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
+        {{'Use an existing'|translate}}
         <mat-form-field>
-          <mat-label>{{'Use an existing database connection' | translate}}</mat-label>
+          <mat-label>{{'database connection' | translate}}</mat-label>
           <mat-select [(ngModel)]="wizard.connectionProvider">
             <mat-option></mat-option>
             <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
@@ -475,26 +476,31 @@
                   <ng-container *ngIf="q.beingEdited">
                     <td class="mat-cell">
                       <mat-form-field>
-                        <input matInput [(ngModel)]="q.name" />
+                        <mat-label>{{'Name'|translate}}</mat-label>
+                        <input matInput [(ngModel)]="q.name" required />
                       </mat-form-field>
                     </td>
                     <td class="mat-cell">
                       <mat-form-field>
-                        <input matInput [(ngModel)]="q.columns" />
+                        <mat-label>{{'Columns'|translate}}</mat-label>
+                        <input matInput [(ngModel)]="q.columns" required />
                       </mat-form-field>
                     </td>
                     <td class="mat-cell">
                       <mat-form-field>
-                        <input matInput [(ngModel)]="q.toDatabase" />
+                        <mat-label>{{'Database' | translate}}</mat-label>
+                        <mat-select [(ngModel)]="q.toDatabase" required>
+                          <mat-option *ngFor="let cp of connectionProviders" [value]="cp.name">{{cp.name}}</mat-option>
+                        </mat-select>
                       </mat-form-field>
                     </td>
-                    <td *ngIf="q.hql && !q.new" class="mat-cell">
+                    <td *ngIf="q.isHql" class="mat-cell">
                       <mat-form-field>
                         <mat-label>HQL</mat-label>
                         <input matInput [(ngModel)]="q.hql" />
                       </mat-form-field>
                     </td>
-                    <td *ngIf="q.sql && !q.new" class="mat-cell">
+                    <td *ngIf="!q.isHql" class="mat-cell">
                       <mat-form-field>
                         <mat-label>SQL</mat-label>
                         <input matInput [(ngModel)]="q.sql" />

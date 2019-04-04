@@ -184,6 +184,11 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
         c.javaType = "default";
       }
     });
+    if(this.tableInfo.table.query) {
+      this.tableInfo.table.query.forEach(q => {
+        q.isHql = !!q.hql;
+      });
+    }
   }
 
   @Button({ list: "table", text: "Save", icon: "save", color: "primary" })
@@ -292,6 +297,9 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   }
 
   saveSelectionProvider(sp) {
+    if(!sp.name || !sp.columns || !sp.toDatabase || (!sp.hql && !sp.sql)) {
+      return;
+    }
     delete sp.beingEdited;
     delete sp.new;
     if(sp.columns) {
@@ -303,6 +311,7 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     if(sp.hql && sp.sql) {
       delete sp.sql;
     }
+    sp.isHql = !!sp.hql;
   }
 
   cancelSelectionProvider(sp) {
