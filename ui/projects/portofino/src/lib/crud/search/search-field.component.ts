@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Property} from "../../class-accessor";
+import {isRequired, Property} from "../../class-accessor";
 import {PortofinoService} from "../../portofino.service";
 import {FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
@@ -22,6 +22,10 @@ export class SearchFieldComponent implements OnInit {
 
   getOptionLabel(option) {
     return option ? option.l : null;
+  }
+
+  get required() {
+    return isRequired(this.property);
   }
 
   ngOnInit() {

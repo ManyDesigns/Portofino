@@ -53,9 +53,12 @@
     <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
     <mat-datepicker #datepicker></mat-datepicker>
   </mat-form-field>
-  <ng-container *ngIf="property.kind == 'boolean'" [formGroup]="form">
-    <mat-checkbox [formControlName]="property.name">
-      {{property.label}}
-    </mat-checkbox>
-  </ng-container>
+  <mat-form-field *ngIf="property.kind == 'boolean'" [formGroup]="form">
+    <mat-select [formControlName]="property.name" [placeholder]="property.label">
+      <mat-option>{{'Any'|translate}}</mat-option>
+      <mat-option value="true">{{'True'|translate}}</mat-option>
+      <mat-option value="false">{{'False'|translate}}</mat-option>
+      <mat-option value="-" *ngIf="!required">{{'No value'|translate}}</mat-option>
+    </mat-select>
+  </mat-form-field>
 </ng-template>
