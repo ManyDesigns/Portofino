@@ -89,12 +89,11 @@ public abstract class DocumentedApiRoot implements ReaderListener {
             if(resource instanceof WithParameters) {
                 WithParameters wp = (WithParameters) resource;
                 for(int i = 0; i < wp.getParameters().size(); i++) {
-                    boolean required = i < wp.getMinParameters();
                     String name = wp.getParameterName(i);
-                    path += "{" + name + "}";
+                    path += "/{" + name + "}";
                     PathParameter parameter = new PathParameter();
                     parameter.setName(name);
-                    parameter.setRequired(required);
+                    parameter.setRequired(true);
                     parameters.add(parameter);
                 }
             }

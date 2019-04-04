@@ -434,6 +434,9 @@ public class Persistence {
     }
 
     public File getLiquibaseChangelogFile(Schema schema) {
+        if(schema == null) {
+            return null;
+        }
         File dbDir = new File(getModelDirectory(), schema.getDatabaseName());
         File schemaDir = new File(dbDir, schema.getSchemaName());
         return new File(schemaDir, changelogFileNameTemplate);

@@ -86,7 +86,7 @@ public class ConnectionsAction extends AbstractPageAction {
 
             Schema dbSchema = DatabaseLogic.findSchemaByName(persistence.getModel(), databaseName, schema.schemaName);
             File changelogFile = persistence.getLiquibaseChangelogFile(dbSchema);
-            js.key("liquibase").value(changelogFile.isFile());
+            js.key("liquibase").value(changelogFile != null && changelogFile.isFile());
             js.endObject();
         }
         js.endArray();
