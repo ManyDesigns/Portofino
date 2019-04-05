@@ -6,7 +6,7 @@ import {
 } from "@angular/core";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {Page, PageConfiguration, PageService} from "../page";
+import {Page, PageChild, PageConfiguration, PageService} from "../page";
 import {map, mergeMap} from "rxjs/operators";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
@@ -15,7 +15,7 @@ import {ClassAccessor, Property} from "../class-accessor";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
-import {BehaviorSubject, from, merge, Observable} from "rxjs";
+import {BehaviorSubject, from, merge, Observable, of, throwError} from "rxjs";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {FormGroup} from "@angular/forms";
@@ -52,7 +52,10 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
               authenticationService: AuthenticationService, protected pageService: PageService,
               protected notificationService: NotificationService, protected translate: TranslateService) {
     super(portofino, http, router, route, authenticationService);
-    this.configuration = { title: "Upstairs" };
+    this.configuration = {
+      title: "Upstairs",
+      //children: [{path: "misc", title: "Misc", icon: null, showInNavigation: true, accessible: true}]
+    };
     route.url.pipe(map(segments => segments.join(''))).subscribe(url => {
       this.url = url;
     });
@@ -65,6 +68,14 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
   private _isExpandable = (node: TableFlatNode) => { return node.expandable };
 
   isExpandable = (_: number, node: TableFlatNode) => { return this._isExpandable(node); };
+
+  loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
+    if(child.path == 'misc') {
+      return of({ actualType: null, title: "Misc", source: null, securityCheckPath: null, children: [] });
+    } else {
+      return throwError(404);
+    }
+  }
 
   ngOnInit(): void {
     this.pageService.notifyPageLoaded(this);

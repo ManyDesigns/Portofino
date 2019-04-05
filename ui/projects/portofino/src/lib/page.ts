@@ -6,7 +6,8 @@ import {
   InjectionToken,
   Input, OnDestroy,
   OnInit, Optional,
-  TemplateRef} from "@angular/core";
+  TemplateRef, Type
+} from "@angular/core";
 import {ANNOTATION_REQUIRED, ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormControl, FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
@@ -62,7 +63,8 @@ export class DefaultNavigationComponent {
 }
 
 export class PageConfiguration {
-  type: string;
+  type?: string;
+  actualType?: Type<any>;
   title: string;
   source: string;
   securityCheckPath: string = ':description';

@@ -71,7 +71,7 @@ export class PageFactoryComponent extends Page implements OnInit {
   }
 
   create(config: PageConfiguration, path: string, parent: Page): Observable<ComponentRef<any>> {
-    const componentType = PageFactoryComponent.components[config.type];
+    const componentType = config.actualType ? config.actualType : PageFactoryComponent.components[config.type];
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
