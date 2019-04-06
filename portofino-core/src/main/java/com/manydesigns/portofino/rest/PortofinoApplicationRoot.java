@@ -8,12 +8,13 @@ import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.security.ResourcePermissions;
 import com.manydesigns.portofino.dispatcher.web.ApplicationRoot;
-import io.swagger.converter.ModelConverters;
-import io.swagger.jackson.ModelResolver;
-import io.swagger.jackson.TypeNameResolver;
-import io.swagger.jaxrs.Reader;
-import io.swagger.models.Swagger;
-import io.swagger.util.Json;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.jackson.ModelResolver;
+import io.swagger.v3.core.jackson.TypeNameResolver;
+import io.swagger.v3.core.util.Json;
+import io.swagger.v3.jaxrs2.Reader;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.vfs2.FileObject;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -47,14 +48,14 @@ public class PortofinoApplicationRoot extends ApplicationRoot {
     }
 
     @Override
-    public void beforeScan(Reader reader, Swagger swagger) {
-        super.beforeScan(reader, swagger);
+    public void beforeScan(Reader reader, OpenAPI openAPI) {
+        super.beforeScan(reader, openAPI);
         ModelConverters.getInstance().addConverter(new PortofinoModelResolver(Json.mapper()));
     }
 
     @Override
-    public void afterScan(Reader reader, Swagger swagger) {
-        super.afterScan(reader, swagger);
+    public void afterScan(Reader reader, OpenAPI openAPI) {
+        super.afterScan(reader, openAPI);
     }
 }
 

@@ -31,9 +31,7 @@ import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
 import com.manydesigns.portofino.dispatcher.web.ApplicationRoot;
-import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.listing.ApiListingResource;
-import io.swagger.jaxrs.listing.SwaggerSerializers;
+import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.VFS;
@@ -84,7 +82,7 @@ public class GrizzlyMain {
         DocumentedApiRoot.setRootFactory(() -> Root.get(root, resourceResolver));
         String host = System.getProperty("portofino.web.host", "0.0.0.0");
         String port = System.getProperty("portofino.web.port", "8090");
-        ResourceConfig config = new ResourceConfig(ApplicationRoot.class, ApiListingResource.class, SwaggerSerializers.class);
+        ResourceConfig config = new ResourceConfig(ApplicationRoot.class, OpenApiResource.class);
         config.property(ServletProperties.FILTER_FORWARD_ON_404, true);
         try {
             config.register(Class.forName("org.glassfish.jersey.jackson.JacksonFeature"));
@@ -98,12 +96,13 @@ public class GrizzlyMain {
         } catch (ClassNotFoundException e) {
             //Shiro not available
         }
+        /* TODO
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setSchemes(new String[]{"http"});
         beanConfig.setHost(host + ":" + port);
         beanConfig.setBasePath("/");
         beanConfig.setResourcePackage(ApplicationRoot.class.getPackage().getName());
-        beanConfig.setScan(true);
+        beanConfig.setScan(true);*/
 
         URI uri = URI.create("http://" + host + ":" + port + "/");
         HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(uri, config);

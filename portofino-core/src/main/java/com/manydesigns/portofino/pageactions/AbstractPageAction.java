@@ -41,9 +41,8 @@ import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.*;
 import com.manydesigns.portofino.shiro.ShiroUtils;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -295,16 +294,16 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
      * Returns the list of operations that can be invoked via REST on this resource.
      * @return the list of operations.
      */
-    @ApiOperation(
-        nickname =
+    @io.swagger.v3.oas.annotations.Operation(
+        operationId =
             "com.manydesigns.portofino.pageactions.AbstractPageAction#describeOperations",
-        value =
+        description =
             "Returns the list of operations that can be invoked via REST on this resource. " +
             "If the user doesn't have permission to invoke an operation, or a VISIBLE guard " +
             "doesn't pass, then the operation is excluded from the result. If an ENABLED guard " +
             "doesn't pass, the operation is included, but it is marked as not available.")
     @ApiResponses({ @ApiResponse(
-            code = 200, message = "A list of operations (name, signature, available).")})
+            responseCode = "200", description = "A list of operations (name, signature, available).")})
     @Path(":operations")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -356,13 +355,13 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
      * Returns the configuration of this action.
      * @return the configuration.
      */
-    @ApiOperation(
-        nickname =
+    @io.swagger.v3.oas.annotations.Operation(
+        operationId =
             "com.manydesigns.portofino.pageactions.AbstractPageAction#getConfiguration",
-        value =
+        description =
             "Returns the configuration of this action. " +
             "The actual type of the configuration object depends on the action class.")
-    @ApiResponses({ @ApiResponse(code = 200, message = "The configuration object.")})
+    @ApiResponses({ @ApiResponse(responseCode = "200", description = "The configuration object.")})
     @Path(":configuration")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)

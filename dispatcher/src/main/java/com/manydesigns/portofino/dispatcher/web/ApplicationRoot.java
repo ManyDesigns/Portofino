@@ -3,6 +3,7 @@ package com.manydesigns.portofino.dispatcher.web;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

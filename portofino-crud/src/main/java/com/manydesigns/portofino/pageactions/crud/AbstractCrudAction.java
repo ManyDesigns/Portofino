@@ -59,8 +59,10 @@ import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import ognl.OgnlContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -1072,9 +1074,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @GET
     @Path(":blob/{propertyName}")
-    @ApiOperation(value = "Downloads the contents of a blob property", response = byte[].class)
+    @Operation(summary = "Downloads the contents of a blob property")
     public Response downloadBlob(
-            @ApiParam(value = "The name of the property", required = true)
+            @Parameter(description = "The name of the property", required = true)
             @PathParam("propertyName") String propertyName) {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).
@@ -1140,11 +1142,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
-    @ApiOperation(value = "Upload a blob property")
+    @Operation(summary = "Upload a blob property")
     public Response uploadBlob(
-            @ApiParam(value = "The name of the property", required = true)
+            @Parameter(description = "The name of the property", required = true)
             @PathParam("propertyName") String propertyName,
-            @ApiParam(value = "The name of uploaded file")
+            @Parameter(description = "The name of uploaded file")
             @QueryParam("filename") String filename,
             InputStream inputStream)
             throws IOException {
@@ -1189,9 +1191,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @DELETE
     @Path(":blob/{propertyName}")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
-    @ApiOperation(value = "Delete the contents of a blob property")
+    @Operation(summary = "Delete the contents of a blob property")
     public Response deleteBlob(
-            @ApiParam(value = "The name of the property", required = true)
+            @Parameter(description = "The name of the property", required = true)
             @PathParam("propertyName") String propertyName)
             throws IOException {
         if(object == null) {
@@ -1275,6 +1277,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @GET
     @Path(":allSelectionProviders")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "The list of selection providers configured on this crud action.")
     public CrudSelectionProviderEdit[] getAllSelectionProviders() {
         Map<List<String>, Collection<String>> availableSelectionProviders =
                 selectionProviderSupport.getAvailableSelectionProviderNames();

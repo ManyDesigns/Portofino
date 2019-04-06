@@ -164,14 +164,14 @@ public class PortofinoRoot extends AbstractPageAction {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response homeJSON() throws URISyntaxException {
-        return Response.temporaryRedirect(new URI("swagger.json")).build();
+    public Response openAPIJSON() throws URISyntaxException {
+        return Response.temporaryRedirect(new URI("openapi.json")).build();
     }
 
     @GET
     @Produces("application/yaml")
-    public Response homeYAML() throws URISyntaxException {
-        return Response.temporaryRedirect(new URI("swagger.yaml")).build();
+    public Response openAPIYAML() throws URISyntaxException {
+        return Response.temporaryRedirect(new URI("openapi.yaml")).build();
     }
 
 }

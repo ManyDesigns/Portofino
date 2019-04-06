@@ -1,25 +1,26 @@
 package com.manydesigns.portofino.dispatcher.swagger;
 
-import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.dispatcher.Resource;
+import com.manydesigns.portofino.dispatcher.RootFactory;
+import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.dispatcher.visitor.DepthFirstVisitor;
 import com.manydesigns.portofino.dispatcher.visitor.ResourceVisitor;
-import io.swagger.annotations.Api;
-import io.swagger.jaxrs.Reader;
-import io.swagger.jaxrs.config.ReaderListener;
-import io.swagger.models.Swagger;
-import io.swagger.models.parameters.Parameter;
-import io.swagger.models.parameters.PathParameter;
+import io.swagger.v3.jaxrs2.Reader;
+import io.swagger.v3.jaxrs2.ReaderListener;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.parameters.PathParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.ResourceContext;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by alessio on 28/07/16.
  */
-@Api
 public abstract class DocumentedApiRoot implements ReaderListener {
     
     protected static final Logger logger = LoggerFactory.getLogger(DocumentedApiRoot.class);
@@ -34,10 +35,10 @@ public abstract class DocumentedApiRoot implements ReaderListener {
     }
     
     @Override
-    public void beforeScan(Reader reader, Swagger swagger) {}
+    public void beforeScan(Reader reader, OpenAPI openAPI) {}
 
     @Override
-    public void afterScan(Reader reader, Swagger swagger) {
+    public void afterScan(Reader reader, OpenAPI openAPI) {
         final SubResourceReader subResourceReader = getSubResourceReader(reader);
         try {
             //TODO actions should be put in a special "inspection mode" to avoid checks (e.g. not-in-use-case),
@@ -46,7 +47,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
             root.setResourceContext(getResourceContext());
             new DepthFirstVisitor((ResourceVisitor) node -> {
                 try {
-                    subResourceReader.readSubResource(node);
+                    OpenAPI subApi = subResourceReader.readSubResource(node);
+                    openAPI.getPaths().putAll(subApi.getPaths());
                 } catch (Exception e) {
                     logger.error("Could not read node at " + node.getLocation(), e);
                 }
@@ -67,15 +69,15 @@ public abstract class DocumentedApiRoot implements ReaderListener {
     protected static class SubResourceReader extends Reader {
 
         public SubResourceReader(Reader reader) {
-            super(reader.getSwagger(), reader.getConfig());
+            super(reader.getOpenAPI());
         }
 
-        public Swagger readSubResource(Resource resource) {
+        public OpenAPI readSubResource(Resource resource) {
             ArrayList<Parameter> parameters = new ArrayList<>();
             String path = calculateResourcePath(resource, parameters);
 
-            return read(resource.getClass(), path, null, true, new String[0], new String[0],
-                    new HashMap<>(), parameters);
+            return read(resource.getClass(), path, null, true, null, null,
+                    new HashSet<>(), parameters, new HashSet<>());
         }
 
         public String calculateResourcePath(Resource resource, ArrayList<Parameter> parameters) {
