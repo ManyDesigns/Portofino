@@ -256,22 +256,6 @@ export class CrudComponent extends Page {
   protected getPageSettingsPanel(): PageSettingsPanel {
     return new CrudPageSettingsPanel(this);
   }
-
-  protected getActionConfigurationToSave(): any {
-    const configurationToSave = super.getActionConfigurationToSave();
-    const settingsPanel = (<CrudPageSettingsPanel>this.settingsPanel);
-    configurationToSave.properties = settingsPanel.properties;
-    configurationToSave.selectionProviders = settingsPanel.selectionProviders.map(sp => {
-      const enabled = sp.selectionProviderName != null;
-      return {
-        enabled: enabled,
-        selectionProviderName: enabled ? sp.selectionProviderName : sp.availableSelectionProviders ? sp.availableSelectionProviders[0] : null,
-        displayModeName: sp.displayModeName,
-        searchDisplayModeName: sp.searchDisplayModeName
-      }
-    });
-    return configurationToSave;
-  }
 }
 
 export enum CrudView {
@@ -341,11 +325,17 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
     }
     const url = `${this.page.portofino.apiRoot}portofino-upstairs/database/connections`;
     this.page.http.get<any[]>(url).subscribe(s => {
-      const confFieldset = this.formDefinition.contents[0] as FieldSet;
-      const dbField = confFieldset.contents.contents.find(f => f instanceof Field && f.name == 'database') as Field
+      const confFieldset = this.formDefinition.contents.find(f => f['name'] == 'configuration') as FieldSet;
+      const dbField = confFieldset.contents.contents.find(f => f instanceof Field && f.name == 'database') as Field;
       dbField.property.selectionProvider = new Selection();
       s.forEach(c => {
-        dbField.property.selectionProvider.options.push({ l: c.name, v: c.name, s: false })
+        const selected = this.page.configuration.database == c.name;
+        const value = { l: c.name, v: c.name, s: selected };
+        dbField.property.selectionProvider.options.push(value);
+        if(selected) {
+          config.database = value;
+          dbField.initialState = value;
+        }
       });
       this.formDefinition = {...this.formDefinition}; //To cause the form component to reload the form
     });
@@ -369,5 +359,21 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
         });
       }
     });
+  }
+
+  getActionConfigurationToSave(): any {
+    const configurationToSave = super.getActionConfigurationToSave();
+    configurationToSave.properties = this.properties;
+    configurationToSave.selectionProviders = this.selectionProviders.map(sp => {
+      const enabled = sp.selectionProviderName != null;
+      return {
+        enabled: enabled,
+        selectionProviderName: enabled ? sp.selectionProviderName : sp.availableSelectionProviders ? sp.availableSelectionProviders[0] : null,
+        displayModeName: sp.displayModeName,
+        searchDisplayModeName: sp.searchDisplayModeName
+      }
+    });
+    configurationToSave.database = configurationToSave.database ? configurationToSave.database.v : null;
+    return configurationToSave;
   }
 }

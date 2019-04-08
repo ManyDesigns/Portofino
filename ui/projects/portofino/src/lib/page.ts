@@ -323,9 +323,11 @@ export class PageSettingsPanel {
   constructor(public page: Page) {}
 
   show() {
-    this.formDefinition.contents = [
-      Field.fromProperty({name: 'title', label: 'Title'}, this.page.configuration)];
-    this.formDefinition.editable = this.page.portofino.localApiAvailable;
+    const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), this.page.configuration);
+    titleField.editable = this.page.portofino.localApiAvailable;
+    const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, this.page.configuration);
+    iconField.editable = this.page.portofino.localApiAvailable;
+    this.formDefinition.contents = [titleField, iconField];
     this.previousConfiguration = this.page.configuration;
     this.reloadConfiguration();
     this.loadPermissions();
@@ -382,6 +384,10 @@ export class PageSettingsPanel {
       })
       //this.page.settingsPanel.refreshConfiguration(); TODO
     });
+  }
+
+  getActionConfigurationToSave() {
+    return this.form.get('configuration').value;
   }
 }
 
@@ -574,7 +580,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   saveConfiguration() {
-    const actionConfiguration = this.getActionConfigurationToSave();
+    const actionConfiguration = this.settingsPanel.getActionConfigurationToSave();
     const path = this.getConfigurationLocation(this.path);
     if (this.portofino.localApiAvailable) {
       const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
@@ -635,10 +641,6 @@ export abstract class Page implements WithButtons, OnDestroy {
     pageConfiguration.title = config.title;
     pageConfiguration.type = config.type;
     return pageConfiguration;
-  }
-
-  protected getActionConfigurationToSave() {
-    return this.settingsPanel.form.get('configuration').value;
   }
 
   get configurationProperties() {
