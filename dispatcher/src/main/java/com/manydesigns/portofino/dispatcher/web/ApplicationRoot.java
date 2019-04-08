@@ -1,25 +1,15 @@
 package com.manydesigns.portofino.dispatcher.web;
 
 import com.manydesigns.portofino.dispatcher.Resource;
-import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
 
 /**
  * Created by alessio on 4/28/16.

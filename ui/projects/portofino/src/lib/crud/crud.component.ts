@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
-import {ClassAccessor, loadClassAccessor} from "../class-accessor";
+import {ClassAccessor, loadClassAccessor, SelectionProvider as Selection} from "../class-accessor";
 import {PortofinoComponent} from "../page.factory";
 import {Operation, Page, PageChild, PageConfiguration, PageSettingsPanel} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
@@ -11,6 +11,7 @@ import {DetailComponent} from "./detail/detail.component";
 import {CreateComponent} from "./detail/create.component";
 import {BulkEditComponent} from "./bulk/bulk-edit.component";
 import {mergeMap} from "rxjs/operators";
+import {Field, FieldSet} from "../form";
 
 @Component({
   selector: 'portofino-crud',
@@ -338,6 +339,16 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
     if(!config) {
       return;
     }
+    const url = `${this.page.portofino.apiRoot}portofino-upstairs/database/connections`;
+    this.page.http.get<any[]>(url).subscribe(s => {
+      const confFieldset = this.formDefinition.contents[0] as FieldSet;
+      const dbField = confFieldset.contents.contents.find(f => f instanceof Field && f.name == 'database') as Field
+      dbField.property.selectionProvider = new Selection();
+      s.forEach(c => {
+        dbField.property.selectionProvider.options.push({ l: c.name, v: c.name, s: false })
+      });
+      this.formDefinition = {...this.formDefinition}; //To cause the form component to reload the form
+    });
     const crud = this.page as CrudComponent;
     crud.http.get<any>(crud.sourceUrl + '/:allSelectionProviders').subscribe(sps => {
       this.selectionProviders = sps;
