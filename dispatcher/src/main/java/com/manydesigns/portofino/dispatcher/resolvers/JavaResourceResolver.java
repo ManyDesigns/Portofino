@@ -79,8 +79,7 @@ public class JavaResourceResolver extends CachingResourceResolver {
     }
 
     protected Class resolveClassFile(FileObject location) throws Exception {
-        return new JavaCodeBase(location.getParent(), codeBase).
-                loadClassFile(location, getBaseName(location));
+        return new JavaCodeBase(location.getParent(), codeBase).loadClassFile(location, getBaseName(location));
     }
 
     public CodeBase getCodeBase() {

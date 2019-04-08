@@ -9,7 +9,6 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;

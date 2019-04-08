@@ -18,6 +18,7 @@ import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
@@ -33,8 +34,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -73,11 +73,16 @@ public class PortofinoRoot extends AbstractPageAction {
         ognlContext.put("securityUtils", new SecurityUtilsBean());
         logger.debug("Publishing textProvider in OGNL context");
         ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
+        return super.consumePathSegment(pathSegment);
+    }
+
+    @Override
+    protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
         FileObject child = children.get(pathSegment);
         if(child != null) {
-            return consumePathSegment(pathSegment, child, resourceResolver);
+            return child;
         }
-        return super.consumePathSegment(pathSegment);
+        return super.getChildLocation(pathSegment);
     }
 
     @Override
@@ -145,6 +150,13 @@ public class PortofinoRoot extends AbstractPageAction {
         description.put("children", getSubResources());
         description.put("loginPath", portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH));
         return description;
+    }
+
+    @Override
+    public Collection<String> getSubResources() {
+        Set<String> subresources = new HashSet<>(super.getSubResources());
+        subresources.addAll(children.keySet());
+        return subresources;
     }
 
     @Override

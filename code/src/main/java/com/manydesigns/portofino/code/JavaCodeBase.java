@@ -32,10 +32,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -184,25 +186,32 @@ public class JavaCodeBase implements CodeBase {
         @Override
         protected Class<?> findClass(String name) throws ClassNotFoundException {
             synchronized (fileObject) {
-                InputStream inputStream = null;
                 try {
+                    FileObject classFile;
                     if (fileObject.getType() == FileType.FILE) {
-                        inputStream = fileObject.getContent().getInputStream();
+                        classFile = fileObject;
                     } else {
-                        inputStream = fileObject.resolveFile(classNameToPath(name) + ".class").getContent().getInputStream();
+                        classFile = fileObject.resolveFile(classNameToPath(name) + ".class");
                     }
-                    byte[] code = IOUtils.toByteArray(inputStream);
-                    return defineClass(name, code);
+                    try(InputStream inputStream = classFile.getContent().getInputStream()) {
+                        byte[] code = IOUtils.toByteArray(inputStream);
+                        return defineClass(name, code);
+                    }
                 } catch (Exception e) {
                     throw new ClassNotFoundException(name, e);
-                } finally {
-                    IOUtils.closeQuietly(inputStream);
                 }
             }
         }
 
-        public Class<?> defineClass(String name, byte[] code) {
-            return defineClass(null, code, 0, code.length);
+        public Class<?> defineClass(String name, byte[] code) throws ClassNotFoundException {
+            try {
+                return defineClass(null, code, 0, code.length);
+            } catch (LinkageError e) {
+                //LinkageError happens (also) when defining the same class twice. Since this classloader ignores the name,
+                //code like theClass.getClassloader().loadClass(anotherName) would fail with an error. Here we wrap it
+                //with a ClassNotFoundException, which is more often expected and handled.
+                throw new ClassNotFoundException(name, e);
+            }
         }
     }
 

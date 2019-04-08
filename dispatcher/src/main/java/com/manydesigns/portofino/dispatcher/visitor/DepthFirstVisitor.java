@@ -1,7 +1,6 @@
 package com.manydesigns.portofino.dispatcher.visitor;
 
 import com.manydesigns.portofino.dispatcher.AbstractResource;
-import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.WithParameters;
 import org.apache.commons.vfs2.FileSystemException;
@@ -16,10 +15,11 @@ import java.util.List;
  * Created by alessio on 17/05/16.
  */
 public class DepthFirstVisitor {
-    
+
     protected final List<ResourceVisitor> visitors = new ArrayList<>();
     protected static final Logger logger = LoggerFactory.getLogger(DepthFirstVisitor.class);
-    
+    public int maxParameters = 10;
+
     public DepthFirstVisitor(ResourceVisitor... visitors) {
         this.visitors.addAll(Arrays.asList(visitors));
     }
@@ -38,7 +38,7 @@ public class DepthFirstVisitor {
         visitResource(resource);
         if(resource instanceof WithParameters && ((WithParameters) resource).getMinParameters() == 0) {
             WithParameters withParameters = (WithParameters) resource;
-            for(int i = 0; i < withParameters.getMaxParameters(); i++) {
+            for(int i = 0; i < Math.min(maxParameters, withParameters.getMaxParameters()); i++) {
                 withParameters.consumeParameter("{" + withParameters.getParameterName(i) + "}");
             }
             visitResource(resource);

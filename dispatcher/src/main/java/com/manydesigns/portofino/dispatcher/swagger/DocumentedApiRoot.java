@@ -49,6 +49,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
                 try {
                     OpenAPI subApi = subResourceReader.readSubResource(node);
                     openAPI.getPaths().putAll(subApi.getPaths());
+                    //TODO merge components too
                 } catch (Exception e) {
                     logger.error("Could not read node at " + node.getLocation(), e);
                 }
