@@ -1,6 +1,6 @@
-import {Injectable, InjectionToken} from "@angular/core";
+import {ErrorHandler, Injectable, InjectionToken} from "@angular/core";
 import {Observable, of} from "rxjs";
-import {map} from "rxjs/operators";
+import {map, mergeMap} from "rxjs/operators";
 import {Type} from "@angular/core/src/type";
 import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
@@ -14,21 +14,30 @@ export enum NotificationLevel {
 @Injectable()
 export abstract class NotificationService {
   abstract show(message: string, level: NotificationLevel): Observable<void>;
-  info(message) {
-    return this.show(message, NotificationLevel.INFO);
+
+  showObservable(message: Observable<string> | string, level: NotificationLevel) {
+    if(message instanceof Observable) {
+      return message.pipe(mergeMap(m => this.show(m, level)));
+    } else {
+      return this.show(message, level);
+    }
   }
-  warn(message) {
-    return this.show(message, NotificationLevel.WARN);
+
+  info(message: string | Observable<string>) {
+    return this.showObservable(message, NotificationLevel.INFO);
   }
-  error(message) {
-    return this.show(message, NotificationLevel.ERROR);
+  warn(message: string | Observable<string>) {
+    return this.showObservable(message, NotificationLevel.WARN);
+  }
+  error(message: string | Observable<string>) {
+    return this.showObservable(message, NotificationLevel.ERROR);
   }
 }
 
 @Injectable()
 export class WindowAlertNotificationService extends NotificationService {
   show(message: string, level: NotificationLevel) {
-    return of(null).pipe(map(_ => {
+    return of(null).pipe(map(() => {
       alert(message);
     }));
   }
@@ -84,5 +93,18 @@ export class NotificationInterceptor implements HttpInterceptor {
       }
       return value;
     }));
+  }
+}
+
+@Injectable()
+export class NotificationErrorHandler extends ErrorHandler {
+
+  constructor(protected notificationService: NotificationService) {
+    super();
+  }
+
+  handleError(error: any): void {
+    super.handleError(error);
+    this.notificationService.error(error);
   }
 }

@@ -25,7 +25,7 @@ public class ModelAction extends AbstractPageAction {
 
     @POST
     @Path(":reload")
-    public void restartApplication() {
+    public void reloadModel() {
         persistence.loadXmlModel();
     }
 

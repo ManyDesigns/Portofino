@@ -406,6 +406,13 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     });
   }
 
+  @Button({ list: "misc", text: "Reload model", color: "primary", icon: "refresh" })
+  reloadModel() {
+    this.http.post(this.portofino.apiRoot + "portofino-upstairs/model", null).subscribe(
+      () => this.notificationService.info(this.translate.get("Model reloaded."))
+    );
+  }
+
 }
 
 class ConnectionProviderSummary {

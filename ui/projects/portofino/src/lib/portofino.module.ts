@@ -1,7 +1,7 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ModuleWithProviders, NgModule, Type} from '@angular/core';
+import {ErrorHandler, ModuleWithProviders, NgModule, Type} from '@angular/core';
 import {
   DefaultToolbarComponent,
   PortofinoAppComponent,
@@ -76,7 +76,7 @@ import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {ContentComponent} from "./content.component";
 import {
-  MatSnackBarNotificationService, NotificationInterceptor,
+  MatSnackBarNotificationService, NotificationErrorHandler, NotificationInterceptor,
   NotificationService
 } from "./notifications/notification.service";
 import {ScrollingModule} from "@angular/cdk/scrolling";
@@ -198,7 +198,8 @@ export class PortofinoCrudModule {}
     { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },
     { provide: TOKEN_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
-    { provide: NotificationService, useClass: MatSnackBarNotificationService }],
+    { provide: NotificationService, useClass: MatSnackBarNotificationService },
+    { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [LoginComponent],
   exports: [
     PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
