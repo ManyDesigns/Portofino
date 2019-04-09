@@ -28,11 +28,11 @@
     </div>
   </mat-nav-list>
   <div *ngIf="!pageService.page.parent">
-    <a mat-list-item>
-      <strong>
-        <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
-        {{pageService.page.title | translate}}</strong></a>
     <mat-nav-list>
+      <a mat-list-item>
+        <strong>
+          <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
+          {{pageService.page.title | translate}}</strong></a>
       <ng-container *ngFor="let child of pageService.page.children">
         <a mat-list-item
            *ngIf="child.accessible && child.showInNavigation"

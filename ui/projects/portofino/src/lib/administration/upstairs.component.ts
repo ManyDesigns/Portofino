@@ -64,6 +64,7 @@ export class UpstairsComponent extends Page implements OnInit {
     return {
       title: "Upstairs", type: "portofino-upstairs", source: "", securityCheckPath: "", children: [
         { path: "settings", title: "Settings", icon: "settings", showInNavigation: true, accessible: true, embedded: false },
+        { path: "permissions", title: "Permissions", icon: "lock", showInNavigation: true, accessible: true, embedded: false },
         //{ path: "misc", title: "Misc", icon: null, showInNavigation: true, accessible: true, embedded: false }
       ]
     };
@@ -72,6 +73,8 @@ export class UpstairsComponent extends Page implements OnInit {
   loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
     if(child.path == 'misc') {
       return of({ actualType: null, title: "Misc", source: null, securityCheckPath: null, children: [] });
+    } else if(child.path == 'permissions') {
+      return of({ actualType: PermissionsComponent, title: "Permissions", source: null, securityCheckPath: null, children: [] });
     } else if(child.path == 'settings') {
       return of({ actualType: SettingsComponent, title: "Settings", source: null, securityCheckPath: null, children: [] });
     } else {
@@ -80,8 +83,6 @@ export class UpstairsComponent extends Page implements OnInit {
   }
 
   ngOnInit(): void {
-    this.pageService.notifyPageLoaded(this);
-    this.settingsPanel.loadPermissions();
     this.loadConnectionProviders();
     this.loadDatabasePlatforms();
   }
@@ -545,14 +546,10 @@ class TableTreeDataSource {
   template: `
     <form (submit)="saveSettings()">
       <mat-card>
-        <mat-card-content>
-          <portofino-form #settingsFormComponent [form]="settingsForm"></portofino-form>
-        </mat-card-content>
+        <mat-card-content><portofino-form #settingsFormComponent [form]="settingsForm"></portofino-form></mat-card-content>
         <mat-card-actions>
-          <div fxLayout="row">
-            <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
-            <portofino-buttons [component]="this"></portofino-buttons>
-          </div>
+          <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+          <portofino-buttons [component]="this"></portofino-buttons>
         </mat-card-actions>
       </mat-card>
   </form>`
@@ -583,4 +580,34 @@ export class SettingsComponent extends Page implements AfterViewInit {
     this.resetSettings();
   }
 
+}
+
+@Component({
+  template: `
+    <mat-card>
+      <mat-card-content>
+        <table *ngIf="parent.settingsPanel.permissions" class="mat-table">
+          <tr class="mat-header-row">
+            <th class="mat-header-cell">{{'Group'|translate}}</th>
+            <th class="mat-header-cell">{{'Access level'|translate}}</th>
+          </tr>
+          <tr *ngFor="let group of parent.settingsPanel.groups" class="mat-row">
+            <td class="mat-cell">{{group.name}}</td>
+            <td class="mat-cell">
+              <mat-select [(ngModel)]="group.level">
+                <mat-option *ngFor="let level of parent.settingsPanel.accessLevels" [value]="level">
+                  {{level}}
+                </mat-option>
+              </mat-select>
+            </td>
+          </tr>
+        </table>
+      </mat-card-content>
+      <mat-card-actions><portofino-buttons [component]="parent" list="permissions"></portofino-buttons></mat-card-actions>
+    </mat-card>`
+})
+export class PermissionsComponent extends Page implements OnInit {
+  ngOnInit(): void {
+    this.parent.settingsPanel.loadPermissions();
+  }
 }

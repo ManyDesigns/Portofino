@@ -1,26 +1,10 @@
+<mat-card>
+  <mat-card-title>{{'Upstairs: Portofino Configuration Application'|translate}}</mat-card-title>
+  <mat-card-content>
+    TODO
+  </mat-card-content>
+</mat-card>
 <mat-tab-group>
-  <mat-tab>
-    <ng-template mat-tab-label>
-      {{'Permissions'|translate}}
-    </ng-template>
-    <table *ngIf="settingsPanel.permissions" class="mat-table">
-      <tr class="mat-header-row">
-        <th class="mat-header-cell">{{'Group'|translate}}</th>
-        <th class="mat-header-cell">{{'Access level'|translate}}</th>
-      </tr>
-      <tr *ngFor="let group of settingsPanel.groups" class="mat-row">
-        <td class="mat-cell">{{group.name}}</td>
-        <td class="mat-cell">
-          <mat-select [(ngModel)]="group.level">
-            <mat-option *ngFor="let level of settingsPanel.accessLevels" [value]="level">
-              {{level}}
-            </mat-option>
-          </mat-select>
-        </td>
-      </tr>
-    </table>
-    <portofino-buttons [component]="this" list="permissions"></portofino-buttons>
-  </mat-tab>
   <mat-tab>
     <ng-template mat-tab-label>
       {{'Database connections'|translate}}

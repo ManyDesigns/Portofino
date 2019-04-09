@@ -92,9 +92,9 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   checkAccessibility(parent: Page, child: PageChild) {
-    let dummy = new DummyPage(this.portofino, this.http, this.router, this.route, this.authenticationService);
-    dummy.parent = parent;
-    dummy.loadPageConfiguration(`${parent.path}/${child.path}`).pipe(mergeMap(config => {
+    parent.loadChildConfiguration(child).pipe(mergeMap(config => {
+      const dummy = new DummyPage(this.portofino, this.http, this.router, this.route, this.authenticationService);
+      dummy.parent = parent;
       dummy.configuration = config;
       return dummy.accessPermitted;
     })).subscribe(flag => child.accessible = flag);

@@ -94,7 +94,7 @@ import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
 import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
 import {LocalStorageService} from "ngx-store";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
-import {SettingsComponent, UpstairsComponent} from "./administration/upstairs.component";
+import {PermissionsComponent, SettingsComponent, UpstairsComponent} from "./administration/upstairs.component";
 
 @NgModule({
   declarations: [
@@ -175,7 +175,7 @@ export class PortofinoPagesModule {}
 export class PortofinoCrudModule {}
 
 @NgModule({
-  declarations: [UpstairsComponent, SettingsComponent],
+  declarations: [UpstairsComponent, PermissionsComponent, SettingsComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
@@ -187,7 +187,7 @@ export class PortofinoCrudModule {}
     NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
-  entryComponents: [UpstairsComponent, SettingsComponent],
+  entryComponents: [UpstairsComponent, PermissionsComponent, SettingsComponent],
   exports: [UpstairsComponent]
 })
 export class PortofinoUpstairsModule {}

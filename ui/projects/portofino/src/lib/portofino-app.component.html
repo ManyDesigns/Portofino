@@ -3,8 +3,10 @@
   <mat-drawer-container [autosize]="true">
     <mat-drawer #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
                 role="navigation">
-      <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
-      <ng-template portofino-navigation></ng-template>
+      <mat-card>
+        <mat-card-title>{{ 'Navigation' | translate }}</mat-card-title>
+        <mat-card-content><ng-template portofino-navigation></ng-template></mat-card-content>
+      </mat-card>
     </mat-drawer>
     <mat-drawer-content class="app-content-content">
       <breadcrumbs></breadcrumbs>
