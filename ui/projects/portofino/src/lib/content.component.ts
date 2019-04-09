@@ -1,18 +1,20 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver, ComponentRef, Injector, OnDestroy,
-  OnInit, ViewChild
+  ComponentFactoryResolver, ComponentRef, Inject, InjectionToken, Injector, OnDestroy,
+  OnInit, Optional, ViewChild
 } from '@angular/core';
 import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {MainPageDirective} from "./content.directive";
-import {Observable, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import {mergeMap} from "rxjs/operators";
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
 import {Page, PageChild, PageService} from "./page";
 import {PageFactoryComponent} from "./page.factory";
+
+export const ROOT_PAGE_CONFIGURATION_LOADER = new InjectionToken('Root Page configuration loader: () => Observable<PageConfiguration>');
 
 @Component({
   selector: 'portofino-content',
@@ -29,9 +31,13 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   constructor(public pageService: PageService,
               protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
-              public portofino: PortofinoService, protected authenticationService: AuthenticationService) {
+              public portofino: PortofinoService, protected authenticationService: AuthenticationService,
+              @Inject(ROOT_PAGE_CONFIGURATION_LOADER) @Optional() rootPageConfigurationLoader) {
     this.pageFactory = new PageFactoryComponent(
       portofino, http, router, route, authenticationService, componentFactoryResolver, injector, null);
+    if(rootPageConfigurationLoader) {
+      this.pageFactory.loadRootPageConfiguration = rootPageConfigurationLoader;
+    }
   }
 
   ngOnInit() {

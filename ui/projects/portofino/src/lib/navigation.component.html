@@ -12,11 +12,9 @@
         {{child.title | translate}}
       </a>
       <div *ngIf="child.path == pageService.page.segment">
-        <a mat-list-item>
-          <strong>
-            <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
-            {{pageService.page.title | translate}}
-          </strong>
+        <a mat-list-item style="font-weight: bold">
+          <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
+          {{pageService.page.title | translate}}
         </a>
         <ng-container *ngFor="let child of pageService.page.children">
           <a mat-list-item

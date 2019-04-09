@@ -1,7 +1,8 @@
 import {Component, Input, NgModule, OnInit} from '@angular/core';
 import {
-  Button, PortofinoModule, PortofinoService, CrudComponent, SearchComponent,
-  NAVIGATION_COMPONENT, DefaultNavigationComponent, PortofinoComponent} from "portofino";
+  Button, PortofinoModule, PortofinoService, CrudComponent, SearchComponent, PageConfiguration,
+  NAVIGATION_COMPONENT, ROOT_PAGE_CONFIGURATION_LOADER,
+  DefaultNavigationComponent, PortofinoComponent, PortofinoUpstairsModule, UpstairsComponent} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -37,6 +38,7 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
 import localeIt from "@angular/common/locales/it";
+import {Observable, of} from "rxjs";
 
 registerLocaleData(localeIt);
 
@@ -62,7 +64,7 @@ export class CustomNavigation {}
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Upstairs" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
 })
 export class AppComponent {}
 
@@ -102,9 +104,11 @@ export class CustomSearch extends SearchComponent {
   declarations: [AppComponent, HelloPortofino, CustomNavigation, CustomCrud, CustomSearch],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
+    { provide: ROOT_PAGE_CONFIGURATION_LOADER, useFactory: AppModule.rootComponent }
   ],
   imports: [
     PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }], { enableTracing: true }),
+    PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
@@ -119,5 +123,9 @@ export class AppModule {
   static navigation() {
     return DefaultNavigationComponent
     //return CustomNavigation
+  }
+
+  static rootComponent(): () => Observable<PageConfiguration> {
+    return () => of(UpstairsComponent.defaultConfiguration());
   }
 }

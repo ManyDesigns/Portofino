@@ -19,19 +19,14 @@ import {BehaviorSubject, from, merge, Observable, of, throwError} from "rxjs";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {FormGroup} from "@angular/forms";
+import {PortofinoComponent} from "../page.factory";
 
 @Component({
   selector: 'portofino-upstairs',
   templateUrl: './upstairs.component.html'
 })
-export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
-
-  readonly settingsForm = new Form([
-    Field.fromProperty(Property.create({name: "appName", label: "Application Name"}).required()),
-    Field.fromProperty(Property.create({name: "loginPath", label: "Login Path"}).required())
-  ]);
-  @ViewChild("settingsFormComponent")
-  settingsFormComponent: FormComponent;
+@PortofinoComponent({ name: "portofino-upstairs" })
+export class UpstairsComponent extends Page implements OnInit {
 
   connectionProviders: ConnectionProviderSummary[];
   connectionProvider: ConnectionProviderDetails;
@@ -52,10 +47,6 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
               authenticationService: AuthenticationService, protected pageService: PageService,
               protected notificationService: NotificationService, protected translate: TranslateService) {
     super(portofino, http, router, route, authenticationService);
-    this.configuration = {
-      title: "Upstairs",
-      //children: [{path: "misc", title: "Misc", icon: null, showInNavigation: true, accessible: true}]
-    };
     route.url.pipe(map(segments => segments.join(''))).subscribe(url => {
       this.url = url;
     });
@@ -69,9 +60,20 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
 
   isExpandable = (_: number, node: TableFlatNode) => { return this._isExpandable(node); };
 
+  static defaultConfiguration(): PageConfiguration {
+    return {
+      title: "Upstairs", type: "portofino-upstairs", source: "", securityCheckPath: "", children: [
+        { path: "settings", title: "Settings", icon: "settings", showInNavigation: true, accessible: true, embedded: false },
+        //{ path: "misc", title: "Misc", icon: null, showInNavigation: true, accessible: true, embedded: false }
+      ]
+    };
+  }
+
   loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
     if(child.path == 'misc') {
       return of({ actualType: null, title: "Misc", source: null, securityCheckPath: null, children: [] });
+    } else if(child.path == 'settings') {
+      return of({ actualType: SettingsComponent, title: "Settings", source: null, securityCheckPath: null, children: [] });
     } else {
       return throwError(404);
     }
@@ -82,10 +84,6 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
     this.settingsPanel.loadPermissions();
     this.loadConnectionProviders();
     this.loadDatabasePlatforms();
-  }
-
-  ngAfterViewInit(): void {
-    this.resetSettings();
   }
 
   loadConnectionProviders() {
@@ -162,20 +160,6 @@ export class UpstairsComponent extends Page implements OnInit, AfterViewInit {
       for (let k in d) {
         this.databasePlatforms.push(d[k]);
       }
-    });
-  }
-
-  @Button({ list: "settings", text: "Save", color: "primary" })
-  saveSettings() {
-    this.settingsFormComponent.controls.updateValueAndValidity(); //TODO why is this needed?
-    this.http.put(this.portofino.apiRoot + "portofino-upstairs/settings", this.settingsFormComponent.controls.value).subscribe();
-  }
-
-  @Button({ list: "settings", text: "Cancel" })
-  resetSettings() {
-    this.http.get<any>(this.portofino.apiRoot + "portofino-upstairs/settings").subscribe(settings => {
-      this.settingsFormComponent.controls.get('appName').setValue(settings.appName.value);
-      this.settingsFormComponent.controls.get('loginPath').setValue(settings.loginPath.value);
     });
   }
 
@@ -554,4 +538,49 @@ class TableTreeDataSource {
       });
     }
   }
+}
+
+@Component({
+  selector: 'portofino-upstairs-settings',
+  template: `
+    <form (submit)="saveSettings()">
+      <mat-card>
+        <mat-card-content>
+          <portofino-form #settingsFormComponent [form]="settingsForm"></portofino-form>
+        </mat-card-content>
+        <mat-card-actions>
+          <div fxLayout="row">
+            <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+            <portofino-buttons [component]="this"></portofino-buttons>
+          </div>
+        </mat-card-actions>
+      </mat-card>
+  </form>`
+})
+export class SettingsComponent extends Page implements AfterViewInit {
+  readonly settingsForm = new Form([
+    Field.fromProperty(Property.create({name: "appName", label: "Application Name"}).required()),
+    Field.fromProperty(Property.create({name: "loginPath", label: "Login Path"}).required())
+  ]);
+  @ViewChild("settingsFormComponent")
+  settingsFormComponent: FormComponent;
+
+  @Button({ text: "Save", color: "primary" })
+  saveSettings() {
+    this.settingsFormComponent.controls.updateValueAndValidity(); //TODO why is this needed?
+    this.http.put(this.portofino.apiRoot + "portofino-upstairs/settings", this.settingsFormComponent.controls.value).subscribe();
+  }
+
+  @Button({ text: "Cancel" })
+  resetSettings() {
+    this.http.get<any>(this.portofino.apiRoot + "portofino-upstairs/settings").subscribe(settings => {
+      this.settingsFormComponent.controls.get('appName').setValue(settings.appName.value);
+      this.settingsFormComponent.controls.get('loginPath').setValue(settings.loginPath.value);
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.resetSettings();
+  }
+
 }

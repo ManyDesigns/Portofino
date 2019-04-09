@@ -33,6 +33,8 @@ export class PageFactoryComponent extends Page implements OnInit {
   @Input()
   path: string;
 
+  loadRootPageConfiguration: () => Observable<PageConfiguration> = () => this.loadPageConfiguration("");
+
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, @Optional() route: ActivatedRoute,
               authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver, protected injector: Injector,
@@ -71,7 +73,7 @@ export class PageFactoryComponent extends Page implements OnInit {
   }
 
   create(config: PageConfiguration, path: string, parent: Page): Observable<ComponentRef<any>> {
-    const componentType = config.actualType ? config.actualType : PageFactoryComponent.components[config.type];
+    const componentType = config.actualType ? { type: config.actualType } : PageFactoryComponent.components[config.type];
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
@@ -104,7 +106,7 @@ export class PageFactoryComponent extends Page implements OnInit {
 
   protected loadPage(parent: Page, child: PageChild, segments: UrlSegment[], index: number): Observable<ComponentRef<Page>> {
     const path = parent ? `${parent.path}/${child.path}` : "";
-    const pageConfiguration = parent ? parent.loadChildConfiguration(child) : this.loadPageConfiguration(path);
+    const pageConfiguration = parent ? parent.loadChildConfiguration(child) : this.loadRootPageConfiguration();
     return pageConfiguration.pipe(
       mergeMap(config => this.create(config, path, parent)),
       mergeMap(componentRef => {

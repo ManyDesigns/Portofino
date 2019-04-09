@@ -94,7 +94,7 @@ import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
 import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
 import {LocalStorageService} from "ngx-store";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
-import {UpstairsComponent} from "./administration/upstairs.component";
+import {SettingsComponent, UpstairsComponent} from "./administration/upstairs.component";
 
 @NgModule({
   declarations: [
@@ -124,8 +124,7 @@ export class PortofinoFormsModule {}
     LanguageSelectorComponent,
     NavigationDirective, DefaultNavigationComponent,
     ToolbarDirective, DefaultToolbarComponent, BreadcrumbsComponent,
-    CreatePageComponent, DeletePageComponent, MovePageComponent,
-    UpstairsComponent
+    CreatePageComponent, DeletePageComponent, MovePageComponent
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
@@ -140,8 +139,7 @@ export class PortofinoFormsModule {}
   providers: [PortofinoService, AuthenticationService, PageService, PageCrudService],
   entryComponents: [
     DefaultNavigationComponent, DefaultToolbarComponent,
-    CreatePageComponent, DeletePageComponent, MovePageComponent,
-    UpstairsComponent],
+    CreatePageComponent, DeletePageComponent, MovePageComponent],
   exports: [
     DefaultPageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
     ContentComponent, PageFactoryComponent, PageHeader,
@@ -175,6 +173,24 @@ export class PortofinoPagesModule {}
     ManyToManyComponent]
 })
 export class PortofinoCrudModule {}
+
+@NgModule({
+  declarations: [UpstairsComponent, SettingsComponent],
+  imports: [
+    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+    HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
+    MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
+    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
+    MatMomentDateModule, MatMomentDatetimeModule, MatProgressBarModule, MatRadioModule,
+    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
+    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
+    NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
+  ],
+  providers: [],
+  entryComponents: [UpstairsComponent, SettingsComponent],
+  exports: [UpstairsComponent]
+})
+export class PortofinoUpstairsModule {}
 
 @NgModule({
   declarations: [PortofinoAppComponent, LoginComponent],
@@ -224,7 +240,6 @@ export class PortofinoModule {
   public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders|Type<PortofinoModule>)[] {
     return [RouterModule.forRoot(
       [...routes,
-              { path: "portofino-upstairs", component: UpstairsComponent },
               { path: "**", component: ContentComponent}],
       { onSameUrlNavigation: "reload", ...config }),
       PortofinoModule];

@@ -1,7 +1,0 @@
-{
-  "title": "Projects",
-  "type": "customcrud",
-  "children": [],
-  "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": true, "showInNavigation": false }],
-  "source": "projects"
-}

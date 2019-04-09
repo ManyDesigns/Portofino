@@ -1,18 +1,6 @@
 <mat-tab-group>
   <mat-tab>
     <ng-template mat-tab-label>
-      {{'Settings'|translate}}
-    </ng-template>
-    <form (submit)="saveSettings()">
-      <portofino-form #settingsFormComponent [form]="settingsForm"></portofino-form>
-      <div fxLayout="row">
-        <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
-        <portofino-buttons [component]="this" list="settings"></portofino-buttons>
-      </div>
-    </form>
-  </mat-tab>
-  <mat-tab>
-    <ng-template mat-tab-label>
       {{'Permissions'|translate}}
     </ng-template>
     <table *ngIf="settingsPanel.permissions" class="mat-table">
