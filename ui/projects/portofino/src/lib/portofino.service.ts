@@ -18,6 +18,7 @@ export class PortofinoService {
   loginPath = 'login';
   sideNavPosition: SideNavPosition = 'page';
   sideNavOpen: boolean;
+  upstairsLink = "/portofino-upstairs";
 
   readonly DEFAULT_LOCALE = 'en';
   readonly localeDefinitions = {};

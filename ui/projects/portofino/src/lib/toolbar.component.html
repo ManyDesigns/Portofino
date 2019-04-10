@@ -7,14 +7,14 @@
     <a mat-button routerLink="/"><span>{{ title | translate}}</span></a>
   </div>
   <div>
-    <ng-container *ngIf="authenticationService.isAdmin">
+    <ng-container *ngIf="authenticationService.isAdmin && (portofino.upstairsLink || pageCrudService.available)">
       <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
-        <a mat-menu-item routerLink="/portofino-upstairs">
+        <a mat-menu-item *ngIf="portofino.upstairsLink" [routerLink]="portofino.upstairsLink">
           <mat-icon>settings</mat-icon>
           {{ 'Upstairs' | translate }}
         </a>
+        <mat-divider *ngIf="portofino.upstairsLink && pageCrudService.available"></mat-divider>
         <ng-container *ngIf="pageCrudService.available">
-          <mat-divider></mat-divider>
           <button mat-menu-item (click)="pageCrudService.showCreatePageDialog()">
             <mat-icon>add</mat-icon>
             {{ 'Add page' | translate }}

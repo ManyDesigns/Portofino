@@ -55,6 +55,8 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   apiRoot: string;
   @Input()
   sideNavPosition: SideNavPosition;
+  @Input()
+  upstairsLink = this.portofino.upstairsLink;
   @ViewChild(ToolbarDirective)
   toolbarHost: ToolbarDirective;
 
@@ -74,6 +76,7 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
     if(this.apiRoot) {
       this.portofino.defaultApiRoot = this.apiRoot;
     }
+    this.portofino.upstairsLink = this.upstairsLink;
     this.portofino.init();
   }
 

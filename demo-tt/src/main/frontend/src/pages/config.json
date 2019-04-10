@@ -1,6 +1,9 @@
 {
   "title": "Home",
   "type": "welcome",
-  "children": [{"path": "projects", "title": "Projects", "embedded": false, "showInNavigation": true }],
+  "children": [
+    {"path": "projects", "title": "Projects", "embedded": false, "showInNavigation": true },
+    {"path": "portofino-upstairs", "title": "Upstairs", "embedded": false, "showInNavigation": false }
+  ],
   "source": ""
 }

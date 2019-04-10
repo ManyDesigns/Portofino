@@ -25,3 +25,6 @@ export * from './lib/crud/search/search-field.component';
 export * from './lib/crud/bulk/bulk-edit.component';
 export * from './lib/portofino.module';
 export * from './lib/administration/upstairs.component';
+export {DatabasePlatform} from "./lib/administration/support";
+export {ConnectionProviderDetails} from "./lib/administration/support";
+export {ConnectionProviderSummary} from "./lib/administration/support";

@@ -1,6 +1,6 @@
 import {Component, Input, NgModule, OnInit} from '@angular/core';
 import {
-  Button, PortofinoModule, PortofinoService, CrudComponent, SearchComponent, PageConfiguration,
+  PortofinoModule, PageConfiguration,
   NAVIGATION_COMPONENT, ROOT_PAGE_CONFIGURATION_LOADER,
   DefaultNavigationComponent, PortofinoComponent, PortofinoUpstairsModule, UpstairsComponent} from "portofino";
 import {
@@ -43,72 +43,19 @@ import {Observable, of} from "rxjs";
 registerLocaleData(localeIt);
 
 @Component({
-  selector: 'portofino-hello',
-  template: `<p>Welcome to Portofino 5!</p>`
-})
-export class HelloPortofino implements OnInit {
-
-  constructor(protected http: HttpClient, protected portofino: PortofinoService) {}
-
-  ngOnInit(): void {
-    this.http.get(this.portofino.apiRoot).subscribe(x => console.log("API Call", x));
-  }
-
-}
-
-@Component({
-  selector: 'custom-navigation',
-  template: `<h3>Custom navigation</h3><p><a routerLink="/start">Start here</a> </p>`
-})
-export class CustomNavigation {}
-
-@Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Portofino Upstairs" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Upstairs" apiRoot="http://localhost:8080/demo-tt/api/" [upstairsLink]="null"></portofino-app>`
 })
 export class AppComponent {}
 
-@PortofinoComponent({ name: 'customcrud' })
-export class CustomCrud extends CrudComponent {
-
-  initialize(): void {
-    console.log("Custom crud");
-    super.initialize();
-    this.configuration.title = 'Custom CRUD';
-    this.searchComponent = CustomSearch;
-    this.searchComponentContext = { customInput: "works!" };
-  }
-
-  @Button({
-    list: 'search-results', text: 'Custom button', icon: 'save', color: "warn", enabledIf: CustomCrud.buttonEnabled
-  })
-  hello() {
-    console.log("Custom button", this.configuration);
-  }
-
-  static buttonEnabled() {
-    return true;
-  }
-}
-
-export class CustomSearch extends SearchComponent {
-  @Input()
-  customInput;
-  ngOnInit(): void {
-    console.log("Custom search with input", this.customInput);
-    super.ngOnInit();
-  }
-}
-
 @NgModule({
-  declarations: [AppComponent, HelloPortofino, CustomNavigation, CustomCrud, CustomSearch],
+  declarations: [AppComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
-    { provide: ROOT_PAGE_CONFIGURATION_LOADER, useFactory: AppModule.rootComponent }
+    { provide: ROOT_PAGE_CONFIGURATION_LOADER, useFactory: AppModule.rootPageConfiguration }
   ],
   imports: [
-    PortofinoModule.withRoutes([{ path: "start", component: HelloPortofino }], { enableTracing: true }),
-    PortofinoUpstairsModule,
+    PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
@@ -116,7 +63,7 @@ export class CustomSearch extends SearchComponent {
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule,
     TranslateModule.forRoot()],
-  entryComponents: [ CustomNavigation, CustomCrud, CustomSearch ],
+  entryComponents: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {
@@ -125,7 +72,7 @@ export class AppModule {
     //return CustomNavigation
   }
 
-  static rootComponent(): () => Observable<PageConfiguration> {
+  static rootPageConfiguration(): () => Observable<PageConfiguration> {
     return () => of(UpstairsComponent.defaultConfiguration());
   }
 }

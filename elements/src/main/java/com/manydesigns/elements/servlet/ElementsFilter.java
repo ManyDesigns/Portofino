@@ -93,6 +93,7 @@ public class ElementsFilter implements Filter {
     }
 
     public void destroy() {
+        ElementsThreadLocals.destroy();
         logger.info("ElementsFilter destroyed");
     }
 

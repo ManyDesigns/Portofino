@@ -1,6 +1,6 @@
 import {Component, NgModule} from '@angular/core';
 import {
-  PortofinoModule, Page, CrudComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent,
+  PortofinoModule, PortofinoUpstairsModule, Page, CrudComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent,
   PortofinoComponent, PortofinoService, AuthenticationService} from "portofino";
 import {
   MatAutocompleteModule,
@@ -35,11 +35,9 @@ export class AppComponent {}
 
 @NgModule({
   declarations: [AppComponent],
-  providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
-  ],
+  providers: [],
   imports: [
-    PortofinoModule.withRoutes([]),
+    PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
@@ -48,9 +46,4 @@ export class AppComponent {}
   entryComponents: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-  static navigation() {
-    return DefaultNavigationComponent
-    //return CustomNavigation
-  }
-}
+export class AppModule {}
