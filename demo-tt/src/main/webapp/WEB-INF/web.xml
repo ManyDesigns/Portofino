@@ -64,15 +64,11 @@
     </servlet-mapping>
 
     <filter>
-        <filter-name>AutoConfigJsonFilter</filter-name>
-        <filter-class>com.manydesigns.portofino.ui.support.pages.AutoConfigJsonFilter</filter-class>
-        <init-param>
-            <param-name>writeGeneratedFiles</param-name>
-            <param-value>false</param-value>
-        </init-param>
+        <filter-name>ConfigJsonCacheFilter</filter-name>
+        <filter-class>com.manydesigns.portofino.ui.support.pages.ConfigJsonCacheFilter</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>AutoConfigJsonFilter</filter-name>
+        <filter-name>ConfigJsonCacheFilter</filter-name>
         <url-pattern>/pages/*</url-pattern>
     </filter-mapping>
 

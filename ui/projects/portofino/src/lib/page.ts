@@ -675,15 +675,14 @@ export abstract class Page implements WithButtons, OnDestroy {
       throw "Local Portofino API not available"
     }
     const pageConfiguration = this.getPageConfigurationToSave({});
-    this.configuration = pageConfiguration;
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     const path = this.getConfigurationLocation(this.path);
     this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
       params: { loginPath: this.portofino.loginPath }}).subscribe(
       () => {
+        this.configuration = pageConfiguration;
         this.settingsPanel.hide();
-        this.reloadBaseUrl();
       });
   }
 

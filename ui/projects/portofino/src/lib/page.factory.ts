@@ -5,7 +5,6 @@ import {
   ComponentRef,
   Injector,
   Input, OnInit, Optional,
-  Type,
   ViewContainerRef
 } from "@angular/core";
 import {PortofinoService} from "./portofino.service";
@@ -13,7 +12,6 @@ import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {AuthenticationService} from "./security/authentication.service";
 import {Observable, of, throwError} from "rxjs";
-import {PortofinoAppComponent} from "./portofino-app.component";
 import {map, mergeMap} from "rxjs/operators";
 
 @Component({

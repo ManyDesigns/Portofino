@@ -36,7 +36,7 @@ public class AutoConfigJsonFilter implements Filter {
             HttpServletRequest request = (HttpServletRequest) req;
             String path = request.getRequestURI().substring(request.getContextPath().length());
             File configJsonFile = new File(request.getServletContext().getRealPath(path));
-            if(!configJsonFile.exists()) {
+            if(path.endsWith("config.json") && !configJsonFile.exists()) {
                 StringBuffer requestURL = request.getRequestURL();
                 URI baseUri = new URI(requestURL.substring(0, requestURL.lastIndexOf(request.getServletPath())));
                 String apiRootUri = ApiInfo.getApiRootUri(req.getServletContext(), baseUri);
