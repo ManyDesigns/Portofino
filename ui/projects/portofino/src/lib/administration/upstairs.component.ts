@@ -14,7 +14,7 @@ import {TablesComponent} from "./tables.component";
   templateUrl: './upstairs.component.html'
 })
 @PortofinoComponent({ name: "portofino-upstairs" })
-export class UpstairsComponent extends Page implements OnInit {
+export class UpstairsComponent extends Page {
 
   static defaultConfiguration(): PageConfiguration {
     return {
@@ -42,10 +42,6 @@ export class UpstairsComponent extends Page implements OnInit {
     } else {
       return throwError(404);
     }
-  }
-
-  ngOnInit(): void {
-    //this.configuration = UpstairsComponent.defaultConfiguration();
   }
 
 }
