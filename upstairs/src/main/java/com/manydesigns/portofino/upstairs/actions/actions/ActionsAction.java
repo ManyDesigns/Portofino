@@ -4,7 +4,6 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -42,13 +41,27 @@ public class ActionsAction extends AbstractPageAction {
         maxParameters = Integer.MAX_VALUE;
     }
 
+    @Path("action")
+    public Resource getResource() {
+        String actionPath = StringUtils.join(parameters, "/");
+        Resource resource = getResource(actionPath);
+        if(resource == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        return resource;
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> describe() {
+        return getPageAction().describe();
+    }
+
+    protected AbstractPageAction getPageAction() {
         String actionPath = StringUtils.join(parameters, "/");
         Resource resource = getResource(actionPath);
         if(resource instanceof AbstractPageAction) {
-            return ((AbstractPageAction) resource).describe();
+            return ((AbstractPageAction) resource);
         } else {
             logger.error("Not a PageAction: " + resource);
             throw new WebApplicationException();

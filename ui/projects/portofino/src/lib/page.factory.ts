@@ -2,9 +2,9 @@ import {Page, PageChild, PageConfiguration, PageService} from "./page";
 import {
   Component,
   ComponentFactoryResolver,
-  ComponentRef,
+  ComponentRef, EventEmitter,
   Injector,
-  Input, OnInit, Optional,
+  Input, OnChanges, OnInit, Optional, Output, SimpleChanges,
   ViewContainerRef
 } from "@angular/core";
 import {PortofinoService} from "./portofino.service";
@@ -18,7 +18,7 @@ import {map, mergeMap} from "rxjs/operators";
   selector: 'portofino-page',
   template: ''
 })
-export class PageFactoryComponent extends Page implements OnInit {
+export class PageFactoryComponent extends Page implements OnInit, OnChanges {
 
   static components: any = {};
 
@@ -30,6 +30,8 @@ export class PageFactoryComponent extends Page implements OnInit {
   segment: string;
   @Input()
   path: string;
+  @Output()
+  pageCreated = new EventEmitter<Page>();
 
   loadRootPageConfiguration: () => Observable<PageConfiguration> = () => this.loadPageConfiguration("");
 
@@ -41,15 +43,23 @@ export class PageFactoryComponent extends Page implements OnInit {
   }
 
   ngOnInit(): void {
-    if(!this.path) {
-      if(this.parent) {
+    this.createPage();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.createPage();
+  }
+
+  protected createPage() {
+    if (!this.path) {
+      if (this.parent) {
         this.path = this.parent.path + '/' + this.segment;
       } else {
         this.path = this.segment;
       }
     }
     let configObservable: Observable<PageConfiguration>;
-    if(this.configuration) {
+    if (this.configuration) {
       configObservable = of(this.configuration);
     } else {
       configObservable = this.loadPageConfiguration(this.path);
@@ -57,7 +67,7 @@ export class PageFactoryComponent extends Page implements OnInit {
     configObservable.pipe(mergeMap(config => this.create(config, this.path, this.parent))).subscribe(c => {
       const page = <Page>c.instance;
       page.embedded = this.embedded;
-      if(this.parent) {
+      if (page.parent) {
         page.baseUrl = page.parent.baseUrl + '/' + page.segment;
         page.url = page.parent.url + '/' + page.segment;
       } else {
@@ -67,6 +77,7 @@ export class PageFactoryComponent extends Page implements OnInit {
       page.initialize();
       this.viewContainerRef.clear();
       this.viewContainerRef.insert(c.hostView);
+      this.pageCreated.emit(page);
     });
   }
 
@@ -127,7 +138,6 @@ export class PageFactoryComponent extends Page implements OnInit {
         return of(componentRef);
       }));
   }
-
 }
 
 export function PortofinoComponent(info: { name: string, defaultActionClass?: string }) {

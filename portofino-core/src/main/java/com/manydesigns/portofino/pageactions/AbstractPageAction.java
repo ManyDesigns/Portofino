@@ -22,9 +22,7 @@ package com.manydesigns.portofino.pageactions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.messages.RequestMessages;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
@@ -62,7 +60,6 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Convenient abstract base class for PageActions. It has fields to hold values of properties specified by the

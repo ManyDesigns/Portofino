@@ -8,6 +8,7 @@ import {PortofinoComponent} from "../page.factory";
 import {ConnectionsComponent} from "./connections.component";
 import {WizardComponent} from "./wizard.component";
 import {TablesComponent} from "./tables.component";
+import {ActionsComponent} from "./actions.component";
 
 @Component({
   selector: 'portofino-upstairs',
@@ -24,12 +25,15 @@ export class UpstairsComponent extends Page {
         { path: "permissions", title: "Permissions", icon: "lock", showInNavigation: true, accessible: true, embedded: false },
         { path: "connections", title: "Connections", icon: "lock", showInNavigation: true, accessible: true, embedded: false },
         { path: "wizard", title: "Wizard", icon: "web", showInNavigation: true, accessible: true, embedded: false },
-        { path: "tables", title: "Tables", icon: "storage", showInNavigation: true, accessible: true, embedded: false }]
+        { path: "tables", title: "Tables", icon: "storage", showInNavigation: true, accessible: true, embedded: false },
+        { path: "actions", title: "Actions", icon: "", showInNavigation: true, accessible: true, embedded: false }]
     };
   }
 
   loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
-    if(child.path == 'connections') {
+    if(child.path == 'actions') {
+      return of({ actualType: ActionsComponent, title: "Actions", source: null, securityCheckPath: null, children: [] });
+    } else if(child.path == 'connections') {
       return of({ actualType: ConnectionsComponent, title: "Connections", source: null, securityCheckPath: null, children: [] });
     } else if(child.path == 'permissions') {
       return of({ actualType: PermissionsComponent, title: "Permissions", source: null, securityCheckPath: null, children: [] });

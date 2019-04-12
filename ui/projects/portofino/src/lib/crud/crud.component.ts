@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
-import {HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {ClassAccessor, loadClassAccessor, SelectionProvider as Selection} from "../class-accessor";
 import {PortofinoComponent} from "../page.factory";
 import {Operation, Page, PageChild, PageConfiguration, PageSettingsPanel} from "../page";
@@ -12,6 +12,10 @@ import {CreateComponent} from "./detail/create.component";
 import {BulkEditComponent} from "./bulk/bulk-edit.component";
 import {mergeMap} from "rxjs/operators";
 import {Field, FieldSet} from "../form";
+import {TranslateService} from "@ngx-translate/core";
+import {PortofinoService} from "../portofino.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import {AuthenticationService} from "../security/authentication.service";
 
 @Component({
   selector: 'portofino-crud',
@@ -63,6 +67,12 @@ export class CrudComponent extends Page {
 
   error: any;
 
+
+  constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
+              authenticationService: AuthenticationService, protected translate: TranslateService) {
+    super(portofino, http, router, route, authenticationService);
+  }
+
   get rowsPerPage() {
     return this.configuration.rowsPerPage ? this.configuration.rowsPerPage : 10;
   }
@@ -86,7 +96,7 @@ export class CrudComponent extends Page {
         this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE") && bulkOpsEnabled;
         this.init();
       },
-      error => this.error = error);
+      () => this.error = this.translate.instant("This page is not configured correctly."));
   }
 
   computeBaseSourceUrl() {
@@ -350,15 +360,17 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
         inSummary: p.property.inSummary, searchable: p.property.searchable
       });
     });
-    crud.classAccessor.properties.forEach(p => {
-      if(!this.properties.find(p2 => p2.name == p.name)) {
-        this.properties.push({
-          enabled: p.key, name: p.name, label: null,
-          insertable: false, updatable: false,
-          inSummary: p.key, searchable: false
-        });
-      }
-    });
+    if(crud.classAccessor) {
+      crud.classAccessor.properties.forEach(p => {
+        if(!this.properties.find(p2 => p2.name == p.name)) {
+          this.properties.push({
+            enabled: p.key, name: p.name, label: null,
+            insertable: false, updatable: false,
+            inSummary: p.key, searchable: false
+          });
+        }
+      });
+    }
   }
 
   getActionConfigurationToSave(): any {

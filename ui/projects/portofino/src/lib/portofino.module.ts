@@ -50,7 +50,7 @@ import {
   MatDividerModule,
   MatListModule,
   MatProgressSpinnerModule,
-  MatTabsModule, MatStepperModule
+  MatTabsModule, MatStepperModule, MatGridListModule
 } from '@angular/material';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -98,6 +98,7 @@ import {PermissionsComponent, SettingsComponent, UpstairsComponent} from "./admi
 import {ConnectionsComponent} from "./administration/connections.component";
 import {WizardComponent} from "./administration/wizard.component";
 import {TablesComponent} from "./administration/tables.component";
+import {ActionsComponent} from "./administration/actions.component";
 
 @NgModule({
   declarations: [
@@ -178,19 +179,23 @@ export class PortofinoPagesModule {}
 export class PortofinoCrudModule {}
 
 @NgModule({
-  declarations: [UpstairsComponent, ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+  declarations: [
+    UpstairsComponent,
+    ActionsComponent, ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
     MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatProgressBarModule, MatRadioModule,
+    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatGridListModule, MatIconModule, MatInputModule,
+    MatMenuModule, MatMomentDateModule, MatMomentDatetimeModule, MatProgressBarModule, MatRadioModule,
     MatSelectModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
     MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
     NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
-  entryComponents: [UpstairsComponent, ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+  entryComponents: [
+    UpstairsComponent,
+    ActionsComponent, ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
   exports: [UpstairsComponent]
 })
 export class PortofinoUpstairsModule {}

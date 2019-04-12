@@ -25,6 +25,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -110,5 +111,12 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
         } else {
             return "optionalPathParameter_" + index;
         }
+    }
+
+    @Override
+    protected void describe(Map<String, Object> description) {
+        description.put("minParameters", minParameters);
+        description.put("maxParameters", maxParameters);
+        description.put("parameters", parameters);
     }
 }
