@@ -8,12 +8,12 @@ import {map} from "rxjs/operators";
 import {Page, PageConfiguration} from "../page";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
-import {PageFactoryComponent, PortofinoComponent} from "../page.factory";
+import {PageFactoryComponent} from "../page.factory";
 
 @Component({
   template: `
-    <mat-grid-list cols="2">
-      <mat-grid-tile>
+    <div fxLayout="row" fxLayoutAlign="start start">
+      <div>
         <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
           <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
             <button mat-icon-button disabled></button>
@@ -37,13 +37,14 @@ import {PageFactoryComponent, PortofinoComponent} from "../page.factory";
             <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate"></mat-progress-bar>
           </mat-tree-node>
         </mat-tree>
-      </mat-grid-tile>
-      <mat-grid-tile>
+      </div>
+      <div>
+        <mat-divider vertical="true"></mat-divider>
         <portofino-page
           *ngIf="selected"
           embedded="true" [path]="selected.pagePath" [configuration]="selected.configuration" (pageCreated)="configurePage($event)"></portofino-page>
-      </mat-grid-tile>
-    </mat-grid-list>
+      </div>
+    </div>
   `
 })
 export class ActionsComponent extends Page implements OnInit {

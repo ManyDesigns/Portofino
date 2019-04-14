@@ -23,10 +23,10 @@ export class UpstairsComponent extends Page {
       children: [
         { path: "settings", title: "Settings", icon: "settings", showInNavigation: true, accessible: true, embedded: false },
         { path: "permissions", title: "Permissions", icon: "lock", showInNavigation: true, accessible: true, embedded: false },
-        { path: "connections", title: "Connections", icon: "lock", showInNavigation: true, accessible: true, embedded: false },
+        { path: "connections", title: "Connections", icon: "network_wifi", showInNavigation: true, accessible: true, embedded: false },
         { path: "wizard", title: "Wizard", icon: "web", showInNavigation: true, accessible: true, embedded: false },
         { path: "tables", title: "Tables", icon: "storage", showInNavigation: true, accessible: true, embedded: false },
-        { path: "actions", title: "Actions", icon: "", showInNavigation: true, accessible: true, embedded: false }]
+        { path: "actions", title: "Actions", icon: "build", showInNavigation: true, accessible: true, embedded: false }]
     };
   }
 

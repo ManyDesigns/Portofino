@@ -99,12 +99,16 @@ export class NotificationInterceptor implements HttpInterceptor {
 @Injectable()
 export class NotificationErrorHandler extends ErrorHandler {
 
-  constructor(protected notificationService: NotificationService) {
+  constructor(protected notificationService: NotificationService, protected translate: TranslateService) {
     super();
   }
 
   handleError(error: any): void {
     super.handleError(error);
-    this.notificationService.error(error);
+    if(error.status) {
+      this.notificationService.error(this.translate.get("Server error"));
+    } else {
+      this.notificationService.error(error);
+    }
   }
 }
