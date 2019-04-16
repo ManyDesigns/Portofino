@@ -22,6 +22,8 @@ import {MatDialog, MatDialogRef} from "@angular/material";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {WithButtons} from "./button.component";
+import {NotificationService} from "./notifications/notification.service";
+import {TranslateService} from "@ngx-translate/core";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -89,10 +91,12 @@ export class PageSettingsPanel {
   permissions: Permissions;
   error;
   readonly accessLevels = ["NONE", "VIEW", "EDIT", "DEVELOP", "DENY"];
+  callback: (boolean) => void;
 
   constructor(public page: Page) {}
 
-  show() {
+  show(callback: (boolean) => void = () => {}) {
+    this.callback = callback;
     const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), this.page.configuration);
     titleField.editable = this.page.portofino.localApiAvailable;
     const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, this.page.configuration);
@@ -120,8 +124,9 @@ export class PageSettingsPanel {
     });
   }
 
-  hide() {
+  hide(saved: boolean) {
     this.active = false;
+    this.callback(saved);
   }
 
   get groups() {
@@ -183,7 +188,8 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
-    @Optional() protected route: ActivatedRoute, public authenticationService: AuthenticationService) {
+    @Optional() protected route: ActivatedRoute, public authenticationService: AuthenticationService,
+    protected notificationService: NotificationService, public translate: TranslateService) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
@@ -345,39 +351,34 @@ export abstract class Page implements WithButtons, OnDestroy {
     return `pages${path}/config.json`.replace(new RegExp("([^:])//"), '$1/');
   }
 
-  configure() {
-    this.settingsPanel.show();
+  configure(callback: (boolean) => void = () => this.reloadBaseUrl()) {
+    this.settingsPanel.show(callback);
   }
 
   saveConfiguration() {
     const actionConfiguration = this.settingsPanel.getActionConfigurationToSave();
     const path = this.getConfigurationLocation(this.path);
+    let saveConfObservable: Observable<any>;
     if (this.portofino.localApiAvailable) {
       const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
       this.configuration = pageConfiguration;
       let data = new FormData();
       data.append("pageConfiguration", JSON.stringify(pageConfiguration));
       data.append("actionConfiguration", JSON.stringify(actionConfiguration));
-      this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
+      saveConfObservable = this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
         params: {
           actionConfigurationPath: this.configurationUrl,
           loginPath: this.portofino.loginPath
         }
-      }).subscribe(() => {
-        this.settingsPanel.hide();
-        this.reloadBaseUrl();
       });
     } else {
-      this.http.put(`${this.configurationUrl}`, actionConfiguration).subscribe(() => {
-        this.settingsPanel.hide();
-        this.reloadBaseUrl();
-      });
+      saveConfObservable = this.http.put(`${this.configurationUrl}`, actionConfiguration);
     }
-  }
-
-  cancelConfiguration() {
-    this.configuration = this.settingsPanel.previousConfiguration;
-    this.settingsPanel.hide();
+    saveConfObservable.subscribe(() => {
+      this.settingsPanel.hide(true);
+    }, () => {
+      this.notificationService.error(this.translate.get("Error saving the configuration"));
+    });
   }
 
   protected reloadBaseUrl() {
@@ -388,6 +389,12 @@ export abstract class Page implements WithButtons, OnDestroy {
       window.location.reload(); //TODO
     }
   }
+
+  cancelConfiguration() {
+    this.configuration = this.settingsPanel.previousConfiguration;
+    this.settingsPanel.hide(false);
+  }
+
 
   get configurationUrl() {
     return this.computeSourceUrl() + this.configurationPath;
@@ -432,12 +439,12 @@ export abstract class Page implements WithButtons, OnDestroy {
       delete g.permissionMap;
     });
     this.http.put(permissionsUrl, this.settingsPanel.groups).subscribe(() => {
-      this.settingsPanel.hide();
+      this.settingsPanel.hide(true);
     });
   }
 
   cancelPermissions() {
-    this.settingsPanel.hide();
+    this.settingsPanel.hide(false);
   }
 
   saveChildren() {
@@ -452,12 +459,12 @@ export abstract class Page implements WithButtons, OnDestroy {
       params: { loginPath: this.portofino.loginPath }}).subscribe(
       () => {
         this.configuration = pageConfiguration;
-        this.settingsPanel.hide();
+        this.settingsPanel.hide(true);
       });
   }
 
   cancelChildren() {
-    this.settingsPanel.hide();
+    this.settingsPanel.hide(false);
   }
 }
 

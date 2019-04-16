@@ -1,12 +1,6 @@
 import {Page, PageConfiguration} from "../page";
 import {Component, OnInit} from "@angular/core";
 import {ConnectionProviderDetails, ConnectionProviderSummary, DatabasePlatform} from "./support";
-import {NotificationService} from "../notifications/notification.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {HttpClient} from "@angular/common/http";
-import {PortofinoService} from "../portofino.service";
-import {AuthenticationService} from "../security/authentication.service";
-import {TranslateService} from "@ngx-translate/core";
 import {from} from "rxjs";
 import {mergeMap} from "rxjs/operators";
 
@@ -19,12 +13,6 @@ export class WizardComponent extends Page implements OnInit {
   databasePlatforms: DatabasePlatform[];
   wizard: { connectionProvider: ConnectionProviderSummary } | any =
     { newConnectionType: 'jdbc', strategy: "automatic" };
-
-  constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
-              authenticationService: AuthenticationService, protected notificationService: NotificationService,
-              protected translate: TranslateService) {
-    super(portofino, http, router, route, authenticationService);
-  }
 
   ngOnInit(): void {
     this.loadConnectionProviders();

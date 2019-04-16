@@ -30,9 +30,9 @@ export class TablesComponent extends Page implements OnInit {
   readonly annotations = new FormGroup({});
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
-              authenticationService: AuthenticationService, protected notificationService: NotificationService,
-              protected translate: TranslateService) {
-    super(portofino, http, router, route, authenticationService);
+              authenticationService: AuthenticationService, notificationService: NotificationService,
+              translate: TranslateService) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate);
     this.tableTreeControl = new FlatTreeControl<TableFlatNode>(this._getLevel, this._isExpandable);
     this.tableTreeDataSource = new TableTreeDataSource(this.tableTreeControl, http, portofino.apiRoot);
   }

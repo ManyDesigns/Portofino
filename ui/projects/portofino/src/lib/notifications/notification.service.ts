@@ -1,6 +1,6 @@
 import {ErrorHandler, Injectable, InjectionToken} from "@angular/core";
 import {Observable, of} from "rxjs";
-import {map, mergeMap} from "rxjs/operators";
+import {map, mergeMap, share} from "rxjs/operators";
 import {Type} from "@angular/core/src/type";
 import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
@@ -24,13 +24,19 @@ export abstract class NotificationService {
   }
 
   info(message: string | Observable<string>) {
-    return this.showObservable(message, NotificationLevel.INFO);
+    const observable = this.showObservable(message, NotificationLevel.INFO).pipe(share());
+    observable.subscribe();
+    return observable;
   }
   warn(message: string | Observable<string>) {
-    return this.showObservable(message, NotificationLevel.WARN);
+    const observable = this.showObservable(message, NotificationLevel.WARN).pipe(share());
+    observable.subscribe();
+    return observable;
   }
   error(message: string | Observable<string>) {
-    return this.showObservable(message, NotificationLevel.ERROR);
+    const observable = this.showObservable(message, NotificationLevel.ERROR).pipe(share());
+    observable.subscribe();
+    return observable;
   }
 }
 

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpParams} from '@angular/common/http';
 import {ClassAccessor, loadClassAccessor, SelectionProvider as Selection} from "../class-accessor";
 import {PortofinoComponent} from "../page.factory";
-import {Operation, Page, PageChild, PageConfiguration, PageSettingsPanel} from "../page";
+import {Operation, Page, PageConfiguration, PageSettingsPanel} from "../page";
 import {Configuration, SelectionProvider} from "./crud.common";
 import {Button} from "../buttons";
 import {SelectionModel} from "@angular/cdk/collections";
@@ -12,10 +12,6 @@ import {CreateComponent} from "./detail/create.component";
 import {BulkEditComponent} from "./bulk/bulk-edit.component";
 import {mergeMap} from "rxjs/operators";
 import {Field, FieldSet} from "../form";
-import {TranslateService} from "@ngx-translate/core";
-import {PortofinoService} from "../portofino.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {AuthenticationService} from "../security/authentication.service";
 
 @Component({
   selector: 'portofino-crud',
@@ -66,12 +62,6 @@ export class CrudComponent extends Page {
   bulkEditComponentContext = {};
 
   error: any;
-
-
-  constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
-              authenticationService: AuthenticationService, protected translate: TranslateService) {
-    super(portofino, http, router, route, authenticationService);
-  }
 
   get rowsPerPage() {
     return this.configuration.rowsPerPage ? this.configuration.rowsPerPage : 10;

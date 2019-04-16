@@ -13,6 +13,8 @@ import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {AuthenticationService} from "./security/authentication.service";
 import {Observable, of, throwError} from "rxjs";
 import {map, mergeMap} from "rxjs/operators";
+import {NotificationService} from "./notifications/notification.service";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-page',
@@ -30,16 +32,20 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
   segment: string;
   @Input()
   path: string;
+  @Input()
+  injector: Injector;
   @Output()
   pageCreated = new EventEmitter<Page>();
 
   loadRootPageConfiguration: () => Observable<PageConfiguration> = () => this.loadPageConfiguration("");
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, @Optional() route: ActivatedRoute,
-              authenticationService: AuthenticationService,
-              protected componentFactoryResolver: ComponentFactoryResolver, protected injector: Injector,
+              authenticationService: AuthenticationService, notificationService: NotificationService,
+              translate: TranslateService,
+              protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
               protected viewContainerRef: ViewContainerRef) {
-    super(portofino, http, router, route, authenticationService);
+    super(portofino, http, router, route, authenticationService, notificationService, translate);
+    this.injector = injector;
   }
 
   ngOnInit(): void {

@@ -1,14 +1,16 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, Injector, OnInit} from "@angular/core";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {BehaviorSubject, merge, Observable} from "rxjs";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {map} from "rxjs/operators";
-import {Page, PageConfiguration} from "../page";
+import {Page, PageConfiguration, PageSettingsPanel} from "../page";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {PageFactoryComponent} from "../page.factory";
+import {NotificationService} from "../notifications/notification.service";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   template: `
@@ -42,7 +44,9 @@ import {PageFactoryComponent} from "../page.factory";
         <mat-divider vertical="true"></mat-divider>
         <portofino-page
           *ngIf="selected"
-          embedded="true" [path]="selected.pagePath" [configuration]="selected.configuration" (pageCreated)="configurePage($event)"></portofino-page>
+          embedded="true" [path]="selected.pagePath" [configuration]="selected.configuration"
+          [parent]="this" [injector]="injector"
+          (pageCreated)="configurePage($event)"></portofino-page>
       </div>
     </div>
   `
@@ -51,11 +55,18 @@ export class ActionsComponent extends Page implements OnInit {
   treeControl: FlatTreeControl<ActionFlatNode>;
   dataSource: PageTreeDataSource;
   selected: ActionFlatNode;
+  injector: Injector;
 
-  constructor(http: HttpClient, portofino: PortofinoService, router: Router, route: ActivatedRoute, authenticationService: AuthenticationService) {
-    super(portofino, http, router, route, authenticationService);
+  constructor(http: HttpClient, portofino: PortofinoService, router: Router, route: ActivatedRoute,
+              authenticationService: AuthenticationService, notificationService: NotificationService,
+              translate: TranslateService, parentInjector: Injector) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate);
     this.treeControl = new FlatTreeControl<ActionFlatNode>(this._getLevel, this._isExpandable);
     this.dataSource = new PageTreeDataSource(this.treeControl, this.portofino.apiRoot, this.http);
+    this.injector = Injector.create({
+      providers: [{ provide: PortofinoService, useValue: Object.assign({}, portofino, { localApiPath: null }) }],
+      parent: parentInjector
+    });
   }
 
   ngOnInit(): void {
@@ -74,27 +85,32 @@ export class ActionsComponent extends Page implements OnInit {
 
   select(node: ActionFlatNode) {
     this.selected = null;
-    this.loadPageConfiguration(node.pagePath).subscribe(config => {
-      node.configuration = config;
-      this.selected = node;
-    }, error => {
-      if(error.status == 404) {
-        if(node.type) {
-          for(let c in PageFactoryComponent.components) {
-            const cdef = PageFactoryComponent.components[c];
-            if(cdef.defaultActionClass == node.type) {
-              node.configuration = Object.assign(new PageConfiguration(), { type: c, source: 'portofino-upstairs/actions/' + node.path + '/action' });
-              this.selected = node;
-              break;
-            }
-          }
+    if(node.type) {
+      for(let c in PageFactoryComponent.components) {
+        const cdef = PageFactoryComponent.components[c];
+        if(cdef.defaultActionClass == node.type) {
+          node.configuration = Object.assign(new PageConfiguration(),
+            { type: c, source: 'portofino-upstairs/actions/' + node.path + '/action' });
+          this.selected = node;
+          break;
         }
       }
-    });
+    }
+    if(!this.selected) {
+      node.configuration = Object.assign(new PageConfiguration(),
+        { actualType: GenericPage, source: 'portofino-upstairs/actions/' + node.path + '/action' });
+      this.selected = node;
+    }
   }
 
   configurePage(page: Page) {
-    page.configure();
+    const callback = (saved: boolean) => {
+      if(saved) {
+        this.notificationService.info(this.translate.get("Configuration saved"));
+      }
+      page.settingsPanel.active = true;
+    };
+    page.configure(callback);
   }
 
 }
@@ -193,4 +209,13 @@ class PageTreeDataSource {
       this.dataChange.next(this.data);
     });
   }
+}
+
+@Component({
+  template: `<portofino-default-page-layout [page]="this">
+    <ng-template #content>This is a generic page used only for configuration</ng-template>
+  </portofino-default-page-layout>`
+})
+export class GenericPage extends Page {
+
 }

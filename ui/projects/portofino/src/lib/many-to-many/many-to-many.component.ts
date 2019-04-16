@@ -1,13 +1,8 @@
-import {Component, Input, OnInit, Optional} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {PortofinoComponent} from "../page.factory";
-import {PortofinoService} from "../portofino.service";
-import {HttpClient} from "@angular/common/http";
 import {FormControl} from "@angular/forms";
 import {Operation, Page, PageConfiguration} from "../page";
-import {AuthenticationService} from "../security/authentication.service";
-import {ActivatedRoute, Router} from "@angular/router";
 import {Button} from "../buttons";
-import {NotificationService} from "../notifications/notification.service";
 
 @Component({
   selector: 'portofino-many-to-many',
@@ -27,11 +22,6 @@ export class ManyToManyComponent extends Page {
   associations: Association[];
 
   readonly associationsPath = "/:availableAssociations";
-
-  constructor(http: HttpClient, portofino: PortofinoService, router: Router, @Optional() route: ActivatedRoute,
-              authenticationService: AuthenticationService, protected notificationService: NotificationService) {
-    super(portofino, http, router, route, authenticationService);
-  }
 
   initialize() {
     this.keySelector.valueChanges.subscribe(value => {

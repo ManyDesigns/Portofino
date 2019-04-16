@@ -2,12 +2,6 @@ import {Page} from "../page";
 import {Component, OnInit} from "@angular/core";
 import {ConnectionProviderDetails, ConnectionProviderSummary, DatabasePlatform} from "./support";
 import {Button} from "../buttons";
-import {NotificationService} from "../notifications/notification.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {HttpClient} from "@angular/common/http";
-import {PortofinoService} from "../portofino.service";
-import {AuthenticationService} from "../security/authentication.service";
-import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   templateUrl: 'connections.component.html'
@@ -18,12 +12,6 @@ export class ConnectionsComponent extends Page implements OnInit {
   connectionProvider: ConnectionProviderDetails;
   isEditConnectionProvider = false;
   databasePlatforms: DatabasePlatform[];
-
-  constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
-              authenticationService: AuthenticationService, protected notificationService: NotificationService,
-              protected translate: TranslateService) {
-    super(portofino, http, router, route, authenticationService);
-  }
 
   ngOnInit(): void {
     this.loadConnectionProviders();

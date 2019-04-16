@@ -12,6 +12,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {mergeMap, tap} from "rxjs/operators";
 import {Router, UrlSegment} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
+import {NotificationService} from "../notifications/notification.service";
 
 @Injectable()
 export class PageCrudService {
@@ -22,9 +23,10 @@ export class PageCrudService {
     protected portofino: PortofinoService, protected pageService: PageService, protected http: HttpClient,
     protected dialog: MatDialog, protected router: Router, protected translate: TranslateService,
     authenticationService: AuthenticationService, componentFactoryResolver: ComponentFactoryResolver,
-    injector: Injector) {
+    injector: Injector, notificationService: NotificationService) {
     this.pageFactory = new PageFactoryComponent(
-      portofino, http, router, null, authenticationService, componentFactoryResolver, injector, null);
+      portofino, http, router, null, authenticationService, notificationService, translate,
+      componentFactoryResolver, injector, null);
   }
 
   showCreatePageDialog() {

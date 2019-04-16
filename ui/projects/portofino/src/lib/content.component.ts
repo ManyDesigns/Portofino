@@ -13,6 +13,8 @@ import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
 import {Page, PageChild, PageService} from "./page";
 import {PageFactoryComponent} from "./page.factory";
+import {NotificationService} from "./notifications/notification.service";
+import {TranslateService} from "@ngx-translate/core";
 
 export const ROOT_PAGE_CONFIGURATION_LOADER = new InjectionToken('Root Page configuration loader: () => Observable<PageConfiguration>');
 
@@ -32,9 +34,11 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
               protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
               public portofino: PortofinoService, protected authenticationService: AuthenticationService,
+              protected notificationService: NotificationService, protected translate: TranslateService,
               @Inject(ROOT_PAGE_CONFIGURATION_LOADER) @Optional() rootPageConfigurationLoader) {
     this.pageFactory = new PageFactoryComponent(
-      portofino, http, router, route, authenticationService, componentFactoryResolver, injector, null);
+      portofino, http, router, route, authenticationService, notificationService, translate, componentFactoryResolver,
+      injector, null);
     if(rootPageConfigurationLoader) {
       this.pageFactory.loadRootPageConfiguration = rootPageConfigurationLoader;
     }
@@ -93,7 +97,8 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
 
   checkAccessibility(parent: Page, child: PageChild) {
     parent.loadChildConfiguration(child).pipe(mergeMap(config => {
-      const dummy = new DummyPage(this.portofino, this.http, this.router, this.route, this.authenticationService);
+      const dummy = new DummyPage(
+        this.portofino, this.http, this.router, this.route, this.authenticationService, this.notificationService, this.translate);
       dummy.parent = parent;
       dummy.configuration = config;
       return dummy.accessPermitted;
