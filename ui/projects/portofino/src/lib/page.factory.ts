@@ -4,7 +4,7 @@ import {
   ComponentFactoryResolver,
   ComponentRef, EventEmitter,
   Injector,
-  Input, OnChanges, OnInit, Optional, Output, SimpleChanges,
+  Input, OnChanges, OnInit, Optional, Output, SimpleChanges, Type,
   ViewContainerRef
 } from "@angular/core";
 import {PortofinoService} from "./portofino.service";
@@ -22,7 +22,7 @@ import {TranslateService} from "@ngx-translate/core";
 })
 export class PageFactoryComponent extends Page implements OnInit, OnChanges {
 
-  static components: any = {};
+  static components: { [name: string]: PortofinoComponent } = {};
 
   @Input()
   parent: Page;
@@ -146,7 +146,10 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
   }
 }
 
-export function PortofinoComponent(info: { name: string, defaultActionClass?: string }) {
+export type PortofinoComponentDefinition = { name: string, defaultActionClass?: string };
+export type PortofinoComponent = { type: Type<any> } & PortofinoComponentDefinition
+
+export function PortofinoComponent(info: PortofinoComponentDefinition) {
   return function(target) {
     PageFactoryComponent.components[info.name] = Object.assign({ type: target }, info);
   };

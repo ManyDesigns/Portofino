@@ -1,4 +1,4 @@
-<ng-container *ngIf="portofino.sideNavPosition == 'page'">
+<div *ngIf="portofino.sideNavPosition == 'page'" fxLayout="column" fxLayoutAlign="space-between">
   <ng-template portofino-toolbar></ng-template>
   <mat-drawer-container [autosize]="true">
     <mat-drawer #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
@@ -15,7 +15,8 @@
       </div>
     </mat-drawer-content>
   </mat-drawer-container>
-</ng-container>
+  <mat-toolbar>{{'Powered by Portofino 5'|translate}}</mat-toolbar>
+</div>
 <ng-container *ngIf="portofino.sideNavPosition == 'body'">
   <mat-sidenav-container [autosize]="true">
     <mat-sidenav #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
@@ -31,6 +32,7 @@
       <div class="app-page-container">
         <router-outlet *ngIf="portofino.apiRoot"></router-outlet>
       </div>
+      <mat-toolbar>{{'Powered by Portofino 5'|translate}}</mat-toolbar>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </ng-container>

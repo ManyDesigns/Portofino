@@ -98,7 +98,7 @@ import {PermissionsComponent, SettingsComponent, UpstairsComponent} from "./admi
 import {ConnectionsComponent} from "./administration/connections.component";
 import {WizardComponent} from "./administration/wizard.component";
 import {TablesComponent} from "./administration/tables.component";
-import {ActionsComponent, GenericPage} from "./administration/actions.component";
+import {ActionsComponent, CreateActionComponent, GenericPage} from "./administration/actions.component";
 
 @NgModule({
   declarations: [
@@ -181,8 +181,8 @@ export class PortofinoCrudModule {}
 @NgModule({
   declarations: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
-    WizardComponent],
+    ActionsComponent, GenericPage, CreateActionComponent,
+    ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
@@ -196,8 +196,8 @@ export class PortofinoCrudModule {}
   providers: [],
   entryComponents: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
-    WizardComponent],
+    ActionsComponent, GenericPage, CreateActionComponent,
+    ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
   exports: [UpstairsComponent]
 })
 export class PortofinoUpstairsModule {}

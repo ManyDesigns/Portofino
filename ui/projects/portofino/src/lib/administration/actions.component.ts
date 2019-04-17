@@ -1,16 +1,21 @@
-import {Component, Injector, OnInit} from "@angular/core";
+import {Component, Inject, Injector, OnInit} from "@angular/core";
 import {FlatTreeControl} from "@angular/cdk/tree";
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {BehaviorSubject, merge, Observable} from "rxjs";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {map} from "rxjs/operators";
-import {Page, PageConfiguration, PageSettingsPanel} from "../page";
+import {Page, PageConfiguration} from "../page";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {PageFactoryComponent} from "../page.factory";
 import {NotificationService} from "../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
+import {Field, Form} from "../form";
+import {Property} from "../class-accessor";
+import {FormGroup} from "@angular/forms";
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
+import {PageCrudService} from "./page-crud.service";
 
 @Component({
   template: `
@@ -22,6 +27,12 @@ import {TranslateService} from "@ngx-translate/core";
             <strong style="margin-right: 0.5em;">{{node.name}}</strong>{{node.type ? node.type.substring(node.type.lastIndexOf('.') + 1) : ''}}
             <button mat-icon-button type="button" (click)="select(node)">
               <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="delete(node)">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="addChild(node)">
+              <mat-icon>add</mat-icon>
             </button>
           </mat-tree-node>
 
@@ -35,6 +46,12 @@ import {TranslateService} from "@ngx-translate/core";
             <strong style="margin-right: 0.5em;">{{node.name}}</strong>{{node.type ? node.type.substring(node.type.lastIndexOf('.') + 1) : ''}}
             <button mat-icon-button type="button" (click)="select(node)">
               <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="delete(node)">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-icon-button type="button" (click)="addChild(node)">
+              <mat-icon>add</mat-icon>
             </button>
             <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate"></mat-progress-bar>
           </mat-tree-node>
@@ -56,10 +73,11 @@ export class ActionsComponent extends Page implements OnInit {
   dataSource: PageTreeDataSource;
   selected: ActionFlatNode;
   injector: Injector;
+  error: string;
 
   constructor(http: HttpClient, portofino: PortofinoService, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, notificationService: NotificationService,
-              translate: TranslateService, parentInjector: Injector) {
+              translate: TranslateService, parentInjector: Injector, protected dialog: MatDialog) {
     super(portofino, http, router, route, authenticationService, notificationService, translate);
     this.treeControl = new FlatTreeControl<ActionFlatNode>(this._getLevel, this._isExpandable);
     this.dataSource = new PageTreeDataSource(this.treeControl, this.portofino.apiRoot, this.http);
@@ -113,9 +131,27 @@ export class ActionsComponent extends Page implements OnInit {
     page.configure(callback);
   }
 
+  delete(node: ActionFlatNode) {
+    this.translate.get("Delete the current action and all its children?").subscribe(t => {
+      if(confirm(t)) {
+        const actions = this.portofino.apiRoot + 'portofino-upstairs/actions/';
+        this.http.delete(actions + node.path).subscribe(() => {
+          this.dataSource.data.splice(this.dataSource.data.indexOf(node), 1);
+          this.dataSource.dataChange.next(this.dataSource.data);
+        });
+      }
+    });
+  }
+
+  addChild(parent: ActionFlatNode) {
+    this.dialog.open(CreateActionComponent, { data: parent }).afterClosed().subscribe(node => {
+      console.log(node);
+    })
+  }
+
 }
 
-class ActionFlatNode {
+export class ActionFlatNode {
   expandable = true;
   type: string;
   isLoading = false;
@@ -218,4 +254,63 @@ class PageTreeDataSource {
 })
 export class GenericPage extends Page {
 
+}
+
+@Component({
+  template: `
+    <h4 mat-dialog-title>{{ 'Create new action' | translate }}</h4>
+    <mat-dialog-content>
+      <mat-error *ngIf="error">{{error|translate}}</mat-error>
+      <form (submit)="save()">
+        <portofino-form [form]="form" [controls]="controls"></portofino-form>
+        <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button color="primary" (click)="save()" [disabled]="!controls.valid">
+        <mat-icon>save</mat-icon>
+        {{'Save'|translate}}
+      </button>
+      <button mat-button (click)="cancel()">
+        <mat-icon>close</mat-icon>
+        {{'Cancel'|translate}}
+      </button>
+    </mat-dialog-actions>`
+})
+export class CreateActionComponent {
+  readonly form = new Form([
+    new Field(Property.create({ name: "segment", type: "string", label: "Segment" }).required()),
+    new Field(Property.create({ name: "type", type: "string", label: "Type" }).required().withSelectionProvider({
+      options: this.getPageTypes()
+    }))]);
+  readonly controls = new FormGroup({});
+  error: any;
+
+  constructor(protected dialog: MatDialogRef<CreateActionComponent>,
+              @Inject(MAT_DIALOG_DATA) protected parent: ActionFlatNode,
+              protected portofino: PortofinoService, protected http: HttpClient,
+              protected translate: TranslateService) {}
+
+  protected getPageTypes() {
+    const types = [];
+    for (let k in PageFactoryComponent.components) {
+      types.push({v: k, l: this.translate.instant(`page type: ${k}`)})
+    }
+    return types;
+  }
+
+  cancel() {
+    this.dialog.close();
+  }
+
+  save() {
+    const action = this.controls.value;
+    const actions = `${this.portofino.apiRoot}portofino-upstairs/actions${this.parent.path}/${action.segment}`;
+    const actionClass = PageFactoryComponent.components[this.controls.value.type.v].defaultActionClass;
+    this.http.post(actions, actionClass).subscribe(() => {
+      this.dialog.close({ segment: action.segment, actionClass: actionClass });
+    }, () => {
+      this.error = "Error";
+    })
+  }
 }

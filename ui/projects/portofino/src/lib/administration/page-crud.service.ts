@@ -157,7 +157,7 @@ export class CreatePageComponent {
   protected getPageTypes() {
     const types = [];
     for (let k in PageFactoryComponent.components) {
-      types.push({v: k, l: `page type: ${k}`})
+      types.push({v: k, l: this.translate.instant(`page type: ${k}`)})
     }
     return types;
   }

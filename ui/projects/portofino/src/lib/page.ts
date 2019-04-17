@@ -162,7 +162,8 @@ export class PageSettingsPanel {
   }
 
   getActionConfigurationToSave() {
-    return this.form.get('configuration').value;
+    const configuration = this.form.get('configuration');
+    return configuration ? configuration.value : {};
   }
 }
 
