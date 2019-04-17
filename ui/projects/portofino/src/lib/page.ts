@@ -5,22 +5,19 @@ import {
   Injectable,
   InjectionToken,
   Input, OnDestroy,
-  OnInit, Optional,
+  Optional,
   TemplateRef, Type
 } from "@angular/core";
-import {ANNOTATION_REQUIRED, ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
-import {FormControl, FormGroup} from "@angular/forms";
+import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
+import {FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {declareButton, getButtons} from "./buttons";
-import {BehaviorSubject, merge, Observable, of, PartialObserver, Subscription} from "rxjs";
-import {catchError, debounceTime, map} from "rxjs/operators";
-import {MatDialog, MatDialogRef} from "@angular/material";
-import {FlatTreeControl} from "@angular/cdk/tree";
-import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
+import {Observable, of, PartialObserver, Subscription} from "rxjs";
+import {catchError, map, mergeMap} from "rxjs/operators";
 import {WithButtons} from "./button.component";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
@@ -290,7 +287,10 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   prepare(): Observable<Page> {
-    return this.checkAccess(true).pipe<Page>(map(() => this));
+    if(this.parent && this.parent.getChild(this.segment) && this.parent.getChild(this.segment).accessible) {
+      return of(this);
+    }
+    return this.checkAccess(true).pipe<Page>(map(() => this)).pipe(catchError(() => of(this)));
   }
 
   checkAccess(askForLogin: boolean): Observable<any> {
@@ -467,6 +467,17 @@ export abstract class Page implements WithButtons, OnDestroy {
   cancelChildren() {
     this.settingsPanel.hide(false);
   }
+
+  checkAccessibility(child: PageChild) {
+    this.loadChildConfiguration(child).pipe(mergeMap(config => {
+      const dummy = new DummyPage(
+        this.portofino, this.http, this.router, this.route, this.authenticationService, this.notificationService, this.translate);
+      dummy.parent = this;
+      dummy.configuration = config;
+      return dummy.accessPermitted;
+    })).subscribe(flag => child.accessible = flag);
+  }
+
 }
 
 @Component({
@@ -513,3 +524,5 @@ export class Group {
   permissions: string[];
   permissionMap: {[name: string]: boolean};
 }
+
+class DummyPage extends Page {}

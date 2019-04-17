@@ -1,7 +1,13 @@
 <mat-card>
   <mat-card-title>{{'Upstairs: Portofino Configuration Application'|translate}}</mat-card-title>
   <mat-card-content>
-
+    <ng-container *ngIf="!portofino.localApiAvailable">
+      <mat-form-field>
+        <mat-label>{{'API'}}</mat-label>
+        <input matInput [(ngModel)]="portofino.defaultApiRoot" />
+      </mat-form-field>
+      <button mat-button (click)="changeApiRoot()">{{'Change'|translate}}</button>
+    </ng-container>
   </mat-card-content>
   <mat-card-actions>
     <portofino-buttons [component]="this" list="misc"></portofino-buttons>

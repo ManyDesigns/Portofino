@@ -39,7 +39,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
     this.pageFactory = new PageFactoryComponent(
       portofino, http, router, route, authenticationService, notificationService, translate, componentFactoryResolver,
       injector, null);
-    if(rootPageConfigurationLoader) {
+    if (rootPageConfigurationLoader) {
       this.pageFactory.loadRootPageConfiguration = rootPageConfigurationLoader;
     }
   }
@@ -71,7 +71,9 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
 
   protected loadAndDisplayPage(segments: UrlSegment[]) {
     this.pageFactory.load(segments).subscribe(
-      componentRef => { this.displayPage(componentRef); },
+      componentRef => {
+        this.displayPage(componentRef);
+      },
       error => this.pageService.notifyError(error));
   }
 
@@ -83,28 +85,16 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
     viewContainerRef.insert(componentRef.hostView);
     this.pageService.notifyPageLoaded(page);
     page.children.forEach(child => {
-      this.checkAccessibility(page, child);
+      page.checkAccessibility(child);
     });
     const parent = page.parent;
     if (parent) {
       parent.children.forEach(child => {
         if (`${parent.path}/${child.path}` != page.path) {
-          this.checkAccessibility(parent, child);
+          parent.checkAccessibility(child);
         }
       });
     }
   }
 
-  checkAccessibility(parent: Page, child: PageChild) {
-    parent.loadChildConfiguration(child).pipe(mergeMap(config => {
-      const dummy = new DummyPage(
-        this.portofino, this.http, this.router, this.route, this.authenticationService, this.notificationService, this.translate);
-      dummy.parent = parent;
-      dummy.configuration = config;
-      return dummy.accessPermitted;
-    })).subscribe(flag => child.accessible = flag);
-  }
-
 }
-
-class DummyPage extends Page {}

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {Page, PageChild, PageConfiguration} from "../page";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
@@ -9,6 +9,14 @@ import {ConnectionsComponent} from "./connections.component";
 import {WizardComponent} from "./wizard.component";
 import {TablesComponent} from "./tables.component";
 import {ActionsComponent} from "./actions.component";
+import {LOCALE_STORAGE_SERVICE, PortofinoService} from "../portofino.service";
+import {ActivatedRoute, Router} from "@angular/router";
+import {AuthenticationService} from "../security/authentication.service";
+import {HttpClient} from "@angular/common/http";
+import {TranslateService} from "@ngx-translate/core";
+import {NotificationService} from "../notifications/notification.service";
+import {LocalStorageService} from "ngx-store";
+import {map} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-upstairs',
@@ -16,6 +24,12 @@ import {ActionsComponent} from "./actions.component";
 })
 @PortofinoComponent({ name: "portofino-upstairs" })
 export class UpstairsComponent extends Page {
+
+  constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
+              authenticationService: AuthenticationService, notificationService: NotificationService,
+              translate: TranslateService, @Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate);
+  }
 
   static defaultConfiguration(): PageConfiguration {
     return {
@@ -46,6 +60,25 @@ export class UpstairsComponent extends Page {
     } else {
       return throwError(404);
     }
+  }
+
+  changeApiRoot() {
+    this.storage.set("portofino.upstairs.apiRoot", this.portofino.defaultApiRoot);
+    this.portofino.init();
+    this.children.forEach(c => {
+      this.checkAccessibility(c);
+    });
+  }
+
+  prepare() {
+    return super.prepare().pipe(map(() => {
+      const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
+      if(apiRoot) {
+        this.portofino.defaultApiRoot = apiRoot;
+        this.changeApiRoot();
+      }
+      return this;
+    }));
   }
 
 }
