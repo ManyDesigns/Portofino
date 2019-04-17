@@ -15,7 +15,7 @@ import {
   DetailComponentHolder,
   SearchComponentHolder
 } from './crud/crud.component';
-import {LOCALE_STORAGE_SERVICE, PortofinoService} from './portofino.service';
+import {LOCALE_STORAGE_SERVICE, PortofinoService, ProgressInterceptor} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
   AuthenticationInterceptor,
@@ -222,6 +222,7 @@ export class PortofinoUpstairsModule {}
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ProgressInterceptor, multi: true },
     { provide: TOKEN_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: NotificationService, useClass: MatSnackBarNotificationService },

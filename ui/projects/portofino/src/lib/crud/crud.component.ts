@@ -242,6 +242,13 @@ export class CrudComponent extends Page {
     }
   }
 
+  protected getPageConfigurationToSave(formValue): PageConfiguration {
+    const superConf: any = super.getPageConfigurationToSave(formValue);
+    const config = Object.assign({}, this.configuration, formValue);
+    superConf.detailChildren = config.detailChildren;
+    return superConf;
+  }
+
   //Configuration
 
   get configurationUrl() {

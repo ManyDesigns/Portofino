@@ -1,11 +1,13 @@
 import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
 import {DateAdapter} from "@angular/material";
 import {DatetimeAdapter} from "@mat-datetimepicker/core";
 import {WebStorageService} from "ngx-store";
+import {Observable} from "rxjs";
+import {catchError, map} from "rxjs/operators";
 
 export const LOCALE_STORAGE_SERVICE = new InjectionToken('Locale Storage');
 
@@ -19,6 +21,7 @@ export class PortofinoService {
   sideNavPosition: SideNavPosition = 'page';
   sideNavOpen: boolean;
   upstairsLink = "/portofino-upstairs";
+  callsInProgress = 0;
 
   readonly DEFAULT_LOCALE = 'en';
   readonly localeDefinitions = {};
@@ -136,3 +139,29 @@ class ApiInfo {
 export declare type SideNavPosition = 'body' | 'page' | undefined;
 
 export declare type Locale = { key: string, name: string, translations?: Object };
+
+@Injectable()
+export class ProgressInterceptor implements HttpInterceptor {
+
+  constructor(protected portofino: PortofinoService) {}
+
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let added = false;
+    return next.handle(req).pipe(map(e => {
+      if(e.type == HttpEventType.Response) {
+        if(added) {
+          this.portofino.callsInProgress--;
+        }
+      } else if(!added && e.type != HttpEventType.User) {
+        this.portofino.callsInProgress++;
+        added = true;
+      }
+      return e;
+    }), catchError((e) => {
+      if(added) {
+        this.portofino.callsInProgress--;
+      }
+      throw e;
+    }));
+  }
+}
