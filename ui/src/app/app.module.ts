@@ -1,8 +1,8 @@
-import {Component, Input, NgModule, OnInit} from '@angular/core';
+import {Component, NgModule} from '@angular/core';
 import {
   PortofinoModule, PageConfiguration,
   NAVIGATION_COMPONENT, ROOT_PAGE_CONFIGURATION_LOADER,
-  DefaultNavigationComponent, PortofinoComponent, PortofinoUpstairsModule, UpstairsComponent} from "portofino";
+  DefaultNavigationComponent, PortofinoUpstairsModule, UpstairsComponent} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -29,7 +29,7 @@ import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {QuillModule} from "ngx-quill";
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
@@ -44,7 +44,7 @@ registerLocaleData(localeIt);
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Portofino Upstairs" apiRoot="http://localhost:8080/demo-tt/api/" [upstairsLink]="null"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Upstairs" apiRoot="http://localhost:8080/" [upstairsLink]="null"></portofino-app>`
 })
 export class AppComponent {}
 
