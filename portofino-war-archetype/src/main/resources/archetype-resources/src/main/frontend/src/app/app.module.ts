@@ -33,8 +33,30 @@ registerLocaleData(localeIt);
 })
 export class AppComponent {}
 
+@Component({
+  selector: 'portofino-welcome',
+  template: `
+    <portofino-default-page-layout [page]="this">
+      <ng-template #content>
+        <p>Welcome to Portofino 5. This is your new empty application.</p>
+        <p>
+          Use the navigation button
+          <button title="{{ 'Navigation' | translate }}" type="button" mat-icon-button
+                  (click)="portofino.toggleSidenav()">
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+          to explore the pages.
+        </p>
+        <p>Initially, the application has the user admin/admin built in. You can use that to run the wizard, connect to your database, and build a complete application from it.</p>
+        <p>The wizard can be found "upstairs", where all the configuration tools lie. The "upstairs" section is optional and can be removed or disabled in production.</p>
+      </ng-template>
+    </portofino-default-page-layout>`
+})
+@PortofinoComponent({ name: 'welcome' })
+export class WelcomeComponent extends Page {}
+
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, WelcomeComponent],
   providers: [],
   imports: [
     PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
@@ -43,7 +65,7 @@ export class AppComponent {}
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule, TranslateModule.forRoot()],
-  entryComponents: [],
+  entryComponents: [WelcomeComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

@@ -5,7 +5,7 @@ You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "5.0.0-SNAPSHOT"
+portofino_version = "5.0-SNAPSHOT"
 tomcat_dir = "apache-tomcat-9.0.16"
 portofino_path = "~/projects/portofino5"
 tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.16/bin/apache-tomcat-9.0.16.zip"
@@ -29,6 +29,7 @@ oneclick_path = build_path + "/portofino-oneclick"
 portofino_path = os.path.expanduser(local.portofino_path)
 tomcat_path = base_path + "/" + local.tomcat_dir
 tomcat_zip = build_path + "/" + local.tomcat_dir + ".zip"
+mvn_command_for_archetype = local.mvn_command_for_archetype if hasattr(local, "mvn_command_for_archetype") else "mvn"
 
 print """//////////////////////
 Portofino build script
@@ -68,7 +69,7 @@ print "Building Portofino with command: " + command
 os.system(command)
 
 print "Generating oneclick from archetype..."
-os.system("cd " + build_path + "; mvn archetype:generate -DarchetypeArtifactId=portofino-war-archetype -DarchetypeGroupId=com.manydesigns -DarchetypeVersion=" + local.portofino_version + " -DinteractiveMode=false -DgroupId=com.manydesigns -DartifactId=portofino-oneclick -Dversion=" + local.portofino_version + "")
+os.system("cd " + build_path + "; " + mvn_command_for_archetype + " archetype:generate -DarchetypeArtifactId=portofino-war-archetype -DarchetypeGroupId=com.manydesigns -DarchetypeVersion=" + local.portofino_version + " -DinteractiveMode=false -DgroupId=com.manydesigns -DartifactId=portofino-oneclick -Dversion=" + local.portofino_version + "")
 
 print "Building oneclick..."
 os.system("cd " + oneclick_path + "; mvn clean package")

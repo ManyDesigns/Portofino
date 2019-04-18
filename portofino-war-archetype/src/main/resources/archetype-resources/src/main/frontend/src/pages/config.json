@@ -1,6 +1,6 @@
 {
   "title": "Welcome",
-  "type": "crud",
+  "type": "welcome",
   "children": [{"path": "portofino-upstairs", "title": "Upstairs", "embedded": false, "showInNavigation": false }],
   "source": "/"
 }
