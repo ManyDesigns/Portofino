@@ -16,8 +16,6 @@ import {PageFactoryComponent} from "./page.factory";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
 
-export const ROOT_PAGE_CONFIGURATION_LOADER = new InjectionToken('Root Page configuration loader: () => Observable<PageConfiguration>');
-
 @Component({
   selector: 'portofino-content',
   templateUrl: './content.component.html',
@@ -34,14 +32,10 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
               protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
               public portofino: PortofinoService, protected authenticationService: AuthenticationService,
-              protected notificationService: NotificationService, protected translate: TranslateService,
-              @Inject(ROOT_PAGE_CONFIGURATION_LOADER) @Optional() rootPageConfigurationLoader) {
+              protected notificationService: NotificationService, protected translate: TranslateService) {
     this.pageFactory = new PageFactoryComponent(
       portofino, http, router, route, authenticationService, notificationService, translate, componentFactoryResolver,
       injector, null);
-    if (rootPageConfigurationLoader) {
-      this.pageFactory.loadRootPageConfiguration = rootPageConfigurationLoader;
-    }
   }
 
   ngOnInit() {

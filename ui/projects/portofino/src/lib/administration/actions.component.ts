@@ -17,57 +17,7 @@ import {FormGroup} from "@angular/forms";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
 import {PageCrudService} from "./page-crud.service";
 
-@Component({
-  template: `
-    <div fxLayout="row" fxLayoutAlign="start start">
-      <div>
-        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
-          <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
-            <button mat-icon-button disabled></button>
-            <strong style="margin-right: 0.5em;">{{node.name}}</strong>{{node.type ? node.type.substring(node.type.lastIndexOf('.') + 1) : ''}}
-            <button mat-icon-button type="button" (click)="select(node)">
-              <mat-icon>settings</mat-icon>
-            </button>
-            <button mat-icon-button type="button" (click)="delete(node)">
-              <mat-icon>delete</mat-icon>
-            </button>
-            <button mat-icon-button type="button" (click)="addChild(node)">
-              <mat-icon>add</mat-icon>
-            </button>
-          </mat-tree-node>
-
-          <mat-tree-node *matTreeNodeDef="let node;when: isExpandable" matTreeNodePadding>
-            <button mat-icon-button matTreeNodeToggle
-                    [attr.aria-label]="'toggle ' + node.name">
-              <mat-icon class="mat-icon-rtl-mirror">
-                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-              </mat-icon>
-            </button>
-            <strong style="margin-right: 0.5em;">{{node.name}}</strong>{{node.type ? node.type.substring(node.type.lastIndexOf('.') + 1) : ''}}
-            <button mat-icon-button type="button" (click)="select(node)">
-              <mat-icon>settings</mat-icon>
-            </button>
-            <button mat-icon-button type="button" (click)="delete(node)">
-              <mat-icon>delete</mat-icon>
-            </button>
-            <button mat-icon-button type="button" (click)="addChild(node)">
-              <mat-icon>add</mat-icon>
-            </button>
-            <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate"></mat-progress-bar>
-          </mat-tree-node>
-        </mat-tree>
-      </div>
-      <div>
-        <mat-divider vertical="true"></mat-divider>
-        <portofino-page
-          *ngIf="selected"
-          embedded="true" [path]="selected.pagePath" [configuration]="selected.configuration"
-          [parent]="this" [injector]="injector"
-          (pageCreated)="configurePage($event)"></portofino-page>
-      </div>
-    </div>
-  `
-})
+@Component({ templateUrl: "actions.component.html" })
 export class ActionsComponent extends Page implements OnInit {
   treeControl: FlatTreeControl<ActionFlatNode>;
   dataSource: PageTreeDataSource;
@@ -294,7 +244,9 @@ export class CreateActionComponent {
   protected getPageTypes() {
     const types = [];
     for (let k in PageFactoryComponent.components) {
-      types.push({v: k, l: this.translate.instant(`page type: ${k}`)})
+      if(PageFactoryComponent.components[k].defaultActionClass) {
+        types.push({v: k, l: this.translate.instant(`page type: ${k}`)})
+      }
     }
     return types;
   }

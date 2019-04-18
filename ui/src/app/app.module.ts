@@ -1,8 +1,6 @@
 import {Component, NgModule} from '@angular/core';
 import {
-  PortofinoModule, PageConfiguration,
-  NAVIGATION_COMPONENT, ROOT_PAGE_CONFIGURATION_LOADER,
-  DefaultNavigationComponent, PortofinoUpstairsModule, UpstairsComponent} from "portofino";
+  PortofinoModule, NAVIGATION_COMPONENT, DefaultNavigationComponent, PortofinoUpstairsModule} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -38,7 +36,6 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
 import localeIt from "@angular/common/locales/it";
-import {Observable, of} from "rxjs";
 
 registerLocaleData(localeIt);
 
@@ -51,8 +48,7 @@ export class AppComponent {}
 @NgModule({
   declarations: [AppComponent],
   providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
-    { provide: ROOT_PAGE_CONFIGURATION_LOADER, useFactory: AppModule.rootPageConfiguration }
+    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation }
   ],
   imports: [
     PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
@@ -70,9 +66,5 @@ export class AppModule {
   static navigation() {
     return DefaultNavigationComponent
     //return CustomNavigation
-  }
-
-  static rootPageConfiguration(): () => Observable<PageConfiguration> {
-    return () => of(UpstairsComponent.defaultConfiguration());
   }
 }

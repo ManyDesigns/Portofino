@@ -23,25 +23,12 @@ import {map} from "rxjs/operators";
   templateUrl: './upstairs.component.html'
 })
 @PortofinoComponent({ name: "portofino-upstairs" })
-export class UpstairsComponent extends Page {
+export class UpstairsComponent extends Page implements OnInit {
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, notificationService: NotificationService,
               translate: TranslateService, @Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {
     super(portofino, http, router, route, authenticationService, notificationService, translate);
-  }
-
-  static defaultConfiguration(): PageConfiguration {
-    return {
-      title: "Upstairs", type: "portofino-upstairs", source: "", securityCheckPath: "",
-      children: [
-        { path: "settings", title: "Settings", icon: "settings", showInNavigation: true, accessible: true, embedded: false },
-        { path: "permissions", title: "Permissions", icon: "lock", showInNavigation: true, accessible: true, embedded: false },
-        { path: "connections", title: "Connections", icon: "network_wifi", showInNavigation: true, accessible: true, embedded: false },
-        { path: "wizard", title: "Wizard", icon: "web", showInNavigation: true, accessible: true, embedded: false },
-        { path: "tables", title: "Tables", icon: "storage", showInNavigation: true, accessible: true, embedded: false },
-        { path: "actions", title: "Actions", icon: "build", showInNavigation: true, accessible: true, embedded: false }]
-    };
   }
 
   loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
@@ -63,6 +50,25 @@ export class UpstairsComponent extends Page {
   }
 
   changeApiRoot() {
+    if(!this.portofino.defaultApiRoot.endsWith("/")) {
+      this.portofino.defaultApiRoot += "/";
+    }
+    this.http.get<any>(this.portofino.defaultApiRoot + ':description').subscribe(response => {
+      if(response.loginPath) {
+        let loginPath = response.loginPath;
+        if(loginPath.startsWith('/')) {
+          loginPath = loginPath.substring(1);
+        }
+        this.portofino.loginPath = loginPath;
+        this.doChangeApiRoot();
+      }
+    }, error => {
+      console.error(error);
+      this.notificationService.error(this.translate.get("Invalid API root (see console for details)"));
+    });
+  }
+
+  protected doChangeApiRoot() {
     this.storage.set("portofino.upstairs.apiRoot", this.portofino.defaultApiRoot);
     this.portofino.init();
     this.children.forEach(c => {
@@ -75,10 +81,14 @@ export class UpstairsComponent extends Page {
       const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
       if(apiRoot) {
         this.portofino.defaultApiRoot = apiRoot;
-        this.changeApiRoot();
+        this.doChangeApiRoot();
       }
       return this;
     }));
+  }
+
+  ngOnInit(): void {
+    this.changeApiRoot();
   }
 
 }
