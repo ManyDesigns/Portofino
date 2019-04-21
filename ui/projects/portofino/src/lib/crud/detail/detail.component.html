@@ -7,7 +7,7 @@
     <mat-card-content>
       <form (submit)="save()" *ngIf="object">
         <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
-                        fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
+                        fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="default center"></portofino-form>
         <div fxLayout="row">
           <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
           <portofino-button *ngFor="let button of parentButtons"

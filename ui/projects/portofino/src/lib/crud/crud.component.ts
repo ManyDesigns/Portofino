@@ -16,7 +16,7 @@ import {Field, FieldSet} from "../form";
 @Component({
   selector: 'portofino-crud',
   templateUrl: './crud.component.html',
-  styleUrls: ['./crud.component.css']
+  styleUrls: ['./crud.component.scss']
 })
 @PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.pageactions.crud.CrudAction" })
 export class CrudComponent extends Page {

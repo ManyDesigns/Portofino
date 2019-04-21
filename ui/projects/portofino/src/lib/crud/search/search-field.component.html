@@ -16,7 +16,7 @@
       </mat-option>
     </mat-autocomplete>
   </mat-form-field>
-  <ng-container *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
+  <div *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
     <label>{{property.label}}</label>
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
                      (change)="property.selectionProvider.updateDependentOptions()">
@@ -24,7 +24,7 @@
         {{ option.l }}
       </mat-radio-button>
     </mat-radio-group>
-  </ng-container>
+  </div>
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'MULTIPLESELECT'" [formGroup]="form">
     <mat-select [formControlName]="property.name" [placeholder]="property.label" [multiple]="true"
                 (selectionChange)="property.selectionProvider.updateDependentOptions()">

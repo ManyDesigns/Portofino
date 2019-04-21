@@ -9,11 +9,13 @@
         <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
       </mat-select>
     </mat-form-field>
-    <label>{{'or create a new one (choose its type)'}}</label>
-    <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider">
-      <mat-radio-button value="jdbc">JDBC</mat-radio-button>
-      <mat-radio-button value="jndi">JNDI</mat-radio-button>
-    </mat-radio-group>
+    <div>
+      <label>{{'or create a new one (choose its type)'}}</label>
+      <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider">
+        <mat-radio-button value="jdbc">JDBC</mat-radio-button>
+        <mat-radio-button value="jndi">JNDI</mat-radio-button>
+      </mat-radio-group>
+    </div>
     <fieldset>
       <legend>{{'Connection parameters' | translate}}</legend>
       <form #step0Form="ngForm">

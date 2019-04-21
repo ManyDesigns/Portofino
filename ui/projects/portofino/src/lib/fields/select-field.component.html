@@ -40,7 +40,7 @@
     </mat-error>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
   </mat-form-field>
-  <ng-container *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
+  <div *ngIf="property.selectionProvider.displayMode == 'RADIO'" [formGroup]="form">
     <label>{{property.label}}</label>
     <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector"></mat-checkbox>
     <mat-radio-group [formControlName]="property.name" [name]="property.name"
@@ -51,7 +51,7 @@
         {{ option.l }}
       </mat-radio-button>
     </mat-radio-group>
-  </ng-container>
+  </div>
 </ng-container>
 <ng-container *ngIf="!enabled">
   <portofino-text-field [enabled]="enabled" [selectable]="selectable" [form]="form" [property]="property" [selector]="selector"></portofino-text-field>

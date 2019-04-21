@@ -6,7 +6,7 @@
     <mat-card-content>
       <form (submit)="save()" *ngIf="object">
         <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
-                        fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center"></portofino-form>
+                        fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="default center"></portofino-form>
         <div fxLayout="row">
           <portofino-button *ngFor="let button of parentButtons" [button]="button" [component]="parent"></portofino-button>
           <portofino-buttons [component]="this"></portofino-buttons>

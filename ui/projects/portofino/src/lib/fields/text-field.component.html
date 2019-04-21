@@ -1,8 +1,8 @@
-<ng-container *ngIf="isRichText()" [formGroup]="form">
+<div *ngIf="isRichText()" [formGroup]="form">
   <label>{{property.label}}</label>
   <quill-editor [formControlName]="property.name" [required]="required" *ngIf="enabled"></quill-editor>
   <span [innerHTML]="control.value" *ngIf="!enabled" class="rich-text"></span>
-</ng-container>
+</div>
 <mat-form-field *ngIf="!isRichText()" [formGroup]="form">
   <mat-label>{{property.label}}</mat-label>
   <input matInput *ngIf="!isMultiline()"
