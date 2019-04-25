@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.pageactions;
 
-import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Page;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -34,7 +33,7 @@ import java.util.List;
  * <p>A PageInstance is the realization of a Portofino page on permanent storage (page.xml + configuration.xml +
  * action.groovy) into a live object in the context of a single http request.<br>
  * A PageInstance includes the parameters extracted from the decomposition of the URL in a sequence of
- * <em>fragments</em> (not to be confused with query string parameters).</p>
+ * <em>segments</em> (not to be confused with query string parameters).</p>
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -89,12 +88,12 @@ public class PageInstance {
     /**
      * Returns the portion of the URL that identifies this PageInstance, including any parameters.
      */
-    public String getUrlFragment() {
-        String fragment = directory.getName().getBaseName();
+    public String getUrlSegment() {
+        String segment = directory.getName().getBaseName();
         for(String param : parameters) {
-            fragment += "/" + param;
+            segment += "/" + param;
         }
-        return fragment;
+        return segment;
     }
 
     /**
@@ -105,7 +104,7 @@ public class PageInstance {
         if(getParent() == null) {
             return "";
         } else {
-            return getParent().getPath() + "/" + getUrlFragment();
+            return getParent().getPath() + "/" + getUrlSegment();
         }
     }
 

@@ -60,7 +60,6 @@ public class PageLogic {
             "Copyright (C) 2005-2017 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(PageLogic.class);
-    public static final String INVALID_PAGE_INSTANCE = "validDispatchPathLength";
 
     protected static final JAXBContext pagesJaxbContext;
 
@@ -182,13 +181,13 @@ public class PageLogic {
                                     try {
                                         Page page = loadPage(key);
                                         return Futures.immediateFuture(
-                                                new FileCacheEntry<Page>(page, key.getContent().getLastModifiedTime(), false));
+                                                new FileCacheEntry<>(page, key.getContent().getLastModifiedTime(), false));
                                     } catch (Throwable t) {
                                         logger.error(
                                                 "Could not reload cached page from " + key.getName().getPath() +
                                                 ", removing from cache", t);
                                         return Futures.immediateFuture(
-                                                new FileCacheEntry<Page>(null, key.getContent().getLastModifiedTime(), true));
+                                                new FileCacheEntry<>(null, key.getContent().getLastModifiedTime(), true));
                                     }
                                 } else {
                                     return Futures.immediateFuture(oldValue);

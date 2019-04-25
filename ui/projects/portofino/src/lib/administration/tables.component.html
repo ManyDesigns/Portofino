@@ -1,12 +1,17 @@
-<mat-tree [dataSource]="tableTreeDataSource" [treeControl]="tableTreeControl" *ngIf="!tableInfo">
+<mat-form-field>
+  <mat-label>{{'Table name'|translate}}</mat-label>
+  <input matInput [(ngModel)]="tableTreeDataSource.filter" />
+  <mat-icon matSuffix>search</mat-icon>
+</mat-form-field>
+<mat-tree [dataSource]="tableTreeDataSource" [treeControl]="tableTreeDataSource.treeControl" *ngIf="!tableInfo">
   <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
     <a href="javascript:void(0)" (click)="editTable(node)">{{node.displayName}}</a>
   </mat-tree-node>
-  <mat-tree-node *matTreeNodeDef="let node;when: isExpandable" matTreeNodePadding>
+  <mat-tree-node *matTreeNodeDef="let node; when: isExpandable" matTreeNodePadding>
     <button mat-icon-button matTreeNodeToggle
             [attr.aria-label]="'toggle ' + node.name">
       <mat-icon class="mat-icon-rtl-mirror">
-        {{tableTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+        {{tableTreeDataSource.treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
       </mat-icon>
     </button>
     {{node.displayName}}

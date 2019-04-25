@@ -1,6 +1,6 @@
 # ManyDesigns Portofino 5 #
 
-[![Build Status](https://travis-ci.com/ManyDesigns/Portofino.svg?branch=master)](https://travis-ci.com/ManyDesigns/Portofino) [![Join the chat at https://gitter.im/ManyDesigns-Portofino/Lobby](https://badges.gitter.im/ManyDesigns-Portofino/Lobby.svg)](https://gitter.im/ManyDesigns-Portofino/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.manydesigns/portofino/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.manydesigns/portofino) [![Build Status](https://travis-ci.com/ManyDesigns/Portofino.svg?branch=master)](https://travis-ci.com/ManyDesigns/Portofino) [![Join the chat at https://gitter.im/ManyDesigns-Portofino/Lobby](https://badges.gitter.im/ManyDesigns-Portofino/Lobby.svg)](https://gitter.im/ManyDesigns-Portofino/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Portofino is a web application framework written in Java and extensible using Groovy, distributed under the LGPL open
 source license. It is developed by ManyDesigns, based in Genoa, Italy (http://www.manydesigns.com).

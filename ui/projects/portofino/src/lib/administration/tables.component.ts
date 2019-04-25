@@ -1,6 +1,6 @@
 import {Page} from "../page";
 import {Component, OnInit} from "@angular/core";
-import {ConnectionProviderDetails, ConnectionProviderSummary, DatabasePlatform} from "./support";
+import {ConnectionProviderDetails, ConnectionProviderSummary} from "./support";
 import {Button} from "../buttons";
 import {NotificationService} from "../notifications/notification.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -12,7 +12,7 @@ import {FlatTreeControl} from "@angular/cdk/tree";
 import {Field, Form} from "../form";
 import {FormGroup} from "@angular/forms";
 import {ClassAccessor} from "../class-accessor";
-import {BehaviorSubject, merge, Observable} from "rxjs";
+import {BehaviorSubject, merge, Observable, Subscription} from "rxjs";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {map} from "rxjs/operators";
 
@@ -22,7 +22,6 @@ import {map} from "rxjs/operators";
 export class TablesComponent extends Page implements OnInit {
 
   connectionProviders: ConnectionProviderSummary[];
-  tableTreeControl: FlatTreeControl<TableFlatNode>;
   tableTreeDataSource: TableTreeDataSource;
   tableInfo: any;
   column: any;
@@ -33,8 +32,8 @@ export class TablesComponent extends Page implements OnInit {
               authenticationService: AuthenticationService, notificationService: NotificationService,
               translate: TranslateService) {
     super(portofino, http, router, route, authenticationService, notificationService, translate);
-    this.tableTreeControl = new FlatTreeControl<TableFlatNode>(this._getLevel, this._isExpandable);
-    this.tableTreeDataSource = new TableTreeDataSource(this.tableTreeControl, http, portofino.apiRoot);
+    const tableTreeControl = new FlatTreeControl<TableFlatNode>(this._getLevel, this._isExpandable);
+    this.tableTreeDataSource = new TableTreeDataSource(tableTreeControl, http, portofino.apiRoot, notificationService, translate);
   }
 
   private _getLevel = (node: TableFlatNode) => node.level;
@@ -239,24 +238,50 @@ class TableFlatNode {
 class TableTreeDataSource {
 
   readonly dataChange = new BehaviorSubject<TableFlatNode[]>([]);
+  protected _data: TableFlatNode[];
+  protected _filter: string;
+  protected subscriptions: Subscription[] = [];
+
+  constructor(public treeControl: FlatTreeControl<TableFlatNode>, private http: HttpClient, private apiRoot: string,
+              private notificationService: NotificationService, private translate: TranslateService) {}
 
   get data(): TableFlatNode[] { return this.dataChange.value; }
   set data(value: TableFlatNode[]) {
-    this.treeControl.dataNodes = value;
-    this.dataChange.next(value);
+    this._data = value;
+    const filteredData = this.filteredData();
+    this.treeControl.dataNodes = filteredData;
+    this.dataChange.next(filteredData);
   }
 
-  constructor(private treeControl: FlatTreeControl<TableFlatNode>, private http: HttpClient, private apiRoot: string) {}
+  protected filteredData() {
+    return this._data.filter(n => {
+      return !n.table || !this._filter || n.table.toLowerCase().includes(this._filter.toLowerCase());
+    });
+  }
+
+  get filter() { return this._filter; }
+  set filter(value) {
+    this._filter = value;
+    this.data = this._data;
+    if(value) {
+      this.treeControl.dataNodes.forEach(n => this.treeControl.expandDescendants(n));
+    }
+  }
 
   connect(collectionViewer: CollectionViewer): Observable<TableFlatNode[]> {
-    this.treeControl.expansionModel.changed.subscribe(change => {
+    this.subscriptions.push(this.treeControl.expansionModel.changed.subscribe(change => {
       if ((change as SelectionChange<TableFlatNode>).added ||
-        (change as SelectionChange<TableFlatNode>).removed) {
+          (change as SelectionChange<TableFlatNode>).removed) {
         this.handleTreeControl(change as SelectionChange<TableFlatNode>);
       }
-    });
+    }));
 
     return merge(collectionViewer.viewChange, this.dataChange).pipe(map(() => this.data));
+  }
+
+  disconnect() {
+    this.subscriptions.forEach(s => s.unsubscribe());
+    this.subscriptions = [];
   }
 
   /** Handle expand/collapse behaviors */
@@ -280,19 +305,21 @@ class TableTreeDataSource {
     if(expand) {
       if(node.children.length > 0) {
         //Already loaded
-        this.data.splice(index + 1, 0, ...node.children);
-        this.dataChange.next(this.data);
+        this._data.splice(index + 1, 0, ...node.children);
+        this.dataChange.next(this.filteredData());
+        node.children.forEach(n => {
+          if(this.treeControl.isExpanded(n)) {
+            this.toggleNode(n, true);
+          }
+        })
       } else {
         this.loadNode(node, index);
       }
     } else {
-      if(!node.schema) {
-        node.children.forEach(n => { this.toggleNode(n, false); });
-      }
       let count = 0;
-      for (let i = index + 1; i < this.data.length && this.data[i].level > node.level; i++, count++) {}
-      this.data.splice(index + 1, count);
-      this.dataChange.next(this.data);
+      for (let i = index + 1; i < this._data.length && this._data[i].level > node.level; i++, count++) {}
+      this._data.splice(index + 1, count);
+      this.dataChange.next(this.filteredData());
     }
   }
 
@@ -304,9 +331,12 @@ class TableTreeDataSource {
         tables.forEach(table => {
           node.children.push(new TableFlatNode(node.db, node.schema, table.name));
         });
-        this.data.splice(index + 1, 0, ...node.children);
+        this._data.splice(index + 1, 0, ...node.children);
         node.loading = false;
-        this.dataChange.next(this.data);
+        this.dataChange.next(this.filteredData());
+      }, () => {
+        node.loading = false;
+        this.notificationService.error(this.translate.get("Could not load tables"));
       });
     } else {
       const url = `${this.apiRoot}portofino-upstairs/database/connections/${node.db}`;
@@ -314,9 +344,12 @@ class TableTreeDataSource {
         c.schemas.forEach(schema => {
           node.children.push(new TableFlatNode(node.db, { name: schema.schema, liquibase: false }, null)); //TODO
         });
-        this.data.splice(index + 1, 0, ...node.children);
+        this._data.splice(index + 1, 0, ...node.children);
         node.loading = false;
-        this.dataChange.next(this.data);
+        this.dataChange.next(this.filteredData());
+      }, () => {
+        node.loading = false;
+        this.notificationService.error(this.translate.get("Could not load schemas"));
       });
     }
   }
