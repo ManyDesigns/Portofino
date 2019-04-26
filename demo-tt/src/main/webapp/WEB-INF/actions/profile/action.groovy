@@ -6,8 +6,7 @@ import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.fields.FileBlobField
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.forms.FormBuilder
-import com.manydesigns.portofino.buttons.annotations.Button
-import com.manydesigns.portofino.buttons.annotations.Buttons
+
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
@@ -97,7 +96,7 @@ public class Profile extends CustomAction {
         }
     }
 
-    @Button(list = "view", order = 1D, type = Button.TYPE_PRIMARY, key = "change.your.password", icon=Button.ICON_GEAR)
+
     public Resolution changePassword() {
         return new RedirectResolution("/login").
                 addParameter("changePassword").
@@ -106,7 +105,7 @@ public class Profile extends CustomAction {
     }
 
     @RequiresAuthentication
-    @Button(list = "view", order = 2D, type = Button.TYPE_DEFAULT, key = "update.your.data" , icon=Button.ICON_EDIT)
+
     public Resolution editData() {
         setupEditForm();
         return new ForwardResolution("/jsp/profile/update-data.jsp");
@@ -124,7 +123,7 @@ public class Profile extends CustomAction {
     }
 
     @RequiresAuthentication
-    @Button(list = "view", order = 3D, type = Button.TYPE_DANGER, key = "change.your.photo" , icon = Button.ICON_PICTURE)
+
     public Resolution changePhoto() {
         loadUser();
         setupPhotoForm();
@@ -132,7 +131,7 @@ public class Profile extends CustomAction {
     }
 
     @RequiresAuthentication
-    @Button(list = "upload-photo", order = 1D, type = Button.TYPE_PRIMARY, key = "upload")
+
     public Resolution uploadPhoto() {
         setupPhotoForm();
         form.readFromRequest(context.request);
@@ -206,7 +205,7 @@ public class Profile extends CustomAction {
     }
 
     @RequiresAuthentication
-    @Button(list = "upload-photo", order = 2D, key = "delete.current.photo" , icon=Button.ICON_TRASH)
+
     public Resolution deletePhoto() {
         loadUser();
         if(user.avatar != null) {
@@ -220,7 +219,7 @@ public class Profile extends CustomAction {
     }
 
     @RequiresAuthentication
-    @Button(list = "update-data", order = 1D, key = "update", type = Button.TYPE_PRIMARY)
+
     public Resolution updateData() {
         setupEditForm();
         form.readFromRequest(context.request);
@@ -235,15 +234,12 @@ public class Profile extends CustomAction {
         }
     }
 
-    @Button(list = "view", order = 4D, type = Button.TYPE_INFO, key = "notifications" , icon=Button.ICON_COMMENT )
+
     public Resolution notifications() {
         return new RedirectResolution("/profile/notifications");
     }
 
-    @Buttons([
-        @Button(list = "upload-photo", order = 3D, key = "cancel"),
-        @Button(list = "update-data", order = 2D, key = "cancel"),
-    ])
+
     public Resolution cancel() {
         return new RedirectResolution(context.actionPath);
     }

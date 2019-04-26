@@ -139,15 +139,8 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
     }
 
     public static int copyInputStreamToFile(InputStream source, File destination) throws IOException {
-        try {
-            FileOutputStream output = openOutputStream(destination);
-            try {
-                return IOUtils.copy(source, output);
-            } finally {
-                IOUtils.closeQuietly(output);
-            }
-        } finally {
-            IOUtils.closeQuietly(source);
+        try(InputStream input = source; FileOutputStream output = openOutputStream(destination)) {
+            return IOUtils.copy(input, output);
         }
     }
 

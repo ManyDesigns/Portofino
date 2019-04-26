@@ -1,7 +1,7 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
-import com.manydesigns.portofino.buttons.GuardType
-import com.manydesigns.portofino.buttons.annotations.Button
+import com.manydesigns.portofino.operations.GuardType
+
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
@@ -69,7 +69,6 @@ class TicketActivityAction extends ActivityStreamAction {
     }
 
 
-    @Button(list = "activity", key = "post.comment")
     @Guard(test = "isContributor()", type = GuardType.VISIBLE)
     public Resolution postComment() {
         try {

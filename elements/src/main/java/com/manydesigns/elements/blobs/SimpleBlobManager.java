@@ -116,29 +116,22 @@ public class SimpleBlobManager implements BlobManager {
         if(!dataFile.getParentFile().isDirectory()) {
             dataFile.getParentFile().mkdirs();
         }
-        FileOutputStream out = new FileOutputStream(dataFile);
         InputStream encryptInputStream;
-        try {
+        try(FileOutputStream out = new FileOutputStream(dataFile)) {
             InputStream inputStream = blob.getInputStream();
             if(blob.isEncrypted()){
                  encryptInputStream = BlobUtils.encrypt(inputStream,blob.getEncryptionType());
                 IOUtils.copyLarge(encryptInputStream, out);
-                //blob.setSize(BlobUtils.calculatePaddingSize(blob));
             }else{
                 blob.setSize(IOUtils.copyLarge(inputStream, out));
             }
-        } finally {
-            IOUtils.closeQuietly(out);
         }
         File metaFile = getMetaFile(blob.getCode());
         if(!metaFile.getParentFile().isDirectory()) {
             metaFile.getParentFile().mkdirs();
         }
-        out = new FileOutputStream(metaFile);
-        try {
+        try(OutputStream out = new FileOutputStream(metaFile)) {
             blob.getMetaProperties().store(out, "Blob code #" + blob.getCode());
-        } finally {
-            IOUtils.closeQuietly(out);
         }
         blob.dispose();
     }

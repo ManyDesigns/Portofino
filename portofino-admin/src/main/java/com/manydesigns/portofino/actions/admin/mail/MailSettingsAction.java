@@ -28,7 +28,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.mail.setup.MailProperties;
-import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.operations.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.security.RequiresAdministrator;

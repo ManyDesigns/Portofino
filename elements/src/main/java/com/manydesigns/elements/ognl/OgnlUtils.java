@@ -76,7 +76,7 @@ public class OgnlUtils {
         Object result;
         try {
             if (ognlContext == null) {
-                result = Ognl.getValue(parsedExpression, root);
+                result = Ognl.getValue(parsedExpression, root, null);
             } else {
                 result = Ognl.getValue(parsedExpression, ognlContext, root);
             }

@@ -18,34 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.elements.annotations.impl;
+package com.manydesigns.portofino.operations;
 
-import com.manydesigns.elements.annotations.CssClass;
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public enum GuardType {
 
-import java.lang.annotation.Annotation;
+    VISIBLE, ENABLED;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-@SuppressWarnings({"ClassExplicitlyAnnotation"})
-public class CssClassImpl implements CssClass {
-    public static final String copyright =
+    public static final String copyright=
             "Copyright (C) 2005-2019 ManyDesigns srl";
-
-    private final String[] value;
-
-    public CssClassImpl(String[] value) {
-        this.value = value;
-    }
-
-    public String[] value() {
-        return value;
-    }
-
-    public Class<? extends Annotation> annotationType() {
-        return CssClass.class;
-    }
 }

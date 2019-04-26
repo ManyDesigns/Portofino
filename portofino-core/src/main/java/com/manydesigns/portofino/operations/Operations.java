@@ -25,9 +25,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.portofino.buttons.GuardType;
-import com.manydesigns.portofino.buttons.annotations.Guard;
-import com.manydesigns.portofino.buttons.annotations.Guards;
+import com.manydesigns.portofino.operations.annotations.Guard;
+import com.manydesigns.portofino.operations.annotations.Guards;
 import ognl.OgnlContext;
 import org.jetbrains.annotations.Nullable;
 

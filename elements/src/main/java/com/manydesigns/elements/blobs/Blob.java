@@ -180,7 +180,11 @@ public class Blob {
     }
 
     public void dispose() {
-        IOUtils.closeQuietly(inputStream);
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getEncryptionType() {

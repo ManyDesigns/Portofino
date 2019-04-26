@@ -4,9 +4,8 @@ import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
-import com.manydesigns.portofino.buttons.GuardType
-import com.manydesigns.portofino.buttons.annotations.Button
-import com.manydesigns.portofino.buttons.annotations.Buttons
+import com.manydesigns.portofino.operations.GuardType
+
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions

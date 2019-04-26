@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.buttons.annotations;
+package com.manydesigns.portofino.operations.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,8 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Declares that the method on which this annotation is placed is to be exposed as multiple buttons on one or
- * more pages. Considerations regarding {@link Button} apply.
+ * Allows to place multiple {@link Guard guards} on a method.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -36,14 +35,13 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-@Deprecated
-public @interface Buttons {
+public @interface Guards {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
     /**
-     * The list of buttons that will call this method when pressed.
+     * The guards.
      */
-    Button[] value();
+    Guard[] value();
 
 }

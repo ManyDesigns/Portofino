@@ -8,7 +8,7 @@ import com.manydesigns.elements.forms.TableForm
 import com.manydesigns.elements.forms.TableFormBuilder
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.GroovyClassAccessor
-import com.manydesigns.portofino.buttons.annotations.Button
+
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 

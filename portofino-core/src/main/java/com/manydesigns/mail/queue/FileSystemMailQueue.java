@@ -37,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -104,10 +105,10 @@ public class FileSystemMailQueue implements MailQueue {
                 for(Attachment attachment : email.getAttachments()) {
                     String attachmentId = RandomUtil.createRandomId(20);
                     File attachmentFile = new File(attachDir, attachmentId + ".bin");
-                    FileOutputStream fos = new FileOutputStream(attachmentFile);
-                    IOUtils.copy(attachment.getInputStream(), fos);
-                    IOUtils.closeQuietly(fos);
-                    IOUtils.closeQuietly(attachment.getInputStream());
+                    try(InputStream inputStream = attachment.getInputStream();
+                        FileOutputStream fos = new FileOutputStream(attachmentFile)) {
+                        IOUtils.copy(inputStream, fos);
+                    }
                     attachment.setFilePath(attachmentFile.getAbsolutePath());
                 }
             }

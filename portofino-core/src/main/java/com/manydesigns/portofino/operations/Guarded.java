@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.buttons;
+package com.manydesigns.portofino.operations;
 
 import javax.ws.rs.core.Response;
 import java.lang.reflect.Method;

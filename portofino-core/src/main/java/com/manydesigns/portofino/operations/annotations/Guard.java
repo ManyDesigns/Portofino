@@ -18,9 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.buttons.annotations;
+package com.manydesigns.portofino.operations.annotations;
 
-import com.manydesigns.portofino.buttons.GuardType;
+import com.manydesigns.portofino.operations.GuardType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,8 +29,9 @@ import java.lang.annotation.Target;
 
 /**
  * Guards a method with a condition. The method cannot be called by a web request if the condition is not met.
- * Additionally, if the method is exposed as a {@link Button button}, this annotation will cause the button
- * to be hidden or disabled if the condition is not met, depending on the type parameter.
+ * Additionally, if the method is exposed as a {@link com.manydesigns.portofino.operations.Operation operation},
+ * this annotation will cause the operation to be hidden or disabled if the condition is not met,
+ * depending on the type parameter.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com

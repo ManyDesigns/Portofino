@@ -342,11 +342,8 @@ public class PageLogic {
         if (configurationClass == null) {
             return null;
         }
-        InputStream inputStream = configurationFile.getContent().getInputStream();
-        try {
+        try(InputStream inputStream = configurationFile.getContent().getInputStream()) {
             return loadConfiguration(inputStream, configurationClass);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 

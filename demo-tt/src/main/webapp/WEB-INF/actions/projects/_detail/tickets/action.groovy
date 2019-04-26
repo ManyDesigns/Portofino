@@ -12,9 +12,8 @@ import com.manydesigns.elements.forms.TableFormBuilder
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.elements.text.OgnlTextFormat
 import com.manydesigns.elements.util.Util
-import com.manydesigns.portofino.buttons.GuardType
-import com.manydesigns.portofino.buttons.annotations.Button
-import com.manydesigns.portofino.buttons.annotations.Buttons
+import com.manydesigns.portofino.operations.GuardType
+
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions

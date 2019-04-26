@@ -3,9 +3,8 @@ package com.manydesigns.portofino.pageactions.crud
 import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.buttons.GuardType
-import com.manydesigns.portofino.buttons.annotations.Button
-import com.manydesigns.portofino.buttons.annotations.Buttons
+import com.manydesigns.portofino.operations.GuardType
+
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
@@ -58,15 +57,14 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "glyphicon-plus white")
+
     @Guard(test="canEditTicket()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override
-    @Button(list = "crud-create", key = "save", order = 1d, type = Button.TYPE_PRIMARY)
+
     @Guard(test="canEditTicket()", type=GuardType.VISIBLE)
     Resolution save() {
         return super.save()    //To change body of overridden methods use File | Settings | File Templates.
@@ -110,18 +108,14 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Buttons([
-        @Button(list = "crud-read", key = "edit", order = 1d, icon = "glyphicon-edit white",
-                group = "crud", type = Button.TYPE_SUCCESS),
-        @Button(list = "crud-read-default-button", key = "search")
-    ])
+
     @Guard(test="canEditTicket()", type=GuardType.VISIBLE)
     Resolution edit() {
         return super.edit()    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override
-    @Button(list = "crud-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
+
     @Guard(test="canEditTicket()", type=GuardType.VISIBLE)
     Resolution update() {
         return super.update()    //To change body of overridden methods use File | Settings | File Templates.
@@ -156,7 +150,7 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
     // Delete customizations
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH)
+
     @Guard(test = "canEditTicket()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();
@@ -202,7 +196,7 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
     // Bulk delete customizations
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "delete", order = 3d, icon = Button.ICON_TRASH)
+
     @Guard(test = "isBulkOperationsEnabled() && canEditTicket()", type = GuardType.VISIBLE)
     public Resolution bulkDelete() {
         return super.bulkDelete()

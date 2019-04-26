@@ -8,9 +8,9 @@ import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.servlet.ServletUtils
-import com.manydesigns.portofino.buttons.GuardType
+import com.manydesigns.portofino.operations.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
-import com.manydesigns.portofino.buttons.annotations.Buttons
+
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
@@ -59,7 +59,7 @@ class ProjectMembersAction extends CrudAction {
     }
 
     @Override
-    @Button(list = "crud-create", key = "save", order = 1d, type = Button.TYPE_PRIMARY)
+
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution save() {
         return super.save() 
@@ -99,18 +99,14 @@ class ProjectMembersAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Buttons([
-        @Button(list = "crud-read", key = "edit", order = 1d, icon = "glyphicon-edit white",
-                group = "crud", type = Button.TYPE_SUCCESS),
-        @Button(list = "crud-read-default-button", key = "search")
-    ])
+
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution edit() {
         return super.edit()    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override
-    @Button(list = "crud-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
+
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution update() {
         return super.update()    //To change body of overridden methods use File | Settings | File Templates.
@@ -155,7 +151,7 @@ class ProjectMembersAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH)
+
     @Guard(test = "isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();

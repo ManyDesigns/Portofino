@@ -26,7 +26,7 @@ import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.buttons.GuardType;
+import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;

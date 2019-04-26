@@ -5,9 +5,8 @@ import com.manydesigns.portofino.tt.TtUtils
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
-import com.manydesigns.portofino.buttons.GuardType
-import com.manydesigns.portofino.buttons.annotations.Button
-import com.manydesigns.portofino.buttons.annotations.Buttons
+import com.manydesigns.portofino.operations.GuardType
+
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
@@ -42,15 +41,14 @@ class ProjectVersionsAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "glyphicon-plus white")
+
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override
-    @Button(list = "crud-create", key = "save", order = 1d, type = Button.TYPE_PRIMARY)
+
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution save() {
         return super.save()    //To change body of overridden methods use File | Settings | File Templates.
@@ -119,17 +117,14 @@ class ProjectVersionsAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Buttons([
-        @Button(list = "pageHeaderButtons", key = "edit.version.details", order = 1d, icon = "glyphicon-edit"),
-        @Button(list = "crud-read-default-button", key = "search")
-    ])
+
     @Guard(test="object != null && isManager()", type=GuardType.VISIBLE)
     Resolution edit() {
         return super.edit()    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     @Override
-    @Button(list = "crud-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
+
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution update() {
         return super.update()    //To change body of overridden methods use File | Settings | File Templates.
@@ -182,7 +177,7 @@ class ProjectVersionsAction extends CrudAction {
     // Delete customizations
     //**************************************************************************
 
-    @Button(list = "pageHeaderButtons", key = "delete", order = 2d, icon = Button.ICON_TRASH)
+
     @Guard(test = "object != null && isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();
