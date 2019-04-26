@@ -59,7 +59,9 @@ public abstract class AbstractAnnotatedAccessor extends com.manydesigns.elements
         for (Annotation annotation : annotations) {
             Class annotationClass = annotation.getJavaAnnotationClass();
             java.lang.annotation.Annotation javaAnnotation = annotation.getJavaAnnotation();
-            this.annotations.put(annotationClass, javaAnnotation);
+            if(annotationClass != null && javaAnnotation != null) {
+                this.annotations.put(annotationClass, javaAnnotation);
+            }
         }
     }
 

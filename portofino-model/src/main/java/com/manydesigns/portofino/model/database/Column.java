@@ -79,7 +79,7 @@ public class Column implements ModelObject, Annotated {
     // Constructors and init
     //**************************************************************************
     public Column() {
-        annotations = new ArrayList<Annotation>();
+        annotations = new ArrayList<>();
     }
 
     public Column(Table table) {

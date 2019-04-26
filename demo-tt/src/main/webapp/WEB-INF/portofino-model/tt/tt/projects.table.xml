@@ -5,9 +5,6 @@
         <column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="id"
                 autoincrement="false">
             <annotations>
-                <annotation type="com.manydesigns.elements.annotations.CssClass">
-                    <value>input-medium</value>
-                </annotation>
                 <annotation type="com.manydesigns.elements.annotations.RegExp">
                     <value>[a-zA-Z0-9]+</value>
                     <value>only.simple.letters.or.numbers.allowed</value>
@@ -16,11 +13,7 @@
         </column>
         <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title"
                 autoincrement="false">
-            <annotations>
-                <annotation type="com.manydesigns.elements.annotations.CssClass">
-                    <value>input-xxlarge</value>
-                </annotation>
-            </annotations>
+            <annotations />
         </column>
         <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description"
                 autoincrement="false">
