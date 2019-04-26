@@ -270,7 +270,7 @@ public class UpstairsAction extends AbstractPageAction {
             }
             Map<String, Object> pageInfo = new HashMap<>();
             pageInfo.put("path", path);
-            pageInfo.put("detail", true);
+            pageInfo.put("detail", depth > 1);
             pageInfo.put("type", "crud");
             pageInfo.put("title", Util.guessToWords(dir.getName()));
             createdPages.add(pageInfo);

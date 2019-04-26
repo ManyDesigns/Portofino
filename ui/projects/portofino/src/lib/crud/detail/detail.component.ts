@@ -21,6 +21,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   editEnabled: boolean;
   deleteEnabled: boolean;
 
+  loading = false;
   editMode = false;
   @Output()
   editModeChanges = new EventEmitter();
@@ -49,16 +50,23 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
 
   ngOnInit() {
     this.initClassAccessor();
+    this.loading = true;
     const objectUrl = `${this.sourceUrl}/${this.id}`;
-    this.http.get(objectUrl, {params: {forEdit: "true"}, observe: 'response'}).subscribe(resp => {
-      this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
-      this.setupForm(resp.body);
-    }, () => {
-      this.translateService.get("Not found").subscribe(t => this.prettyName = t);
-    });
+    this.loadObject(objectUrl);
     this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
       this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
       this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
+    });
+  }
+
+  protected loadObject(objectUrl: string) {
+    this.http.get(objectUrl, {params: {forEdit: "true"}, observe: 'response'}).subscribe(resp => {
+      this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
+      this.loading = false;
+      this.setupForm(resp.body);
+    }, () => {
+      this.loading = false;
+      this.translateService.get("Not found").subscribe(t => this.prettyName = t);
     });
   }
 
