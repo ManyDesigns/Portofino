@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {isUpdatable, Property} from "../../class-accessor";
@@ -7,13 +7,14 @@ import {Operation} from "../../page";
 import {NotificationService} from "../../notifications/notification.service";
 import {Button} from "../../buttons";
 import {TranslateService} from "@ngx-translate/core";
+import {Subject, Subscription} from "rxjs";
 
 @Component({
   selector: 'portofino-crud-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.css']
 })
-export class DetailComponent extends BaseDetailComponent implements OnInit {
+export class DetailComponent extends BaseDetailComponent implements OnInit, OnDestroy {
 
   @Input()
   id: string;
@@ -25,6 +26,9 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
   editMode = false;
   @Output()
   editModeChanges = new EventEmitter();
+  @Input()
+  editOrView: Subject<boolean>;
+  protected subscriptions: Subscription[] = [];
 
   operationsPath = '/:operations';
 
@@ -52,18 +56,32 @@ export class DetailComponent extends BaseDetailComponent implements OnInit {
     this.initClassAccessor();
     this.loading = true;
     const objectUrl = `${this.sourceUrl}/${this.id}`;
-    this.loadObject(objectUrl);
-    this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
-      this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
-      this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
+    this.loadObject(objectUrl, () => {
+      this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
+        this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
+        this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
+        this.subscriptions.push(this.editOrView.subscribe(edit => {
+          console.log("edit", edit);
+          if(this.editEnabled && edit) {
+            this.edit();
+          } else {
+            this.cancel();
+          }
+        }));
+      });
     });
   }
 
-  protected loadObject(objectUrl: string) {
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(s => s.unsubscribe());
+  }
+
+  protected loadObject(objectUrl: string, onSuccess: () => void) {
     this.http.get(objectUrl, {params: {forEdit: "true"}, observe: 'response'}).subscribe(resp => {
       this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
       this.loading = false;
-      this.setupForm(resp.body);
+      this.object = resp.body;
+      onSuccess();
     }, () => {
       this.loading = false;
       this.translateService.get("Not found").subscribe(t => this.prettyName = t);

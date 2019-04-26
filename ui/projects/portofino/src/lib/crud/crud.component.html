@@ -12,7 +12,7 @@
       [component]="detailComponent" [context]="detailComponentContext"
       [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
       [sourceUrl]="sourceUrl" (close)="goToSearch()" (editModeChanges)="onEditModeChange($event)"
-      [parentButtons]="getButtons('detail')" [parent]="page">
+      [parentButtons]="getButtons('detail')" [editOrView]="editMode" [parent]="page">
     </portofino-crud-detail-holder>
     <portofino-crud-create-holder *ngIf="isCreateView()"
       [component]="createComponent" [context]="createComponentContext"

@@ -12,6 +12,7 @@ import {CreateComponent} from "./detail/create.component";
 import {BulkEditComponent} from "./bulk/bulk-edit.component";
 import {mergeMap} from "rxjs/operators";
 import {Field, FieldSet} from "../form";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'portofino-crud',
@@ -35,6 +36,8 @@ export class CrudComponent extends Page {
   @Output()
   readonly refreshSearch = new EventEmitter();
   readonly selection = new SelectionModel<any>(true, []);
+  @Output()
+  readonly editMode = new BehaviorSubject<boolean>(false);
 
   id: string;
   view: CrudView;
@@ -106,15 +109,21 @@ export class CrudComponent extends Page {
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
-    this.subscribe(this.route.queryParams,params => {
-      if(params.hasOwnProperty('create') && this.createEnabled && !this.embedded) {
-        this.showCreate();
-      } else if(this.id) {
-        this.showDetail();
-      } else {
-        this.showSearch();
-      }
-    });
+    if(this.route) {
+      this.subscribe(this.route.queryParams,params => {
+        if(params.hasOwnProperty('create') && this.createEnabled && !this.embedded) {
+          this.showCreate();
+        } else if(this.id) {
+          this.showDetail();
+          if(params.hasOwnProperty('edit') && !this.embedded) {
+            console.log("edit!");
+            this.editMode.next(true);
+          }
+        } else {
+          this.showSearch();
+        }
+      });
+    }
     this.subscribe(this.portofino.localeChange, _ => {
       if(this.view == CrudView.SEARCH) {
         this.refreshSearch.emit();
