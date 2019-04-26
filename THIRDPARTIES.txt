@@ -3,23 +3,12 @@ ManyDesigns Portofino includes other software as detailed below.
 This product includes software developed by the Apache Software 
 Foundation (http://www.apache.org/).
 
-This product includes software developed by the
-OpenSymphony Group (http://www.opensymphony.com/).
-
-This product includes software developed by the
-Visigoth Software Society (http://www.visigoths.org/).
-
 This software contains unmodified binary redistributions for H2 database engine (http://www.h2database.com/),
 which is dual licensed and available under a modified version of the MPL 1.1 (Mozilla Public License)
 or under the (unmodified) EPL 1.0 (Eclipse Public License).
 An original copy of the license agreement can be found at: http://www.h2database.com/html/license.html
 
 All trademarks belong to their respective owners.
-
-Ace (Ajax.org Cloud9 Editor) version 1.2.0
-Site: https://github.com/ajaxorg/ace/
-Files: ace-1.2.0.jar
-License: Mozilla Public License
 
 ANTLR Parser Generator
 Site: http://www.antlr.org/
@@ -39,6 +28,16 @@ Files: batik-anim-1.8.jar, batik-awt-util-1.8.jar, batik-bridge-1.8.jar, batik-c
        batik-util-1.8.jar, batik-xml-1.8.jar
 License: Apache License v2.0
 
+Apache Commons OGNL
+Site: https://commons.apache.org/proper/commons-ognl/
+File: ognl-3.2.8.jar
+License: Apache License v2.0
+
+Apache Commons VFS
+Site: http://commons.apache.org/proper/commons-vfs/
+File: commons-vfs2-2.2.jar
+License: Apache License v2.0
+
 Apache FOP
 Site: http://xmlgraphics.apache.org/fop/
 File: fop-2.1.jar
@@ -46,7 +45,9 @@ License: Apache License v2.0
 
 Apache Shiro
 Site: http://shiro.apache.org
-Files: shiro-core-1.3.2.jar, shiro-web-1.3.2.jar
+Files: shiro-cache-1.4.0.jar, shiro-config-core-1.4.0.jar, shiro-config-ogdl-1.4.0.jar, shiro-core-1.4.0.jar,
+       shiro-crypto-cipher-1.4.0.jar, shiro-crypto-core-1.4.0.jar, shiro-crypto-hash-1.4.0.jar, shiro-event-1.4.0.jar,
+       shiro-lang-1.4.0.jar, shiro-web-1.4.0.jar
 License: Apache License v2.0
 
 Apache XML-commons
@@ -59,44 +60,19 @@ Site: http://xmlgraphics.apache.org/commons/
 File: xmlgraphics-commons-2.1.jar
 License: Apache License v2.0
 
-Atmosphere
-Site: http://async-io.org
-File: atmosphere-runtime-2.4.8.jar, atmosphere-javascript-2.3.2.jar
-License: Apache License v2.0
-
-Bootstrap
-Site: http://twitter.github.io/bootstrap/index.html
-Files: bootstrap-3.3.7.jar
-License: Apache License v2.0
-
-Bootstrap DateTimePicker
-Site: https://github.com/eternicode/bootstrap-datepicker
-Files: Eonasdan-bootstrap-datetimepicker-4.17.37.jar
-License: Apache License v2.0
-
-OpenSymphony ognl
-Site: http://www.opensymphony.com/ognl
-File: ognl-3.2.jar
-License: http://www.opensymphony.com/ognl/license.action
-
 c3p0 - JDBC3 Connection and Statement Pooling
 Site: http://www.mchange.com/projects/c3p0/
 File: c3p0-0.9.2.1.jar
 License: LGPL
 
-CKEditor - web text editor
-Site: http://ckeditor.com/
-File: ckeditor-4.5.3.jar
-License: LGPL
-
 Commons BeanUtils
 Site: http://commons.apache.org/beanutils/
-File: commons-beanutils-1.8.3.jar
+File: commons-beanutils-1.9.2.jar
 License: Apache License v2
 
 Commons Codec
 Site: http://commons.apache.org/codec/
-File: commons-codec-1.3.jar
+File: commons-codec-1.11.jar
 License: Apache License v2
 
 Commons Collections
@@ -111,7 +87,7 @@ License: Apache License v2
 
 Commons DbUtils
 Site: http://commons.apache.org/dbutils/
-File: commons-dbutils-1.3.jar
+File: commons-dbutils-1.7.jar
 License: Apache License v2
 
 Commons Email
@@ -126,7 +102,7 @@ License: Apache License v2
 
 Commons IO
 Site: http://commons.apache.org/io/
-File: commons-io-2.0.1.jar
+File: commons-io-2.6.jar
 License: Apache License v2
 
 Commons Lang
@@ -141,28 +117,23 @@ License: BSD
 
 Ehcache
 Site: http://ehcache.org/
-File: ehcache-core-2.10.2.2.21.jar
+File: ehcache-core-2.10.5.jar
 License: Apache License v2
 
 FindBugs JSR-305
 Site: http://findbugs.sourceforge.net/
-File: jsr305-1.3.9.jar
+File: jsr305-3.0.2.jar
 License: Apache License v2
 
 Google Guava
 Site: http://code.google.com/p/guava-libraries/
-File: guava-18.0.jar
-License: Apache License v2
-
-Google Guice
-Site: http://code.google.com/p/google-guice/
-File: guice-3.0.jar
+File: guava-27.0.1-jre.jar
 License: Apache License v2
 
 Groovy
 Site: http://groovy.codehaus.org/
-File: groovy-2.4.7.jar, groovy-json-2.4.7.jar, groovy-templates-2.4.7.jar
-License: Apache License v2
+File: groovy-2.5.4.jar, groovy-json-2.5.4.jar, groovy-templates-2.5.4.jar, groovy-xml-2.5.4.jar
+License: Apache License v2.0
 
 Hibernate ORM
 Site: http://www.hibernate.org/
@@ -172,67 +143,42 @@ Files: hibernate-core-4.3.11.Final.jar,
        hibernate-c3p0-4.3.11.Final.jar
 License: LGPL v2.1
 
-IntelliJ Annotations
-Site: http://www.jetbrains.com/idea
-File: annotations-7.0.3.jar
-License: Apache License
-
-Java Excel API
-Site: http://jexcelapi.sourceforge.net/
-File: jxl-2.6.12.jar
-License: LGPLv2
-
-Java Standard Tag Library (JSTL)
-Site: http://jstl.java.net/
-File: jstl-1.2.jar
-Licenses: Common Development and Distribution License (CDDL) version 1.0 + GNU General Public License (GPL) version 2
+Jadira Usertype
+Site: http://jadira.sourceforge.net/usertype.core/index.html
+Files: usertype.jodatime-2.0.1.jar, usertype.spi-2.0.1.jar
+License: Apache License v2
 
 JavaBeans Activation Framework
 Site: http://www.oracle.com/technetwork/java/javase/downloads/index-135046.html
-File: activation-1.1.jar
+File: activation-1.1.1.jar
 License: Oracle Binary Code License Agreement for Java SE
 
-JavaMail API 1.4.1
+JavaMail API
 http://java.sun.com/products/javamail/
-File: mail-1.4.1.jar
+File: mail-1.5.6.jar
 License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
 
 Javassist
 Site: http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/
-File: javassist-3.18.1-GA.jar
+File: javassist-3.22.0-GA.jar
 License: Apache License
-
-Jcommon
-Site: http://www.jfree.org/jcommon/index.php
-File: jcommon-1.0.15.jar
-License: LGPL
 
 Jersey
 Site: https://jersey.java.net/
 Files:
-jersey-client-2.22.1.jar, jersey-common-2.22.1.jar, jersey-container-servlet-2.22.1.jar,
-jersey-container-servlet-core-2.22.1.jar, jersey-entity-filtering-2.22.1.jar, jersey-guava-2.22.1.jar,
-jersey-media-jaxb-2.22.1.jar, jersey-media-json-jackson-2.22.1.jar, jersey-server-2.22.1.jar
+jersey-client-2.27.jar, jersey-common-2.27.jar, jersey-container-servlet-2.27.jar,
+jersey-container-servlet-core-2.27.jar, jersey-entity-filtering-2.27.jar, jersey-guava-2.27.jar,
+jersey-media-jaxb-2.27.jar, jersey-media-json-jackson-2.27.jar, jersey-server-2.27.jar
 Licenses: Common Development and Distribution License (CDDL) version 1.1 + GNU General Public License (GPL) version 2
-
-JFreeChart
-Site: http://www.jfree.org/jfreechart/
-File: jfreechart-1.0.12.jar
-License: LGPL
 
 Joda Time
 Site: http://joda-time.sourceforge.net/
 File: joda-time-2.9.1.jar
 License: Apache License v2
 
-JQuery UI
-Site: http://jqueryui.com
-Files: jquery-ui-1.12.0.jar
-License: MIT
-
 JSON
 Site: http://www.json.org
-File: json-20140107.jar
+File: json-20180813.jar
 License: JSON License (http://www.json.org/license.html)
 
 JSoup
@@ -247,12 +193,12 @@ License: LGPL
 
 Liquibase
 Site: http://www.liquibase.org/
-File: liquibase-core-3.5.3.jar
+File: liquibase-core-3.6.2.jar
 License: Apache License v2.0
 
 LOGBack
 Site: http://logback.qos.ch/
-Files: logback-classic-1.1.7.jar, logback-core-1.1.7.jar
+Files: logback-classic-1.2.3.jar, logback-core-1.2.3.jar
 License: Eclipse Public License v1.0
 
 NekoHTML
@@ -260,32 +206,23 @@ Site: http://nekohtml.sourceforge.net/
 File: nekohtml-1.9.10.jar
 License: Apache License v2.0
 
-openid-selector
-Site: https://code.google.com/p/openid-selector/
-Files: openid-selector directory
-License: BSD
-
-openid4java
-Site: http://code.google.com/p/openid4java/
-File: openid4java-1.0.0.jar
-License: Apache License v2.0
-
 Quartz Scheduler
 Site: http://quartz-scheduler.org/
-File: quartz-2.2.1.jar
+File: quartz-2.3.0.jar
 License: Apache License v2.0
 
-Standard: An Implementation of the JSP™ Standard Tag Library (JSTL)
-Site: http://jakarta.apache.org/taglibs/doc/standard-doc/ReleaseNotes.html
-File: standard-spec-1.2.5.jar, standard-impl-1.2.5.jar
+RxJava
+Site: https://github.com/ReactiveX/RxJava
+File: rxjava-2.2.5.jar
 License: Apache License v2.0
 
 Simple Logging Facade for Java
 Site: http://www.slf4j.org/
-Files: slf4j-api-1.7.21.jar, slf4j-nop-1.7.21.jar, jcl-over-slf4j-1.7.21.jar, log4j-over-slf4j-1.7.21.jar
+Files: slf4j-api-1.7.25.jar, slf4j-nop-1.7.25.jar, jcl-over-slf4j-1.7.25.jar, log4j-over-slf4j-1.7.25.jar
 License: MIT
 
-SweetiePlus Icon Set
-Site: http://sublink.ca/icons/sweetieplus/
-Files: SweetiePlus-v2-SublinkInteractive directory
-License: Creative Commons Attribution-ShareAlike 3.0 Unported
+Swagger
+Site: https://github.com/swagger-api/swagger-core
+Files: swagger-jaxrs2-2.0.7.jar, swagger-models-2.0.7.jar, swagger-annotation-2.0.7.jar, swagger-integration-2.0.7.jar,
+       swagger-core-2.0.7.jar
+License: Apache License v2.0
