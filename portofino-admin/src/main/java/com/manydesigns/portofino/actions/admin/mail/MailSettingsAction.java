@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 @UrlBinding(MailSettingsAction.URL_BINDING)
 public class MailSettingsAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/admin/mail/settings";
 

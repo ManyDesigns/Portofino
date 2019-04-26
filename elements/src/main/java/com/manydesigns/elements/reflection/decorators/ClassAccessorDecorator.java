@@ -17,7 +17,7 @@ import java.lang.annotation.Annotation;
  */
 public class ClassAccessorDecorator extends AbstractAnnotatedAccessor implements ClassAccessor {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     private final ClassAccessor delegate;
     private final PropertyAccessor[] properties;

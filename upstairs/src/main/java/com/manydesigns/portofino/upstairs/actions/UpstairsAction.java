@@ -63,7 +63,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.ACTI
 @RequiresAuthentication
 @RequiresAdministrator
 public class UpstairsAction extends AbstractPageAction {
-    public static final String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(UpstairsAction.class);
 

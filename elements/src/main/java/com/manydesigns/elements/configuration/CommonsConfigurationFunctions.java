@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,7 +33,7 @@ import java.math.BigInteger;
  */
 public class CommonsConfigurationFunctions {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
     
     public static String getString(Configuration configuration, String key) {
         return configuration.getString(key);

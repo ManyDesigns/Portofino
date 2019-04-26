@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -72,7 +72,7 @@ import static javax.ws.rs.core.Response.Status.CONFLICT;
 public class PortofinoFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
     public final static Logger accessLogger = LoggerFactory.getLogger("com.manydesigns.portofino.access");

@@ -10,7 +10,7 @@ import org.apache.shiro.authc.credential.DefaultPasswordService;
  */
 public class PortofinoPasswordService extends DefaultPasswordService {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     @Override
     protected void checkHashFormatDurability() {

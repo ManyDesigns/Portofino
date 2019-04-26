@@ -57,7 +57,7 @@ public class FileBean {
      *
      * @param file the File object on the server which holds the uploaded contents of the file
      * @param contentType the content type of the file declared by the browser during upload
-     * @param originalName the name of the file as declared by the user&apos;s browser
+     * @param originalName the name of the file as declared by the user's browser
      */
     public FileBean(File file, String contentType, String originalName) {
         this.file = file;
@@ -70,7 +70,7 @@ public class FileBean {
      *
      * @param file the File object on the server which holds the uploaded contents of the file
      * @param contentType the content type of the file declared by the browser during upload
-     * @param originalName the name of the file as declared by the user&apos;s browser
+     * @param originalName the name of the file as declared by the user's browser
      * @param charset the charset specified by the servlet request
      */
     public FileBean(File file, String contentType, String originalName, String charset) {

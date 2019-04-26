@@ -45,10 +45,9 @@ public abstract class JWTFilter extends PathMatchingFilter {
     protected abstract String getToken(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Object mappedValue);
 
     /**
-     * Returns the host name or IP associated with the current subject.  This method is primarily provided for use
-     * during construction of an <code>AuthenticationToken</code>.
-     * <p/>
-     * The default implementation merely returns {@link ServletRequest#getRemoteHost()}.
+     * <p>Returns the host name or IP associated with the current subject.  This method is primarily provided for use
+     * during construction of an <code>AuthenticationToken</code>.</p>
+     * <p>The default implementation merely returns {@link ServletRequest#getRemoteHost()}.</p>
      *
      * @param request the incoming ServletRequest
      * @return the <code>InetAddress</code> to associate with the login attempt.

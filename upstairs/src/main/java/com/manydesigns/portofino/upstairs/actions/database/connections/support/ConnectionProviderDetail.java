@@ -15,7 +15,7 @@ import java.util.Date;
 @JsonClassDescription
 public class ConnectionProviderDetail {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     @JsonIgnore
     protected Database database;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 */
 public class RangeSearchField extends AbstractSearchField {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     public final static String MIN_SUFFIX = "_min";
     public final static String MAX_SUFFIX = "_max";

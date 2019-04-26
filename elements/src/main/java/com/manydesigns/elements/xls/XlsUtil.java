@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -50,7 +50,7 @@ import java.util.HashMap;
  */
 public class XlsUtil {
   public static final String copyright =
-    "Copyright (C) 2005-2017 ManyDesigns srl";
+    "Copyright (C) 2005-2019 ManyDesigns srl";
 
   //Map for formatters, only 350 availables in jxl
   private HashMap<String, WritableCellFormat> formatMap = new HashMap<String, WritableCellFormat>();

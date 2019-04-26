@@ -13,7 +13,7 @@ import java.lang.annotation.Annotation;
  */
 public class PropertyAccessorDecorator extends AbstractAnnotatedAccessor implements PropertyAccessor {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     private final PropertyAccessor delegate;
 

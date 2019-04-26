@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import com.manydesigns.portofino.dispatcher.security.SecureResource;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface PageAction extends SecureResource {
-    String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
 
     ActionContext getContext();
 
