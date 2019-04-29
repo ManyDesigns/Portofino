@@ -1,4 +1,4 @@
-import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
+import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@angular/core';
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {TRANSLATIONS_EN} from "./i18n/en";
@@ -26,6 +26,7 @@ export class PortofinoService {
   readonly DEFAULT_LOCALE = 'en';
   readonly localeDefinitions = {};
   readonly localeChange = new EventEmitter<Locale>();
+  readonly templates: { [name: string]: TemplateRef<any> } = {};
 
   constructor(public http: HttpClient, protected translate: TranslateService,
               @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,

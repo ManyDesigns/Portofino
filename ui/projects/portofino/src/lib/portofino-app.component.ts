@@ -1,18 +1,17 @@
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
-  ComponentFactoryResolver,
-  Directive,
+  ComponentFactoryResolver, ContentChild, Directive,
   Inject,
   InjectionToken,
   Input,
-  OnInit,
+  OnInit, Optional, TemplateRef,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
 import {PortofinoService, SideNavPosition} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {NAVIGATION_COMPONENT} from "./page";
+import {NAVIGATION_COMPONENT, TemplatesComponent} from "./page";
 import {NavigationDirective} from "./content.directive";
 import {PageCrudService} from "./administration/page-crud.service";
 
@@ -63,6 +62,11 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   @ViewChild(NavigationDirective)
   navigationHost: NavigationDirective;
 
+  @ViewChild(TemplatesComponent)
+  builtinTemplates: TemplatesComponent;
+  @ContentChild(TemplatesComponent)
+  extraTemplates: TemplatesComponent;
+
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver,
               protected changeDetector: ChangeDetectorRef,
@@ -81,6 +85,14 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    for (let key in this.builtinTemplates.templates) {
+      this.portofino.templates[key] = this.builtinTemplates.templates[key];
+    }
+    if(this.extraTemplates) {
+      for (let key in this.extraTemplates.templates) {
+        this.portofino.templates[key] = this.extraTemplates.templates[key];
+      }
+    }
     //Dynamically create the toolbar and navigation components
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
     let toolbar = this.toolbarHost.viewContainerRef.createComponent(componentFactory).instance as ToolbarComponent;

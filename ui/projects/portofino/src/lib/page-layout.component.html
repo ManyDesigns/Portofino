@@ -1,10 +1,13 @@
+<ng-template #defaultTemplate let-content="content" let-page="page">
+  <ng-template [ngTemplateOutlet]="content"></ng-template>
+  <portofino-page *ngFor="let child of page.embeddedChildren"
+                  [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+</ng-template>
 <div class="page" [class.embedded]="page.embedded">
   <portofino-page-header [page]="page"></portofino-page-header>
   <div class="page-body">
     <ng-container *ngIf="!page.settingsPanel.active">
-      <ng-template [ngTemplateOutlet]="content"></ng-template>
-      <portofino-page *ngFor="let child of page.embeddedChildren"
-                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+      <ng-template [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ content: content, page: page }"></ng-template>
     </ng-container>
     <mat-tab-group *ngIf="page.settingsPanel.active">
       <mat-tab>

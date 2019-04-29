@@ -63,7 +63,7 @@ export class CustomNavigation {}
 @Component({
   selector: 'portofino-welcome',
   template: `
-    <portofino-default-page-layout [page]="this">
+    <portofino-page-layout [page]="this">
       <ng-template #content>
         <p>Welcome to the Portofino 5 demo application "demo-tt"!</p>
         <p>
@@ -75,7 +75,7 @@ export class CustomNavigation {}
           to explore the app.
         </p>
       </ng-template>
-    </portofino-default-page-layout>`
+    </portofino-page-layout>`
 })
 @PortofinoComponent({ name: 'welcome' })
 export class WelcomeComponent extends Page {}
@@ -115,7 +115,9 @@ export class CustomSearch extends SearchComponent {
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/"></portofino-app>`
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
+    <portofino-templates></portofino-templates>
+  </portofino-app>`
 })
 export class DemoTTAppComponent {}
 

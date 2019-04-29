@@ -62,9 +62,9 @@ import {CreateComponent} from './crud/detail/create.component';
 import {MainPageDirective, NavigationDirective} from './content.directive';
 import {
   DefaultNavigationComponent,
-  DefaultPageLayout,
+  PageLayout,
   NAVIGATION_COMPONENT,
-  PageHeader, PageService
+  PageHeader, PageService, TemplatesComponent
 } from './page';
 import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
@@ -123,8 +123,8 @@ export class PortofinoFormsModule {}
 
 @NgModule({
   declarations: [
-    DefaultPageLayout, ButtonComponent, ButtonsComponent,
-    ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective,
+    PageLayout, ButtonComponent, ButtonsComponent,
+    ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
     LanguageSelectorComponent,
     NavigationDirective, DefaultNavigationComponent,
     ToolbarDirective, DefaultToolbarComponent, BreadcrumbsComponent,
@@ -145,8 +145,8 @@ export class PortofinoFormsModule {}
     DefaultNavigationComponent, DefaultToolbarComponent,
     CreatePageComponent, DeletePageComponent, MovePageComponent],
   exports: [
-    DefaultPageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
-    ContentComponent, PageFactoryComponent, PageHeader,
+    PageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
+    ContentComponent, PageFactoryComponent, PageHeader, TemplatesComponent,
     DefaultNavigationComponent, NavigationDirective, DefaultToolbarComponent, ToolbarDirective]
 })
 export class PortofinoPagesModule {}
@@ -229,7 +229,7 @@ export class PortofinoUpstairsModule {}
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [LoginComponent],
   exports: [
-    PortofinoAppComponent, DefaultPageLayout, ButtonComponent, ButtonsComponent, LoginComponent,
+    PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent, LoginComponent, TemplatesComponent,
     ContentComponent, PageFactoryComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,

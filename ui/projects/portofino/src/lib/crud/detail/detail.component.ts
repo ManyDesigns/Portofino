@@ -61,7 +61,6 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
         this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
         this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
         this.subscriptions.push(this.editOrView.subscribe(edit => {
-          console.log("edit", edit);
           if(this.editEnabled && edit) {
             this.edit();
           } else {

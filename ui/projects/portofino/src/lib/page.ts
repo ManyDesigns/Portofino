@@ -1,12 +1,13 @@
 import {
+  AfterViewInit,
   Component,
   ContentChild,
-  EventEmitter,
+  EventEmitter, Host,
   Injectable,
   InjectionToken,
-  Input, OnDestroy,
-  Optional,
-  TemplateRef, Type
+  Input, OnDestroy, OnInit,
+  Optional, SkipSelf,
+  TemplateRef, Type, ViewChild
 } from "@angular/core";
 import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
@@ -69,6 +70,7 @@ export class PageConfiguration {
   securityCheckPath: string = ':description';
   children: PageChild[] = [];
   icon?: string;
+  template?: string;
 }
 
 export class PageChild {
@@ -286,6 +288,19 @@ export abstract class Page implements WithButtons, OnDestroy {
     return getButtons(this, list);
   }
 
+  get template(): TemplateRef<any> {
+    const templateName = this.configuration.template;
+    if(templateName) {
+      const template = this.portofino.templates[templateName];
+      if(!template) {
+        console.error("Unknown template: " + templateName);
+      }
+      return template;
+    } else {
+      return null; //use the default template
+    }
+  }
+
   prepare(): Observable<Page> {
     if(this.parent && this.parent.getChild(this.segment) && this.parent.getChild(this.segment).accessible) {
       return of(this);
@@ -492,17 +507,64 @@ export class PageHeader {
 }
 
 @Component({
-  selector: 'portofino-default-page-layout',
-  templateUrl: './default-page-layout.component.html',
-  styleUrls: ['./default-page-layout.component.css']
+  selector: 'portofino-templates',
+  template: `
+    <ng-template #defaultTemplate let-content="content" let-page="page">
+      <ng-template [ngTemplateOutlet]="content"></ng-template>
+      <portofino-page *ngFor="let child of page.embeddedChildren"
+                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+    </ng-template>
+    <ng-template #mainWithTabs let-content="content" let-page="page">
+      <ng-template [ngTemplateOutlet]="content"></ng-template>
+      <mat-tab-group>
+        <mat-tab *ngFor="let child of page.embeddedChildren">
+          <ng-template mat-tab-label>
+            <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+            {{child.title|translate}}
+          </ng-template>
+          <portofino-page [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+        </mat-tab>
+      </mat-tab-group>
+    </ng-template>
+  
+  `
 })
-export class DefaultPageLayout {
+export class TemplatesComponent implements AfterViewInit {
+
+  templates: { [name: string]: TemplateRef<any> } = {};
+
+  @ViewChild("defaultTemplate")
+  defaultTemplate: TemplateRef<any>;
+  @ViewChild("mainWithTabs")
+  mainWithTabs: TemplateRef<any>;
+
+  ngAfterViewInit(): void {
+    this.templates.defaultTemplate = this.defaultTemplate;
+    this.templates.mainWithTabs = this.mainWithTabs;
+  }
+}
+
+@Component({
+  selector: 'portofino-page-layout',
+  templateUrl: './page-layout.component.html',
+  styleUrls: ['./page-layout.component.css']
+})
+export class PageLayout implements AfterViewInit {
   @Input()
   page: Page;
   @ContentChild("content")
   content: TemplateRef<any>;
+  @ViewChild("defaultTemplate")
+  defaultTemplate: TemplateRef<any>;
   @ContentChild("extraConfiguration")
   extraConfiguration: TemplateRef<any>;
+
+  template: TemplateRef<any>;
+
+  ngAfterViewInit(): void {
+    const template = this.page.template;
+    this.template = template ? template : this.defaultTemplate;
+  }
 }
 
 export class Operation {

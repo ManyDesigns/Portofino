@@ -36,7 +36,7 @@ export class AppComponent {}
 @Component({
   selector: 'portofino-welcome',
   template: `
-    <portofino-default-page-layout [page]="this">
+    <portofino-page-layout [page]="this">
       <ng-template #content>
         <p>Welcome to Portofino 5. This is your new empty application.</p>
         <p>
@@ -50,7 +50,7 @@ export class AppComponent {}
         <p>Initially, the application has the user admin/admin built in. You can use that to run the wizard, connect to your database, and build a complete application from it.</p>
         <p>The wizard can be found "upstairs", where all the configuration tools lie. The "upstairs" section is optional and can be removed or disabled in production.</p>
       </ng-template>
-    </portofino-default-page-layout>`
+    </portofino-page-layout>`
 })
 @PortofinoComponent({ name: 'welcome' })
 export class WelcomeComponent extends Page {}

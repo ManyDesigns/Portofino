@@ -116,7 +116,6 @@ export class CrudComponent extends Page {
         } else if(this.id) {
           this.showDetail();
           if(params.hasOwnProperty('edit') && !this.embedded) {
-            console.log("edit!");
             this.editMode.next(true);
           }
         } else {

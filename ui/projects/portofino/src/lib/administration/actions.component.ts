@@ -94,9 +94,7 @@ export class ActionsComponent extends Page implements OnInit {
   }
 
   addChild(parent: ActionFlatNode) {
-    this.dialog.open(CreateActionComponent, { data: parent }).afterClosed().subscribe(node => {
-      console.log(node);
-    })
+    this.dialog.open(CreateActionComponent, { data: parent }).afterClosed().subscribe(node => {});
   }
 
 }
@@ -198,9 +196,10 @@ class PageTreeDataSource {
 }
 
 @Component({
-  template: `<portofino-default-page-layout [page]="this">
-    <ng-template #content>This is a generic page used only for configuration</ng-template>
-  </portofino-default-page-layout>`
+  template: `
+    <portofino-page-layout [page]="this">
+      <ng-template #content>This is a generic page used only for configuration</ng-template>
+    </portofino-page-layout>`
 })
 export class GenericPage extends Page {
 
