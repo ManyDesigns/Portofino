@@ -45,12 +45,25 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Jersey. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jersey</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- RestEasy. Enable on WildFly. -->
+        <!-- <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-resteasy</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.5</version>
+        </dependency>-->
         <!-- Quartz support. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
