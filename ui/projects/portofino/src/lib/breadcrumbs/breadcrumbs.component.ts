@@ -1,12 +1,13 @@
 import {PortofinoService} from "../portofino.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {Component, OnInit} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {AuthenticationService} from "../security/authentication.service";
-import {PageService} from "../page";
+import {Page, PageService} from "../page";
+import {Subscription} from "rxjs";
 
-export interface BreadCrumb {
-  name: string;
-  path: string;
+export class Breadcrumb {
+  title: string;
+  url: string;
 }
 
 @Component({
@@ -14,46 +15,38 @@ export interface BreadCrumb {
   templateUrl: 'breadcrumbs.component.html',
   styleUrls: ['./breadcrumbs.component.css']
 })
-export class BreadcrumbsComponent implements OnInit {
+export class BreadcrumbsComponent implements OnInit, OnDestroy {
 
-  breadcrumbList: Array<any> = [];
+  breadcrumbList: Array<Breadcrumb> = [];
+  protected subscriptions: Subscription[] = [];
 
   constructor(
-    public portofino: PortofinoService, protected router: Router, private activatedRoute: ActivatedRoute,
+    public portofino: PortofinoService, protected router: Router,
     public authenticationService: AuthenticationService, public pageService: PageService) {
   }
 
   ngOnInit() {
-    this.listenRouting();
+    this.subscriptions.push(this.pageService.pageLoaded.subscribe(page => {
+      this.breadcrumbList = [];
+      this.addBreadcrumb(page);
+    }));
   }
 
-  listenRouting() {
-    let routerUrl: string, routerList: Array<any>, target: any;
-    this.router.events.subscribe((router: any) => {
-      routerUrl = router.urlAfterRedirects;
-      if (routerUrl && typeof routerUrl === 'string') {
-        //target = this.pageService.page;
-        this.breadcrumbList.length = 0;
-        routerList = routerUrl.slice(1).split('/');
-        routerList.forEach((router, index) => {
-          router = router.split('?')[0];
-          this.breadcrumbList.push({
-            name: router,
-            path: (index === 0) ? router : `${this.breadcrumbList[index-1].path}/${router}`
-          });
-        });
-      }
-    });
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(s => s.unsubscribe());
+    this.subscriptions = [];
   }
 
-  getTitle(item:BreadCrumb){
-    let currentPage =  this.pageService.page;
-      while ( currentPage!= undefined  && currentPage!=null ) {
-        if( currentPage.baseUrl==('/'+item.path) )
-          return currentPage.configuration.title;
-        currentPage=currentPage.parent;
-      }
-    return item.name;
+  protected addBreadcrumb(page: Page) {
+    if (page.parent) {
+      this.addBreadcrumb(page.parent);
+    }
+    if(page.url != page.baseUrl) {
+      this.breadcrumbList.push({title: page.title, url: page.baseUrl});
+      this.breadcrumbList.push({title: page.url.substring(page.baseUrl.length + 1), url: page.url});
+    } else {
+      this.breadcrumbList.push({title: page.title, url: page.url});
+    }
   }
 
 }
