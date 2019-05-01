@@ -13,8 +13,8 @@ public class ResteasyCleanupFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        request.getServletContext().removeAttribute(ResteasyProviderFactory.class.getName());
-        request.getServletContext().removeAttribute(Dispatcher.class.getName());
+//        request.getServletContext().removeAttribute(ResteasyProviderFactory.class.getName());
+//        request.getServletContext().removeAttribute(Dispatcher.class.getName());
         chain.doFilter(request, response);
     }
 

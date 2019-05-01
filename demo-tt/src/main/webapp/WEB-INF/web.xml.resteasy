@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-      version="3.0">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
     <display-name>ManyDesigns Portofino</display-name>
     <description>ManyDesigns Portofino</description>
 
@@ -12,7 +12,7 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-    
+
     <!--
         Here you can change where the Portofino app lives. If you comment this out, the default value
         ${serverInfo:realPath}/WEB-INF is used.
@@ -42,7 +42,7 @@
             <param-value>/api</param-value>
         </init-param>
         <init-param>
-            <param-name>javax.ws.rs.core.Application</param-name>
+            <param-name>javax.ws.rs.Application</param-name>
             <param-value>com.manydesigns.portofino.resteasy.PortofinoApplication</param-value>
         </init-param>
     </servlet>

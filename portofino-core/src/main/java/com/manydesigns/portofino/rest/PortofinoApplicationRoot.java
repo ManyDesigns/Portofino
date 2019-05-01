@@ -13,24 +13,49 @@ import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.core.jackson.TypeNameResolver;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.jaxrs2.Reader;
+import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.vfs2.FileObject;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.ws.rs.Path;
 import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
 import java.lang.reflect.*;
 import java.net.URLStreamHandlerFactory;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 @Path("/")
 public class PortofinoApplicationRoot extends ApplicationRoot {
+
+    @Context
+    protected ServletConfig config;
+    @Context
+    protected Application application;
+
+    @PostConstruct
+    public void init() {
+        try {
+            new JaxrsOpenApiContextBuilder()
+                    .servletConfig(config)
+                    .application(application)
+                    .resourceClasses(Collections.singleton(getClass().getName()))
+                    .buildContext(true);
+        } catch (OpenApiConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     protected ResourceContext getResourceContext() {
