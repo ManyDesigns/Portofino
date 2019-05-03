@@ -178,6 +178,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   parent: Page;
   allowEmbeddedComponents: boolean = true;
   embedded = false;
+  returnUrl;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
@@ -193,6 +194,15 @@ export abstract class Page implements WithButtons, OnDestroy {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
+    this.setupBasicPageButtons();
+    if(!this.embedded && this.route) {
+      this.subscribe(this.route.params, p => {
+          this.returnUrl = p['returnUrl'];
+      });
+    }
+  }
+
+  private setupBasicPageButtons() {
     declareButton({
       color: 'primary', icon: 'save', text: 'Save', list: 'configuration'
     }, this, 'saveConfiguration', null);
@@ -211,6 +221,9 @@ export abstract class Page implements WithButtons, OnDestroy {
     declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'children'
     }, this, 'cancelChildren', null);
+    declareButton({
+      icon: 'arrow_back', text: 'Back', list: 'breadcrumbs', presentIf: () => this.canGoBack()
+    }, this, 'goBack', null);
   }
 
   initialize() {}
@@ -493,6 +506,23 @@ export abstract class Page implements WithButtons, OnDestroy {
     })).subscribe(flag => child.accessible = flag);
   }
 
+  goBack() {
+    if(this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    } else {
+      this.goToParent();
+    }
+  }
+
+  canGoBack(): boolean {
+    return this.returnUrl || this.parent;
+  }
+
+  goToParent() {
+    if (this.parent) {
+      this.router.navigateByUrl(this.parent.url);
+    }
+  }
 }
 
 @Component({
@@ -525,9 +555,7 @@ export class PageHeader {
           <portofino-page [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
         </mat-tab>
       </mat-tab-group>
-    </ng-template>
-  
-  `
+    </ng-template>`
 })
 export class TemplatesComponent implements AfterViewInit {
 

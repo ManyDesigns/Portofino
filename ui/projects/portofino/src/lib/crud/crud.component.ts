@@ -159,6 +159,7 @@ export class CrudComponent extends Page {
 
   showSearch() {
     this.allowEmbeddedComponents = true;
+    this.returnUrl = null;
     this.view = CrudView.SEARCH;
   }
 
@@ -226,6 +227,15 @@ export class CrudComponent extends Page {
       this.reloadBaseUrl();
     } else {
       this.showSearch();
+      this.refreshSearch.emit();
+    }
+  }
+
+  goToParent() {
+    if(this.view == CrudView.DETAIL || this.view == CrudView.CREATE) {
+      this.goToSearch();
+    } else {
+      super.goToParent();
     }
   }
 

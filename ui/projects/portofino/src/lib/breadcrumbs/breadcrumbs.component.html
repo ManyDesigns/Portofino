@@ -1,5 +1,6 @@
-<mat-toolbar fxLayout="row" fxLayoutAlign="left center" class="breadcrumbs-bar">
+<mat-toolbar fxLayout="row" fxLayoutAlign="space-between center" class="breadcrumbs-bar">
   <ng-container *ngIf="!!pageService.page">
+    <div fxLayout="row" fxLayoutAlign="left center" >
       <div class="breadcrumb-item"
           *ngFor="let item of breadcrumbList; let i = index"
           [class.active]="i===breadcrumbList.length-1">
@@ -11,5 +12,7 @@
         </span>
         <span class="breadcrumb-link-disabled" *ngIf="i===breadcrumbList.length-1">{{item.title | translate}}</span>
       </div>
+    </div>
+    <portofino-buttons [component]="pageService.page" list="breadcrumbs"></portofino-buttons>
   </ng-container>
 </mat-toolbar>
