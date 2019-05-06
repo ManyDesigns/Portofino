@@ -94,7 +94,12 @@ import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
 import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
 import {LocalStorageService} from "ngx-store";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
-import {PermissionsComponent, SettingsComponent, UpstairsComponent} from "./administration/upstairs.component";
+import {
+  MailSettingsComponent,
+  PermissionsComponent,
+  SettingsComponent,
+  UpstairsComponent
+} from "./administration/upstairs.component";
 import {ConnectionsComponent} from "./administration/connections.component";
 import {WizardComponent} from "./administration/wizard.component";
 import {TablesComponent} from "./administration/tables.component";
@@ -182,7 +187,7 @@ export class PortofinoCrudModule {}
   declarations: [
     UpstairsComponent,
     ActionsComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
@@ -197,7 +202,7 @@ export class PortofinoCrudModule {}
   entryComponents: [
     UpstairsComponent,
     ActionsComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
   exports: [UpstairsComponent]
 })
 export class PortofinoUpstairsModule {}

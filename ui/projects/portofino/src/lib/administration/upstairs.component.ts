@@ -36,6 +36,8 @@ export class UpstairsComponent extends Page implements OnInit {
       return of({ actualType: ActionsComponent, title: "Actions", source: null, securityCheckPath: null, children: [] });
     } else if(child.path == 'connections') {
       return of({ actualType: ConnectionsComponent, title: "Connections", source: null, securityCheckPath: null, children: [] });
+    } else if(child.path == 'mail') {
+      return of({ actualType: MailSettingsComponent, title: "Mail", source: null, securityCheckPath: null, children: [] });
     } else if(child.path == 'permissions') {
       return of({ actualType: PermissionsComponent, title: "Permissions", source: null, securityCheckPath: null, children: [] });
     } else if(child.path == 'settings') {
@@ -117,7 +119,9 @@ export class SettingsComponent extends Page implements AfterViewInit {
   @Button({ text: "Save", color: "primary" })
   saveSettings() {
     this.settingsFormComponent.controls.updateValueAndValidity(); //TODO why is this needed?
-    this.http.put(this.portofino.apiRoot + "portofino-upstairs/settings", this.settingsFormComponent.controls.value).subscribe();
+    this.http.put(this.portofino.apiRoot + "portofino-upstairs/settings", this.settingsFormComponent.controls.value).subscribe(
+      () => this.notificationService.info(this.translate.get("Settings saved"))
+    );
   }
 
   @Button({ text: "Cancel" })
@@ -162,4 +166,65 @@ export class PermissionsComponent extends Page implements OnInit {
   ngOnInit(): void {
     this.parent.settingsPanel.loadPermissions();
   }
+}
+
+@Component({
+  selector: 'portofino-upstairs-mail-settings',
+  template: `
+    <form (submit)="saveSettings()">
+      <mat-card>
+        <mat-card-content>
+          <portofino-form #settingsFormComponent [form]="settingsForm"
+                          fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="default center">
+          </portofino-form>
+        </mat-card-content>
+        <mat-card-actions>
+          <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+          <portofino-buttons [component]="this"></portofino-buttons>
+        </mat-card-actions>
+      </mat-card>
+  </form>`
+})
+export class MailSettingsComponent extends Page implements AfterViewInit {
+  readonly settingsForm = new Form([
+    Field.fromProperty(Property.create({name: "mailEnabled", label: "Mail enabled", type: "boolean"}).required()),
+    Field.fromProperty(Property.create({name: "keepSent", label: "Keep sent messages", type: "boolean"}).required()),
+    Field.fromProperty(Property.create({name: "queueLocation", label: "Queue location"}).required()),
+    Field.fromProperty(Property.create({name: "smtpHost", label: "Host"})),
+    Field.fromProperty(Property.create({name: "smtpPort", label: "Port"})),
+    Field.fromProperty(Property.create({name: "smtpSSL", label: "SSL enabled", type: "boolean"})),
+    Field.fromProperty(Property.create({name: "smtpTLS", label: "TLS enabled", type: "boolean"})),
+    Field.fromProperty(Property.create({name: "smtpLogin", label: "Login"})),
+    Field.fromProperty(Property.create({name: "smtpPassword", label: "Password"}).withAnnotation("com.manydesigns.elements.annotations.Password")),
+  ]);
+  @ViewChild("settingsFormComponent")
+  settingsFormComponent: FormComponent;
+
+  @Button({ text: "Save", color: "primary" })
+  saveSettings() {
+    this.settingsFormComponent.controls.updateValueAndValidity(); //TODO why is this needed?
+    this.http.put(this.portofino.apiRoot + "portofino-upstairs/mail", this.settingsFormComponent.controls.value).subscribe(
+      () => this.notificationService.info(this.translate.get("Settings saved"))
+    );
+  }
+
+  @Button({ text: "Cancel" })
+  resetSettings() {
+    this.http.get<any>(this.portofino.apiRoot + "portofino-upstairs/mail").subscribe(settings => {
+      this.settingsFormComponent.controls.get('mailEnabled').setValue(settings.mailEnabled.value);
+      this.settingsFormComponent.controls.get('keepSent').setValue(settings.keepSent.value);
+      this.settingsFormComponent.controls.get('queueLocation').setValue(settings.queueLocation.value);
+      this.settingsFormComponent.controls.get('smtpHost').setValue(settings.smtpHost.value);
+      this.settingsFormComponent.controls.get('smtpPort').setValue(settings.smtpPort.value);
+      this.settingsFormComponent.controls.get('smtpSSL').setValue(settings.smtpSSL.value);
+      this.settingsFormComponent.controls.get('smtpTLS').setValue(settings.smtpTLS.value);
+      this.settingsFormComponent.controls.get('smtpLogin').setValue(settings.smtpLogin.value);
+      this.settingsFormComponent.controls.get('smtpPassword').setValue(settings.smtpPassword.value);
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.resetSettings();
+  }
+
 }

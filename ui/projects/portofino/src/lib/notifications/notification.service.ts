@@ -111,8 +111,10 @@ export class NotificationErrorHandler extends ErrorHandler {
     super.handleError(error);
     if(error.status) {
       this.notificationService.error(this.translate.get("Server error"));
+    } else if(error.status === 0) {
+      this.notificationService.error(this.translate.get("Communication error"));
     } else {
-      this.notificationService.error(error);
+      this.notificationService.error(this.translate.get(error.message ? error.message : error));
     }
   }
 }
