@@ -1,10 +1,8 @@
-import {ErrorHandler, Injectable, InjectionToken} from "@angular/core";
+import {ErrorHandler, Injectable} from "@angular/core";
 import {Observable, of} from "rxjs";
 import {map, mergeMap, share} from "rxjs/operators";
-import {Type} from "@angular/core/src/type";
 import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
-import {AuthenticationService, NO_AUTH_HEADER} from "../security/authentication.service";
 import {TranslateService} from "@ngx-translate/core";
 
 export enum NotificationLevel {

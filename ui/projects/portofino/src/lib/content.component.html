@@ -8,6 +8,9 @@
     <ng-template portofino-embedded-pages></ng-template>
   </div>
 </ng-container>
-<div *ngIf="!!pageService.error" class="mat-display-2 error">
+<div *ngIf="!!pageService.error && pageService.error.status !== 0" class="mat-display-2 error">
   {{ 'Page not found! Error: _' | translate:{ error: pageService.error.message || pageService.error }  }}
+</div>
+<div *ngIf="!!pageService.error && pageService.error.status === 0" class="mat-display-2 error">
+  {{ 'Communication error' | translate }}
 </div>
