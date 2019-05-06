@@ -1,4 +1,12 @@
-import {ClassAccessor, deriveKind, getAnnotation, getValidators, isEnabled, Property} from "./class-accessor";
+import {
+  ClassAccessor,
+  deriveKind,
+  getAnnotation,
+  getValidators,
+  isEnabled,
+  isMultiline,
+  Property
+} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
@@ -134,7 +142,8 @@ export class DynamicFormComponentDirective {
 
 @Component({
   selector: 'portofino-form',
-  templateUrl: './form.component.html'
+  templateUrl: './form.component.html',
+  styleUrls: ['./form.component.scss']
 })
 export class FormComponent implements OnInit, AfterViewInit {
   private _controls: FormGroup;
@@ -331,6 +340,10 @@ export class FormComponent implements OnInit, AfterViewInit {
 
   isFormList(obj) {
     return obj instanceof FormList;
+  }
+
+  isMultiline(property) {
+    return isMultiline(property);
   }
 
 }

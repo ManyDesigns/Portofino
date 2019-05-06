@@ -3,7 +3,7 @@
   <quill-editor [formControlName]="property.name" [required]="required" *ngIf="enabled"></quill-editor>
   <span [innerHTML]="control.value" *ngIf="!enabled" class="rich-text"></span>
 </div>
-<mat-form-field *ngIf="!isRichText()" [formGroup]="form">
+<mat-form-field *ngIf="!isRichText()" [formGroup]="form" [ngClass]="{ multiline: isMultiline() }">
   <mat-label>{{property.label}}</mat-label>
   <input matInput *ngIf="!isMultiline()"
          [formControlName]="property.name" [required]="required" [type]="isPassword() ? 'password' : 'text'" />

@@ -172,13 +172,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Integer maxResults;
     public String sortProperty;
     public String sortDirection;
-    public boolean searchVisible;
-
-    //--------------------------------------------------------------------------
-    // Popup
-    //--------------------------------------------------------------------------
-
-    protected String popupCloseCallback;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -193,10 +186,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //--------------------------------------------------------------------------
 
     protected SelectionProviderSupport selectionProviderSupport;
-
-    protected String relName;
-    protected int selectionProviderIndex;
-    protected String labelSearch;
 
     //--------------------------------------------------------------------------
     // Data objects
@@ -733,8 +722,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             searchString = searchForm.toSearchString(getUrlEncoding());
             if (searchString.length() == 0) {
                 searchString = null;
-            } else {
-                searchVisible = true;
             }
         } else {
             MutableHttpServletRequest dummyRequest = new MutableHttpServletRequest();
@@ -756,7 +743,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
             }
             searchForm.readFromRequest(dummyRequest);
-            searchVisible = true;
         }
     }
 
@@ -1327,22 +1313,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Selection providers
     //**************************************************************************
 
-    public Response jsonSelectFieldOptions() {
-        return jsonOptions(relName, prefix, labelSearch, true);
-    }
-
-    public Response jsonSelectFieldSearchOptions() {
-        return jsonOptions(relName, searchPrefix, labelSearch, true);
-    }
-
-    public Response jsonAutocompleteOptions() {
-        return jsonOptions(relName, prefix, labelSearch, false);
-    }
-
-    public Response jsonAutocompleteSearchOptions() {
-        return jsonOptions(relName, searchPrefix, labelSearch, false);
-    }
-
     /**
      * Returns values to update a single select or autocomplete field, in JSON form.
      * See {@link #jsonOptions(String, int, String, String, boolean)}.
@@ -1362,7 +1332,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             @QueryParam("labelSearch") String labelSearch,
             @QueryParam("prefix") String prefix,
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
-        return jsonOptions(selectionProviderName, selectionProviderIndex, labelSearch, prefix, includeSelectPrompt);
+        return jsonOptions(selectionProviderName, 0, labelSearch, prefix, includeSelectPrompt);
     }
     
     /**
@@ -2073,51 +2043,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
-    }
-
-    public boolean isSearchVisible() {
-        //If embedded, search is always closed by default
-        return searchVisible && !PageActionLogic.isEmbedded(this);
-    }
-
-    public void setSearchVisible(boolean searchVisible) {
-        this.searchVisible = searchVisible;
-    }
-
-    public String getRelName() {
-        return relName;
-    }
-
-    public void setRelName(String relName) {
-        this.relName = relName;
-    }
-
-    public int getSelectionProviderIndex() {
-        return selectionProviderIndex;
-    }
-
-    public void setSelectionProviderIndex(int selectionProviderIndex) {
-        this.selectionProviderIndex = selectionProviderIndex;
-    }
-
-    public String getLabelSearch() {
-        return labelSearch;
-    }
-
-    public void setLabelSearch(String labelSearch) {
-        this.labelSearch = labelSearch;
-    }
-
-    public boolean isPopup() {
-        return !StringUtils.isEmpty(popupCloseCallback);
-    }
-
-    public String getPopupCloseCallback() {
-        return popupCloseCallback;
-    }
-
-    public void setPopupCloseCallback(String popupCloseCallback) {
-        this.popupCloseCallback = popupCloseCallback;
     }
 
     public ResultSetNavigation getResultSetNavigation() {
