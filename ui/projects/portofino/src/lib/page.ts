@@ -98,7 +98,8 @@ export class PageSettingsPanel {
     const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), pageConfiguration);
     const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, pageConfiguration);
     if(pageConfiguration.template) {
-      pageConfiguration.template = { v: pageConfiguration.template, l: this.page.portofino.templates[pageConfiguration.template].description, s: true };
+      const description = this.page.portofino.templates[pageConfiguration.template].description;
+      pageConfiguration.template = { v: pageConfiguration.template, l: description, s: true };
     }
     const templates = [];
     for (let key in this.page.portofino.templates) {
