@@ -2153,6 +2153,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @GET
     @Path(":selectionProviders")
     @Produces(MediaType.APPLICATION_JSON)
+    public List legacySelectionProviders() {
+        return selectionProviders();
+    }
+
+    @GET
+    @Path(":selectionProvider")//For Portofino 5 compatibility
+    @Produces(MediaType.APPLICATION_JSON)
     @SuppressWarnings("unchecked")
     public List selectionProviders() {
         List result = new ArrayList();
