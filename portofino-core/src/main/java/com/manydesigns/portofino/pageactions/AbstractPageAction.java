@@ -39,6 +39,7 @@ import com.manydesigns.portofino.pages.PageLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.*;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.configuration.Configuration;
@@ -353,10 +354,8 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
      * @return the configuration.
      */
     @io.swagger.v3.oas.annotations.Operation(
-        operationId =
-            "com.manydesigns.portofino.pageactions.AbstractPageAction#getConfiguration",
-        description =
-            "Returns the configuration of this action. " +
+        operationId = "com.manydesigns.portofino.pageactions.AbstractPageAction#getConfiguration",
+        description = "Returns the configuration of this action. " +
             "The actual type of the configuration object depends on the action class.")
     @ApiResponses({ @ApiResponse(responseCode = "200", description = "The configuration object.")})
     @Path(":configuration")
@@ -366,10 +365,16 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return pageInstance.getConfiguration();
     }
 
+    @io.swagger.v3.oas.annotations.Operation(
+            operationId = "com.manydesigns.portofino.pageactions.AbstractPageAction#setConfiguration",
+            description = "Update the configuration of this action. " +
+                    "The actual type of the configuration object depends on the action class.")
     @RequiresAdministrator
     @PUT
     @Path(":configuration")
-    public void setConfiguration(String configurationString) throws IOException {
+    public void setConfiguration(
+            @RequestBody(description = "The configuration object in JSON format.")
+            String configurationString) throws IOException {
         Class<?> configurationClass = PageActionLogic.getConfigurationClass(getClass());
         Object configuration = new ObjectMapper().readValue(configurationString, configurationClass);
         saveConfiguration(configuration);
@@ -392,6 +397,9 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         }
     }
 
+    @io.swagger.v3.oas.annotations.Operation(
+            operationId = "com.manydesigns.portofino.pageactions.AbstractPageAction#getConfigurationAccessor",
+            description = "A ClassAccessor that describes the configuration of this action.")
     @GET
     @Path(":configuration/classAccessor")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -410,6 +418,9 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
     // Configuration
     ////////////////
 
+    @io.swagger.v3.oas.annotations.Operation(
+            operationId = "com.manydesigns.portofino.pageactions.AbstractPageAction#getActionPermissions",
+            description = "An object describing the permissions on this resource; both currently active permissions and supported values.")
     @GET
     @Path(":permissions")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
@@ -439,11 +450,17 @@ public abstract class AbstractPageAction extends AbstractResourceWithParameters 
         return result;
     }
 
+    @io.swagger.v3.oas.annotations.Operation(
+            operationId = "com.manydesigns.portofino.pageactions.AbstractPageAction#setActionPermissions",
+            description = "Set the permissions about this resource.")
     @RequiresAdministrator
     @PUT
     @Path(":permissions")
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public void setActionPermissions(List<Group> groups) throws Exception {
+    public void setActionPermissions(
+            @RequestBody(description = "An array of permissions, one for each user group. Each element of the array " +
+                    "has a group name, a desired access level (null means inherited) and a list of action-specific permissions.")
+            List<Group> groups) throws Exception {
         List<Group> existingGroups = getPage().getPermissions().getGroups();
         existingGroups.clear();
         existingGroups.addAll(groups);
