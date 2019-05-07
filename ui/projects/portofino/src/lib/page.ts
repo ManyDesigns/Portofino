@@ -1,13 +1,10 @@
 import {
-  AfterViewInit,
+  AfterViewInit, ChangeDetectorRef,
   Component,
   ContentChild,
-  EventEmitter, Host,
-  Injectable,
+  EventEmitter, Injectable,
   InjectionToken,
-  Input, OnDestroy, OnInit,
-  Optional, SkipSelf,
-  TemplateRef, Type, ViewChild
+  Input, OnDestroy, Optional, TemplateRef, Type, ViewChild
 } from "@angular/core";
 import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
@@ -308,7 +305,7 @@ export abstract class Page implements WithButtons, OnDestroy {
       if(!template) {
         console.error("Unknown template: " + templateName);
       }
-      return template;
+      return template.template;
     } else {
       return null; //use the default template
     }
@@ -559,7 +556,7 @@ export class PageHeader {
 })
 export class TemplatesComponent implements AfterViewInit {
 
-  templates: { [name: string]: TemplateRef<any> } = {};
+  templates: { [name: string]: { template: TemplateRef<any>, description?: string }} = {};
 
   @ViewChild("defaultTemplate")
   defaultTemplate: TemplateRef<any>;
@@ -567,8 +564,8 @@ export class TemplatesComponent implements AfterViewInit {
   mainWithTabs: TemplateRef<any>;
 
   ngAfterViewInit(): void {
-    this.templates.defaultTemplate = this.defaultTemplate;
-    this.templates.mainWithTabs = this.mainWithTabs;
+    this.templates.defaultTemplate = { template: this.defaultTemplate, description: "The default template" };
+    this.templates.mainWithTabs = { template: this.mainWithTabs, description: "Page with embedded pages as tabs" };
   }
 }
 
@@ -589,9 +586,12 @@ export class PageLayout implements AfterViewInit {
 
   template: TemplateRef<any>;
 
+  constructor(protected changeDetector: ChangeDetectorRef) {}
+
   ngAfterViewInit(): void {
     const template = this.page.template;
     this.template = template ? template : this.defaultTemplate;
+    this.changeDetector.detectChanges();
   }
 }
 

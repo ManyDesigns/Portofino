@@ -6,7 +6,7 @@
 <div class="page" [class.embedded]="page.embedded">
   <portofino-page-header [page]="page"></portofino-page-header>
   <div class="page-body">
-    <ng-container *ngIf="!page.settingsPanel.active">
+    <ng-container *ngIf="!page.settingsPanel.active && template">
       <ng-template [ngTemplateOutlet]="template" [ngTemplateOutletContext]="{ content: content, page: page }"></ng-template>
     </ng-container>
     <mat-tab-group *ngIf="page.settingsPanel.active">

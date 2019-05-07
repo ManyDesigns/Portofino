@@ -26,7 +26,7 @@ export class PortofinoService {
   readonly DEFAULT_LOCALE = 'en';
   readonly localeDefinitions = {};
   readonly localeChange = new EventEmitter<Locale>();
-  readonly templates: { [name: string]: TemplateRef<any> } = {};
+  readonly templates: { [name: string]: { template: TemplateRef<any>, description?: string }} = {};
 
   constructor(public http: HttpClient, protected translate: TranslateService,
               @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,

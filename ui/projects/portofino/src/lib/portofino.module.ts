@@ -3,7 +3,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ErrorHandler, ModuleWithProviders, NgModule, Type} from '@angular/core';
 import {
-  DefaultToolbarComponent,
+  DefaultFooterComponent,
+  DefaultToolbarComponent, FOOTER_COMPONENT, FooterDirective,
   PortofinoAppComponent,
   TOOLBAR_COMPONENT,
   ToolbarDirective
@@ -132,7 +133,7 @@ export class PortofinoFormsModule {}
     ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
     LanguageSelectorComponent,
     NavigationDirective, DefaultNavigationComponent,
-    ToolbarDirective, DefaultToolbarComponent, BreadcrumbsComponent,
+    ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
     CreatePageComponent, DeletePageComponent, MovePageComponent
   ],
   imports: [
@@ -147,12 +148,13 @@ export class PortofinoFormsModule {}
   ],
   providers: [PortofinoService, AuthenticationService, PageService, PageCrudService],
   entryComponents: [
-    DefaultNavigationComponent, DefaultToolbarComponent,
+    DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
     CreatePageComponent, DeletePageComponent, MovePageComponent],
   exports: [
     PageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
     ContentComponent, PageFactoryComponent, PageHeader, TemplatesComponent,
-    DefaultNavigationComponent, NavigationDirective, DefaultToolbarComponent, ToolbarDirective]
+    DefaultNavigationComponent, NavigationDirective, DefaultToolbarComponent, ToolbarDirective,
+    DefaultFooterComponent, FooterDirective]
 })
 export class PortofinoPagesModule {}
 
@@ -224,6 +226,7 @@ export class PortofinoUpstairsModule {}
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
+    { provide: FOOTER_COMPONENT, useFactory: PortofinoModule.footerComponent },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },
@@ -235,7 +238,8 @@ export class PortofinoUpstairsModule {}
   entryComponents: [LoginComponent],
   exports: [
     PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent, LoginComponent, TemplatesComponent,
-    ContentComponent, PageFactoryComponent, PageHeader, DefaultNavigationComponent, DefaultToolbarComponent,
+    ContentComponent, PageFactoryComponent, PageHeader,
+    DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
     ManyToManyComponent]
@@ -251,6 +255,10 @@ export class PortofinoModule {
 
   static toolbarComponent() {
     return DefaultToolbarComponent;
+  }
+
+  static footerComponent() {
+    return DefaultFooterComponent;
   }
 
   public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders|Type<PortofinoModule>)[] {

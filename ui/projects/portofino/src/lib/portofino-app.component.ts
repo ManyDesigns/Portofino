@@ -5,8 +5,7 @@ import {
   Inject,
   InjectionToken,
   Input,
-  OnInit, Optional, TemplateRef,
-  ViewChild,
+  OnInit, ViewChild,
   ViewContainerRef
 } from '@angular/core';
 import {PortofinoService, SideNavPosition} from "./portofino.service";
@@ -16,6 +15,7 @@ import {NavigationDirective} from "./content.directive";
 import {PageCrudService} from "./administration/page-crud.service";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
+export const FOOTER_COMPONENT = new InjectionToken('Footer Component');
 
 @Directive({
   selector: '[portofino-toolbar]'
@@ -23,6 +23,14 @@ export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 export class ToolbarDirective {
   constructor(public viewContainerRef: ViewContainerRef) { }
 }
+
+@Directive({
+  selector: '[portofino-footer]'
+})
+export class FooterDirective {
+  constructor(public viewContainerRef: ViewContainerRef) { }
+}
+
 
 export interface ToolbarComponent {
   authenticationService: AuthenticationService;
@@ -42,6 +50,12 @@ export class DefaultToolbarComponent implements ToolbarComponent {
 }
 
 @Component({
+  selector: 'portofino-default-footer',
+  template: `<mat-toolbar fxLayoutAlign="center center"><footer style="font-size: 10px">{{'Powered by Portofino 5'|translate}}</footer></mat-toolbar>`
+})
+export class DefaultFooterComponent {}
+
+@Component({
   selector: 'portofino-app',
   templateUrl: './portofino-app.component.html',
   styleUrls: ['./portofino-app.component.css']
@@ -58,6 +72,8 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   upstairsLink = this.portofino.upstairsLink;
   @ViewChild(ToolbarDirective)
   toolbarHost: ToolbarDirective;
+  @ViewChild(FooterDirective)
+  footerHost: FooterDirective;
 
   @ViewChild(NavigationDirective)
   navigationHost: NavigationDirective;
@@ -71,6 +87,7 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
               protected componentFactoryResolver: ComponentFactoryResolver,
               protected changeDetector: ChangeDetectorRef,
               @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,
+              @Inject(FOOTER_COMPONENT) protected footerComponent,
               @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {}
 
   ngOnInit(): void {
@@ -93,12 +110,14 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
         this.portofino.templates[key] = this.extraTemplates.templates[key];
       }
     }
-    //Dynamically create the toolbar and navigation components
-    let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
-    let toolbar = this.toolbarHost.viewContainerRef.createComponent(componentFactory).instance as ToolbarComponent;
+    //Dynamically create the toolbar, footer and navigation components
+    let toolbarFactory = this.componentFactoryResolver.resolveComponentFactory(this.toolbarComponent);
+    let toolbar = this.toolbarHost.viewContainerRef.createComponent(toolbarFactory).instance as ToolbarComponent;
+    toolbar.title = this.title;
     let navigationFactory = this.componentFactoryResolver.resolveComponentFactory(this.navigationComponent);
     this.navigationHost.viewContainerRef.createComponent(navigationFactory);
-    toolbar.title = this.title;
+    let footerFactory = this.componentFactoryResolver.resolveComponentFactory(this.footerComponent);
+    this.footerHost.viewContainerRef.createComponent(footerFactory);
     this.changeDetector.detectChanges();
   }
 }
