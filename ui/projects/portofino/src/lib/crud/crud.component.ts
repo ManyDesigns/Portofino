@@ -260,13 +260,6 @@ export class CrudComponent extends Page {
     }
   }
 
-  protected getPageConfigurationToSave(formValue): PageConfiguration {
-    const superConf: any = super.getPageConfigurationToSave(formValue);
-    const config = Object.assign({}, this.configuration, formValue);
-    superConf.detailChildren = config.detailChildren;
-    return superConf;
-  }
-
   //Configuration
 
   get configurationUrl() {
@@ -402,5 +395,12 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
     });
     configurationToSave.database = configurationToSave.database ? configurationToSave.database.v : null;
     return configurationToSave;
+  }
+
+  getPageConfigurationToSave(formValue): PageConfiguration {
+    const superConf: any = super.getPageConfigurationToSave(formValue);
+    const config = Object.assign({}, this.page.configuration, formValue);
+    superConf.detailChildren = config.detailChildren;
+    return superConf;
   }
 }

@@ -93,12 +93,25 @@ export class PageSettingsPanel {
 
   show(callback: (boolean) => void = () => {}) {
     this.callback = callback;
-    const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), this.page.configuration);
-    titleField.editable = this.page.portofino.localApiAvailable;
-    const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, this.page.configuration);
-    iconField.editable = this.page.portofino.localApiAvailable;
-    this.formDefinition.contents = [titleField, iconField];
-    this.previousConfiguration = this.page.configuration;
+    const pageConfiguration = this.page.configuration;
+    this.previousConfiguration = Object.assign({}, pageConfiguration);
+    const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), pageConfiguration);
+    const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, pageConfiguration);
+    if(pageConfiguration.template) {
+      pageConfiguration.template = { v: pageConfiguration.template, l: this.page.portofino.templates[pageConfiguration.template].description, s: true };
+    }
+    const templates = [];
+    for (let key in this.page.portofino.templates) {
+      const template = this.page.portofino.templates[key];
+      templates.push({ v: key, l: this.page.translate.instant(template.description ? template.description : key), s: false})
+    }
+    const templateField = Field.fromProperty(Property.create({ name: "template", label: "Template" }).withSelectionProvider({
+      options: templates
+    }), pageConfiguration);
+    this.formDefinition.contents = [titleField, iconField, templateField];
+    this.formDefinition.contents.forEach((f: Field) => {
+      f.editable = this.page.portofino.localApiAvailable;
+    });
     this.reloadConfiguration();
     this.loadPermissions();
     this.active = true;
@@ -160,6 +173,19 @@ export class PageSettingsPanel {
   getActionConfigurationToSave() {
     const configuration = this.form.get('configuration');
     return Object.assign({}, configuration ? configuration.value : {});
+  }
+
+  getPageConfigurationToSave(formValue = this.form.value) {
+    const config = Object.assign({}, this.page.configuration, formValue);
+    const pageConfiguration = new PageConfiguration();
+    //Reflection would be nice
+    pageConfiguration.children = config.children;
+    pageConfiguration.securityCheckPath = config.securityCheckPath;
+    pageConfiguration.source = config.source;
+    pageConfiguration.title = config.title;
+    pageConfiguration.type = config.type;
+    pageConfiguration.template = config.template ? config.template.v : null;
+    return pageConfiguration;
   }
 }
 
@@ -386,7 +412,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     const path = this.getConfigurationLocation(this.path);
     let saveConfObservable: Observable<any>;
     if (this.portofino.localApiAvailable) {
-      const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
+      const pageConfiguration = this.settingsPanel.getPageConfigurationToSave();
       this.configuration = pageConfiguration;
       let data = new FormData();
       data.append("pageConfiguration", JSON.stringify(pageConfiguration));
@@ -433,19 +459,6 @@ export abstract class Page implements WithButtons, OnDestroy {
     }));
   }
 
-  //TODO refactor into page settings panel
-  protected getPageConfigurationToSave(formValue) {
-    const config = Object.assign({}, this.configuration, formValue);
-    const pageConfiguration = new PageConfiguration();
-    //Reflection would be nice
-    pageConfiguration.children = config.children;
-    pageConfiguration.securityCheckPath = config.securityCheckPath;
-    pageConfiguration.source = config.source;
-    pageConfiguration.title = config.title;
-    pageConfiguration.type = config.type;
-    return pageConfiguration;
-  }
-
   get configurationProperties() {
     return null;
   }
@@ -477,7 +490,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     if (!this.portofino.localApiAvailable) {
       throw "Local Portofino API not available"
     }
-    const pageConfiguration = this.getPageConfigurationToSave({});
+    const pageConfiguration = this.settingsPanel.getPageConfigurationToSave({});
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     const path = this.getConfigurationLocation(this.path);

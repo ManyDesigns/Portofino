@@ -1,6 +1,8 @@
 <portofino-templates></portofino-templates>
 <div *ngIf="portofino.sideNavPosition == 'page'" fxFlexFill fxLayout="column" fxLayoutAlign="space-between">
-  <ng-template fxFlex="none" portofino-toolbar></ng-template>
+  <div fxFlex="none">
+    <ng-template portofino-toolbar></ng-template>
+  </div>
   <mat-drawer-container [autosize]="true" fxFlex>
     <mat-drawer #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
                 role="navigation">
@@ -16,7 +18,9 @@
       </div>
     </mat-drawer-content>
   </mat-drawer-container>
-  <ng-template fxFlex="none" portofino-footer></ng-template>
+  <div fxFlex="none">
+    <ng-template portofino-footer></ng-template>
+  </div>
 </div>
 <ng-container *ngIf="portofino.sideNavPosition == 'body'">
   <mat-sidenav-container [autosize]="true">

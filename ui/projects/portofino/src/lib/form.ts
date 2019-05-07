@@ -311,7 +311,7 @@ export class FormComponent implements OnInit, AfterViewInit {
       initialState = { value: initialState, disabled: disabled };
     }
     if(initialState.value && selectionProvider && selectionProvider.options && selectionProvider.options.length > 0) {
-      const selectedOption = selectionProvider.options.find(o => o.v == initialState.value.v);
+      const selectedOption = selectionProvider.options.find(o => o.v == initialState.value.v || o.v == initialState.value);
       return Object.assign(initialState, { value: selectedOption });
     } else {
       return initialState;
