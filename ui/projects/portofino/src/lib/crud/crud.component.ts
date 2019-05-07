@@ -29,7 +29,7 @@ export class CrudComponent extends Page {
   classAccessor: ClassAccessor;
   selectionProviders: SelectionProvider[];
   classAccessorPath = '/:classAccessor';
-  selectionProvidersPath = '/:selectionProviders';
+  selectionProvidersPath = '/:selectionProvider';
 
   @Input()
   pageSize: number;

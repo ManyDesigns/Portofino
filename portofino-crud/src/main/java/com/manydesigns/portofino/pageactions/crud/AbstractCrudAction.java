@@ -61,6 +61,7 @@ import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import ognl.OgnlContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -109,13 +110,13 @@ import java.util.regex.Pattern;
  *      <li>Managing selection providers to constrain certain properties to values taken from a list, and aid
  *          the user in inserting those values (e.g. picking colours from a combo box, or cities with an
  *          autocompleted input field); the actual handling of selection providers is delegated to a
- *          companion object of type {@link SelectionProviderSupport} which must be provided by the concrete
+ *          companion object of type {@link SelectionProviderSupport} which must be provided by concrete
  *          subclasses;</li>
  *      <li>Handling permissions so that only enabled users may create, edit or delete objects;</li>
  *      <li>Offering hooks for subclasses to easily customize certain key functions (e.g. execute custom code
  *          before or after saving an object).</li>
  *   </ul>
- * <p>This PageAction can handle a varying number of URL path parameters. Each parameter is assumed to be part
+ * <p>This PageAction can handle a varying number of URL path parameters (segments). Each segment is assumed to be part
  * of an object identifier - for example, a database primary key (single or multi-valued). When no parameter is
  * specified, the page is in search mode. When the correct number of parameters is provided, the action attempts
  * to load an object with the appropriate identifier (for example, by loading a row from a database table with
@@ -344,7 +345,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(object == null) {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
-
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         return jsonFormData();
@@ -1327,10 +1327,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @GET
     @Path(":selectionProvider/{selectionProviderName}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "The values a given selection provider can assume")
     public Response jsonOptions(
+            @Parameter(description = "The name of the selection provider")
             @PathParam("selectionProviderName") String selectionProviderName,
+            @Parameter(description = "The searched substring (for autocomplete search)")
             @QueryParam("labelSearch") String labelSearch,
+            @Parameter(description = "The form prefix (advanced and generally not used)")
             @QueryParam("prefix") String prefix,
+            @Parameter(description = "Whether the returned values include a default option \"Please choose one\"")
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         return jsonOptions(selectionProviderName, 0, labelSearch, prefix, includeSelectPrompt);
     }
@@ -1351,11 +1356,17 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @GET
     @Path(":selectionProvider/{selectionProviderName}/{selectionProviderIndex : (\\d+)}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "The values a given selection provider can assume")
     public Response jsonOptions(
+            @Parameter(description = "The name of the selection provider")
             @PathParam("selectionProviderName") String selectionProviderName,
+            @Parameter(description = "For multi-field selection providers, the index of the field")
             @PathParam("selectionProviderIndex") int selectionProviderIndex,
+            @Parameter(description = "The searched substring (for autocomplete search)")
             @QueryParam("labelSearch") String labelSearch,
+            @Parameter(description = "The form prefix (advanced and generally not used)")
             @QueryParam("prefix") String prefix,
+            @Parameter(description = "Whether the returned values include a default option \"Please choose one\"")
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
@@ -1398,16 +1409,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @GET
-    @Path(":selectionProviders") //For Portofino 4 compatibility
-    @Produces(MediaType.APPLICATION_JSON)
-    public List legacySelectionProviders() {
-        return selectionProviders();
-    }
-
-    @GET
     @Path(":selectionProvider")
     @Produces(MediaType.APPLICATION_JSON)
     @SuppressWarnings("unchecked")
+    @Operation(summary = "The list of selection providers supported by this resource")
     public List selectionProviders() {
         List result = new ArrayList();
         // setup option providers
@@ -1461,18 +1466,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(!actionPath.endsWith("/")) {
             sb.append("/");
         }
-        boolean first = true;
-
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append("/");
-            }
-            sb.append("%{");
-            sb.append(property.getName());
-            sb.append("}");
-        }
+        sb.append(pkHelper.getFormatString());
         appendSearchStringParamIfNecessary(sb);
         return sb.toString();
     }
@@ -1574,11 +1568,22 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Operation(summary = "The contents of this resource: either search results or a single object, depending on path parameters")
     public Response getAsJson(
+            @Parameter(description = "The search string (see http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
             @QueryParam("searchString") String searchString,
-            @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults,
-            @QueryParam("sortProperty") String sortProperty, @QueryParam("sortDirection") String sortDirection,
-            @QueryParam("forEdit") boolean forEdit, @QueryParam("newObject") boolean newObject) {
+            @Parameter(description = "The index of the first search result")
+            @QueryParam("firstResult") Integer firstResult,
+            @Parameter(description = "The maximum number of returned search results")
+            @QueryParam("maxResults") Integer maxResults,
+            @Parameter(description = "The property according to which the search results are sorted")
+            @QueryParam("sortProperty") String sortProperty,
+            @Parameter(description = "The direction of the sort (asc or desc)")
+            @QueryParam("sortDirection") String sortDirection,
+            @Parameter(description = "The returned object is pre-populated for being edited (including computed fields)")
+            @QueryParam("forEdit") boolean forEdit,
+            @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields)")
+            @QueryParam("newObject") boolean newObject) {
         if(newObject) {
             return jsonCreateData();
         }
@@ -1607,9 +1612,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response httpPostJson(String jsonObject) throws Exception {
+    @Operation(summary = "Create a new object (without blob data)")
+    public Response httpPostJson(
+            @RequestBody(description = "The object in JSON form, as returned by GET") String jsonObject)
+            throws Exception {
         if(object != null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /objectKey instead").build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Update not supported, PUT to /objectKey instead").build();
         }
         preCreate();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
@@ -1644,6 +1652,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Operation(summary = "Create a new object (including blob data)")
+    @RequestBody(description = "A multipart request including the object in JSON form, as returned by GET, and the uploaded blobs.")
     public Response httpPostMultipart() throws Exception {
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
@@ -1694,7 +1704,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     @Guard(test = "isEditEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
-    public Response httpPutJson(@QueryParam("id") List<String> ids, String jsonObject) {
+    @Operation(summary = "Update one or more objects (without blob data)")
+    public Response httpPutJson(
+            @Parameter(description = "The (optional) list of object ids to update in bulk")
+            @QueryParam("id")
+            List<String> ids,
+            @RequestBody(description = "The object in JSON form, as returned by GET")
+            String jsonObject) {
         if(object == null) {
             return bulkUpdate(jsonObject, ids);
         }
@@ -1780,7 +1796,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Guard(test = "isEditEnabled()", type = GuardType.VISIBLE)
-    public Response httpPutMultipart() throws Throwable {
+    @Operation(summary = "Update a single object (including blob data)")
+    @RequestBody(description = "A multipart request including the object in JSON form, as returned by GET, and the uploaded blobs.")
+    public Response httpPutMultipart() {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
@@ -1831,7 +1849,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @DELETE
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     @Guard(test = "isDeleteEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
-    public int httpDelete(@QueryParam("id") List<String> ids) throws Exception {
+    @Operation(summary = "Delete one or more objects")
+    public int httpDelete(
+            @Parameter(description = "The (optional) list of object ids to delete in bulk")
+            @QueryParam("id")
+            List<String> ids) throws Exception {
         if(object == null) {
             return bulkDelete(ids);
         }
@@ -1890,6 +1912,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Path(":classAccessor")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Operation(summary = "The class accessor that describes the entities managed by this crud action")
     public String describeClassAccessor() {
         JSONStringer jsonStringer = new JSONStringer();
         ReflectionUtil.classAccessorToJson(getClassAccessor(), jsonStringer);

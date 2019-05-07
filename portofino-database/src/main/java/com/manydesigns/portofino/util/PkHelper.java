@@ -26,6 +26,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,12 @@ public class PkHelper {
     //**************************************************************************
 
     public TextFormat createPkGenerator() {
+        String formatString = getFormatString();
+        return OgnlTextFormat.create(formatString);
+    }
+
+    @NotNull
+    public String getFormatString() {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (PropertyAccessor property : classAccessor.getKeyProperties()) {
@@ -78,7 +85,7 @@ public class PkHelper {
             sb.append(property.getName());
             sb.append("}");
         }
-        return OgnlTextFormat.create(sb.toString());
+        return sb.toString();
     }
 
     public Serializable getPrimaryKey(String... params) {
