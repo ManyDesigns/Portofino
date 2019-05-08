@@ -100,15 +100,24 @@ export class PortofinoService {
     this.http.get<ApiInfo>(this.localApiPath).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
       if(response.loginPath) {
-        let loginPath = response.loginPath;
-        if(loginPath.startsWith('/')) {
-          loginPath = loginPath.substring(1);
-        }
-        this.loginPath = loginPath;
+        this.loginPath = this.sanitizeLoginPath(response.loginPath);
+      } else {
+        this.http.get<any>(this.apiRoot + ':description').subscribe(response => {
+          if(response.loginPath) {
+            this.loginPath = this.sanitizeLoginPath(response.loginPath);
+          }
+        }); //TODO warn about failed init in case of error because only reloading the page will potentially fix it.
       }
     }, error => {
       this.fallbackInit();
     });
+  }
+
+  private sanitizeLoginPath(loginPath) {
+    if (loginPath.startsWith('/')) {
+      loginPath = loginPath.substring(1);
+    }
+    return loginPath;
   }
 
   private fallbackInit() {

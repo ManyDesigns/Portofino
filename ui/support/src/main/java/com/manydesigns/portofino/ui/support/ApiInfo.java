@@ -21,13 +21,17 @@ public class ApiInfo extends Resource {
     public Map info() {
         Map<String, String> info = new HashMap<>();
         info.put("apiRoot", getApiRootUri(servletContext, uriInfo));
-        Invocation.Builder request = path(":description").request();
-        Response response = request.get();
-        if (response.getStatus() == 200) {
-            Map map = response.readEntity(Map.class);
-            info.put("loginPath", map.get("loginPath").toString());
-        } else {
-            throw new WebApplicationException(response);
+        try {
+            Invocation.Builder request = path(":description").request();
+            Response response = request.get();
+            if (response.getStatus() == 200) {
+                Map map = response.readEntity(Map.class);
+                info.put("loginPath", map.get("loginPath").toString());
+            } else {
+                //Ignore. The client will ask for the loginPath itself.
+            }
+        } catch (Exception e) {
+            //Ignore. The client will ask for the loginPath itself.
         }
         return info;
     }
