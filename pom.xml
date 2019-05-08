@@ -108,7 +108,6 @@
         <jsqlparser.version>0.9.6</jsqlparser.version>
         <json.version>20180813</json.version>
         <jsoup.version>1.9.2</jsoup.version>
-        <jstl.version>1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>3.6.2</liquibase.version>
         <logback.version>1.2.3</logback.version>
@@ -118,6 +117,7 @@
         <servlet.api.version>3.1.0</servlet.api.version>
         <shiro.version>1.4.0</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <spring.version>5.0.10.RELEASE</spring.version>
         <stax.version>1.2.0</stax.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
