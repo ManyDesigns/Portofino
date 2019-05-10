@@ -94,7 +94,7 @@
         <commons.lang.version>2.5</commons.lang.version>
         <ehcache.version>2.10.5</ehcache.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>2.5.4</groovy.version>
+        <groovy.version>2.5.6</groovy.version>
         <guava.version>27.0.1-jre</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
         <jackson.version>2.9.8</jackson.version>
@@ -102,7 +102,6 @@
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.27</jersey.version>
-        <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.6</jsqlparser.version>
@@ -141,10 +140,6 @@
         <module>portofino-oracle</module>
         <module>portofino-postgresql</module>
         <!-- Pages -->
-        <module>portofino-calendar</module>
-        <!--<module>portofino-map</module>
-        <module>portofino-gallery</module>
-        <module>portofino-chart</module>-->
         <module>portofino-crud</module>
         <!-- Optional services -->
         <module>portofino-atmosphere</module>
