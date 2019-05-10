@@ -1,4 +1,4 @@
-<div *ngIf="!!pageService.page">
+<div *ngIf="!!pageService.page" class="portofino-navigation">
   <mat-nav-list *ngIf="pageService.page.parent">
     <a mat-list-item [routerLink]="pageService.page.parent.url" routerLinkActive="active">
       <mat-icon *ngIf="pageService.page.parent.icon">{{pageService.page.parent.icon}}</mat-icon>

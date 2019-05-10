@@ -1,7 +1,6 @@
 import {
   ClassAccessor,
   deriveKind,
-  getAnnotation,
   getValidators,
   isEnabled,
   isMultiline,

@@ -19,6 +19,23 @@ $theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 // Using the $theme variable from the pre-built theme you can call the theming function
 @include mat-datetimepicker-theme($theme);
 
+//TODO find a way to import this
+@mixin portofino-theme($theme) {
+  $primary: map-get($theme, primary);
+
+  .portofino-navigation {
+    .mat-list-item.active {
+      background-color: mat-color($primary, 50);
+    }
+    &:hover,
+    &:focus {
+      .mat-list-item:not(.expanded) {
+        background-color: mat-color($primary, 100) !important;
+      }
+    }
+  }
+}
+
 .container {
   min-height: 100%;
 }
