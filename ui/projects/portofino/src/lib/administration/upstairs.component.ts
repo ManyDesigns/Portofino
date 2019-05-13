@@ -52,17 +52,23 @@ export class UpstairsComponent extends Page implements OnInit {
   }
 
   changeApiRoot() {
-    if(!this.portofino.defaultApiRoot.endsWith("/")) {
-      this.portofino.defaultApiRoot += "/";
+    if(this.portofino.localApiAvailable) {
+      return;
     }
-    this.http.get<any>(this.portofino.defaultApiRoot + ':description').subscribe(response => {
+    if(!this.portofino.apiRoot.endsWith("/")) {
+      this.portofino.apiRoot += "/";
+    }
+    this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(response => {
       if(response.loginPath) {
         let loginPath = response.loginPath;
         if(loginPath.startsWith('/')) {
           loginPath = loginPath.substring(1);
         }
         this.portofino.loginPath = loginPath;
-        this.doChangeApiRoot();
+        this.storage.set("portofino.upstairs.apiRoot", this.portofino.apiRoot);
+        this.children.forEach(c => {
+          this.checkAccessibility(c);
+        });
       }
     }, error => {
       console.error(error);
@@ -70,20 +76,12 @@ export class UpstairsComponent extends Page implements OnInit {
     });
   }
 
-  protected doChangeApiRoot() {
-    this.storage.set("portofino.upstairs.apiRoot", this.portofino.defaultApiRoot);
-    this.portofino.init();
-    this.children.forEach(c => {
-      this.checkAccessibility(c);
-    });
-  }
-
   prepare() {
     return super.prepare().pipe(map(() => {
       const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
-      if(apiRoot) {
-        this.portofino.defaultApiRoot = apiRoot;
-        this.doChangeApiRoot();
+      if(apiRoot && !this.portofino.localApiAvailable) {
+        this.portofino.apiRoot = apiRoot;
+        this.changeApiRoot();
       }
       return this;
     }));

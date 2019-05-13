@@ -1,5 +1,5 @@
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.pageactions.custom.CustomAction
+import com.manydesigns.portofino.resourceactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions

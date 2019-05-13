@@ -10,7 +10,7 @@ import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
-import com.manydesigns.portofino.pageactions.custom.CustomAction
+import com.manydesigns.portofino.resourceactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.security.AccessLevel

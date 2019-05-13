@@ -11,14 +11,14 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.Module;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.pageactions.PageInstance;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
-import com.manydesigns.portofino.pages.Group;
-import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.pages.PageLogic;
-import com.manydesigns.portofino.pages.Permissions;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
+import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
+import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.actions.Group;
+import com.manydesigns.portofino.actions.ActionLogic;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
@@ -62,7 +62,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.ACTI
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class UpstairsAction extends AbstractPageAction {
+public class UpstairsAction extends AbstractResourceAction {
     public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(UpstairsAction.class);
@@ -159,13 +159,13 @@ public class UpstairsAction extends AbstractPageAction {
                             userCrudCreated = true;
                         }
                         File dir = new File(actionsDirectory, table.getActualEntityName());
-                        createCrudPage(database.getConnectionProvider(), dir, table, template, userTable, userPasswordColumn, createdPages);
+                        createCrudAction(database.getConnectionProvider(), dir, table, template, userTable, userPasswordColumn, createdPages);
                     }
                 }
                 if(userTable != null) {
                     if(!userCrudCreated) {
                         File dir = new File(actionsDirectory, userTable.getActualEntityName());
-                        createCrudPage(database.getConnectionProvider(), dir, userTable, template, userTable, userPasswordColumn, createdPages);
+                        createCrudAction(database.getConnectionProvider(), dir, userTable, template, userTable, userPasswordColumn, createdPages);
                     }
                     setupUserPages(database.getConnectionProvider(), template, userTable, createdPages);
                     try {
@@ -208,7 +208,7 @@ public class UpstairsAction extends AbstractPageAction {
         return DatabaseLogic.findTableByName(persistence.getModel(), tableInfo.database, tableInfo.schema, tableInfo.table.getTableName());
     }
 
-    protected Page createCrudPage(
+    protected ActionDescriptor createCrudAction(
             ConnectionProvider connectionProvider, File dir, Table table, Template template,
             Table userTable, String userPasswordColumn, List<Map> createdPages) throws Exception {
         String query = "from " + table.getActualEntityName() + " order by id desc";
@@ -216,10 +216,10 @@ public class UpstairsAction extends AbstractPageAction {
         bindings.put("parentName", "");
         bindings.put("parentProperty", "nothing");
         bindings.put("linkToParentProperty", NO_LINK_TO_PARENT);
-        return createCrudPage(connectionProvider, dir, table, query, template, bindings, userTable, userPasswordColumn, createdPages, 1);
+        return createCrudAction(connectionProvider, dir, table, query, template, bindings, userTable, userPasswordColumn, createdPages, 1);
     }
 
-    protected Page createCrudPage(
+    protected ActionDescriptor createCrudAction(
             ConnectionProvider connectionProvider,
             File dir, Table table, String query,
             Template template, Map<String, String> bindings, Table userTable, String userPasswordColumn, List<Map> createdPages, int depth)
@@ -228,7 +228,7 @@ public class UpstairsAction extends AbstractPageAction {
             RequestMessages.addWarningMessage(
                     ElementsThreadLocals.getText("directory.exists.page.not.created._", dir.getAbsolutePath()));
         } else if(dir.mkdirs()) {
-            logger.info("Creating CRUD page {}", dir.getAbsolutePath());
+            logger.info("Creating CRUD action {}", dir.getAbsolutePath());
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(table.getDatabaseName());
             configuration.setupDefaults();
@@ -246,16 +246,16 @@ public class UpstairsAction extends AbstractPageAction {
             }
 
             FileObject directory = VFS.getManager().toFileObject(dir);
-            PageLogic.saveConfiguration(directory, configuration);
-            Page page = new Page();
-            PageLogic.savePage(directory, page);
+            ActionLogic.saveConfiguration(directory, configuration);
+            ActionDescriptor action = new ActionDescriptor();
+            ActionLogic.saveActionDescriptor(directory, action);
             File actionFile = new File(dir, "action.groovy");
             try(FileWriter fileWriter = new FileWriter(actionFile)) {
                 template.make(bindings).writeTo(fileWriter);
             }
 
             logger.debug("Creating _detail directory");
-            File detailDir = new File(dir, PageInstance.DETAIL);
+            File detailDir = new File(dir, ActionInstance.DETAIL);
             if(!detailDir.isDirectory() && !detailDir.mkdir()) {
                 logger.warn("Could not create detail directory {}", detailDir.getAbsolutePath());
                 RequestMessages.addWarningMessage(
@@ -265,7 +265,7 @@ public class UpstairsAction extends AbstractPageAction {
             String path = dir.getName();
             File parent = dir.getParentFile().getParentFile(); //two because of _detail
             for(int i = 1; i < depth; i++) {
-                path =  parent.getName() + "/" + PageInstance.DETAIL + "/" + path;
+                path =  parent.getName() + "/" + ActionInstance.DETAIL + "/" + path;
                 parent = parent.getParentFile().getParentFile();
             }
             Map<String, Object> pageInfo = new HashMap<>();
@@ -281,7 +281,7 @@ public class UpstairsAction extends AbstractPageAction {
                     createChildCrudPage(connectionProvider, dir, template, variable, children, ref, userTable, userPasswordColumn, createdPages, depth);
                 }
             }
-            return page;
+            return action;
         } else {
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
             RequestMessages.addWarningMessage(
@@ -333,14 +333,14 @@ public class UpstairsAction extends AbstractPageAction {
         if(multipleRoles) {
             childDirName += "-as-" + linkToParentProperty;
         }
-        File childDir = new File(new File(dir, PageInstance.DETAIL), childDirName);
+        File childDir = new File(new File(dir, ActionInstance.DETAIL), childDirName);
 
         Map<String, String> bindings = new HashMap<>();
         bindings.put("parentName", parentName);
         bindings.put("parentProperty", parentProperty);
         bindings.put("linkToParentProperty", linkToParentProperty);
 
-        createCrudPage(
+        createCrudAction(
                 connectionProvider, childDir, fromTable, childQuery, template, bindings, userTable, userPasswordColumn, createdPages, depth + 1);
     }
 
@@ -620,17 +620,17 @@ public class UpstairsAction extends AbstractPageAction {
                 bindings.put("parentProperty", "primaryPrincipal.id");
                 bindings.put("linkToParentProperty", linkToUserProperty);
 
-                Page page = createCrudPage(
+                ActionDescriptor action = createCrudAction(
                         connectionProvider, dir, fromTable, childQuery, template, bindings, null, null,
                         createdPages, 1);
-                if(page != null) {
+                if(action != null) {
                     Group group = new Group();
                     group.setName(SecurityLogic.getAnonymousGroup(conf));
                     group.setAccessLevel(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);
-                    page.setPermissions(permissions);
-                    PageLogic.savePage(VFS.getManager().toFileObject(dir), page);
+                    action.setPermissions(permissions);
+                    ActionLogic.saveActionDescriptor(VFS.getManager().toFileObject(dir), action);
                 }
             }
         }

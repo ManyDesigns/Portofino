@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.pageactions.crud.CrudAction
+import com.manydesigns.portofino.resourceactions.crud.CrudAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions

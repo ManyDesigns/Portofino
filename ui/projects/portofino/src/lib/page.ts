@@ -181,11 +181,12 @@ export class PageSettingsPanel {
     const pageConfiguration = new PageConfiguration();
     //Reflection would be nice
     pageConfiguration.children = config.children;
+    pageConfiguration.icon = config.icon;
     pageConfiguration.securityCheckPath = config.securityCheckPath;
     pageConfiguration.source = config.source;
+    pageConfiguration.template = config.template ? config.template.v : null;
     pageConfiguration.title = config.title;
     pageConfiguration.type = config.type;
-    pageConfiguration.template = config.template ? config.template.v : null;
     return pageConfiguration;
   }
 }

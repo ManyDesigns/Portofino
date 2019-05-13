@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.pageactions.login.DefaultLoginAction
+import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction
 
 class MyLogin extends DefaultLoginAction {
 

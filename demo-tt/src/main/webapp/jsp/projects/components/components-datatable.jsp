@@ -5,13 +5,13 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ page import="com.manydesigns.elements.ElementsThreadLocals" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
+<%@ page import="com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction" %>
 <%@ page import="java.io.Writer" %>
 <%@ page import="java.math.BigInteger" %>
 <%@ page import="java.util.Map" %>
 <%@ page language="java" %>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
-<c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.resourceactions.crud.CrudAction"/>
+<c:set var="pageId" value="${actionBean.actionInstance.page.id}" />
 <c:set var="project" value="${actionBean.project}" />
 <div class="portofino-datatable">
     <span class="crud-confirm-bulk-delete" style="display: none;">

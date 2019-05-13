@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.upstairs.actions.users;
 
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,7 +21,7 @@ import java.util.Map;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class UsersAction extends AbstractPageAction {
+public class UsersAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersAction.class);
 

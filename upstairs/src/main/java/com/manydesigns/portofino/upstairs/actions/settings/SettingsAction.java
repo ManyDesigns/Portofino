@@ -27,7 +27,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.Settings;
 import org.apache.commons.configuration.Configuration;
@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class SettingsAction extends AbstractPageAction {
+public class SettingsAction extends AbstractResourceAction {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 

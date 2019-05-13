@@ -94,7 +94,7 @@ export class PageCrudService {
     return this.pageFactory.loadPath(sanitizedDestination).pipe(mergeMap(newParent => {
       return this.http.post(`${this.portofino.localApiPath}/pages/${sanitizedDestination}/config.json`, path, {
         headers: {
-          "Content-Type": "application/vnd.com.manydesigns.portofino.page-move"
+          "Content-Type": "application/vnd.com.manydesigns.portofino.action-move"
         },
         params: {
           sourceActionPath: `${page.computeSourceUrl()}`,

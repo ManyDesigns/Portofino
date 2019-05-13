@@ -102,15 +102,19 @@ export class PortofinoService {
       if(response.loginPath) {
         this.loginPath = this.sanitizeLoginPath(response.loginPath);
       } else {
-        this.http.get<any>(this.apiRoot + ':description').subscribe(response => {
-          if(response.loginPath) {
-            this.loginPath = this.sanitizeLoginPath(response.loginPath);
-          }
-        }); //TODO warn about failed init in case of error because only reloading the page will potentially fix it.
+        this.initLoginPath();
       }
     }, error => {
       this.fallbackInit();
     });
+  }
+
+  private initLoginPath() {
+    this.http.get<any>(this.apiRoot + ':description').subscribe(response => {
+      if (response.loginPath) {
+        this.loginPath = this.sanitizeLoginPath(response.loginPath);
+      }
+    }); //TODO warn about failed init in case of error because only reloading the page will potentially fix it.
   }
 
   private sanitizeLoginPath(loginPath) {
@@ -123,6 +127,7 @@ export class PortofinoService {
   private fallbackInit() {
     this.localApiPath = null;
     this.apiRoot = this.sanitizeApiRoot(this.defaultApiRoot);
+    this.initLoginPath();
   }
 
   private sanitizeApiRoot(apiRoot) {

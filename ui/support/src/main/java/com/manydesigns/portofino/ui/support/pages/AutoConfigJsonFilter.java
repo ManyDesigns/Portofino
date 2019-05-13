@@ -92,10 +92,10 @@ public class AutoConfigJsonFilter implements Filter {
     }
 
     protected String translateType(String superclass) {
-        if("com.manydesigns.portofino.pageactions.crud.CrudAction".equals(superclass)) {
+        if("com.manydesigns.portofino.resourceactions.crud.CrudAction".equals(superclass)) {
             return "crud";
         }
-        if("com.manydesigns.portofino.pageactions.crud.AbstractCrudAction".equals(superclass)) {
+        if("com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction".equals(superclass)) {
             return "crud";
         }
         return null;

@@ -21,9 +21,9 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.pageactions.crud.CrudAction;
-import com.manydesigns.portofino.pageactions.m2m.ManyToManyAction;
-import com.manydesigns.portofino.pageactions.registry.ActionRegistry;
+import com.manydesigns.portofino.resourceactions.crud.CrudAction;
+import com.manydesigns.portofino.resourceactions.m2m.ManyToManyAction;
+import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -57,14 +57,6 @@ public class RegExpFieldHelper implements FieldHelper {
     public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
                                                    PropertyAccessor propertyAccessor,
                                                    String prefix) {
-        if (String.class.isAssignableFrom(propertyAccessor.getType())
-                && propertyAccessor.isAnnotationPresent(RegExp.class)) {
-            TextSearchField textSearchField =
-                    new TextSearchField(propertyAccessor, prefix);
-            textSearchField.setShowMatchMode(false);
-            textSearchField.setMatchMode(TextMatchMode.EQUALS);
-            return textSearchField;
-        }
         return null;
     }
 }

@@ -21,12 +21,12 @@
 package com.manydesigns.portofino.security;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.pageactions.PageInstance;
+import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.pages.Permissions;
+import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.shiro.GroupPermission;
-import com.manydesigns.portofino.shiro.PagePermission;
+import com.manydesigns.portofino.shiro.ActionPermission;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -68,7 +68,7 @@ public class SecurityLogic {
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
 
-    public static boolean hasPermissions(Configuration conf, PageInstance instance, Subject subject, Method handler) {
+    public static boolean hasPermissions(Configuration conf, ActionInstance instance, Subject subject, Method handler) {
         logger.debug("Checking action permissions");
         Class<?> theClass = instance.getActionClass();
         RequiresPermissions requiresPermissions = getRequiresPermissionsAnnotation(handler, theClass);
@@ -81,26 +81,26 @@ public class SecurityLogic {
     }
 
     public static boolean hasPermissions
-            (Configuration conf, PageInstance instance, Subject subject, AccessLevel accessLevel, String... permissions) {
+            (Configuration conf, ActionInstance instance, Subject subject, AccessLevel accessLevel, String... permissions) {
         Permissions configuration = calculateActualPermissions(instance);
         return hasPermissions(conf, configuration, subject, accessLevel, permissions);
     }
 
-    public static Permissions calculateActualPermissions(PageInstance instance) {
-        List<Page> pages = new ArrayList<Page>();
+    public static Permissions calculateActualPermissions(ActionInstance instance) {
+        List<ActionDescriptor> actionDescriptors = new ArrayList<>();
         while (instance != null) {
-            pages.add(0, instance.getPage());
+            actionDescriptors.add(0, instance.getActionDescriptor());
             instance = instance.getParent();
         }
 
-        return calculateActualPermissions(new Permissions(), pages);
+        return calculateActualPermissions(new Permissions(), actionDescriptors);
     }
 
-    public static Permissions calculateActualPermissions(Permissions basePermissions, List<Page> pages) {
+    public static Permissions calculateActualPermissions(Permissions basePermissions, List<ActionDescriptor> actionDescriptors) {
         Permissions result = new Permissions();
         Map<String, AccessLevel> resultLevels = result.getActualLevels();
         resultLevels.putAll(basePermissions.getActualLevels());
-        for (Page current : pages) {
+        for (ActionDescriptor current : actionDescriptors) {
             Permissions currentPerms = current.getPermissions();
 
             Map<String, AccessLevel> currentLevels = currentPerms.getActualLevels();
@@ -115,10 +115,10 @@ public class SecurityLogic {
             }
         }
 
-        if (pages.size() > 0) {
-            Page lastPage = pages.get(pages.size() - 1);
+        if (actionDescriptors.size() > 0) {
+            ActionDescriptor lastAction = actionDescriptors.get(actionDescriptors.size() - 1);
             Map<String, Set<String>> lastPermissions =
-                    lastPage.getPermissions().getActualPermissions();
+                    lastAction.getPermissions().getActualPermissions();
             result.getActualPermissions().putAll(lastPermissions);
         } else {
             result.getActualPermissions().putAll(basePermissions.getActualPermissions());
@@ -164,8 +164,8 @@ public class SecurityLogic {
             if(isAdministrator(conf)) {
                 return true;
             }
-            PagePermission pagePermission = new PagePermission(configuration, level, permissions);
-            return subject.isPermitted(pagePermission);
+            ActionPermission actionPermission = new ActionPermission(configuration, level, permissions);
+            return subject.isPermitted(actionPermission);
         } else {
             //Shiro does not check permissions for non authenticated users
             return hasAnonymousPermissions(conf, configuration, level, permissions);
@@ -176,8 +176,8 @@ public class SecurityLogic {
             (Configuration conf, Permissions configuration, org.apache.shiro.mgt.SecurityManager securityManager,
              PrincipalCollection principals, AccessLevel level, String... permissions) {
         if(principals != null) {
-            PagePermission pagePermission = new PagePermission(configuration, level, permissions);
-            return securityManager.isPermitted(principals, pagePermission);
+            ActionPermission actionPermission = new ActionPermission(configuration, level, permissions);
+            return securityManager.isPermitted(principals, actionPermission);
         } else {
             //Shiro does not check permissions for non authenticated users
             return hasAnonymousPermissions(conf, configuration, level, permissions);
@@ -186,11 +186,11 @@ public class SecurityLogic {
 
     public static boolean hasAnonymousPermissions
             (Configuration conf, Permissions configuration, AccessLevel level, String... permissions) {
-        PagePermission pagePermission = new PagePermission(configuration, level, permissions);
+        ActionPermission actionPermission = new ActionPermission(configuration, level, permissions);
         List<String> groups = new ArrayList<String>();
         groups.add(getAllGroup(conf));
         groups.add(getAnonymousGroup(conf));
-        return new GroupPermission(groups).implies(pagePermission);
+        return new GroupPermission(groups).implies(actionPermission);
     }
 
     public static boolean isAdministrator(ServletRequest request) {
@@ -250,14 +250,14 @@ public class SecurityLogic {
     }
 
     public static boolean isAllowed(
-            HttpServletRequest request, PageInstance pageInstance, Object actionBean, Method handler) {
+            HttpServletRequest request, ActionInstance actionInstance, Object actionBean, Method handler) {
         Subject subject = SecurityUtils.getSubject();
 
         if (!satisfiesRequiresAdministrator(request, actionBean, handler)) {
             return false;
         }
 
-        logger.debug("Checking page permissions");
+        logger.debug("Checking actionDescriptor permissions");
         boolean isNotAdmin = !isAdministrator(request);
         if (isNotAdmin) {
             ServletContext servletContext = request.getServletContext();
@@ -265,10 +265,10 @@ public class SecurityLogic {
             Permissions permissions;
             String resource;
             boolean allowed;
-            if(pageInstance != null) {
-                logger.debug("The protected resource is a page action");
-                resource = pageInstance.getPath();
-                allowed = hasPermissions(configuration, pageInstance, subject, handler);
+            if(actionInstance != null) {
+                logger.debug("The protected resource is a actionDescriptor action");
+                resource = actionInstance.getPath();
+                allowed = hasPermissions(configuration, actionInstance, subject, handler);
             } else {
                 logger.debug("The protected resource is a regular JAX-RS resource");
                 resource = request.getRequestURI();
@@ -285,11 +285,11 @@ public class SecurityLogic {
     }
 
     public static boolean hasPermissions
-            (Configuration conf, Method method, Class fallbackClass, PageInstance pageInstance, Subject subject) {
+            (Configuration conf, Method method, Class fallbackClass, ActionInstance actionInstance, Subject subject) {
         RequiresPermissions requiresPermissions =
                     SecurityLogic.getRequiresPermissionsAnnotation(method, fallbackClass);
         if(requiresPermissions != null) {
-            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
+            Permissions permissions = SecurityLogic.calculateActualPermissions(actionInstance);
             return SecurityLogic.hasPermissions
                     (conf, permissions, subject, requiresPermissions);
         } else {

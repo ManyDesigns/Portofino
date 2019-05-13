@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.pageactions.activitystream
+package com.manydesigns.portofino.resourceactions.activitystream
 
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager

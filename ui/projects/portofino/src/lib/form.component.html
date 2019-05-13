@@ -11,13 +11,13 @@
       <fieldset>
         <legend>{{content.label}}</legend>
         <portofino-form [form]="content.contents" [controls]="controls.get(content.name)"
-                        fxLayout="row wrap" fxLayoutGap="10px grid"></portofino-form> <!-- TODO make configurable -->
+                        fxLayout="row wrap"></portofino-form>
       </fieldset>
     </ng-container>
     <ng-container *ngIf="isFormList(content)">
       <portofino-form *ngFor="let form of content.contents; let i = index;"
                       [form]="form" [controls]="$any(controls.get(content.name)).at(i)"
-                      fxLayout="row wrap" fxLayoutGap="10px grid"></portofino-form> <!-- TODO make configurable -->
+                      fxLayout="row wrap"></portofino-form>
     </ng-container>
     <ng-template portofino-dynamic-form-component
                  [name]="content.name" [ngIf]="content.hasOwnProperty('component')"></ng-template>

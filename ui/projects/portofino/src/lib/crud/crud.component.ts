@@ -19,7 +19,7 @@ import {BehaviorSubject} from "rxjs";
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.scss']
 })
-@PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.pageactions.crud.CrudAction" })
+@PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.resourceactions.crud.CrudAction" })
 export class CrudComponent extends Page {
 
   @Input()

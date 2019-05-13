@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.portofino.pages.Permissions;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.apache.shiro.authz.Permission;
 import org.slf4j.Logger;
@@ -54,8 +54,8 @@ public class GroupPermission implements Permission {
         if(p instanceof GroupPermission) {
             GroupPermission gp = (GroupPermission) p;
             return gp.groups.containsAll(groups) && groups.containsAll(gp.groups);
-        } else if(p instanceof PagePermission) {
-            PagePermission pp = (PagePermission) p;
+        } else if(p instanceof ActionPermission) {
+            ActionPermission pp = (ActionPermission) p;
             return hasPermissions
                     (pp.getCalculatedPermissions(), groups, pp.getAccessLevel(), pp.getPermissions());
         }

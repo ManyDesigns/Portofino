@@ -18,7 +18,7 @@
           {{error.message ? error.message : error}}
         </mat-error>
         <portofino-form [form]="page.settingsPanel.formDefinition" [controls]="page.settingsPanel.form"
-                        fxLayout="row wrap" fxLayoutGap="10px grid"></portofino-form>
+                        fxLayout="row wrap"></portofino-form>
         <ng-container *ngIf="extraConfiguration">
           <ng-template [ngTemplateOutlet]="extraConfiguration"></ng-template>
         </ng-container>

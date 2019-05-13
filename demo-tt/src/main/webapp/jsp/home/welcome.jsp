@@ -6,7 +6,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.resourceactions.custom.CustomAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <shiro:user>
@@ -18,7 +18,7 @@
             Welcome <c:out value="${principal['first_name']} ${principal['last_name']}"/>
         </shiro:user>
         <shiro:guest>
-            <c:out value="${actionBean.pageInstance.title}"/>
+            <c:out value="${actionBean.actionInstance.title}"/>
         </shiro:guest>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">

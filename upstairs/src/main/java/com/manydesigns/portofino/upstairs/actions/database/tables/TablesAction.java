@@ -13,7 +13,7 @@ import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -43,7 +42,7 @@ import java.util.*;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class TablesAction extends AbstractPageAction {
+public class TablesAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(TablesAction.class);
     public static final String DATE_FORMAT = DateFormat.class.getName();

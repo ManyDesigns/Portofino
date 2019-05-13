@@ -26,7 +26,7 @@ import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.portofino.operations.Guarded;
 import com.manydesigns.portofino.cache.ControlsCache;
 import com.manydesigns.portofino.operations.Operations;
-import com.manydesigns.portofino.pageactions.PageAction;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -98,9 +98,9 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
-        if(resource instanceof PageAction) {
-            PageAction pageAction = (PageAction) resource;
-            pageAction.prepareForExecution();
+        if(resource instanceof ResourceAction) {
+            ResourceAction resourceAction = (ResourceAction) resource;
+            resourceAction.prepareForExecution();
         }
         checkAuthorizations(requestContext, resource);
         accessLogger.info(requestContext.getMethod());
@@ -137,8 +137,8 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             Method handler = resourceInfo.getResourceMethod();
             AUTH_CHECKER.assertAuthorized(resource, handler);
             logger.debug("Standard Shiro security check passed.");
-            if(resource instanceof PageAction) {
-                checkPageActionInvocation(requestContext, (PageAction) resource);
+            if(resource instanceof ResourceAction) {
+                checkResourceActionInvocation(requestContext, (ResourceAction) resource);
             }
         } catch (UnauthenticatedException e) {
             logger.debug("Method required authentication", e);
@@ -172,18 +172,18 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-    protected void checkPageActionInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
+    protected void checkResourceActionInvocation(ContainerRequestContext requestContext, ResourceAction resourceAction) {
         Method handler = resourceInfo.getResourceMethod();
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        if(!SecurityLogic.isAllowed(request, pageAction.getPageInstance(), pageAction, handler)) {
+        if(!SecurityLogic.isAllowed(request, resourceAction.getActionInstance(), resourceAction, handler)) {
             Response.Status status =
                     SecurityUtils.getSubject().isAuthenticated() ?
                             Response.Status.FORBIDDEN :
                             Response.Status.UNAUTHORIZED;
             requestContext.abortWith(Response.status(status).build());
-        } else if(!Operations.doGuardsPass(pageAction, handler)) {
-            if(pageAction instanceof Guarded) {
-                Response response = ((Guarded) pageAction).guardsFailed(handler);
+        } else if(!Operations.doGuardsPass(resourceAction, handler)) {
+            if(resourceAction instanceof Guarded) {
+                Response response = ((Guarded) resourceAction).guardsFailed(handler);
                 requestContext.abortWith(response);
             } else {
                 requestContext.abortWith(

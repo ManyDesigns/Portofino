@@ -4,10 +4,10 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.resourceactions.activitystream.ActivityStreamAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.pageInstance.title}"/>
+        <c:out value="${actionBean.actionInstance.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <br/>

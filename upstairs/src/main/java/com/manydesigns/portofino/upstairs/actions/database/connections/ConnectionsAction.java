@@ -9,7 +9,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderDetail;
@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -42,7 +41,7 @@ import java.util.function.BiFunction;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class ConnectionsAction extends AbstractPageAction {
+public class ConnectionsAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(ConnectionsAction.class);
 
