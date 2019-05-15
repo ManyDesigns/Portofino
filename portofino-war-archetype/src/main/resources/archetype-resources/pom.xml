@@ -42,34 +42,42 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-derby</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-db2</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-googlecloudsql</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-h2</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mssql</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mysql</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-oracle</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-postgresql</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
 
         <!--
@@ -82,6 +90,7 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-crud</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!--
         ///////////////////////////////////////////////////////////////////////
@@ -99,6 +108,7 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!-- Exports to PDF and XLS. -->
         <dependency>
@@ -120,26 +130,31 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-angular-ui-support</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!-- Support for page actions. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-core</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!-- Support for database connectivity. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-upstairs</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!-- REST support through Jersey. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jersey</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!-- REST support through RestEasy. -->
         <!--
@@ -237,7 +252,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v8.11.1</nodeVersion>
-                                    <npmVersion>6.0.1</npmVersion>
+                                    <npmVersion>6.9.0</npmVersion>
                                 </configuration>
                             </execution>
 
