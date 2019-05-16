@@ -380,12 +380,16 @@ export abstract class Page implements WithButtons, OnDestroy {
     } else {
       source = this.portofino.apiRoot + source;
     }
-    //replace double slash, but not in http(s)://
-    source = source.replace(new RegExp("([^:])//"), '$1/');
+    source = Page.removeDoubleSlashesFromUrl(source);
     while (source.endsWith("/"))  {
       source = source.substring(0, source.length - 1);
     }
     return source;
+  }
+
+  static removeDoubleSlashesFromUrl(url) {
+    //replace double slash, but not in http(s)://
+    return url.replace(new RegExp("([^:])//"), '$1/');
   }
 
   operationAvailable(ops: Operation[], signature: string) {
@@ -401,8 +405,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   getConfigurationLocation(path: string = this.path) {
-    //replace double slash, but not in http(s)://
-    return `pages${path}/config.json`.replace(new RegExp("([^:])//"), '$1/');
+    return Page.removeDoubleSlashesFromUrl(`pages${path}/config.json`);
   }
 
   configure(callback: (boolean) => void = () => this.reloadBaseUrl()) {

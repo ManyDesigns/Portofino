@@ -21,7 +21,7 @@ export const TRANSLATIONS_IT = {
   "permission: crud-create": "Creazione",
   "permission: crud-edit": "Modifica",
   "permission: crud-delete": "Cancellazione",
-  "_ is required.": "{{label}} &egrave; obbligatorio.",
+  "_ is required.": "{{label}} è obbligatorio.",
   '_: max _.': "{label}: max {max}.",
   'Invalid date, _ expected.': "Data non valida, il formato corretto è {{dateFormat}}.",
   "Select": "Seleziona"

@@ -9,20 +9,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URLDecoder;
 
 public class ConfigJsonCacheFilter implements Filter {
 
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
+    public void init(FilterConfig filterConfig) {}
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
         String path = request.getRequestURI().substring(request.getContextPath().length());
+        path = URLDecoder.decode(path, "UTF-8"); //TODO read from portofino.properties
         if(path.endsWith("config.json")) {
             //HTTP 1.0
             response.setHeader(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);

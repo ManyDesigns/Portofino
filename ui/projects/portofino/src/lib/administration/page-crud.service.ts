@@ -6,11 +6,11 @@ import {Field, Form} from "../form";
 import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
 import {PageFactoryComponent} from "../page.factory";
-import {PageConfiguration, PageService} from "../page";
+import {Page, PageConfiguration, PageService} from "../page";
 import {throwError} from "rxjs";
 import {TranslateService} from "@ngx-translate/core";
 import {mergeMap, tap} from "rxjs/operators";
-import {Router, UrlSegment} from "@angular/router";
+import {Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {NotificationService} from "../notifications/notification.service";
 
@@ -50,6 +50,7 @@ export class PageCrudService {
       parentPage = this.pageService.page.parent;
     }  else if(position == 'TOP') {
       parentPage = this.pageService.page.root;
+      page.source = `/${page.source}`;
     } else {
       return throwError("Unsupported position: " + position)
     }
@@ -57,7 +58,7 @@ export class PageCrudService {
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
     const reloadPageConfiguration = () => parentPage.loadConfiguration(); //Update the navigation
     return this.http.post(`${this.portofino.localApiPath}/${path}`, page, { params: {
-        actionPath: `${parentPage.computeSourceUrl()}/${page.source}`,
+        actionPath: Page.removeDoubleSlashesFromUrl(`${parentPage.computeSourceUrl()}/${page.source}`),
         actionClass: PageFactoryComponent.components[page.type].defaultActionClass,
         childrenProperty: parentPage.childrenProperty,
         loginPath: this.portofino.loginPath
@@ -94,13 +95,13 @@ export class PageCrudService {
     return this.pageFactory.loadPath(sanitizedDestination).pipe(mergeMap(newParent => {
       return this.http.post(`${this.portofino.localApiPath}/pages/${sanitizedDestination}/config.json`, path, {
         headers: {
-          "Content-Type": "application/vnd.com.manydesigns.portofino.action-move"
+          "Content-Type": "application/vnd.com.manydesigns.portofino.page-move"
         },
         params: {
           sourceActionPath: `${page.computeSourceUrl()}`,
           detail: !!moveInstruction.detail + "",
           loginPath: this.portofino.loginPath,
-          destinationActionParent: newParent.instance.computeSourceUrl()
+          destinationActionParent: !page.configuration.source.startsWith("/") ? newParent.instance.computeSourceUrl() : null
         }}).pipe(mergeMap(goUpOnePage));
     }));
   }
