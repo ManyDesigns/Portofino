@@ -16,7 +16,7 @@
         extensible using Groovy, distributed under the LGPL open source license.
         The framework can be used to create interactive database-driven web
         applications. The creation process includes automatic generation through
-        a &quot;wizard&quot; tool, manual configuration through a web-based
+        a "wizard" tool, manual configuration through a web-based
         administration interface, and customization through scripting languages.
         The framework combines features that are typical of Content Management
         Systems and of Rapid application development tools. Portofino is mainly
@@ -97,7 +97,7 @@
         <groovy.version>2.5.6</groovy.version>
         <guava.version>27.0.1-jre</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
