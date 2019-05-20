@@ -509,7 +509,7 @@ public class ManyToManyAction extends AbstractResourceAction {
         try {
             loadOnePk(key);
         }catch (Exception e){
-            logger.error("Cannot get key "+key ,e);
+            logger.error("Cannot get key " + key ,e);
         }
         return jsonAssociations();
     }
@@ -519,11 +519,12 @@ public class ManyToManyAction extends AbstractResourceAction {
         PropertyAccessor onePkAccessor = tableAccessor.getProperty(m2mConfiguration.getActualOnePropertyName());
 
         if(onePkAccessor == null) {
-            logger.warn("Not a property: {}", m2mConfiguration.getActualOnePropertyName());
+            logger.error("Not a property: {}", m2mConfiguration.getActualOnePropertyName());
+            return;
         }
 
         Class type = onePkAccessor.getType();
-        onePk = OgnlUtils.convertValue(key,type);
+        onePk = OgnlUtils.convertValue(key, type);
     }
 
     /**
@@ -646,7 +647,7 @@ public class ManyToManyAction extends AbstractResourceAction {
         if(onePk != null) {
             try {
                 loadAssociations();
-                if(potentiallyAvailableAssociations == null && onePk != null) {
+                if(potentiallyAvailableAssociations == null) {
                     return resourceActionNotConfigured();
                 }
             } catch (NoSuchFieldException e) {
