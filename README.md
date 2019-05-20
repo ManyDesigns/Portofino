@@ -2,6 +2,7 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.manydesigns/portofino/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.manydesigns/portofino)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/ManyDesigns/Portofino.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ManyDesigns/Portofino/context:java)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/ManyDesigns/Portofino.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ManyDesigns/Portofino/context:javascript)
 [![Build Status](https://travis-ci.com/ManyDesigns/Portofino.svg?branch=master)](https://travis-ci.com/ManyDesigns/Portofino)
 [![Join the chat at https://gitter.im/ManyDesigns-Portofino/Lobby](https://badges.gitter.im/ManyDesigns-Portofino/Lobby.svg)](https://gitter.im/ManyDesigns-Portofino/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
