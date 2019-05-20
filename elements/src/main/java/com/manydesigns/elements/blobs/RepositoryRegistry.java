@@ -10,23 +10,14 @@ public class RepositoryRegistry {
   public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
   public static final Logger logger = LoggerFactory.getLogger(RepositoryRegistry.class);
 
-  private static RepositoryRegistry instance = null;    // lazy loading
-  private Map<String,Repository> registry;
+  private static RepositoryRegistry instance = new RepositoryRegistry();
+  private final Map<String, Repository> registry;
 
   private RepositoryRegistry() {
-    synchronized(RepositoryRegistry.class) {
       registry = new HashMap<>();
-    }
   }
 
   public static RepositoryRegistry getInstance() {
-    if(instance == null) {
-      synchronized(RepositoryRegistry.class) {
-        if(instance == null) {
-          instance = new RepositoryRegistry();
-        }
-      }
-    }
     return instance;
   }
 

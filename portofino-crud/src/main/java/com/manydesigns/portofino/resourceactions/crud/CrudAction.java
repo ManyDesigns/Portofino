@@ -141,7 +141,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
         try {
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
-            logger.debug("Query string {} contains select");
+            logger.debug("Query string {} contains select", queryString);
             List items = plainSelect.getSelectItems();
             if(items.size() != 1) {
                 logger.error("I don't know how to generate a count query for {}", queryString);
