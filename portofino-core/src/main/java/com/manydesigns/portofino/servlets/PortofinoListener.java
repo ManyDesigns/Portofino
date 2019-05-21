@@ -241,14 +241,21 @@ public class PortofinoListener extends DispatcherInitializer
         File configurationFile = new File(applicationDirectory, "portofino.properties");
         configuration =  new PropertiesConfiguration(configurationFile);
 
-        File localConfigurationFile =
-                new File(applicationDirectory, "portofino-local.properties");
+        String localConfigurationPath = System.getProperty("portofino.configuration.file");
+        File localConfigurationFile;
+        if(localConfigurationPath != null) {
+            localConfigurationFile = new File(localConfigurationPath);
+            if(!localConfigurationFile.exists()) {
+                logger.warn("Configuration file " + localConfigurationPath + " does not exist");
+            }
+        } else {
+            localConfigurationFile = new File(applicationDirectory, "portofino-local.properties");
+        }
         if (localConfigurationFile.exists()) {
-            logger.info("Local configuration found: {}", localConfigurationFile);
+            logger.info("Local configuration file: {}", localConfigurationFile);
             PropertiesConfiguration localConfiguration =
                     new PropertiesConfiguration(localConfigurationFile);
-            CompositeConfiguration compositeConfiguration =
-                    new CompositeConfiguration();
+            CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
             compositeConfiguration.addConfiguration(localConfiguration, true);
             compositeConfiguration.addConfiguration(configuration);
             configuration = compositeConfiguration;
@@ -258,9 +265,7 @@ public class PortofinoListener extends DispatcherInitializer
     public void setupCommonsConfiguration() {
         logger.debug("Setting up commons-configuration lookups...");
         BeanLookup serverInfoLookup = new BeanLookup(serverInfo);
-        ConfigurationInterpolator.registerGlobalLookup(
-                "serverInfo",
-                serverInfoLookup);
+        ConfigurationInterpolator.registerGlobalLookup("serverInfo", serverInfoLookup);
     }
 
     @Override
