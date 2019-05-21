@@ -74,7 +74,7 @@ public class InstanceBuilder<T> {
             }
         }
 
-        logger.debug("Installed {0}: {1}", clazz.getName(), instance);
+        logger.debug("Installed {}: {}", clazz.getName(), instance);
         return instance;
     }
 

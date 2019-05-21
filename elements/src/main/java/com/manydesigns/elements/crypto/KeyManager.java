@@ -121,10 +121,7 @@ public class KeyManager {
       while ((line = br.readLine()) != null) {
         strKeyPEM += line + "\n";
       }
-    } catch (IOException e) {
-      e.printStackTrace();
     }
-
     return strKeyPEM;
   }
 
@@ -162,9 +159,7 @@ public class KeyManager {
     StringBuilder passPhrase = new StringBuilder();
 
     if(passphrasePath!=null) {
-      BufferedReader br = null;
-      try {
-        br = new BufferedReader(new FileReader(passphrasePath));
+      try(BufferedReader br = new BufferedReader(new FileReader(passphrasePath))) {
         String line;
         while ((line = br.readLine()) != null) {
           passPhrase.append(line);

@@ -1,17 +1,16 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver, ComponentRef, Inject, InjectionToken, Injector, OnDestroy,
-  OnInit, Optional, ViewChild
+  ComponentFactoryResolver, ComponentRef, Injector, OnDestroy,
+  OnInit, ViewChild
 } from '@angular/core';
 import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {MainPageDirective} from "./content.directive";
 import {Subscription} from "rxjs";
-import {mergeMap} from "rxjs/operators";
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {Page, PageChild, PageService} from "./page";
+import {Page, PageService} from "./page";
 import {PageFactoryComponent} from "./page.factory";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";

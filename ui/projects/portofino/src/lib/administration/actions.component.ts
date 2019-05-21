@@ -15,7 +15,6 @@ import {Field, Form} from "../form";
 import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
-import {PageCrudService} from "./page-crud.service";
 
 @Component({ templateUrl: "actions.component.html" })
 export class ActionsComponent extends Page implements OnInit {

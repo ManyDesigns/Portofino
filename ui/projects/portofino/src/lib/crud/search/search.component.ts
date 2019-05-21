@@ -118,7 +118,7 @@ export class SearchComponent implements OnInit, OnDestroy {
             } else {
               return this.translate.get("Blob not found");
             }
-          }
+          };
         }
         this.resultFields.push(field);
         this.datatableColumns.push(property.name);

@@ -1,7 +1,5 @@
 import {Component, NgModule} from '@angular/core';
-import {
-  PortofinoModule, PortofinoUpstairsModule, Page, CrudComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, AuthenticationService} from "portofino";
+import { PortofinoModule, PortofinoUpstairsModule, Page, PortofinoComponent} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
@@ -15,9 +13,8 @@ import {
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {Router} from "@angular/router";
 import {QuillModule} from "ngx-quill";
-import {HttpClientModule, HttpClient} from "@angular/common/http";
+import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
