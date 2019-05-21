@@ -1,5 +1,5 @@
 import {PortofinoService} from "../portofino.service";
-import {ActivatedRoute, Router} from "@angular/router";
+import {Router} from "@angular/router";
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {AuthenticationService} from "../security/authentication.service";
 import {Page, PageService} from "../page";

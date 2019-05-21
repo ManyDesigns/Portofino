@@ -239,7 +239,6 @@ export class FormComponent implements OnInit, AfterViewInit {
   protected setupFormList(v: FormList, formGroup: FormGroup) {
     let control = formGroup.get(v.name);
     if (control instanceof FormArray) {
-      const length = control.length;
       const formArray = control as FormArray;
       v.contents.forEach((f, i) => {
         let formGroup = new FormGroup({});

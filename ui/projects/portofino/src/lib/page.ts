@@ -87,11 +87,11 @@ export class PageSettingsPanel {
   permissions: Permissions;
   error;
   readonly accessLevels = ["NONE", "VIEW", "EDIT", "DEVELOP", "DENY"];
-  callback: (boolean) => void;
+  callback: (saved: boolean) => void;
 
   constructor(public page: Page) {}
 
-  show(callback: (boolean) => void = () => {}) {
+  show(callback: (saved: boolean) => void = () => {}) {
     this.callback = callback;
     const pageConfiguration = this.page.configuration;
     this.previousConfiguration = Object.assign({}, pageConfiguration);
@@ -104,7 +104,7 @@ export class PageSettingsPanel {
     const templates = [];
     for (let key in this.page.portofino.templates) {
       const template = this.page.portofino.templates[key];
-      templates.push({ v: key, l: this.page.translate.instant(template.description ? template.description : key), s: false})
+      templates.push({ v: key, l: this.page.translate.instant(template.description ? template.description : key), s: false});
     }
     const templateField = Field.fromProperty(Property.create({ name: "template", label: "Template" }).withSelectionProvider({
       options: templates
@@ -408,7 +408,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     return Page.removeDoubleSlashesFromUrl(`pages${path}/config.json`);
   }
 
-  configure(callback: (boolean) => void = () => this.reloadBaseUrl()) {
+  configure(callback: (saved: boolean) => void = () => this.reloadBaseUrl()) {
     this.settingsPanel.show(callback);
   }
 

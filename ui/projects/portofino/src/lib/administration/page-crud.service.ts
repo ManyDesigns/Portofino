@@ -52,7 +52,7 @@ export class PageCrudService {
       parentPage = this.pageService.page.root;
       page.source = `/${page.source}`;
     } else {
-      return throwError("Unsupported position: " + position)
+      return throwError("Unsupported position: " + position);
     }
     delete page.position;
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
