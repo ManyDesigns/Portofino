@@ -24,6 +24,7 @@ import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +102,7 @@ public class Annotation implements ModelObject {
         javaAnnotationClass = null;
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         javaAnnotationClass = ReflectionUtil.loadClass(type);
         if (javaAnnotationClass == null) {
             logger.warn("Cannot load annotation class: {}", type);
@@ -167,7 +168,7 @@ public class Annotation implements ModelObject {
         }
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {}
 

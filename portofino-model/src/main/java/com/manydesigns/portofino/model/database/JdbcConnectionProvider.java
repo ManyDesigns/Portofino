@@ -55,7 +55,6 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     protected String username;
     protected String password;
 
-    protected Configuration configuration;
     protected String keyPrefix;
 
     //**************************************************************************

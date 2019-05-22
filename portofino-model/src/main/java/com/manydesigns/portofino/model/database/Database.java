@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,11 +85,11 @@ public class Database implements ModelObject {
 
     public void reset() {}
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert databaseName != null;
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Schema schema : schemas) {
@@ -110,8 +111,7 @@ public class Database implements ModelObject {
     }
 
     @XmlElementWrapper(name="schemas")
-    @XmlElement(name = "schema",
-            type = Schema.class)
+    @XmlElement(name = "schema", type = Schema.class)
     public List<Schema> getSchemas() {
         return schemas;
     }

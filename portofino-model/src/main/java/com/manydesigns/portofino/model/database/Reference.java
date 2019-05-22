@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -82,12 +83,12 @@ public class Reference implements ModelObject {
         actualToColumn = null;
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert owner != null;
         assert fromColumn != null;
     }
 
-    public void link(Model model) {
+    public void link(Model model, Configuration configuration) {
         actualFromColumn =
                 DatabaseLogic.findColumnByName(owner.getFromTable(), fromColumn);
         if (actualFromColumn == null) {

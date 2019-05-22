@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,16 +61,16 @@ public class Model {
     // Reset / init
     //**************************************************************************
 
-    public void init() {
+    public void init(Configuration configuration) {
         for (Database database : databases) {
-            init(database);
+            init(database, configuration);
         }
     }
 
-    public void init(ModelObject rootObject) {
+    public void init(ModelObject rootObject, Configuration configuration) {
         new ResetVisitor().visit(rootObject);
-        new InitVisitor(this).visit(rootObject);
-        new LinkVisitor(this).visit(rootObject);
+        new InitVisitor(this, configuration).visit(rootObject);
+        new LinkVisitor(this, configuration).visit(rootObject);
     }
 
     //**************************************************************************

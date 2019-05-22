@@ -23,6 +23,8 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"catalog", "schemaName","schema","immediateTables"})
+@XmlType(propOrder = {"catalog", "schemaName", "immediateTables"})
 public class Schema implements ModelObject {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
@@ -53,8 +55,11 @@ public class Schema implements ModelObject {
     protected final List<Table> tables = new ArrayList<Table>();
 
     protected String schemaName;
-    protected String schema;
+    protected String actualSchemaName;
     protected String catalog;
+
+    protected Configuration configuration;
+    protected String key;
     
     //**************************************************************************
     // Logging
@@ -67,7 +72,7 @@ public class Schema implements ModelObject {
     // Constructors and init
     //**************************************************************************
     public Schema() {
-        immediateTables = new ArrayList<Table>();
+        immediateTables = new ArrayList<>();
     }
 
     public Schema(Database database) {
@@ -87,21 +92,28 @@ public class Schema implements ModelObject {
 
     public String getQualifiedName() {
         if(getDatabaseName() == null) {
-            return schema!=null?schema:schemaName;
+            return actualSchemaName != null ? actualSchemaName : schemaName;
         }
-        return MessageFormat.format("{0}.{1}", getDatabaseName(), schema!=null?schema:schemaName);
+        return MessageFormat.format("{0}.{1}", getDatabaseName(),
+                actualSchemaName != null ? actualSchemaName : schemaName);
     }
 
     public void reset() {}
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert database != null;
         assert schemaName != null;
-        if( schema == null )
-            schema = schemaName;
+        this.configuration = configuration;
+        key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + schemaName;
+        if(actualSchemaName == null) {
+            actualSchemaName = configuration.getString(key);
+        }
+        if(actualSchemaName == null) {
+            actualSchemaName = schemaName;
+        }
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Table table : tables) {
@@ -134,16 +146,20 @@ public class Schema implements ModelObject {
         this.schemaName = schemaName;
     }
 
-    @XmlAttribute(required = false)
-    public String getSchema() {
-        return schema;
+    public String getActualSchemaName() {
+        return actualSchemaName;
     }
 
-    public void setSchema(String schema) {
-        this.schema = schema;
+    public void setActualSchemaName(String actualSchemaName) {
+        if(StringUtils.isEmpty(actualSchemaName)) {
+            configuration.clearProperty(key);
+        } else if(configuration.containsKey(key) || !schemaName.equals(actualSchemaName)) {
+            configuration.setProperty(key, actualSchemaName);
+        }
+        this.actualSchemaName = actualSchemaName;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute
     public String getCatalog() {
         return catalog;
     }
@@ -153,8 +169,7 @@ public class Schema implements ModelObject {
     }
 
     @XmlElementWrapper(name="tables")
-    @XmlElement(name = "table",
-            type = Table.class)
+    @XmlElement(name = "table", type = Table.class)
     public List<Table> getImmediateTables() {
         return immediateTables;
     }
@@ -169,11 +184,9 @@ public class Schema implements ModelObject {
     //**************************************************************************
 
     public List<Column> getAllColumns() {
-        List<Column> result = new ArrayList<Column>();
+        List<Column> result = new ArrayList<>();
         for (Table table : tables) {
-            for (Column column : table.getColumns()) {
-                result.add(column);
-            }
+            result.addAll(table.getColumns());
         }
         return result;
     }

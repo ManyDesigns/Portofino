@@ -22,6 +22,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Pair;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,8 +105,8 @@ public class ForeignKey extends DatabaseSelectionProvider
     }
 
     @Override
-    public void init(Model model) {
-        super.init(model);
+    public void init(Model model, Configuration configuration) {
+        super.init(model, configuration);
 
         assert fromTable != null;
         assert name != null;
@@ -121,8 +122,8 @@ public class ForeignKey extends DatabaseSelectionProvider
     }
 
     @Override
-    public void link(Model model) {
-        super.link(model);
+    public void link(Model model, Configuration configuration) {
+        super.link(model, configuration);
         toTable = DatabaseLogic.findTableByName(model, toDatabase, toSchema, toTableName);
         if(toTable != null) {
             // wire up Table.oneToManyRelationships

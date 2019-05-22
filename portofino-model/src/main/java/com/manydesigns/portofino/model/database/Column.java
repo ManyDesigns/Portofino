@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +106,7 @@ public class Column implements ModelObject, Annotated {
         actualJavaType = null;
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert table != null;
         //TODO questi assert dovrebbero essere test + throw exception
         assert columnName != null;
@@ -135,7 +136,7 @@ public class Column implements ModelObject, Annotated {
         }
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Annotation annotation : annotations) {

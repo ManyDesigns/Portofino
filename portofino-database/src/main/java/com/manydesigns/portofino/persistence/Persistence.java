@@ -58,7 +58,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -194,7 +193,7 @@ public class Persistence {
                 JdbcConnection jdbcConnection = new JdbcConnection(connection);
                 liquibase.database.Database lqDatabase =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
-                lqDatabase.setDefaultSchemaName(schema.getSchema());
+                lqDatabase.setDefaultSchemaName(schema.getActualSchemaName());
                 String relativeChangelogPath =
                         ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
                 Liquibase lq = new Liquibase(
@@ -267,7 +266,7 @@ public class Persistence {
         }
 
         setups.clear();
-        model.init();
+        model.init(configuration);
         for (Database database : model.getDatabases()) {
             try {
                 ConnectionProvider connectionProvider = database.getConnectionProvider();
@@ -317,7 +316,7 @@ public class Persistence {
         return null;
     }
 
-    public org.apache.commons.configuration.Configuration getPortofinoProperties() {
+    public org.apache.commons.configuration.Configuration getConfiguration() {
         return configuration;
     }
 
@@ -430,7 +429,7 @@ public class Persistence {
     //**************************************************************************
 
     public String getName() {
-        return getPortofinoProperties().getString(PortofinoProperties.APP_NAME);
+        return getConfiguration().getString(PortofinoProperties.APP_NAME);
     }
 
     public File getLiquibaseChangelogFile(Schema schema) {
