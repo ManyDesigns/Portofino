@@ -116,8 +116,7 @@
         <servlet.api.version>3.1.0</servlet.api.version>
         <shiro.version>1.4.0</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spring.version>5.0.10.RELEASE</spring.version>
-        <stax.version>1.2.0</stax.version>
+        <spring.version>5.1.5.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <modules>

@@ -16,7 +16,7 @@ import {
   DetailComponentHolder,
   SearchComponentHolder
 } from './crud/crud.component';
-import {LOCALE_STORAGE_SERVICE, PortofinoService, ProgressInterceptor} from './portofino.service';
+import {LOCALE_STORAGE_SERVICE, LOCALES, PortofinoService, ProgressInterceptor} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
   AuthenticationInterceptor,
@@ -105,6 +105,8 @@ import {ConnectionsComponent} from "./administration/connections.component";
 import {WizardComponent} from "./administration/wizard.component";
 import {TablesComponent} from "./administration/tables.component";
 import {ActionsComponent, CreateActionComponent, GenericPage} from "./administration/actions.component";
+import {TRANSLATIONS_EN} from "./i18n/en";
+import {TRANSLATIONS_IT} from "./i18n/it";
 
 @NgModule({
   declarations: [
@@ -233,6 +235,9 @@ export class PortofinoUpstairsModule {}
     { provide: HTTP_INTERCEPTORS, useClass: ProgressInterceptor, multi: true },
     { provide: TOKEN_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
+    { provide: LOCALES, useValue: [
+      { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
+      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
     { provide: NotificationService, useClass: MatSnackBarNotificationService },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [LoginComponent],
