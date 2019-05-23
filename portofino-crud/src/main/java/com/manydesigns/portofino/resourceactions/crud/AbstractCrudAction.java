@@ -467,6 +467,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         Map<String, String> bulkOperations = new HashMap<>();
         bulkOperations.put("name", "Bulk operations");
         bulkOperations.put("available", String.valueOf(isBulkOperationsEnabled()));
+        operations.add(bulkOperations);
         return operations;
     }
 

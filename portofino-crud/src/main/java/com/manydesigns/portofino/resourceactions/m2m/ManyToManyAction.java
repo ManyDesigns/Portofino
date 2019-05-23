@@ -654,41 +654,37 @@ public class ManyToManyAction extends AbstractResourceAction {
                 return resourceActionNotConfigured();
             }
 
-            booleanRelation = new LinkedHashMap<Object, Boolean>();
-            if(potentiallyAvailableAssociations != null) {
-                ClassAccessor ca = getManyTableAccessor();
-                PkHelper pkHelper = new PkHelper(ca);
+            booleanRelation = new LinkedHashMap<>();
+            ClassAccessor ca = getManyTableAccessor();
+            PkHelper pkHelper = new PkHelper(ca);
 
-                for(Object obj : potentiallyAvailableAssociations) {
-                    String pk = StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
-                    enumList.put(pk);
-                    titleMap.put(pk, ShortNameUtils.getName(ca, obj));
+            for(Object obj : potentiallyAvailableAssociations) {
+                String pk = StringUtils.join(pkHelper.generatePkStringArray(obj), "/");
+                enumList.put(pk);
+                titleMap.put(pk, ShortNameUtils.getName(ca, obj));
 
-                    if(!availableAssociations.contains(obj)) {
-                        trueRelations.put(pk);
-                    }
+                if(!availableAssociations.contains(obj)) {
+                    trueRelations.put(pk);
                 }
-            }else{
-                logger.warn("potentiallyAvailableAssociations is empty");
             }
 
             model.put(onePk.toString(), trueRelations);
 
             JSONObject items = new JSONObject();
-            items.put("type","string");
+            items.put("type", "string");
             items.put("enum", enumList);
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("type","array");
-            jsonObject.put("title","");
-            jsonObject.put("items",items);
+            jsonObject.put("type", "array");
+            jsonObject.put("title", "");
+            jsonObject.put("items", items);
 
             JSONObject properties = new JSONObject();
             properties.put(onePk.toString(),jsonObject);
 
-            schema.put("type","object");
-            schema.put("title","Many to many");
-            schema.put("properties",properties);
+            schema.put("type", "object");
+            schema.put("title", "Many to many");
+            schema.put("properties", properties);
 
             JSONObject checkboxes = new JSONObject();
             checkboxes.put("key", onePk.toString());

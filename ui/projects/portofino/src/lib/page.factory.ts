@@ -1,4 +1,4 @@
-import {Page, PageChild, PageConfiguration, PageService} from "./page";
+import {Page, PageChild, PageConfiguration} from "./page";
 import {
   Component,
   ComponentFactoryResolver,

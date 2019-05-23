@@ -84,9 +84,9 @@ public class CryptoService {
     return new CipherInputStream(decryptedInputStream, cipher);
   }
 
-  public Long getFileSize( Long originalSize ){
+  public long getFileSize( Long originalSize ){
     //if( typeAlgo ...
-    Double value = Math.ceil(originalSize.doubleValue()/16d)*16;
-    return value.longValue();
+    double value = Math.ceil(originalSize.doubleValue()/16d)*16;
+    return (long) value;
   }
 }

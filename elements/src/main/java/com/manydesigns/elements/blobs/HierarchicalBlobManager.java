@@ -40,11 +40,12 @@ public class HierarchicalBlobManager extends SimpleBlobManager {
         if( blob.getRepository() != null ) { //TODO vedere se usare così
             Repository repository = RepositoryRegistry.getInstance().getRepository(blob.getRepository());
             repository.load(blob);
-        }else{
-            if(blob.isEncrypted())
-                blob.setInputStream(BlobUtils.decrypt(new FileInputStream(getDataFile(blob.getCode())),blob.getEncryptionType()));
-            else
+        } else {
+            if(blob.isEncrypted()) {
+                blob.setInputStream(BlobUtils.decrypt(new FileInputStream(getDataFile(blob.getCode())), blob.getEncryptionType()));
+            } else {
                 blob.setInputStream(new FileInputStream(getDataFile(blob.getCode())));
+            }
         }
         return blob.getInputStream();
     }
