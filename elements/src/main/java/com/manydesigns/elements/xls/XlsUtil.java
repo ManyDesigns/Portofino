@@ -62,9 +62,9 @@ public class XlsUtil {
         jxl.write.Number number;
         BigDecimal decimalValue = numField.getValue();
         if (numField.getDecimalFormat() == null) {
-          number = new Number(j, i, decimalValue == null ? null : decimalValue.doubleValue());
+          number = new Number(j, i, decimalValue.doubleValue());
         } else {
-          number = new Number(j, i, decimalValue == null ? null : decimalValue.doubleValue(),
+          number = new Number(j, i, decimalValue.doubleValue(),
             getNumberFormat(numField.getDecimalFormat().toPattern()));
         }
         sheet.addCell(number);

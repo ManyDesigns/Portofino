@@ -375,7 +375,7 @@ public class ActionLogic {
 
     public static void configureResourceAction(ResourceAction resourceAction, ActionInstance actionInstance) {
         if(actionInstance.getConfiguration() != null) {
-            logger.debug("ActionDescriptor instance {} is already configured");
+            logger.debug("ActionDescriptor instance {} is already configured", actionInstance);
             return;
         }
         FileObject configurationFile;
