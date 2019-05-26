@@ -134,7 +134,7 @@ public class TablesAction extends AbstractResourceAction {
         if(table == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        Map result = new HashMap();
+        Map<String, Object> result = new HashMap<>();
         result.put("table", table);
         List<Map> typeInfo = new ArrayList<>();
         Type[] types = persistence.getConnectionProvider(db).getTypes();
@@ -155,9 +155,13 @@ public class TablesAction extends AbstractResourceAction {
                     }
                 }
             }
+            if(type == null) {
+                logger.error("No candidate types available for column {}", column.getQualifiedName());
+                break;
+            }
             Integer precision = column.getLength();
             Class[] javaTypes = type.getAvailableJavaTypes(precision);
-            Map info = new HashMap();
+            Map<String, Object> info = new HashMap<>();
             info.put("type", type);
 
             //Default
@@ -169,7 +173,7 @@ public class TablesAction extends AbstractResourceAction {
             typeInfo.add(info);
 
             //Available
-            List availableTypes = new ArrayList();
+            List<Map> availableTypes = new ArrayList<>();
             info.put("types", availableTypes);
             //Existing
             if(column.getJavaType() != null) {
