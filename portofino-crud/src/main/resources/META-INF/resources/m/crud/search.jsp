@@ -41,6 +41,10 @@
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             <div class="portofino-datatable"></div>
 
+            <noscript>
+                <jsp:include page="datatable.jsp"/>
+            </noscript>
+
             <div class="row">
                 <div class="col-md-12">
                     <portofino:buttons list="crud-search" />
