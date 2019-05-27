@@ -15,7 +15,7 @@ public class DefaultFieldEncrypter implements FieldEncrypter {
             return value;
         }
         try {
-            CryptoService.getInstance().encrypt(value);
+            return CryptoService.getInstance().encrypt(value);
         } catch (Exception e) {
             logger.error("DefaultFieldEncrypter.encrypt error:"+e.getMessage(),e);
         }
@@ -27,7 +27,7 @@ public class DefaultFieldEncrypter implements FieldEncrypter {
             return value;
         }
         try {
-            CryptoService.getInstance().decrypt(value);
+            return CryptoService.getInstance().decrypt(value);
         } catch (Exception e) {
             logger.error("DefaultFieldEncrypter.decrypt error:"+e.getMessage(),e);
         }
