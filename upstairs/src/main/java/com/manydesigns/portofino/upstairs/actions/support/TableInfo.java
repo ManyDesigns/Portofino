@@ -20,7 +20,7 @@ public class TableInfo {
 
     public TableInfo(Table table) {
         this.database = table.getDatabaseName();
-        this.schema = table.getSchemaName();
+        this.schema = table.getSchema().getSchemaName();
         this.table = table;
     }
 

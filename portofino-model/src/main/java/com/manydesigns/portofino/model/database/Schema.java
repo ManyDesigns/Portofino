@@ -178,6 +178,13 @@ public class Schema implements ModelObject {
         return tables;
     }
 
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     //**************************************************************************
     // Get all objects of a certain kind

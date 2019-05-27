@@ -114,10 +114,8 @@ public class TablesAction extends AbstractResourceAction {
             }
             if(!table.getSchemaName().equals(lastSchema)) {
                 File changelogFile = persistence.getLiquibaseChangelogFile(table.getSchema());
-                String schemaDescr = table.getSchemaName();
-
                 lastSchema = table.getSchemaName();
-                schema = createNode(schemaDescr, changelogFile.isFile());
+                schema = createNode(table.getSchema().getSchemaName(), changelogFile.isFile());
                 ((List)database.get("children")).add(schema);
             }
             ((List)schema.get("children")).add(createLeaf(table.getTableName(), table.getActualEntityName()));
@@ -198,7 +196,7 @@ public class TablesAction extends AbstractResourceAction {
     @PUT
     public void saveTable(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
-            Table table) throws IOException, JAXBException {
+            Table table) throws Exception {
         Table existing = DatabaseLogic.findTableByName(persistence.getModel(), db, schema, tableName);
         if(existing == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -498,7 +496,7 @@ public class TablesAction extends AbstractResourceAction {
         Collections.sort(tables, (o1, o2) -> {
             int dbComp = o1.getDatabaseName().compareToIgnoreCase(o2.getDatabaseName());
             if(dbComp == 0) {
-                int schemaComp = o1.getSchemaName().compareToIgnoreCase(o2.getSchemaName());
+                int schemaComp = o1.getSchema().getSchemaName().compareToIgnoreCase(o2.getSchema().getSchemaName());
                 if(schemaComp == 0) {
                     return o1.getTableName().compareToIgnoreCase(o2.getTableName());
                 } else {

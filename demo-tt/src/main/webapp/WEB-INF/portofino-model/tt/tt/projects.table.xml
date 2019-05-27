@@ -25,11 +25,7 @@
         </column>
         <column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="url"
                 autoincrement="false">
-            <annotations>
-                <annotation type="com.manydesigns.elements.annotations.CssClass">
-                    <value>input-xxlarge</value>
-                </annotation>
-            </annotations>
+            <annotations />
         </column>
         <column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="public_"
                 autoincrement="false">

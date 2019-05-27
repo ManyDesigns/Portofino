@@ -8,11 +8,7 @@
         </column>
         <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title"
                 autoincrement="false">
-            <annotations>
-                <annotation type="com.manydesigns.elements.annotations.CssClass">
-                    <value>input-xxlarge</value>
-                </annotation>
-            </annotations>
+            <annotations />
         </column>
         <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description"
                 autoincrement="false">

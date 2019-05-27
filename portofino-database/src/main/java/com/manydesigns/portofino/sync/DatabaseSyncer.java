@@ -108,7 +108,6 @@ public class DatabaseSyncer {
                     logger.debug("Source schema not found. Creating an empty one.");
                     sourceSchema = new Schema();
                     sourceSchema.setSchemaName(schemaName);
-                    sourceSchema.setActualSchemaName(schemaRealName);
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
@@ -137,14 +136,10 @@ public class DatabaseSyncer {
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing schema: {}", sourceSchema.getActualSchemaName());
-
         targetSchema.setSchemaName(sourceSchema.getSchemaName());
-        targetSchema.setActualSchemaName(sourceSchema.getActualSchemaName());
-
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);
         syncForeignKeys(databaseSnapshot, sourceSchema, targetSchema);
-
         return targetSchema;
     }
 

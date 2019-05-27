@@ -14,9 +14,6 @@
         </column>
         <column columnName="title" columnType="VARCHAR" length="255" scale="0" jdbcType="12" autoincrement="false" nullable="false">
             <annotations>
-                <annotation type="com.manydesigns.elements.annotations.CssClass">
-                    <value>input-xxlarge</value>
-                </annotation>
                 <annotation type="com.manydesigns.elements.annotations.MaxLength">
                     <value>255</value>
                 </annotation>

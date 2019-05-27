@@ -166,7 +166,6 @@ public class ConnectionsAction extends AbstractResourceAction {
                 updateSchemas(connectionProvider, schemasJson);
             }
             form.writeToObject(cp);
-            CommonsConfigurationUtils.save(portofinoConfiguration);
             return handler.apply(connectionProvider, form);
         } else {
             return Response.serverError().entity(form).build();
@@ -195,7 +194,6 @@ public class ConnectionsAction extends AbstractResourceAction {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         updateSchemas(connectionProvider, new JSONArray(jsonInput));
-        CommonsConfigurationUtils.save(portofinoConfiguration);
         persistence.syncDataModel(databaseName);
         persistence.initModel();
         persistence.saveXmlModel();
@@ -266,23 +264,24 @@ public class ConnectionsAction extends AbstractResourceAction {
             if(selected) {
                 if(selectedSchemaNames.contains(schemaName)) {
                     for(Schema modelSchema : database.getSchemas()) {
-                        if(modelSchema.getActualSchemaName().equalsIgnoreCase(schemaName)) {
+                        if(modelSchema.getSchemaName().equalsIgnoreCase(schemaName)) {
                             if(!schema.isNull("name")) {
-                                modelSchema.setActualSchemaName(schema.getString("name")); //TODO save in .properties
+                                modelSchema.setActualSchemaName(schema.getString("name"));
                             }
                             break;
                         }
                     }
                 } else {
                     Schema modelSchema = new Schema();
+                    modelSchema.setDatabase(database);
+                    modelSchema.setSchemaName(schemaName);
                     if(!schema.isNull("catalog")) {
                         modelSchema.setCatalog(schema.getString("catalog"));
                     }
                     if(!schema.isNull("name")) {
+                        modelSchema.setConfiguration(portofinoConfiguration);
                         modelSchema.setActualSchemaName(schema.getString("name"));
                     }
-                    modelSchema.setSchemaName(schemaName);
-                    modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
                 }
             } else if(selectedSchemaNames.contains(schemaName)) {
@@ -314,7 +313,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         for(String[] schemaName : schemaNamesFromDb) {
             boolean selected = false;
             for(Schema schema : selectedSchemas) {
-                if(schemaName[1].equalsIgnoreCase(schema.getActualSchemaName())) {
+                if(schemaName[1].equalsIgnoreCase(schema.getSchemaName())) {
                     selected = true;
                     break;
                 }
@@ -328,7 +327,7 @@ public class ConnectionsAction extends AbstractResourceAction {
     @DELETE
     @Path("{databaseName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void deleteConnection(@PathParam("databaseName") String databaseName) throws IOException, JAXBException {
+    public void deleteConnection(@PathParam("databaseName") String databaseName) throws Exception {
         Database database =
                 DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
         if (database == null) {
