@@ -241,7 +241,12 @@ public class PortofinoListener extends DispatcherInitializer
         File configurationFile = new File(applicationDirectory, "portofino.properties");
         configuration =  new PropertiesConfiguration(configurationFile);
 
-        String localConfigurationPath = System.getProperty("portofino.configuration.file");
+        String localConfigurationPath = null;
+        try {
+            localConfigurationPath = System.getProperty("portofino.configuration.file");
+        } catch (SecurityException e) {
+            logger.warn("Reading system properties is forbidden. Will read configuration file from standard location.", e);
+        }
         File localConfigurationFile;
         if(localConfigurationPath != null) {
             localConfigurationFile = new File(localConfigurationPath);

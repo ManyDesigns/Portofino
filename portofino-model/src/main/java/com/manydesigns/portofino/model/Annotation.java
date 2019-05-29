@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
@@ -75,7 +76,7 @@ public class Annotation implements ModelObject {
     //**************************************************************************
 
     public Annotation() {
-        values = new ArrayList<String>();
+        values = new ArrayList<>();
     }
 
     public Annotation(String type) {
@@ -193,9 +194,16 @@ public class Annotation implements ModelObject {
         this.type = type;
     }
 
+    @JsonProperty("values")
     @XmlElement(name = "value", type = java.lang.String.class)
     public List<String> getValues() {
         return values;
+    }
+
+    //Needed for Jackson
+    public void setValues(List<String> values) {
+        this.values.clear();
+        this.values.addAll(values);
     }
 
     public Class getJavaAnnotationClass() {

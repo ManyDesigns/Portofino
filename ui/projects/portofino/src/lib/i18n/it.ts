@@ -98,6 +98,7 @@ export const TRANSLATIONS_IT = {
   "Upstairs: Portofino Configuration Application": "Piano di sopra: applicazione di configurazione per Portofino",
   "Use an existing": "Usa una connessione esistente",
   "Username": "Nome utente",
+  "Wizard": "Wizard",
   "_ not found": "{{what}} non trovato",
   "_ is required.": "{{label}} è obbligatorio.",
   '_: max _.': "{label}: max {max}.",

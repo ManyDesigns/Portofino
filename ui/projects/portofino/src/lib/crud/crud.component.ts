@@ -362,11 +362,7 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
       this.selectionProviders = sps;
     });
     config.properties.forEach(p => {
-      this.properties.push({
-        enabled: p.property.enabled, name: p.property.name, label: p.property.label,
-        insertable: p.property.insertable, updatable: p.property.updatable,
-        inSummary: p.property.inSummary, searchable: p.property.searchable
-      });
+      this.properties.push(Object.assign({}, p.property));
     });
     if(crud.classAccessor) {
       crud.classAccessor.properties.forEach(p => {
@@ -374,7 +370,7 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
           this.properties.push({
             enabled: p.key, name: p.name, label: null,
             insertable: false, updatable: false,
-            inSummary: p.key, searchable: false
+            inSummary: p.key, searchable: false, annotations: []
           });
         }
       });
