@@ -16,7 +16,7 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
 
   @Input()
   ids: string[];
-  @ViewChild(FormComponent)
+  @ViewChild(FormComponent, { static: false })
   formComponent: FormComponent;
 
   constructor(

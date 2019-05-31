@@ -70,17 +70,17 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   sideNavPosition: SideNavPosition;
   @Input()
   upstairsLink = this.portofino.upstairsLink;
-  @ViewChild(ToolbarDirective)
+  @ViewChild(ToolbarDirective, { static: false })
   toolbarHost: ToolbarDirective;
-  @ViewChild(FooterDirective)
+  @ViewChild(FooterDirective, { static: false })
   footerHost: FooterDirective;
 
-  @ViewChild(NavigationDirective)
+  @ViewChild(NavigationDirective, { static: false })
   navigationHost: NavigationDirective;
 
-  @ViewChild(TemplatesComponent)
+  @ViewChild(TemplatesComponent, { static: true })
   builtinTemplates: TemplatesComponent;
-  @ContentChild(TemplatesComponent)
+  @ContentChild(TemplatesComponent, { static: false })
   extraTemplates: TemplatesComponent;
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
