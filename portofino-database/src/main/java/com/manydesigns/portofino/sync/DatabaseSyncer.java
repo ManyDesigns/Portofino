@@ -528,11 +528,11 @@ public class DatabaseSyncer {
                 return -1;
             }
             public int compare(Column c1, Column c2) {
-                Integer index1 = oldIndex(c1);
-                Integer index2 = oldIndex(c2);
+                int index1 = oldIndex(c1);
+                int index2 = oldIndex(c2);
                 if(index1 != -1) {
                     if(index2 != -1) {
-                        return index1.compareTo(index2);
+                        return Integer.compare(index1, index2);
                     } else {
                         return -1;
                     }
