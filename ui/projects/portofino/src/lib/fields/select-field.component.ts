@@ -1,6 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {FieldComponent} from "./field.component";
 import {debounceTime} from "rxjs/operators";
+import {FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'portofino-select-field',
@@ -33,5 +34,12 @@ export class SelectFieldComponent extends FieldComponent {
 
   trackByOptionValue(index, option) {
     return option.v;
+  }
+
+  safeValue(form: FormGroup) {
+    if(!form || !form.controls || !form.controls[this.property.name] || !form.controls[this.property.name].value) {
+      return '';
+    }
+    return form.controls[this.property.name].value.l
   }
 }

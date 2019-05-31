@@ -1,7 +1,7 @@
 import {Component, ComponentFactoryResolver, Injectable, Injector} from "@angular/core";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import {Field, Form} from "../form";
 import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
