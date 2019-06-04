@@ -32,12 +32,6 @@ public class Pages extends Resource {
     public static final String PORTOFINO_ACTION_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.action-move";
     public static final String PORTOFINO_PAGE_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.page-move";
 
-    @Context
-    protected ServletContext servletContext;
-
-    @Context
-    protected UriInfo uriInfo;
-
     @POST
     @Path("{path:.+}")
     public Response createPageAndAction(

@@ -51,8 +51,6 @@ public class FileBlobField extends AbstractBlobField {
     };
     protected Callable<String> blobCodeGenerator = DEFAULT_CODE_GENERATOR;
 
-    protected String encryptionType=null;
-
     public FileBlobField(@NotNull PropertyAccessor accessor,
                          @NotNull Mode mode,
                          @Nullable String prefix) {
@@ -63,7 +61,7 @@ public class FileBlobField extends AbstractBlobField {
                          @NotNull Mode mode,
                          @Nullable String prefix,@Nullable String encryptionType) {
         super(accessor, mode, prefix);
-        this.encryptionType=encryptionType;
+        this.encryptionType = encryptionType;
     }
 
     @Override

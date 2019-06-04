@@ -171,7 +171,9 @@ public abstract class ConnectionProvider {
             errorMessage = e.getMessage();
             logger.warn("Could not create database platform for " + databaseName, e);
         } finally {
-            DbUtil.closeResultSetAndStatement(typeRs);
+            if(typeRs != null) {
+                DbUtil.closeResultSetAndStatement(typeRs);
+            }
             releaseConnection(conn);
             lastTested = new Date();
         }

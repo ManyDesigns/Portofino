@@ -58,9 +58,9 @@ public class JavaCodeBase implements CodeBase {
     protected InMemoryFileManager fileManager;
     protected VFSClassloader vfsClassloader;
 
-    protected static final Logger logger = LoggerFactory.getLogger(JavaCodeBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(JavaCodeBase.class);
 
-    public JavaCodeBase(FileObject root) throws IOException {
+    public JavaCodeBase(FileObject root) {
         this.root = root;
     }
 
@@ -126,7 +126,7 @@ public class JavaCodeBase implements CodeBase {
         }
     }
     
-    protected void listClassFiles(String packageName, List<JavaFileObject> list) throws IOException {
+    protected void listClassFiles(String packageName, Collection<JavaFileObject> list) throws IOException {
         Enumeration<URL> resources = getClassLoader().getResources(packageName.replace('.', '/'));
         while (resources.hasMoreElements()) {
             URL url = resources.nextElement();

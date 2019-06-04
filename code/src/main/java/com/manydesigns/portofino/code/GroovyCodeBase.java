@@ -27,7 +27,7 @@ public class GroovyCodeBase implements CodeBase {
     protected FileObject root;
     protected CodeBase parent;
     protected ClassLoader classLoader;
-    protected static final Logger logger = LoggerFactory.getLogger(GroovyCodeBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(GroovyCodeBase.class);
     
     public GroovyCodeBase(FileObject root) throws IOException {
         this(root, null, null);
@@ -51,7 +51,7 @@ public class GroovyCodeBase implements CodeBase {
         cc.setRecompileGroovySource(true);
         groovyScriptEngine = new GroovyScriptEngine(new URL[] { this.root.getURL() }, getClassLoader());
         groovyScriptEngine.setConfig(cc);
-        groovyScriptEngine.getGroovyClassLoader().setShouldRecompile(true);
+        groovyScriptEngine.getGroovyClassLoader().setShouldRecompile(Boolean.TRUE);
     }
 
     public GroovyCodeBase(FileObject root, CodeBase parent) throws IOException {

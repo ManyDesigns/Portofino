@@ -71,9 +71,6 @@ public class UpstairsAction extends AbstractResourceAction {
     ApplicationContext applicationContext;
 
     @Autowired
-    CodeBase codeBase;
-
-    @Autowired
     Persistence persistence;
 
     @Autowired
