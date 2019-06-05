@@ -352,14 +352,11 @@ public class ActionLogic {
         if (configurationClass == null) {
             return null;
         }
-        Object configuration;
         String configurationPackage = configurationClass.getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        configuration = unmarshaller.unmarshal(new StreamSource(inputStream), configurationClass);
-        if(configuration instanceof JAXBElement) {
-            configuration = ((JAXBElement) configuration).getValue();
-        }
+        JAXBElement element = unmarshaller.unmarshal(new StreamSource(inputStream), configurationClass);
+        Object configuration = element.getValue();
         if (!configurationClass.isInstance(configuration)) {
             logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
             return null;

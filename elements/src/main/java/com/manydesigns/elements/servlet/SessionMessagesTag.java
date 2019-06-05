@@ -81,7 +81,7 @@ public class SessionMessagesTag extends TagSupport {
     private void writeList(XhtmlBuffer xb,
                            List<String> errorMessages,
                            String htmlClass) {
-        if (errorMessages.size() == 0) {
+        if (errorMessages.isEmpty()) {
             return;
         }
 

@@ -13,16 +13,15 @@ public class CookieJWTFilter extends JWTFilter {
 
     @Override
     protected String getToken(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Object mappedValue) {
-        String jwt = null;
         Cookie[] cookies = httpRequest.getCookies();
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if (getCookieName().equals(cookie.getName())) {
-                    jwt = cookie.getValue();
+                    return cookie.getValue();
                 }
             }
         }
-        return jwt;
+        return null;
     }
     
     public String getCookieName() {

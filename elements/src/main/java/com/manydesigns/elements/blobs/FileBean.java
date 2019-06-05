@@ -178,7 +178,7 @@ public class FileBean {
         this.saved = this.file.renameTo(toFile);
 
         // If the rename didn't work, try copying the darn thing bit by bit
-        if (this.saved == false) {
+        if (!this.saved) {
             saveViaCopy(toFile);
         }
     }
@@ -191,36 +191,15 @@ public class FileBean {
      * @param toFile the file to save to
      */
     protected void saveViaCopy(File toFile) throws IOException {
-        OutputStream out = null;
-        InputStream in = null;
-        try {
-            out = new FileOutputStream(toFile);
-            in = new FileInputStream(this.file);
-
+        try(OutputStream out = new FileOutputStream(toFile); InputStream in = new FileInputStream(this.file)) {
             byte[] buffer = new byte[1024];
             for (int count; (count = in.read(buffer)) > 0;) {
                 out.write(buffer, 0, count);
             }
-
             out.close();
-            out = null;
             in.close();
-            in = null;
-
             this.file.delete();
             this.saved = true;
-        }
-        finally {
-            try {
-                if (out != null)
-                    out.close();
-            }
-            catch (Exception e) {}
-            try {
-                if (in != null)
-                    in.close();
-            }
-            catch (Exception e) {}
         }
     }
 

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  * Created by alessio on 02/08/16.
  */
 public abstract class JWTFilter extends PathMatchingFilter {
-    private static final Logger logger = LoggerFactory.getLogger(CookieJWTFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JWTFilter.class);
 
     @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {

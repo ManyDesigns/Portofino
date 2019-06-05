@@ -186,12 +186,12 @@ public class Pages extends Resource {
     }
 
     public void movePage(String sourcePath, File destParentConfigFile, String segment, boolean detail) throws IOException {
+        if(segment.contains("..") || segment.contains(File.separator)) {
+            throw new IllegalArgumentException("Invalid segment: " + segment);
+        }
         File sourceConfigFile = new File(servletContext.getRealPath(sourcePath));
         File destParentConfigDir = destParentConfigFile.getParentFile();
         File destConfigDir = new File(destParentConfigDir, segment);
-        if(segment.contains("..")) {
-            throw new IllegalArgumentException("Invalid segment: " + segment);
-        }
         if(destConfigDir.isDirectory() || destConfigDir.mkdirs()) {
             movePage(sourceConfigFile, new File(destConfigDir, "config.json"), detail ? "detailChildren" : "children");
         } else {

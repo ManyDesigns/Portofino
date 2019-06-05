@@ -16,7 +16,7 @@ import java.util.Collections;
  */
 public class ResourceMethodInterceptor extends PermissionAnnotationMethodInterceptor {
     
-    protected static final Logger logger = LoggerFactory.getLogger(PermissionAnnotationMethodInterceptor.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ResourceMethodInterceptor.class);
 
     @Override
     public void assertAuthorized(MethodInvocation mi) throws AuthorizationException {
