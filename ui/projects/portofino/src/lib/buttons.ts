@@ -1,4 +1,4 @@
-import {ThemePalette} from "@angular/material";
+import { ThemePalette } from "@angular/material/core";
 
 export const BUTTONS = "__portofinoButtons__";
 

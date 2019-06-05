@@ -1,7 +1,7 @@
 import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@angular/core';
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
-import {DateAdapter} from "@angular/material";
+import { DateAdapter } from "@angular/material/core";
 import {DatetimeAdapter} from "@mat-datetimepicker/core";
 import {WebStorageService} from "ngx-store";
 import {Observable} from "rxjs";

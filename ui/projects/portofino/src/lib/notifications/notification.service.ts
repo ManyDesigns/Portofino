@@ -1,7 +1,7 @@
 import {ErrorHandler, Injectable} from "@angular/core";
 import {Observable, of} from "rxjs";
 import {map, mergeMap, share} from "rxjs/operators";
-import {MatSnackBar, MatSnackBarConfig} from "@angular/material";
+import { MatSnackBar, MatSnackBarConfig } from "@angular/material/snack-bar";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 

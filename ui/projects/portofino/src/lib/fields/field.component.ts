@@ -5,11 +5,12 @@ import {
   SkipSelf} from '@angular/core';
 import {isRequired, Property} from "../class-accessor";
 import {
+  AbstractControl,
   AbstractFormGroupDirective,
   ControlContainer,
   FormControl,
-  FormGroup, FormGroupDirective} from "@angular/forms";
-import {AbstractControl} from "@angular/forms/src/model";
+  FormGroup, FormGroupDirective
+} from "@angular/forms";
 
 export abstract class FieldComponent implements OnInit {
 

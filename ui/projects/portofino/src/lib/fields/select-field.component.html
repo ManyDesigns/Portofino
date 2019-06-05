@@ -55,5 +55,5 @@
 </ng-container>
 <mat-form-field *ngIf="!enabled">
   <mat-label>{{property.label}}</mat-label>
-  <input matInput [name]="property.name" [value]="form.controls[property.name].value.l" [required]="required" disabled />
+  <input matInput [name]="property.name" [value]="safeValue(form)" [required]="required" disabled />
 </mat-form-field>

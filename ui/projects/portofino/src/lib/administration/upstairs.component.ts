@@ -111,7 +111,7 @@ export class SettingsComponent extends Page implements AfterViewInit {
     Field.fromProperty(Property.create({name: "appName", label: "Application Name"}).required()),
     Field.fromProperty(Property.create({name: "loginPath", label: "Login Path"}).required())
   ]);
-  @ViewChild("settingsFormComponent")
+  @ViewChild("settingsFormComponent", { static: true })
   settingsFormComponent: FormComponent;
 
   @Button({ text: "Save", color: "primary" })
@@ -195,7 +195,7 @@ export class MailSettingsComponent extends Page implements AfterViewInit {
     Field.fromProperty(Property.create({name: "smtpLogin", label: "Login"})),
     Field.fromProperty(Property.create({name: "smtpPassword", label: "Password"}).withAnnotation("com.manydesigns.elements.annotations.Password")),
   ]);
-  @ViewChild("settingsFormComponent")
+  @ViewChild("settingsFormComponent", { static: true })
   settingsFormComponent: FormComponent;
 
   @Button({ text: "Save", color: "primary" })

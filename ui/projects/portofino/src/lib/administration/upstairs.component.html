@@ -1,6 +1,14 @@
 <mat-card>
   <mat-card-title>{{'Upstairs: Portofino Configuration Application'|translate}}</mat-card-title>
   <mat-card-content>
+    <p>{{'This is the configuration panel for a Portofino API backend.'|translate}}</p>
+    <p>{{'Portofino is a free and open source web platform that helps developers create outstanding enterprise applications by addressing three specific needs: productivity, features and architecture.'|translate}}</p>
+    <p>
+      <a mat-button href="http://portofino.manydesigns.com/en/support">{{'Get support'|translate}}</a>
+      <a mat-button href="http://portofino.manydesigns.com/en/docs">{{'Documentation'|translate}}</a>
+      <a mat-button href="https://github.com/ManyDesigns/Portofino/wiki">{{'Wiki'|translate}}</a>
+      <a mat-button href="https://github.com/ManyDesigns/Portofino/issues">{{'Issue tracker'|translate}}</a>
+    </p>
     <ng-container *ngIf="!portofino.localApiAvailable">
       <mat-form-field>
         <mat-label>{{'API'}}</mat-label>

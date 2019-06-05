@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, Type} from '@angular/core';
 import {
   ClassAccessor,
   isDateProperty,
@@ -8,7 +8,9 @@ import {
   isSearchable,
   Property, SelectionOption
 } from "../../class-accessor";
-import {MatTableDataSource, PageEvent, Sort} from "@angular/material";
+import { PageEvent } from "@angular/material/paginator";
+import { Sort } from "@angular/material/sort";
+import { MatTableDataSource } from "@angular/material/table";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {FormArray, FormControl, FormGroup} from "@angular/forms";
@@ -18,7 +20,6 @@ import {AuthenticationService} from "../../security/authentication.service";
 import {MediaObserver} from "@angular/flex-layout";
 import {Observable, of, Subject, Subscription} from "rxjs";
 import {ButtonInfo, getButtons} from "../../buttons";
-import {Type} from "@angular/core/src/type";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({

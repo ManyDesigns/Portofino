@@ -32,7 +32,7 @@ export abstract class BaseDetailComponent implements WithButtons {
 
   readonly formDefinition = new Form();
   readonly form = new FormGroup({});
-  @ViewChild(FormComponent)
+  @ViewChild(FormComponent, { static: false })
   formComponent: FormComponent;
   properties: Property[] = [];
   object;

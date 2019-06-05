@@ -576,9 +576,9 @@ export class TemplatesComponent implements AfterViewInit {
 
   templates: { [name: string]: { template: TemplateRef<any>, description?: string }} = {};
 
-  @ViewChild("defaultTemplate")
+  @ViewChild("defaultTemplate", { static: true })
   defaultTemplate: TemplateRef<any>;
-  @ViewChild("mainWithTabs")
+  @ViewChild("mainWithTabs", { static: true })
   mainWithTabs: TemplateRef<any>;
 
   ngAfterViewInit(): void {
@@ -595,11 +595,11 @@ export class TemplatesComponent implements AfterViewInit {
 export class PageLayout implements AfterViewInit {
   @Input()
   page: Page;
-  @ContentChild("content")
+  @ContentChild("content", { static: false })
   content: TemplateRef<any>;
-  @ViewChild("defaultTemplate")
+  @ViewChild("defaultTemplate", { static: true })
   defaultTemplate: TemplateRef<any>;
-  @ContentChild("extraConfiguration")
+  @ContentChild("extraConfiguration", { static: false })
   extraConfiguration: TemplateRef<any>;
 
   template: TemplateRef<any>;
