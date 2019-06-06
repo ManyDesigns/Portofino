@@ -1,7 +1,6 @@
 <div *ngIf="!!pageService.page">
   <mat-nav-list *ngIf="pageService.page.parent">
     <a mat-list-item [routerLink]="pageService.page.parent.url" routerLinkActive="active">
-      <mat-icon *ngIf="pageService.page.parent.icon">{{pageService.page.parent.icon}}</mat-icon>
       {{pageService.page.parent.title | translate}}
     </a>
     <div *ngFor="let child of pageService.page.parent.children">
@@ -9,36 +8,30 @@
          *ngIf="child.path != pageService.page.segment && child.accessible && child.showInNavigation"
          [routerLink]="pageService.page.parent.url + '/' + child.path" routerLinkActive="active">
         <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
-        {{child.title | translate}}
+        {{child.title}}
       </a>
       <div *ngIf="child.path == pageService.page.segment">
-        <a mat-list-item style="font-weight: bold">
-          <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
-          {{pageService.page.title | translate}}
-        </a>
+        <a mat-list-item><strong>{{pageService.page.title | translate}}</strong></a>
         <ng-container *ngFor="let child of pageService.page.children">
           <a mat-list-item
              *ngIf="child.accessible && child.showInNavigation"
              [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
             <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
-            {{child.title | translate}}
+            {{child.title}}
           </a>
         </ng-container>
       </div>
     </div>
   </mat-nav-list>
   <div *ngIf="!pageService.page.parent">
+    <a mat-list-item><strong>{{pageService.page.title | translate}}</strong></a>
     <mat-nav-list>
-      <a mat-list-item>
-        <strong>
-          <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
-          {{pageService.page.title | translate}}</strong></a>
       <ng-container *ngFor="let child of pageService.page.children">
         <a mat-list-item
            *ngIf="child.accessible && child.showInNavigation"
            [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
           <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
-          {{child.title | translate}}
+          {{child.title}}
         </a>
       </ng-container>
     </mat-nav-list>

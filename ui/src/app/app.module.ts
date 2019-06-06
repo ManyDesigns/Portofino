@@ -64,7 +64,7 @@ export class AppComponent {}
 })
 export class AppModule {
   static navigation() {
-    return DefaultNavigationComponent
+    return DefaultNavigationComponent;
     //return CustomNavigation
   }
 }

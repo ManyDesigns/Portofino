@@ -1,12 +1,10 @@
-<div *ngIf="portofino.sideNavPosition == 'page'" fxFlexFill fxLayout="column" fxLayoutAlign="space-between">
-  <ng-template fxFlex="none" portofino-toolbar></ng-template>
-  <mat-drawer-container [autosize]="true" fxFlex>
+<ng-container *ngIf="portofino.sideNavPosition == 'page'">
+  <ng-template portofino-toolbar></ng-template>
+  <mat-drawer-container [autosize]="true">
     <mat-drawer #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
-                role="navigation">
-      <mat-card>
-        <mat-card-title>{{ 'Navigation' | translate }}</mat-card-title>
-        <mat-card-content><ng-template portofino-navigation></ng-template></mat-card-content>
-      </mat-card>
+                 role="navigation">
+      <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
+      <ng-template portofino-navigation></ng-template>
     </mat-drawer>
     <mat-drawer-content class="app-content-content">
       <breadcrumbs></breadcrumbs>
@@ -21,7 +19,7 @@
   <mat-sidenav-container [autosize]="true">
     <mat-sidenav #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
                  role="navigation">
-      <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+      <mat-toolbar class="app-sidenav-title" color="primary" fxLayout="row" fxLayoutAlign="space-between center">
         <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
       </mat-toolbar>
       <ng-template portofino-navigation></ng-template>
