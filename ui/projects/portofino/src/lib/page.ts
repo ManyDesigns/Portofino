@@ -388,8 +388,8 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   static removeDoubleSlashesFromUrl(url) {
-    //replace double slash, but not in http(s)://
-    return url.replace(new RegExp("([^:])//"), '$1/');
+    //Replace all double slash (g flag), but not in http(s)://
+    return url.replace(new RegExp("([^:])//", "g"), '$1/');
   }
 
   operationAvailable(ops: Operation[], signature: string) {

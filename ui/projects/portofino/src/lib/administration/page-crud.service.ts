@@ -50,7 +50,6 @@ export class PageCrudService {
       parentPage = this.pageService.page.parent;
     }  else if(position == 'TOP') {
       parentPage = this.pageService.page.root;
-      page.source = `/${page.source}`;
     } else {
       return throwError("Unsupported position: " + position);
     }
@@ -134,26 +133,34 @@ export class PageCrudService {
     </mat-dialog-actions>`
 })
 export class CreatePageComponent {
-  readonly form = new Form([
-    new Field(Property.create({ name: "source", type: "string", label: "Segment" }).required()),
-    new Field(Property.create({ name: "type", type: "string", label: "Type" }).required().withSelectionProvider({
-      options: this.getPageTypes()
-    })),
-    new Field(Property.create({ name: "position", type: "string", label: "Position" }).required().withSelectionProvider({
-      options: [
-        {v: 'CHILD', l: this.translate.instant("As a child of the current page")},
-        {v: 'SIBLING', l: this.translate.instant("As a sibling of the current page")},
-        {v: 'TOP', l: this.translate.instant("At the top level")}]
-    })),
-    { html: '<br />' },
-    new Field(Property.create({ name: "title", type: "string", label: "Title" }).required()),
-    new Field(Property.create({ name: "icon", type: "string", label: "Icon" }))
-  ]);
+  readonly form;
   readonly controls = new FormGroup({});
   error: any;
 
   constructor(protected dialog: MatDialogRef<CreatePageComponent>, protected pageCrud: PageCrudService,
-              protected translate: TranslateService) {}
+              protected pageService: PageService, protected translate: TranslateService) {
+    const availablePositions = pageService.page.parent ?
+      [{v: 'CHILD', l: this.translate.instant("As a child of the current page")},
+       {v: 'SIBLING', l: this.translate.instant("As a sibling of the current page")},
+       {v: 'TOP', l: this.translate.instant("At the top level")}] :
+      [{v: 'TOP', l: this.translate.instant("At the top level")}];
+    const positionField = new Field(Property.create({ name: "position", type: "string", label: "Position" }).required().withSelectionProvider({
+      options: availablePositions
+    }));
+    if(!pageService.page.parent) {
+      positionField.initialState = 'TOP';
+    }
+    this.form = new Form([
+      new Field(Property.create({ name: "source", type: "string", label: "Segment" }).required()),
+      new Field(Property.create({ name: "type", type: "string", label: "Type" }).required().withSelectionProvider({
+        options: this.getPageTypes()
+      })),
+      positionField,
+      { html: '<br />' },
+      new Field(Property.create({ name: "title", type: "string", label: "Title" }).required()),
+      new Field(Property.create({ name: "icon", type: "string", label: "Icon" }))
+    ]);
+  }
 
   protected getPageTypes() {
     const types = [];
