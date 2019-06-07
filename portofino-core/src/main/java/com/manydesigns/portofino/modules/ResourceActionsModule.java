@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionLogic;
@@ -36,6 +37,7 @@ import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -134,8 +136,13 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
 
         if(!configuration.containsKey("jwt.secret")) {
             String jwtSecret = Encoders.BASE64.encode((UUID.randomUUID() + UUID.randomUUID().toString()).getBytes());
-            logger.warn("No jwt.secret property was set, so we generated one: {}. It will only be valid until the application stops.", jwtSecret);
+            logger.warn("No jwt.secret property was set, so we generated one: {}.", jwtSecret);
             configuration.setProperty("jwt.secret", jwtSecret);
+            try {
+                CommonsConfigurationUtils.save(configuration);
+            } catch (ConfigurationException e) {
+                logger.warn("Configuration could not be saved", e);
+            }
         }
 
         logger.info("Initializing Shiro environment");

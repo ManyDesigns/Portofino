@@ -55,7 +55,7 @@ export class PageCrudService {
     }
     delete page.position;
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
-    const reloadPageConfiguration = () => parentPage.loadConfiguration(); //Update the navigation
+    const reloadPageConfiguration = () => parentPage.loadConfiguration(); //Update the navigation in case we're adding as a child (default) TODO could navigate to the destination instead, but needs to handle detail
     return this.http.post(`${this.portofino.localApiPath}/${path}`, page, { params: {
         actionPath: Page.removeDoubleSlashesFromUrl(`${parentPage.computeSourceUrl()}/${page.source}`),
         actionClass: PageFactoryComponent.components[page.type].defaultActionClass,

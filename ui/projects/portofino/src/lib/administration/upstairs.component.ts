@@ -45,7 +45,7 @@ export class UpstairsComponent extends Page implements OnInit {
     } else if(child.path == 'tables') {
       return of({ actualType: TablesComponent, title: "Tables", source: null, securityCheckPath: null, children: [] });
     } else if(child.path == 'wizard') {
-      return of({ actualType: WizardComponent, title: "wizard", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: WizardComponent, title: "Wizard", source: null, securityCheckPath: null, children: [] });
     } else {
       return throwError(404);
     }

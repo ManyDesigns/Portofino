@@ -38,9 +38,8 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const reload = () => this.reloadPage();
-    this.subscriptions.push(this.authenticationService.logins.subscribe(reload));
-    this.subscriptions.push(this.authenticationService.logouts.subscribe(reload));
+    this.subscriptions.push(this.authenticationService.logins.subscribe(() => this.reloadPage()));
+    this.subscriptions.push(this.authenticationService.logouts.subscribe(() => this.router.navigateByUrl("/")));
   }
 
   ngAfterViewInit() {

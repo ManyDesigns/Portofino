@@ -1,6 +1,6 @@
 {
   "name": "portofino-upstairs",
-  "version": "5.0.1",
+  "version": "5.0.1-fix",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
