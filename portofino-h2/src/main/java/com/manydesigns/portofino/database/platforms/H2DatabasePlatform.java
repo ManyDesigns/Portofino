@@ -25,6 +25,7 @@ import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatfo
 import org.hibernate.dialect.H2Dialect;
 
 import java.sql.Connection;
+import java.sql.Statement;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -67,15 +68,11 @@ public class H2DatabasePlatform extends AbstractDatabasePlatform {
     @Override
     public void shutdown(ConnectionProvider connectionProvider) {
         super.shutdown(connectionProvider);
-        Connection connection = null;
-        try {
-            connection = connectionProvider.acquireConnection();
-            connection.createStatement().execute("SHUTDOWN");
+        try(Connection connection = connectionProvider.acquireConnection();
+            Statement statement = connection.createStatement()) {
+            statement.execute("SHUTDOWN");
         } catch (Exception e) {
-            logger.warn("Could not shutdown connection provider: {}",
-                    connectionProvider.getDatabase().getDatabaseName());
-        } finally {
-            connectionProvider.releaseConnection(connection);
+            logger.warn("Could not shutdown connection provider " + connectionProvider.getDatabase().getDatabaseName(), e);
         }
     }
 }
