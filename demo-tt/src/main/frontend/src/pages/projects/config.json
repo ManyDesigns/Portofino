@@ -2,6 +2,7 @@
   "title": "Projects",
   "type": "crud",
   "children": [],
-  "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": false, "showInNavigation": true }],
-  "source": "projects"
+  "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": true, "showInNavigation": true }],
+  "source": "projects",
+  "template": "mainWithTabs"
 }

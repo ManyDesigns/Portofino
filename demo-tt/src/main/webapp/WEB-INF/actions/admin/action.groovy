@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.pageactions.custom.CustomAction
+import com.manydesigns.portofino.resourceactions.custom.CustomAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresAuthentication

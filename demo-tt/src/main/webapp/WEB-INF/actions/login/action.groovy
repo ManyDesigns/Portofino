@@ -1,7 +1,7 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.FormBuilder
-import com.manydesigns.portofino.pageactions.login.DefaultLoginAction
+import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction
 import com.manydesigns.portofino.shiro.PortofinoRealm
 
 class MyLogin extends DefaultLoginAction {

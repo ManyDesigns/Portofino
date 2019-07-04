@@ -71,7 +71,7 @@ public class AbstractFormBuilder {
 
         manager = FieldsManager.getManager();
         this.classAccessor = classAccessor;
-        selectionProviders = new HashMap<String[], SelectionProvider>();
+        selectionProviders = new HashMap<>();
 
         logger.debug("Exiting AbstractBuilder constructor");
     }

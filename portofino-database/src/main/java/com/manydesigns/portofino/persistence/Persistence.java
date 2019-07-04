@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.persistence;
 
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
@@ -39,6 +40,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
@@ -58,7 +60,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -194,7 +195,7 @@ public class Persistence {
                 JdbcConnection jdbcConnection = new JdbcConnection(connection);
                 liquibase.database.Database lqDatabase =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
-                lqDatabase.setDefaultSchemaName(schema.getSchema());
+                lqDatabase.setDefaultSchemaName(schema.getActualSchemaName());
                 String relativeChangelogPath =
                         ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
                 Liquibase lq = new Liquibase(
@@ -216,7 +217,7 @@ public class Persistence {
         }
     }
 
-    public synchronized void saveXmlModel() throws IOException, JAXBException {
+    public synchronized void saveXmlModel() throws IOException, JAXBException, ConfigurationException {
         //TODO gestire conflitti con modifiche esterne?
         File tempFile = File.createTempFile(appModelFile.getName(), "");
 
@@ -250,6 +251,7 @@ public class Persistence {
             }
         }
         logger.info("Saved xml model to file: {}", appModelFile);
+        CommonsConfigurationUtils.save(configuration);
     }
 
     public synchronized void initModel() {
@@ -267,7 +269,7 @@ public class Persistence {
         }
 
         setups.clear();
-        model.init();
+        model.init(configuration);
         for (Database database : model.getDatabases()) {
             try {
                 ConnectionProvider connectionProvider = database.getConnectionProvider();
@@ -317,7 +319,7 @@ public class Persistence {
         return null;
     }
 
-    public org.apache.commons.configuration.Configuration getPortofinoProperties() {
+    public org.apache.commons.configuration.Configuration getConfiguration() {
         return configuration;
     }
 
@@ -430,7 +432,7 @@ public class Persistence {
     //**************************************************************************
 
     public String getName() {
-        return getPortofinoProperties().getString(PortofinoProperties.APP_NAME);
+        return getConfiguration().getString(PortofinoProperties.APP_NAME);
     }
 
     public File getLiquibaseChangelogFile(Schema schema) {

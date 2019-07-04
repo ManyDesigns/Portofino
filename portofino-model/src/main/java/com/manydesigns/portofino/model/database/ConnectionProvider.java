@@ -25,6 +25,7 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,7 @@ public abstract class ConnectionProvider {
     protected Date lastTested;
     protected Database database;
     protected String hibernateDialect;
+    protected Configuration configuration;
 
     //**************************************************************************
     // Logging
@@ -105,6 +107,7 @@ public abstract class ConnectionProvider {
     //**************************************************************************
 
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
+        configuration = databasePlatformsRegistry.getPortofinoConfiguration();
         Connection conn = null;
         ResultSet typeRs = null;
         String databaseName = getDatabase().getDatabaseName();
@@ -168,7 +171,9 @@ public abstract class ConnectionProvider {
             errorMessage = e.getMessage();
             logger.warn("Could not create database platform for " + databaseName, e);
         } finally {
-            DbUtil.closeResultSetAndStatement(typeRs);
+            if(typeRs != null) {
+                DbUtil.closeResultSetAndStatement(typeRs);
+            }
             releaseConnection(conn);
             lastTested = new Date();
         }

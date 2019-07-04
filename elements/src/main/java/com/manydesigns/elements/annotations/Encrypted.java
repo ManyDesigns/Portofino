@@ -35,6 +35,6 @@ import java.lang.annotation.Target;
 public @interface Encrypted {
     String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    String value();
+    String value() default "com.manydesigns.elements.DefaultFieldEncrypter";
 
 }

@@ -1,16 +1,16 @@
 import {Component, ComponentFactoryResolver, Injectable, Injector} from "@angular/core";
 import {PortofinoService} from "../portofino.service";
 import {HttpClient} from "@angular/common/http";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import {Field, Form} from "../form";
 import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
 import {PageFactoryComponent} from "../page.factory";
-import {PageConfiguration, PageService} from "../page";
+import {Page, PageConfiguration, PageService} from "../page";
 import {throwError} from "rxjs";
 import {TranslateService} from "@ngx-translate/core";
 import {mergeMap, tap} from "rxjs/operators";
-import {Router, UrlSegment} from "@angular/router";
+import {Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {NotificationService} from "../notifications/notification.service";
 
@@ -51,13 +51,13 @@ export class PageCrudService {
     }  else if(position == 'TOP') {
       parentPage = this.pageService.page.root;
     } else {
-      return throwError("Unsupported position: " + position)
+      return throwError("Unsupported position: " + position);
     }
     delete page.position;
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
-    const reloadPageConfiguration = () => parentPage.loadConfiguration(); //Update the navigation
+    const reloadPageConfiguration = () => parentPage.loadConfiguration(); //Update the navigation in case we're adding as a child (default) TODO could navigate to the destination instead, but needs to handle detail
     return this.http.post(`${this.portofino.localApiPath}/${path}`, page, { params: {
-        actionPath: `${parentPage.computeSourceUrl()}/${page.source}`,
+        actionPath: Page.removeDoubleSlashesFromUrl(`${parentPage.computeSourceUrl()}/${page.source}`),
         actionClass: PageFactoryComponent.components[page.type].defaultActionClass,
         childrenProperty: parentPage.childrenProperty,
         loginPath: this.portofino.loginPath
@@ -100,7 +100,7 @@ export class PageCrudService {
           sourceActionPath: `${page.computeSourceUrl()}`,
           detail: !!moveInstruction.detail + "",
           loginPath: this.portofino.loginPath,
-          destinationActionParent: newParent.instance.computeSourceUrl()
+          destinationActionParent: !page.configuration.source.startsWith("/") ? newParent.instance.computeSourceUrl() : null
         }}).pipe(mergeMap(goUpOnePage));
     }));
   }
@@ -133,26 +133,34 @@ export class PageCrudService {
     </mat-dialog-actions>`
 })
 export class CreatePageComponent {
-  readonly form = new Form([
-    new Field(Property.create({ name: "source", type: "string", label: "Segment" }).required()),
-    new Field(Property.create({ name: "type", type: "string", label: "Type" }).required().withSelectionProvider({
-      options: this.getPageTypes()
-    })),
-    new Field(Property.create({ name: "position", type: "string", label: "Position" }).required().withSelectionProvider({
-      options: [
-        {v: 'CHILD', l: this.translate.instant("As a child of the current page")},
-        {v: 'SIBLING', l: this.translate.instant("As a sibling of the current page")},
-        {v: 'TOP', l: this.translate.instant("At the top level")}]
-    })),
-    { html: '<br />' },
-    new Field(Property.create({ name: "title", type: "string", label: "Title" }).required()),
-    new Field(Property.create({ name: "icon", type: "string", label: "Icon" }))
-  ]);
+  readonly form;
   readonly controls = new FormGroup({});
   error: any;
 
   constructor(protected dialog: MatDialogRef<CreatePageComponent>, protected pageCrud: PageCrudService,
-              protected translate: TranslateService) {}
+              protected pageService: PageService, protected translate: TranslateService) {
+    const availablePositions = pageService.page.parent ?
+      [{v: 'CHILD', l: this.translate.instant("As a child of the current page")},
+       {v: 'SIBLING', l: this.translate.instant("As a sibling of the current page")},
+       {v: 'TOP', l: this.translate.instant("At the top level")}] :
+      [{v: 'TOP', l: this.translate.instant("At the top level")}];
+    const positionField = new Field(Property.create({ name: "position", type: "string", label: "Position" }).required().withSelectionProvider({
+      options: availablePositions
+    }));
+    if(!pageService.page.parent) {
+      positionField.initialState = 'TOP';
+    }
+    this.form = new Form([
+      new Field(Property.create({ name: "source", type: "string", label: "Segment" }).required()),
+      new Field(Property.create({ name: "type", type: "string", label: "Type" }).required().withSelectionProvider({
+        options: this.getPageTypes()
+      })),
+      positionField,
+      { html: '<br />' },
+      new Field(Property.create({ name: "title", type: "string", label: "Title" }).required()),
+      new Field(Property.create({ name: "icon", type: "string", label: "Icon" }))
+    ]);
+  }
 
   protected getPageTypes() {
     const types = [];

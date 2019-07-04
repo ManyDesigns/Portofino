@@ -24,6 +24,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +96,7 @@ public class PrimaryKey implements ModelObject {
         valid = true;
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert table != null;
 
 // Liquibase on MySQL returns null primaryKey name if the name is "PRIMARY"
@@ -109,7 +110,7 @@ public class PrimaryKey implements ModelObject {
 
     }
 
-    public void link(Model model) {
+    public void link(Model model, Configuration configuration) {
         for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             Column column = pkc.getActualColumn();
             if (column == null) {

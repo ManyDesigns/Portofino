@@ -39,7 +39,7 @@ public class MailSenderRunnable implements Runnable {
     protected final MailSender sender;
 
     protected boolean alive;
-    protected int pollInterval = 1000;
+    protected long pollInterval = 1000;
 
     public static final Logger logger = LoggerFactory.getLogger(MailSenderRunnable.class);
 
@@ -58,7 +58,7 @@ public class MailSenderRunnable implements Runnable {
 
     protected void mainLoop() throws InterruptedException {
         Set<String> idsToMarkAsSent = new HashSet<String>();
-        int pollIntervalMultiplier = 1;
+        byte pollIntervalMultiplier = 1;
         while (alive) {
             long now = System.currentTimeMillis();
             int serverErrors = sender.runOnce(idsToMarkAsSent);
@@ -86,11 +86,11 @@ public class MailSenderRunnable implements Runnable {
         alive = false;
     }
 
-    public int getPollInterval() {
+    public long getPollInterval() {
         return pollInterval;
     }
 
-    public void setPollInterval(int pollInterval) {
+    public void setPollInterval(long pollInterval) {
         this.pollInterval = pollInterval;
     }
 

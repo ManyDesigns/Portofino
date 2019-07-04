@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<action title="Tickets" navigationRoot="INHERIT" id="wzfccowrega5htzisex76k8vu" description="All the tickets">
+    <detailLayout template="well-with-tabs">
+        <childPages>
+            <childPage showInNavigation="false" order="0" name="activity" container="default"/>
+            <childPage showInNavigation="false" order="0" name="attachments" container="default"/>
+            <childPage showInNavigation="false" order="0" name="affected-components" container="default"/>
+        </childPages>
+    </detailLayout>
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <permissions>
+        <group name="registered">
+            <permission>crud-create</permission>
+            <permission>crud-edit</permission>
+        </group>
+    </permissions>
+</action>

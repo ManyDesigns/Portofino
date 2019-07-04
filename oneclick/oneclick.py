@@ -5,7 +5,7 @@ You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "5.0-SNAPSHOT"
+portofino_version = "5.0.0"
 tomcat_dir = "apache-tomcat-9.0.16"
 portofino_path = "~/projects/portofino5"
 tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.16/bin/apache-tomcat-9.0.16.zip"
@@ -66,12 +66,15 @@ for driver in local.drivers:
 
 command = "cd " + portofino_path + "; mvn clean install"
 print "Building Portofino with command: " + command
+os.system("mvn -version")
 os.system(command)
 
 print "Generating oneclick from archetype..."
+os.system(mvn_command_for_archetype + " -version")
 os.system("cd " + build_path + "; " + mvn_command_for_archetype + " archetype:generate -DarchetypeArtifactId=portofino-war-archetype -DarchetypeGroupId=com.manydesigns -DarchetypeVersion=" + local.portofino_version + " -DinteractiveMode=false -DgroupId=com.manydesigns -DartifactId=portofino-oneclick -Dversion=" + local.portofino_version + "")
 
 print "Building oneclick..."
+os.system("mvn -version")
 os.system("cd " + oneclick_path + "; mvn clean package")
 
 

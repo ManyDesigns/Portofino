@@ -1,0 +1,4 @@
+extraction:
+  java:
+    index:
+      build_command: mvn clean package -Pno-frontend-build -Dmaven.test.skip

@@ -2,10 +2,9 @@ package com.manydesigns.portofino.upstairs.actions.database.platforms;
 
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,7 @@ import java.util.Map;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class PlatformsAction extends AbstractPageAction {
+public class PlatformsAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(PlatformsAction.class);
 

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +119,7 @@ public class Table implements ModelObject, Annotated {
         oneToManyRelationships.clear();
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert schema != null;
         assert tableName != null;
         
@@ -144,7 +145,7 @@ public class Table implements ModelObject, Annotated {
         actualEntityName = calculatedEntityName;
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Column column : columns) {
@@ -189,7 +190,7 @@ public class Table implements ModelObject, Annotated {
 
     @Required
     public String getSchemaName() {
-        return schema.getSchema();
+        return schema.getActualSchemaName();
     }
 
     @Required

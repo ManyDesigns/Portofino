@@ -18,12 +18,6 @@ import javax.ws.rs.core.UriInfo;
 @Path("blobs")
 public class DownloadBlob extends Resource {
 
-  @Context
-  protected ServletContext servletContext;
-
-  @Context
-  protected UriInfo uriInfo;
-
   @GET
   public Response download(@QueryParam("path") String path, @QueryParam("token") String token) {
     Invocation.Builder req = path(path).request();

@@ -28,7 +28,7 @@
         {{ '_ is required.' | translate:{ label: property.label } }}
       </mat-error>
     </div>
-    <div class="mat-form-field-subscript-wrapper" *ngIf="control.hasError('server-side')" class="alert alert-danger">
+    <div class="mat-form-field-subscript-wrapper alert alert-danger" *ngIf="control.hasError('server-side')">
       <ng-container *ngFor="let error of control.getError('server-side')">
         {{error}}<br />
       </ng-container>

@@ -5,7 +5,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
+%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.searchTitle}"/>

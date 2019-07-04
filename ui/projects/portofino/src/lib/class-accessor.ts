@@ -56,11 +56,15 @@ export class Property {
   }
 
   required(value: boolean = true): Property {
-    const annotation = getAnnotation(this, ANNOTATION_REQUIRED);
+    return this.withAnnotation(ANNOTATION_REQUIRED, { value: value });
+  }
+
+  withAnnotation(type: string, properties: any = {}) {
+    const annotation = getAnnotation(this, type);
     if(annotation) {
-      annotation.properties.value = value;
+      annotation.properties = properties;
     } else {
-      this.annotations.push(new Annotation(ANNOTATION_REQUIRED, {value: value}));
+      this.annotations.push(new Annotation(type, properties));
     }
     return this;
   }

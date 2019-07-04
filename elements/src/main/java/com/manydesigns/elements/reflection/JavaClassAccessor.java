@@ -192,12 +192,10 @@ public class JavaClassAccessor implements ClassAccessor {
             keyAccessors = keys.values().iterator().next();
         }
 
-        Collections.sort(keyAccessors, new Comparator<PropertyAccessor>() {
-            public int compare(PropertyAccessor o1, PropertyAccessor o2) {
-                Integer ord1 = o1.getAnnotation(Key.class).order();
-                Integer ord2 = o2.getAnnotation(Key.class).order();
-                return ord1.compareTo(ord2);
-            }
+        Collections.sort(keyAccessors, (o1, o2) -> {
+            int ord1 = o1.getAnnotation(Key.class).order();
+            int ord2 = o2.getAnnotation(Key.class).order();
+            return Integer.compare(ord1, ord2);
         });
 
         return keyAccessors;

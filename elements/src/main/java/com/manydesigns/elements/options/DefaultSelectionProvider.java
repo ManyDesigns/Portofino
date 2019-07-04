@@ -274,9 +274,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }
-                    } else if (matching && value != null &&
-                            value instanceof Object[]
-                            && ArrayUtils.contains((Object[]) value, cellValue)) {
+                    } else if (matching && value instanceof Object[] &&
+                               ArrayUtils.contains((Object[]) value, cellValue)) {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }

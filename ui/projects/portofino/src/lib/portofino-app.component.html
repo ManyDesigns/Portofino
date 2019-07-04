@@ -1,10 +1,15 @@
-<ng-container *ngIf="portofino.sideNavPosition == 'page'">
-  <ng-template portofino-toolbar></ng-template>
-  <mat-drawer-container [autosize]="true">
+<portofino-templates></portofino-templates>
+<div *ngIf="portofino.sideNavPosition == 'page'" fxFlexFill fxLayout="column" fxLayoutAlign="space-between" class="mat-app-background">
+  <div fxFlex="none">
+    <ng-template portofino-toolbar></ng-template>
+  </div>
+  <mat-drawer-container [autosize]="true" fxFlex>
     <mat-drawer #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
-                 role="navigation">
-      <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
-      <ng-template portofino-navigation></ng-template>
+                role="navigation">
+      <mat-card>
+        <mat-card-title>{{ 'Navigation' | translate }}</mat-card-title>
+        <mat-card-content><ng-template portofino-navigation></ng-template></mat-card-content>
+      </mat-card>
     </mat-drawer>
     <mat-drawer-content class="app-content-content">
       <breadcrumbs></breadcrumbs>
@@ -13,13 +18,15 @@
       </div>
     </mat-drawer-content>
   </mat-drawer-container>
-  <mat-toolbar fxFlex="none" fxLayoutAlign="center center"><span style="font-size: 10px">{{'Powered by Portofino 5'|translate}}</span></mat-toolbar>
+  <div fxFlex="none">
+    <ng-template portofino-footer></ng-template>
+  </div>
 </div>
 <ng-container *ngIf="portofino.sideNavPosition == 'body'">
   <mat-sidenav-container [autosize]="true">
     <mat-sidenav #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
                  role="navigation">
-      <mat-toolbar class="app-sidenav-title" color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+      <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
         <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
       </mat-toolbar>
       <ng-template portofino-navigation></ng-template>
@@ -30,7 +37,7 @@
       <div class="app-page-container">
         <router-outlet *ngIf="portofino.apiRoot"></router-outlet>
       </div>
-      <mat-toolbar fxLayoutAlign="center center"><span style="font-size: 10px">{{'Powered by Portofino 5'|translate}}</span></mat-toolbar>
+      <ng-template portofino-footer></ng-template>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </ng-container>

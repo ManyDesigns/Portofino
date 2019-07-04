@@ -1,4 +1,4 @@
-<portofino-default-page-layout [page]="this">
+<portofino-page-layout [page]="this">
   <ng-template #content>
     <mat-error *ngIf="error">Error: {{error|json}}</mat-error>
     <portofino-crud-search-holder *ngIf="isSearchView()"
@@ -11,13 +11,13 @@
     <portofino-crud-detail-holder *ngIf="isDetailView()"
       [component]="detailComponent" [context]="detailComponentContext"
       [id]="id" [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-      [sourceUrl]="sourceUrl" (close)="goToSearch()" (editModeChanges)="onEditModeChange($event)"
+      [sourceUrl]="sourceUrl" (close)="goBack()" (editModeChanges)="onEditModeChange($event)"
       [parentButtons]="getButtons('detail')" [editOrView]="editMode" [parent]="page">
     </portofino-crud-detail-holder>
     <portofino-crud-create-holder *ngIf="isCreateView()"
       [component]="createComponent" [context]="createComponentContext"
       [classAccessor]="classAccessor" [configuration]="configuration" [selectionProviders]="selectionProviders"
-      [sourceUrl]="sourceUrl" (close)="goToSearch()"
+      [sourceUrl]="sourceUrl" (close)="goBack()"
       [parentButtons]="getButtons('create')" [parent]="page">
     </portofino-crud-create-holder>
     <portofino-crud-bulk-edit-holder *ngIf="isBulkEditView()"
@@ -90,4 +90,4 @@
       </table>
     </fieldset>
   </ng-template>
-</portofino-default-page-layout>
+</portofino-page-layout>

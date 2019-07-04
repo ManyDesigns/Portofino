@@ -25,7 +25,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import org.apache.commons.configuration.Configuration;
@@ -52,31 +52,9 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class LoginAction extends AbstractPageAction {
+public abstract class LoginAction extends AbstractResourceAction {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
-
-    //**************************************************************************
-    // Injections
-    //**************************************************************************
-
-    @Autowired
-    public Configuration portofinoConfiguration;
-
-    //**************************************************************************
-    // Request parameters
-    //**************************************************************************
-
-    public String userName;
-    public String pwd;
-    public boolean rememberMe;
-
-    public String email;
-
-    public String newPassword;
-    public String confirmNewPassword;
-
-    public String token;
 
     //**************************************************************************
     // Presentation elements
@@ -556,62 +534,6 @@ public abstract class LoginAction extends AbstractPageAction {
 
     public Form getSignUpForm() {
         return signUpForm;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPwd() {
-        return pwd;
-    }
-
-    public void setPwd(String pwd) {
-        this.pwd = pwd;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
-    public String getConfirmNewPassword() {
-        return confirmNewPassword;
-    }
-
-    public void setConfirmNewPassword(String confirmNewPassword) {
-        this.confirmNewPassword = confirmNewPassword;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public boolean isRememberMe() {
-        return rememberMe;
-    }
-
-    public void setRememberMe(boolean rememberMe) {
-        this.rememberMe = rememberMe;
     }
 
     public boolean isCaptchaValidationFailed() {

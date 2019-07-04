@@ -1,7 +1,5 @@
 import {Component, NgModule} from '@angular/core';
-import {
-  PortofinoModule, PortofinoUpstairsModule, Page, CrudComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, AuthenticationService} from "portofino";
+import { PortofinoModule, PortofinoUpstairsModule, Page, PortofinoComponent} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
@@ -15,9 +13,8 @@ import {
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {Router} from "@angular/router";
 import {QuillModule} from "ngx-quill";
-import {HttpClientModule, HttpClient} from "@angular/common/http";
+import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
@@ -36,7 +33,7 @@ export class AppComponent {}
 @Component({
   selector: 'portofino-welcome',
   template: `
-    <portofino-default-page-layout [page]="this">
+    <portofino-page-layout [page]="this">
       <ng-template #content>
         <p>Welcome to Portofino 5. This is your new empty application.</p>
         <p>
@@ -50,7 +47,7 @@ export class AppComponent {}
         <p>Initially, the application has the user admin/admin built in. You can use that to run the wizard, connect to your database, and build a complete application from it.</p>
         <p>The wizard can be found "upstairs", where all the configuration tools lie. The "upstairs" section is optional and can be removed or disabled in production.</p>
       </ng-template>
-    </portofino-default-page-layout>`
+    </portofino-page-layout>`
 })
 @PortofinoComponent({ name: 'welcome' })
 export class WelcomeComponent extends Page {}

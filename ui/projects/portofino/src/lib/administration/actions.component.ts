@@ -14,8 +14,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {Field, Form} from "../form";
 import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from "@angular/material";
-import {PageCrudService} from "./page-crud.service";
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
 
 @Component({ templateUrl: "actions.component.html" })
 export class ActionsComponent extends Page implements OnInit {
@@ -94,9 +93,7 @@ export class ActionsComponent extends Page implements OnInit {
   }
 
   addChild(parent: ActionFlatNode) {
-    this.dialog.open(CreateActionComponent, { data: parent }).afterClosed().subscribe(node => {
-      console.log(node);
-    })
+    this.dialog.open(CreateActionComponent, { data: parent }).afterClosed().subscribe(node => {});
   }
 
 }
@@ -198,9 +195,10 @@ class PageTreeDataSource {
 }
 
 @Component({
-  template: `<portofino-default-page-layout [page]="this">
-    <ng-template #content>This is a generic page used only for configuration</ng-template>
-  </portofino-default-page-layout>`
+  template: `
+    <portofino-page-layout [page]="this">
+      <ng-template #content>This is a generic page used only for configuration</ng-template>
+    </portofino-page-layout>`
 })
 export class GenericPage extends Page {
 

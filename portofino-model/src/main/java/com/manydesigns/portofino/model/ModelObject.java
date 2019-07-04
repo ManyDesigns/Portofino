@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model;
 
+import org.apache.commons.configuration.Configuration;
 import javax.xml.bind.Unmarshaller;
 
 /*
@@ -35,8 +36,8 @@ public interface ModelObject {
     void afterUnmarshal(Unmarshaller u, Object parent);
 
     void reset();
-    void init(Model model);
-    void link(Model model);
+    void init(Model model, Configuration configuration);
+    void link(Model model, Configuration configuration);
 
     void visitChildren(ModelObjectVisitor visitor);
 

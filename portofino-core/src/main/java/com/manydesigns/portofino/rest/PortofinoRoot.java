@@ -6,20 +6,19 @@ import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.i18n.TextProviderBean;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.pageactions.PageAction;
-import com.manydesigns.portofino.pageactions.ActionContext;
-import com.manydesigns.portofino.pageactions.PageInstance;
-import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.pages.PageLogic;
+import com.manydesigns.portofino.resourceactions.*;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.actions.ActionLogic;
+import com.manydesigns.portofino.resourceactions.ActionContext;
+import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -31,14 +30,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class PortofinoRoot extends AbstractPageAction {
+public class PortofinoRoot extends AbstractResourceAction {
 
     @Context
     protected ServletContext servletContext;
@@ -88,9 +86,9 @@ public class PortofinoRoot extends AbstractPageAction {
     @Override
     public PortofinoRoot init() {
         super.init();
-        Page rootPage = PageLogic.getPage(location);
-        PageInstance pageInstance = new PageInstance(null, location, rootPage, getClass());
-        setPageInstance(pageInstance);
+        ActionDescriptor rootActionDescriptor = ActionLogic.getActionDescriptor(location);
+        ActionInstance actionInstance = new ActionInstance(null, location, rootActionDescriptor, getClass());
+        setActionInstance(actionInstance);
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         ActionContext context = new ActionContext();
         context.setServletContext(servletContext);
@@ -102,7 +100,7 @@ public class PortofinoRoot extends AbstractPageAction {
     }
 
     @Override
-    public PageAction getParent() {
+    public ResourceAction getParent() {
         return null;
     }
 
@@ -135,7 +133,7 @@ public class PortofinoRoot extends AbstractPageAction {
     /**
      * Returns a description of the root.
      * @since 5.0
-     * @return the page's description as JSON.
+     * @return the action's description as JSON.
      */
     @Path(":description")
     @Produces(MediaType.APPLICATION_JSON)
@@ -145,7 +143,7 @@ public class PortofinoRoot extends AbstractPageAction {
         Map<String, Object> description = new HashMap<String, Object>();
         description.put("superclass", getClass().getSuperclass().getName());
         description.put("class", getClass().getName());
-        description.put("page", pageInstance.getPage());
+        description.put("page", actionInstance.getActionDescriptor());
         description.put("path", getPath());
         description.put("children", getSubResources());
         description.put("loginPath", portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH));

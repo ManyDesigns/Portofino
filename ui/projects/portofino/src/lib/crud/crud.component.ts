@@ -19,7 +19,7 @@ import {BehaviorSubject} from "rxjs";
   templateUrl: './crud.component.html',
   styleUrls: ['./crud.component.scss']
 })
-@PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.pageactions.crud.CrudAction" })
+@PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.resourceactions.crud.CrudAction" })
 export class CrudComponent extends Page {
 
   @Input()
@@ -29,7 +29,7 @@ export class CrudComponent extends Page {
   classAccessor: ClassAccessor;
   selectionProviders: SelectionProvider[];
   classAccessorPath = '/:classAccessor';
-  selectionProvidersPath = '/:selectionProviders';
+  selectionProvidersPath = '/:selectionProvider';
 
   @Input()
   pageSize: number;
@@ -116,7 +116,6 @@ export class CrudComponent extends Page {
         } else if(this.id) {
           this.showDetail();
           if(params.hasOwnProperty('edit') && !this.embedded) {
-            console.log("edit!");
             this.editMode.next(true);
           }
         } else {
@@ -160,6 +159,7 @@ export class CrudComponent extends Page {
 
   showSearch() {
     this.allowEmbeddedComponents = true;
+    this.returnUrl = null;
     this.view = CrudView.SEARCH;
   }
 
@@ -227,6 +227,15 @@ export class CrudComponent extends Page {
       this.reloadBaseUrl();
     } else {
       this.showSearch();
+      this.refreshSearch.emit();
+    }
+  }
+
+  goToParent() {
+    if(this.view == CrudView.DETAIL || this.view == CrudView.CREATE) {
+      this.goToSearch();
+    } else {
+      super.goToParent();
     }
   }
 
@@ -249,13 +258,6 @@ export class CrudComponent extends Page {
     } else {
       return "children";
     }
-  }
-
-  protected getPageConfigurationToSave(formValue): PageConfiguration {
-    const superConf: any = super.getPageConfigurationToSave(formValue);
-    const config = Object.assign({}, this.configuration, formValue);
-    superConf.detailChildren = config.detailChildren;
-    return superConf;
   }
 
   //Configuration
@@ -360,11 +362,7 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
       this.selectionProviders = sps;
     });
     config.properties.forEach(p => {
-      this.properties.push({
-        enabled: p.property.enabled, name: p.property.name, label: p.property.label,
-        insertable: p.property.insertable, updatable: p.property.updatable,
-        inSummary: p.property.inSummary, searchable: p.property.searchable
-      });
+      this.properties.push(Object.assign({}, p.property));
     });
     if(crud.classAccessor) {
       crud.classAccessor.properties.forEach(p => {
@@ -372,7 +370,7 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
           this.properties.push({
             enabled: p.key, name: p.name, label: null,
             insertable: false, updatable: false,
-            inSummary: p.key, searchable: false
+            inSummary: p.key, searchable: false, annotations: []
           });
         }
       });
@@ -393,5 +391,12 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
     });
     configurationToSave.database = configurationToSave.database ? configurationToSave.database.v : null;
     return configurationToSave;
+  }
+
+  getPageConfigurationToSave(formValue): PageConfiguration {
+    const superConf: any = super.getPageConfigurationToSave(formValue);
+    const config = Object.assign({}, this.page.configuration, formValue);
+    superConf.detailChildren = config.detailChildren;
+    return superConf;
   }
 }

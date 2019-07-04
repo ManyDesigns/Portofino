@@ -106,7 +106,7 @@ public class FormBuilder extends AbstractFormBuilder {
     }
 
     public FormBuilder configPrefix(String prefix) {
-        logger.debug("Configuring prefix to: ", prefix);
+        logger.debug("Configuring prefix to: {}", prefix);
 
         this.prefix = prefix;
         return this;

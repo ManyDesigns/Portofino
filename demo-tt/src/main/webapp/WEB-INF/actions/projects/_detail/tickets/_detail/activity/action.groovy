@@ -2,8 +2,8 @@ import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.operations.GuardType
 
-import com.manydesigns.portofino.buttons.annotations.Guard
-import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
+import com.manydesigns.portofino.operations.annotations.Guard
+import com.manydesigns.portofino.resourceactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions

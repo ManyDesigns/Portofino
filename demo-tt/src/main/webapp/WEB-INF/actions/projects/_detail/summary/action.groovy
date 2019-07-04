@@ -3,8 +3,8 @@ import com.manydesigns.portofino.tt.TtUtils
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.operations.GuardType
 
-import com.manydesigns.portofino.buttons.annotations.Guard
-import com.manydesigns.portofino.pageactions.custom.CustomAction
+import com.manydesigns.portofino.operations.annotations.Guard
+import com.manydesigns.portofino.resourceactions.custom.CustomAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import javax.ws.rs.GET

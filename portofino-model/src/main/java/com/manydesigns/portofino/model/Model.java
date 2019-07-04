@@ -21,11 +21,13 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -44,7 +46,7 @@ public class Model {
     // Fields
     //**************************************************************************
 
-    protected final ArrayList<Database> databases;
+    protected final LinkedList<Database> databases;
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -53,23 +55,23 @@ public class Model {
     //**************************************************************************
 
     public Model() {
-        this.databases = new ArrayList<Database>();
+        this.databases = new LinkedList<Database>();
     }
 
     //**************************************************************************
     // Reset / init
     //**************************************************************************
 
-    public void init() {
+    public void init(Configuration configuration) {
         for (Database database : databases) {
-            init(database);
+            init(database, configuration);
         }
     }
 
-    public void init(ModelObject rootObject) {
+    public void init(ModelObject rootObject, Configuration configuration) {
         new ResetVisitor().visit(rootObject);
-        new InitVisitor(this).visit(rootObject);
-        new LinkVisitor(this).visit(rootObject);
+        new InitVisitor(this, configuration).visit(rootObject);
+        new LinkVisitor(this, configuration).visit(rootObject);
     }
 
     //**************************************************************************

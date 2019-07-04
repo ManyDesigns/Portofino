@@ -24,6 +24,8 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -33,6 +35,8 @@ import org.apache.commons.configuration.FileConfiguration;
  */
 public class CommonsConfigurationUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(CommonsConfigurationUtils.class);
+
     public static void save(Configuration configuration) throws ConfigurationException {
         FileConfiguration fileConfiguration =
                 getWritableFileConfiguration(configuration);
@@ -40,6 +44,7 @@ public class CommonsConfigurationUtils {
             throw new ConfigurationException("Cannot save configuration");
         } else {
             fileConfiguration.save();
+            logger.info("Configuration saved to {}", fileConfiguration.getFile().getAbsolutePath());
         }
     }
 

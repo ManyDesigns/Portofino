@@ -101,14 +101,13 @@ public class DatabaseSyncer {
 
             for (Schema schema : schemas) {
                 String schemaName = schema.getSchemaName();
-                String schemaRealName = schema.getSchema();
+                String schemaRealName = schema.getActualSchemaName();
                 logger.info("Processing schema: {}", schemaRealName);
                 Schema sourceSchema = DatabaseLogic.findSchemaByNameIgnoreCase(sourceDatabase, schemaName);
                 if (sourceSchema == null) {
                     logger.debug("Source schema not found. Creating an empty one.");
                     sourceSchema = new Schema();
                     sourceSchema.setSchemaName(schemaName);
-                    sourceSchema.setSchema(schemaRealName);
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
@@ -136,15 +135,11 @@ public class DatabaseSyncer {
     }
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
-        logger.info("Synchronizing schema: {}", sourceSchema.getSchema());
-
+        logger.info("Synchronizing schema: {}", sourceSchema.getActualSchemaName());
         targetSchema.setSchemaName(sourceSchema.getSchemaName());
-        targetSchema.setSchema(sourceSchema.getSchema());
-
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);
         syncForeignKeys(databaseSnapshot, sourceSchema, targetSchema);
-
         return targetSchema;
     }
 
@@ -533,11 +528,11 @@ public class DatabaseSyncer {
                 return -1;
             }
             public int compare(Column c1, Column c2) {
-                Integer index1 = oldIndex(c1);
-                Integer index2 = oldIndex(c2);
+                int index1 = oldIndex(c1);
+                int index2 = oldIndex(c2);
                 if(index1 != -1) {
                     if(index2 != -1) {
-                        return index1.compareTo(index2);
+                        return Integer.compare(index1, index2);
                     } else {
                         return -1;
                     }

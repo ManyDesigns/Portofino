@@ -22,6 +22,7 @@ package com.manydesigns.portofino.servlets;
 
 import javax.servlet.*;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -36,7 +37,7 @@ public class UTF8ResponseFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {}
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         chain.doFilter(request, response);
     }
 

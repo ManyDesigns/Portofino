@@ -1,4 +1,11 @@
-import {ClassAccessor, deriveKind, getAnnotation, getValidators, isEnabled, Property} from "./class-accessor";
+import {
+  ClassAccessor,
+  deriveKind,
+  getValidators,
+  isEnabled,
+  isMultiline,
+  Property
+} from "./class-accessor";
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
@@ -134,7 +141,8 @@ export class DynamicFormComponentDirective {
 
 @Component({
   selector: 'portofino-form',
-  templateUrl: './form.component.html'
+  templateUrl: './form.component.html',
+  styleUrls: ['./form.component.scss']
 })
 export class FormComponent implements OnInit, AfterViewInit {
   private _controls: FormGroup;
@@ -231,7 +239,6 @@ export class FormComponent implements OnInit, AfterViewInit {
   protected setupFormList(v: FormList, formGroup: FormGroup) {
     let control = formGroup.get(v.name);
     if (control instanceof FormArray) {
-      const length = control.length;
       const formArray = control as FormArray;
       v.contents.forEach((f, i) => {
         let formGroup = new FormGroup({});
@@ -302,7 +309,7 @@ export class FormComponent implements OnInit, AfterViewInit {
       initialState = { value: initialState, disabled: disabled };
     }
     if(initialState.value && selectionProvider && selectionProvider.options && selectionProvider.options.length > 0) {
-      const selectedOption = selectionProvider.options.find(o => o.v == initialState.value.v);
+      const selectedOption = selectionProvider.options.find(o => o.v == initialState.value.v || o.v == initialState.value);
       return Object.assign(initialState, { value: selectedOption });
     } else {
       return initialState;
@@ -331,6 +338,10 @@ export class FormComponent implements OnInit, AfterViewInit {
 
   isFormList(obj) {
     return obj instanceof FormList;
+  }
+
+  isMultiline(property) {
+    return isMultiline(property);
   }
 
 }

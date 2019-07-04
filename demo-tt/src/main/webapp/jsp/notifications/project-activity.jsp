@@ -4,7 +4,7 @@
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<jsp:useBean id="activityItem" scope="request" type="com.manydesigns.portofino.pageactions.activitystream.ActivityItem"/>
+<jsp:useBean id="activityItem" scope="request" type="com.manydesigns.portofino.resourceactions.activitystream.ActivityItem"/>
 <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
 <body>
 <div style="padding: 20px;background-color: #f5f5f5;font-family: Helvetica, Arial, sans-serif;font-size: 14px;line-height: 20px;">

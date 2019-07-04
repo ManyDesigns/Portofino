@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.0.2-SNAPSHOT</version>
     </parent>
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
@@ -45,12 +45,25 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Jersey. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jersey</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- RestEasy. Enable on WildFly. -->
+        <!-- <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-resteasy</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.5</version>
+        </dependency>-->
         <!-- Quartz support. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -136,6 +149,28 @@
     <profiles>
         <profile>
             <id>no-frontend-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <mkdir dir="target/frontend" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>build-frontend</id>
@@ -158,8 +193,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v8.11.1</nodeVersion>
-                                    <npmVersion>6.0.1</npmVersion>
+                                    <nodeVersion>v12.3.1</nodeVersion>
+                                    <npmVersion>6.9.0</npmVersion>
                                 </configuration>
                             </execution>
 

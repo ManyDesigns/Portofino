@@ -1,15 +1,14 @@
-import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
+import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@angular/core';
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
-import {TRANSLATIONS_EN} from "./i18n/en";
-import {TRANSLATIONS_IT} from "./i18n/it";
-import {DateAdapter} from "@angular/material";
+import { DateAdapter } from "@angular/material/core";
 import {DatetimeAdapter} from "@mat-datetimepicker/core";
 import {WebStorageService} from "ngx-store";
 import {Observable} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 
 export const LOCALE_STORAGE_SERVICE = new InjectionToken('Locale Storage');
+export const LOCALES = new InjectionToken('Locales');
 
 @Injectable()
 export class PortofinoService {
@@ -26,11 +25,13 @@ export class PortofinoService {
   readonly DEFAULT_LOCALE = 'en';
   readonly localeDefinitions = {};
   readonly localeChange = new EventEmitter<Locale>();
+  readonly templates: { [name: string]: { template: TemplateRef<any>, description?: string }} = {};
 
   constructor(public http: HttpClient, protected translate: TranslateService,
               @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,
+              @Inject(LOCALES) locales: Locale[],
               protected dateAdapter: DateAdapter<any>, protected datetimeAdapter: DatetimeAdapter<any>) {
-    this.setupTranslateService();
+    this.setupTranslateService(locales);
   }
 
   configureLocale(lang: Locale) {
@@ -69,10 +70,9 @@ export class PortofinoService {
     this.storage.set('locale', locale);
   }
 
-  protected setupTranslateService() {
+  protected setupTranslateService(locales: Locale[]) {
     this.translate.setDefaultLang(this.DEFAULT_LOCALE);
-    this.configureLocale({ key: 'en', name: 'English', translations: TRANSLATIONS_EN });
-    this.configureLocale({ key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT });
+    locales.forEach(l => { this.configureLocale(l); });
     this.setLocale(this.getInitialLocale());
   }
 
@@ -99,20 +99,34 @@ export class PortofinoService {
     this.http.get<ApiInfo>(this.localApiPath).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
       if(response.loginPath) {
-        let loginPath = response.loginPath;
-        if(loginPath.startsWith('/')) {
-          loginPath = loginPath.substring(1);
-        }
-        this.loginPath = loginPath;
+        this.loginPath = this.sanitizeLoginPath(response.loginPath);
+      } else {
+        this.initLoginPath();
       }
     }, error => {
       this.fallbackInit();
     });
   }
 
+  private initLoginPath() {
+    this.http.get<any>(this.apiRoot + ':description').subscribe(response => {
+      if (response.loginPath) {
+        this.loginPath = this.sanitizeLoginPath(response.loginPath);
+      }
+    }); //TODO warn about failed init in case of error because only reloading the page will potentially fix it.
+  }
+
+  private sanitizeLoginPath(loginPath) {
+    if (loginPath.startsWith('/')) {
+      loginPath = loginPath.substring(1);
+    }
+    return loginPath;
+  }
+
   private fallbackInit() {
     this.localApiPath = null;
     this.apiRoot = this.sanitizeApiRoot(this.defaultApiRoot);
+    this.initLoginPath();
   }
 
   private sanitizeApiRoot(apiRoot) {

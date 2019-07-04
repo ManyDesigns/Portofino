@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
@@ -32,7 +32,7 @@ export abstract class BaseDetailComponent implements WithButtons {
 
   readonly formDefinition = new Form();
   readonly form = new FormGroup({});
-  @ViewChild(FormComponent)
+  @ViewChild(FormComponent, { static: false })
   formComponent: FormComponent;
   properties: Property[] = [];
   object;

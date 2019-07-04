@@ -3,19 +3,21 @@ package com.manydesigns.portofino.upstairs.actions.database.connections;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderDetail;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderSummary;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,7 +35,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -42,7 +43,7 @@ import java.util.function.BiFunction;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class ConnectionsAction extends AbstractPageAction {
+public class ConnectionsAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(ConnectionsAction.class);
 
@@ -139,14 +140,14 @@ public class ConnectionsAction extends AbstractPageAction {
     @PUT
     @Path("{databaseName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response saveConnection(@PathParam("databaseName") String databaseName, String jsonInput) {
+    public Response saveConnection(@PathParam("databaseName") String databaseName, String jsonInput) throws ConfigurationException {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         return saveConnectionProvider(connectionProvider, new JSONObject(jsonInput), this::doSaveConnectionProvider);
     }
 
-    public Response saveConnectionProvider(
+    protected Response saveConnectionProvider(
             ConnectionProvider connectionProvider, JSONObject jsonObject,
-            BiFunction<ConnectionProvider, Form, Response> handler) {
+            BiFunction<ConnectionProvider, Form, Response> handler) throws ConfigurationException {
         ConnectionProviderDetail cp = new ConnectionProviderDetail(connectionProvider);
         Form form = new FormBuilder(ConnectionProviderDetail.class).configMode(Mode.EDIT).build();
         if(cp.getJndiResource() != null) {
@@ -254,7 +255,7 @@ public class ConnectionsAction extends AbstractPageAction {
         List<Schema> selectedSchemas = database.getSchemas();
         List<String> selectedSchemaNames = new ArrayList<>(selectedSchemas.size());
         for(Schema schema : selectedSchemas) {
-            selectedSchemaNames.add(schema.getSchema().toLowerCase());
+            selectedSchemaNames.add(schema.getSchemaName().toLowerCase());
         }
         for(Object schemaObject : schemasJson) {
             JSONObject schema = (JSONObject) schemaObject;
@@ -263,29 +264,30 @@ public class ConnectionsAction extends AbstractPageAction {
             if(selected) {
                 if(selectedSchemaNames.contains(schemaName)) {
                     for(Schema modelSchema : database.getSchemas()) {
-                        if(modelSchema.getSchema().equalsIgnoreCase(schemaName)) {
+                        if(modelSchema.getSchemaName().equalsIgnoreCase(schemaName)) {
                             if(!schema.isNull("name")) {
-                                modelSchema.setSchemaName(schema.getString("name"));
+                                modelSchema.setActualSchemaName(schema.getString("name"));
                             }
                             break;
                         }
                     }
                 } else {
                     Schema modelSchema = new Schema();
+                    modelSchema.setDatabase(database);
+                    modelSchema.setSchemaName(schemaName);
                     if(!schema.isNull("catalog")) {
                         modelSchema.setCatalog(schema.getString("catalog"));
                     }
                     if(!schema.isNull("name")) {
-                        modelSchema.setSchemaName(schema.getString("name"));
+                        modelSchema.setConfiguration(portofinoConfiguration);
+                        modelSchema.setActualSchemaName(schema.getString("name"));
                     }
-                    modelSchema.setSchema(schemaName);
-                    modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
                 }
             } else if(selectedSchemaNames.contains(schemaName)) {
                 Schema toBeRemoved = null;
                 for(Schema aSchema : database.getSchemas()) {
-                    if(aSchema.getSchema().equalsIgnoreCase(schemaName)) {
+                    if(aSchema.getSchemaName().equalsIgnoreCase(schemaName)) {
                         toBeRemoved = aSchema;
                         break;
                     }
@@ -311,7 +313,7 @@ public class ConnectionsAction extends AbstractPageAction {
         for(String[] schemaName : schemaNamesFromDb) {
             boolean selected = false;
             for(Schema schema : selectedSchemas) {
-                if(schemaName[1].equalsIgnoreCase(schema.getSchema())) {
+                if(schemaName[1].equalsIgnoreCase(schema.getSchemaName())) {
                     selected = true;
                     break;
                 }
@@ -325,7 +327,7 @@ public class ConnectionsAction extends AbstractPageAction {
     @DELETE
     @Path("{databaseName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public void deleteConnection(@PathParam("databaseName") String databaseName) throws IOException, JAXBException {
+    public void deleteConnection(@PathParam("databaseName") String databaseName) throws Exception {
         Database database =
                 DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
         if (database == null) {

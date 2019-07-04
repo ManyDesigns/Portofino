@@ -1,17 +1,16 @@
 import {
   AfterViewInit,
   Component,
-  ComponentFactoryResolver, ComponentRef, Inject, InjectionToken, Injector, OnDestroy,
-  OnInit, Optional, ViewChild
+  ComponentFactoryResolver, ComponentRef, Injector, OnDestroy,
+  OnInit, ViewChild
 } from '@angular/core';
 import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {MainPageDirective} from "./content.directive";
 import {Subscription} from "rxjs";
-import {mergeMap} from "rxjs/operators";
 import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
-import {Page, PageChild, PageService} from "./page";
+import {Page, PageService} from "./page";
 import {PageFactoryComponent} from "./page.factory";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
@@ -22,7 +21,7 @@ import {TranslateService} from "@ngx-translate/core";
   styleUrls: ['./content.component.css']
 })
 export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
-  @ViewChild(MainPageDirective)
+  @ViewChild(MainPageDirective, { static: false })
   contentHost: MainPageDirective;
   protected pageFactory: PageFactoryComponent;
 
@@ -39,9 +38,8 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    const reload = () => this.reloadPage();
-    this.subscriptions.push(this.authenticationService.logins.subscribe(reload));
-    this.subscriptions.push(this.authenticationService.logouts.subscribe(reload));
+    this.subscriptions.push(this.authenticationService.logins.subscribe(() => this.reloadPage()));
+    this.subscriptions.push(this.authenticationService.logouts.subscribe(() => this.router.navigateByUrl("/")));
   }
 
   ngAfterViewInit() {

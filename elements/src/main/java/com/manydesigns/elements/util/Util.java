@@ -183,6 +183,7 @@ public class Util {
         return true;
     }
 
+    @Deprecated
     public static String urlencode(String s) {
         if (s == null) {
             return null;

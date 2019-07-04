@@ -53,6 +53,7 @@
     </mat-radio-group>
   </div>
 </ng-container>
-<ng-container *ngIf="!enabled">
-  <portofino-text-field [enabled]="enabled" [selectable]="selectable" [form]="form" [property]="property" [selector]="selector"></portofino-text-field>
-</ng-container>
+<mat-form-field *ngIf="!enabled">
+  <mat-label>{{property.label}}</mat-label>
+  <input matInput [name]="property.name" [value]="safeValue(form)" [required]="required" disabled />
+</mat-form-field>

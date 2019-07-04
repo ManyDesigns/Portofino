@@ -13,7 +13,7 @@ import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -43,7 +42,7 @@ import java.util.*;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class TablesAction extends AbstractPageAction {
+public class TablesAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(TablesAction.class);
     public static final String DATE_FORMAT = DateFormat.class.getName();
@@ -115,10 +114,8 @@ public class TablesAction extends AbstractPageAction {
             }
             if(!table.getSchemaName().equals(lastSchema)) {
                 File changelogFile = persistence.getLiquibaseChangelogFile(table.getSchema());
-                String schemaDescr = table.getSchemaName();
-
                 lastSchema = table.getSchemaName();
-                schema = createNode(schemaDescr, changelogFile.isFile());
+                schema = createNode(table.getSchema().getSchemaName(), changelogFile.isFile());
                 ((List)database.get("children")).add(schema);
             }
             ((List)schema.get("children")).add(createLeaf(table.getTableName(), table.getActualEntityName()));
@@ -135,7 +132,7 @@ public class TablesAction extends AbstractPageAction {
         if(table == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        Map result = new HashMap();
+        Map<String, Object> result = new HashMap<>();
         result.put("table", table);
         List<Map> typeInfo = new ArrayList<>();
         Type[] types = persistence.getConnectionProvider(db).getTypes();
@@ -156,9 +153,13 @@ public class TablesAction extends AbstractPageAction {
                     }
                 }
             }
+            if(type == null) {
+                logger.error("No candidate types available for column {}", column.getQualifiedName());
+                break;
+            }
             Integer precision = column.getLength();
             Class[] javaTypes = type.getAvailableJavaTypes(precision);
-            Map info = new HashMap();
+            Map<String, Object> info = new HashMap<>();
             info.put("type", type);
 
             //Default
@@ -170,7 +171,7 @@ public class TablesAction extends AbstractPageAction {
             typeInfo.add(info);
 
             //Available
-            List availableTypes = new ArrayList();
+            List<Map> availableTypes = new ArrayList<>();
             info.put("types", availableTypes);
             //Existing
             if(column.getJavaType() != null) {
@@ -195,7 +196,7 @@ public class TablesAction extends AbstractPageAction {
     @PUT
     public void saveTable(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
-            Table table) throws IOException, JAXBException {
+            Table table) throws Exception {
         Table existing = DatabaseLogic.findTableByName(persistence.getModel(), db, schema, tableName);
         if(existing == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -495,7 +496,7 @@ public class TablesAction extends AbstractPageAction {
         Collections.sort(tables, (o1, o2) -> {
             int dbComp = o1.getDatabaseName().compareToIgnoreCase(o2.getDatabaseName());
             if(dbComp == 0) {
-                int schemaComp = o1.getSchemaName().compareToIgnoreCase(o2.getSchemaName());
+                int schemaComp = o1.getSchema().getSchemaName().compareToIgnoreCase(o2.getSchema().getSchemaName());
                 if(schemaComp == 0) {
                     return o1.getTableName().compareToIgnoreCase(o2.getTableName());
                 } else {

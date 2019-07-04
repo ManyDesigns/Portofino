@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.resourceactions.custom.CustomAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageHeader">
         <div class="pull-right">

@@ -82,7 +82,7 @@ public abstract class BlobUtils {
             logger.debug("Decrypting encryptedInputStream");
             return CryptoService.getInstance().encrypt(decryptedInputStream);
         } catch (GeneralSecurityException | IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error("Error encrypting input stream", e);
         }
         return decryptedInputStream;
     }
@@ -90,9 +90,9 @@ public abstract class BlobUtils {
     public static InputStream decrypt( InputStream encryptedInputStream , String type ){
         try {
             logger.debug("Decrypting encryptedInputStream");
-            return  CryptoService.getInstance().decrypt(encryptedInputStream);
+            return CryptoService.getInstance().decrypt(encryptedInputStream);
         } catch (GeneralSecurityException | IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error("Error decrypting input stream", e);
         }
         return encryptedInputStream;
     }

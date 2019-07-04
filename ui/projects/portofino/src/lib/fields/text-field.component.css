@@ -1,3 +1,7 @@
 span.rich-text > ::ng-deep p {
   margin: 0;
 }
+
+.multiline {
+  width: 100%;
+}

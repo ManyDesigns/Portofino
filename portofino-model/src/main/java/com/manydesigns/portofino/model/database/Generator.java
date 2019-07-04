@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -76,11 +77,11 @@ public abstract class Generator implements ModelObject {
 
     public void reset() {}
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert primaryKeyColumn != null;
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {}
 }

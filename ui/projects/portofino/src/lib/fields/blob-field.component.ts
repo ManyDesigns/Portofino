@@ -1,4 +1,4 @@
-import {Component, Host, Inject, Input, Optional, SkipSelf} from '@angular/core';
+import {Component, Host, Input, Optional, SkipSelf} from '@angular/core';
 import {FieldComponent} from "./field.component";
 import {PortofinoService} from "../portofino.service";
 import {AuthenticationService} from "../security/authentication.service";

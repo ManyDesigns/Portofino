@@ -3,10 +3,10 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.resourceactions.custom.CustomAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.pageInstance.title}"/>
+        <c:out value="${actionBean.actionInstance.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageHeader">
         <div class="pull-right">

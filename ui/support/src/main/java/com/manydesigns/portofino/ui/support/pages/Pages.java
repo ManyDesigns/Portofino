@@ -29,13 +29,8 @@ import java.util.*;
 public class Pages extends Resource {
 
     private static final Logger logger = LoggerFactory.getLogger(Pages.class);
+    public static final String PORTOFINO_ACTION_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.action-move";
     public static final String PORTOFINO_PAGE_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.page-move";
-
-    @Context
-    protected ServletContext servletContext;
-
-    @Context
-    protected UriInfo uriInfo;
 
     @POST
     @Path("{path:.+}")
@@ -177,21 +172,31 @@ public class Pages extends Resource {
         File destParentConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
         String[] segments = sourceActionPath.split("/");
         String segment = segments[segments.length - 1];
+        if(destinationActionParent == null) {
+            movePage(sourcePath, destParentConfigFile, segment, detail);
+            return Response.ok().build();
+        }
         String destinationActionPath = getActionPath(destinationActionParent + (detail ? "/_detail/" : "/") + segment);
         Invocation.Builder request = path(destinationActionPath).request().header(AUTHORIZATION_HEADER, auth);
-        Response response = request.post(Entity.entity(sourceActionPath, PORTOFINO_PAGE_MOVE_TYPE));
+        Response response = request.post(Entity.entity(sourceActionPath, PORTOFINO_ACTION_MOVE_TYPE));
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            File sourceConfigFile = new File(servletContext.getRealPath(sourcePath));
-            File destParentConfigDir = destParentConfigFile.getParentFile();
-            if(destParentConfigDir.isDirectory() || destParentConfigDir.mkdirs()) {
-                File destConfigDir = new File(destParentConfigDir, segment);
-                destConfigDir.mkdirs();
-                movePage(sourceConfigFile, new File(destConfigDir, "config.json"), detail ? "detailChildren" : "children");
-            } else {
-                throw new WebApplicationException("Could not create " + destParentConfigDir.getAbsolutePath());
-            }
+            movePage(sourcePath, destParentConfigFile, segment, detail);
         }
         return response;
+    }
+
+    public void movePage(String sourcePath, File destParentConfigFile, String segment, boolean detail) throws IOException {
+        if(segment.contains("..") || segment.contains(File.separator)) {
+            throw new IllegalArgumentException("Invalid segment: " + segment);
+        }
+        File sourceConfigFile = new File(servletContext.getRealPath(sourcePath));
+        File destParentConfigDir = destParentConfigFile.getParentFile();
+        File destConfigDir = new File(destParentConfigDir, segment);
+        if(destConfigDir.isDirectory() || destConfigDir.mkdirs()) {
+            movePage(sourceConfigFile, new File(destConfigDir, "config.json"), detail ? "detailChildren" : "children");
+        } else {
+            throw new WebApplicationException("Could not create directory " + destConfigDir.getAbsolutePath());
+        }
     }
 
     public void movePage(File sourceConfigFile, File destConfigFile, String childrenProperty) throws IOException {

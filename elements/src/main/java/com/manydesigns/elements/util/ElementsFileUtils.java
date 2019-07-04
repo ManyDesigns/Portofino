@@ -110,17 +110,19 @@ public class ElementsFileUtils {
         return true;
     }
 
-
+    @Deprecated
     public static boolean setReadable(File file, boolean readable) {
         String perms = readable ? "u+rx" : "a-rx";
         return chmod(file, perms);
     }
 
+    @Deprecated
     public static boolean setWritable(File file, boolean writable) {
         String perms = writable ? "u+w" : "a-w";
         return chmod(file, perms);
     }
 
+    @Deprecated
     public static boolean chmod(File file, String perms) {
         logger.debug("chmod {} {}", perms, file.getAbsolutePath());
         Runtime runtime = Runtime.getRuntime();

@@ -1,12 +1,10 @@
 import {
+  AfterViewInit, ChangeDetectorRef,
   Component,
   ContentChild,
-  EventEmitter,
-  Injectable,
+  EventEmitter, Injectable,
   InjectionToken,
-  Input, OnDestroy,
-  Optional,
-  TemplateRef, Type
+  Input, OnDestroy, Optional, TemplateRef, Type, ViewChild
 } from "@angular/core";
 import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
@@ -69,6 +67,7 @@ export class PageConfiguration {
   securityCheckPath: string = ':description';
   children: PageChild[] = [];
   icon?: string;
+  template?: string;
 }
 
 export class PageChild {
@@ -88,18 +87,32 @@ export class PageSettingsPanel {
   permissions: Permissions;
   error;
   readonly accessLevels = ["NONE", "VIEW", "EDIT", "DEVELOP", "DENY"];
-  callback: (boolean) => void;
+  callback: (saved: boolean) => void;
 
   constructor(public page: Page) {}
 
-  show(callback: (boolean) => void = () => {}) {
+  show(callback: (saved: boolean) => void = () => {}) {
     this.callback = callback;
-    const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), this.page.configuration);
-    titleField.editable = this.page.portofino.localApiAvailable;
-    const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, this.page.configuration);
-    iconField.editable = this.page.portofino.localApiAvailable;
-    this.formDefinition.contents = [titleField, iconField];
-    this.previousConfiguration = this.page.configuration;
+    const pageConfiguration = this.page.configuration;
+    this.previousConfiguration = Object.assign({}, pageConfiguration);
+    const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), pageConfiguration);
+    const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, pageConfiguration);
+    if(pageConfiguration.template) {
+      const description = this.page.portofino.templates[pageConfiguration.template].description;
+      pageConfiguration.template = { v: pageConfiguration.template, l: description, s: true };
+    }
+    const templates = [];
+    for (let key in this.page.portofino.templates) {
+      const template = this.page.portofino.templates[key];
+      templates.push({ v: key, l: this.page.translate.instant(template.description ? template.description : key), s: false});
+    }
+    const templateField = Field.fromProperty(Property.create({ name: "template", label: "Template" }).withSelectionProvider({
+      options: templates
+    }), pageConfiguration);
+    this.formDefinition.contents = [titleField, iconField, templateField];
+    this.formDefinition.contents.forEach((f: Field) => {
+      f.editable = this.page.portofino.localApiAvailable;
+    });
     this.reloadConfiguration();
     this.loadPermissions();
     this.active = true;
@@ -162,6 +175,20 @@ export class PageSettingsPanel {
     const configuration = this.form.get('configuration');
     return Object.assign({}, configuration ? configuration.value : {});
   }
+
+  getPageConfigurationToSave(formValue = this.form.value) {
+    const config = Object.assign({}, this.page.configuration, formValue);
+    const pageConfiguration = new PageConfiguration();
+    //Reflection would be nice
+    pageConfiguration.children = config.children;
+    pageConfiguration.icon = config.icon;
+    pageConfiguration.securityCheckPath = config.securityCheckPath;
+    pageConfiguration.source = config.source;
+    pageConfiguration.template = config.template ? config.template.v : null;
+    pageConfiguration.title = config.title;
+    pageConfiguration.type = config.type;
+    return pageConfiguration;
+  }
 }
 
 export abstract class Page implements WithButtons, OnDestroy {
@@ -176,6 +203,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   parent: Page;
   allowEmbeddedComponents: boolean = true;
   embedded = false;
+  returnUrl;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
@@ -191,6 +219,15 @@ export abstract class Page implements WithButtons, OnDestroy {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
+    this.setupBasicPageButtons();
+    if(!this.embedded && this.route) {
+      this.subscribe(this.route.params, p => {
+          this.returnUrl = p['returnUrl'];
+      });
+    }
+  }
+
+  private setupBasicPageButtons() {
     declareButton({
       color: 'primary', icon: 'save', text: 'Save', list: 'configuration'
     }, this, 'saveConfiguration', null);
@@ -209,6 +246,9 @@ export abstract class Page implements WithButtons, OnDestroy {
     declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'children'
     }, this, 'cancelChildren', null);
+    declareButton({
+      icon: 'arrow_back', text: 'Back', list: 'breadcrumbs', presentIf: () => this.canGoBack()
+    }, this, 'goBack', null);
   }
 
   initialize() {}
@@ -286,6 +326,19 @@ export abstract class Page implements WithButtons, OnDestroy {
     return getButtons(this, list);
   }
 
+  get template(): TemplateRef<any> {
+    const templateName = this.configuration.template;
+    if(templateName) {
+      const template = this.portofino.templates[templateName];
+      if(!template) {
+        console.error("Unknown template: " + templateName);
+      }
+      return template.template;
+    } else {
+      return null; //use the default template
+    }
+  }
+
   prepare(): Observable<Page> {
     if(this.parent && this.parent.getChild(this.segment) && this.parent.getChild(this.segment).accessible) {
       return of(this);
@@ -327,12 +380,16 @@ export abstract class Page implements WithButtons, OnDestroy {
     } else {
       source = this.portofino.apiRoot + source;
     }
-    //replace double slash, but not in http(s)://
-    source = source.replace(new RegExp("([^:])//"), '$1/');
+    source = Page.removeDoubleSlashesFromUrl(source);
     while (source.endsWith("/"))  {
       source = source.substring(0, source.length - 1);
     }
     return source;
+  }
+
+  static removeDoubleSlashesFromUrl(url) {
+    //Replace all double slash (g flag), but not in http(s)://
+    return url.replace(new RegExp("([^:])//", "g"), '$1/');
   }
 
   operationAvailable(ops: Operation[], signature: string) {
@@ -348,11 +405,10 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   getConfigurationLocation(path: string = this.path) {
-    //replace double slash, but not in http(s)://
-    return `pages${path}/config.json`.replace(new RegExp("([^:])//"), '$1/');
+    return Page.removeDoubleSlashesFromUrl(`pages${path}/config.json`);
   }
 
-  configure(callback: (boolean) => void = () => this.reloadBaseUrl()) {
+  configure(callback: (saved: boolean) => void = () => this.reloadBaseUrl()) {
     this.settingsPanel.show(callback);
   }
 
@@ -361,7 +417,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     const path = this.getConfigurationLocation(this.path);
     let saveConfObservable: Observable<any>;
     if (this.portofino.localApiAvailable) {
-      const pageConfiguration = this.getPageConfigurationToSave(this.settingsPanel.form.value);
+      const pageConfiguration = this.settingsPanel.getPageConfigurationToSave();
       this.configuration = pageConfiguration;
       let data = new FormData();
       data.append("pageConfiguration", JSON.stringify(pageConfiguration));
@@ -408,19 +464,6 @@ export abstract class Page implements WithButtons, OnDestroy {
     }));
   }
 
-  //TODO refactor into page settings panel
-  protected getPageConfigurationToSave(formValue) {
-    const config = Object.assign({}, this.configuration, formValue);
-    const pageConfiguration = new PageConfiguration();
-    //Reflection would be nice
-    pageConfiguration.children = config.children;
-    pageConfiguration.securityCheckPath = config.securityCheckPath;
-    pageConfiguration.source = config.source;
-    pageConfiguration.title = config.title;
-    pageConfiguration.type = config.type;
-    return pageConfiguration;
-  }
-
   get configurationProperties() {
     return null;
   }
@@ -452,7 +495,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     if (!this.portofino.localApiAvailable) {
       throw "Local Portofino API not available"
     }
-    const pageConfiguration = this.getPageConfigurationToSave({});
+    const pageConfiguration = this.settingsPanel.getPageConfigurationToSave({});
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     const path = this.getConfigurationLocation(this.path);
@@ -478,6 +521,23 @@ export abstract class Page implements WithButtons, OnDestroy {
     })).subscribe(flag => child.accessible = flag);
   }
 
+  goBack() {
+    if(this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    } else {
+      this.goToParent();
+    }
+  }
+
+  canGoBack(): boolean {
+    return this.returnUrl || this.parent;
+  }
+
+  goToParent() {
+    if (this.parent) {
+      this.router.navigateByUrl(this.parent.url);
+    }
+  }
 }
 
 @Component({
@@ -492,17 +552,65 @@ export class PageHeader {
 }
 
 @Component({
-  selector: 'portofino-default-page-layout',
-  templateUrl: './default-page-layout.component.html',
-  styleUrls: ['./default-page-layout.component.css']
+  selector: 'portofino-templates',
+  template: `
+    <ng-template #defaultTemplate let-content="content" let-page="page">
+      <ng-template [ngTemplateOutlet]="content"></ng-template>
+      <portofino-page *ngFor="let child of page.embeddedChildren"
+                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+    </ng-template>
+    <ng-template #mainWithTabs let-content="content" let-page="page">
+      <ng-template [ngTemplateOutlet]="content"></ng-template>
+      <mat-tab-group>
+        <mat-tab *ngFor="let child of page.embeddedChildren">
+          <ng-template mat-tab-label>
+            <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+            {{child.title|translate}}
+          </ng-template>
+          <portofino-page [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+        </mat-tab>
+      </mat-tab-group>
+    </ng-template>`
 })
-export class DefaultPageLayout {
+export class TemplatesComponent implements AfterViewInit {
+
+  templates: { [name: string]: { template: TemplateRef<any>, description?: string }} = {};
+
+  @ViewChild("defaultTemplate", { static: true })
+  defaultTemplate: TemplateRef<any>;
+  @ViewChild("mainWithTabs", { static: true })
+  mainWithTabs: TemplateRef<any>;
+
+  ngAfterViewInit(): void {
+    this.templates.defaultTemplate = { template: this.defaultTemplate, description: "The default template" };
+    this.templates.mainWithTabs = { template: this.mainWithTabs, description: "Page with embedded pages as tabs" };
+  }
+}
+
+@Component({
+  selector: 'portofino-page-layout',
+  templateUrl: './page-layout.component.html',
+  styleUrls: ['./page-layout.component.css']
+})
+export class PageLayout implements AfterViewInit {
   @Input()
   page: Page;
-  @ContentChild("content")
+  @ContentChild("content", { static: false })
   content: TemplateRef<any>;
-  @ContentChild("extraConfiguration")
+  @ViewChild("defaultTemplate", { static: true })
+  defaultTemplate: TemplateRef<any>;
+  @ContentChild("extraConfiguration", { static: false })
   extraConfiguration: TemplateRef<any>;
+
+  template: TemplateRef<any>;
+
+  constructor(protected changeDetector: ChangeDetectorRef) {}
+
+  ngAfterViewInit(): void {
+    const template = this.page.template;
+    this.template = template ? template : this.defaultTemplate;
+    this.changeDetector.detectChanges();
+  }
 }
 
 export class Operation {

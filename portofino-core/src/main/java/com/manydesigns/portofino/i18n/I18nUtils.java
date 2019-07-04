@@ -36,8 +36,6 @@ import com.manydesigns.portofino.modules.BaseModule;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
-import javax.servlet.jsp.jstl.core.Config;
-import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -56,10 +54,6 @@ public class I18nUtils {
         ResourceBundleManager resourceBundleManager =
                 (ResourceBundleManager) servletContext.getAttribute(BaseModule.RESOURCE_BUNDLE_MANAGER);
         ResourceBundle portofinoResourceBundle = resourceBundleManager.getBundle(locale);
-
-        LocalizationContext localizationContext =
-                new LocalizationContext(portofinoResourceBundle, locale);
-        request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
 
         //Setup Elements I18n
         ResourceBundle elementsResourceBundle =

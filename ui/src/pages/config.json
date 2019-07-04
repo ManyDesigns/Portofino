@@ -7,7 +7,8 @@
     { "path": "connections", "title": "Connections", "icon": "network_wifi", "showInNavigation": true, "accessible": true, "embedded": false },
     { "path": "wizard", "title": "Wizard", "icon": "web", "showInNavigation": true, "accessible": true, "embedded": false },
     { "path": "tables", "title": "Tables", "icon": "storage", "showInNavigation": true, "accessible": true, "embedded": false },
-    { "path": "actions", "title": "Actions", "icon": "build", "showInNavigation": true, "accessible": true, "embedded": false }],
+    { "path": "actions", "title": "Actions", "icon": "build", "showInNavigation": true, "accessible": true, "embedded": false },
+    { "path": "mail", "title": "Mail", "icon": "email", "showInNavigation": true, "accessible": true, "embedded": false }],
   "source": "",
   "securityCheckPath": ""
 }

@@ -1,5 +1,6 @@
-package com.manydesigns.portofino.pageactions.crud
+package com.manydesigns.portofino.resourceactions.crud
 
+import com.manydesigns.portofino.resourceactions.crud.CrudAction
 import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.ElementsThreadLocals
@@ -9,9 +10,9 @@ import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.servlet.ServletUtils
 import com.manydesigns.portofino.operations.GuardType
-import com.manydesigns.portofino.buttons.annotations.Button
+import com.manydesigns.portofino.operations.annotations.Button
 
-import com.manydesigns.portofino.buttons.annotations.Guard
+import com.manydesigns.portofino.operations.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions

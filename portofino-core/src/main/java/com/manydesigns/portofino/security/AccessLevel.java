@@ -21,15 +21,15 @@
 package com.manydesigns.portofino.security;
 
 /**
- * Enumerates the possible <em>access levels</em> to a page. In order of priority:
+ * Enumerates the possible <em>access levels</em> for a resource. In order of priority:
  * <ul>
  *     <li><strong><code>NONE</code></strong> - neither grants, nor forbids access.</li>
- *     <li><strong><code>VIEW</code></strong> - grants access to the page in read-only mode.</li>
- *     <li><strong><code>EDIT</code></strong> - grants access to the page in edit mode: some operations are permitted
- *     (depending on the type of page), but at least modifying the Groovy source code of the page is forbidden.</li>
+ *     <li><strong><code>VIEW</code></strong> - grants access to the resource in read-only mode.</li>
+ *     <li><strong><code>EDIT</code></strong> - grants access to the resource in edit mode: some operations are permitted
+ *     (depending on the type of resource), but at least modifying the Groovy source code of the actionDescriptor is forbidden.</li>
  *     <li><strong><code>DEVELOP</code></strong> - grants every permissions except those reserved for the administrator
- *     (superuser), including that of editing the Groovy source code of the page.</li>
- *     <li><strong><code>DENY</code></strong> - denies access to the page.</li>
+ *     (superuser), including that of editing the Groovy source code of the resource.</li>
+ *     <li><strong><code>DENY</code></strong> - denies access to the resource.</li>
  * </ul>
  *
  * The level with the greatest priority wins over the others.
@@ -43,7 +43,7 @@ public enum AccessLevel {
 
     NONE(0), VIEW(1), EDIT(2), DEVELOP(3), DENY(Integer.MAX_VALUE);
 
-    private AccessLevel(int level) {
+    AccessLevel(int level) {
         this.level = level;
     }
 

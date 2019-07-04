@@ -43,49 +43,41 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-derby</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-db2</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-googlecloudsql</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-h2</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mssql</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mysql</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-oracle</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-postgresql</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
 
         <!--
@@ -99,16 +91,7 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-crud</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
-        <!-- Calendar pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-calendar</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!--
         ///////////////////////////////////////////////////////////////////////
         // Optional services. Remove a module to disable its features.       //
@@ -126,18 +109,15 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Exports to PDF and XLS. -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>fop</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
             <artifactId>jxl</artifactId>
-            <scope>compile</scope>
         </dependency>
 
         <!--
@@ -157,28 +137,24 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-core</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Support for database connectivity. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-upstairs</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- REST support through Jersey. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jersey</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- REST support through RestEasy. -->
         <!--
@@ -212,24 +188,21 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -256,6 +229,28 @@
     <profiles>
         <profile>
             <id>no-frontend-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <mkdir dir="target/frontend" />
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>build-frontend</id>
@@ -278,8 +273,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v8.11.1</nodeVersion>
-                                    <npmVersion>6.0.1</npmVersion>
+                                    <nodeVersion>v12.3.1</nodeVersion>
+                                    <npmVersion>6.9.0</npmVersion>
                                 </configuration>
                             </execution>
 

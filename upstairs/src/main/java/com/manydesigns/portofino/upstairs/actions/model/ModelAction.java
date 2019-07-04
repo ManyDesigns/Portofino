@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.upstairs.actions.model;
 
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -18,7 +18,7 @@ import javax.ws.rs.Path;
  */
 @RequiresAuthentication
 @RequiresAdministrator
-public class ModelAction extends AbstractPageAction {
+public class ModelAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelAction.class);
 
