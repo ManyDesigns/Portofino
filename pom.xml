@@ -97,7 +97,8 @@
         <groovy.version>2.5.6</groovy.version>
         <guava.version>27.0.1-jre</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
-        <jackson.version>2.9.9.1</jackson.version>
+        <jackson.version>2.9.9</jackson.version>
+        <jackson.databind.version>2.9.9.1</jackson.databind.version>
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
