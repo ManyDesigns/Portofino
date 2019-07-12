@@ -1,4 +1,14 @@
-import {Component, Input, OnDestroy, OnInit, Type} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  Type,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import {
   ClassAccessor,
   isDateProperty,
@@ -21,13 +31,14 @@ import {MediaObserver} from "@angular/flex-layout";
 import {Observable, of, Subject, Subscription} from "rxjs";
 import {ButtonInfo, getButtons} from "../../buttons";
 import {TranslateService} from "@ngx-translate/core";
+import {SearchFieldComponent} from "./search-field.component";
 
 @Component({
   selector: 'portofino-crud-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css']
 })
-export class SearchComponent implements OnInit, OnDestroy {
+export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input()
   classAccessor: ClassAccessor;
@@ -39,7 +50,9 @@ export class SearchComponent implements OnInit, OnDestroy {
   baseUrl: string;
 
   searchProperties: Property[] = [];
-  form: FormGroup;
+  @ViewChildren(SearchFieldComponent)
+  searchFields: QueryList<SearchFieldComponent>;
+  readonly form = new FormGroup({});
   results: SearchResults;
   resultsDataSource = new MatTableDataSource();
   resultFields: SearchResultField[] = [];
@@ -68,12 +81,15 @@ export class SearchComponent implements OnInit, OnDestroy {
               protected auth: AuthenticationService, public media: MediaObserver) {}
 
   ngOnInit() {
-    this.setupForm();
+    this.setupFields();
     this.setupSelectionProviders();
     this.listenToMediaChanges();
+  }
+
+  ngAfterViewInit(): void {
     this.search();
     if(this.refresh) {
-      this.refreshSubscription = this.refresh.subscribe(_ => this.refreshSearch())
+      this.refreshSubscription = this.refresh.subscribe(_ => this.refreshSearch());
     }
   }
 
@@ -83,8 +99,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
-  protected setupForm() {
-    const formControls = {};
+  protected setupFields() {
     if (this.selectionEnabled) {
       this.datatableColumns.push(this.selectColumnName);
     }
@@ -95,7 +110,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
       if (isSearchable(property)) {
         this.searchProperties.push(property);
-        formControls[property.name] = new FormControl();
       }
       if (isInSummary(property)) {
         const field = new SearchResultField();
@@ -132,12 +146,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       f.routerLink = row => this.baseUrl + '/' + row.__rowKey;
       this.resultFields[0].href = null;
     });
-    this.customizeForm(formControls);
-    this.form = new FormGroup(formControls);
-  }
-
-  protected customizeForm(formControls) {
-    //Extension hook
   }
 
   protected setupSelectionProviders() {
@@ -174,7 +182,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   protected listenToMediaChanges() {
     let wasDatatableHidden = !this.isDataTable();
-    this.media.media$.subscribe(() => {
+    this.media.asObservable().subscribe(() => {
       let refresh = false;
       if (this.isDataTable()) {
         refresh = wasDatatableHidden;
@@ -277,7 +285,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   protected composeSearch(params: HttpParams) {
-    this.searchProperties.forEach(property => {
+    this.searchFields.forEach(field => {
+      const property = field.property;
       if(property.selectionProvider) {
         params = this.addSelectionProviderSearchParameter(property, params);
       } else {
@@ -293,16 +302,28 @@ export class SearchComponent implements OnInit, OnDestroy {
     if(value == null) {
       return params;
     }
-    if (isDateProperty(property)) {
-      params = params.set(`search_${name}_min`, value.valueOf().toString());
-      params = params.set(`search_${name}_max`, value.valueOf().toString());
-    } else if (isNumericProperty(property)) {
-      params = params.set(`search_${name}_min`, value.toString());
-      params = params.set(`search_${name}_max`, value.toString());
+    if(value.exact) {
+      params = params.set(`search_${name}_min`, this.stringifySearchParam(property, value.exact));
+      params = params.set(`search_${name}_max`, this.stringifySearchParam(property, value.exact));
+    } else if(value.min || value.max) {
+      if(value.min) {
+        params = params.set(`search_${name}_min`, this.stringifySearchParam(property, value.min));
+      }
+      if(value.max) {
+        params = params.set(`search_${name}_max`, this.stringifySearchParam(property, value.max));
+      }
     } else {
-      params = params.set(`search_${name}`, value.toString());
+      params = params.set(`search_${name}`, this.stringifySearchParam(property, value));
     }
     return params;
+  }
+
+  stringifySearchParam(property: Property, value) {
+    if (isDateProperty(property)) {
+      return value.valueOf().toString();
+    } else {
+      return value.toString();
+    }
   }
 
   protected addSelectionProviderSearchParameter(property, params: HttpParams) {

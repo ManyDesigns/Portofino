@@ -24,7 +24,7 @@
     <mat-label>{{property.label}}</mat-label>
     <input matInput [formControlName]="property.name" [matAutocomplete]="autocomplete"
            [required]="required" [title]="property.label">
-    <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
+    <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel" panelWidth="auto">
       <mat-option *ngFor="let option of property.selectionProvider.options; trackBy: trackByOptionValue"
                   [value]="option">
         {{ option.l }}

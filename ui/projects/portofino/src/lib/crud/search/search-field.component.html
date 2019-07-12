@@ -10,7 +10,7 @@
   </mat-form-field>
   <mat-form-field *ngIf="property.selectionProvider.displayMode == 'AUTOCOMPLETE'" [formGroup]="form">
     <input matInput [formControlName]="property.name" [placeholder]="property.label" [matAutocomplete]="autocomplete">
-    <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel">
+    <mat-autocomplete #autocomplete="matAutocomplete" [displayWith]="getOptionLabel" panelWidth="auto">
       <mat-option *ngFor="let option of property.selectionProvider.options" [value]="option">
         {{ option.l }}
       </mat-option>
@@ -45,9 +45,25 @@
   <mat-form-field *ngIf="property.kind == 'string'" [formGroup]="form">
     <input matInput [formControlName]="property.name" [placeholder]="property.label">
   </mat-form-field>
-  <mat-form-field *ngIf="property.kind == 'number'" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.label">
-  </mat-form-field>
+  <ng-container *ngIf="property.kind == 'number'" [formGroup]="form">
+    <mat-form-field *ngIf="!ranged" [formGroupName]="property.name">
+      <input matInput formControlName="exact" [placeholder]="property.label">
+      <button mat-icon-button matSuffix (click)="ranged = true" title="{{'Range'|translate}}">
+        <mat-icon>more_horiz</mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
+      <span matPrefix>{{'Min'|translate}}</span>
+      <input matInput formControlName="min" [placeholder]="property.label">
+    </mat-form-field>
+    <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
+      <span matPrefix>{{'Max'|translate}}</span>
+      <input matInput formControlName="max" [placeholder]="property.label">
+      <button mat-icon-button matSuffix (click)="ranged = false" title="{{'Exact'|translate}}">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    </mat-form-field>
+  </ng-container>
   <mat-form-field *ngIf="property.kind == 'date'" [formGroup]="form">
     <input matInput [formControlName]="property.name" [placeholder]="property.label" [matDatepicker]="datepicker">
     <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
