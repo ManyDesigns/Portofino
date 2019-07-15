@@ -4,28 +4,21 @@ import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction
 import com.manydesigns.portofino.shiro.PortofinoRealm
 
-class MyLogin extends DefaultLoginAction {
-
-    @Override
-    protected String getRememberedUserName(Serializable principal) {
-        return principal.email;
-    }
+class Login extends DefaultLoginAction {
 
     @Override
     protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
-
         if (password == null) {
             errorMessages.add(ElementsThreadLocals.getText("empty.password"))
-            return false;
+            return false
         }
         if (password.length() < 8) {
             errorMessages.add(ElementsThreadLocals.getText("password.too.short", 8))
-            return false;
+            return false
         }
-        return true;
+        true
     }
 
-    @Override
     protected void setupSignUpForm(PortofinoRealm realm) {
         FormBuilder formBuilder = new FormBuilder(realm.getSelfRegisteredUserClassAccessor())
                 .configMode(Mode.CREATE)
@@ -33,12 +26,4 @@ class MyLogin extends DefaultLoginAction {
         signUpForm = formBuilder.build();
         signUpForm.findFieldByPropertyName("password").setRequired(true);
     }
-
-    @Override
-    protected boolean validateSignUpPassword(List<String> errorMessages) {
-        String password = signUpForm.findFieldByPropertyName("password").getValue();
-        return checkPasswordStrength(password, errorMessages);
-    }
-
-
 }

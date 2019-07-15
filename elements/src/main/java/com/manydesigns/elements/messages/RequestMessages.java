@@ -51,7 +51,7 @@ public class RequestMessages {
             LoggerFactory.getLogger(RequestMessages.class);
 
     public static void addInfoMessage(String msg) {
-        getInfoQueue().add(StringEscapeUtils.escapeXml(msg));
+        getInfoQueue().add(msg);
     }
 
     public static void addInfoMessage(XhtmlFragment xml) {
@@ -61,7 +61,7 @@ public class RequestMessages {
     }
 
     public static void addWarningMessage(String msg) {
-        getWarningQueue().add(StringEscapeUtils.escapeXml(msg));
+        getWarningQueue().add(msg);
     }
 
     public static void addWarningMessage(XhtmlFragment xml) {
@@ -71,7 +71,7 @@ public class RequestMessages {
     }
 
     public static void addErrorMessage(String msg) {
-        getErrorQueue().add(StringEscapeUtils.escapeXml(msg));
+        getErrorQueue().add(msg);
     }
 
     public static void addErrorMessage(XhtmlFragment xml) {
@@ -81,19 +81,19 @@ public class RequestMessages {
     }
 
     public static List<String> consumeInfoMessages() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         getInfoQueue().drainTo(result);
         return result;
     }
 
     public static List<String> consumeWarningMessages() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         getWarningQueue().drainTo(result);
         return result;
     }
 
     public static List<String> consumeErrorMessages() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         getErrorQueue().drainTo(result);
         return result;
     }
@@ -114,18 +114,18 @@ public class RequestMessages {
         HttpServletRequest req = ElementsThreadLocals.getHttpServletRequest();
         if (req == null) {
             logger.debug("No request available. Returning dummy queue.");
-            return new LinkedBlockingQueue<String>();
+            return new LinkedBlockingQueue<>();
         }
-        BlockingQueue<String> infoQueue;
+        BlockingQueue<String> queue;
         synchronized (req) {
-            infoQueue = (BlockingQueue) req.getAttribute(queueName);
-            if (infoQueue == null) {
+            queue = (BlockingQueue) req.getAttribute(queueName);
+            if (queue == null) {
                 // install a new queue
-                infoQueue = new LinkedBlockingQueue<>();
-                req.setAttribute(queueName, infoQueue);
+                queue = new LinkedBlockingQueue<>();
+                req.setAttribute(queueName, queue);
             }
         }
-        return infoQueue;
+        return queue;
     }
 
 }

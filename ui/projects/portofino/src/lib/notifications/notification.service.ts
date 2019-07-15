@@ -1,6 +1,6 @@
 import {ErrorHandler, Injectable} from "@angular/core";
 import {Observable, of} from "rxjs";
-import {map, mergeMap, share} from "rxjs/operators";
+import {catchError, map, mergeMap, share} from "rxjs/operators";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material/snack-bar";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
@@ -61,42 +61,56 @@ export class MatSnackBarNotificationService extends NotificationService {
   }
 }
 
+export const PORTOFINO_MESSAGE_HEADER = "X-Portofino-Message";
+
 @Injectable()
 export class NotificationInterceptor implements HttpInterceptor {
-
-  readonly headerRegex = /^([^:]+?): (.+?)$/g;
 
   constructor(protected notificationService: NotificationService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(map(value => {
       if(value.type == HttpEventType.Response) {
-        let messages = value.headers.getAll("X-Portofino-Message") || [];
-        messages.forEach(message => {
-          const result = this.headerRegex.exec(message);
-          if(result && result.length > 0) {
-            const type = result[1];
-            const mess = result[2];
-            switch (type) {
-              case 'info':
-                this.notificationService.info(mess);
-                break;
-              case 'warning':
-                this.notificationService.warn(mess);
-                break;
-              case 'error':
-                this.notificationService.error(mess);
-                break;
-              default:
-                this.notificationService.warn(mess);
-            }
-          } else {
-            this.notificationService.error(message);
-          }
-        })
+        let messages = value.headers.getAll(PORTOFINO_MESSAGE_HEADER) || [];
+        this.display(messages);
       }
       return value;
+    }), catchError(e => {
+      if(e.headers) {
+        const messages = e.headers.getAll(PORTOFINO_MESSAGE_HEADER);
+        if(messages) {
+          this.display(messages);
+          e.__portofino_handled = true;
+        }
+      }
+      throw e;
     }));
+  }
+
+  protected display(messages) {
+    const headerRegex = /^([^:]+?): (.+?)$/g;
+    messages.forEach(message => {
+      const result = headerRegex.exec(message);
+      if (result && result.length > 0) {
+        const type = result[1];
+        const mess = result[2];
+        switch (type) {
+          case 'info':
+            this.notificationService.info(mess);
+            break;
+          case 'warning':
+            this.notificationService.warn(mess);
+            break;
+          case 'error':
+            this.notificationService.error(mess);
+            break;
+          default:
+            this.notificationService.warn(mess);
+        }
+      } else {
+        this.notificationService.error(message);
+      }
+    });
   }
 }
 
@@ -109,6 +123,9 @@ export class NotificationErrorHandler extends ErrorHandler {
 
   handleError(error: any): void {
     super.handleError(error);
+    if(error.__portofino_handled) {
+      return;
+    }
     if(error.status) {
       this.notificationService.error(this.translate.get("Server error"));
     } else if(error.status === 0) {

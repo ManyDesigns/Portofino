@@ -12,12 +12,14 @@ import {WebStorageService} from "ngx-store";
 import {TranslateService} from "@ngx-translate/core";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
+export const CHANGE_PASSWORD_COMPONENT = new InjectionToken('Change Password Component');
 export const TOKEN_STORAGE_SERVICE = new InjectionToken('JSON Web Token Storage');
 
 @Injectable()
 export class AuthenticationService {
 
-  dialogRef: MatDialogRef<any>;
+  credentialsObservable: Observable<any>;
+  changePasswordObservable: Observable<any>;
   currentUser: UserInfo;
   retryUnauthenticatedOnSessionExpiration = true;
   readonly logins = new EventEmitter<UserInfo>();
@@ -25,8 +27,10 @@ export class AuthenticationService {
 
   constructor(private http: HttpClient, protected dialog: MatDialog,
               @Inject(TOKEN_STORAGE_SERVICE) protected storage: WebStorageService,
-              private portofino: PortofinoService, @Inject(LOGIN_COMPONENT) protected loginComponent,
-              protected notifications: NotificationService, protected translate: TranslateService) {
+              private portofino: PortofinoService, protected notifications: NotificationService,
+              protected translate: TranslateService,
+              @Inject(LOGIN_COMPONENT) protected loginComponent,
+              @Inject(CHANGE_PASSWORD_COMPONENT) protected changePasswordComponent) {
     const userInfo = this.storage.get('user');
     if(userInfo) {
       this.currentUser = new UserInfo(userInfo.displayName, userInfo.administrator, userInfo.groups);
@@ -69,11 +73,12 @@ export class AuthenticationService {
   }
 
   protected askForCredentials() {
-    if(!this.dialogRef) {
-      this.dialogRef = this.dialog.open(this.loginComponent);
+    if(this.credentialsObservable) {
+      return this.credentialsObservable;
     }
-    return this.dialogRef.afterClosed().pipe(map(result => {
-      this.dialogRef = null;
+    const dialogRef = this.dialog.open(this.loginComponent);
+    this.credentialsObservable = dialogRef.afterClosed().pipe(map(result => {
+      this.credentialsObservable = null;
       if (result && result.jwt) {
         this.setAuthenticationInfo(result);
         return result;
@@ -81,10 +86,23 @@ export class AuthenticationService {
         return null;
       }
     }));
+    return this.credentialsObservable;
   }
 
   public showLoginDialog() {
     this.askForCredentials().subscribe();
+  }
+
+  public showChangePasswordDialog() {
+    if(this.changePasswordObservable) {
+      return this.changePasswordObservable;
+    }
+    const dialogRef = this.dialog.open(this.changePasswordComponent);
+    this.changePasswordObservable = dialogRef.afterClosed().pipe(map(result => {
+      this.changePasswordObservable = null;
+      return result;
+    }));
+    return this.changePasswordObservable;
   }
 
   protected removeAuthenticationInfo() {
@@ -127,6 +145,17 @@ export class AuthenticationService {
     return this.http.post(
       this.loginPath,
       new HttpParams({fromObject: {"username": username, "password": password}}),
+      {headers: headers}
+    );
+  }
+
+  changePassword(oldPassword, newPassword) {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .set(NO_AUTH_HEADER, 'true');
+    return this.http.put(
+      `${this.loginPath}/password`,
+      new HttpParams({fromObject: {"oldPassword": oldPassword, "newPassword": newPassword}}),
       {headers: headers}
     );
   }

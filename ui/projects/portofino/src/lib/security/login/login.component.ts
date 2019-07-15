@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from "@angular/material/dialog";
 import {AuthenticationService} from "../authentication.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {NotificationService} from "../../notifications/notification.service";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-login',
@@ -10,37 +12,28 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 })
 export class LoginComponent implements OnInit {
 
-  public loginRecord: FormGroup;
-  formErrors: any;
+  loginForm: FormGroup;
 
-  message: string;
-
-  constructor(private dialogRef: MatDialogRef<LoginComponent>, private authenticationService: AuthenticationService,
-              private builder: FormBuilder) {
-    this.loginRecord = this.builder.group({
+  constructor(protected dialogRef: MatDialogRef<LoginComponent>, protected authenticationService: AuthenticationService,
+              protected formBuilder: FormBuilder, protected notificationService: NotificationService,
+              protected translate: TranslateService) {
+    this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
-
-    this.formErrors = {
-      username: {},
-      password: {},
-    };
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   login() {
-    const loginRecord = this.loginRecord;
-    this.authenticationService.login(loginRecord.get('username').value, loginRecord.get('password').value).subscribe(
+    this.authenticationService.login(this.loginForm.get('username').value, this.loginForm.get('password').value).subscribe(
       result => {
         this.dialogRef.close(result);
-        this.loginRecord.get('password').setValue("");
+        this.loginForm.get('password').setValue("");
       },
-      error => {
-        this.message = "Login failed";
-        this.loginRecord.get('password').setValue("");
+      () => {
+        this.notificationService.error(this.translate.get("Login failed"));
+        this.loginForm.get('password').setValue("");
       });
   }
 

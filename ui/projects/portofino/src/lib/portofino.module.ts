@@ -20,7 +20,7 @@ import {LOCALE_STORAGE_SERVICE, LOCALES, PortofinoService, ProgressInterceptor} 
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
   AuthenticationInterceptor,
-  AuthenticationService,
+  AuthenticationService, CHANGE_PASSWORD_COMPONENT,
   LOGIN_COMPONENT,
   TOKEN_STORAGE_SERVICE
 } from "./security/authentication.service";
@@ -107,6 +107,7 @@ import {TablesComponent} from "./administration/tables.component";
 import {ActionsComponent, CreateActionComponent, GenericPage} from "./administration/actions.component";
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
+import {ChangePasswordComponent} from "./security/login/change-password.component";
 
 @NgModule({
   declarations: [
@@ -125,7 +126,9 @@ import {TRANSLATIONS_IT} from "./i18n/it";
   exports: [
     FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
     NumberFieldComponent, SelectFieldComponent, TextFieldComponent,
-    FormComponent]
+    FormComponent,
+    MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule]
 })
 export class PortofinoFormsModule {}
 
@@ -141,11 +144,9 @@ export class PortofinoFormsModule {}
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule,
-    MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatProgressBarModule, MatRadioModule,
-    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
+    MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule, MatMenuModule,
+    MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
+    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule.forChild()
   ],
   providers: [PortofinoService, AuthenticationService, PageService, PageCrudService],
@@ -212,7 +213,7 @@ export class PortofinoCrudModule {}
 export class PortofinoUpstairsModule {}
 
 @NgModule({
-  declarations: [PortofinoAppComponent, LoginComponent],
+  declarations: [PortofinoAppComponent, LoginComponent, ChangePasswordComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
@@ -226,6 +227,7 @@ export class PortofinoUpstairsModule {}
   providers: [
     //These are factories to avoid circular dependencies
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
+    { provide: CHANGE_PASSWORD_COMPONENT, useFactory: PortofinoModule.changePasswordComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: FOOTER_COMPONENT, useFactory: PortofinoModule.footerComponent },
@@ -240,7 +242,7 @@ export class PortofinoUpstairsModule {}
       { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
     { provide: NotificationService, useClass: MatSnackBarNotificationService },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
-  entryComponents: [LoginComponent],
+  entryComponents: [LoginComponent, ChangePasswordComponent],
   exports: [
     PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent, LoginComponent, TemplatesComponent,
     ContentComponent, PageFactoryComponent, PageHeader,
@@ -250,6 +252,10 @@ export class PortofinoUpstairsModule {}
     ManyToManyComponent]
 })
 export class PortofinoModule {
+  static changePasswordComponent() {
+    return ChangePasswordComponent;
+  }
+
   static loginComponent() {
     return LoginComponent;
   }

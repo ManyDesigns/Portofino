@@ -31,6 +31,9 @@ package com.manydesigns.portofino.resourceactions.login;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.RequestMessages;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
@@ -46,6 +49,7 @@ import com.manydesigns.portofino.shiro.JSONWebToken;
 import com.manydesigns.portofino.shiro.JWTFilter;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -187,7 +191,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     @Path("password")
     @PUT
-    public void changePassword(@FormParam("password") String password, @FormParam("newPassword") String newPassword) {
+    public void changePassword(@FormParam("oldPassword") String oldPassword, @FormParam("newPassword") String newPassword) {
         List<String> errorMessages = new ArrayList<>();
         if (!checkPasswordStrength(newPassword, errorMessages)) {
             for (String current : errorMessages) {
@@ -201,7 +205,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
         Serializable principal = (Serializable) subject.getPrincipal();
         Serializable userId = portofinoRealm.getUserId(principal);
         try {
-            portofinoRealm.changePassword(principal, password, newPassword);
+            portofinoRealm.changePassword(principal, oldPassword, newPassword);
             if(subject.isRemembered()) {
                 UsernamePasswordToken usernamePasswordToken =
                         new UsernamePasswordToken(getRememberedUserName(principal), newPassword);
@@ -226,6 +230,18 @@ public class DefaultLoginAction extends AbstractResourceAction {
     protected String getRememberedUserName(Serializable principal) {
         PortofinoRealm realm = ShiroUtils.getPortofinoRealm();
         return realm.getUsername(principal);
+    }
+
+    @Path("user/classAccessor")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Operation(summary = "The class accessor that describes the registration of a new user")
+    public String describeClassAccessor() {
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        ClassAccessor classAccessor = portofinoRealm.getSelfRegisteredUserClassAccessor();
+        JSONStringer jsonStringer = new JSONStringer();
+        ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
+        return jsonStringer.toString();
     }
 
     @Path("{sessionId}")

@@ -1,13 +1,17 @@
 <h4 mat-dialog-title>{{ 'Sign in' | translate }}</h4>
 <mat-dialog-content>
-  <form (submit)="login()" [formGroup]="loginRecord">
+  <form (submit)="login()" [formGroup]="loginForm">
     <mat-form-field>
-      <input matInput placeholder="Username" name="username" formControlName="username">
-      <mat-error>{{message}}</mat-error>
+      <input matInput placeholder="{{ 'Username' | translate }}" name="username" formControlName="username">
+      <mat-error *ngIf="loginForm.get('username').hasError('required')" class="alert alert-danger">
+        {{ 'Username is required.' | translate }}
+      </mat-error>
     </mat-form-field>
     <mat-form-field>
-      <input matInput placeholder="Password" type="password" name="password" formControlName="password">
-      <mat-error>{{message}}</mat-error>
+      <input matInput placeholder="{{ 'Password' | translate }}" type="password" name="password" formControlName="password">
+      <mat-error *ngIf="loginForm.get('password').hasError('required')" class="alert alert-danger">
+        {{ 'Password is required.' | translate }}
+      </mat-error>
     </mat-form-field>
     <button type="submit" style="display:none">{{ 'Sign in' | translate }}</button>
   </form>
