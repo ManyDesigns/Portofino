@@ -39,7 +39,7 @@ class Security extends AbstractPortofinoRealm {
         return loadAuthenticationInfo(token);
     }
 
-    public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
+    AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String login = usernamePasswordToken.username;
         String plainTextPassword;
         if (usernamePasswordToken.password == null) {
@@ -225,12 +225,17 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     String getUserPrettyName(Serializable user) {
-        return "${user.first_name} ${user.last_name}";
+        "${user.first_name} ${user.last_name}"
     }
 
     @Override
     Serializable getUserId(Serializable user) {
-        return user.id
+        user.id
+    }
+
+    @Override
+    String getUsername(Serializable user) {
+        user.email
     }
 
     @Override

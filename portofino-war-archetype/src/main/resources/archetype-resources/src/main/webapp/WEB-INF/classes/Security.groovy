@@ -65,7 +65,13 @@ class Security extends AbstractPortofinoRealm {
         user
     }
 
+    @Override
     Serializable getUserId(Serializable user) {
+        user
+    }
+
+    @Override
+    String getUsername(Serializable user) {
         user
     }
 

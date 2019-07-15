@@ -300,16 +300,25 @@ public class Security extends AbstractPortofinoRealm {
     @Override
     String getUserPrettyName(Serializable user) {
         if(StringUtils.isEmpty(userNameProperty)) {
-            return user.toString();
+            return user.toString()
         }
-        return user[userNameProperty];
+        return user[userNameProperty]
     }
 
+    @Override
     Serializable getUserId(Serializable user) {
         if(StringUtils.isEmpty(userIdProperty)) {
-            return user.toString();
+            return user.toString()
         }
-        return (Serializable) user[userIdProperty];
+        return (Serializable) user[userIdProperty]
+    }
+
+    @Override
+    String getUsername(Serializable user) {
+        if(StringUtils.isEmpty(userNameProperty)) {
+            return user.toString()
+        }
+        return user[userNameProperty]
     }
 
     @Override

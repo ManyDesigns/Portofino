@@ -148,6 +148,14 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     Serializable getUserId(Serializable user);
 
+    /**
+     * Extracts a value that, together with a password, uniquely identifies the user. This is the username or login name
+     * that the user provides when authenticating via username and password.
+     * @param user the user's primary principal (as returned by loadAuthenticationInfo()).
+     * @return the username.
+     */
+    String getUsername(Serializable user);
+
     //--------------------------------------------------------------------------
     // Groups CRUD
     //--------------------------------------------------------------------------

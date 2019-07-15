@@ -29,11 +29,14 @@
 
 package com.manydesigns.portofino.resourceactions.login;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
@@ -43,8 +46,10 @@ import com.manydesigns.portofino.shiro.JSONWebToken;
 import com.manydesigns.portofino.shiro.JWTFilter;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.session.Session;
@@ -56,6 +61,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,7 +72,7 @@ import java.io.Serializable;
  */
 @ScriptTemplate("script_template.groovy")
 @ResourceActionName("Login")
-public class DefaultLoginAction extends LoginAction implements ResourceAction {
+public class DefaultLoginAction extends AbstractResourceAction {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
@@ -80,7 +87,6 @@ public class DefaultLoginAction extends LoginAction implements ResourceAction {
     // ResourceAction implementation
     //--------------------------------------------------------------------------
 
-    @Override
     @POST
     @Produces("application/json")
     public String login(@FormParam("username") String username, @FormParam("password") String password)
@@ -134,12 +140,10 @@ public class DefaultLoginAction extends LoginAction implements ResourceAction {
         return stringer.toString();
     }
 
-    @Override
     protected void sendForgotPasswordEmail(String from, String to, String subject, String body) {
         sendMail(from, to, subject, body);
     }
 
-    @Override
     protected void sendSignupConfirmationEmail(String from, String to, String subject, String body) {
         sendMail(from, to, subject, body);
     }
@@ -161,9 +165,81 @@ public class DefaultLoginAction extends LoginAction implements ResourceAction {
         }
     }
 
-    @Override
     public String getApplicationName() {
         return portofinoConfiguration.getString(PortofinoProperties.APP_NAME);
+    }
+
+    protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
+        if (password == null) {
+            errorMessages.add(ElementsThreadLocals.getText("null.password"));
+            return false;
+        }
+        if (password.length() < 8) {
+            errorMessages.add(ElementsThreadLocals.getText("password.too.short", 8));
+            return false;
+        }
+        if (StringUtils.isAlpha(password)) {
+            errorMessages.add(ElementsThreadLocals.getText("password.only.letters"));
+            return false;
+        }
+        return true;
+    }
+
+    @Path("password")
+    @PUT
+    public void changePassword(@FormParam("password") String password, @FormParam("newPassword") String newPassword) {
+        List<String> errorMessages = new ArrayList<>();
+        if (!checkPasswordStrength(newPassword, errorMessages)) {
+            for (String current : errorMessages) {
+                RequestMessages.addErrorMessage(current);
+            }
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        Subject subject = SecurityUtils.getSubject();
+        Serializable principal = (Serializable) subject.getPrincipal();
+        Serializable userId = portofinoRealm.getUserId(principal);
+        try {
+            portofinoRealm.changePassword(principal, password, newPassword);
+            if(subject.isRemembered()) {
+                UsernamePasswordToken usernamePasswordToken =
+                        new UsernamePasswordToken(getRememberedUserName(principal), newPassword);
+                usernamePasswordToken.setRememberMe(true);
+                try {
+                    subject.login(usernamePasswordToken);
+                } catch (Exception e) {
+                    logger.warn("User " + userId + " changed password but could not be subsequently authenticated", e);
+                }
+            }
+        } catch (IncorrectCredentialsException e) {
+            logger.warn("User {} password change: Incorrect credentials", userId);
+            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("wrong.password"));
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("Password update failed for user " + userId, e);
+            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("password.change.failed"));
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    protected String getRememberedUserName(Serializable principal) {
+        PortofinoRealm realm = ShiroUtils.getPortofinoRealm();
+        return realm.getUsername(principal);
+    }
+
+    @Path("{sessionId}")
+    @DELETE
+    @Deprecated
+    public void logout(@PathParam("sessionId") String sessionId) {
+        logout();
+    }
+
+    @DELETE
+    public void logout() {
+        Subject subject = SecurityUtils.getSubject();
+        subject.logout();
+        logger.info("User logout");
     }
 
 }

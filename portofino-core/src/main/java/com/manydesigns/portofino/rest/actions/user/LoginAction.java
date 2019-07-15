@@ -61,28 +61,9 @@ public abstract class LoginAction extends AbstractResourceAction {
     //**************************************************************************
 
     protected Form signUpForm;
-    public String returnUrl;
-    public String cancelReturnUrl;
-
-    //**************************************************************************
-    // Captcha
-    //**************************************************************************
-
-    private static Cage cage;
-    public static final String CAPTCHA_SESSION_ATTRIBUTE = "LoginAction.captcha";
-    public boolean captchaValidationFailed;
 
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
-
-    static {
-        try {
-            cage = new CaptchaGenerator();
-        } catch (NoClassDefFoundError e) {
-            cage = null;
-            logger.warn("Captcha generator not available", e);
-        }
-    }
 
     public LoginAction() {}
 
@@ -464,21 +445,6 @@ public abstract class LoginAction extends AbstractResourceAction {
     // Utility methods
     //**************************************************************************
 
-    protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
-        if (password == null) {
-            errorMessages.add(ElementsThreadLocals.getText("null.password"));
-            return false;
-        }
-        if (password.length() < 8) {
-            errorMessages.add(ElementsThreadLocals.getText("password.too.short", 8));
-            return false;
-        }
-        if (StringUtils.isAlpha(password)) {
-            errorMessages.add(ElementsThreadLocals.getText("password.only.letters"));
-            return false;
-        }
-        return true;
-    }
 //
 //    protected Resolution redirectToReturnUrl() {
 //        return redirectToReturnUrl(returnUrl);
@@ -512,31 +478,7 @@ public abstract class LoginAction extends AbstractResourceAction {
 
     public abstract String getApplicationName();
 
-    public String getReturnUrl() {
-        return returnUrl;
-    }
-
-    public void setReturnUrl(String returnUrl) {
-        this.returnUrl = returnUrl;
-    }
-
-    public String getCancelReturnUrl() {
-        return cancelReturnUrl;
-    }
-
-    public void setCancelReturnUrl(String cancelReturnUrl) {
-        this.cancelReturnUrl = cancelReturnUrl;
-    }
-
-    public Configuration getPortofinoConfiguration() {
-        return portofinoConfiguration;
-    }
-
     public Form getSignUpForm() {
         return signUpForm;
-    }
-
-    public boolean isCaptchaValidationFailed() {
-        return captchaValidationFailed;
     }
 }
