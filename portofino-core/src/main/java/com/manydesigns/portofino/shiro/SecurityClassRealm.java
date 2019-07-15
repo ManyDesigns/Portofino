@@ -190,6 +190,11 @@ public class SecurityClassRealm implements PortofinoRealm, Destroyable {
     }
 
     @Override
+    public String getUsername(Serializable user) {
+        return ensureDelegate().getUsername(user);
+    }
+
+    @Override
     public Set<String> getGroups() {
         return ensureDelegate().getGroups();
     }
