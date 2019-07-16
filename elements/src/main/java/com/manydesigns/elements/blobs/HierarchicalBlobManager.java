@@ -41,10 +41,11 @@ public class HierarchicalBlobManager extends SimpleBlobManager {
             Repository repository = RepositoryRegistry.getInstance().getRepository(blob.getRepository());
             repository.load(blob);
         } else {
+            FileInputStream fileInputStream = new FileInputStream(getDataFile(blob.getCode()));
             if(blob.isEncrypted()) {
-                blob.setInputStream(BlobUtils.decrypt(new FileInputStream(getDataFile(blob.getCode())), blob.getEncryptionType()));
+                blob.setInputStream(BlobUtils.decrypt(fileInputStream, blob.getEncryptionType()));
             } else {
-                blob.setInputStream(new FileInputStream(getDataFile(blob.getCode())));
+                blob.setInputStream(fileInputStream);
             }
         }
         return blob.getInputStream();
@@ -62,14 +63,12 @@ public class HierarchicalBlobManager extends SimpleBlobManager {
             if(!metaFile.getParentFile().isDirectory()) {
                 metaFile.getParentFile().mkdirs();
             }
-            FileOutputStream out = new FileOutputStream(metaFile);
-            try {
+            try(FileOutputStream out = new FileOutputStream(metaFile)) {
                 blob.getMetaProperties().store(out, "Remote Blob code #" + blob.getCode()); //TODO aggiungere altre info in commento
             } finally {
-                IOUtils.closeQuietly(out);
+                blob.dispose();
             }
-            blob.dispose();
-        }else{
+        } else {
             super.save(blob);
         }
     }
@@ -86,22 +85,22 @@ public class HierarchicalBlobManager extends SimpleBlobManager {
             String code = blob.getCode();
             ensureValidCode(code);
             File metaFile = getMetaFile(code);
-            boolean success = true;
+            boolean success;
             try {
                 Repository repository=RepositoryRegistry.getInstance().getRepository(blob.getRepository());
-                success = repository.delete(blob) && success;
+                success = repository.delete(blob);
             } catch (Exception e) {
                 logger.warn("Cound not delete file from repository ", e);
                 success = false;
             }
             try {
-                success = metaFile.delete() && success;
+                success = success && metaFile.delete();
             } catch (Exception e) {
                 logger.warn("Cound not delete meta file", e);
                 success = false;
             }
             return success;
-        }else {
+        } else {
             return super.delete(blob);
         }
     }

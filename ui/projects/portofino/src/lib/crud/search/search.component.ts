@@ -6,7 +6,6 @@ import {
   OnInit,
   QueryList,
   Type,
-  ViewChild,
   ViewChildren
 } from '@angular/core';
 import {
@@ -14,7 +13,6 @@ import {
   isDateProperty,
   isEnabled,
   isInSummary,
-  isNumericProperty,
   isSearchable,
   Property, SelectionOption
 } from "../../class-accessor";

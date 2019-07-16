@@ -142,15 +142,15 @@ public class SimpleBlobManager implements BlobManager {
         ensureValidCode(code);
         File metaFile = getMetaFile(code);
         File dataFile = getDataFile(code);
-        boolean success = true;
+        boolean success;
         try {
-            success = metaFile.delete() && success;
+            success = metaFile.delete();
         } catch (Exception e) {
             logger.warn("Cound not delete meta file", e);
             success = false;
         }
         try {
-            success = dataFile.delete() && success;
+            success = success && dataFile.delete();
         } catch (Exception e) {
             logger.warn("Cound not delete data file", e);
             success = false;
