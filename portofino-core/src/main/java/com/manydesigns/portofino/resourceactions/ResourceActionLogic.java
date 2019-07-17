@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -73,7 +74,7 @@ public class ResourceActionLogic {
         if(scriptTemplate != null) {
             String templateLocation = scriptTemplate.value();
             try {
-                return IOUtils.toString(actionClass.getResourceAsStream(templateLocation), Charset.forName("UTF-8"));
+                return IOUtils.toString(actionClass.getResourceAsStream(templateLocation), StandardCharsets.UTF_8);
             } catch (Exception e) {
                 logger.error("Can't load script template: " + templateLocation + " for class: " + actionClass.getName(), e);
             }
@@ -88,7 +89,7 @@ public class ResourceActionLogic {
             InputStream stream =
                     ResourceActionLogic.class.getResourceAsStream
                             ("/com/manydesigns/portofino/resourceactions/default_script_template.txt");
-            return IOUtils.toString(stream, Charset.forName("UTF-8"));
+            return IOUtils.toString(stream, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new Error("Can't load script template", e);
         }

@@ -13,6 +13,7 @@ export const LOCALES = new InjectionToken('Locales');
 @Injectable()
 export class PortofinoService {
 
+  applicationName: string;
   defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
   localApiPath = 'portofino';

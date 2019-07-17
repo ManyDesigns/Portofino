@@ -24,6 +24,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Keys for configuration properties.
@@ -64,7 +65,7 @@ public final class PortofinoProperties {
     //Utilities
     public static String getPortofinoVersion() {
         try {
-            return IOUtils.toString(PortofinoProperties.class.getResourceAsStream("/portofino.version"), Charset.forName("UTF-8"));
+            return IOUtils.toString(PortofinoProperties.class.getResourceAsStream("/portofino.version"), StandardCharsets.UTF_8);
         } catch (IOException e) {
             return null;
         }

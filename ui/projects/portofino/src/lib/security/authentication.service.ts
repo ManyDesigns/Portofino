@@ -3,7 +3,7 @@ import {
   HttpClient,
   HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpParams, HttpRequest
 } from "@angular/common/http";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import {MatDialog} from "@angular/material/dialog";
 import {Observable, throwError} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
@@ -158,6 +158,12 @@ export class AuthenticationService {
       new HttpParams({fromObject: {"oldPassword": oldPassword, "newPassword": newPassword}}),
       {headers: headers}
     );
+  }
+
+  sendForgotPasswordEmail(email, loginPageUrl) {
+    return this.http.post(`${this.loginPath}/:send-reset-password-email`,{
+      email: email, loginPageUrl: loginPageUrl, siteNameOrAddress: this.portofino.applicationName
+    });
   }
 
   get loginPath() {

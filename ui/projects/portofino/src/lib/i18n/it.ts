@@ -40,6 +40,7 @@ export const TRANSLATIONS_IT = {
   "False string": "Stringa per il valore false",
   "Foreign keys": "Chiavi esterne",
   "Foreign keys and selection providers": "Chiavi esterne e selection provider",
+  "Forgot password": "Password dimenticata",
   "Group": "Gruppo",
   "Hibernate dialect": "Dialect di Hibernate",
   "Icon": "Icona",

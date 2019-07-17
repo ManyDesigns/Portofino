@@ -24,14 +24,11 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -84,19 +81,19 @@ public class SessionMessages {
     }
 
     public static List<String> consumeInfoMessages() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         getInfoQueue().drainTo(result);
         return result;
     }
 
     public static List<String> consumeWarningMessages() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         getWarningQueue().drainTo(result);
         return result;
     }
 
     public static List<String> consumeErrorMessages() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         getErrorQueue().drainTo(result);
         return result;
     }
@@ -117,7 +114,7 @@ public class SessionMessages {
         HttpServletRequest req = ElementsThreadLocals.getHttpServletRequest();
         if (req == null) {
             logger.debug("No request available. Returning dummy queue.");
-            return new LinkedBlockingQueue<String>();
+            return new LinkedBlockingQueue<>();
         }
         HttpSession session = req.getSession();
         BlockingQueue<String> infoQueue;

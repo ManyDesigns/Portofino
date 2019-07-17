@@ -98,6 +98,7 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
       this.portofino.defaultApiRoot = this.apiRoot;
     }
     this.portofino.upstairsLink = this.upstairsLink;
+    this.portofino.applicationName = this.title;
     this.portofino.init();
   }
 

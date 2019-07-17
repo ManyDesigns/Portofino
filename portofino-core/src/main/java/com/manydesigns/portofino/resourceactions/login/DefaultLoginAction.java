@@ -32,6 +32,8 @@ package com.manydesigns.portofino.resourceactions.login;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.servlet.UrlBuilder;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.mail.queue.MailQueue;
@@ -45,11 +47,9 @@ import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.rest.actions.user.LoginAction;
 import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.shiro.JSONWebToken;
-import com.manydesigns.portofino.shiro.JWTFilter;
-import com.manydesigns.portofino.shiro.PortofinoRealm;
-import com.manydesigns.portofino.shiro.ShiroUtils;
+import com.manydesigns.portofino.shiro.*;
 import io.swagger.v3.oas.annotations.Operation;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -61,12 +61,18 @@ import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -80,16 +86,8 @@ public class DefaultLoginAction extends AbstractResourceAction {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
-    // Properties
-    //--------------------------------------------------------------------------
-
     @Autowired
     public MailQueue mailQueue;
-
-    //--------------------------------------------------------------------------
-    // ResourceAction implementation
-    //--------------------------------------------------------------------------
 
     @POST
     @Produces("application/json")
@@ -144,12 +142,87 @@ public class DefaultLoginAction extends AbstractResourceAction {
         return stringer.toString();
     }
 
+    public static class ResetPasswordEmailRequest {
+        public String email;
+        public String siteNameOrAddress;
+        public String loginPageUrl;
+    }
+
+    @Path(":send-reset-password-email")
+    @POST
+    public void sendResetPasswordEmail(ResetPasswordEmailRequest req) {
+        if (SecurityUtils.getSubject().isAuthenticated()) {
+            logger.debug("Already logged in");
+            return;
+        }
+
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        try {
+            Serializable user = portofinoRealm.getUserByEmail(req.email);
+            if(user != null) {
+                String token = portofinoRealm.generateOneTimeToken(user);
+                String body = getResetPasswordEmailBody(req.siteNameOrAddress, req.loginPageUrl.replace("TOKEN", token));
+                String from = portofinoConfiguration.getString(PortofinoProperties.MAIL_FROM);
+                String subject = ElementsThreadLocals.getText("password.reset.confirmation.required");
+                sendForgotPasswordEmail(from, req.email, subject, body);
+            } else {
+                logger.warn("Forgot password request for nonexistent email");
+            }
+        } catch (Exception e) {
+            logger.error("Error during password reset", e);
+            throw new WebApplicationException(ElementsThreadLocals.getText("password.reset.failed"), e);
+        }
+    }
+
+    protected String getResetPasswordEmailBody(String site, String changePasswordLink) throws IOException {
+        String countryIso = context.getRequest().getLocale().getLanguage().toLowerCase();
+        InputStream is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail." + countryIso + ".html");
+        if(is == null) {
+            is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail.en.html");
+        }
+        try(InputStream stream = is) {
+            String template = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            return template.replace("$link", changePasswordLink).replace("$site", site);
+        }
+    }
+
     protected void sendForgotPasswordEmail(String from, String to, String subject, String body) {
         sendMail(from, to, subject, body);
     }
 
     protected void sendSignupConfirmationEmail(String from, String to, String subject, String body) {
         sendMail(from, to, subject, body);
+    }
+
+    public static class ResetPasswordRequest {
+        public String token;
+        public String newPassword;
+    }
+
+    @Path(":reset-password")
+    @POST
+    public void resetPassword(ResetPasswordRequest request) {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return;
+        }
+
+        List<String> errorMessages = new ArrayList<String>();
+        if (!checkPasswordStrength(request.newPassword, errorMessages)) {
+            for (String current : errorMessages) {
+                RequestMessages.addErrorMessage(current);
+            }
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
+        PasswordResetToken token = new PasswordResetToken(request.token, request.newPassword);
+        try {
+            subject.login(token);
+        } catch (AuthenticationException e) {
+            String errMsg = ElementsThreadLocals.getText("the.password.reset.link.is.no.longer.active");
+            throw new WebApplicationException(errMsg, e, Response.Status.UNAUTHORIZED);
+        }
     }
 
     protected void sendMail(String from, String to, String subject, String body) {
@@ -197,7 +270,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             for (String current : errorMessages) {
                 RequestMessages.addErrorMessage(current);
             }
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
@@ -219,7 +292,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
         } catch (IncorrectCredentialsException e) {
             logger.warn("User {} password change: Incorrect credentials", userId);
             RequestMessages.addErrorMessage(ElementsThreadLocals.getText("wrong.password"));
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
         } catch (Exception e) {
             logger.error("Password update failed for user " + userId, e);
             RequestMessages.addErrorMessage(ElementsThreadLocals.getText("password.change.failed"));

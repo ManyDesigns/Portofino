@@ -375,15 +375,16 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         addAttribute("class", "text file");
         addAttribute("data-show-preview", "false");
         addAttribute("data-show-upload", "false");
-        if (disabled)
+        if (disabled) {
             addAttribute("disabled", "disabled");
+        }
         closeElement("input");
-        String script = "$('#"+StringEscapeUtils.escapeJavaScript(id)+"').fileinput({'showUpload':false, 'previewFileType':'text' , 'browseLabel':'' , 'removeLabel':''}); ";
+        String script = "$('#" + StringEscapeUtils.escapeJavaScript(id) + "').fileinput({'showUpload':false, 'previewFileType':'text' , 'browseLabel':'' , 'removeLabel':''}); ";
 
         if (disabled)
-            script+="$('#"+StringEscapeUtils.escapeJavaScript(id)+"').fileinput('disable');";
+            script += "$('#" + StringEscapeUtils.escapeJavaScript(id) + "').fileinput('disable');";
 
-         writeJavaScript(script);
+        writeJavaScript(script);
 
     }
 

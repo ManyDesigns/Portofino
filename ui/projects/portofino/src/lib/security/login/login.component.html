@@ -1,6 +1,7 @@
-<h4 mat-dialog-title>{{ 'Sign in' | translate }}</h4>
+<h4 mat-dialog-title *ngIf="!forgotPassword">{{ 'Sign in' | translate }}</h4>
+<h4 mat-dialog-title *ngIf="forgotPassword">{{ 'Forgot password' | translate }}</h4>
 <mat-dialog-content>
-  <form (submit)="login()" [formGroup]="loginForm">
+  <form (submit)="login()" [formGroup]="loginForm" *ngIf="!forgotPassword">
     <mat-form-field>
       <input matInput placeholder="{{ 'Username' | translate }}" name="username" formControlName="username">
       <mat-error *ngIf="loginForm.get('username').hasError('required')" class="alert alert-danger">
@@ -13,10 +14,25 @@
         {{ 'Password is required.' | translate }}
       </mat-error>
     </mat-form-field>
+    <br />
+    <a href="#" (click)="toggleForgotPassword(); $event.preventDefault();">{{ 'Forgot password' | translate }}</a>
     <button type="submit" style="display:none">{{ 'Sign in' | translate }}</button>
   </form>
+  <form (submit)="sendForgotPasswordEmail()" [formGroup]="forgotPasswordForm" *ngIf="forgotPassword">
+    <mat-form-field>
+      <input matInput placeholder="{{ 'Email' | translate }}" name="email" formControlName="email">
+      <mat-error *ngIf="forgotPasswordForm.get('email').hasError('required')" class="alert alert-danger">
+        {{ 'Email is required.' | translate }}
+      </mat-error>
+    </mat-form-field>
+    <button type="submit" style="display:none">{{ 'Send the email' | translate }}</button>
+  </form>
 </mat-dialog-content>
-<mat-dialog-actions>
+<mat-dialog-actions *ngIf="!forgotPassword">
   <button mat-button (click)="login()" color="accent">{{ 'Sign in' | translate }}</button>
   <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+</mat-dialog-actions>
+<mat-dialog-actions *ngIf="forgotPassword">
+  <button mat-button (click)="sendForgotPasswordEmail()" color="accent">{{ 'Send the email' | translate }}</button>
+  <button mat-button (click)="toggleForgotPassword()">{{ 'Cancel' | translate }}</button>
 </mat-dialog-actions>
