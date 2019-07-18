@@ -1,33 +1,72 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from "@angular/material/dialog";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {AuthenticationService} from "../authentication.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NotificationService} from "../../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
 import {Location} from "@angular/common";
+import {SignupComponent} from "./signup.component";
+import {ForgottenPasswordComponent} from "./forgotten-password.component";
+import {ActivatedRoute} from "@angular/router";
+import {ResetPasswordComponent} from "./reset-password.component";
 
 @Component({
   selector: 'portofino-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  template: `
+    <h4 mat-dialog-title>{{ 'Sign in' | translate }}</h4>
+    <mat-dialog-content>
+      <form (submit)="login()" [formGroup]="loginForm">
+        <mat-form-field>
+          <input matInput placeholder="{{ 'Username' | translate }}" name="username" formControlName="username">
+          <mat-error *ngIf="loginForm.get('username').hasError('required')" class="alert alert-danger">
+            {{ 'Username is required.' | translate }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="{{ 'Password' | translate }}" type="password" name="password" formControlName="password">
+          <mat-error *ngIf="loginForm.get('password').hasError('required')" class="alert alert-danger">
+            {{ 'Password is required.' | translate }}
+          </mat-error>
+        </mat-form-field>
+        <button type="submit" style="display:none">{{ 'Sign in' | translate }}</button>
+      </form>
+      <hr />
+      <a href="#" (click)="openForgotPasswordDialog(); $event.preventDefault();">{{ 'Forgot password?' | translate }}</a><br />
+      <a href="#" (click)="openSignUpDialog(); $event.preventDefault();">{{ 'Sign up' | translate }}</a> {{ "if you don't have an account" | translate }}
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button (click)="login()" color="accent">{{ 'Sign in' | translate }}</button>
+      <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+    </mat-dialog-actions>`
 })
 export class LoginComponent implements OnInit {
 
   loginForm: FormGroup;
-  forgotPassword = false;
-  forgotPasswordForm: FormGroup;
+  forgottenPasswordComponent = ForgottenPasswordComponent;
+  resetPasswordComponent = ResetPasswordComponent;
+  signupComponent = SignupComponent;
 
-  constructor(protected dialogRef: MatDialogRef<LoginComponent>, protected authenticationService: AuthenticationService,
+  constructor(protected dialog: MatDialog, protected dialogRef: MatDialogRef<LoginComponent>,
+              protected authenticationService: AuthenticationService, protected route: ActivatedRoute,
               protected formBuilder: FormBuilder, protected notificationService: NotificationService,
               protected translate: TranslateService, protected location: Location) {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
-    this.forgotPasswordForm = this.formBuilder.group({ email: ['', [Validators.required, Validators.email]] });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    if(this.route) {
+      this.route.queryParams.subscribe(params => {
+        if(params.hasOwnProperty('resetPassword')) {
+          this.dialog.open(this.resetPasswordComponent, {
+            data: { token: params.token }
+          })
+        }
+      });
+    }
+  }
 
   login() {
     this.authenticationService.login(this.loginForm.get('username').value, this.loginForm.get('password').value).subscribe(
@@ -41,18 +80,12 @@ export class LoginComponent implements OnInit {
       });
   }
 
-  sendForgotPasswordEmail() {
-    this.authenticationService.sendForgotPasswordEmail(this.forgotPasswordForm.get('email').value,
-      this.location.path(false) + "?token=TOKEN").subscribe(
-      () => {
-        this.notificationService.info(this.translate.get("Check your mailbox and follow the instructions."));
-        this.toggleForgotPassword();
-      }
-    );
+  openForgotPasswordDialog() {
+    this.dialog.open(this.forgottenPasswordComponent);
   }
 
-  toggleForgotPassword() {
-    this.forgotPassword = !this.forgotPassword;
+  openSignUpDialog() {
+    this.dialog.open(this.signupComponent);
   }
 
 }

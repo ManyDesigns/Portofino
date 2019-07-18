@@ -166,6 +166,12 @@ export class AuthenticationService {
     });
   }
 
+  resetPassword(newPassword, token) {
+    return this.http.post(`${this.loginPath}/:reset-password`,{
+      newPassword: newPassword, token: token
+    });
+  }
+
   get loginPath() {
     return `${this.portofino.apiRoot}${this.portofino.loginPath}`;
   }

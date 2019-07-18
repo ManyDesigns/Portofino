@@ -191,7 +191,7 @@ public class Pages extends Resource {
         }
         File sourceConfigFile = new File(servletContext.getRealPath(sourcePath));
         File destParentConfigDir = destParentConfigFile.getParentFile();
-        File destConfigDir = new File(destParentConfigDir, segment);
+        File destConfigDir = new File(destParentConfigDir, segment); //lgtm [java/path-injection] until https://github.com/Semmle/ql/issues/1416 is fixed
         if(destConfigDir.isDirectory() || destConfigDir.mkdirs()) {
             movePage(sourceConfigFile, new File(destConfigDir, "config.json"), detail ? "detailChildren" : "children");
         } else {

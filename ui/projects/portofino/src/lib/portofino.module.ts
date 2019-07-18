@@ -108,6 +108,9 @@ import {ActionsComponent, CreateActionComponent, GenericPage} from "./administra
 import {TRANSLATIONS_EN} from "./i18n/en";
 import {TRANSLATIONS_IT} from "./i18n/it";
 import {ChangePasswordComponent} from "./security/login/change-password.component";
+import {SignupComponent} from "./security/login/signup.component";
+import {ForgottenPasswordComponent} from "./security/login/forgotten-password.component";
+import {ResetPasswordComponent} from "./security/login/reset-password.component";
 
 @NgModule({
   declarations: [
@@ -157,7 +160,10 @@ export class PortofinoFormsModule {}
     PageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
     ContentComponent, PageFactoryComponent, PageHeader, TemplatesComponent,
     DefaultNavigationComponent, NavigationDirective, DefaultToolbarComponent, ToolbarDirective,
-    DefaultFooterComponent, FooterDirective]
+    DefaultFooterComponent, FooterDirective,
+    MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule, MatMenuModule,
+    MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
+    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule]
 })
 export class PortofinoPagesModule {}
 
@@ -170,11 +176,7 @@ export class PortofinoPagesModule {}
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
-    MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule,
-    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
+    MatPaginatorModule, MatSortModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
   ],
   providers: [],
@@ -184,7 +186,8 @@ export class PortofinoPagesModule {}
   exports: [
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    ManyToManyComponent]
+    ManyToManyComponent,
+    MatPaginatorModule, MatSortModule]
 })
 export class PortofinoCrudModule {}
 
@@ -196,12 +199,7 @@ export class PortofinoCrudModule {}
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
-    MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatGridListModule, MatIconModule, MatInputModule,
-    MatMenuModule, MatMomentDateModule, MatMomentDatetimeModule, MatProgressBarModule, MatRadioModule,
-    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
-    NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
+    MatGridListModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
   entryComponents: [
@@ -213,15 +211,12 @@ export class PortofinoCrudModule {}
 export class PortofinoUpstairsModule {}
 
 @NgModule({
-  declarations: [PortofinoAppComponent, LoginComponent, ChangePasswordComponent],
+  declarations: [
+    PortofinoAppComponent,
+    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
-    MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatPaginatorModule, MatProgressBarModule, MatRadioModule,
-    MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule, MatDatetimepickerModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
   ],
   providers: [
@@ -242,10 +237,12 @@ export class PortofinoUpstairsModule {}
       { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
     { provide: NotificationService, useClass: MatSnackBarNotificationService },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
-  entryComponents: [LoginComponent, ChangePasswordComponent],
+  entryComponents: [
+    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent],
   exports: [
-    PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent, LoginComponent, TemplatesComponent,
-    ContentComponent, PageFactoryComponent, PageHeader,
+    PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent,
+    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
+    TemplatesComponent, ContentComponent, PageFactoryComponent, PageHeader,
     DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
