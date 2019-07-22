@@ -16,7 +16,7 @@
         extensible using Groovy, distributed under the LGPL open source license.
         The framework can be used to create interactive database-driven web
         applications. The creation process includes automatic generation through
-        a &quot;wizard&quot; tool, manual configuration through a web-based
+        a "wizard" tool, manual configuration through a web-based
         administration interface, and customization through scripting languages.
         The framework combines features that are typical of Content Management
         Systems and of Rapid application development tools. Portofino is mainly
@@ -109,7 +109,7 @@
         <json.version>20180813</json.version>
         <jsoup.version>1.9.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>3.6.2</liquibase.version>
+        <liquibase.version>3.7.0</liquibase.version>
         <logback.version>1.2.3</logback.version>
         <ognl.version>3.2.8</ognl.version>
         <quartz.version>2.3.0</quartz.version>
