@@ -13,13 +13,13 @@ import {TranslateService} from "@ngx-translate/core";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 export const CHANGE_PASSWORD_COMPONENT = new InjectionToken('Change Password Component');
+export const RESET_PASSWORD_COMPONENT = new InjectionToken('Reset Password Component');
 export const TOKEN_STORAGE_SERVICE = new InjectionToken('JSON Web Token Storage');
 
 @Injectable()
 export class AuthenticationService {
 
   credentialsObservable: Observable<any>;
-  changePasswordObservable: Observable<any>;
   currentUser: UserInfo;
   retryUnauthenticatedOnSessionExpiration = true;
   readonly logins = new EventEmitter<UserInfo>();
@@ -30,7 +30,8 @@ export class AuthenticationService {
               private portofino: PortofinoService, protected notifications: NotificationService,
               protected translate: TranslateService,
               @Inject(LOGIN_COMPONENT) protected loginComponent,
-              @Inject(CHANGE_PASSWORD_COMPONENT) protected changePasswordComponent) {
+              @Inject(CHANGE_PASSWORD_COMPONENT) protected changePasswordComponent,
+              @Inject(RESET_PASSWORD_COMPONENT) protected resetPasswordComponent) {
     const userInfo = this.storage.get('user');
     if(userInfo) {
       this.currentUser = new UserInfo(userInfo.displayName, userInfo.administrator, userInfo.groups);
@@ -94,15 +95,13 @@ export class AuthenticationService {
   }
 
   public showChangePasswordDialog() {
-    if(this.changePasswordObservable) {
-      return this.changePasswordObservable;
-    }
-    const dialogRef = this.dialog.open(this.changePasswordComponent);
-    this.changePasswordObservable = dialogRef.afterClosed().pipe(map(result => {
-      this.changePasswordObservable = null;
-      return result;
-    }));
-    return this.changePasswordObservable;
+    return this.dialog.open(this.changePasswordComponent);
+  }
+
+  showResetPasswordDialog(token: string) {
+    return this.dialog.open(this.resetPasswordComponent, {
+      data: { token: token }
+    });
   }
 
   protected removeAuthenticationInfo() {

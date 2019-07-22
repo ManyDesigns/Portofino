@@ -47,6 +47,14 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
       this.pageService.reset();
       this.loadAndDisplayPage(segments);
     }));
+    this.subscriptions.push(this.route.queryParams.subscribe(params => {
+      const urlWithoutParams = this.router.url.substring(0, this.router.url.indexOf("?"));
+      if(urlWithoutParams === "" || urlWithoutParams === "/") {
+        if (params.hasOwnProperty('resetPassword')) {
+          this.authenticationService.showResetPasswordDialog(params.token);
+        }
+      }
+    }));
   }
 
   ngOnDestroy() {

@@ -21,7 +21,7 @@ import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
   AuthenticationInterceptor,
   AuthenticationService, CHANGE_PASSWORD_COMPONENT,
-  LOGIN_COMPONENT,
+  LOGIN_COMPONENT, RESET_PASSWORD_COMPONENT,
   TOKEN_STORAGE_SERVICE
 } from "./security/authentication.service";
 import {LoginComponent} from './security/login/login.component';
@@ -223,6 +223,7 @@ export class PortofinoUpstairsModule {}
     //These are factories to avoid circular dependencies
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: CHANGE_PASSWORD_COMPONENT, useFactory: PortofinoModule.changePasswordComponent },
+    { provide: RESET_PASSWORD_COMPONENT, useFactory: PortofinoModule.resetPasswordComponent },
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: FOOTER_COMPONENT, useFactory: PortofinoModule.footerComponent },
@@ -251,6 +252,10 @@ export class PortofinoUpstairsModule {}
 export class PortofinoModule {
   static changePasswordComponent() {
     return ChangePasswordComponent;
+  }
+
+  static resetPasswordComponent() {
+    return ResetPasswordComponent;
   }
 
   static loginComponent() {

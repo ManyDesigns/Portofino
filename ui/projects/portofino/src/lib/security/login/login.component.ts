@@ -47,26 +47,16 @@ export class LoginComponent implements OnInit {
   signupComponent = SignupComponent;
 
   constructor(protected dialog: MatDialog, protected dialogRef: MatDialogRef<LoginComponent>,
-              protected authenticationService: AuthenticationService, protected route: ActivatedRoute,
+              protected authenticationService: AuthenticationService,
               protected formBuilder: FormBuilder, protected notificationService: NotificationService,
-              protected translate: TranslateService, protected location: Location) {
+              protected translate: TranslateService) {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
   }
 
-  ngOnInit() {
-    if(this.route) {
-      this.route.queryParams.subscribe(params => {
-        if(params.hasOwnProperty('resetPassword')) {
-          this.dialog.open(this.resetPasswordComponent, {
-            data: { token: params.token }
-          })
-        }
-      });
-    }
-  }
+  ngOnInit() {}
 
   login() {
     this.authenticationService.login(this.loginForm.get('username').value, this.loginForm.get('password').value).subscribe(
