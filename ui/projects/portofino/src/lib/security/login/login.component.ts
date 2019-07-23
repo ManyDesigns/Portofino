@@ -4,10 +4,8 @@ import {AuthenticationService} from "../authentication.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NotificationService} from "../../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
-import {Location} from "@angular/common";
 import {SignupComponent} from "./signup.component";
 import {ForgottenPasswordComponent} from "./forgotten-password.component";
-import {ActivatedRoute} from "@angular/router";
 import {ResetPasswordComponent} from "./reset-password.component";
 
 @Component({

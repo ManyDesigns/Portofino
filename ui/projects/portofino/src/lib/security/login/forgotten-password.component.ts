@@ -4,8 +4,7 @@ import {AuthenticationService} from "../authentication.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NotificationService} from "../../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
-import {Location, LocationStrategy, PlatformLocation} from "@angular/common";
-import {Router} from "@angular/router";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'portofino-forgotten-password',
