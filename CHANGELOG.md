@@ -2,6 +2,21 @@
 All notable changes to this project from version 5.0.0 upwards will be documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+- Numbers and dates can be searched with ranges (like in Portofino 4) as well as with an exact value.
+- Change password dialog
+- Forgot password dialog
+- Quartz jobs are reloaded automatically when the code changes, without restarting the application, and open Hibernate sessions are closed even in case of exceptions.
+
+### Changed
+- Angular version updated
+- Liquibase version updated
+
+### Security
+- Improved code quality and security and updated insecure dependencies using automated tools.
+
 ## [5.0.1] - 2019-06-07
 
 ### Added
