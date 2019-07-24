@@ -29,19 +29,14 @@
 
 package com.manydesigns.portofino.quartz;
 
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.persistence.Persistence;
-import org.quartz.Job;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import javax.servlet.ServletContext;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,32 +48,63 @@ public class PortofinoJobFactory extends SimpleJobFactory {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    private final ApplicationContext applicationContext;
     private static final Logger logger = LoggerFactory.getLogger(PortofinoJobFactory.class);
+    private final ApplicationContext applicationContext;
+    private final CodeBase codeBase;
 
     public PortofinoJobFactory(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
+        this.codeBase = applicationContext.getBean(CodeBase.class);
     }
 
     @Override
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
-        final Job job = super.newJob(bundle, scheduler);
+        Job job = instantiateJob(bundle);
         applicationContext.getAutowireCapableBeanFactory().autowireBean(job);
-        return jobExecutionContext -> {
-            job.execute(jobExecutionContext);
-            try {
-                //In a different class to make the database module optional at runtime
-                SessionCleaner.closeSessions(applicationContext);
-            } catch (NoClassDefFoundError e) {
-                logger.debug("Database module not available, not closing sessions", e);
+        return new Job() {
+            @Override
+            public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+                try {
+                    job.execute(jobExecutionContext);
+                } finally {
+                    try {
+                        //In a different class to make the database module optional at runtime
+                        SessionCleaner.closeSessions(applicationContext);
+                    } catch (NoClassDefFoundError e) {
+                        logger.debug("Database module not available, not closing sessions", e);
+                    }
+                }
             }
         };
+    }
+
+    protected Job instantiateJob(TriggerFiredBundle bundle) throws SchedulerException {
+        JobDetail jobDetail = bundle.getJobDetail();
+        Class jobClass = jobDetail.getJobClass();
+        //Attempt to reload
+        try {
+            Class newClass = codeBase.loadClass(jobClass.getName());
+            if(Job.class.isAssignableFrom(newClass)) {
+                jobClass = newClass;
+            } else {
+                logger.error(newClass + " does not extend " + Job.class + ", not reloading the job.");
+            }
+        } catch (Exception e) {
+            logger.error("Failed to reload job class " + jobClass.getName(), e);
+        }
+        Job job;
+        try {
+            job = (Job) jobClass.newInstance();
+        } catch (Exception e) {
+            throw new SchedulerException("Problem instantiating class '" + jobDetail.getJobClass().getName() + "'", e);
+        }
+        return job;
     }
 
 }
 
 class SessionCleaner {
-    public static void closeSessions(ApplicationContext applicationContext) {
+    static void closeSessions(ApplicationContext applicationContext) {
         Persistence persistence = applicationContext.getBean(Persistence.class);
         persistence.closeSessions();
     }
