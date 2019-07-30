@@ -5,44 +5,56 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NotificationService} from "../../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
 import {Location} from "@angular/common";
+import {HttpClient} from "@angular/common/http";
+import {Form} from "../../form";
+import {Class} from "estree";
+import {ClassAccessor} from "../../class-accessor";
 
 @Component({
   selector: 'portofino-signup',
   template: `
     <h4 mat-dialog-title>{{ 'Sign up' | translate }}</h4>
     <mat-dialog-content>
-      TODO
+      <portofino-form [form]="signupFormDefinition" [controls]="signupForm"></portofino-form>
     </mat-dialog-content>
     <mat-dialog-actions>
-      <button mat-button (click)="signUp()" color="accent">{{ 'Sign up' | translate }}</button>
+      <button mat-button (click)="signUp()" [disabled]="signupForm.invalid" color="accent">{{ 'Sign up' | translate }}</button>
       <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
     </mat-dialog-actions>`
 })
 export class SignupComponent implements OnInit {
 
-  loginForm: FormGroup;
+  signupFormDefinition: Form;
+  signupForm = new FormGroup({});
 
-  constructor(protected dialog: MatDialog, protected dialogRef: MatDialogRef<SignupComponent>,
-              protected authenticationService: AuthenticationService,
-              protected formBuilder: FormBuilder, protected notificationService: NotificationService,
-              protected translate: TranslateService, protected location: Location) {
-    this.loginForm = this.formBuilder.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
-    });
+  constructor(protected dialogRef: MatDialogRef<SignupComponent>, protected http: HttpClient,
+              protected authenticationService: AuthenticationService, protected location: Location,
+              protected notificationService: NotificationService,
+              protected translate: TranslateService) {}
+
+  ngOnInit() {
+    this.http.get<ClassAccessor>(`${this.authenticationService.loginPath}/user/classAccessor`).subscribe(
+      c => this.signupFormDefinition = Form.fromClassAccessor(c),
+      () => this.dialogRef.close()
+    );
   }
 
-  ngOnInit() {}
-
   signUp() {
-    this.authenticationService.login(this.loginForm.get('username').value, this.loginForm.get('password').value).subscribe(
+    //TODO alternative to window.location?
+    const confirmationUrl = window.location.origin + this.location.normalize("/") + "?confirmSignup=x&token=TOKEN";
+    const user = {};
+    for(var k in this.signupForm.value) {
+      const value = this.signupForm.value[k];
+      if(value && value.hasOwnProperty("password")) {
+        user[k] = value.password;
+        user[k + "_confirm"] = value.confirmPassword;
+      } else {
+        user[k] = value;
+      }
+    }
+    this.authenticationService.signup(user, confirmationUrl).subscribe(
       result => {
         this.dialogRef.close(result);
-        this.loginForm.get('password').setValue("");
-      },
-      () => {
-        this.notificationService.error(this.translate.get("Login failed"));
-        this.loginForm.get('password').setValue("");
       });
   }
 

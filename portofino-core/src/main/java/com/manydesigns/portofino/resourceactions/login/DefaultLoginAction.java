@@ -30,7 +30,11 @@
 package com.manydesigns.portofino.resourceactions.login;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.servlet.UrlBuilder;
@@ -164,7 +168,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
                 String body = getResetPasswordEmailBody(req.siteNameOrAddress, req.loginPageUrl.replace("TOKEN", token));
                 String from = portofinoConfiguration.getString(PortofinoProperties.MAIL_FROM);
                 String subject = ElementsThreadLocals.getText("password.reset.confirmation.required");
-                sendForgotPasswordEmail(from, req.email, subject, body);
+                sendMail(from, req.email, subject, body);
             } else {
                 logger.warn("Forgot password request for nonexistent email");
             }
@@ -176,9 +180,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     protected String getResetPasswordEmailBody(String site, String changePasswordLink) throws IOException {
         String countryIso = context.getRequest().getLocale().getLanguage().toLowerCase();
-        InputStream is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail." + countryIso + ".html");
+        InputStream is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/passwordResetEmail." + countryIso + ".html");
         if(is == null) {
-            is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail.en.html");
+            is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/passwordResetEmail.en.html");
         }
         try(InputStream stream = is) {
             String template = IOUtils.toString(stream, StandardCharsets.UTF_8);
@@ -186,12 +190,16 @@ public class DefaultLoginAction extends AbstractResourceAction {
         }
     }
 
-    protected void sendForgotPasswordEmail(String from, String to, String subject, String body) {
-        sendMail(from, to, subject, body);
-    }
-
-    protected void sendSignupConfirmationEmail(String from, String to, String subject, String body) {
-        sendMail(from, to, subject, body);
+    protected String getConfirmSignUpEmailBody(String site, String confirmSignUpLink) throws IOException {
+        String countryIso = context.getRequest().getLocale().getLanguage().toLowerCase();
+        InputStream is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail." + countryIso + ".html");
+        if(is == null) {
+            is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail.en.html");
+        }
+        try(InputStream stream = is) {
+            String template = IOUtils.toString(stream, StandardCharsets.UTF_8);
+            return template.replace("$link", confirmSignUpLink).replace("$site", site);
+        }
     }
 
     public static class ResetPasswordRequest {
@@ -309,12 +317,90 @@ public class DefaultLoginAction extends AbstractResourceAction {
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "The class accessor that describes the registration of a new user")
-    public String describeClassAccessor() {
-        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
-        ClassAccessor classAccessor = portofinoRealm.getSelfRegisteredUserClassAccessor();
+    public String describeNewUserClassAccessor() {
+        ClassAccessor classAccessor = getNewUserClassAccessor();
         JSONStringer jsonStringer = new JSONStringer();
         ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
         return jsonStringer.toString();
+    }
+
+    public ClassAccessor getNewUserClassAccessor() {
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        return portofinoRealm.getSelfRegisteredUserClassAccessor();
+    }
+
+    @Path("user")
+    @POST
+    public void createUser() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.getPrincipal() != null) {
+            logger.debug("Already logged in");
+            throw new WebApplicationException(Response.Status.CONFLICT);
+        }
+
+        String confirmationUrl = context.getRequest().getParameter("portofino:confirmationUrl");
+        String siteNameOrAddress = context.getRequest().getParameter("portofino:siteNameOrAddress");
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        Form signUpForm = setupSignUpForm();
+        signUpForm.readFromRequest(context.getRequest());
+        if (!signUpForm.validate()) {
+            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("please.correct.the.errors.before.proceeding"));
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
+        List<String> errorMessages = new ArrayList<String>();
+        if (!validateSignUpPassword(signUpForm, errorMessages)) {
+            for (String current : errorMessages) {
+                RequestMessages.addErrorMessage(current);
+            }
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+
+        try {
+            Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
+            signUpForm.writeToObject(user);
+            String token = portofinoRealm.saveSelfRegisteredUser(user);
+            String body = getConfirmSignUpEmailBody(siteNameOrAddress, confirmationUrl.replace("TOKEN", token));
+            String from = portofinoConfiguration.getString(
+                    PortofinoProperties.MAIL_FROM, "example@example.com");
+            sendMail(from, portofinoRealm.getEmail((Serializable) user), ElementsThreadLocals.getText("confirm.signup"), body);
+        } catch (ExistingUserException e) {
+            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("a.user.with.the.same.username.already.exists"));
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        } catch (Exception e) {
+            logger.error("Error during sign-up", e);
+            throw new WebApplicationException(e);
+        }
+    }
+
+    public static class ConfirmUserRequest {
+        public String token;
+    }
+
+    @Path("user/:confirm")
+    @POST
+    public void confirmUser(ConfirmUserRequest request) {
+        SignUpToken token = new SignUpToken(request.token);
+        Subject subject = SecurityUtils.getSubject();
+        try {
+            subject.login(token);
+        } catch (AuthenticationException e) {
+            String errMsg = ElementsThreadLocals.getText("the.sign.up.confirmation.link.is.no.longer.active");
+            RequestMessages.addErrorMessage(errMsg);
+            logger.warn(errMsg, e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+    }
+
+    protected Form setupSignUpForm() {
+        FormBuilder formBuilder = new FormBuilder(getNewUserClassAccessor())
+                .configMode(Mode.CREATE)
+                .configReflectiveFields();
+        return formBuilder.build();
+    }
+
+    protected boolean validateSignUpPassword(Form signUpForm, List<String> errorMessages) {
+        return true;
     }
 
     @Path("{sessionId}")

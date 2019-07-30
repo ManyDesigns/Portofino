@@ -1,6 +1,6 @@
 import {
   ClassAccessor,
-  deriveKind,
+  deriveKind, getAnnotation,
   getValidators,
   isEnabled,
   isMultiline,
@@ -21,7 +21,7 @@ import {
   FormArray,
   FormControl,
   FormGroup,
-  FormGroupDirective
+  FormGroupDirective, ValidationErrors, ValidatorFn
 } from "@angular/forms";
 import {FieldFactoryComponent} from "./fields/field.factory";
 
@@ -103,20 +103,20 @@ export class Field {
   }
 }
 
-export class FieldSetSetup extends FormSetup { name?: string; label?: string; }
+export class FieldSetSetup extends FormSetup { name?: string; label?: string; visible?: boolean; }
 
 export class FieldSet {
   name: string;
   label: string;
   contents: Form;
+  visible = true;
 
   static fromClassAccessor(ca: ClassAccessor, setup: FieldSetSetup = {}) {
     const fieldSet = new FieldSet();
-    if(!setup) {
-      setup = { object: {}};
-    }
+    setup = Object.assign({ object: {}, visible: true }, setup);
     fieldSet.name = setup.name || ca.name;
     fieldSet.label = setup.label || fieldSet.name;
+    fieldSet.visible = setup.visible;
     fieldSet.contents = Form.fromClassAccessor(ca, setup);
     return fieldSet;
   }
@@ -211,7 +211,7 @@ export class FormComponent implements OnInit, AfterViewInit {
     form.contents.forEach(v => {
       if (v instanceof Field) {
         controlNames.push(v.name);
-        this.setupField(v, formGroup);
+        this.setupField(v, form.selectableFields, formGroup);
       } else if (v instanceof FieldSet) {
         controlNames.push(v.name);
         this.setupFieldSet(v, formGroup);
@@ -289,13 +289,24 @@ export class FormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  protected setupField(v: Field, formGroup: FormGroup) {
+  protected setupField(v: Field, selectable: boolean, formGroup: FormGroup) {
     const property = v.property;
+    const passwordAnnotation = getAnnotation(property, "com.manydesigns.elements.annotations.Password");
+    const passwordConfirmationRequired = passwordAnnotation ? passwordAnnotation.properties.confirmationRequired : false;
     const control = formGroup.get(property.name);
-    if (control instanceof FormControl) {
-      control.reset(this.computeInitialState(v));
+    const initialState = this.computeInitialState(v);
+
+    if(passwordConfirmationRequired && !initialState.disabled && !selectable) {
+      //TODO reset?
+      const subGroup = new FormGroup({});
+      subGroup.setControl("password", new FormControl(initialState, getValidators(property)));
+      subGroup.setControl("confirmPassword", new FormControl(initialState, getValidators(property)));
+      subGroup.setValidators(checkSamePassword);
+      formGroup.setControl(property.name, subGroup);
+    } else if (control instanceof FormControl) {
+      control.reset(initialState);
     } else {
-      formGroup.setControl(property.name, new FormControl(this.computeInitialState(v), getValidators(property)));
+      formGroup.setControl(property.name, new FormControl(initialState, getValidators(property)));
     }
   }
 
@@ -345,3 +356,10 @@ export class FormComponent implements OnInit, AfterViewInit {
   }
 
 }
+
+export const checkSamePassword: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+  const password = control.get('password');
+  const confirmPassword = control.get('confirmPassword');
+  console.log("control", control);
+  return password.value !== confirmPassword.value ? {'passwordsDontMatch': true} : null;
+};

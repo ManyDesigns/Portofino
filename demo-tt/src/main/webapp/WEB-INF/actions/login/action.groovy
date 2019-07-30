@@ -1,8 +1,7 @@
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.elements.Mode
-import com.manydesigns.elements.forms.FormBuilder
+import com.manydesigns.elements.reflection.ClassAccessor
+import com.manydesigns.elements.reflection.FilteredClassAccessor
 import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction
-import com.manydesigns.portofino.shiro.PortofinoRealm
 
 class Login extends DefaultLoginAction {
 
@@ -19,11 +18,11 @@ class Login extends DefaultLoginAction {
         true
     }
 
-    protected void setupSignUpForm(PortofinoRealm realm) {
-        FormBuilder formBuilder = new FormBuilder(realm.getSelfRegisteredUserClassAccessor())
-                .configMode(Mode.CREATE)
-                .configFields("email", "password", "first_name", "last_name");
-        signUpForm = formBuilder.build();
-        signUpForm.findFieldByPropertyName("password").setRequired(true);
+    @Override
+    ClassAccessor getNewUserClassAccessor() {
+        def classAccessor = new FilteredClassAccessor(
+                super.getNewUserClassAccessor(),
+                true, "email", "password", "first_name", "last_name")
+        classAccessor
     }
 }

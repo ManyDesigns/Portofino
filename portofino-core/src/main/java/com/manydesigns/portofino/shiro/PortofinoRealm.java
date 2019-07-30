@@ -156,6 +156,13 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     String getUsername(Serializable user);
 
+    /**
+     * Extracts the email of the user.
+     * @param user the user's primary principal (as returned by loadAuthenticationInfo()).
+     * @return the email.
+     */
+    String getEmail(Serializable user);
+
     //--------------------------------------------------------------------------
     // Groups CRUD
     //--------------------------------------------------------------------------

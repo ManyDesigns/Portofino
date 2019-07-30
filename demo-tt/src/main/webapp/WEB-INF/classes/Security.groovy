@@ -239,6 +239,11 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
+    String getEmail(Serializable user) {
+        user.email
+    }
+
+    @Override
     ClassAccessor getSelfRegisteredUserClassAccessor() {
         Database database = DatabaseLogic.findDatabaseByName(persistence.model, "tt");
         Table table = DatabaseLogic.findTableByEntityName(database, "users");

@@ -171,6 +171,22 @@ export class AuthenticationService {
     });
   }
 
+  signup(user: any, confirmationUrl) {
+    const headers = new HttpHeaders().set(NO_AUTH_HEADER, 'true');
+    const params = new FormData();
+    params.append('portofino:confirmationUrl', confirmationUrl);
+    params.append('portofino:siteNameOrAddress', this.portofino.applicationName);
+    for(let k in user) {
+      params.append(k, user[k]);
+    }
+    return this.http.post(
+      `${this.loginPath}/user`, params,{headers: headers});
+  }
+
+  confirmSignup(token) {
+    return this.http.post(`${this.loginPath}/user/:confirm`,{ token: token });
+  }
+
   get loginPath() {
     return `${this.portofino.apiRoot}${this.portofino.loginPath}`;
   }

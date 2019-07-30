@@ -136,7 +136,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             action.init();
         }
         ActionInstance actionInstance = new ActionInstance(
-                parentActionInstance, resourceAction.getLocation(), action, (Class<? extends ResourceAction>) resourceAction.getClass());
+                parentActionInstance, resourceAction.getLocation(), action, resourceAction.getClass());
         actionInstance.setActionBean(resourceAction);
         ActionLogic.configureResourceAction(resourceAction, actionInstance);
         ActionContext context = new ActionContext();

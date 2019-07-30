@@ -8,11 +8,14 @@
       </portofino-field>
     </ng-container>
     <ng-container *ngIf="isFieldSet(content)">
-      <fieldset>
+      <fieldset *ngIf="content.visible">
         <legend>{{content.label}}</legend>
         <portofino-form [form]="content.contents" [controls]="controls.get(content.name)"
                         fxLayout="row wrap"></portofino-form>
       </fieldset>
+      <portofino-form *ngIf="!content.visible"
+                      [form]="content.contents" [controls]="controls.get(content.name)"
+                      fxLayout="row wrap"></portofino-form>
     </ng-container>
     <ng-container *ngIf="isFormList(content)">
       <portofino-form *ngFor="let form of content.contents; let i = index;"
