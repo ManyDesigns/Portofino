@@ -28,7 +28,7 @@ import {ResetPasswordComponent} from "./reset-password.component";
         </mat-form-field>
         <button type="submit" style="display:none">{{ 'Sign in' | translate }}</button>
       </form>
-      <hr />
+      <mat-divider></mat-divider>
       <a href="#" (click)="openForgotPasswordDialog(); $event.preventDefault();">{{ 'Forgot password?' | translate }}</a><br />
       <a href="#" (click)="openSignUpDialog(); $event.preventDefault();">{{ 'Sign up' | translate }}</a> {{ "if you don't have an account" | translate }}
     </mat-dialog-content>

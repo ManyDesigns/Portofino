@@ -15,7 +15,10 @@ import {ClassAccessor} from "../../class-accessor";
   template: `
     <h4 mat-dialog-title>{{ 'Sign up' | translate }}</h4>
     <mat-dialog-content>
-      <portofino-form [form]="signupFormDefinition" [controls]="signupForm"></portofino-form>
+      <form (submit)="signUp()">
+        <portofino-form [form]="signupFormDefinition" [controls]="signupForm"></portofino-form>
+        <button type="submit" style="display:none">{{ 'Sign up' | translate }}</button>
+      </form>
     </mat-dialog-content>
     <mat-dialog-actions>
       <button mat-button (click)="signUp()" [disabled]="signupForm.invalid" color="accent">{{ 'Sign up' | translate }}</button>
