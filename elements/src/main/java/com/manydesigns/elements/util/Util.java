@@ -399,7 +399,7 @@ public class Util {
     }
 
     public final static Pattern linkPattern =
-            Pattern.compile("(http://|https://|ftp://|www\\.)[^\\s,)]+", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("([a-z]+:/|www\\.)[^\\s,)]+", Pattern.CASE_INSENSITIVE);
     public final static Pattern emailPattern =
             Pattern.compile("[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)*@[a-z0-9\\-_]++" +
                     "(\\.[a-z0-9\\-_]++)++", Pattern.CASE_INSENSITIVE);
