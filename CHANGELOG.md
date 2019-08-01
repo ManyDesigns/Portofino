@@ -5,10 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Numbers and dates can be searched with ranges (like in Portofino 4) as well as with an exact value..
-- Change password dialog.
-- Forgot password dialog.
-- Quartz jobs are reloaded automatically when the code changes, without restarting the application, and open Hibernate sessions are closed even in case of exceptions.
+- Restored and extended some Portofino 4 features:
+  - Numbers and dates can be searched with ranges as well as with an exact value.
+  - Sign up, change password and forgot password dialogs and REST methods.
+  - Password fields can ask to confirm the password (type it twice).
+- Quartz jobs are reloaded automatically when the code changes, without restarting the application, and any open Hibernate sessions are closed even in case of exceptions.
+- Use Material Typography in the UI, improving its looks.
+- Better detection of links in text fields with `@HighlightLinks`.
 
 ### Changed
 - Angular version updated.
