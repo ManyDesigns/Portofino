@@ -24,9 +24,9 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>dist</directory>
+                            <directory>${project.basedir}/dist</directory>
                             <includes>
-                                <include>*</include>
+                                <include>**</include>
                             </includes>
                         </fileset>
                     </filesets>
