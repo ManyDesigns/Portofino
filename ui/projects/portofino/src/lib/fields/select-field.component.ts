@@ -40,6 +40,7 @@ export class SelectFieldComponent extends FieldComponent {
     if(!form || !form.controls || !form.controls[this.property.name] || !form.controls[this.property.name].value) {
       return '';
     }
-    return form.controls[this.property.name].value.l
+    const value = form.controls[this.property.name].value;
+    return value.hasOwnProperty('l') ? value.l : value
   }
 }
