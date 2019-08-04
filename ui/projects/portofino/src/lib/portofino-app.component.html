@@ -6,10 +6,7 @@
   <mat-drawer-container [autosize]="true" fxFlex>
     <mat-drawer #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
                 role="navigation">
-      <mat-card>
-        <mat-card-title>{{ 'Navigation' | translate }}</mat-card-title>
-        <mat-card-content><ng-template portofino-navigation></ng-template></mat-card-content>
-      </mat-card>
+      <ng-template portofino-navigation></ng-template>
     </mat-drawer>
     <mat-drawer-content class="app-content-content">
       <breadcrumbs></breadcrumbs>
@@ -26,9 +23,6 @@
   <mat-sidenav-container [autosize]="true">
     <mat-sidenav #sidenav class="app-sidenav" [opened]="portofino.sideNavOpen" mode="side" [disableClose]="false"
                  role="navigation">
-      <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
-        <h3 class="mat-title">{{ 'Navigation' | translate }}</h3>
-      </mat-toolbar>
       <ng-template portofino-navigation></ng-template>
     </mat-sidenav>
     <mat-sidenav-content class="app-content-content">

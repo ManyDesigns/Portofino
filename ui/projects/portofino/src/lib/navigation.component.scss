@@ -1,5 +1,10 @@
+mat-sidenav-container {
+  height: 100%;
+}
+
 mat-sidenav {
   min-width: 300px !important;
+  box-shadow: 3px 0 6px rgba(0, 0, 0, 0.24);
 }
 
 :host {
@@ -7,6 +12,10 @@ mat-sidenav {
   flex-direction: column;
   outline: none;
   width: 100%;
+}
+
+.mat-list-base {
+  padding-top: 0;
 }
 
 .mat-list-item {

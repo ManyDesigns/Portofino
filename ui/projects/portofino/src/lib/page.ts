@@ -561,7 +561,7 @@ export class PageHeader {
     </ng-template>
     <ng-template #mainWithTabs let-content="content" let-page="page">
       <ng-template [ngTemplateOutlet]="content"></ng-template>
-      <mat-tab-group>
+      <mat-tab-group *ngIf="page.embeddedChildren && page.embeddedChildren.length > 0">
         <mat-tab *ngFor="let child of page.embeddedChildren">
           <ng-template mat-tab-label>
             <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>

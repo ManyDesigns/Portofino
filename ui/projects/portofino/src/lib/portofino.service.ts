@@ -19,7 +19,7 @@ export class PortofinoService {
   localApiPath = 'portofino';
   loginPath = 'login';
   sideNavPosition: SideNavPosition = 'page';
-  sideNavOpen: boolean;
+  sideNavOpen = true;
   upstairsLink = "/portofino-upstairs";
   callsInProgress = 0;
 

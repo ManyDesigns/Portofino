@@ -40,7 +40,7 @@ export interface ToolbarComponent {
 @Component({
   selector: 'portofino-default-toolbar',
   templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.css']
+  styleUrls: ['./toolbar.component.scss']
 })
 export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;

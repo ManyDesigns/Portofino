@@ -35,6 +35,10 @@ class ProjectsCrudAction extends CrudAction {
         return TtUtils.principalHasProjectRole(object, TtUtils.ROLE_MANAGER);
     }
 
+    @Override
+    boolean isBulkOperationsEnabled() {
+        false //Remember, if you set it to true, you also have to disable the editPostProcess logic or bulk updates won't work.
+    }
 //
 //    //**************************************************************************
 //    // Search customizations
