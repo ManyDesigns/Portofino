@@ -4,7 +4,7 @@
     <ng-template portofino-toolbar></ng-template>
   </div>
   <mat-drawer-container [autosize]="true" fxFlex>
-    <mat-drawer class="app-sidenav" [opened]="sidenav.open" [mode]="sidenav.mode" [disableClose]="false"
+    <mat-drawer class="app-sidenav mat-elevation-z8" [opened]="sidenav.open" [mode]="sidenav.mode" [disableClose]="false"
                 role="navigation">
       <ng-template portofino-navigation></ng-template>
     </mat-drawer>
@@ -21,7 +21,7 @@
 </div>
 <ng-container *ngIf="sidenav.position == 'body'">
   <mat-sidenav-container [autosize]="true">
-    <mat-sidenav class="app-sidenav" [opened]="sidenav.open" [mode]="sidenav.mode" [disableClose]="false"
+    <mat-sidenav class="app-sidenav mat-elevation-z8" [opened]="sidenav.open" [mode]="sidenav.mode" [disableClose]="false"
                  role="navigation">
       <ng-template portofino-navigation></ng-template>
     </mat-sidenav>

@@ -538,6 +538,15 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.router.navigateByUrl(this.parent.url);
     }
   }
+
+  /**
+   * Extension point. When a request fails because of insufficient privileges, but the user refuses to log in, this
+   * method is called. The page has a chance to handle the event and to return false to prevent the default behaviour
+   * from happening.
+   */
+  handleDeclinedLogin() {
+    return true;
+  }
 }
 
 @Component({

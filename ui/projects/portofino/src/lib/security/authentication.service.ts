@@ -24,6 +24,7 @@ export class AuthenticationService {
   retryUnauthenticatedOnSessionExpiration = true;
   readonly logins = new EventEmitter<UserInfo>();
   readonly logouts = new EventEmitter<void>();
+  readonly declinedLogins = new EventEmitter<void>();
 
   constructor(private http: HttpClient, protected dialog: MatDialog,
               @Inject(TOKEN_STORAGE_SERVICE) protected storage: WebStorageService,
@@ -55,7 +56,8 @@ export class AuthenticationService {
           return this.askForCredentials().pipe(
             map(result => {
               if (!result) {
-                throw new Error("User declined login");
+                this.declinedLogins.emit();
+                throw new LoginDeclinedException("User declined login");
               }
             }),
             mergeMap(() => this.doHttpRequest(this.withAuthenticationHeader(req))));
@@ -225,3 +227,9 @@ export class UserInfo {
 }
 
 export const NO_AUTH_HEADER = "portofino-no-auth";
+
+export class LoginDeclinedException extends Error {
+  constructor(public message: string) {
+    super();
+  }
+}
