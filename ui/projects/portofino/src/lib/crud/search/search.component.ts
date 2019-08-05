@@ -310,6 +310,10 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
       if(value.max) {
         params = params.set(`search_${name}_max`, this.stringifySearchParam(property, value.max));
       }
+    } else if(value.hasOwnProperty('mode')) {
+      console.log(value);
+      params = params.set(`search_${name}`, this.stringifySearchParam(property, value.value));
+      params = params.set(`search_${name}_mode`, value.mode);
     } else {
       params = params.set(`search_${name}`, this.stringifySearchParam(property, value));
     }
@@ -317,7 +321,9 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   stringifySearchParam(property: Property, value) {
-    if (isDateProperty(property)) {
+    if(value === null || value === undefined) {
+      return '';
+    } else if (isDateProperty(property)) {
       return value.valueOf().toString();
     } else {
       return value.toString();

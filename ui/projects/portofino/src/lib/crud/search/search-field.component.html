@@ -42,39 +42,72 @@
   </ng-container>
 </ng-container>
 <ng-template #simple>
-  <mat-form-field *ngIf="property.kind == 'string'" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.label">
-  </mat-form-field>
-  <ng-container *ngIf="property.kind == 'number'" [formGroup]="form">
-    <mat-form-field *ngIf="!ranged" [formGroupName]="property.name">
-      <input matInput formControlName="exact" [placeholder]="property.label">
-      <button mat-icon-button matSuffix (click)="ranged = true" title="{{'Range'|translate}}">
-        <mat-icon>more_horiz</mat-icon>
-      </button>
-    </mat-form-field>
-    <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
-      <span matPrefix>{{'Min'|translate}}</span>
-      <input matInput formControlName="min" [placeholder]="property.label">
-    </mat-form-field>
-    <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
-      <span matPrefix>{{'Max'|translate}}</span>
-      <input matInput formControlName="max" [placeholder]="property.label">
-      <button mat-icon-button matSuffix (click)="ranged = false" title="{{'Exact'|translate}}">
-        <mat-icon>more_vert</mat-icon>
-      </button>
+  <ng-container [formGroup]="form">
+    <ng-container *ngIf="isString" [formGroupName]="property.name">
+      <mat-form-field>
+        <mat-label>{{property.label}}</mat-label>
+        <mat-select formControlName="mode">
+          <mat-option value="">{{ 'contains' | translate }}</mat-option>
+          <mat-option value="equals">{{ 'is equal to' | translate }}</mat-option>
+          <mat-option value="starts">{{ 'starts with' | translate }}</mat-option>
+          <mat-option value="ends">{{ 'ends with' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field >
+        <input matInput formControlName="value" placeholder="{{'text'|translate}}">
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="property.kind == 'number'">
+      <mat-form-field *ngIf="!ranged" [formGroupName]="property.name">
+        <input matInput formControlName="exact" [placeholder]="property.label">
+        <button mat-icon-button matSuffix (click)="ranged = true" title="{{'Range'|translate}}">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+      </mat-form-field>
+      <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
+        <mat-label>{{'Min'|translate}}</mat-label>
+        <input matInput formControlName="min" [placeholder]="property.label">
+      </mat-form-field>
+      <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
+        <mat-label>{{'Max'|translate}}</mat-label>
+        <input matInput formControlName="max" [placeholder]="property.label">
+        <button mat-icon-button matSuffix (click)="ranged = false" title="{{'Exact'|translate}}">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </mat-form-field>
+    </ng-container>
+    <ng-container *ngIf="property.kind == 'date'">
+      <mat-form-field *ngIf="!ranged" [formGroupName]="property.name">
+        <input matInput formControlName="exact" [placeholder]="property.label" [matDatepicker]="datepicker_exact">
+        <mat-datepicker #datepicker_exact></mat-datepicker>
+        <mat-datepicker-toggle matSuffix [for]="datepicker_exact"></mat-datepicker-toggle>
+        <button mat-icon-button matSuffix (click)="ranged = true" title="{{'Range'|translate}}">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+      </mat-form-field>
+      <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
+        <mat-label>{{'Min'|translate}}</mat-label>
+        <input matInput formControlName="min" [placeholder]="property.label" [matDatepicker]="datepicker_min">
+        <mat-datepicker #datepicker_min></mat-datepicker>
+        <mat-datepicker-toggle matSuffix [for]="datepicker_min"></mat-datepicker-toggle>
+      </mat-form-field>
+      <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
+        <mat-label>{{'Max'|translate}}</mat-label>
+        <input matInput formControlName="max" [placeholder]="property.label" [matDatepicker]="datepicker_max">
+        <mat-datepicker #datepicker_max></mat-datepicker>
+        <mat-datepicker-toggle matSuffix [for]="datepicker_max"></mat-datepicker-toggle>
+        <button mat-icon-button matSuffix (click)="ranged = false" title="{{'Exact'|translate}}">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </mat-form-field>
+    </ng-container>
+    <mat-form-field *ngIf="property.kind == 'boolean'">
+      <mat-select [formControlName]="property.name" [placeholder]="property.label">
+        <mat-option>{{'Any'|translate}}</mat-option>
+        <mat-option value="true">{{'True'|translate}}</mat-option>
+        <mat-option value="false">{{'False'|translate}}</mat-option>
+        <mat-option value="-" *ngIf="!required">{{'No value'|translate}}</mat-option>
+      </mat-select>
     </mat-form-field>
   </ng-container>
-  <mat-form-field *ngIf="property.kind == 'date'" [formGroup]="form">
-    <input matInput [formControlName]="property.name" [placeholder]="property.label" [matDatepicker]="datepicker">
-    <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
-    <mat-datepicker #datepicker></mat-datepicker>
-  </mat-form-field>
-  <mat-form-field *ngIf="property.kind == 'boolean'" [formGroup]="form">
-    <mat-select [formControlName]="property.name" [placeholder]="property.label">
-      <mat-option>{{'Any'|translate}}</mat-option>
-      <mat-option value="true">{{'True'|translate}}</mat-option>
-      <mat-option value="false">{{'False'|translate}}</mat-option>
-      <mat-option value="-" *ngIf="!required">{{'No value'|translate}}</mat-option>
-    </mat-select>
-  </mat-form-field>
 </ng-template>

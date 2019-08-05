@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {isDateProperty, isNumericProperty, isRequired, Property} from "../../class-accessor";
+import {isDateProperty, isNumericProperty, isRequired, isStringProperty, Property} from "../../class-accessor";
 import {PortofinoService} from "../../portofino.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
@@ -56,9 +56,9 @@ export class SearchFieldComponent implements OnInit {
       });
       this.form.setControl(this.property.name, group);
     } else {
-      const control = new FormControl();
-      this.form.setControl(this.property.name, control);
       if (this.property.selectionProvider) {
+        const control = new FormControl();
+        this.form.setControl(this.property.name, control);
         if (this.property.selectionProvider.displayMode == 'AUTOCOMPLETE') {
           control.valueChanges.pipe(debounceTime(this.debounceTime)).subscribe(value => {
             if (control.dirty && value != null && value.hasOwnProperty("length")) {
@@ -68,8 +68,18 @@ export class SearchFieldComponent implements OnInit {
         } else if(this.property.selectionProvider.index == 0) {
           this.property.selectionProvider.loadOptions();
         }
+      } else if(this.isString) {
+        this.form.setControl(this.property.name, new FormGroup({
+          value: new FormControl(), mode: new FormControl()
+        }));
+      } else {
+        this.form.setControl(this.property.name, new FormControl());
       }
     }
+  }
+
+  get isString() {
+    return isStringProperty(this.property);
   }
 
   get rangeSearchSupported() {

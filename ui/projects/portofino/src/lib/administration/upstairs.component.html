@@ -11,7 +11,7 @@
     </p>
     <ng-container *ngIf="!portofino.localApiAvailable">
       <mat-form-field>
-        <mat-label>{{'API'}}</mat-label>
+        <mat-label>{{'API' | translate}}</mat-label>
         <input matInput [(ngModel)]="portofino.apiRoot" />
       </mat-form-field>
       <button mat-button (click)="changeApiRoot()">{{'Change'|translate}}</button>
