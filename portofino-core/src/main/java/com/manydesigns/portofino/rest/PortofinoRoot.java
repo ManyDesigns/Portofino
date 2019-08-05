@@ -35,8 +35,12 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PortofinoRoot extends AbstractResourceAction {
+
+    private static final Logger logger = LoggerFactory.getLogger(PortofinoRoot.class);
 
     @Context
     protected ServletContext servletContext;

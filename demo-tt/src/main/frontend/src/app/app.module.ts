@@ -1,7 +1,7 @@
 import {Component, Input, NgModule, OnInit} from '@angular/core';
 import {
   PortofinoModule, PortofinoUpstairsModule, Page, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, CrudComponent, SearchComponent, Button} from "portofino";
+  PortofinoComponent, PortofinoService, CrudComponent, SearchComponent, Button, SearchResults} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -62,23 +62,18 @@ export class CustomNavigation {}
 
 @Component({
   selector: 'portofino-welcome',
-  template: `
-    <portofino-page-layout [page]="this">
-      <ng-template #content>
-        <p>Welcome to the Portofino 5 demo application "demo-tt"!</p>
-        <p>
-          Use the navigation button
-          <button title="{{ 'Navigation' | translate }}" type="button" mat-icon-button
-                  (click)="portofino.toggleSidenav()">
-            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-          </button>
-          to explore the app.
-        </p>
-      </ng-template>
-    </portofino-page-layout>`
+  templateUrl: 'home.html',
+  styleUrls: ['home.scss']
 })
 @PortofinoComponent({ name: 'welcome' })
-export class WelcomeComponent extends Page {}
+export class WelcomeComponent extends Page implements OnInit {
+  projects = [];
+  ngOnInit(): void {
+    this.http.get<SearchResults>(`${this.portofino.apiRoot}projects?maxResults=20`).subscribe(
+      res => this.projects = res.records
+    );
+  }
+}
 
 @PortofinoComponent({ name: 'customcrud' })
 export class CustomCrud extends CrudComponent {

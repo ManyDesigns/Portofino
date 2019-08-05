@@ -1,7 +1,7 @@
-<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center" fxLayout.lt-md="column" fxLayoutAlign.lt-md="start stretch" class="mat-elevation-z6">
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center" class="mat-elevation-z6">
   <div>
     <button title="{{ title | translate }}" type="button" mat-icon-button
-            (click)="portofino.toggleSidenav()">
+            (click)="sidenav.toggle()">
       <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
     </button>
     <a mat-button routerLink="/"><span>{{ title | translate}}</span></a>
@@ -11,7 +11,7 @@
     <ng-container *ngIf="authenticationService.isAdmin && (portofino.upstairsLink || pageCrudService.available)">
       <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
         <a mat-menu-item *ngIf="portofino.upstairsLink" [routerLink]="portofino.upstairsLink">
-          <mat-icon>settings</mat-icon>
+          <mat-icon>build</mat-icon>
           {{ 'Upstairs' | translate }}
         </a>
         <mat-divider *ngIf="portofino.upstairsLink && pageCrudService.available"></mat-divider>
@@ -31,8 +31,8 @@
         </ng-container>
       </mat-menu>
       <button mat-button [matMenuTriggerFor]="adminMenu">
-        <mat-icon>more_vert</mat-icon>
-        {{ 'Administration' | translate }}
+        <mat-icon>settings</mat-icon>
+        <span fxHide.xs="true">{{ 'Administration' | translate }}</span>
       </button>
     </ng-container>
     <portofino-language-selector *ngIf="portofino.locales.length > 1"></portofino-language-selector>
@@ -49,7 +49,7 @@
       </mat-menu>
       <button mat-button [matMenuTriggerFor]="userMenu">
         <mat-icon>account_circle</mat-icon>
-        {{ authenticationService.currentUser.displayName }}
+        <span fxHide.xs="true">{{ authenticationService.currentUser.displayName }}</span>
       </button>
     </ng-container>
     <ng-container *ngIf="!authenticationService.currentUser">

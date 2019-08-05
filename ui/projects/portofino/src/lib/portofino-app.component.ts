@@ -4,15 +4,15 @@ import {
   ComponentFactoryResolver, ContentChild, Directive,
   Inject,
   InjectionToken,
-  Input,
-  OnInit, ViewChild,
+  Input, OnInit, ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import {PortofinoService, SideNavPosition} from "./portofino.service";
+import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
 import {NAVIGATION_COMPONENT, TemplatesComponent} from "./page";
 import {NavigationDirective} from "./content.directive";
 import {PageCrudService} from "./administration/page-crud.service";
+import {SidenavService} from "./sidenav.service";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 export const FOOTER_COMPONENT = new InjectionToken('Footer Component');
@@ -46,7 +46,7 @@ export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
   constructor(
     public authenticationService: AuthenticationService, public portofino: PortofinoService,
-    public pageCrudService: PageCrudService) {}
+    public pageCrudService: PageCrudService, public sidenav: SidenavService) {}
 }
 
 @Component({
@@ -67,8 +67,6 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   @Input()
   apiRoot: string;
   @Input()
-  sideNavPosition: SideNavPosition;
-  @Input()
   upstairsLink = this.portofino.upstairsLink;
   @ViewChild(ToolbarDirective, { static: false })
   toolbarHost: ToolbarDirective;
@@ -85,15 +83,12 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver,
-              protected changeDetector: ChangeDetectorRef,
+              protected changeDetector: ChangeDetectorRef, public sidenav: SidenavService,
               @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,
               @Inject(FOOTER_COMPONENT) protected footerComponent,
               @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {}
 
   ngOnInit(): void {
-    if(this.sideNavPosition) {
-      this.portofino.sideNavPosition = this.sideNavPosition;
-    }
     if(this.apiRoot) {
       this.portofino.defaultApiRoot = this.apiRoot;
     }

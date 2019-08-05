@@ -34,10 +34,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.elements.servlet.UrlBuilder;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.mail.queue.MailQueue;
@@ -46,7 +43,6 @@ import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
-import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.rest.actions.user.LoginAction;
@@ -63,20 +59,19 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -89,6 +84,8 @@ import java.util.Locale;
 public class DefaultLoginAction extends AbstractResourceAction {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultLoginAction.class);
 
     @Autowired
     public MailQueue mailQueue;

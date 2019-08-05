@@ -52,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
@@ -60,6 +61,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -95,21 +97,12 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected UriInfo uriInfo;
 
     /**
-     * The Groovy script for this action.
-     */
-    protected String script;
-
-    /**
      * The context object holds various elements of contextual information such
      * as the HTTP request and response objects.
      */
     protected ActionContext context;
 
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger =
+    private static final Logger logger =
             LoggerFactory.getLogger(AbstractResourceAction.class);
 
     protected AbstractResourceAction() {
@@ -180,6 +173,30 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return context.getActionPath();
     }
 
+    public String getApiRootUri() {
+        ServletContext servletContext = getContext().getServletContext();
+        String apiRoot = servletContext.getInitParameter("portofino.api.root");
+        if (apiRoot == null) {
+            apiRoot = "http://localhost:8080";
+        } else if (apiRoot.contains("://")) {
+            //Keep as is
+        } else if (!apiRoot.startsWith("/")) {
+            apiRoot = servletContext.getContextPath() + "/" + apiRoot;
+        }
+        if (!apiRoot.contains("://")) {
+            URI baseUri = uriInfo.getBaseUri();
+            apiRoot = baseUri.getScheme() + "://" + baseUri.getAuthority() + apiRoot;
+        }
+        if (!apiRoot.endsWith("/")) {
+            apiRoot += "/";
+        }
+        return apiRoot;
+    }
+
+    public String getAbsoluteActionPath() {
+        return getApiRootUri() + getActionPath();
+    }
+
     //--------------------------------------------------------------------------
     // Getters/Setters
     //--------------------------------------------------------------------------
@@ -244,14 +261,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
 
     public Map getOgnlContext() {
         return ElementsThreadLocals.getOgnlContext();
-    }
-
-    public String getScript() {
-        return script;
-    }
-
-    public void setScript(String script) {
-        this.script = script;
     }
 
     public Configuration getPortofinoConfiguration() {

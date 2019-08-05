@@ -86,13 +86,13 @@
         </button>
       </mat-form-field>
       <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
-        <mat-label>{{'Min'|translate}}</mat-label>
+        <mat-label>{{property.label}} - {{'from'|translate}}</mat-label>
         <input matInput formControlName="min" [placeholder]="property.label" [matDatepicker]="datepicker_min">
         <mat-datepicker #datepicker_min></mat-datepicker>
         <mat-datepicker-toggle matSuffix [for]="datepicker_min"></mat-datepicker-toggle>
       </mat-form-field>
       <mat-form-field *ngIf="ranged" [formGroupName]="property.name">
-        <mat-label>{{'Max'|translate}}</mat-label>
+        <mat-label>{{'To'|translate}}</mat-label>
         <input matInput formControlName="max" [placeholder]="property.label" [matDatepicker]="datepicker_max">
         <mat-datepicker #datepicker_max></mat-datepicker>
         <mat-datepicker-toggle matSuffix [for]="datepicker_max"></mat-datepicker-toggle>

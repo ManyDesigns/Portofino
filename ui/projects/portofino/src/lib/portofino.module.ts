@@ -111,6 +111,7 @@ import {ChangePasswordComponent} from "./security/login/change-password.componen
 import {SignupComponent} from "./security/login/signup.component";
 import {ForgottenPasswordComponent} from "./security/login/forgotten-password.component";
 import {ResetPasswordComponent} from "./security/login/reset-password.component";
+import {SidenavService} from "./sidenav.service";
 
 @NgModule({
   declarations: [
@@ -152,7 +153,7 @@ export class PortofinoFormsModule {}
     MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule.forChild()
   ],
-  providers: [PortofinoService, AuthenticationService, PageService, PageCrudService],
+  providers: [PortofinoService, AuthenticationService, PageService, PageCrudService, SidenavService],
   entryComponents: [
     DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
     CreatePageComponent, DeletePageComponent, MovePageComponent],

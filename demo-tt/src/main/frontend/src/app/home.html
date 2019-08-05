@@ -1,0 +1,23 @@
+<portofino-page-layout [page]="this">
+  <ng-template #content>
+    <div fxFlex fxLayout="column">
+      <p>Welcome to the Portofino 5 demo application "demo-tt"! Here is a list of projects:</p>
+      <p fxLayout="row wrap" fxLayout.lt-md="column" fxFlex fxLayoutGap="20px">
+        <mat-card ngClass="{{project.public_.value ? 'success' : 'warn'}}" *ngFor="let project of projects">
+          <mat-card-header>
+            <div mat-card-avatar>
+              <mat-icon class="icon-lg">dashboard</mat-icon>
+            </div>
+            <mat-card-title>{{project.id.value}}</mat-card-title>
+            <mat-card-subtitle>{{project.title.value}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+            <a [routerLink]="'/projects/' + project.id.value">
+              {{'Open'|translate}}
+            </a>
+          </mat-card-actions>
+        </mat-card>
+      </p>
+    </div>
+  </ng-template>
+</portofino-page-layout>

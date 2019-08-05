@@ -18,8 +18,6 @@ export class PortofinoService {
   apiRoot: string;
   localApiPath = 'portofino';
   loginPath = 'login';
-  sideNavPosition: SideNavPosition = 'page';
-  sideNavOpen = true;
   upstairsLink = "/portofino-upstairs";
   callsInProgress = 0;
 
@@ -140,18 +138,12 @@ export class PortofinoService {
   get localApiAvailable() {
     return !!this.localApiPath;
   }
-
-  public toggleSidenav(){
-    this.sideNavOpen=!this.sideNavOpen;
-  }
 }
 
 class ApiInfo {
   apiRoot: string;
   loginPath: string;
 }
-
-export declare type SideNavPosition = 'body' | 'page' | undefined;
 
 export declare type Locale = { key: string, name: string, translations?: Object };
 

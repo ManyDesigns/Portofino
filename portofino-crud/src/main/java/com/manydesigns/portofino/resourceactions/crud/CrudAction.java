@@ -274,9 +274,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     // Object loading
     //**************************************************************************
 
-    public void loadObjects() {
-        //Se si passano dati sbagliati al criterio restituisco messaggio d'errore
-        // ma nessun risultato
+    public List<Object> loadObjects() {
         try {
             TableCriteria criteria = new TableCriteria(baseTable);
             if(searchForm != null) {
@@ -296,6 +294,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             logger.warn("Incorrect Field Type", e);
             RequestMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
         }
+        return objects;
     }
 
     /**

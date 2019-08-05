@@ -30,9 +30,13 @@ import javax.ws.rs.core.Response;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RequiresAdministrator
 public class ActionsAction extends AbstractResourceAction {
+
+    private static final Logger logger = LoggerFactory.getLogger(ActionsAction.class);
 
     public static final String PORTOFINO_ACTION_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.action-move";
 

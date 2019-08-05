@@ -196,7 +196,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public PkHelper pkHelper;
 
     public T object;
-    public List<? extends T> objects;
+    public List<T> objects;
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
@@ -225,7 +225,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * first and max results parameters. If the load is successful, the implementation must assign
      * the result to the <code>objects</code> field.
      */
-    public abstract void loadObjects();
+    public abstract List<T> loadObjects();
 
     /**
      * Loads an object by its identifier and returns it. The object must satisfy the current search criteria.
@@ -292,7 +292,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
                 .value(totalRecords)
                 .key("startIndex")
                 .value(firstResult == null ? 0 : firstResult)
-                .key("Result")
+                .key("records")
                 .array();
         for (TableForm.Row row : tableForm.getRows()) {
             js.object()
@@ -1454,7 +1454,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * @return the read link expression.
      */
     protected String getReadLinkExpression() {
-        String actionPath = context.getActionPath();
+        String actionPath = getAbsoluteActionPath();
         StringBuilder sb = new StringBuilder(actionPath);
         if(!actionPath.endsWith("/")) {
             sb.append("/");
@@ -1470,11 +1470,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     protected OgnlTextFormat getReadURLFormat() {
         String readLinkExpression = getReadLinkExpression();
-        OgnlTextFormat hrefFormat = OgnlTextFormat.create(readLinkExpression);
-        hrefFormat.setUrl(true);
-        String encoding = getUrlEncoding();
-        hrefFormat.setEncoding(encoding);
-        return hrefFormat;
+        return OgnlTextFormat.create(readLinkExpression);
     }
 
     /**

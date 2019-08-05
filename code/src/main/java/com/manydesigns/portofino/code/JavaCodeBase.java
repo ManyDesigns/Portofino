@@ -36,6 +36,7 @@ import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -243,11 +244,8 @@ public class JavaCodeBase implements CodeBase {
 
         @Override
         public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-            InputStream input = openInputStream();
-            try {
-                return IOUtils.toString(input);
-            } finally {
-                IOUtils.closeQuietly(input);
+            try(InputStream input = openInputStream()) {
+                return IOUtils.toString(input, Charset.defaultCharset());
             }
         }
 

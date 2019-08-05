@@ -1,0 +1,49 @@
+/** Demo-tt customizations - inspired by SB Admin material template  **/
+.icon-lg {
+  font-size: 40px;
+}
+
+.mat-card {
+  color: #fff;
+  min-width: 200px;
+  .mat-card-header {
+    width: 100%;
+  }
+  .mat-card-header-text {
+    text-align: right;
+  }
+  .mat-card-title {
+    font-size: 40px !important;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    text-align: right;
+  }
+  .mat-card-subtitle {
+    color: #fff;
+    text-align: right;
+  }
+
+  .mat-card-actions {
+    a {
+      text-decoration: none;
+      cursor: pointer;
+      color: #fff;
+    }
+  }
+}
+
+.mat-card.danger {
+  background: linear-gradient(60deg, #ec407a, #d81b60);
+}
+
+.mat-card.warn {
+  background: linear-gradient(60deg, #ffa726, #fb8c00);
+}
+
+.mat-card.success {
+  background: linear-gradient(60deg, #66bb6a, #43a047);
+}
+
+.mat-card.info {
+  background: linear-gradient(60deg, #26c6da, #00acc1);
+}

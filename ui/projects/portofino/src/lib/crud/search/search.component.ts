@@ -68,7 +68,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly selectColumnName = "__select";
   @Input()
   refresh: Subject<void>;
-  refreshSubscription: Subscription;
+  protected readonly subscriptions: Subscription[] = [];
 
   @Input()
   parentButtons: ButtonInfo[] = [];
@@ -87,14 +87,12 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   ngAfterViewInit(): void {
     this.search();
     if(this.refresh) {
-      this.refreshSubscription = this.refresh.subscribe(_ => this.refreshSearch());
+      this.subscriptions.push(this.refresh.subscribe(_ => this.refreshSearch()));
     }
   }
 
   ngOnDestroy(): void {
-    if(this.refreshSubscription) {
-      this.refreshSubscription.unsubscribe();
-    }
+    this.subscriptions.forEach(s => s.unsubscribe());
   }
 
   protected setupFields() {
@@ -180,7 +178,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
 
   protected listenToMediaChanges() {
     let wasDatatableHidden = !this.isDataTable();
-    this.media.asObservable().subscribe(() => {
+    this.subscriptions.push(this.media.asObservable().subscribe(() => {
       let refresh = false;
       if (this.isDataTable()) {
         refresh = wasDatatableHidden;
@@ -192,7 +190,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
         this.page = 0;
         this.refreshSearch();
       }
-    });
+    }));
   }
 
   protected loadSelectionOptions(property: Property, autocomplete: string = null) {
@@ -265,7 +263,6 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.http.get<SearchResults>(this.sourceUrl, {params: params}).subscribe(
       results => {
-        results.records = results['Result'];
         this.results = results;
         if(this.isDataTable() || !this.resultsDataSource.data) {
           this.resultsDataSource.data = this.results.records;
