@@ -36,13 +36,23 @@ public class DecimalFormatImpl implements DecimalFormat {
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
     private final String value;
+    private final int multiplier;
+
+    public DecimalFormatImpl(String value, int multiplier) {
+        this.value = value;
+        this.multiplier = multiplier;
+    }
 
     public DecimalFormatImpl(String value) {
-        this.value = value;
+        this(value, 1);
     }
 
     public String value() {
         return value;
+    }
+
+    public int multiplier() {
+        return multiplier;
     }
 
     public Class<? extends Annotation> annotationType() {

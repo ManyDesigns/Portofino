@@ -38,4 +38,5 @@ public @interface DecimalFormat {
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
     String value();
+    int multiplier() default 1;
 }

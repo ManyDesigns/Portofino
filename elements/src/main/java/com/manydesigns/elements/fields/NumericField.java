@@ -32,6 +32,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -127,6 +128,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
             Locale locale = ElementsThreadLocals.getHttpServletRequest().getLocale();
             DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(locale);
             decimalFormat = new DecimalFormat(decimalFormatAnnotation.value(), decimalFormatSymbols);
+            decimalFormat.setMultiplier(decimalFormatAnnotation.multiplier());
         }
     }
 
@@ -204,16 +206,6 @@ public class NumericField extends AbstractTextField<BigDecimal> {
             Object value = accessor.get(obj);
             decimalValue = OgnlUtils.convertValue(value, BigDecimal.class);
         }
-
-        updateStringValue();
-    }
-
-    protected void updateStringValue() {
-        if (decimalValue == null) {
-            stringValue = null;
-        } else {
-            stringValue = getDecimalFormat().format(decimalValue);
-        }
     }
 
     public void writeToObject(Object obj) {
@@ -242,16 +234,10 @@ public class NumericField extends AbstractTextField<BigDecimal> {
                 decimalFormatError = true;
                 return;
             }
-            decimalValue = tmpValue.setScale(scale, BigDecimal.ROUND_HALF_EVEN);
+            decimalValue = tmpValue.setScale(scale, RoundingMode.HALF_EVEN);
         }catch (Exception e) {
             logger.debug("Decimal parse error", e);
         }
-    }
-
-    @Override
-    public void readFrom(KeyValueAccessor keyValueAccessor) {
-        super.readFrom(keyValueAccessor);
-        updateStringValue();
     }
 
     @Override
@@ -317,6 +303,11 @@ public class NumericField extends AbstractTextField<BigDecimal> {
 
     public void setValue(BigDecimal decimalValue) {
         this.decimalValue = decimalValue;
+        if (decimalValue == null) {
+            stringValue = null;
+        } else {
+            stringValue = getDecimalFormat().format(decimalValue);
+        }
     }
 
     public int getPrecision() {
