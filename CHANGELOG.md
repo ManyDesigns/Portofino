@@ -13,9 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Improve the UI:
     - Use Material Typography.
     - Make it look better by drawing inspiration from [sb-admin-material](https://github.com/start-javascript/sb-admin-material).
+    - The user declining to log in is sent back to the home. The current page has a chance to inject another behaviour.
 - Quartz jobs are reloaded automatically when the code changes, without restarting the application,
   and any open Hibernate sessions are closed even in case of exceptions.
 - Better detection of links in text fields with `@HighlightLinks`.
+- Support the `multiplier` property of the `@DecimalFormat` annotation (for percent, per mille and similar).
 
 ### Changed
 - Angular version updated.
@@ -43,8 +45,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Default field encrypter (ported from P4).
 - Many to many selection provider database session (ported from P4).
 - Annotations not preserved when saving CRUD configuration and tables.
-- Select fields with no value.
-- Create new page at the top level was broken.
+- Select fields with no value and disabled select fields showing nothing or `undefined`.
+- Create new page at the top level.
+- Toolbar overflowing on mobile.
 
 ### Security
 - Improved code quality and security using snyk, lgtm and SpotBugs to find vulnerabilities and brittle code.
