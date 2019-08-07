@@ -112,11 +112,12 @@ import {SignupComponent} from "./security/login/signup.component";
 import {ForgottenPasswordComponent} from "./security/login/forgotten-password.component";
 import {ResetPasswordComponent} from "./security/login/reset-password.component";
 import {SidenavService} from "./sidenav.service";
+import {RichTextComponent} from "./fields/rich-text.component";
 
 @NgModule({
   declarations: [
     FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
-    NumberFieldComponent, SelectFieldComponent, TextFieldComponent,
+    NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
     FormComponent, DynamicFormComponentDirective],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
@@ -129,7 +130,7 @@ import {SidenavService} from "./sidenav.service";
     NumberFieldComponent, SelectFieldComponent, TextFieldComponent],
   exports: [
     FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
-    NumberFieldComponent, SelectFieldComponent, TextFieldComponent,
+    NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
     FormComponent,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
     MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule]

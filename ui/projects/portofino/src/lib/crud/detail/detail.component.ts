@@ -28,7 +28,6 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
   editModeChanges = new EventEmitter();
   @Input()
   editOrView: Subject<boolean>;
-  protected subscriptions: Subscription[] = [];
 
   operationsPath = '/:operations';
 
@@ -60,19 +59,20 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
       this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
         this.editEnabled = ops.some(op => op.signature == "PUT" && op.available);
         this.deleteEnabled = ops.some(op => op.signature == "DELETE" && op.available);
-        this.subscriptions.push(this.editOrView.subscribe(edit => {
+        this.editOrView.subscribe(edit => {
           if(this.editEnabled && edit) {
             this.edit();
           } else {
             this.cancel();
           }
-        }));
+        });
       });
     });
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(s => s.unsubscribe());
+    super.ngOnDestroy();
+    this.editOrView.complete();
   }
 
   protected loadObject(objectUrl: string, onSuccess: () => void) {

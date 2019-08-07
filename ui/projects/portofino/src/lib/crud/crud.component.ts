@@ -274,6 +274,12 @@ export class CrudComponent extends Page {
   protected getPageSettingsPanel(): PageSettingsPanel {
     return new CrudPageSettingsPanel(this);
   }
+
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    this.editMode.complete();
+    this.refreshSearch.complete();
+  }
 }
 
 export enum CrudView {

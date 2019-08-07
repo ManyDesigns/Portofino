@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
@@ -17,7 +17,7 @@ import {NotificationService} from "../notifications/notification.service";
 import {Button, ButtonInfo, getButtons} from "../buttons";
 import {WithButtons} from "../button.component";
 
-export abstract class BaseDetailComponent implements WithButtons {
+export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
 
   @Input()
   classAccessor: ClassAccessor;
@@ -295,5 +295,9 @@ export abstract class BaseDetailComponent implements WithButtons {
 
   protected isFormValid(): boolean {
     return this.form.valid;
+  }
+
+  ngOnDestroy(): void {
+    this.close.complete();
   }
 }

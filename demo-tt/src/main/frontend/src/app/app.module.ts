@@ -128,7 +128,7 @@ export class DemoTTAppComponent {}
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
     MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
-    FileInputAccessorModule, NgxdModule, QuillModule,
+    FileInputAccessorModule, NgxdModule, QuillModule.forRoot(),
     TranslateModule.forRoot()],
   entryComponents: [ CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch ],
   bootstrap: [DemoTTAppComponent]

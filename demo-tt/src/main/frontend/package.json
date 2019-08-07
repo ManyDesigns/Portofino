@@ -37,7 +37,7 @@
     "material-design-icons": "^3.0.1",
     "moment": "^2.24.0",
     "moment-with-locales-es6": "^1.0.1",
-    "ngx-quill": "^5.2.0",
+    "ngx-quill": "^7.1.2",
     "ngx-store": "^2.1.0",
     "quill": "^1.3.6",
     "roboto-fontface": "^0.10.0",

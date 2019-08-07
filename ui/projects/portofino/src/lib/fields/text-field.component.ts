@@ -7,7 +7,7 @@ import {FormControl, FormGroupDirective, NgForm} from "@angular/forms";
 @Component({
   selector: 'portofino-text-field',
   templateUrl: './text-field.component.html',
-  styleUrls: ['./text-field.component.css']
+  styleUrls: ['./text-field.component.scss']
 })
 export class TextFieldComponent extends FieldComponent {
 

@@ -61,7 +61,7 @@ export class WelcomeComponent extends Page {}
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
-    FileInputAccessorModule, QuillModule, TranslateModule.forRoot()],
+    FileInputAccessorModule, QuillModule.forRoot(), TranslateModule.forRoot()],
   entryComponents: [WelcomeComponent],
   bootstrap: [AppComponent]
 })

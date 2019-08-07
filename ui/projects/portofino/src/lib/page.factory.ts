@@ -4,7 +4,7 @@ import {
   ComponentFactoryResolver,
   ComponentRef, EventEmitter,
   Injector,
-  Input, OnChanges, OnInit, Optional, Output, SimpleChanges, Type,
+  Input, OnChanges, OnDestroy, OnInit, Optional, Output, SimpleChanges, Type,
   ViewContainerRef
 } from "@angular/core";
 import {PortofinoService} from "./portofino.service";
@@ -143,6 +143,12 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
         }
         return of(componentRef);
       }));
+  }
+
+
+  ngOnDestroy() {
+    super.ngOnDestroy();
+    this.pageCreated.complete();
   }
 }
 

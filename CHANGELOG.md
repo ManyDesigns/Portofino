@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Support the `multiplier` property of the `@DecimalFormat` annotation (for percent, per mille and similar).
 
 ### Changed
+- Rich text component is better integrated in Material forms.
 - Angular version updated.
 - Liquibase version updated.
 

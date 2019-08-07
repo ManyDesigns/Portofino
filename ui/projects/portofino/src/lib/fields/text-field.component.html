@@ -1,8 +1,7 @@
-<div *ngIf="isRichText()" [formGroup]="form">
-  <label>{{property.label}}</label>
-  <quill-editor [formControlName]="property.name" [required]="required" *ngIf="enabled"></quill-editor>
-  <span [innerHTML]="control.value" *ngIf="!enabled" class="rich-text"></span>
-</div>
+<mat-form-field *ngIf="isRichText()" [formGroup]="form" class="rich-text">
+  <mat-label>{{property.label}}</mat-label>
+  <portofino-rich-text [formControlName]="property.name" [required]="required" [enabled]="enabled"></portofino-rich-text>
+</mat-form-field>
 <mat-form-field *ngIf="!isRichText() && !isPasswordConfirmationRequired()" [formGroup]="form" [ngClass]="{ multiline: isMultiline() }">
   <mat-label>{{property.label}}</mat-label>
   <input matInput *ngIf="!isMultiline()"

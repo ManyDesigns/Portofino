@@ -3,7 +3,7 @@ import {
   deriveKind, getAnnotation,
   getValidators,
   isEnabled,
-  isMultiline,
+  isMultiline, isRichText,
   Property
 } from "./class-accessor";
 import {
@@ -11,7 +11,7 @@ import {
   Component,
   ComponentFactoryResolver, Directive,
   EventEmitter, Host,
-  Input, OnInit, Optional, Output,
+  Input, OnDestroy, OnInit, Optional, Output,
   QueryList, Type,
   ViewChildren, ViewContainerRef
 } from "@angular/core";
@@ -144,7 +144,7 @@ export class DynamicFormComponentDirective {
   templateUrl: './form.component.html',
   styleUrls: ['./form.component.scss']
 })
-export class FormComponent implements OnInit, AfterViewInit {
+export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   private _controls: FormGroup;
   @Input()
   set controls(controls: FormGroup) {
@@ -196,6 +196,10 @@ export class FormComponent implements OnInit, AfterViewInit {
     if(this.form) {
       this.reset(this.form)
     }
+  }
+
+  ngOnDestroy(): void {
+    this.formReset.complete();
   }
 
   protected reset(form: Form, andControls = true) {
@@ -354,7 +358,7 @@ export class FormComponent implements OnInit, AfterViewInit {
   }
 
   isMultiline(property) {
-    return isMultiline(property);
+    return isMultiline(property) || isRichText(property);
   }
 
 }
@@ -362,6 +366,5 @@ export class FormComponent implements OnInit, AfterViewInit {
 export const checkSamePassword: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
   const password = control.get('password');
   const confirmPassword = control.get('confirmPassword');
-  console.log("control", control);
   return password.value !== confirmPassword.value ? {'passwordsDontMatch': true} : null;
 };
