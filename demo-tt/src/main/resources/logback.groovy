@@ -30,7 +30,6 @@ logger("org.hibernate.connection.C3P0ConnectionProvider", INFO)
 logger("com.manydesigns.portofino.i18n.ResourceBundleManager", WARN)
 logger("com.manydesigns.portofino.servlets.PortofinoListener", INFO)
 logger("com.manydesigns.portofino.tt.TtUtils", INFO)
-logger("buttons.tag", INFO)
 
 //Periodically reload this file when it changes
 scan("30 seconds")

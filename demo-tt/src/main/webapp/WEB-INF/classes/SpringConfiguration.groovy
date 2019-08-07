@@ -1,12 +1,16 @@
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.tt.NotificationsJob
+import com.manydesigns.portofino.tt.Refresh
 import com.manydesigns.portofino.tt.TtUtils
+import io.reactivex.disposables.Disposable
 import org.hibernate.Session
 import org.quartz.*
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 import javax.annotation.PostConstruct
@@ -17,6 +21,7 @@ class SpringConfiguration {
 
     Scheduler scheduler
     JobKey notificationJobKey
+    Disposable subscription
 
     @Autowired
     Persistence persistence
@@ -28,14 +33,17 @@ class SpringConfiguration {
         scheduler = StdSchedulerFactory.getDefaultScheduler()
         notificationJobKey = scheduleJob(NotificationsJob, "NotificationsJob", 10, "tt")
 
-        persistence.status.subscribe({ status ->
+        subscription = persistence.status.subscribe({ status ->
             logger.info("Persistence status: ${status}")
         })
     }
 
     @PreDestroy
     void unscheduleJobs() {
-        scheduler.deleteJob(notificationJobKey)
+        if(!scheduler.isShutdown()) {
+            scheduler.deleteJob(notificationJobKey)
+        }
+        subscription.dispose()
     }
 
     JobKey scheduleJob(Class clazz, String jobName, int pollSecInterval, String jobGroup) {
@@ -57,6 +65,11 @@ class SpringConfiguration {
             logger.error("Could not schedule " + jobName + " job", e);
             return null
         }
+    }
+
+    @Bean
+    Refresh getRefresh() {
+        return new Refresh();
     }
 
 }

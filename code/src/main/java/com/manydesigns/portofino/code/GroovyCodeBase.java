@@ -21,12 +21,9 @@ import static com.manydesigns.portofino.code.JavaCodeBase.classNameToPath;
 /**
  * Created by alessio on 28/03/17.
  */
-public class GroovyCodeBase implements CodeBase {
+public class GroovyCodeBase extends AbstractCodeBase {
     
     protected GroovyScriptEngine groovyScriptEngine;
-    protected FileObject root;
-    protected CodeBase parent;
-    protected ClassLoader classLoader;
     private static final Logger logger = LoggerFactory.getLogger(GroovyCodeBase.class);
     
     public GroovyCodeBase(FileObject root) throws IOException {
@@ -34,8 +31,8 @@ public class GroovyCodeBase implements CodeBase {
     }
 
     public GroovyCodeBase(FileObject root, CodeBase parent, ClassLoader classLoader) throws IOException {
+        super(root, parent, classLoader);
         this.root = root;
-        this.parent = parent;
         this.classLoader = classLoader;
         resetGroovyScriptEngine();
     }
@@ -57,9 +54,9 @@ public class GroovyCodeBase implements CodeBase {
     public GroovyCodeBase(FileObject root, CodeBase parent) throws IOException {
         this(root, parent, parent != null ? parent.getClassLoader() : null);
     }
-    
+
     @Override
-    public Class loadClass(String className) throws IOException, ClassNotFoundException {
+    protected Class loadLocalClass(String className) throws IOException, ClassNotFoundException {
         String resourceName = classNameToPath(className);
         FileObject fileObject = root.resolveFile(resourceName + ".groovy");
         if(fileObject.exists()) {
@@ -71,10 +68,7 @@ public class GroovyCodeBase implements CodeBase {
                 throw new ClassNotFoundException(className, e);
             }
         }
-        if(parent != null) {
-            return parent.loadClass(className);
-        }
-        return getClassLoader().loadClass(className);
+        return null;
     }
 
     public Class loadGroovyFile(FileObject fileObject) throws FileSystemException, ResourceException, ScriptException {
@@ -87,20 +81,8 @@ public class GroovyCodeBase implements CodeBase {
     }
 
     @Override
-    public void close() {
-        
-    }
-
-    @Override
-    public FileObject getRoot() {
-        return root;
-    }
-
-    @Override
     public void clear() throws Exception {
-        if(parent != null) {
-            parent.clear();
-        }
+        super.clear();
         resetGroovyScriptEngine();
     }
 }

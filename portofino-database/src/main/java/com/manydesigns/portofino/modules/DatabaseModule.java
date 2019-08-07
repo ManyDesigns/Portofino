@@ -37,7 +37,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
@@ -137,10 +136,14 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     @Override
     public void onApplicationEvent(@NotNull ApplicationEvent event) {
         if(event instanceof ContextRefreshedEvent) {
-            logger.info("Starting persistence...");
-            applicationContext.getBean(Persistence.class).start();
-            status = ModuleStatus.STARTED;
-            logger.info("Persistence started.");
+            Persistence persistence = applicationContext.getBean(Persistence.class);
+            Persistence.Status status = persistence.status.getValue();
+            if(status == null || status == Persistence.Status.STOPPED) {
+                logger.info("Starting persistence...");
+                persistence.start();
+                this.status = ModuleStatus.STARTED;
+                logger.info("Persistence started.");
+            }
         }
     }
 }

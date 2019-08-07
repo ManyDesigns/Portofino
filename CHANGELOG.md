@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   and any open Hibernate sessions are closed even in case of exceptions.
 - Better detection of links in text fields with `@HighlightLinks`.
 - Support the `multiplier` property of the `@DecimalFormat` annotation (for percent, per mille and similar).
+- When source code changes, the user-defined Spring context is reloaded, so that services and actions can pick up the changes.
 
 ### Changed
 - Rich text component is better integrated in Material forms.

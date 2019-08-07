@@ -46,14 +46,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class JavaCodeBase implements CodeBase {
+public class JavaCodeBase extends AbstractCodeBase {
     
     //TODO reset()
 
-    protected FileObject root;
-    protected CodeBase parent;
-    protected ClassLoader classLoader;
-    
     protected JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     protected DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
     protected InMemoryFileManager fileManager;
@@ -62,13 +58,11 @@ public class JavaCodeBase implements CodeBase {
     private static final Logger logger = LoggerFactory.getLogger(JavaCodeBase.class);
 
     public JavaCodeBase(FileObject root) {
-        this.root = root;
+        super(root);
     }
 
     public JavaCodeBase(FileObject root, CodeBase parent, ClassLoader classLoader) throws IOException {
-        this.root = root;
-        this.parent = parent;
-        this.classLoader = classLoader;
+        super(root, parent, classLoader);
         resetFileManagerAndClassLoader();
     }
 
@@ -85,7 +79,7 @@ public class JavaCodeBase implements CodeBase {
     }
     
     @Override
-    public Class loadClass(String className) throws IOException, ClassNotFoundException {
+    protected Class loadLocalClass(String className) throws FileSystemException, ClassNotFoundException {
         String resourceName = classNameToPath(className);
         FileObject fileObject = root.resolveFile(resourceName + ".class");
         if(fileObject.exists()) {
@@ -95,19 +89,11 @@ public class JavaCodeBase implements CodeBase {
         if(fileObject.exists()) {
             return loadJavaFile(fileObject, className);
         }
-        if(parent != null) {
-            return parent.loadClass(className);
-        }
-        return getClassLoader().loadClass(className);
+        return null;
     }
 
     public Class loadClassFile(FileObject location, String name) throws FileSystemException, ClassNotFoundException {
         return new VFSClassloader(location, getClassLoader()).loadClass(name);
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
-        return classLoader != null ? classLoader : Thread.currentThread().getContextClassLoader();
     }
 
     public Class loadJavaFile(final FileObject fileObject, final String name) throws ClassNotFoundException {
@@ -361,6 +347,7 @@ public class JavaCodeBase implements CodeBase {
 
     @Override
     public void close() {
+        super.close();
         if (fileManager != null) try {
             fileManager.close();
         } catch (IOException e) {
@@ -369,15 +356,8 @@ public class JavaCodeBase implements CodeBase {
     }
 
     @Override
-    public FileObject getRoot() {
-        return root;
-    }
-
-    @Override
     public void clear() throws Exception {
-        if(parent != null) {
-            parent.clear();
-        }
+        super.clear();
         resetFileManagerAndClassLoader();
     }
 }

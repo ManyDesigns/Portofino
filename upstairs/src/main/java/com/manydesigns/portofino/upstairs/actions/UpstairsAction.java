@@ -23,6 +23,7 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.SecurityLogic;
+import com.manydesigns.portofino.spring.PortofinoSpringServletContainerInitializer;
 import com.manydesigns.portofino.upstairs.ModuleInfo;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
 import com.manydesigns.portofino.upstairs.actions.support.WizardInfo;
@@ -68,7 +69,7 @@ public class UpstairsAction extends AbstractResourceAction {
     public final static Logger logger = LoggerFactory.getLogger(UpstairsAction.class);
 
     @Autowired
-    ApplicationContext applicationContext;
+    ConfigurableApplicationContext applicationContext;
 
     @Autowired
     Persistence persistence;
@@ -107,15 +108,7 @@ public class UpstairsAction extends AbstractResourceAction {
     public void restartApplication() throws Exception {
         codeBase.clear();
         OgnlUtils.clearCache();
-        if(applicationContext instanceof ConfigurableApplicationContext) {
-            //Spring enhances @Configuration classes. To do so it loads them by name from its classloader.
-            //Thus, replacing the classloader with a fresh one has also the side-effect of making Spring reload the user
-            //SpringConfiguration class, provided it already existed and was annotated with @Configuration.
-            //Note that Spring won't pick up new @Bean methods. It will also barf badly on removed @Bean methods,
-            //effectively crashing the application. Changing the return value and even the return type is fine.
-            ((DefaultResourceLoader) applicationContext).setClassLoader(codeBase.asClassLoader());
-            ((ConfigurableApplicationContext) applicationContext).refresh();
-        }
+        PortofinoSpringServletContainerInitializer.refresh(applicationContext, codeBase);
     }
 
     @POST
