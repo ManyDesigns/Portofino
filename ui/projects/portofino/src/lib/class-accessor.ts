@@ -119,6 +119,7 @@ export function isStringProperty(property: Property) {
 export function isNumericProperty(property: Property) {
   return property.type == 'java.lang.Long' || property.type == 'java.lang.Integer' ||
          property.type == 'java.lang.Float' || property.type == 'java.lang.Double' ||
+         property.type == 'java.math.BigInteger' || property.type == 'java.math.BigDecimal' ||
          property.type == 'number'
 }
 
@@ -193,7 +194,7 @@ export function deriveKind(property: Property) {
   if(isBooleanProperty(property)) {
     return "boolean";
   }
-  throw `${property.name}: unsuppored property type ${property.type}`
+  throw `${property.name}: unsupported property type ${property.type}`
 }
 
 export function getValidators(property: Property): ValidatorFn[] {
