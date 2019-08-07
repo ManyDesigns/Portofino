@@ -4,6 +4,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.servlets.PortofinoListener;
 import io.reactivex.disposables.Disposable;
 import org.apache.commons.configuration.Configuration;
@@ -19,6 +20,9 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
@@ -73,9 +77,9 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
                     Class userConfigurationClass = codeBase.loadClass("SpringConfiguration");
                     ((DefaultResourceLoader) rootContext).setClassLoader(codeBase.asClassLoader());
                     ((AnnotationConfigRegistry) rootContext).register(userConfigurationClass);
-                    boolean reload = "false".equalsIgnoreCase(sc.getInitParameter(RELOAD_CONTEXT_WHEN_SOURCES_CHANGE));
+                    boolean reload = !"false".equalsIgnoreCase(sc.getInitParameter(RELOAD_CONTEXT_WHEN_SOURCES_CHANGE));
                     Disposable subscription = codeBase.getReloads().subscribe(c -> {
-                        if(reload && refreshing.compareAndSet(false, true)) {
+                        if(reload && isReloadable(c) && refreshing.compareAndSet(false, true)) {
                             logger.info("Detected reload of " + c + ", refreshing the application context");
                             refresh(rootContext, codeBase);
                             refreshing.set(false);
@@ -116,6 +120,10 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
         };
         listener.setContextInitializers(getRootApplicationContextInitializers());
         servletContext.addListener(listener);
+    }
+
+    protected boolean isReloadable(Class c) {
+        return c.getAnnotation(Component.class) != null || c.getAnnotation(Repository.class) != null || c.getAnnotation(Service.class) != null;
     }
 
     public static void refresh(ConfigurableApplicationContext applicationContext, CodeBase codeBase) {
