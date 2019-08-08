@@ -37,6 +37,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -74,8 +75,7 @@ public class SecurityClassRealm implements PortofinoRealm, Destroyable {
     //--------------------------------------------------------------------------
 
     public SecurityClassRealm(
-            CodeBase codeBase, String className, ApplicationContext applicationContext)
-            throws InstantiationException, IllegalAccessException, IOException, ClassNotFoundException {
+            CodeBase codeBase, String className, ApplicationContext applicationContext) throws Exception {
         this.codeBase = codeBase;
         this.className = className;
         this.applicationContext = applicationContext;
@@ -97,8 +97,7 @@ public class SecurityClassRealm implements PortofinoRealm, Destroyable {
         }
     }
 
-    private PortofinoRealm doEnsureDelegate()
-            throws IllegalAccessException, InstantiationException, IOException, ClassNotFoundException {
+    private PortofinoRealm doEnsureDelegate() throws Exception {
         Class<?> scriptClass = codeBase.loadClass(className);
         if(scriptClass.isInstance(security)) { //Class did not change
             return security;
@@ -107,7 +106,7 @@ public class SecurityClassRealm implements PortofinoRealm, Destroyable {
             if(security != null) {
                 logger.debug("Script class changed: from " + security.getClass() + " to " + scriptClass);
             }
-            Object securityTemp = scriptClass.newInstance();
+            Object securityTemp = scriptClass.getConstructor().newInstance();
             if(securityTemp instanceof PortofinoRealm) {
                 PortofinoRealm realm = (PortofinoRealm) securityTemp;
                 configureDelegate(realm);

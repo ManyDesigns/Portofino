@@ -34,6 +34,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -155,8 +156,8 @@ public abstract class AbstractResource implements SecureResource {
 
     protected Object createSubResource(
             Class<?> subResourceClass, FileObject location, String segment)
-            throws IllegalAccessException, InstantiationException {
-        return initSubResource(subResourceClass.newInstance(), location, segment);
+            throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+        return initSubResource(subResourceClass.getConstructor().newInstance(), location, segment);
     }
 
     protected Object initSubResource(Object resource, FileObject location, String segment) {

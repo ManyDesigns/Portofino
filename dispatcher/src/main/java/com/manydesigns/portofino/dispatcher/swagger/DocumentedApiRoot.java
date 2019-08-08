@@ -108,7 +108,7 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         @Override
         public <T> T getResource(Class<T> resourceClass) {
             try {
-                return initResource(resourceClass.newInstance());
+                return initResource(resourceClass.getConstructor().newInstance());
             } catch (Exception e) {
                 logger.warn("Could not create resource for Swagger", e);
                 return null;

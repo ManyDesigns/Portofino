@@ -94,7 +94,7 @@
         <commons.lang.version>2.5</commons.lang.version>
         <ehcache.version>2.10.5</ehcache.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>2.5.6</groovy.version>
+        <groovy.version>2.5.8</groovy.version>
         <guava.version>27.0.1-jre</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
         <jackson.version>2.9.9</jackson.version>
@@ -295,7 +295,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.10</version>
+                <version>6.14.3</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
