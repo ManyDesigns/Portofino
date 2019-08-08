@@ -26,8 +26,16 @@ public abstract class AbstractCodeBase implements CodeBase {
         this.parent = parent;
         this.classLoader = classLoader;
         if(parent != null) {
-            parent.getReloads().subscribe(reloads::onNext);
+            //noinspection ResultOfMethodCallIgnored - subscriptions are disposed on close
+            parent.getReloads().subscribe(c -> {
+                parentClassReloaded(c);
+                reloads.onNext(c);
+            });
         }
+    }
+
+    protected void parentClassReloaded(Class c) throws Exception {
+        clear();
     }
 
     @Override
@@ -80,7 +88,13 @@ public abstract class AbstractCodeBase implements CodeBase {
 
     @Override
     public void close() {
-        reloads.onComplete();
+        try {
+            if(parent != null) {
+                parent.close();
+            }
+        } finally {
+            reloads.onComplete();
+        }
     }
 
     @Override
