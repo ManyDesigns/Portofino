@@ -276,11 +276,22 @@ export class PortofinoModule {
     return DefaultFooterComponent;
   }
 
-  public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders|Type<PortofinoModule>)[] {
+  public static forRoot(): (ModuleWithProviders<RouterModule> | PortofinoModule)[] {
+    return [RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()), PortofinoModule];
+  }
+
+  public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders<RouterModule>|Type<PortofinoModule>)[] {
     return [RouterModule.forRoot(
-      [...routes,
-              { path: "**", component: ContentComponent}],
-      { onSameUrlNavigation: "reload", ...config }),
+      [...routes, ...PortofinoModule.defaultRoutes()],
+      { ...PortofinoModule.defaultRouterConfig(), ...config }),
       PortofinoModule];
+  }
+
+  public static defaultRoutes(): Routes {
+    return [{ path: "**", component: ContentComponent}];
+  }
+
+  public static defaultRouterConfig(): ExtraOptions {
+    return { onSameUrlNavigation: "reload" };
   }
 }

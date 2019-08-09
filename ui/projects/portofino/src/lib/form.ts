@@ -305,7 +305,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
       const subGroup = new FormGroup({});
       subGroup.setControl("password", new FormControl(initialState, getValidators(property)));
       subGroup.setControl("confirmPassword", new FormControl(initialState, getValidators(property)));
-      subGroup.setValidators(checkSamePassword);
+      subGroup.setValidators(samePasswordChecker("password", "confirmPassword"));
       formGroup.setControl(property.name, subGroup);
     } else if (control instanceof FormControl) {
       control.reset(initialState);
@@ -363,8 +363,10 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
 
 }
 
-export const checkSamePassword: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
-  const password = control.get('password');
-  const confirmPassword = control.get('confirmPassword');
-  return password.value !== confirmPassword.value ? {'passwordsDontMatch': true} : null;
-};
+export function samePasswordChecker(passwordField, confirmationField): ValidatorFn {
+  return (control: FormGroup): ValidationErrors | null => {
+    const password = control.get(passwordField);
+    const confirmPassword = control.get(confirmationField);
+    return password.value !== confirmPassword.value ? {'passwordsDontMatch': true} : null;
+  };
+}

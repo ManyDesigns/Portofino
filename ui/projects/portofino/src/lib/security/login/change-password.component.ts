@@ -3,8 +3,6 @@ import {
   FormControl,
   FormGroup,
   FormGroupDirective, NgForm,
-  ValidationErrors,
-  ValidatorFn,
   Validators
 } from "@angular/forms";
 import {ErrorStateMatcher, MatDialogRef} from "@angular/material";
@@ -12,6 +10,7 @@ import {AuthenticationService} from "../authentication.service";
 import {Component} from "@angular/core";
 import {NotificationService} from "../../notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
+import {samePasswordChecker} from "../../form";
 
 @Component({
   selector: 'portofino-change-password',
@@ -67,7 +66,7 @@ export class ChangePasswordComponent {
       oldPassword: ['', Validators.required],
       newPassword: ['', Validators.required],
       confirmNewPassword: ['', Validators.required]
-    }, { validators: checkSamePassword });
+    }, { validators: samePasswordChecker("newPassword", "confirmNewPassword") });
   }
 
   change() {
@@ -79,9 +78,3 @@ export class ChangePasswordComponent {
   }
 
 }
-
-export const checkSamePassword: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
-  const newPassword = control.get('newPassword');
-  const confirmNewPassword = control.get('confirmNewPassword');
-  return newPassword.value !== confirmNewPassword.value ? {'passwordsDontMatch': true} : null;
-};
