@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     and any open Hibernate sessions are closed even in case of exceptions.
     - When source code changes, the user-defined Spring context is refreshed, so that services and actions can pick up the changes.
     Only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
+- When embedded, the crud page has now the option to open the detail in the same page instead of navigating to the detail URL.
 
 ### Changed
 - UI improvements:
@@ -25,6 +26,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - Rich text component is better integrated in Material forms.
     - Better detection of links in text fields with `@HighlightLinks`.
 - Important dependencies updated: Angular, Groovy and Liquibase.
+
+### Fixed
+- Select fields with no value and disabled select fields showing nothing or `undefined`.
+- Create new page at the top level.
+- Toolbar overflowing on mobile.
+- Support BigInteger and BigDecimal properties in the UI.
+- Properly save the crud page configuration.
 
 ### Security
 - Improved code quality and security and updated insecure dependencies using automated tools.
@@ -48,9 +56,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Default field encrypter (ported from P4).
 - Many to many selection provider database session (ported from P4).
 - Annotations not preserved when saving CRUD configuration and tables.
-- Select fields with no value and disabled select fields showing nothing or `undefined`.
-- Create new page at the top level.
-- Toolbar overflowing on mobile.
 
 ### Security
 - Improved code quality and security using snyk, lgtm and SpotBugs to find vulnerabilities and brittle code.
