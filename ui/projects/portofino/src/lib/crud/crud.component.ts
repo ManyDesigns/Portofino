@@ -152,6 +152,11 @@ export class CrudComponent extends Page {
     this.view = CrudView.CREATE;
   }
 
+  openDetail(id) {
+    this.id = id;
+    this.showDetail();
+  }
+
   showDetail() {
     this.allowEmbeddedComponents = true;
     this.view = CrudView.DETAIL;
@@ -275,6 +280,10 @@ export class CrudComponent extends Page {
     return new CrudPageSettingsPanel(this);
   }
 
+  isOpenDetailInSamePage() {
+    return this.embedded && this.configuration.openDetailInSamePageWhenEmbedded
+  }
+
   ngOnDestroy() {
     super.ngOnDestroy();
     this.editMode.complete();
@@ -340,6 +349,16 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
   properties = [];
   selectionProviders = [];
 
+
+  protected setupPageConfigurationForm(pageConfiguration) {
+    super.setupPageConfigurationForm(pageConfiguration);
+    this.formDefinition.contents.push(Field.fromProperty({
+      name: 'openDetailInSamePageWhenEmbedded',
+      label: 'Open detail in the same page when embedded',
+      type: 'boolean'},
+      pageConfiguration));
+  }
+
   protected setupConfigurationForm(ca: ClassAccessor, config: any) {
     super.setupConfigurationForm(ca, config);
     this.properties = [];
@@ -399,10 +418,11 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
     return configurationToSave;
   }
 
-  getPageConfigurationToSave(formValue): PageConfiguration {
-    const superConf: any = super.getPageConfigurationToSave(formValue);
+  getPageConfigurationToSave(formValue = this.form.value): PageConfiguration {
+    const pageConf: any = super.getPageConfigurationToSave(formValue);
     const config = Object.assign({}, this.page.configuration, formValue);
-    superConf.detailChildren = config.detailChildren;
-    return superConf;
+    pageConf.detailChildren = config.detailChildren;
+    pageConf.openDetailInSamePageWhenEmbedded = config.openDetailInSamePageWhenEmbedded;
+    return pageConf;
   }
 }

@@ -7,7 +7,7 @@ import {Operation} from "../../page";
 import {NotificationService} from "../../notifications/notification.service";
 import {Button} from "../../buttons";
 import {TranslateService} from "@ngx-translate/core";
-import {Subject, Subscription} from "rxjs";
+import {Subject} from "rxjs";
 
 @Component({
   selector: 'portofino-crud-detail',
@@ -52,7 +52,10 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
   }
 
   ngOnInit() {
-    this.initClassAccessor();
+    //Multiple inits are possible when openDetailInSamePage is true
+    if(this.properties.length == 0) {
+      this.initClassAccessor();
+    }
     this.loading = true;
     const objectUrl = `${this.sourceUrl}/${this.id}`;
     this.loadObject(objectUrl, () => {
@@ -80,6 +83,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
       this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
       this.loading = false;
       this.object = resp.body;
+      this.setupForm(this.object);
       onSuccess();
     }, () => {
       this.loading = false;

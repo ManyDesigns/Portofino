@@ -2,7 +2,7 @@
   <mat-checkbox [formControlName]="property.name">
     {{property.label}}
   </mat-checkbox>
-  <mat-error align="end" *ngIf="control.hasError('server-side')">
+  <mat-error *ngIf="control.hasError('server-side')">
     <ng-container *ngFor="let error of control.getError('server-side')">
       {{error}}<br />
     </ng-container>

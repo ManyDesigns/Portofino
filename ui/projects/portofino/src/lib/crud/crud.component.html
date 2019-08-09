@@ -5,7 +5,8 @@
       [component]="searchComponent" [context]="searchComponentContext"
       [classAccessor]="classAccessor" [pageSize]="rowsPerPage" [sourceUrl]="sourceUrl" [baseUrl]="url"
       [selectionProviders]="selectionProviders" [selectionEnabled]="bulkDeleteEnabled || bulkEditEnabled"
-      [selection]="selection" [refresh]="refreshSearch"
+      [selection]="selection" [refresh]="refreshSearch" (openDetail)="openDetail($event)"
+      [openDetailInSamePage]="isOpenDetailInSamePage()"
       [parentButtons]="getButtons('search-results')" [parent]="page">
     </portofino-crud-search-holder>
     <portofino-crud-detail-holder *ngIf="isDetailView()"

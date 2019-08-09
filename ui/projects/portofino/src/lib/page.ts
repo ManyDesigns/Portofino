@@ -95,27 +95,41 @@ export class PageSettingsPanel {
     this.callback = callback;
     const pageConfiguration = this.page.configuration;
     this.previousConfiguration = Object.assign({}, pageConfiguration);
-    const titleField = Field.fromProperty(Property.create({name: 'title', label: 'Title'}).required(), pageConfiguration);
-    const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, pageConfiguration);
-    if(pageConfiguration.template) {
-      const description = this.page.portofino.templates[pageConfiguration.template].description;
-      pageConfiguration.template = { v: pageConfiguration.template, l: description, s: true };
-    }
-    const templates = [];
-    for (let key in this.page.portofino.templates) {
-      const template = this.page.portofino.templates[key];
-      templates.push({ v: key, l: this.page.translate.instant(template.description ? template.description : key), s: false});
-    }
-    const templateField = Field.fromProperty(Property.create({ name: "template", label: "Template" }).withSelectionProvider({
-      options: templates
-    }), pageConfiguration);
-    this.formDefinition.contents = [titleField, iconField, templateField];
+    this.setupPageConfigurationForm(pageConfiguration);
     this.formDefinition.contents.forEach((f: Field) => {
       f.editable = this.page.portofino.localApiAvailable;
     });
     this.reloadConfiguration();
     this.loadPermissions();
     this.active = true;
+  }
+
+  protected setupPageConfigurationForm(pageConfiguration) {
+    const titleField = Field.fromProperty(Property.create({
+      name: 'title',
+      label: 'Title'
+    }).required(), pageConfiguration);
+    const iconField = Field.fromProperty({name: 'icon', label: 'Icon'}, pageConfiguration);
+    if (pageConfiguration.template) {
+      const description = this.page.portofino.templates[pageConfiguration.template].description;
+      pageConfiguration.template = {v: pageConfiguration.template, l: description, s: true};
+    }
+    const templates = [];
+    for (let key in this.page.portofino.templates) {
+      const template = this.page.portofino.templates[key];
+      templates.push({
+        v: key,
+        l: this.page.translate.instant(template.description ? template.description : key),
+        s: false
+      });
+    }
+    const templateField = Field.fromProperty(Property.create({
+      name: "template",
+      label: "Template"
+    }).withSelectionProvider({
+      options: templates
+    }), pageConfiguration);
+    this.formDefinition.contents = [titleField, iconField, templateField];
   }
 
   loadPermissions() {
@@ -408,7 +422,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     return Page.removeDoubleSlashesFromUrl(`pages${path}/config.json`);
   }
 
-  configure(callback: (saved: boolean) => void = () => this.reloadBaseUrl()) {
+  configure(callback: (saved: boolean) => void = () => this.embedded ? this.parent.reloadBaseUrl() : this.reloadBaseUrl()) {
     this.settingsPanel.show(callback);
   }
 
@@ -552,7 +566,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 @Component({
   selector: 'portofino-page-header',
   templateUrl: './page-header.component.html',
-  styleUrls: ['./page-header.component.css']
+  styleUrls: ['./page-header.component.scss']
 })
 export class PageHeader {
   @Input()
@@ -599,7 +613,7 @@ export class TemplatesComponent implements AfterViewInit {
 @Component({
   selector: 'portofino-page-layout',
   templateUrl: './page-layout.component.html',
-  styleUrls: ['./page-layout.component.css']
+  styleUrls: ['./page-layout.component.scss']
 })
 export class PageLayout implements AfterViewInit {
   @Input()

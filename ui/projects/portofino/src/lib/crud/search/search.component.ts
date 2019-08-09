@@ -1,9 +1,9 @@
 import {
   AfterViewInit,
-  Component,
+  Component, EventEmitter,
   Input,
   OnDestroy,
-  OnInit,
+  OnInit, Output,
   QueryList,
   Type,
   ViewChildren
@@ -75,6 +75,11 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input()
   parent: any;
 
+  @Input()
+  openDetailInSamePage = false;
+  @Output()
+  openDetail = new EventEmitter<string>();
+
   constructor(protected http: HttpClient, protected portofino: PortofinoService, protected translate: TranslateService,
               protected auth: AuthenticationService, public media: MediaObserver) {}
 
@@ -93,6 +98,7 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(s => s.unsubscribe());
+    this.openDetail.complete();
   }
 
   protected setupFields() {
@@ -139,8 +145,11 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
       this.resultFields[0].key = true;
     }
     this.resultFields.filter(f => f.key).forEach(f => {
-      f.routerLink = row => this.baseUrl + '/' + row.__rowKey;
-      this.resultFields[0].href = null;
+      if(this.openDetailInSamePage) {
+        f.action = row => this.openDetail.emit(row.__rowKey);
+      } else {
+        f.routerLink = row => this.baseUrl + '/' + row.__rowKey;
+      }
     });
   }
 
@@ -308,7 +317,6 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
         params = params.set(`search_${name}_max`, this.stringifySearchParam(property, value.max));
       }
     } else if(value.hasOwnProperty('mode')) {
-      console.log(value);
       params = params.set(`search_${name}`, this.stringifySearchParam(property, value.value));
       params = params.set(`search_${name}_mode`, value.mode);
     } else {
@@ -431,6 +439,7 @@ export class SearchResultField {
   key = false;
   href: (_: { __rowKey: string } | any) => string;
   routerLink: (_: { __rowKey: string } | any) => string | any[];
+  action:  (_: { __rowKey: string } | any) => void;
   value: (row, field: SearchResultField) => Observable<string> = SearchResultField.defaultValueFn;
   component: Type<any>;
   inList = false;

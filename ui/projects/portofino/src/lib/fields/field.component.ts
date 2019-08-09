@@ -1,8 +1,9 @@
 import {
-  Host,
+  Host, HostBinding,
   Input,
   OnInit, Optional,
-  SkipSelf} from '@angular/core';
+  SkipSelf
+} from '@angular/core';
 import {isRequired, Property} from "../class-accessor";
 import {
   AbstractControl,
@@ -15,6 +16,7 @@ import {
 export abstract class FieldComponent implements OnInit {
 
   @Input()
+  @HostBinding('class.enabled')
   enabled: boolean = true;
   @Input()
   property: Property;
