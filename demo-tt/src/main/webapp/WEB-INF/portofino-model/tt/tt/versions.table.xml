@@ -14,7 +14,7 @@
                 autoincrement="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.Multiline">
-                    <value>true</value>
+                    <property name="value" value="true"/>
                 </annotation>
             </annotations>
         </column>
@@ -22,7 +22,7 @@
                 autoincrement="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.DateFormat">
-                    <value>yyyy-MM-dd</value>
+                    <property name="value" value="yyyy-MM-dd"/>
                 </annotation>
             </annotations>
         </column>
@@ -30,7 +30,7 @@
                 autoincrement="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.DateFormat">
-                    <value>yyyy-MM-dd</value>
+                    <property name="value" value="yyyy-MM-dd"/>
                 </annotation>
             </annotations>
         </column>

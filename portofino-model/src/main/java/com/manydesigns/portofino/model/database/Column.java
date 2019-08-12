@@ -265,8 +265,7 @@ public class Column implements ModelObject, Annotated {
     }
 
     @XmlElementWrapper(name="annotations")
-    @XmlElement(name = "annotation",
-            type = Annotation.class)
+    @XmlElement(name = "annotation", type = Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

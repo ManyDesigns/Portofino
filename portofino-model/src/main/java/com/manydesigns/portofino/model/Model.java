@@ -55,7 +55,7 @@ public class Model {
     //**************************************************************************
 
     public Model() {
-        this.databases = new LinkedList<Database>();
+        this.databases = new LinkedList<>();
     }
 
     //**************************************************************************

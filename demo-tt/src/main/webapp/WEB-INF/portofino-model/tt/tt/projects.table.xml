@@ -6,8 +6,8 @@
                 autoincrement="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.RegExp">
-                    <value>[a-zA-Z0-9]+</value>
-                    <value>only.simple.letters.or.numbers.allowed</value>
+                    <property name="value" value="[a-zA-Z0-9]+"/>
+                    <property name="errorMessage" value="only.simple.letters.or.numbers.allowed"/>
                 </annotation>
             </annotations>
         </column>
@@ -19,7 +19,7 @@
                 autoincrement="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.RichText">
-                    <value>true</value>
+                    <property name="value" value="true"/>
                 </annotation>
             </annotations>
         </column>

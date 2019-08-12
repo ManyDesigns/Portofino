@@ -16,7 +16,7 @@
                 autoincrement="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.Password">
-                    <value>true</value>
+                    <property name="confirmationRequired" value="true"/>
                 </annotation>
             </annotations>
         </column>

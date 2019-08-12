@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.manydesigns.elements.annotations.AnnotationFactory;
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
@@ -35,8 +36,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,13 +59,15 @@ public class Annotation implements ModelObject {
 
     protected Object parent;
     protected String type;
-    protected List<String> values;
+    @Deprecated
+    protected List<String> values = new ArrayList<>();
+    protected List<Property> properties = new ArrayList<>();
 
     //**************************************************************************
     // Fields for wire up
     //**************************************************************************
 
-    protected Class javaAnnotationClass;
+    protected Class<? extends java.lang.annotation.Annotation> javaAnnotationClass;
     protected java.lang.annotation.Annotation javaAnnotation;
 
     //**************************************************************************
@@ -75,9 +81,7 @@ public class Annotation implements ModelObject {
     // Contruction
     //**************************************************************************
 
-    public Annotation() {
-        values = new ArrayList<>();
-    }
+    public Annotation() {}
 
     public Annotation(String type) {
         this();
@@ -106,10 +110,55 @@ public class Annotation implements ModelObject {
     public void init(Model model, Configuration configuration) {
         javaAnnotationClass = ReflectionUtil.loadClass(type);
         if (javaAnnotationClass == null) {
-            logger.warn("Cannot load annotation class: {}", type);
+            logger.error("Cannot load annotation class: {}", type);
+            return;
+        }
+        if(!java.lang.annotation.Annotation.class.isAssignableFrom(javaAnnotationClass)) {
+            logger.error("Not an annotation: " + javaAnnotationClass);
+            javaAnnotationClass = null;
             return;
         }
 
+        if(properties.isEmpty()) {
+            java.lang.annotation.Annotation legacyAnnotation = createLegacyAnnotation();
+            if(legacyAnnotation != null) {
+                javaAnnotation = legacyAnnotation;
+                try {
+                    logger.info("Migrating annotation " + javaAnnotation + " to new format");
+                    List<Property> properties = new ArrayList<>();
+                    for (Method method : AnnotationFactory.getAnnotationMethods(javaAnnotationClass)) {
+                        Property property = new Property();
+                        property.setName(method.getName());
+                        Object value = method.invoke(javaAnnotation);
+                        property.setValue(OgnlUtils.convertValueToString(value));
+                        properties.add(property);
+                    }
+                    this.properties.addAll(properties);
+                    values.clear();
+                } catch (Exception e) {
+                    logger.error("Migration failed", e);
+                }
+            }
+        }
+        if(javaAnnotation == null) {
+            Map<String, Object> values = new HashMap<>();
+            properties.forEach(p -> {
+                String name = p.getName();
+                try {
+                    values.put(name, OgnlUtils.convertValue(p.getValue(), javaAnnotationClass.getMethod(name).getReturnType()));
+                } catch (NoSuchMethodException e) {
+                    logger.warn("Ignoring nonexistent annotation property " + name + " for " + javaAnnotationClass);
+                }
+            });
+            try {
+                javaAnnotation = new AnnotationFactory().make(javaAnnotationClass, values);
+            } catch (Exception e) {
+                logger.error("Could not make annotation proxy for " + javaAnnotationClass, e);
+            }
+        }
+    }
+
+    protected java.lang.annotation.Annotation createLegacyAnnotation() {
         AnnotationsManager annotationsManager =
                 AnnotationsManager.getManager();
 
@@ -117,9 +166,7 @@ public class Annotation implements ModelObject {
                 annotationsManager.getAnnotationImplementationClass(
                         javaAnnotationClass);
         if (annotationImplClass == null) {
-            logger.warn("Cannot find implementation for annotation class: {}",
-                    javaAnnotationClass);
-            return;
+            return null;
         }
 
         Constructor[] constructors =
@@ -127,7 +174,8 @@ public class Annotation implements ModelObject {
         for (Constructor candidateConstructor : constructors) {
             Class[] parameterTypes =
                     candidateConstructor.getParameterTypes();
-            if (parameterTypes.length != values.size()) {
+            if (parameterTypes.length == 0 || //Skip default constructor
+                parameterTypes.length != values.size()) {
                 continue;
             }
 
@@ -155,7 +203,7 @@ public class Annotation implements ModelObject {
                     castValues[i] = OgnlUtils.convertValue(value, parameterType);
                 }
 
-                javaAnnotation = (java.lang.annotation.Annotation)
+                return (java.lang.annotation.Annotation)
                         ReflectionUtil.newInstance(
                                 candidateConstructor, castValues);
             } catch (Throwable e) {
@@ -163,10 +211,7 @@ public class Annotation implements ModelObject {
                         candidateConstructor, e);
             }
         }
-
-        if (javaAnnotation == null) {
-            logger.warn("Cannot instanciate annotation: {}", javaAnnotationClass);
-        }
+        return null;
     }
 
     public void link(Model model, Configuration configuration) {}
@@ -195,15 +240,29 @@ public class Annotation implements ModelObject {
     }
 
     @JsonProperty("values")
-    @XmlElement(name = "value", type = java.lang.String.class)
+    @XmlElement(name = "value", type = String.class)
+    @Deprecated
     public List<String> getValues() {
         return values;
     }
 
     //Needed for Jackson
+    @Deprecated
     public void setValues(List<String> values) {
         this.values.clear();
         this.values.addAll(values);
+    }
+
+    @JsonProperty("properties")
+    @XmlElement(name = "property", type = Property.class)
+    public List<Property> getProperties() {
+        return properties;
+    }
+
+    //Needed for Jackson
+    public void setProperties(List<Property> properties) {
+        this.properties.clear();
+        this.properties.addAll(properties);
     }
 
     public Class getJavaAnnotationClass() {
@@ -212,5 +271,14 @@ public class Annotation implements ModelObject {
 
     public java.lang.annotation.Annotation getJavaAnnotation() {
         return javaAnnotation;
+    }
+
+    public Property getProperty(String name) {
+        for(Property property : properties) {
+            if(name.equals(property.getName())) {
+                return property;
+            }
+        }
+        return null;
     }
 }

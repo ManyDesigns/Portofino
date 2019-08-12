@@ -5,7 +5,7 @@
         <column columnName="project" columnType="VARCHAR" length="10" scale="0" jdbcType="12" autoincrement="false" nullable="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.MaxLength">
-                    <value>10</value>
+                    <property name="value" value="10"/>
                 </annotation>
             </annotations>
         </column>
@@ -15,17 +15,17 @@
         <column columnName="title" columnType="VARCHAR" length="255" scale="0" jdbcType="12" autoincrement="false" nullable="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.MaxLength">
-                    <value>255</value>
+                    <property name="value" value="255"/>
                 </annotation>
             </annotations>
         </column>
         <column columnName="description" columnType="VARCHAR" length="4000" scale="0" jdbcType="12" autoincrement="false" nullable="true">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.MaxLength">
-                    <value>4000</value>
+                    <property name="value" value="4000"/>
                 </annotation>
                 <annotation type="com.manydesigns.elements.annotations.Multiline">
-                    <value>true</value>
+                    <property name="value" value="true"/>
                 </annotation>
             </annotations>
         </column>
@@ -41,7 +41,7 @@
         <column columnName="created_by" columnType="INT" length="10" scale="0" jdbcType="4" autoincrement="false" nullable="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.FieldSet">
-                    <value>Workflow</value>
+                    <property name="value" value="Workflow"/>
                 </annotation>
             </annotations>
         </column>
@@ -60,14 +60,14 @@
         <column columnName="created" columnType="TIMESTAMP" length="19" scale="0" jdbcType="93" autoincrement="false" nullable="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.DateFormat">
-                    <value>dd/MM/yyyy</value>
+                    <property name="value" value="dd/MM/yyyy"/>
                 </annotation>
             </annotations>
         </column>
         <column columnName="last_updated" columnType="TIMESTAMP" length="19" scale="0" jdbcType="93" autoincrement="false" nullable="false">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.DateFormat">
-                    <value>dd/MM/yyyy HH:mm</value>
+                    <property name="value" value="dd/MM/yyyy HH:mm"/>
                 </annotation>
             </annotations>
         </column>

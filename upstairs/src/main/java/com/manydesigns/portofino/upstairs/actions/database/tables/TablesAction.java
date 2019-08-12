@@ -12,6 +12,7 @@ import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Annotation;
+import com.manydesigns.portofino.model.Property;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -372,6 +373,8 @@ public class TablesAction extends AbstractResourceAction {
                 return;
             } else if(REGEXP.equals(annType)) {
                 jsonStringer.key("regexp");
+                jsonStringer.value(a.getProperty("value").getValue());
+                return;
             } else if(RICH_TEXT.equals(annType)) {
                 jsonStringer.key("typeOfContent");
                 jsonStringer.object();
@@ -394,10 +397,15 @@ public class TablesAction extends AbstractResourceAction {
                 RequestMessages.addErrorMessage(msg); //TODO i18n
                 return;
             }
-            if(!a.getValues().isEmpty()) {
-                jsonStringer.value(a.getValues().get(0));
+            if(a.getProperties().size() > 1) {
+                jsonStringer.object();
+                for (Property p : a.getProperties()) {
+                    jsonStringer.key(p.getName()).value(p.getValue());
+                }
+                jsonStringer.endObject();
+            } else {
+                jsonStringer.value(a.getProperties().get(0).getValue());
             }
-
         });
         jsonStringer.endObject();
         jsonStringer.endObject();
@@ -430,7 +438,7 @@ public class TablesAction extends AbstractResourceAction {
             classAccessor.addProperty(new MutablePropertyAccessor("stringFormat", String.class).configureAnnotation(select));
             select = new SelectImpl(
                     DisplayMode.DROPDOWN, SearchDisplayMode.DROPDOWN,
-                    new String[] {MULTILINE, RICH_TEXT},
+                    new String[] { MULTILINE, RICH_TEXT },
                     new String[] { "Multiline", "Rich text" },
                     true);
             classAccessor.addProperty(new MutablePropertyAccessor("typeOfContent", String.class).configureAnnotation(select));

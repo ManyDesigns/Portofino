@@ -37,6 +37,7 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  **/
+@Deprecated
 public class AnnotationsManager {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
