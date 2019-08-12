@@ -4,7 +4,7 @@ import {
   ComponentFactoryResolver,
   ComponentRef, EventEmitter,
   Injector,
-  Input, OnChanges, OnDestroy, OnInit, Optional, Output, SimpleChanges, Type,
+  Input, OnChanges, OnInit, Optional, Output, SimpleChanges, Type,
   ViewContainerRef
 } from "@angular/core";
 import {PortofinoService} from "./portofino.service";

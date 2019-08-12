@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - Support the `multiplier` property of the `@DecimalFormat` annotation (for percent, per mille and similar).
     - Rich text component is better integrated in Material forms.
     - Better detection of links in text fields with `@HighlightLinks`.
-- Important dependencies updated: Angular, Groovy and Liquibase.
+- Important dependencies updated: Angular, Groovy, Liquibase, Shiro.
 
 ### Fixed
 - Select fields with no value and disabled select fields showing nothing or `undefined`.
