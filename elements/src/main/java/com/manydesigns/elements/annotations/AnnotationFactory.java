@@ -8,7 +8,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A factory for annotation proxies.
+ * @author Alessio Stalla - alessiostalla@gmail.com
+ */
 public class AnnotationFactory {
+    public static final String copyright =
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     private final ClassLoader classLoader;
 

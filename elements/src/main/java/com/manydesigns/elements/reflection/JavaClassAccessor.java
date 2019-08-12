@@ -163,7 +163,7 @@ public class JavaClassAccessor implements ClassAccessor {
             if(key != null) {
                 List<PropertyAccessor> keyProperties = keys.get(key.name());
                 if(keyProperties == null) {
-                    keyProperties = new ArrayList<PropertyAccessor>();
+                    keyProperties = new ArrayList<>();
                     keys.put(key.name(), keyProperties);
                 }
                 keyProperties.add(propertyAccessor);

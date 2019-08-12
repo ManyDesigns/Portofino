@@ -39,7 +39,7 @@ public class CrudConfiguration implements ResourceActionConfiguration, Configura
     protected Integer rowsPerPage;
 
     public CrudConfiguration() {
-        properties = new ArrayList<CrudProperty>();
+        properties = new ArrayList<>();
     }
 
     public void init() {}

@@ -23,6 +23,7 @@ public class AnnotationFactoryTest {
         assertEquals(select.values(), new String[0]);
         assertTrue(select.nullOption());
 
+        //User values
         Map<String, Object> values = new HashMap<>();
         values.put("displayMode", DisplayMode.AUTOCOMPLETE);
         values.put("labels", new String[] { "test", "labels" });
@@ -33,6 +34,15 @@ public class AnnotationFactoryTest {
         assertEquals(select.labels(), new String[] { "test", "labels" });
         assertEquals(select.values(), new String[0]);
         assertFalse(select.nullOption());
+    }
+
+    public void testMissingValue() {
+        try {
+            new AnnotationFactory().make(ShortName.class);
+            fail("Should have thrown exception");
+        } catch (IllegalArgumentException e) {
+            //Ok
+        }
     }
 
 }

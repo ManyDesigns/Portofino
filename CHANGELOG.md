@@ -4,6 +4,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- New versatile strategy for annotations in Elements and in the model: use proxies instead of implementation classes.
+  This allows to support third-party annotations with no effort from the developer.
+  Existing annotations are automatically migrated.
+  
+### Deprecated
+- The old `AnnotationsManager` in Elements, replaced by the `AnnotationFactory`.
+  
+### Removed
+- The `@LabelI18n` annotation that has been long deprecated in favor of `@Label`. 
+
+## [Unreleased]
+
 ### Added
 - Restored and extended some Portofino 4 features:
     - Numbers and dates can be searched with ranges as well as with an exact value.

@@ -37,7 +37,7 @@ public @interface Key {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    public static final String DEFAULT_NAME = "default";
+    String DEFAULT_NAME = "default";
 
     String name() default DEFAULT_NAME;
 

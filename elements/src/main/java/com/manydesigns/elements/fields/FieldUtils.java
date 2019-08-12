@@ -22,7 +22,6 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
@@ -49,11 +48,7 @@ public class FieldUtils {
 
     public static String getLabel(PropertyAccessor accessor, TextProvider textProvider) {
         String label;
-        if (accessor.isAnnotationPresent(LabelI18N.class)) {
-            String text = accessor.getAnnotation(LabelI18N.class).value();
-            logger.debug("LabelI18N annotation present with value: {}", text);
-            label = textProvider.getText(text);
-        } else if (accessor.isAnnotationPresent(Label.class)) {
+        if (accessor.isAnnotationPresent(Label.class)) {
             String text = accessor.getAnnotation(Label.class).value();
             logger.debug("Label annotation present with value: {}", text);
             label = textProvider.getText(text);
