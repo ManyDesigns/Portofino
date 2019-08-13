@@ -38,7 +38,7 @@ public class CorsServletContainerInitializer implements ServletContainerInitiali
                 if (!StringUtils.isEmpty(allowedOrigins)) {
                     corsFilter.setInitParameter("cors.allowed.origins", allowedOrigins);
                 }
-                corsFilter.addMappingForUrlPatterns(null, false, "/*");
+                corsFilter.addMappingForUrlPatterns(null, false, "*");
             } catch (ClassNotFoundException e) {
                 logger.info("Tomcat CORS filter not available");
             }
