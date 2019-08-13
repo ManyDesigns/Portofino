@@ -1597,10 +1597,17 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
                     Blob blob = ((AbstractBlobField) field).getValue();
                     if(blob != null) {
+                        //Since Dispatcher is consuming url and  adding parameters of detail on current pageInstance we
+                        // copy current parameters and reset after genereting the download blob url
+                        List<String> parameters = new ArrayList<String>(pageInstance.getParameters());
+
                         UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
                             .addParameter("downloadBlob", "")
                             .addParameter("propertyName", field.getPropertyAccessor().getName());
                         field.setHref(urlBuilder.toString());
+
+                        pageInstance.getParameters().clear();
+                        pageInstance.getParameters().addAll(parameters);
                     }
                 }
             }
