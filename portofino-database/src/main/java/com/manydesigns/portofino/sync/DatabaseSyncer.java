@@ -117,7 +117,7 @@ public class DatabaseSyncer {
                 }
                 SnapshotControl snapshotControl = new SnapshotControl(liquibaseDatabase);
                 DatabaseSnapshot snapshot =
-                        dsgf.createSnapshot(new CatalogAndSchema(catalog, schemaName), liquibaseDatabase, snapshotControl);
+                        dsgf.createSnapshot(new CatalogAndSchema(catalog, schemaRealName), liquibaseDatabase, snapshotControl);
 
                 logger.debug("Synchronizing schema");
                 Schema targetSchema = new Schema();
