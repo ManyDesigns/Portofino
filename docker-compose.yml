@@ -1,0 +1,24 @@
+version: '3'
+services:
+  db:
+    image: postgres:11
+    container_name: demo-tt-db
+    volumes:
+      - ./docker/data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=tt
+      - POSTGRES_PASSWORD=tt
+      - POSTGRES_DB=tt
+    restart: always
+  portofino:
+      build: ./demo-tt
+      network_mode: host
+      ports:
+        - "80:8080"
+      container_name: demo-tt-portofino
+      volumes:
+        - ./docker/logs/:/usr/local/tomcat/logs/
+      depends_on:
+        - db
