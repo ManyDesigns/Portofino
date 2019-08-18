@@ -24,6 +24,7 @@ import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.annotations.Key;
 import com.manydesigns.elements.util.ReflectionUtil;
 import org.json.JSONStringer;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -136,6 +137,7 @@ public class JavaClassAccessorTest extends AbstractElementsTest {
         assertEquals("key2", javaClassAccessor.getKeyProperties()[1].getName());
     }
 
+    @Test(enabled = false)
     public void testJSON() {
         ClassAccessor javaClassAccessor = new JavaClassAccessor(TestBeanMultiPk.class);
         JSONStringer jsonStringer = new JSONStringer();
