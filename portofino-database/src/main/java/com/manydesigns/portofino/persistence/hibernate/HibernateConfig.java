@@ -187,11 +187,11 @@ public class HibernateConfig {
                                            com.manydesigns.portofino.model.database.Table aTable) {
 
 
-        Table tab = mappings.addTable(quoteIdentifier(aTable.getSchemaName()), null,
+        Table tab = mappings.addTable(quoteIdentifier(aTable.getSchemaRealName()), null,
                 quoteIdentifier(aTable.getTableName()), null, false);
         //tab.setName(escapeName(aTable.getTableName()));
         //tab.setSchema(escapeName(aTable.getSchemaName()));
-        mappings.addTableBinding(aTable.getSchemaName(), null,
+        mappings.addTableBinding(aTable.getSchemaRealName(), null,
                 aTable.getTableName(), aTable.getTableName(), null);
 
         RootClass clazz = new RootClass();

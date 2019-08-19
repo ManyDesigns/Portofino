@@ -175,7 +175,7 @@ public class DatabaseSyncer {
 
             targetFK.setToDatabase(targetSchema.getDatabaseName());
 
-            String pkSchemaName = liquibasePkTable.getSchema().getName();
+            String pkSchemaName = targetSchema.getSchemaName();
             String pkTableName = normalizeTableName(liquibasePkTable, databaseSnapshot);
             targetFK.setToSchema(pkSchemaName);
             targetFK.setToTableName(pkTableName);
