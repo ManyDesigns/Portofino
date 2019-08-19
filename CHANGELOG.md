@@ -16,15 +16,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - When source code changes, the user-defined Spring context is refreshed, so that services and actions can pick up the changes.
     Only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
 - When embedded, the crud page has now the option to open the detail in the same page instead of navigating to the detail URL.
+- Check for new versions at startup.
+- Make the JWT expiration time configurable (in minutes, defaults to 30).
 
 ### Changed
 - UI improvements:
-    - Better looks by drawing inspiration from [sb-admin-material](https://github.com/start-javascript/sb-admin-material).
+    - Improve looks by drawing inspiration from [sb-admin-material](https://github.com/start-javascript/sb-admin-material).
     - Use Material Typography.
     - The user declining to log in is sent back to the home. The current page has a chance to inject another behaviour.
     - Support the `multiplier` property of the `@DecimalFormat` annotation (for percent, per mille and similar).
-    - Rich text component is better integrated in Material forms.
-    - Better detection of links in text fields with `@HighlightLinks`.
+    - The rich text component is better integrated in Material forms.
+    - More comprehensive detection of links in text fields with `@HighlightLinks`.
 - Important dependencies updated: Angular, Groovy, Liquibase, Shiro.
 
 ### Fixed
@@ -33,6 +35,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Toolbar overflowing on mobile.
 - Support BigInteger and BigDecimal properties in the UI.
 - Properly save the crud page configuration.
+- Use the correct schema name when synchronizing an aliased schema (ported from Portofino 4).
 
 ### Security
 - Improved code quality and security and updated insecure dependencies using automated tools.
