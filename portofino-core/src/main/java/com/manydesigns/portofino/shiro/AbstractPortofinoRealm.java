@@ -126,7 +126,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         claims.put("serialized-principal", bytes.toByteArray());
         return Jwts.builder().
                 setClaims(claims).
-                setExpiration(new DateTime().plusDays(1).toDate()).
+                setExpiration(new DateTime().plusMinutes(portofinoConfiguration.getInt("jwt.secret.expiration",30)).toDate()).
                 signWith(key, SignatureAlgorithm.HS512).
                 compact();
     }
