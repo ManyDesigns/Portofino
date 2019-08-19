@@ -24,7 +24,6 @@ import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.annotations.Key;
 import com.manydesigns.elements.util.ReflectionUtil;
 import org.json.JSONStringer;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

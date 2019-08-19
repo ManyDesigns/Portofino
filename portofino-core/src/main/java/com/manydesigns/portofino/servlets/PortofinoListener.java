@@ -46,11 +46,19 @@ import javax.servlet.*;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -187,14 +195,58 @@ public class PortofinoListener extends DispatcherInitializer
             logger.error("The encoding is not supported by the JVM!");
         }
 
+        String portofinoVersion = PortofinoProperties.getPortofinoVersion();
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
-                lineSeparator + "--- ManyDesigns Portofino " + PortofinoProperties.getPortofinoVersion() + " started successfully" +
+                lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
                 lineSeparator + "--- Context path: {}" +
                 lineSeparator + "--- Real path: {}" +
                 lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
                 lineSeparator + SEPARATOR,
-                (Object[]) new String[] { serverInfo.getContextPath(), serverInfo.getRealPath() });
+                serverInfo.getContextPath(), serverInfo.getRealPath());
+
+        String versionCheckUrl = configuration.getString(
+                "portofino.version.check.url",
+                "https://portofino.manydesigns.com/version-check.jsp");
+        if(!"off".equalsIgnoreCase(versionCheckUrl)) {
+            try {
+                checkForNewVersion(portofinoVersion, versionCheckUrl);
+            } catch (Throwable t) {
+                logger.warn("Version check failed unexpectedly", t);
+            }
+        }
+    }
+
+    protected void checkForNewVersion(String portofinoVersion, String versionCheckUrl) {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(versionCheckUrl)
+                .queryParam("version", portofinoVersion);
+        Future<Response> responseFuture = target.request().async().get();
+        Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                Response response = responseFuture.get();
+                if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+                    String latestVersion = response.readEntity(String.class);
+                    if (Objects.equals(portofinoVersion, latestVersion)) {
+                        logger.info("Your installation of Portofino is up-to-date");
+                    } else {
+                        String lineSeparator = System.getProperty("line.separator", "\n");
+                        logger.info(lineSeparator + SEPARATOR + lineSeparator +
+                                "A new version of Portofino is available: " + latestVersion +
+                                lineSeparator + SEPARATOR);
+                    }
+                } else {
+                    logger.info("Version check failed: " + response.getStatus());
+                }
+                String message = response.getHeaderString("X-Message");
+                if (message != null) {
+                    logger.info(message);
+                }
+            } catch (Exception e) {
+                logger.info("Could not check for new version: " + e.getMessage());
+                logger.debug("Additional information", e);
+            }
+        });
     }
 
     @Override
