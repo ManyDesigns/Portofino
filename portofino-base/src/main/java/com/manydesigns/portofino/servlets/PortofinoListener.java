@@ -293,7 +293,7 @@ public class PortofinoListener
             try {
                 Response response = responseFuture.get();
                 if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-                    String latestVersion = response.readEntity(String.class);
+                    String latestVersion = response.readEntity(String.class).trim();
                     if (Objects.equals(portofinoVersion, latestVersion)) {
                         logger.info("Your installation of Portofino is up-to-date");
                     } else {
