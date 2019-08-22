@@ -115,6 +115,27 @@ public class PortofinoListener extends DispatcherInitializer
                     servletContextAttributeMap);
             init(servletContextEvent);
             super.contextInitialized(servletContextEvent);
+
+            String portofinoVersion = PortofinoProperties.getPortofinoVersion();
+            String lineSeparator = System.getProperty("line.separator", "\n");
+            logger.info(lineSeparator + SEPARATOR +
+                            lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
+                            lineSeparator + "--- Context path: {}" +
+                            lineSeparator + "--- Real path: {}" +
+                            lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
+                            lineSeparator + SEPARATOR,
+                    serverInfo.getContextPath(), serverInfo.getRealPath());
+
+            String versionCheckUrl = configuration.getString(
+                    "portofino.version.check.url",
+                    "https://portofino.manydesigns.com/version-check.jsp");
+            if(!"off".equalsIgnoreCase(versionCheckUrl)) {
+                try {
+                    checkForNewVersion(portofinoVersion, versionCheckUrl);
+                } catch (Throwable t) {
+                    logger.warn("Version check failed unexpectedly", t);
+                }
+            }
         } catch (Throwable e) {
             logger.error("Could not start ManyDesigns Portofino", e);
             throw new Error(e);
@@ -194,27 +215,6 @@ public class PortofinoListener extends DispatcherInitializer
         if(!Charset.isSupported(encoding)) {
             logger.error("The encoding is not supported by the JVM!");
         }
-
-        String portofinoVersion = PortofinoProperties.getPortofinoVersion();
-        String lineSeparator = System.getProperty("line.separator", "\n");
-        logger.info(lineSeparator + SEPARATOR +
-                lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
-                lineSeparator + "--- Context path: {}" +
-                lineSeparator + "--- Real path: {}" +
-                lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
-                lineSeparator + SEPARATOR,
-                serverInfo.getContextPath(), serverInfo.getRealPath());
-
-        String versionCheckUrl = configuration.getString(
-                "portofino.version.check.url",
-                "https://portofino.manydesigns.com/version-check.jsp");
-        if(!"off".equalsIgnoreCase(versionCheckUrl)) {
-            try {
-                checkForNewVersion(portofinoVersion, versionCheckUrl);
-            } catch (Throwable t) {
-                logger.warn("Version check failed unexpectedly", t);
-            }
-        }
     }
 
     protected void checkForNewVersion(String portofinoVersion, String versionCheckUrl) {
@@ -226,7 +226,7 @@ public class PortofinoListener extends DispatcherInitializer
             try {
                 Response response = responseFuture.get();
                 if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-                    String latestVersion = response.readEntity(String.class);
+                    String latestVersion = response.readEntity(String.class).trim();
                     if (Objects.equals(portofinoVersion, latestVersion)) {
                         logger.info("Your installation of Portofino is up-to-date");
                     } else {
