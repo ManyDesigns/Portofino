@@ -194,7 +194,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v12.3.1</nodeVersion>
-                                    <npmVersion>6.9.0</npmVersion>
+                                    <npmVersion>6.11.2</npmVersion>
                                 </configuration>
                             </execution>
 
