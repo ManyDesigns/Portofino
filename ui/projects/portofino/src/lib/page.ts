@@ -341,11 +341,12 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   get template(): TemplateRef<any> {
-    const templateName = this.configuration.template;
+    const template = this.configuration.template;
+    const templateName = template && template.v ? template.v : template;
     if(templateName) {
       const template = this.portofino.templates[templateName];
       if(!template) {
-        console.error("Unknown template: " + templateName);
+        console.error("Unknown template", templateName);
       }
       return template.template;
     } else {
@@ -423,6 +424,9 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   configure(callback: (saved: boolean) => void = () => this.embedded ? this.parent.reloadBaseUrl() : this.reloadBaseUrl()) {
+    if(!this.authenticationService.isAdmin) {
+      return;
+    }
     this.settingsPanel.show(callback);
   }
 
