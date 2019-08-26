@@ -53,7 +53,7 @@ import java.util.List;
  */
 public class DatabaseSyncer {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseSyncer.class);
@@ -159,11 +159,9 @@ public class DatabaseSyncer {
             Table targetFromTable = DatabaseLogic.findTableByNameIgnoreCase(targetSchema, fkTableName);
             if (targetFromTable == null) {
                 logger.error("Table '{}' not found in schema '{}'. Skipping foreign key: {}",
-                        new Object[] {
-                                fkTableName,
-                                targetSchema.getSchemaName(),
-                                fkName
-                        });
+                        fkTableName,
+                        targetSchema.getSchemaName(),
+                        fkName);
                 continue;
             }
 
@@ -175,37 +173,42 @@ public class DatabaseSyncer {
 
             targetFK.setToDatabase(targetSchema.getDatabaseName());
 
-            String pkSchemaName = targetSchema.getSchemaName();
+            String pkSchemaName = liquibasePkTable.getSchema().getName();
             String pkTableName = normalizeTableName(liquibasePkTable, databaseSnapshot);
-            targetFK.setToSchema(pkSchemaName);
+            String logicalSchemaName = pkSchemaName;
+            for(Schema schema : sourceSchema.getDatabase().getSchemas()) {
+                if(schema.getSchemaName().equals(pkSchemaName)) {
+                    logicalSchemaName = schema.getSchemaName();
+                    logger.debug("Logical name for schema " + pkSchemaName + " is " + logicalSchemaName);
+                    break;
+                }
+            }
+            targetFK.setToSchema(logicalSchemaName);
             targetFK.setToTableName(pkTableName);
-            if (pkSchemaName == null || pkTableName == null) {
+            if (logicalSchemaName == null || pkTableName == null) {
                 logger.error("Null schema or table name: foreign key " +
                         "(schema: {}, table: {}, fk: {}) " +
                         "references primary key (schema: {}, table: {}). Skipping foreign key.",
-                        new Object[] {
-                            targetFromTable.getSchemaName(),
-                            targetFromTable.getTableName(),
-                            fkName,
-                            pkSchemaName,
-                            pkTableName
-                        }
-                );
+                        targetFromTable.getSchemaName(),
+                        targetFromTable.getTableName(),
+                        fkName,
+                        logicalSchemaName,
+                        pkTableName);
                 continue;
             }
 
             Database targetDatabase = targetSchema.getDatabase();
             Schema pkSchema = DatabaseLogic.findSchemaByNameIgnoreCase(
-                    targetDatabase, pkSchemaName);
+                    targetDatabase, logicalSchemaName);
             if (pkSchema == null) {
-                logger.error("Cannot find referenced schema: {}. Skipping foreign key.", pkSchemaName);
+                logger.error("Cannot find referenced schema: {}. Skipping foreign key.", logicalSchemaName);
                 continue;
             }
             Table pkTable =
                     DatabaseLogic.findTableByNameIgnoreCase(pkSchema, pkTableName);
             if (pkTable == null) {
                 logger.error("Cannot find referenced table (schema: {}, table: {}). Skipping foreign key.",
-                        pkSchemaName, pkTableName);
+                        logicalSchemaName, pkTableName);
                 continue;
             }
 
@@ -244,11 +247,9 @@ public class DatabaseSyncer {
                                 targetFromTable, fromColumnName);
                 if (fromColumn == null) {
                     logger.error("Cannot find from column (schema: {}, table: {}, column: {}).",
-                            new Object[] {
-                                    targetFromTable.getSchemaName(),
-                                    targetFromTable.getTableName(),
-                                    fromColumnName
-                            });
+                            targetFromTable.getSchemaName(),
+                            targetFromTable.getTableName(),
+                            fromColumnName);
                     referencesHaveErrors = true;
                     break;
                 }
@@ -257,11 +258,9 @@ public class DatabaseSyncer {
                         DatabaseLogic.findColumnByNameIgnoreCase(pkTable, toColumnName);
                 if (toColumn == null) {
                     logger.error("Cannot find to column (schema: {}, table: {}, column: {}).",
-                            new Object[] {
-                                    pkTable.getSchemaName(),
-                                    pkTable.getTableName(),
-                                    toColumnName
-                            });
+                            pkTable.getSchemaName(),
+                            pkTable.getTableName(),
+                            toColumnName);
                     referencesHaveErrors = true;
                     break;
                 }
@@ -275,11 +274,9 @@ public class DatabaseSyncer {
 
             if (referencesHaveErrors) {
                 logger.error("Skipping foreign key (schema: {}, table: {}, fk: {}) because of errors.",
-                        new Object[] {
-                                pkTable.getSchemaName(),
-                                pkTable.getTableName(),
-                                fkName
-                        });
+                        pkTable.getSchemaName(),
+                        pkTable.getTableName(),
+                        fkName);
                 continue;
             }
 
@@ -358,12 +355,9 @@ public class DatabaseSyncer {
                 Column pkColumn = DatabaseLogic.findColumnByNameIgnoreCase(targetTable, columnName);
                 if (pkColumn == null) {
                     logger.error("Primary key (table: {}, pk: {}) has invalid column: {}",
-                            new Object[] {
-                                pkTableName,
-                                primaryKeyName,
-                                columnName
-                            }
-                    );
+                            pkTableName,
+                            primaryKeyName,
+                            columnName);
                     pkColumnsHaveErrors = true;
                     break;
                 }
@@ -533,11 +527,11 @@ public class DatabaseSyncer {
                 return -1;
             }
             public int compare(Column c1, Column c2) {
-                Integer index1 = oldIndex(c1);
-                Integer index2 = oldIndex(c2);
+                int index1 = oldIndex(c1);
+                int index2 = oldIndex(c2);
                 if(index1 != -1) {
                     if(index2 != -1) {
-                        return index1.compareTo(index2);
+                        return Integer.compare(index1, index2);
                     } else {
                         return -1;
                     }
