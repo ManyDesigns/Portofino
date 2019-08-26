@@ -1,5 +1,5 @@
 # Changelog
-All notable changes to this project from version 5.0.0 upwards will be documented in this file. 
+All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
@@ -12,9 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - Password fields can ask to confirm the password (i.e., to type it twice).
 - Improve developer experience with better code reloading:
     - Quartz jobs are reloaded automatically when the code changes, without restarting the application,
-    and any open Hibernate sessions are closed even in case of exceptions.
+      and any open Hibernate sessions are closed even in case of exceptions.
     - When source code changes, the user-defined Spring context is refreshed, so that services and actions can pick up the changes.
-    Only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
+      Only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
 - When embedded, the crud page has now the option to open the detail in the same page instead of navigating to the detail URL.
 - Check for new versions at startup.
 - Make the JWT expiration time configurable (in minutes, defaults to 30).
@@ -36,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Toolbar overflowing on mobile.
 - Support BigInteger and BigDecimal properties in the UI.
 - Properly save the crud page configuration.
-- Use the correct schema name when synchronizing an aliased schema (ported from Portofino 4).
+- Use the correct schema name when synchronizing an aliased schema.
 
 ### Security
 - Improved code quality and security and updated insecure dependencies using automated tools.
