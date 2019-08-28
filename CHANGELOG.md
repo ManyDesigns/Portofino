@@ -12,9 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - Password fields can ask to confirm the password (i.e., to type it twice).
 - Improve developer experience with better code reloading:
     - Quartz jobs are reloaded automatically when the code changes, without restarting the application,
-      and any open Hibernate sessions are closed even in case of exceptions.
+      and, when they terminate execution, any open Hibernate sessions are closed even in case of exceptions.
     - When source code changes, the user-defined Spring context is refreshed, so that services and actions can pick up the changes.
-      Only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
+      This only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
 - When embedded, the crud page has now the option to open the detail in the same page instead of navigating to the detail URL.
 - Check for new versions at startup.
 - Make the JWT expiration time configurable (in minutes, defaults to 30).
@@ -31,7 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Important dependencies updated: Angular, Groovy, Liquibase, Shiro.
 
 ### Fixed
-- Select fields with no value and disabled select fields showing nothing or `undefined`.
+- Select fields with no value or disabled showing nothing or `undefined`.
 - Create new page at the top level.
 - Toolbar overflowing on mobile.
 - Support BigInteger and BigDecimal properties in the UI.
