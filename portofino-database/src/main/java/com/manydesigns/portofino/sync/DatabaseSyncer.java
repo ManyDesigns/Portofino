@@ -177,7 +177,7 @@ public class DatabaseSyncer {
             String pkTableName = normalizeTableName(liquibasePkTable, databaseSnapshot);
             String logicalSchemaName = pkSchemaName;
             for(Schema schema : sourceSchema.getDatabase().getSchemas()) {
-                if(schema.getSchemaName().equals(pkSchemaName)) {
+                if(schema.getSchema().equals(pkSchemaName)) {
                     logicalSchemaName = schema.getSchemaName();
                     logger.debug("Logical name for schema " + pkSchemaName + " is " + logicalSchemaName);
                     break;
