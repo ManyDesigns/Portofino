@@ -55,7 +55,13 @@ public class ForeignKey extends DatabaseSelectionProvider
     // Fields (logical)
     //**************************************************************************
 
+    /**
+     * Name of the property containing many values (e.g. cities)
+     */
     protected String manyPropertyName;
+    /**
+     * Name of the property referring to a single value (e.g. country)
+     */
     protected String onePropertyName;
     protected String toTableName;
 

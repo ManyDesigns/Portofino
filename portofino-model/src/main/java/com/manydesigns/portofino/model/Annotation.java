@@ -159,6 +159,9 @@ public class Annotation implements ModelObject {
     }
 
     protected java.lang.annotation.Annotation createLegacyAnnotation() {
+        if(values.isEmpty()) {
+            return null;
+        }
         AnnotationsManager annotationsManager =
                 AnnotationsManager.getManager();
 
@@ -174,8 +177,7 @@ public class Annotation implements ModelObject {
         for (Constructor candidateConstructor : constructors) {
             Class[] parameterTypes =
                     candidateConstructor.getParameterTypes();
-            if (parameterTypes.length == 0 || //Skip default constructor
-                parameterTypes.length != values.size()) {
+            if (parameterTypes.length != values.size()) {
                 continue;
             }
 

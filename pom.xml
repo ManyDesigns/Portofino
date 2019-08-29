@@ -96,7 +96,7 @@
         <fop.version>2.1</fop.version>
         <groovy.version>2.5.8</groovy.version>
         <guava.version>27.0.1-jre</guava.version>
-        <hibernate.version>4.3.11.Final</hibernate.version>
+        <hibernate.version>5.4.4.Final</hibernate.version>
         <jackson.version>2.9.9</jackson.version>
         <jackson.databind.version>2.9.9.3</jackson.databind.version>
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->

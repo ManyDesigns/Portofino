@@ -57,7 +57,7 @@ public class OgnlHqlFormat extends AbstractOgnlFormat {
     protected void replaceOgnlExpression(StringBuilder sb,
                                          int index,
                                          String ognlExpression) {
-        sb.append("?").append(index);
+        sb.append(":p").append(index);
     }
 
 }

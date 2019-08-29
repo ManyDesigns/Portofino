@@ -32,32 +32,33 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Alias;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.JdbcParameter;
-import net.sf.jsqlparser.expression.Parenthesis;
+import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.jdbc.Work;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.ManagedType;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.*;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -229,7 +230,7 @@ public class QueryUtils {
                 TableCriteria.EqCriterion eqCriterion =
                         (TableCriteria.EqCriterion) criterion;
                 Object value = eqCriterion.getValue();
-                hqlFormat = "{0} = ?" + (parametersList.size() + initialParameterIndex);
+                hqlFormat = "{0} = :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.InCriterion) {
                 TableCriteria.InCriterion inCriterion =
@@ -240,14 +241,14 @@ public class QueryUtils {
                     boolean first = true;
                     for (Object value : values) {
                         if (!first){
-                            params.append(", ?").append(parametersList.size() + initialParameterIndex);
+                            params.append(", :p").append(parametersList.size() + initialParameterIndex);
                         } else {
-                            params.append("?").append(parametersList.size() + initialParameterIndex);
+                            params.append(":p").append(parametersList.size() + initialParameterIndex);
                             first = false;
                         }
                         parametersList.add(value);
                     }
-                    hqlFormat = "{0} in ("+params.toString()+")";
+                    hqlFormat = "{0} in (" + params + ")";
                 } else {
                     hqlFormat = null;
                 }
@@ -255,7 +256,7 @@ public class QueryUtils {
                 TableCriteria.NeCriterion neCriterion =
                         (TableCriteria.NeCriterion) criterion;
                 Object value = neCriterion.getValue();
-                hqlFormat = "{0} <> ?" + (parametersList.size() + initialParameterIndex);
+                hqlFormat = "{0} <> :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.BetweenCriterion) {
                 TableCriteria.BetweenCriterion betweenCriterion =
@@ -263,44 +264,44 @@ public class QueryUtils {
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
                 hqlFormat =
-                        "{0} >= ?" + (parametersList.size() + initialParameterIndex) +
-                        " AND {0} <= ?" + (parametersList.size() + initialParameterIndex + 1);
+                        "{0} >= :p" + (parametersList.size() + initialParameterIndex) +
+                        " AND {0} <= :p" + (parametersList.size() + initialParameterIndex + 1);
                 parametersList.add(min);
                 parametersList.add(max);
             } else if (criterion instanceof TableCriteria.GtCriterion) {
                 TableCriteria.GtCriterion gtCriterion =
                         (TableCriteria.GtCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} > ?" + (parametersList.size() + initialParameterIndex);
+                hqlFormat = "{0} > :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.GeCriterion) {
                 TableCriteria.GeCriterion gtCriterion =
                         (TableCriteria.GeCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} >= ?" + (parametersList.size() + initialParameterIndex);
+                hqlFormat = "{0} >= :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LtCriterion) {
                 TableCriteria.LtCriterion ltCriterion =
                         (TableCriteria.LtCriterion) criterion;
                 Object value = ltCriterion.getValue();
-                hqlFormat = "{0} < ?" + (parametersList.size() + initialParameterIndex);
+                hqlFormat = "{0} < :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LeCriterion) {
                 TableCriteria.LeCriterion leCriterion =
                         (TableCriteria.LeCriterion) criterion;
                 Object value = leCriterion.getValue();
-                hqlFormat = "{0} <= ?" + (parametersList.size() + initialParameterIndex);
+                hqlFormat = "{0} <= :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LikeCriterion) {
                 TableCriteria.LikeCriterion likeCriterion =
                         (TableCriteria.LikeCriterion) criterion;
                 String value = (String) likeCriterion.getValue();
                 if(likeCriterion.getTextMatchMode() == TextMatchMode.EQUALS) {
-                    hqlFormat = "{0} = ?" + (parametersList.size() + initialParameterIndex);
+                    hqlFormat = "{0} = :p" + (parametersList.size() + initialParameterIndex);
                     parametersList.add(value);
                 } else {
                     String pattern = processTextMatchMode(likeCriterion.getTextMatchMode(), value);
-                    hqlFormat = "{0} like ?" + (parametersList.size() + initialParameterIndex);
+                    hqlFormat = "{0} like :p" + (parametersList.size() + initialParameterIndex);
                     parametersList.add(pattern);
                 }
             } else if (criterion instanceof TableCriteria.IlikeCriterion) {
@@ -308,11 +309,11 @@ public class QueryUtils {
                         (TableCriteria.IlikeCriterion) criterion;
                 String value = (String) ilikeCriterion.getValue();
                 if(ilikeCriterion.getTextMatchMode() == TextMatchMode.EQUALS) {
-                    hqlFormat = "lower({0}) = lower(?" + (parametersList.size() + initialParameterIndex + ")");
+                    hqlFormat = "lower({0}) = lower(:p" + (parametersList.size() + initialParameterIndex + ")");
                     parametersList.add(value);
                 } else {
                     String pattern = processTextMatchMode(ilikeCriterion.getTextMatchMode(), value);
-                    hqlFormat = "lower({0}) like lower(?" + (parametersList.size() + initialParameterIndex) + ")";
+                    hqlFormat = "lower({0}) like lower(:p" + (parametersList.size() + initialParameterIndex) + ")";
                     parametersList.add(pattern);
                 }
             } else if (criterion instanceof TableCriteria.IsNullCriterion) {
@@ -583,9 +584,9 @@ public class QueryUtils {
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
                 if (parameters[i] instanceof Collection) {
-                    query.setParameterList(String.valueOf(i + 1), (Collection) parameters[i]);
+                    query.setParameterList("p" + (i + 1), (Collection) parameters[i]);
                 } else
-                    query.setParameter(String.valueOf(i + 1), parameters[i]);
+                    query.setParameter("p" + (i + 1), parameters[i]);
             }
         }
 
@@ -720,8 +721,8 @@ public class QueryUtils {
                 net.sf.jsqlparser.schema.Column column =
                         new net.sf.jsqlparser.schema.Column(mainEntityTable, propertyAccessor.getName());
                 condition.setLeftExpression(column);
-                JdbcParameter jdbcParameter = new JdbcParameter();
-                jdbcParameter.setIndex(p + i + 1);
+                JdbcNamedParameter jdbcParameter = new JdbcNamedParameter();
+                jdbcParameter.setName("p" + (p + i + 1));
                 condition.setRightExpression(jdbcParameter);
                 parameters[p + i] = propertyAccessor.get(pk);
             }
@@ -807,20 +808,22 @@ public class QueryUtils {
         ClassAccessor toAccessor = persistence.getTableAccessor(databaseName, entityName);
 
         try {
-            org.hibernate.Criteria criteria =
-                    session.createCriteria(fromTable.getActualEntityName());
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery criteria = cb.createQuery(Map.class);
+            Root c = criteria.from(getEntityType(session, fromTable));
+            criteria = criteria.select(c);
+            List<Predicate> where = new ArrayList<>();
             for (Reference reference : relationship.getReferences()) {
                 Column fromColumn = reference.getActualFromColumn();
                 Column toColumn = reference.getActualToColumn();
                 PropertyAccessor toPropertyAccessor
                         = toAccessor.getProperty(toColumn.getActualPropertyName());
                 Object toValue = toPropertyAccessor.get(obj);
-                criteria.add(Restrictions.eq(fromColumn.getActualPropertyName(),
-                        toValue));
+                where.add(cb.equal(c.get(fromColumn.getActualPropertyName()), toValue));
             }
+            criteria = criteria.where(where.toArray(new Predicate[0]));
             //noinspection unchecked
-            List<Object> result = criteria.list();
-            return result;
+            return session.createQuery(criteria).list();
         } catch (Throwable e) {
             String msg = String.format(
                     "Cannot access relationship %s on entity %s.%s",
@@ -828,6 +831,24 @@ public class QueryUtils {
             logger.warn(msg, e);
         }
         return null;
+    }
+
+    public static EntityType getEntityType(Session session, Table table) {
+        String entityName = table.getActualEntityName();
+        return getEntityType(session, entityName);
+    }
+
+    @NotNull
+    public static EntityType getEntityType(Session session, String entityName) {
+        for(ManagedType<?> managedType : session.getMetamodel().getManagedTypes()) {
+            if(managedType instanceof EntityType) {
+                EntityType entityType = (EntityType) managedType;
+                if (entityType.getName().equals(entityName)) {
+                    return entityType;
+                }
+            }
+        }
+        throw new RuntimeException("Entity not found: " + entityName);
     }
 
 }

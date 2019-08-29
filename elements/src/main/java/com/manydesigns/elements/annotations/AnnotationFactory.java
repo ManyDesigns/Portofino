@@ -39,6 +39,10 @@ public class AnnotationFactory {
         });
         return (T) Proxy.newProxyInstance(classLoader, new Class[] { annotationClass },
                 (proxy, method, args) -> {
+                    if(method.getName().equals("annotationType")) {
+                        return annotationClass;
+                    }
+
                     Object value = values.get(method.getName());
                     if (value == null) {
                         value = method.getDefaultValue();

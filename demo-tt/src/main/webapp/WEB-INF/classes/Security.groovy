@@ -5,6 +5,7 @@ import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.security.SecurityLogic
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
@@ -19,6 +20,8 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+
+import javax.persistence.criteria.CriteriaBuilder
 
 class Security extends AbstractPortofinoRealm {
 
@@ -51,10 +54,13 @@ class Security extends AbstractPortofinoRealm {
         String encryptedPassword = encryptPassword(plainTextPassword);
         Session session = persistence.getSession("tt");
 
-        Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("email", login).ignoreCase());
+        def cb = session.criteriaBuilder
+        def criteria = cb.createQuery()
+        def from = criteria.from(QueryUtils.getEntityType(session, 'users'))
+        criteria = criteria.select(from).where(cb.equal(cb.lower(from.get("email")), login?.toLowerCase()))
 
-        Serializable principal = (Serializable) criteria.uniqueResult();
+        //Serializable principal = (Serializable) session.createQuery("from users where lower(email) = lower(:email)").setParameter("email", login).uniqueResult()
+        Serializable principal = (Serializable) session.createQuery(criteria).uniqueResult()
 
         if (principal == null) {
             throw new UnknownAccountException("Unknown user");

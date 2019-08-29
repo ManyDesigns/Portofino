@@ -32,13 +32,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -53,12 +51,13 @@ public class JavaCodeBase extends AbstractCodeBase {
     protected JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     protected DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
     protected InMemoryFileManager fileManager;
-    protected VFSClassloader vfsClassloader;
+    protected VFSClassloader sourceClassloader;
+    protected VFSClassloader compiledClassloader;
 
     private static final Logger logger = LoggerFactory.getLogger(JavaCodeBase.class);
 
-    public JavaCodeBase(FileObject root) {
-        super(root);
+    public JavaCodeBase(FileObject root) throws IOException {
+        this(root, null, null);
     }
 
     public JavaCodeBase(FileObject root, CodeBase parent, ClassLoader classLoader) throws IOException {
@@ -72,8 +71,9 @@ public class JavaCodeBase extends AbstractCodeBase {
         }
         if(compiler != null) {
             fileManager = new InMemoryFileManager(compiler.getStandardFileManager(diagnosticCollector, null, null));
-            vfsClassloader = new VFSClassloader(fileManager.directory, getClassLoader());
+            sourceClassloader = new VFSClassloader(fileManager.directory, getClassLoader());
         }
+        compiledClassloader = new VFSClassloader(root, getClassLoader());
     }
 
     public JavaCodeBase(FileObject root, CodeBase parent) throws IOException {
@@ -85,7 +85,7 @@ public class JavaCodeBase extends AbstractCodeBase {
         String resourceName = classNameToPath(className);
         FileObject fileObject = root.resolveFile(resourceName + ".class");
         if(fileObject.exists()) {
-            return loadClassFile(fileObject, className);
+            return compiledClassloader.loadClass(className);
         }
         fileObject = root.resolveFile(resourceName + ".java");
         if(fileObject.exists()) {
@@ -98,8 +98,15 @@ public class JavaCodeBase extends AbstractCodeBase {
         return null;
     }
 
-    public Class loadClassFile(FileObject location, String name) throws FileSystemException, ClassNotFoundException {
-        return new VFSClassloader(location, getClassLoader()).loadClass(name);
+    public Class loadClassFile(FileObject location, String name) throws ClassNotFoundException {
+        try {
+            return new VFSClassloader(location, getClassLoader()).loadClass(name);
+        } catch (LinkageError e) {
+            //LinkageError happens (also) when defining the same class twice. Since this classloader ignores the name,
+            //code like theClass.getClassloader().loadClass(anotherName) would fail with an error. Here we wrap it
+            //with a ClassNotFoundException, which is more often expected and handled.
+            throw new ClassNotFoundException(name, e);
+        }
     }
 
     public Class loadJavaFile(final FileObject fileObject, final String name) throws ClassNotFoundException {
@@ -108,7 +115,7 @@ public class JavaCodeBase extends AbstractCodeBase {
             JavaCompiler.CompilationTask task =
                     compiler.getTask(null, fileManager, null, null, null, Collections.singletonList(javaFile));
             if(task.call()) {
-                return vfsClassloader.loadClass(name);
+                return sourceClassloader.loadClass(name);
             } else {
                 logger.warn("Compilation errors");
                 //TODO log compilation errors
@@ -188,22 +195,11 @@ public class JavaCodeBase extends AbstractCodeBase {
                     }
                     try(InputStream inputStream = classFile.getContent().getInputStream()) {
                         byte[] code = IOUtils.toByteArray(inputStream);
-                        return defineClass(name, code);
+                        return defineClass(name, code, 0, code.length);
                     }
                 } catch (Exception e) {
                     throw new ClassNotFoundException(name, e);
                 }
-            }
-        }
-
-        public Class<?> defineClass(String name, byte[] code) throws ClassNotFoundException {
-            try {
-                return defineClass(null, code, 0, code.length);
-            } catch (LinkageError e) {
-                //LinkageError happens (also) when defining the same class twice. Since this classloader ignores the name,
-                //code like theClass.getClassloader().loadClass(anotherName) would fail with an error. Here we wrap it
-                //with a ClassNotFoundException, which is more often expected and handled.
-                throw new ClassNotFoundException(name, e);
             }
         }
     }

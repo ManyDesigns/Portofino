@@ -29,8 +29,9 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.modules.DatabaseModule;
-import com.manydesigns.portofino.persistence.hibernate.HibernateConfig;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
+import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
+import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import io.reactivex.subjects.BehaviorSubject;
@@ -46,8 +47,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -275,26 +274,11 @@ public class Persistence {
                 ConnectionProvider connectionProvider = database.getConnectionProvider();
                 connectionProvider.init(databasePlatformsRegistry);
                 if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
-                    HibernateConfig builder = new HibernateConfig(connectionProvider, configuration);
-                    String trueString = database.getTrueString();
-                    if (trueString != null) {
-                        builder.setTrueString(
-                                "null".equalsIgnoreCase(trueString) ? null : trueString);
-                    }
-                    String falseString = database.getFalseString();
-                    if (falseString != null) {
-                        builder.setFalseString(
-                                "null".equalsIgnoreCase(falseString) ? null : falseString);
-                    }
-                    Configuration configuration =
-                            builder.buildSessionFactory(database);
-                    StandardServiceRegistryBuilder registryBuilder =
-                            new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-                    SessionFactory sessionFactory = configuration.buildSessionFactory(registryBuilder.build());
-
+                    SessionFactoryBuilder builder = new SessionFactoryBuilder(database, configuration);
+                    SessionFactoryAndCodeBase sessionFactoryAndCodeBase =
+                            builder.buildSessionFactory();
                     HibernateDatabaseSetup setup =
-                            new HibernateDatabaseSetup(
-                                    configuration, sessionFactory);
+                            new HibernateDatabaseSetup(sessionFactoryAndCodeBase.sessionFactory);
                     String databaseName = database.getDatabaseName();
                     setups.put(databaseName, setup);
                 }

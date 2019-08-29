@@ -306,7 +306,8 @@ left join version_states vs on vs.id = act.version_state
         if (versionState != null) {
             newActivity.version_state = versionState.id;
         }
-        session.save("activity", (Object) newActivity);
+        //TODO breaking change - find a way to keep the same entity name
+        session.save("tt.tt.activity", (Object) newActivity);
     }
 
     static public String createDiffMessage(Form from, Form to) {

@@ -23,6 +23,7 @@ package com.manydesigns.portofino.database;
 import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
 
@@ -66,8 +67,9 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
         return ObjectUtils.hashCode(x);
     }
 
-    public Object nullSafeGet(ResultSet resultSet, String[] names, SessionImplementor sessionImplementor, Object owner)
-        throws HibernateException, SQLException {
+    @Override
+    public Object nullSafeGet(ResultSet resultSet, String[] names, SharedSessionContractImplementor session, Object owner)
+            throws HibernateException, SQLException {
         String value = resultSet.getString(names[0]);
         return parseBoolean(value);
     }
@@ -94,10 +96,11 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
         }
     }
 
-    public void nullSafeSet(PreparedStatement statement, Object value, int index, SessionImplementor sessionImplementor)
-        throws HibernateException, SQLException {
-        if(value == null) {
-            if(trueString != null && falseString != null) {
+    @Override
+    public void nullSafeSet(PreparedStatement statement, Object value, int index, SharedSessionContractImplementor session)
+            throws HibernateException, SQLException {
+        if (value == null) {
+            if (trueString != null && falseString != null) {
                 statement.setString(index, null);
             } else {
                 throw new HibernateException("Null is not supported as a boolean value for this type");

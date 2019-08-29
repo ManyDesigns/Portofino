@@ -36,26 +36,19 @@ public class HibernateDatabaseSetup {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    protected final Configuration configuration;
     protected final SessionFactory sessionFactory;
     protected final ThreadLocal<Session> threadSessions;
 
         public static final Logger logger =
             LoggerFactory.getLogger(HibernateDatabaseSetup.class);
 
-    public HibernateDatabaseSetup(Configuration configuration,
-                                  SessionFactory sessionFactory) {
+    public HibernateDatabaseSetup(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
-        this.configuration = configuration;
         threadSessions = new ThreadLocal<Session>();
     }
 
     public SessionFactory getSessionFactory() {
         return sessionFactory;
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
     }
 
     public ThreadLocal<Session> getThreadSessions() {
