@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [5.0.2] - 2019-08-29
+
 ### Added
 - Restored and extended some Portofino 4 features:
     - Numbers and dates can be searched with ranges as well as with an exact value.

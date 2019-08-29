@@ -464,7 +464,7 @@
                                 <link>http://www.joda.org/joda-time/apidocs/</link>
                                 <link>https://docs.oracle.com/javaee/6/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -link http://shiro.apache.org/static/1.4.0/apidocs/ -link https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/ -link https://docs.jboss.org/hibernate/orm/4.3/javadocs/ -link http://docs.groovy-lang.org/latest/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link http://docs.oracle.com/javase/6/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
+                                -link http://shiro.apache.org/static/1.4.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/javadocs/v1.10/apidocs/ -link https://docs.jboss.org/hibernate/orm/4.3/javadocs/ -link http://docs.groovy-lang.org/latest/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/en/java/javase/11/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
