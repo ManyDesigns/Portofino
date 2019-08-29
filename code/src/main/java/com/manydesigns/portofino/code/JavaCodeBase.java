@@ -70,8 +70,10 @@ public class JavaCodeBase extends AbstractCodeBase {
         if(fileManager != null) {
             fileManager.close();
         }
-        fileManager = new InMemoryFileManager(compiler.getStandardFileManager(diagnosticCollector, null, null));
-        vfsClassloader = new VFSClassloader(fileManager.directory, getClassLoader());
+        if(compiler != null) {
+            fileManager = new InMemoryFileManager(compiler.getStandardFileManager(diagnosticCollector, null, null));
+            vfsClassloader = new VFSClassloader(fileManager.directory, getClassLoader());
+        }
     }
 
     public JavaCodeBase(FileObject root, CodeBase parent) throws IOException {
@@ -87,7 +89,11 @@ public class JavaCodeBase extends AbstractCodeBase {
         }
         fileObject = root.resolveFile(resourceName + ".java");
         if(fileObject.exists()) {
-            return loadJavaFile(fileObject, className);
+            if(compiler != null) {
+                return loadJavaFile(fileObject, className);
+            } else {
+                throw new ClassNotFoundException("Java compiler not available to compile " + fileObject.getName().getPath());
+            }
         }
         return null;
     }
