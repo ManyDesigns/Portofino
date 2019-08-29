@@ -87,7 +87,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultLoginAction.class);
 
-    @Autowired
+    @Autowired(required = false)
     public MailQueue mailQueue;
 
     @POST
