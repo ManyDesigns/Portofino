@@ -45,7 +45,6 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
-import com.manydesigns.portofino.rest.actions.user.LoginAction;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,7 +86,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultLoginAction.class);
 
-    @Autowired
+    @Autowired(required = false)
     public MailQueue mailQueue;
 
     @POST
@@ -177,9 +176,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     protected String getResetPasswordEmailBody(String site, String changePasswordLink) throws IOException {
         String countryIso = context.getRequest().getLocale().getLanguage().toLowerCase();
-        InputStream is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/passwordResetEmail." + countryIso + ".html");
+        InputStream is = DefaultLoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/passwordResetEmail." + countryIso + ".html");
         if(is == null) {
-            is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/passwordResetEmail.en.html");
+            is = DefaultLoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/passwordResetEmail.en.html");
         }
         try(InputStream stream = is) {
             String template = IOUtils.toString(stream, StandardCharsets.UTF_8);
@@ -189,9 +188,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     protected String getConfirmSignUpEmailBody(String site, String confirmSignUpLink) throws IOException {
         String countryIso = context.getRequest().getLocale().getLanguage().toLowerCase();
-        InputStream is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail." + countryIso + ".html");
+        InputStream is = DefaultLoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail." + countryIso + ".html");
         if(is == null) {
-            is = LoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail.en.html");
+            is = DefaultLoginAction.class.getResourceAsStream("/com/manydesigns/portofino/actions/user/confirmSignUpEmail.en.html");
         }
         try(InputStream stream = is) {
             String template = IOUtils.toString(stream, StandardCharsets.UTF_8);

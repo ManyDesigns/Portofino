@@ -312,13 +312,15 @@ public class ConnectionsAction extends AbstractResourceAction {
         List<SelectableSchema> selectableSchemas = new ArrayList<>(schemaNamesFromDb.size());
         for(String[] schemaName : schemaNamesFromDb) {
             boolean selected = false;
+            String logicalName = schemaName[1];
             for(Schema schema : selectedSchemas) {
-                if(schemaName[1].equalsIgnoreCase(schema.getSchemaName())) {
+                if(schemaName[1].equalsIgnoreCase(schema.getActualSchemaName())) {
                     selected = true;
+                    logicalName = schema.getSchemaName();
                     break;
                 }
             }
-            SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], schemaName[1], selected);
+            SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], logicalName, selected);
             selectableSchemas.add(schema);
         }
         return selectableSchemas;

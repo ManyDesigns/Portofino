@@ -1,21 +1,10 @@
 # Changelog
-All notable changes to this project from version 5.0.0 upwards will be documented in this file. 
+All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Changed
-- New versatile strategy for annotations in Elements and in the model: use proxies instead of implementation classes.
-  This allows to support third-party annotations with no effort from the developer.
-  Existing annotations are automatically migrated.
-  
-### Deprecated
-- The old `AnnotationsManager` in Elements, replaced by the `AnnotationFactory`.
-  
-### Removed
-- The `@LabelI18n` annotation that has been long deprecated in favor of `@Label`. 
-
-## [Unreleased]
+## [5.0.2] - 2019-08-29
 
 ### Added
 - Restored and extended some Portofino 4 features:
@@ -25,27 +14,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - Password fields can ask to confirm the password (i.e., to type it twice).
 - Improve developer experience with better code reloading:
     - Quartz jobs are reloaded automatically when the code changes, without restarting the application,
-    and any open Hibernate sessions are closed even in case of exceptions.
+      and, when they terminate execution, any open Hibernate sessions are closed even in case of exceptions.
     - When source code changes, the user-defined Spring context is refreshed, so that services and actions can pick up the changes.
-    Only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
+      This only works with classes annotated `@Component`, `@Repository` or `@Service`, to avoid excessive refreshes.
 - When embedded, the crud page has now the option to open the detail in the same page instead of navigating to the detail URL.
+- Check for new versions at startup.
+- Make the JWT expiration time configurable (in minutes, defaults to 30).
 
 ### Changed
 - UI improvements:
-    - Better looks by drawing inspiration from [sb-admin-material](https://github.com/start-javascript/sb-admin-material).
+    - Improve looks by drawing inspiration from [sb-admin-material](https://github.com/start-javascript/sb-admin-material).
     - Use Material Typography.
     - The user declining to log in is sent back to the home. The current page has a chance to inject another behaviour.
     - Support the `multiplier` property of the `@DecimalFormat` annotation (for percent, per mille and similar).
-    - Rich text component is better integrated in Material forms.
-    - Better detection of links in text fields with `@HighlightLinks`.
+    - The rich text component is better integrated in Material forms.
+    - More comprehensive detection of links in text fields with `@HighlightLinks`.
+    - The page settings panel is reachable via the URL, by including the query parameter `settings`.
 - Important dependencies updated: Angular, Groovy, Liquibase, Shiro.
 
 ### Fixed
-- Select fields with no value and disabled select fields showing nothing or `undefined`.
+- Select fields with no value or disabled showing nothing or `undefined`.
 - Create new page at the top level.
 - Toolbar overflowing on mobile.
 - Support BigInteger and BigDecimal properties in the UI.
 - Properly save the crud page configuration.
+- Use the correct schema name when synchronizing an aliased schema.
 
 ### Security
 - Improved code quality and security and updated insecure dependencies using automated tools.

@@ -59,18 +59,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   ngAfterViewInit() {
     this.subscriptions.push(this.route.url.subscribe(segments => {
       this.pageService.reset();
-      this.loadAndDisplayPage(segments);
-    }));
-    this.subscriptions.push(this.route.queryParams.subscribe(params => {
-      if(this.isRootPage()) {
-        if (params.hasOwnProperty('resetPassword')) {
-          this.authenticationService.showResetPasswordDialog(params.token);
-        } else if (params.hasOwnProperty('confirmSignup')) {
-          this.authenticationService.confirmSignup(params.token).subscribe(
-            () => this.notificationService.info(this.translate.get("User successfully created."))
-          );
-        }
-      }
+      this.loadAndDisplayPage(segments, this.route.snapshot.queryParams);
     }));
   }
 
@@ -91,12 +80,27 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  protected loadAndDisplayPage(segments: UrlSegment[]) {
+  protected loadAndDisplayPage(segments, params) {
     this.pageFactory.load(segments).subscribe(
       componentRef => {
         this.displayPage(componentRef);
+        this.handleQueryParameters(componentRef.instance, params);
       },
       error => this.pageService.notifyError(error));
+  }
+
+  protected handleQueryParameters(page, params) {
+    if (params.hasOwnProperty("settings")) {
+      page.configure();
+    } else if (!page.parent) {
+      if (params.hasOwnProperty('resetPassword')) {
+        this.authenticationService.showResetPasswordDialog(params.token);
+      } else if (params.hasOwnProperty('confirmSignup')) {
+        this.authenticationService.confirmSignup(params.token).subscribe(
+          () => this.notificationService.info(this.translate.get("User successfully created."))
+        );
+      }
+    }
   }
 
   protected displayPage(componentRef: ComponentRef<Page>) {
