@@ -76,34 +76,38 @@ public class SessionFactoryBuilder {
     public SessionFactoryAndCodeBase buildSessionFactory(FileObject root) throws Exception {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         CodeBase codeBase = new JavaCodeBase(root);
+        List<Table> tablesWithPK = database.getAllTables();
+        tablesWithPK.removeIf(t -> {
+            boolean skip = t.getPrimaryKey() == null;
+            if(skip) {
+                logger.warn("Skipping table without primary key: {}", t.getQualifiedName());
+            }
+            return skip;
+        });
         try {
             //Use a new classloader as scratch space for Javassist
             URLClassLoader scratchClassLoader = new URLClassLoader(new URL[0]);
             Thread.currentThread().setContextClassLoader(scratchClassLoader);
-            for (Table table : database.getAllTables()) {
+            for (Table table : tablesWithPK) {
                 generateClass(table);
             }
-            for (Table table : database.getAllTables()) {
+            for (Table table : tablesWithPK) {
                 mapRelationships(table);
             }
-            for (Table table : database.getAllTables()) {
+            for (Table table : tablesWithPK) {
                 byte[] classFile = getClassFile(table);
                 FileObject location = getEntityLocation(root, table);
                 try(OutputStream outputStream = location.getContent().getOutputStream()) {
                     outputStream.write(classFile);
                 }
             }
-            try {
-                Class<?> aClass = scratchClassLoader.loadClass("tt.tt.components");
-                logger.info("foo " + aClass);
-            } catch (Exception e) {}
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        return buildSessionFactory(codeBase);
+        return buildSessionFactory(codeBase, tablesWithPK);
     }
 
-    public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase) {
+    public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase, List<Table> tablesWithPK) {
         BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
@@ -114,7 +118,7 @@ public class SessionFactoryBuilder {
                 new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
         MetadataSources sources = new MetadataSources(standardRegistry);
         try {
-            for (Table table : database.getAllTables()) {
+            for (Table table : tablesWithPK) {
                 Class persistentClass = getPersistentClass(table, codeBase);
                 sources.addAnnotatedClass(persistentClass);
                 classLoaderService.classes.put(persistentClass.getName(), persistentClass);

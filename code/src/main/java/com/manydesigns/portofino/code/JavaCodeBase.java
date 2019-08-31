@@ -190,6 +190,7 @@ public class JavaCodeBase extends AbstractCodeBase {
                     FileObject classFile;
                     if (fileObject.getType() == FileType.FILE) {
                         classFile = fileObject;
+                        name = null; //Ignore the name
                     } else {
                         classFile = fileObject.resolveFile(classNameToPath(name) + ".class");
                     }

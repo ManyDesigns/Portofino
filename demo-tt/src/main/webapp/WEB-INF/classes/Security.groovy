@@ -54,12 +54,9 @@ class Security extends AbstractPortofinoRealm {
         String encryptedPassword = encryptPassword(plainTextPassword);
         Session session = persistence.getSession("tt");
 
-        def cb = session.criteriaBuilder
-        def criteria = cb.createQuery()
-        def from = criteria.from(QueryUtils.getEntityType(session, 'users'))
-        criteria = criteria.select(from).where(cb.equal(cb.lower(from.get("email")), login?.toLowerCase()))
+        def (criteria, cb, from) = QueryUtils.createCriteria(session, 'users')
+        criteria.where(cb.equal(cb.lower(from.get("email")), login?.toLowerCase()))
 
-        //Serializable principal = (Serializable) session.createQuery("from users where lower(email) = lower(:email)").setParameter("email", login).uniqueResult()
         Serializable principal = (Serializable) session.createQuery(criteria).uniqueResult()
 
         if (principal == null) {

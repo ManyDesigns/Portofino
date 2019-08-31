@@ -306,11 +306,10 @@ left join version_states vs on vs.id = act.version_state
         if (versionState != null) {
             newActivity.version_state = versionState.id;
         }
-        //TODO breaking change - find a way to keep the same entity name
-        session.save("tt.tt.activity", (Object) newActivity);
+        session.save("activity", (Object) newActivity);
     }
 
-    static public String createDiffMessage(Form from, Form to) {
+    static String createDiffMessage(Form from, Form to) {
         XhtmlBuffer xb = new XhtmlBuffer();
         int diffCount = 0;
         xb.openElement("dl");
@@ -328,7 +327,7 @@ left join version_states vs on vs.id = act.version_state
                 xb.openElement("dd")
                 if (propertyAccessor.type == String.class) {
                     DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-                    LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(StringUtils.trimToEmpty(oldField.value), StringUtils.trimToEmpty(newField.value));
+                    LinkedList<Diff> diffs = diffMatchPatch.diff_main(StringUtils.trimToEmpty(oldField.value), StringUtils.trimToEmpty(newField.value));
                     diffMatchPatch.diff_cleanupSemantic(diffs);
                     diff_prettyHtml(xb, diffs);
                 } else {

@@ -275,10 +275,9 @@ public class Persistence {
                 connectionProvider.init(databasePlatformsRegistry);
                 if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
                     SessionFactoryBuilder builder = new SessionFactoryBuilder(database, configuration);
-                    SessionFactoryAndCodeBase sessionFactoryAndCodeBase =
-                            builder.buildSessionFactory();
+                    SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
                     HibernateDatabaseSetup setup =
-                            new HibernateDatabaseSetup(sessionFactoryAndCodeBase.sessionFactory);
+                            new HibernateDatabaseSetup(database, sessionFactoryAndCodeBase.sessionFactory);
                     String databaseName = database.getDatabaseName();
                     setups.put(databaseName, setup);
                 }

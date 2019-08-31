@@ -31,18 +31,21 @@ import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import groovy.lang.Tuple3;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.JdbcNamedParameter;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.jdbc.Work;
+import org.hibernate.query.Query;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -808,10 +811,7 @@ public class QueryUtils {
         ClassAccessor toAccessor = persistence.getTableAccessor(databaseName, entityName);
 
         try {
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery criteria = cb.createQuery(Map.class);
-            Root c = criteria.from(getEntityType(session, fromTable));
-            criteria = criteria.select(c);
+            Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> criteria = createCriteria(session, fromTable);
             List<Predicate> where = new ArrayList<>();
             for (Reference reference : relationship.getReferences()) {
                 Column fromColumn = reference.getActualFromColumn();
@@ -819,11 +819,9 @@ public class QueryUtils {
                 PropertyAccessor toPropertyAccessor
                         = toAccessor.getProperty(toColumn.getActualPropertyName());
                 Object toValue = toPropertyAccessor.get(obj);
-                where.add(cb.equal(c.get(fromColumn.getActualPropertyName()), toValue));
+                where.add(criteria.getSecond().equal(criteria.getThird().get(fromColumn.getActualPropertyName()), toValue));
             }
-            criteria = criteria.where(where.toArray(new Predicate[0]));
-            //noinspection unchecked
-            return session.createQuery(criteria).list();
+            return session.createQuery(criteria.getFirst().where(where.toArray(new Predicate[0]))).list();
         } catch (Throwable e) {
             String msg = String.format(
                     "Cannot access relationship %s on entity %s.%s",
@@ -833,13 +831,24 @@ public class QueryUtils {
         return null;
     }
 
-    public static EntityType getEntityType(Session session, Table table) {
+    public static Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> createCriteria(Session session, Table table) {
+        return createCriteria(session, table.getActualEntityName());
+    }
+
+    public static Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> createCriteria(Session session, String entityName) {
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Object> criteria = cb.createQuery();
+        Root from = criteria.from(getEntityType(session, entityName));
+        return new Tuple3<>(criteria.select(from), cb, from);
+    }
+
+    public static EntityType<?> getEntityType(Session session, Table table) {
         String entityName = table.getActualEntityName();
         return getEntityType(session, entityName);
     }
 
     @NotNull
-    public static EntityType getEntityType(Session session, String entityName) {
+    public static EntityType<?> getEntityType(Session session, String entityName) {
         for(ManagedType<?> managedType : session.getMetamodel().getManagedTypes()) {
             if(managedType instanceof EntityType) {
                 EntityType entityType = (EntityType) managedType;

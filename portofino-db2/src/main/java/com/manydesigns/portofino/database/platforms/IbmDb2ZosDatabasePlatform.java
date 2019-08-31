@@ -23,6 +23,7 @@ package com.manydesigns.portofino.database.platforms;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import com.manydesigns.portofino.database.dialects.DB2ZOSDialect;
 import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
+import org.hibernate.dialect.DB2390V8Dialect;
 
 
 /*
@@ -36,7 +37,7 @@ public class IbmDb2ZosDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    public final static String DESCRIPTION = "IBM DB2 for ZOS";
+    public final static String DESCRIPTION = "IBM DB2 for z/OS";
     public final static String STANDARD_DRIVER_CLASS_NAME =
             "com.ibm.db2.jcc.DB2Driver";
 
@@ -45,7 +46,7 @@ public class IbmDb2ZosDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public IbmDb2ZosDatabasePlatform()  {
-        super(new DB2ZOSDialect(), "jdbc:db2://<host>[:<port>]/<database_name>");
+        super(new DB2390V8Dialect(), "jdbc:db2://<host>[:<port>]/<database_name>");
     }
 
     //**************************************************************************
