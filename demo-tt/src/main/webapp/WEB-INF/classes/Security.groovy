@@ -21,8 +21,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
-import javax.persistence.criteria.CriteriaBuilder
-
 class Security extends AbstractPortofinoRealm {
 
     public static final String ADMIN_GROUP_NAME = "admin";
@@ -118,7 +116,7 @@ class Security extends AbstractPortofinoRealm {
         Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("token", token));
 
-        Serializable principal = (Serializable)criteria.uniqueResult();
+        Serializable principal = (Serializable) criteria.uniqueResult()
 
         if (principal == null) {
             throw new IncorrectCredentialsException();

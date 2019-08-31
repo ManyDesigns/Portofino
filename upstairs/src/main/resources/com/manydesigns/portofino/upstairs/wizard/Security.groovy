@@ -138,10 +138,10 @@ public class Security extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(databaseName);
-        Criteria criteria = session.createCriteria(userTableEntityName);
-        criteria.add(Restrictions.eq(userNameProperty, userName));
+        def (criteria, cb, from) = QueryUtils.createCriteria(session, userTableEntityName)
+        criteria.where(cb.equal(from.get(userNameProperty), userName))
 
-        List result = criteria.list()
+        List result = session.createQuery(criteria).list()
 
         if (result.size() == 1) {
             def user = cleanUser(result[0])
@@ -366,9 +366,10 @@ public class Security extends AbstractPortofinoRealm {
 
         if(!StringUtils.isEmpty(groupTableEntityName)) {
             Session session = persistence.getSession(databaseName)
-            def criteria = session.createCriteria(groupTableEntityName)
-            criteria.projection = Projections.property(groupNameProperty)
-            criteria.addOrder(Order.asc(groupNameProperty))
+            def (criteria, cb, from) = QueryUtils.createCriteria(session, groupTableEntityName)
+            def groupNameExpression = from.get(groupNameProperty)
+            criteria.select(groupNameExpression).orderBy(cb.asc(groupNameExpression))
+
             for(x in criteria.list()) {
                 groups.add(String.valueOf(x))
             }
