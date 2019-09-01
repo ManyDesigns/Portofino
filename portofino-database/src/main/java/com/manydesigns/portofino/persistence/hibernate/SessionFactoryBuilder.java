@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.persistence.hibernate;
 
-import com.google.common.reflect.TypeParameter;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.model.database.*;
@@ -17,7 +16,8 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
-import org.hibernate.EntityMode;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
@@ -28,7 +28,6 @@ import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.type.Type;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +38,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +88,12 @@ public class SessionFactoryBuilder {
             //Use a new classloader as scratch space for Javassist
             URLClassLoader scratchClassLoader = new URLClassLoader(new URL[0]);
             Thread.currentThread().setContextClassLoader(scratchClassLoader);
+
+            CtClass baseClass = generateBaseClass();
+            try(OutputStream outputStream = root.resolveFile(database.getDatabaseName() + FileName.SEPARATOR_CHAR + "BaseEntity.class").getContent().getOutputStream()) {
+                outputStream.write(baseClass.toBytecode());
+            }
+
             for (Table table : tablesWithPK) {
                 generateClass(table);
             }
@@ -168,8 +174,8 @@ public class SessionFactoryBuilder {
             throw new Error("Unsupported connection provider: " + connectionProvider);
         }
         settings.put("hibernate.ejb.metamodel.population", "enabled");
-        //TODO necessary?
-        settings.put("hibernate.default_entity_mode", EntityMode.MAP.getExternalName());
+        //Setting this disallows mapping entities to Java classes
+        //settings.put("hibernate.default_entity_mode", EntityMode.MAP.getExternalName());
     }
 
     protected FileObject getEntityLocation(FileObject root, Table table) throws FileSystemException {
@@ -199,8 +205,8 @@ public class SessionFactoryBuilder {
         return getMappedClass(table).toBytecode();
     }
 
-    public CtClass generateClass(Table table) throws CannotCompileException, NotFoundException {
-        CtClass cc = classPool.makeClass(getMappedClassName(table));
+    public CtClass generateBaseClass() throws NotFoundException {
+        CtClass cc = classPool.makeClass(getBaseEntityName());
         cc.addInterface(classPool.get(Serializable.class.getName()));
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
@@ -208,15 +214,58 @@ public class SessionFactoryBuilder {
         ccFile.addAttribute(classAnnotations);
         javassist.bytecode.annotation.Annotation annotation;
 
+        annotation = new javassist.bytecode.annotation.Annotation(MappedSuperclass.class.getName(), constPool);
+        classAnnotations.addAnnotation(annotation);
+
+        Annotation stringBooleanType = new Annotation(TypeDef.class.getName(), constPool);
+        stringBooleanType.addMemberValue("name", new StringMemberValue(StringBooleanType.class.getName(), constPool));
+        stringBooleanType.addMemberValue("typeClass", new ClassMemberValue(StringBooleanType.class.getName(), constPool));
+        ArrayMemberValue parameters = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
+        parameters.setValue(new AnnotationMemberValue[] {
+                new AnnotationMemberValue(makeParameterAnnotation("trueString", trueString, constPool), constPool),
+                new AnnotationMemberValue(makeParameterAnnotation("falseString", falseString, constPool), constPool)
+        });
+        stringBooleanType.addMemberValue("parameters", parameters);
+
+        annotation = new javassist.bytecode.annotation.Annotation(TypeDefs.class.getName(), constPool);
+        ArrayMemberValue typeDefs = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
+        typeDefs.setValue(new AnnotationMemberValue[] {
+                new AnnotationMemberValue(stringBooleanType, constPool)
+        });
+        annotation.addMemberValue("value", typeDefs);
+        classAnnotations.addAnnotation(annotation);
+        return cc;
+    }
+
+    protected Annotation makeParameterAnnotation(String name, String value, ConstPool constPool) {
+        Annotation annotation = new Annotation(org.hibernate.annotations.Parameter.class.getName(), constPool);
+        annotation.addMemberValue("name", new StringMemberValue(name, constPool));
+        annotation.addMemberValue("value", new StringMemberValue(value, constPool));
+        return annotation;
+    }
+
+    @NotNull
+    public String getBaseEntityName() {
+        return database.getDatabaseName() + ".BaseEntity";
+    }
+
+    public CtClass generateClass(Table table) throws CannotCompileException, NotFoundException {
+        CtClass cc = classPool.makeClass(getMappedClassName(table));
+        cc.setSuperclass(classPool.get(getBaseEntityName()));
+        ClassFile ccFile = cc.getClassFile();
+        ConstPool constPool = ccFile.getConstPool();
+        AnnotationsAttribute classAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
+        ccFile.addAttribute(classAnnotations);
+        javassist.bytecode.annotation.Annotation annotation;
+
         annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Table.class.getName(), constPool);
-        annotation.addMemberValue("name", new StringMemberValue(table.getTableName(), ccFile.getConstPool()));
-        annotation.addMemberValue("schema", new StringMemberValue(table.getSchema().getActualSchemaName(), ccFile.getConstPool()));
+        annotation.addMemberValue("name", new StringMemberValue(table.getTableName(), constPool));
+        annotation.addMemberValue("schema", new StringMemberValue(table.getSchema().getActualSchemaName(), constPool));
         classAnnotations.addAnnotation(annotation);
 
         annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Entity.class.getName(), constPool);
-        annotation.addMemberValue("name", new StringMemberValue(table.getActualEntityName(), ccFile.getConstPool()));
+        annotation.addMemberValue("name", new StringMemberValue(table.getActualEntityName(), constPool));
         classAnnotations.addAnnotation(annotation);
-
 
         //Primary keys
         List<Column> columnPKList = table.getPrimaryKey().getColumns();
@@ -231,21 +280,25 @@ public class SessionFactoryBuilder {
             CtField field = new CtField(classPool.get(column.getActualJavaType().getName()), propertyName, cc);
             AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
             annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Column.class.getName(), constPool);
-            annotation.addMemberValue("name", new StringMemberValue(column.getColumnName(), ccFile.getConstPool()));
+            annotation.addMemberValue("name", new StringMemberValue(column.getColumnName(), constPool));
             fieldAnnotations.addAnnotation(annotation);
+
             if(columnPKList.contains(column)) {
-                annotation.addMemberValue("updatable", new BooleanMemberValue(false, ccFile.getConstPool()));
+                annotation.addMemberValue("updatable", new BooleanMemberValue(false, constPool));
                 annotation = new javassist.bytecode.annotation.Annotation(Id.class.getName(), constPool);
                 fieldAnnotations.addAnnotation(annotation);
                 if(column.isAutoincrement()) {
                     annotation = new javassist.bytecode.annotation.Annotation(GeneratedValue.class.getName(), constPool);
-                    EnumMemberValue value = new EnumMemberValue(ccFile.getConstPool());
+                    EnumMemberValue value = new EnumMemberValue(constPool);
                     value.setType(GenerationType.class.getName());
                     value.setValue(GenerationType.IDENTITY.name());
                     annotation.addMemberValue("strategy", value);
                     fieldAnnotations.addAnnotation(annotation);
                 }
             }
+
+            setupColumnType(column, fieldAnnotations, constPool);
+
             field.getFieldInfo().addAttribute(fieldAnnotations);
             cc.addField(field);
             String accessorName = propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
@@ -253,6 +306,17 @@ public class SessionFactoryBuilder {
             cc.addMethod(CtNewMethod.setter("set" + accessorName, field));
         }
         return cc;
+    }
+
+    protected void setupColumnType(Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
+        Annotation annotation;
+        if(Boolean.class.equals(column.getActualJavaType())) {
+            if(column.getJdbcType() == Types.CHAR || column.getJdbcType() == Types.VARCHAR) {
+                annotation = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);
+                annotation.addMemberValue("name", new StringMemberValue(StringBooleanType.class.getName(), constPool));
+                fieldAnnotations.addAnnotation(annotation);
+            }
+        }
     }
 
     public void mapRelationships(Table table) throws NotFoundException, CannotCompileException {

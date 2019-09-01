@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.persistence.hibernate;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.HibernateException;
@@ -32,6 +32,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -44,15 +45,13 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    private int sqlType = Types.CHAR;
-
     public static final String NULL = new StringBuilder("null").toString();
 
     private String trueString = "T";
     private String falseString = "F";
 
     public int[] sqlTypes() {
-        return new int[] { sqlType };
+        return new int[] { Types.CHAR, Types.VARCHAR };
     }
 
     public Class returnedClass() {
@@ -149,12 +148,8 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
         if(newString != nullValue) {
             falseString = newString != NULL ? newString : null;
         }
-        if((trueString == falseString) || ((trueString != null) && trueString.equals(falseString))) {
+        if(Objects.equals(trueString, falseString)) {
             throw new IllegalArgumentException("trueString and falseString must be distinct");
-        }
-        String sqlTypeCode = parameters.getProperty("sqlType");
-        if(sqlTypeCode != null) {
-            sqlType = Integer.parseInt(sqlTypeCode);
         }
     }
 

@@ -22,7 +22,7 @@
 //
 //import com.manydesigns.elements.reflection.JavaClassAccessor;
 //import com.manydesigns.elements.reflection.PropertyAccessor;
-//import com.manydesigns.portofino.database.StringBooleanType;
+//import com.manydesigns.portofino.persistence.hibernate.StringBooleanType;
 //import com.manydesigns.portofino.model.database.*;
 //import com.manydesigns.portofino.model.database.ForeignKey;
 //import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
@@ -916,7 +916,7 @@
 //            }
 //        } else if(DateTime.class.isAssignableFrom(javaType)) {
 //            typeName = PersistentDateTime.class.getName();
-//        } else if (javaType == Boolean.class) {
+    //        } else if (javaType == Boolean.class) {
 //            if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
 //                typeName = BooleanType.INSTANCE.getName();
 //            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL || jdbcType == Types.INTEGER ||
