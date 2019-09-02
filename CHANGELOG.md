@@ -4,6 +4,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- Updated Hibernate to version 5.x
+    - Session factory is now configured with annotated Java classes generated at runtime
+- Guarantee that Portofino 5 can run without a Java compiler (JDK) available 
+    
+### Fixed
+- Allow `mail.enabled = false` to work again. 
+
 ## [5.0.2] - 2019-08-29
 
 ### Added
