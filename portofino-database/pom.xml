@@ -57,8 +57,8 @@
         </dependency>
         <dependency>
             <groupId>org.jadira.usertype</groupId>
-            <artifactId>usertype.jodatime</artifactId>
-            <version>2.0.1</version>
+            <artifactId>usertype.core</artifactId>
+            <version>6.0.1.GA</version>
         </dependency>
         <dependency>
             <groupId>io.reactivex.rxjava2</groupId>

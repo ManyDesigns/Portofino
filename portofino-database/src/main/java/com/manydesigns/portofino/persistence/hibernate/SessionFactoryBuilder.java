@@ -6,6 +6,7 @@ import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
@@ -28,7 +29,9 @@ import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
+import org.jadira.usertype.dateandtime.joda.PersistentDateTime;
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,7 +316,31 @@ public class SessionFactoryBuilder {
         if(Boolean.class.equals(column.getActualJavaType())) {
             if(column.getJdbcType() == Types.CHAR || column.getJdbcType() == Types.VARCHAR) {
                 annotation = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);
-                annotation.addMemberValue("name", new StringMemberValue(StringBooleanType.class.getName(), constPool));
+                annotation.addMemberValue("type", new StringMemberValue(StringBooleanType.class.getName(), constPool));
+                fieldAnnotations.addAnnotation(annotation);
+            }
+        } else if(DateTime.class.isAssignableFrom(column.getActualJavaType())) {
+            annotation = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);
+            annotation.addMemberValue("type", new StringMemberValue(PersistentDateTime.class.getName(), constPool));
+            ArrayMemberValue parameters = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
+            parameters.setValue(new AnnotationMemberValue[] {
+                    new AnnotationMemberValue(makeParameterAnnotation("databaseZone", "jvm", constPool), constPool)
+            });
+            annotation.addMemberValue("parameters", parameters);
+            fieldAnnotations.addAnnotation(annotation);
+        } else {
+            DatabasePlatform.TypeDescriptor databaseSpecificType =
+                    database.getConnectionProvider().getDatabasePlatform().getDatabaseSpecificType(column);
+            if(databaseSpecificType != null) {
+                annotation = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);
+                annotation.addMemberValue("type", new StringMemberValue(databaseSpecificType.name, constPool));
+                ArrayMemberValue parameters = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
+                List<AnnotationMemberValue> typeParams = new ArrayList<>();
+                for(Map.Entry param : databaseSpecificType.parameters.entrySet()) {
+                    typeParams.add(new AnnotationMemberValue(makeParameterAnnotation(param.getKey().toString(), String.valueOf(param.getValue()), constPool), constPool));
+                }
+                parameters.setValue(typeParams.toArray(new AnnotationMemberValue[0]));
+                annotation.addMemberValue("parameters", parameters);
                 fieldAnnotations.addAnnotation(annotation);
             }
         }
