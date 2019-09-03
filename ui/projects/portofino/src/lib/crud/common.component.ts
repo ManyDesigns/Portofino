@@ -16,6 +16,7 @@ import {Field, Form, FormComponent} from "../form";
 import {NotificationService} from "../notifications/notification.service";
 import {Button, ButtonInfo, getButtons} from "../buttons";
 import {WithButtons} from "../button.component";
+import {TranslateService} from "@ngx-translate/core";
 
 export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
 
@@ -44,7 +45,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
   parent: any;
 
   protected constructor(
-    protected http: HttpClient, protected portofino: PortofinoService,
+    protected http: HttpClient, protected portofino: PortofinoService, protected translate: TranslateService,
     protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService) {}
 
   protected initClassAccessor() {
@@ -264,16 +265,20 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
           let errorsFound = 0;
           for(let p in error.error) {
             let property = error.error[p];
-            if(property.errors) {
+            if(property && property.errors) {
               let control = this.form.controls[p];
-              control.markAsTouched({ onlySelf: true });
-              control.setErrors({ 'server-side': property.errors }, { emitEvent: false });
-              errorsFound++;
+              if(control) {
+                control.markAsTouched({ onlySelf: true });
+                control.setErrors({ 'server-side': property.errors }, { emitEvent: false });
+                errorsFound++;
+              }
             }
           }
           if(errorsFound > 0) {
-            this.notificationService.error('There are validation errors').subscribe();
+            this.notificationService.error(this.translate.get('There are validation errors'));
             this.changeDetector.detectChanges();
+          } else {
+            this.notificationService.error(this.translate.get('Unexpected error'));
           }
         }
       });
