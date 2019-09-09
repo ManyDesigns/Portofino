@@ -6,6 +6,7 @@ import {BaseDetailComponent} from "../common.component";
 import {FormComponent} from "../../form";
 import {NotificationService} from "../../notifications/notification.service";
 import {Button} from "../../buttons";
+import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
@@ -20,9 +21,9 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
   formComponent: FormComponent;
 
   constructor(
-    protected http: HttpClient, protected portofino: PortofinoService,
-    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService) {
-    super(http, portofino, changeDetector, notificationService);
+    http: HttpClient, portofino: PortofinoService, translate: TranslateService,
+    changeDetector: ChangeDetectorRef, notificationService: NotificationService) {
+    super(http, portofino, translate, changeDetector, notificationService);
   }
 
   protected setupForm(object): void {
@@ -53,6 +54,7 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
   }
 
   isFormValid() {
+    //TODO does this still apply?
     //This is a workaround because the form stays "invalid" even if all control validators are removed programmatically
     //after its creation.
     return this.form.valid || Object.keys(this.form.controls).every(k => {

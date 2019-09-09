@@ -45,6 +45,7 @@ export const TRANSLATIONS_IT = {
   "Hibernate dialect": "Dialect di Hibernate",
   "Icon": "Icona",
   "Inherited (_)": "Eredita ({{level}})",
+  'Invalid date.': "Data non valida.",
   'Invalid date, _ expected.': "Data non valida, il formato corretto è {{dateFormat}}.",
   "Java type": "Tipo Java",
   "JDBC Type": "Tipo JDBC",

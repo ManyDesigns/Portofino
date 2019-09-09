@@ -20,8 +20,8 @@ import {coerceBooleanProperty} from "@angular/cdk/coercion";
   selector: 'portofino-rich-text',
   template: `
       <quill-editor [formControl]="control" [required]="required" *ngIf="enabled"></quill-editor>
-      <span [innerHTML]="control.value" *ngIf="!enabled" class="rich-text read-only"></span>`,
-  styles: [`span.rich-text.read-only p { margin-bottom: 0; }`],
+      <p [innerHTML]="control.value" *ngIf="!enabled" class="rich-text read-only" [ngStyle]="{ 'margin-bottom': control.value ? 0 : null }"></p>`,
+  styles: [`p.rich-text.read-only p { margin-bottom: 0; }`],
   encapsulation: ViewEncapsulation.None
 })
 export class RichTextComponent implements MatFormFieldControl<string>, ControlValueAccessor, OnDestroy, AfterViewInit {
@@ -39,7 +39,7 @@ export class RichTextComponent implements MatFormFieldControl<string>, ControlVa
   id = `portofino-rich-text-${RichTextComponent.nextId++}`;
   @HostBinding('class.floating')
   get shouldLabelFloat() {
-    return !!(this._value || this.editor);
+    return !!(this.value || this.enabled);
   }
   readonly stateChanges = new Subject<void>();
   @Input()

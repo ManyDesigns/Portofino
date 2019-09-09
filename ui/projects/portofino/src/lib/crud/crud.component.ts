@@ -143,7 +143,7 @@ export class CrudComponent extends Page {
     } else {
       this.router.navigate(['.'], {
         relativeTo: this.route,
-        queryParams: { create: "x" }});
+        queryParams: { create: "" }});
     }
   }
 

@@ -32,10 +32,9 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
   operationsPath = '/:operations';
 
   constructor(
-    protected http: HttpClient, protected portofino: PortofinoService,
-    protected changeDetector: ChangeDetectorRef, protected notificationService: NotificationService,
-    protected translateService: TranslateService) {
-    super(http, portofino, changeDetector, notificationService);
+    http: HttpClient, portofino: PortofinoService, translate: TranslateService,
+    changeDetector: ChangeDetectorRef, notificationService: NotificationService) {
+    super(http, portofino, translate, changeDetector, notificationService);
   }
 
   isEditable(property: Property): boolean {
@@ -87,7 +86,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
       onSuccess();
     }, () => {
       this.loading = false;
-      this.translateService.get("Not found").subscribe(t => this.prettyName = t);
+      this.translate.get("Not found").subscribe(t => this.prettyName = t);
     });
   }
 

@@ -32,10 +32,10 @@ export class DateTimeFieldComponent extends FieldComponent {
 
   get dateFormat() {
     const df = getAnnotation(this.property, 'com.manydesigns.elements.annotations.DateFormat');
-    return this.convertDateFormat(df ? df.properties.value as string : null);
+    return DateTimeFieldComponent.convertDateFormat(df ? df.properties.value as string : null);
   }
 
-  protected convertDateFormat(format: string) {
+  public static convertDateFormat(format: string) {
     if(!format) {
       return 'DD/MM/YYYY';
     }
