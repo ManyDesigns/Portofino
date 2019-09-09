@@ -300,30 +300,30 @@ public class ConnectionsAction extends AbstractResourceAction {
     }
 
     protected List<SelectableSchema> getSchemas(ConnectionProvider connectionProvider) throws Exception {
-        Connection conn = connectionProvider.acquireConnection();
-        logger.debug("Reading database metadata");
-        DatabaseMetaData metadata = conn.getMetaData();
-        List<String[]> schemaNamesFromDb =
-                connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
-        connectionProvider.releaseConnection(conn);
+        try(Connection conn = connectionProvider.acquireConnection()) {
+            logger.debug("Reading database metadata");
+            DatabaseMetaData metadata = conn.getMetaData();
+            List<String[]> schemaNamesFromDb =
+                    connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
 
-        List<Schema> selectedSchemas = connectionProvider.getDatabase().getSchemas();
+            List<Schema> selectedSchemas = connectionProvider.getDatabase().getSchemas();
 
-        List<SelectableSchema> selectableSchemas = new ArrayList<>(schemaNamesFromDb.size());
-        for(String[] schemaName : schemaNamesFromDb) {
-            boolean selected = false;
-            String logicalName = schemaName[1];
-            for(Schema schema : selectedSchemas) {
-                if(schemaName[1].equalsIgnoreCase(schema.getActualSchemaName())) {
-                    selected = true;
-                    logicalName = schema.getSchemaName();
-                    break;
+            List<SelectableSchema> selectableSchemas = new ArrayList<>(schemaNamesFromDb.size());
+            for(String[] schemaName : schemaNamesFromDb) {
+                boolean selected = false;
+                String logicalName = schemaName[1];
+                for(Schema schema : selectedSchemas) {
+                    if(schemaName[1].equalsIgnoreCase(schema.getActualSchemaName())) {
+                        selected = true;
+                        logicalName = schema.getSchemaName();
+                        break;
+                    }
                 }
+                SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], logicalName, selected);
+                selectableSchemas.add(schema);
             }
-            SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], logicalName, selected);
-            selectableSchemas.add(schema);
+            return selectableSchemas;
         }
-        return selectableSchemas;
     }
 
     @DELETE

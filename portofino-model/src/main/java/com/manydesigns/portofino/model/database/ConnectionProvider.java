@@ -108,11 +108,8 @@ public abstract class ConnectionProvider {
 
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
         configuration = databasePlatformsRegistry.getPortofinoConfiguration();
-        Connection conn = null;
-        ResultSet typeRs = null;
         String databaseName = getDatabase().getDatabaseName();
-        try {
-            conn = acquireConnection();
+        try(Connection conn = acquireConnection()) {
 
             DatabaseMetaData metadata = conn.getMetaData();
 
@@ -147,12 +144,13 @@ public abstract class ConnectionProvider {
 
             // extract supported types
             types.clear();
-            typeRs = metadata.getTypeInfo();
-            while (typeRs.next()) {
-                readType(typeRs);
+            try(ResultSet typeRs = metadata.getTypeInfo()) {
+                while (typeRs.next()) {
+                    readType(typeRs);
+                }
+                fixMissingTypeAliases(types);
+                Collections.sort(types, new TypeComparator());
             }
-            fixMissingTypeAliases(types);
-            Collections.sort(types, new TypeComparator());
 
             databasePlatform =
                     databasePlatformsRegistry.findApplicableAbstraction(this);
@@ -170,12 +168,6 @@ public abstract class ConnectionProvider {
             status = STATUS_ERROR;
             errorMessage = e.getMessage();
             logger.warn("Could not create database platform for " + databaseName, e);
-        } finally {
-            if(typeRs != null) {
-                DbUtil.closeResultSetAndStatement(typeRs);
-            }
-            releaseConnection(conn);
-            lastTested = new Date();
         }
     }
 
@@ -247,7 +239,6 @@ public abstract class ConnectionProvider {
 
     public abstract String getDescription();
     public abstract Connection acquireConnection() throws Exception;
-    public abstract void releaseConnection(Connection conn);
 
     //**************************************************************************
     // ModelObject implementation
@@ -365,7 +356,7 @@ public abstract class ConnectionProvider {
 
     public String getActualHibernateDialectName() {
         if(StringUtils.isBlank(hibernateDialect)) {
-            return getDatabasePlatform().getHibernateDialect().getClass().getName();
+            return getDatabasePlatform().getHibernateDialect();
         } else {
             return hibernateDialect;
         }

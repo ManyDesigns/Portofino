@@ -23,7 +23,6 @@ package com.manydesigns.portofino.model.database.platforms;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import org.hibernate.dialect.Dialect;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -46,7 +45,7 @@ public interface DatabasePlatform {
 
     String getDescription();
     String getStandardDriverClassName();
-    Dialect getHibernateDialect();
+    String getHibernateDialect();
     /**
      * Is Hibernate able to automatically the dialect from a JDBC connection for this database platform?
      * @return false if and only if the hibernate.dialect property must be explicitly set in order to connect to

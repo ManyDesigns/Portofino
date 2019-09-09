@@ -69,11 +69,8 @@ public class DatabaseSyncer {
         Database targetDatabase = new Database();
         targetDatabase.setDatabaseName(databaseName);
 
-        Connection conn = null;
-        try {
-            logger.debug("Acquiring connection");
-            conn = connectionProvider.acquireConnection();
-
+        logger.debug("Acquiring connection");
+        try(Connection conn = connectionProvider.acquireConnection()) {
             logger.debug("Creating Liquibase connection");
             DatabaseConnection liquibaseConnection = new JdbcConnection(conn);
 
@@ -126,8 +123,6 @@ public class DatabaseSyncer {
                 targetDatabase.getSchemas().add(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
             }
-        } finally {
-            connectionProvider.releaseConnection(conn);
         }
         targetDatabase.setConnectionProvider(connectionProvider);
         connectionProvider.setDatabase(targetDatabase);

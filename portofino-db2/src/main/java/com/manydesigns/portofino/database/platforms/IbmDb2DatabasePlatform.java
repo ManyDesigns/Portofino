@@ -43,7 +43,7 @@ public class IbmDb2DatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public IbmDb2DatabasePlatform() {
-        super(new DB2Dialect(), "jdbc:db2://<host>[:<port>]/<database_name>");
+        super(DB2Dialect.class.getName(), "jdbc:db2://<host>[:<port>]/<database_name>");
     }
 
     //**************************************************************************

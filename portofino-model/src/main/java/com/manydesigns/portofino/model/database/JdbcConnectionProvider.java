@@ -22,8 +22,6 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -120,10 +118,6 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     public Connection acquireConnection() throws Exception {
         Class.forName(driver);
         return DriverManager.getConnection(actualUrl, actualUsername, actualPassword);
-    }
-
-    public void releaseConnection(Connection conn) {
-        DbUtils.closeQuietly(conn);
     }
 
     //**************************************************************************

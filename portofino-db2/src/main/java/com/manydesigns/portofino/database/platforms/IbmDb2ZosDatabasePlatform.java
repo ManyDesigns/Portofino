@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.database.dialects.DB2ZOSDialect;
 import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
 import org.hibernate.dialect.DB2390V8Dialect;
 
@@ -46,7 +45,7 @@ public class IbmDb2ZosDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public IbmDb2ZosDatabasePlatform()  {
-        super(new DB2390V8Dialect(), "jdbc:db2://<host>[:<port>]/<database_name>");
+        super(DB2390V8Dialect.class.getName(), "jdbc:db2://<host>[:<port>]/<database_name>");
     }
 
     //**************************************************************************

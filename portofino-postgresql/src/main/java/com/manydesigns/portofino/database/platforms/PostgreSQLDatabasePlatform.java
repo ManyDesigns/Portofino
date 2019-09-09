@@ -53,7 +53,7 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public PostgreSQLDatabasePlatform() {
-        super(new PostgreSQL82Dialect(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
+        super(PostgreSQL82Dialect.class.getName(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
     }
 
     //**************************************************************************

@@ -22,7 +22,6 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
-import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.MySQLDialect;
 
 import java.sql.DatabaseMetaData;
@@ -50,7 +49,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public MySql5DatabasePlatform() {
-        super(new MySQLDialect(), "jdbc:mysql://<host>[:<port>][/<database>]");
+        super(MySQLDialect.class.getName(), "jdbc:mysql://<host>[:<port>][/<database>]");
     }
 
     //**************************************************************************
@@ -71,15 +70,12 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
 
 
     public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
-        ResultSet rs = databaseMetaData.getCatalogs();
-        List<String[]> schemaNames = new ArrayList<String[]>();
-        try {
+        List<String[]> schemaNames = new ArrayList<>();
+        try(ResultSet rs = databaseMetaData.getCatalogs()) {
             while(rs.next()) {
                 String schemaName = rs.getString(TABLE_CAT);
                 schemaNames.add(new String[] { null, schemaName });
             }
-        } finally {
-            DbUtils.closeQuietly(rs);
         }
         return schemaNames;
     }

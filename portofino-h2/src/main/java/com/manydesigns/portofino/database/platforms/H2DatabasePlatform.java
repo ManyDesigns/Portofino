@@ -46,7 +46,7 @@ public class H2DatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public H2DatabasePlatform() {
-        super(new H2Dialect(), "jdbc:h2:<database or connection spec>");
+        super(H2Dialect.class.getName(), "jdbc:h2:<database or connection spec>");
     }
 
     //**************************************************************************

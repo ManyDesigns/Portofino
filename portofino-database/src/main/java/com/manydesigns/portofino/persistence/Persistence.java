@@ -186,9 +186,7 @@ public class Persistence {
                 continue;
             }
             logger.info("Running changelog file: {}", changelogFile);
-            Connection connection = null;
-            try {
-                connection = connectionProvider.acquireConnection();
+            try(Connection connection = connectionProvider.acquireConnection()) {
                 JdbcConnection jdbcConnection = new JdbcConnection(connection);
                 liquibase.database.Database lqDatabase =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
@@ -208,8 +206,6 @@ public class Persistence {
             } catch (Exception e) {
                 String msg = "Couldn't update database: " + schemaName;
                 logger.error(msg, e);
-            } finally {
-                connectionProvider.releaseConnection(connection);
             }
         }
     }

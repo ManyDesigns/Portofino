@@ -23,7 +23,6 @@ package com.manydesigns.portofino.model.database.platforms;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.apache.commons.dbutils.DbUtils;
-import org.hibernate.dialect.Dialect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +76,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     protected String status;
-    protected Dialect hibernateDialect;
+    protected String hibernateDialect;
     protected String connectionStringTemplate;
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractDatabasePlatform.class);
@@ -86,7 +85,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Constructors
     //**************************************************************************
 
-    public AbstractDatabasePlatform(Dialect hibernateDialect, String connectionStringTemplate) {
+    public AbstractDatabasePlatform(String hibernateDialect, String connectionStringTemplate) {
         this.hibernateDialect = hibernateDialect;
         this.connectionStringTemplate = connectionStringTemplate;
         status = DatabasePlatform.STATUS_CREATED;
@@ -114,7 +113,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         return null;
     }
 
-    public Dialect getHibernateDialect() {
+    public String getHibernateDialect() {
         return hibernateDialect;
     }
 
@@ -136,16 +135,13 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
 
     public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
-        ResultSet rs = databaseMetaData.getSchemas();
-        List<String[]> schemaNames = new ArrayList<String[]>();
-        try {
+        List<String[]> schemaNames = new ArrayList<>();
+        try(ResultSet rs = databaseMetaData.getSchemas()) {
             while(rs.next()) {
                 String schemaName = rs.getString(TABLE_SCHEM);
                 String schemaCatalog = rs.getString(getCatalogColumnName());
                 schemaNames.add(new String[] { schemaCatalog, schemaName });
             }
-        } finally {
-            DbUtils.closeQuietly(rs);
         }
         return schemaNames;
     }

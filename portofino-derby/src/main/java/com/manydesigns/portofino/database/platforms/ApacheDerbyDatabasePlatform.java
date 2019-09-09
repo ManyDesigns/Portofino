@@ -43,7 +43,7 @@ public class ApacheDerbyDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public ApacheDerbyDatabasePlatform() {
-        super(new DerbyTenFiveDialect(), "jdbc:derby:<databaseName>");
+        super(DerbyTenFiveDialect.class.getName(), "jdbc:derby:<databaseName>");
     }
 
     //**************************************************************************

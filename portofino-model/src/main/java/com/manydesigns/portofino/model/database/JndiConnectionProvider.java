@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.elements.annotations.Required;
-import org.apache.commons.dbutils.DbUtils;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -73,10 +72,6 @@ public class JndiConnectionProvider extends ConnectionProvider {
     public DataSource getDataSource() throws Exception {
         InitialContext ic = new InitialContext();
         return (DataSource) ic.lookup(jndiResource);
-    }
-
-    public void releaseConnection(Connection conn) {
-        DbUtils.closeQuietly(conn);
     }
 
     //**************************************************************************
