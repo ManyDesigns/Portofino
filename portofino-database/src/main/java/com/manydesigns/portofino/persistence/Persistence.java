@@ -41,6 +41,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -77,7 +78,6 @@ public class Persistence {
     // Constants
     //**************************************************************************
 
-    public static final String APP_DBS_DIR = "dbs";
     public static final String APP_MODEL_FILE = "portofino-model.xml";
     public static final String APP_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
@@ -92,7 +92,7 @@ public class Persistence {
 
     protected final File appDir;
     protected final File appModelFile;
-    protected final org.apache.commons.configuration.Configuration configuration;
+    protected final Configuration configuration;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
 
     public enum Status {
@@ -112,9 +112,7 @@ public class Persistence {
     // Constructors
     //**************************************************************************
 
-    public Persistence(
-            File appDir, org.apache.commons.configuration.Configuration configuration,
-            DatabasePlatformsRegistry databasePlatformsRegistry) {
+    public Persistence(File appDir, Configuration configuration, DatabasePlatformsRegistry databasePlatformsRegistry) {
         this.appDir = appDir;
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
@@ -302,7 +300,7 @@ public class Persistence {
         return null;
     }
 
-    public org.apache.commons.configuration.Configuration getConfiguration() {
+    public Configuration getConfiguration() {
         return configuration;
     }
 

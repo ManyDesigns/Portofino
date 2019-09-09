@@ -5,7 +5,9 @@ import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ForeignKey;
+import com.manydesigns.portofino.model.database.SequenceGenerator;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.model.database.TableGenerator;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
@@ -17,6 +19,7 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 import org.hibernate.boot.Metadata;
@@ -80,13 +83,7 @@ public class SessionFactoryBuilder {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         CodeBase codeBase = new JavaCodeBase(root);
         List<Table> tablesWithPK = database.getAllTables();
-        tablesWithPK.removeIf(t -> {
-            boolean skip = t.getPrimaryKey() == null;
-            if(skip) {
-                logger.warn("Skipping table without primary key: {}", t.getQualifiedName());
-            }
-            return skip;
-        });
+        tablesWithPK.removeIf(this::checkTableWithValidPrimaryKey);
         try {
             //Use a new classloader as scratch space for Javassist
             URLClassLoader scratchClassLoader = new URLClassLoader(new URL[0]);
@@ -114,6 +111,19 @@ public class SessionFactoryBuilder {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
         return buildSessionFactory(codeBase, tablesWithPK);
+    }
+
+    protected boolean checkTableWithValidPrimaryKey(Table table) {
+        if(table.getPrimaryKey() == null) {
+            logger.warn("Skipping table without primary key: {}", table.getQualifiedName());
+            return true;
+        }
+        List<Column> columnPKList = table.getPrimaryKey().getColumns();
+        if(!table.getColumns().containsAll(columnPKList)) {
+            logger.error("Skipping table with primary key that refers to invalid columns: {}", table.getQualifiedName());
+            return true;
+        }
+        return false;
     }
 
     public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase, List<Table> tablesWithPK) {
@@ -270,33 +280,33 @@ public class SessionFactoryBuilder {
         annotation.addMemberValue("name", new StringMemberValue(table.getActualEntityName(), constPool));
         classAnnotations.addAnnotation(annotation);
 
-        //Primary keys
+        setupColumns(table, cc, constPool);
+        return cc;
+    }
+
+    protected void setupColumns(Table table, CtClass cc, ConstPool constPool) throws CannotCompileException, NotFoundException {
         List<Column> columnPKList = table.getPrimaryKey().getColumns();
-
-        if(!table.getColumns().containsAll(columnPKList)) {
-            logger.error("Primary key refers to some invalid columns, skipping table {}", table.getQualifiedName());
-            return null;
-        }
-
+        Annotation annotation;
         for(Column column : table.getColumns()) {
             String propertyName = column.getActualPropertyName();
             CtField field = new CtField(classPool.get(column.getActualJavaType().getName()), propertyName, cc);
             AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-            annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Column.class.getName(), constPool);
+            annotation = new Annotation(javax.persistence.Column.class.getName(), constPool);
             annotation.addMemberValue("name", new StringMemberValue(column.getColumnName(), constPool));
             fieldAnnotations.addAnnotation(annotation);
 
             if(columnPKList.contains(column)) {
                 annotation.addMemberValue("updatable", new BooleanMemberValue(false, constPool));
-                annotation = new javassist.bytecode.annotation.Annotation(Id.class.getName(), constPool);
+                annotation = new Annotation(Id.class.getName(), constPool);
                 fieldAnnotations.addAnnotation(annotation);
                 if(column.isAutoincrement()) {
-                    annotation = new javassist.bytecode.annotation.Annotation(GeneratedValue.class.getName(), constPool);
-                    EnumMemberValue value = new EnumMemberValue(constPool);
-                    value.setType(GenerationType.class.getName());
-                    value.setValue(GenerationType.IDENTITY.name());
-                    annotation.addMemberValue("strategy", value);
-                    fieldAnnotations.addAnnotation(annotation);
+                    setupIdentityGenerator(fieldAnnotations, constPool);
+                } else {
+                    PrimaryKeyColumn pkColumn = table.getPrimaryKey().findPrimaryKeyColumnByName(column.getColumnName());
+                    Generator generator = pkColumn.getGenerator();
+                    if(generator != null) {
+                        setupNonIdentityGenerator(table, fieldAnnotations, generator, constPool);
+                    }
                 }
             }
 
@@ -308,7 +318,57 @@ public class SessionFactoryBuilder {
             cc.addMethod(CtNewMethod.getter("get" + accessorName, field));
             cc.addMethod(CtNewMethod.setter("set" + accessorName, field));
         }
-        return cc;
+    }
+
+    protected void setupIdentityGenerator(AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
+        Annotation annotation = makeGeneratedValueAnnotation(GenerationType.IDENTITY, constPool);
+        fieldAnnotations.addAnnotation(annotation);
+    }
+
+    protected void setupNonIdentityGenerator(Table table, AnnotationsAttribute fieldAnnotations, Generator generator, ConstPool constPool) {
+        String generatorName = table.getQualifiedName() + "_generator";
+        if (generator instanceof IncrementGenerator) {
+            addGeneratedValueAnnotation(GenerationType.AUTO, generatorName, fieldAnnotations, constPool);
+            Annotation annotation = new Annotation(GenericGenerator.class.getName(), constPool);
+            annotation.addMemberValue("name", new StringMemberValue(generatorName, constPool));
+            annotation.addMemberValue("strategy", new StringMemberValue("increment", constPool));
+            fieldAnnotations.addAnnotation(annotation);
+        } else if (generator instanceof SequenceGenerator) {
+            addGeneratedValueAnnotation(GenerationType.SEQUENCE, generatorName, fieldAnnotations, constPool);
+            Annotation annotation = new Annotation(javax.persistence.SequenceGenerator.class.getName(), constPool);
+            annotation.addMemberValue("name", new StringMemberValue(generatorName, constPool));
+            annotation.addMemberValue("sequenceName", new StringMemberValue(((SequenceGenerator) generator).getName(), constPool));
+            fieldAnnotations.addAnnotation(annotation);
+        } else if (generator instanceof TableGenerator) {
+            addGeneratedValueAnnotation(GenerationType.TABLE, generatorName, fieldAnnotations, constPool);
+            Annotation annotation = new Annotation(javax.persistence.TableGenerator.class.getName(), constPool);
+            annotation.addMemberValue("name", new StringMemberValue(generatorName, constPool));
+            annotation.addMemberValue("schema", new StringMemberValue(table.getSchema().getActualSchemaName(), constPool));
+            annotation.addMemberValue("table", new StringMemberValue(((TableGenerator) generator).getTable(), constPool));
+            annotation.addMemberValue("pkColumnName", new StringMemberValue(((TableGenerator) generator).getKeyColumn(), constPool));
+            annotation.addMemberValue("pkColumnValue", new StringMemberValue(((TableGenerator) generator).getKeyValue(), constPool));
+            annotation.addMemberValue("valueColumnName", new StringMemberValue(((TableGenerator) generator).getValueColumn(), constPool));
+            //TODO support additional parameters for the generator?
+            fieldAnnotations.addAnnotation(annotation);
+        } else {
+            throw new IllegalArgumentException("Unsupported generator: " + generator);
+        }
+    }
+
+    protected void addGeneratedValueAnnotation(GenerationType generationType, String generatorName, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
+        Annotation annotation = makeGeneratedValueAnnotation(generationType, constPool);
+        annotation.addMemberValue("generator", new StringMemberValue(generatorName, constPool));
+        fieldAnnotations.addAnnotation(annotation);
+    }
+
+    @NotNull
+    protected Annotation makeGeneratedValueAnnotation(GenerationType identity, ConstPool constPool) {
+        Annotation annotation = new Annotation(GeneratedValue.class.getName(), constPool);
+        EnumMemberValue value = new EnumMemberValue(constPool);
+        value.setType(GenerationType.class.getName());
+        value.setValue(identity.name());
+        annotation.addMemberValue("strategy", value);
+        return annotation;
     }
 
     protected void setupColumnType(Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
