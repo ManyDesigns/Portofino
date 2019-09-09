@@ -39,7 +39,6 @@ export class RichTextComponent implements MatFormFieldControl<string>, ControlVa
   id = `portofino-rich-text-${RichTextComponent.nextId++}`;
   @HostBinding('class.floating')
   get shouldLabelFloat() {
-    console.log("AAA", this.value, this.enabled);
     return !!(this.value || this.enabled);
   }
   readonly stateChanges = new Subject<void>();

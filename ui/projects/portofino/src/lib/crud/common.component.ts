@@ -76,7 +76,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
       if(!object[p.name]) {
         //value is undefined
       } else if (isDateProperty(p)) {
-        value = moment(object[p.name].value);
+        value = object[p.name].value ? moment(object[p.name].value) : null;
       } else if (isBlob(p) && object[p.name].value) {
         const portofinoBlob = object[p.name].value;
         value = new BlobFile();
@@ -299,7 +299,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
   protected abstract doSave(object): Observable<Object>;
 
   protected isFormValid(): boolean {
-    return this.form.valid;
+    return !this.form.invalid;
   }
 
   ngOnDestroy(): void {

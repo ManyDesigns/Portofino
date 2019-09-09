@@ -54,6 +54,7 @@ export class BulkEditComponent extends BaseDetailComponent implements OnInit {
   }
 
   isFormValid() {
+    //TODO does this still apply?
     //This is a workaround because the form stays "invalid" even if all control validators are removed programmatically
     //after its creation.
     return this.form.valid || Object.keys(this.form.controls).every(k => {

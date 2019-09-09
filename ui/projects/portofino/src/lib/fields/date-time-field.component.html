@@ -30,6 +30,9 @@
   <mat-error *ngIf="control.hasError('date-format')" class="alert alert-danger">
     {{ 'Invalid date, _ expected.' | translate:{ dateFormat: control.getError('date-format') } }}
   </mat-error>
+  <mat-error *ngIf="control.hasError('matDatepickerParse')" class="alert alert-danger">
+    {{ 'Invalid date.' | translate }}
+  </mat-error>
   <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
     <ng-container *ngFor="let error of control.getError('server-side')">
       {{error}}<br />

@@ -5,8 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Fixed
-- Save/update exception properly handled
-- Allow `mail.enabled = false` to work again. 
+- Save/update exception properly handled.
+- `mail.enabled = false` makes the application fail to start.
+- Rich text field label misplacement.
+- Form invalid with empty, pristine date fields.
 
 ## [5.0.2] - 2019-08-29
 
