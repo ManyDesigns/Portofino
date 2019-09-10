@@ -208,6 +208,10 @@ public class SessionFactoryBuilder {
             throw new Error("Unsupported connection provider: " + connectionProvider);
         }
         settings.put("hibernate.ejb.metamodel.population", "enabled");
+        //TODO evaluate if they're still applicable:
+        //  .setProperty("hibernate.current_session_context_class", "org.hibernate.context.internal.ThreadLocalSessionContext")
+        //  .setProperty("org.hibernate.hql.ast.AST", "true")
+        //  .setProperty("hibernate.globally_quoted_identifiers", "false");
     }
 
     protected FileObject getEntityLocation(FileObject root, Table table) throws FileSystemException {
@@ -317,6 +321,14 @@ public class SessionFactoryBuilder {
             AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
             annotation = new Annotation(javax.persistence.Column.class.getName(), constPool);
             annotation.addMemberValue("name", new StringMemberValue(column.getColumnName(), constPool));
+            annotation.addMemberValue("nullable", new BooleanMemberValue(column.isNullable(), constPool));
+            if(column.getLength() != null) {
+                annotation.addMemberValue("precision", new IntegerMemberValue(column.getLength(), constPool));
+                annotation.addMemberValue("length", new IntegerMemberValue(column.getLength(), constPool));
+            }
+            if(column.getScale() != null) {
+                annotation.addMemberValue("scale", new IntegerMemberValue(column.getScale(), constPool));
+            }
             fieldAnnotations.addAnnotation(annotation);
 
             if(columnPKList.contains(column)) {
