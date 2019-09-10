@@ -37,19 +37,19 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
+public class MariaDBDatabasePlatform extends MySql5DatabasePlatform {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    public final static String DESCRIPTION = "MySQL 5.x";
-    public final static String STANDARD_DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+    public final static String DESCRIPTION = "MariaDB";
+    public final static String STANDARD_DRIVER_CLASS_NAME = "org.mariadb.jdbc.Driver";
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public MySql5DatabasePlatform() {
-        super(new MySQLDialect(), "jdbc:mysql://<host>[:<port>][/<database>]?disableMariaDbDriver");
+    public MariaDBDatabasePlatform() {
+        this.connectionStringTemplate = "jdbc:mariadb://<host>[:<port>][/<database>]";
     }
 
     //**************************************************************************
@@ -65,22 +65,13 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
-        return "MySQL".equals(connectionProvider.getDatabaseProductName());
+        return "MariaDB".equals(connectionProvider.getDatabaseProductName());
     }
 
-
-    public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
-        ResultSet rs = databaseMetaData.getCatalogs();
-        List<String[]> schemaNames = new ArrayList<String[]>();
-        try {
-            while(rs.next()) {
-                String schemaName = rs.getString(TABLE_CAT);
-                schemaNames.add(new String[] { null, schemaName });
-            }
-        } finally {
-            DbUtils.closeQuietly(rs);
-        }
-        return schemaNames;
+    @Override
+    public boolean isDialectAutodetected() {
+        return false;
     }
+
 }
 

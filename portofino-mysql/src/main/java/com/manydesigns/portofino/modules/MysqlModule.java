@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.database.platforms.MariaDBDatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.MySql5DatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
@@ -89,6 +90,7 @@ public class MysqlModule implements Module {
     @Override
     public void init() {
         databasePlatformsRegistry.addDatabasePlatform(new MySql5DatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new MariaDBDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 
