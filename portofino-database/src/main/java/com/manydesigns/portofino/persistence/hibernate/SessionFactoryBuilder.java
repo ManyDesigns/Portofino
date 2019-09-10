@@ -2,23 +2,23 @@ package com.manydesigns.portofino.persistence.hibernate;
 
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
-import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.SequenceGenerator;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.model.database.TableGenerator;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.*;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
+import org.hibernate.EntityMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SessionFactoryBuilder {
 
@@ -58,8 +59,9 @@ public class SessionFactoryBuilder {
     protected String falseString = "F";
     protected final Database database;
     protected final ClassPool classPool = new ClassPool(ClassPool.getDefault());
+    protected EntityMode entityMode = EntityMode.MAP;
 
-    public SessionFactoryBuilder(Database database, Configuration configuration) {
+    public SessionFactoryBuilder(Database database) {
         this.database = database;
         String trueString = database.getTrueString();
         if (trueString != null) {
@@ -80,27 +82,37 @@ public class SessionFactoryBuilder {
     }
 
     public SessionFactoryAndCodeBase buildSessionFactory(FileObject root) throws Exception {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         CodeBase codeBase = new JavaCodeBase(root);
-        List<Table> tablesWithPK = database.getAllTables();
-        tablesWithPK.removeIf(this::checkTableWithValidPrimaryKey);
+        List<Table> mappableTables = database.getAllTables();
+        mappableTables.removeIf(this::checkTableWithValidPrimaryKey);
+        List<Table> externallyMappedTables = mappableTables.stream().filter(t -> {
+            boolean externallyMapped = t.getActualJavaClass() != null;
+            if (externallyMapped) {
+                logger.debug("Skipping table explicitly mapped with {}", t.getActualJavaClass());
+            }
+            return externallyMapped;
+        }).collect(Collectors.toList());
+        mappableTables.removeAll(externallyMappedTables);
+
+        //Use a new classloader as scratch space for Javassist
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        URLClassLoader scratchClassLoader = new URLClassLoader(new URL[0], contextClassLoader);
+        Thread.currentThread().setContextClassLoader(scratchClassLoader);
+
         try {
-            //Use a new classloader as scratch space for Javassist
-            URLClassLoader scratchClassLoader = new URLClassLoader(new URL[0]);
-            Thread.currentThread().setContextClassLoader(scratchClassLoader);
 
             CtClass baseClass = generateBaseClass();
             try(OutputStream outputStream = root.resolveFile(database.getDatabaseName() + FileName.SEPARATOR_CHAR + "BaseEntity.class").getContent().getOutputStream()) {
                 outputStream.write(baseClass.toBytecode());
             }
 
-            for (Table table : tablesWithPK) {
+            for (Table table : mappableTables) {
                 generateClass(table);
             }
-            for (Table table : tablesWithPK) {
+            for (Table table : mappableTables) {
                 mapRelationships(table);
             }
-            for (Table table : tablesWithPK) {
+            for (Table table : mappableTables) {
                 byte[] classFile = getClassFile(table);
                 FileObject location = getEntityLocation(root, table);
                 try(OutputStream outputStream = location.getContent().getOutputStream()) {
@@ -110,7 +122,7 @@ public class SessionFactoryBuilder {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        return buildSessionFactory(codeBase, tablesWithPK);
+        return buildSessionFactory(codeBase, mappableTables, externallyMappedTables);
     }
 
     protected boolean checkTableWithValidPrimaryKey(Table table) {
@@ -126,37 +138,46 @@ public class SessionFactoryBuilder {
         return false;
     }
 
-    public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase, List<Table> tablesWithPK) {
+    public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase, List<Table> tablesToMap, List<Table> externallyMappedTables) {
         BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
-        Map settings = new HashMap();
+        Map<String, Object> settings = new HashMap<>();
         setupConnection(settings);
         ServiceRegistry standardRegistry =
                 new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
         MetadataSources sources = new MetadataSources(standardRegistry);
+        List<String> externallyMappedClasses = new ArrayList<>();
         try {
-            for (Table table : tablesWithPK) {
+            for (Table table : tablesToMap) {
                 Class persistentClass = getPersistentClass(table, codeBase);
                 sources.addAnnotatedClass(persistentClass);
                 classLoaderService.classes.put(persistentClass.getName(), persistentClass);
+            }
+            for(Table table : externallyMappedTables) {
+                sources.addAnnotatedClass(table.getActualJavaClass());
+                externallyMappedClasses.add(table.getActualJavaClass().getName());
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         MetadataBuilder metadataBuilder = sources.getMetadataBuilder();
         Metadata metadata = metadataBuilder.build();
-        //Map using hashmaps
-        //TODO handle tables with javaClass=...
-        metadata.getEntityBindings().forEach((PersistentClass c) -> {
-            c.setClassName(null);
-            if(c.getIdentifier() instanceof Component) {
-                Component component = (Component) c.getIdentifier();
-                component.setComponentClassName(null);
-                component.setDynamic(true);
-            }
-        });
+        if (entityMode == EntityMode.MAP) {
+            metadata.getEntityBindings().forEach((PersistentClass c) -> {
+                if(!externallyMappedClasses.contains(c.getClassName())) {
+                    c.setClassName(null);
+                    if (c.getIdentifier() instanceof Component) {
+                        Component component = (Component) c.getIdentifier();
+                        component.setComponentClassName(null);
+                        component.setDynamic(true);
+                    }
+                }
+            });
+        } else {
+            throw new IllegalStateException("Unsupported entity mode: " + entityMode);
+        }
         org.hibernate.boot.SessionFactoryBuilder sessionFactoryBuilder = metadata.getSessionFactoryBuilder();
         return new SessionFactoryAndCodeBase(sessionFactoryBuilder.build(), codeBase);
     }
@@ -187,8 +208,6 @@ public class SessionFactoryBuilder {
             throw new Error("Unsupported connection provider: " + connectionProvider);
         }
         settings.put("hibernate.ejb.metamodel.population", "enabled");
-        //Setting this disallows mapping entities to Java classes
-        //settings.put("hibernate.default_entity_mode", EntityMode.MAP.getExternalName());
     }
 
     protected FileObject getEntityLocation(FileObject root, Table table) throws FileSystemException {
@@ -202,7 +221,12 @@ public class SessionFactoryBuilder {
 
     @NotNull
     private String getMappedClassName(Table table) {
-        return table.getSchema().getQualifiedName() + "." + table.getActualEntityName();
+        //TODO translate to CamelCase when entityMode is POJO
+        //TODO sanitize names so that they are valid Java identifiers
+        //TODO avoid clashes with externally mapped classes
+        return table.getActualJavaClass() == null ?
+                table.getSchema().getQualifiedName() + "." + table.getActualEntityName() :
+                table.getJavaClass();
     }
 
     public Class getPersistentClass(Table table, CodeBase codeBase) throws IOException, ClassNotFoundException {
@@ -418,8 +442,7 @@ public class SessionFactoryBuilder {
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
         Table toTable = foreignKey.getToTable();
-        String propertyName = foreignKey.getActualOnePropertyName();
-        CtField field = new CtField(getMappedClass(toTable), propertyName, cc);
+        CtField field = new CtField(getMappedClass(toTable), foreignKey.getActualOnePropertyName(), cc);
         cc.addField(field);
 
         AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
@@ -439,12 +462,8 @@ public class SessionFactoryBuilder {
         ArrayMemberValue joinColumns = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
         joinColumns.setValue(joinColumnsValue.toArray(new MemberValue[0]));
         annotation.addMemberValue("value", joinColumns);
-        fieldAnnotations.addAnnotation(annotation);
-        field.getFieldInfo().addAttribute(fieldAnnotations);
 
-        String accessorName = propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
-        cc.addMethod(CtNewMethod.getter("get" + accessorName, field));
-        cc.addMethod(CtNewMethod.setter("set" + accessorName, field));
+        finalizeRelationshipProperty(cc, field, annotation, fieldAnnotations);
     }
 
     protected void mapOneToMany(ForeignKey foreignKey) throws NotFoundException, CannotCompileException {
@@ -452,8 +471,7 @@ public class SessionFactoryBuilder {
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
         Table fromTable = foreignKey.getFromTable();
-        String propertyName = foreignKey.getActualManyPropertyName();
-        CtField field = new CtField(classPool.get(List.class.getName()), propertyName, cc);
+        CtField field = new CtField(classPool.get(List.class.getName()), foreignKey.getActualManyPropertyName(), cc);
         String referencedClassName = getMappedClassName(fromTable);
         field.setGenericSignature("Ljava/util/List<L" + referencedClassName.replace('.', '/') + ";>;");
         cc.addField(field);
@@ -463,11 +481,18 @@ public class SessionFactoryBuilder {
         annotation = new Annotation(OneToMany.class.getName(), constPool);
         annotation.addMemberValue("targetEntity", new ClassMemberValue(referencedClassName, constPool));
         annotation.addMemberValue("mappedBy", new StringMemberValue(foreignKey.getActualOnePropertyName(), constPool));
-        //TODO cascade
+        //TODO cascade?
+
+        finalizeRelationshipProperty(cc, field, annotation, fieldAnnotations);
+    }
+
+    protected void finalizeRelationshipProperty(
+            CtClass cc, CtField field, Annotation annotation, AnnotationsAttribute fieldAnnotations)
+            throws CannotCompileException {
         fieldAnnotations.addAnnotation(annotation);
         field.getFieldInfo().addAttribute(fieldAnnotations);
 
-        String accessorName = propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
+        String accessorName = field.getName().toUpperCase() + field.getName().substring(1);
         cc.addMethod(CtNewMethod.getter("get" + accessorName, field));
         cc.addMethod(CtNewMethod.setter("set" + accessorName, field));
     }
