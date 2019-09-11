@@ -11,7 +11,7 @@
     <filter>
         <filter-name>cleanup-filter</filter-name>
         <filter-class>
-            com.manydesigns.portofino.servlets.CleanupFilter
+            com.manydesigns.portofino.servlets.CloseSessionsFilter
         </filter-class>
         <async-supported>true</async-supported>
     </filter>

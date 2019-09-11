@@ -16,7 +16,7 @@ public class AbstractAnnotatedAccessor implements AnnotatedElement {
     protected final Map<Class, Annotation> annotations;
 
     public AbstractAnnotatedAccessor() {
-        this.annotations = new HashMap<Class, Annotation>();
+        this.annotations = new HashMap<>();
     }
 
     //**************************************************************************
