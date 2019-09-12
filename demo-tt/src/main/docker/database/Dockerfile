@@ -1,2 +1,4 @@
 FROM postgres:9.4
-ADD 01-init-demo-tt-db.sh /docker-entrypoint-initdb.d/01-init-demo-tt-db.sh
+RUN mkdir -p /docker-entrypoint-initdb.d
+ADD *.sh /docker-entrypoint-initdb.d/
+ADD *.sql /docker-entrypoint-initdb.d/

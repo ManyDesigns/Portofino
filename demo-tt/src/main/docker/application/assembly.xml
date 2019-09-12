@@ -7,9 +7,6 @@
             <source>${project.build.directory}/${project.name}-${project.version}.war</source>
             <destName>ROOT.war</destName>
         </file>
-        <file>
-            <source>${project.basedir}/src/main/docker/server/portofino-local.properties</source>
-        </file>
     </files>
     <dependencySets>
         <dependencySet>

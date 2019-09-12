@@ -299,15 +299,12 @@ public class PortofinoListener extends DispatcherInitializer
         } catch (SecurityException e) {
             logger.warn("Reading system properties is forbidden. Will read configuration file from standard location.", e);
         }
-        File localConfigurationFile;
-        if(localConfigurationPath != null) {
-            localConfigurationFile = new File(localConfigurationPath);
-            if(!localConfigurationFile.exists()) {
-                logger.warn("Configuration file " + localConfigurationPath + " does not exist");
-            }
-        } else {
-            localConfigurationFile = new File(applicationDirectory, "portofino-local.properties");
+        if(localConfigurationPath == null) {
+            localConfigurationPath = configuration.getString(
+                    "portofino-local.properties",
+                    new File(applicationDirectory, "portofino-local.properties").getAbsolutePath());
         }
+        File localConfigurationFile = new File(localConfigurationPath);
         if (localConfigurationFile.exists()) {
             logger.info("Local configuration file: {}", localConfigurationFile);
             PropertiesConfiguration localConfiguration =
@@ -316,6 +313,8 @@ public class PortofinoListener extends DispatcherInitializer
             compositeConfiguration.addConfiguration(localConfiguration, true);
             compositeConfiguration.addConfiguration(configuration);
             configuration = compositeConfiguration;
+        } else {
+            logger.info("No local configuration found at {}", localConfigurationPath);
         }
     }
 
