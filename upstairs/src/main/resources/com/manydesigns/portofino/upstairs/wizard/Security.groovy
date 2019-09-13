@@ -322,6 +322,14 @@ public class Security extends AbstractPortofinoRealm {
     }
 
     @Override
+    String getEmail(Serializable user) {
+        if(StringUtils.isEmpty(userEmailProperty)) {
+            throw new UnsupportedOperationException("Email property not configured.");
+        }
+        user[userEmailProperty]
+    }
+
+    @Override
     String generateOneTimeToken(Serializable user) {
         if(StringUtils.isEmpty(userTokenProperty)) {
             throw new UnsupportedOperationException("Token property not configured.");

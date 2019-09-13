@@ -4,11 +4,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- Support for MariaDB Connector/J
+
 ### Fixed
-- Save/update exception properly handled.
+- Save/update exception not handled properly.
 - `mail.enabled = false` makes the application fail to start.
 - Rich text field label misplacement.
 - Form invalid with empty, pristine date fields.
+- Broken built-in and generated `Security.groovy`. 
 
 ## [5.0.2] - 2019-08-29
 
