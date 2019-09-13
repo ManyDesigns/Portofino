@@ -77,7 +77,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     String getEmail(Serializable user) {
-        throw new UnsupportedOperationException("User has no email property not configured.");
+        throw new UnsupportedOperationException("User has no email property.");
     }
 
     @Override
