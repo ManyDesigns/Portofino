@@ -108,8 +108,25 @@ public class DefaultLoginAction extends AbstractResourceAction {
         } catch (AuthenticationException e) {
             logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        } else {
+            return checkJWT();
         }
-        return checkJWT();
+    }
+
+    @Path(":renew-token")
+    @POST
+    public String renewToken() {
+        Subject subject = SecurityUtils.getSubject();
+        if(subject.isAuthenticated()) {
+            subject.logout();
+            PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+            String token = portofinoRealm.generateWebToken(subject.getPrincipal());
+            subject.login(new JSONWebToken(token));
+            return token;
+        } else {
+            logger.warn("Token renew request for unauthenticated user");
+            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        }
     }
 
     @GET

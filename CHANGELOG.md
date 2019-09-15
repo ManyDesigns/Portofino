@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Support for MariaDB Connector/J
+- Support for MariaDB Connector/J.
+- Simple automatic JWT renewal (this means that user sessions do not expire during regular user activity).
 
 ### Fixed
 - Save/update exception not handled properly.

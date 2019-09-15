@@ -103,6 +103,7 @@
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.27</jersey.version>
+        <jjwt.version>0.10.7</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.6</jsqlparser.version>

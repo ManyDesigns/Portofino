@@ -48,7 +48,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
       //Give the page a chance to handle it
       if(!this.pageService.page || this.pageService.page.handleDeclinedLogin()) {
         if(this.isRootPage()) {
-          this.reloadPage();
+          window.location.reload(); //TODO
         } else {
           this.router.navigateByUrl("/");
         }
