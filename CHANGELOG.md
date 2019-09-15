@@ -9,11 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - Session factory is now configured with annotated Java classes generated at runtime
 - Guarantee that Portofino 5 can run without a Java compiler (JDK) available 
 
+### Added
+- Support for MariaDB Connector/J.
+- Simple automatic JWT renewal (this means that user sessions do not expire during regular user activity).
+
 ### Fixed
-- Save/update exception properly handled.
+- Save/update exception not handled properly.
 - `mail.enabled = false` makes the application fail to start.
 - Rich text field label misplacement.
 - Form invalid with empty, pristine date fields.
+- Broken built-in and generated `Security.groovy`. 
 
 ## [5.0.2] - 2019-08-29
 

@@ -176,6 +176,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         Method handler = resourceInfo.getResourceMethod();
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         if(!SecurityLogic.isAllowed(request, resourceAction.getActionInstance(), resourceAction, handler)) {
+            logger.warn("Request not allowed: " + request.getMethod() + " " + request.getRequestURI());
             Response.Status status =
                     SecurityUtils.getSubject().isAuthenticated() ?
                             Response.Status.FORBIDDEN :

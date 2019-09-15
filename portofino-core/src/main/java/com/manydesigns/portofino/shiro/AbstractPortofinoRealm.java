@@ -62,8 +62,10 @@ import java.util.*;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements PortofinoRealm {
-    public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+
+    public static final String JWT_EXPIRATION_PROPERTY = "jwt.expiration";
+    public static final String JWT_SECRET_PROPERTY = "jwt.secret";
 
     @Autowired
     protected Configuration portofinoConfiguration;
@@ -124,7 +126,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
             throw new RuntimeException(e);
         }
         claims.put("serialized-principal", bytes.toByteArray());
-        int expireAfterMinutes = portofinoConfiguration.getInt("jwt.secret.expiration", 30);
+        int expireAfterMinutes = portofinoConfiguration.getInt(JWT_EXPIRATION_PROPERTY, 30);
         return Jwts.builder().
                 setClaims(claims).
                 setExpiration(new DateTime().plusMinutes(expireAfterMinutes).toDate()).
@@ -134,7 +136,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     @NotNull
     protected Key getJWTKey() {
-        String secret = portofinoConfiguration.getString("jwt.secret");
+        String secret = portofinoConfiguration.getString(JWT_SECRET_PROPERTY);
         return new SecretKeySpec(Decoders.BASE64.decode(secret), SignatureAlgorithm.HS512.getJcaName());
     }
 

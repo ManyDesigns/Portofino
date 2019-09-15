@@ -1,7 +1,7 @@
 import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
 import {
   HttpClient,
-  HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpParams, HttpRequest
+  HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpParams, HttpRequest, HttpResponse
 } from "@angular/common/http";
 import {MatDialog} from "@angular/material/dialog";
 import {Observable, throwError} from "rxjs";
@@ -10,6 +10,7 @@ import {PortofinoService} from "../portofino.service";
 import {NotificationService} from "../notifications/notification.service";
 import {WebStorageService} from "ngx-store";
 import {TranslateService} from "@ngx-translate/core";
+import moment from 'moment-with-locales-es6';
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 export const CHANGE_PASSWORD_COMPONENT = new InjectionToken('Change Password Component');
@@ -22,6 +23,8 @@ export class AuthenticationService {
   credentialsObservable: Observable<any>;
   currentUser: UserInfo;
   retryUnauthenticatedOnSessionExpiration = true;
+  lastRenew = moment(0);
+  renewAfterSeconds = 600;
   readonly logins = new EventEmitter<UserInfo>();
   readonly logouts = new EventEmitter<void>();
   readonly declinedLogins = new EventEmitter<void>();
@@ -39,40 +42,64 @@ export class AuthenticationService {
     }
   }
 
-  request(req: HttpRequest<any>, observable: Observable<HttpEvent<any>>): Observable<HttpEvent<any>> {
-    return observable.pipe(catchError((error) => {
+  request(req: HttpRequest<any>, httpHandler: HttpHandler): Observable<HttpEvent<any>> {
+    const requestWithAuth = (original) => httpHandler.handle(original).pipe(catchError((error) => {
       if (error.status === 401) {
-        const hasToken = !!this.jsonWebToken;
-        this.removeAuthenticationInfo();
-        if(hasToken || !this.retryUnauthenticatedOnSessionExpiration) {
-          req = req.clone({ headers: req.headers.delete("Authorization") });
-          return this.doHttpRequest(req).pipe(map(result => {
-            this.translate.get("You have been logged out because your session has expired.")
-              .pipe(mergeMap(m => this.notifications.warn(m)))
-              .subscribe();
-            return result;
-          }));
-        } else {
-          return this.askForCredentials().pipe(
-            map(result => {
-              if (!result) {
-                this.declinedLogins.emit();
-                throw new LoginDeclinedException("User declined login");
-              }
-            }),
-            mergeMap(() => this.doHttpRequest(this.withAuthenticationHeader(req))));
-        }
-      } else if(error.status === 403) {
-        this.translate.get("You do not have the permission to do that!")
-          .pipe(mergeMap(m => this.notifications.error(m)))
-          .subscribe();
+        return this.authenticate(original);
+      } else if (error.status === 403) {
+        this.notifications.error(this.translate.get("You do not have the permission to do that!"));
       }
       return throwError(error);
     }), share());
+
+    if (req.headers.has(NO_RENEW_HEADER)) {
+      req = req.clone({headers: req.headers.delete(NO_RENEW_HEADER)});
+    } else if (!!this.jsonWebToken && this.portofino.apiRoot &&
+      moment().diff(this.lastRenew, 'seconds') > this.renewAfterSeconds) {
+      this.lastRenew = moment();
+      //The body here is to work around CORS requests failing with an empty body (TODO investigate)
+      this.http.request(this.withAuthenticationHeader(
+        new HttpRequest<any>("POST", `${this.loginPath}/:renew-token`, "renew", {
+          headers: new HttpHeaders().set(NO_RENEW_HEADER, 'true'), responseType: 'text'
+        }))).subscribe(
+        event => {
+          if(event instanceof HttpResponse) {
+            if(event.status == 200) {
+              const token = event.body;
+              this.setJsonWebToken(token);
+            } else {
+              this.notifications.error(this.translate.get("Failed to renew authentication token"));
+            }
+          }
+        },
+        () => this.notifications.error(this.translate.get("Failed to renew authentication token")));
+    }
+    return requestWithAuth(req);
   }
 
-  protected doHttpRequest(req) {
-    return this.http.request(req);
+  protected setJsonWebToken(token) {
+    this.storage.set('jwt', token);
+  }
+
+  protected authenticate(req: HttpRequest<any>) {
+    const hasToken = !!this.jsonWebToken;
+    this.removeAuthenticationInfo();
+    if (hasToken || !this.retryUnauthenticatedOnSessionExpiration) {
+      req = req.clone({headers: req.headers.delete("Authorization")});
+      return this.http.request(req).pipe(map(result => {
+        this.notifications.error(this.translate.get("You have been logged out because your session has expired."));
+        return result;
+      }));
+    } else {
+      return this.askForCredentials().pipe(
+        map(result => {
+          if (!result) {
+            this.declinedLogins.emit();
+            throw new LoginDeclinedException("User declined login");
+          }
+        }),
+        mergeMap(() => this.http.request(this.withAuthenticationHeader(req))));
+    }
   }
 
   protected askForCredentials() {
@@ -83,6 +110,7 @@ export class AuthenticationService {
     this.credentialsObservable = dialogRef.afterClosed().pipe(map(result => {
       this.credentialsObservable = null;
       if (result && result.jwt) {
+        this.lastRenew = moment();
         this.setAuthenticationInfo(result);
         return result;
       } else {
@@ -110,10 +138,11 @@ export class AuthenticationService {
     this.storage.remove('jwt');
     this.storage.remove('user');
     this.currentUser = null;
+    this.lastRenew = moment(0);
   }
 
   protected setAuthenticationInfo(result) {
-    this.storage.set('jwt', result.jwt);
+    this.setJsonWebToken(result.jwt);
     this.storage.set('user', {
       displayName: result.displayName,
       administrator: result.administrator,
@@ -195,7 +224,9 @@ export class AuthenticationService {
 
   logout() {
     const url = `${this.loginPath}`;
-    this.http.delete(url).subscribe(() => {
+    this.http.delete(url, {
+      headers: new HttpHeaders().set(NO_RENEW_HEADER, 'true')
+    }).subscribe(() => {
       this.removeAuthenticationInfo();
       this.logouts.emit();
     });
@@ -217,7 +248,7 @@ export class AuthenticationInterceptor implements HttpInterceptor {
       req = req.clone({ headers: req.headers.delete(NO_AUTH_HEADER) });
       return next.handle(req);
     } else {
-      return this.authenticationService.request(req, next.handle(req));
+      return this.authenticationService.request(req, next);
     }
   }
 }
@@ -226,7 +257,8 @@ export class UserInfo {
   constructor(public displayName: string, public administrator: boolean, public groups: string[]) {}
 }
 
-export const NO_AUTH_HEADER = "portofino-no-auth";
+export const NO_AUTH_HEADER = "X-Portofino-no-auth";
+export const NO_RENEW_HEADER = "X-Portofino-no-renew";
 
 export class LoginDeclinedException extends Error {
   constructor(public message: string) {
