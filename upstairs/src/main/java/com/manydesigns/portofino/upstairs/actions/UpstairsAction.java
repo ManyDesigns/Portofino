@@ -7,23 +7,22 @@ import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.actions.ActionLogic;
+import com.manydesigns.portofino.actions.Group;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.ActionLogic;
-import com.manydesigns.portofino.actions.Permissions;
-import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.spring.PortofinoSpringServletContainerInitializer;
+import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.upstairs.ModuleInfo;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
 import com.manydesigns.portofino.upstairs.actions.support.WizardInfo;
@@ -42,10 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.DefaultResourceLoader;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
@@ -108,7 +106,8 @@ public class UpstairsAction extends AbstractResourceAction {
     public void restartApplication() throws Exception {
         codeBase.clear();
         OgnlUtils.clearCache();
-        PortofinoSpringServletContainerInitializer.refresh(applicationContext, codeBase);
+        ServletContext servletContext = context.getServletContext();
+        PortofinoContextLoaderListener.get(servletContext).refresh();
     }
 
     @POST
