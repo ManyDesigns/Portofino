@@ -48,6 +48,7 @@ public class PersistenceTest {
 
     @BeforeMethod
     public void setup() throws Exception {
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"));
         Configuration configuration = new PropertiesConfiguration();
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
@@ -327,7 +328,6 @@ public class PersistenceTest {
     }
 
     public void testDateWithDTSSwitch() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"));
         Date problematicDate = new Date(73, 5, 3); //1973-06-03 DTS switch at midnight in tz Europe/Rome
 
         Map<String, Object> order = new HashMap<>();
