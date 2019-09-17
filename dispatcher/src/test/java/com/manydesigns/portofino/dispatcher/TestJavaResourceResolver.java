@@ -6,6 +6,8 @@ import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;
@@ -13,6 +15,8 @@ import java.lang.reflect.Field;
 import static org.testng.AssertJUnit.*;
 
 public class TestJavaResourceResolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestJavaResourceResolver.class);
 
     @Test
     public void smokeTest() throws Exception {
@@ -74,7 +78,7 @@ public class TestJavaResourceResolver {
             getResourceResolver().resolve(root.resolveFile("d.error"), Class.class); //A.java
             fail("Should have thrown");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("Thrown exception", e);
         }
     }
 

@@ -277,12 +277,6 @@
                 <version>${logback.version}</version>
                 <scope>compile</scope>
             </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>${logback.version}</version>
-                <scope>compile</scope>
-            </dependency>
             <!-- Groovy -->
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
@@ -294,6 +288,11 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>6.14.3</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
                 <scope>test</scope>
             </dependency>
         </dependencies>

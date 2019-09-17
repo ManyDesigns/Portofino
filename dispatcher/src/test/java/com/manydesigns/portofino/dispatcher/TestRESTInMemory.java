@@ -20,6 +20,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTestNg;
 import org.glassfish.jersey.test.inmemory.InMemoryTestContainerFactory;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import javax.annotation.PostConstruct;
@@ -36,6 +38,8 @@ import static org.testng.Assert.fail;
 import static org.testng.AssertJUnit.assertTrue;
 
 public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestRESTInMemory.class);
 
     @Override
     protected ResourceConfig configure() {
@@ -103,7 +107,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
             String result = target("test/p").request().get(String.class);
             fail("Should have thrown, not return " + result);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("Thrown exception", e);
         }
         String result = target("test/p/1").request().get(String.class);
         assertEquals(result, "[\"1\"]");
@@ -113,7 +117,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
             target("test/p/1/2/3").request().get(String.class);
             fail("Should have thrown");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("Thrown exception", e);
         }
     }
     
