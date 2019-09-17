@@ -26,6 +26,8 @@ import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegis
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +68,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
-    public File applicationDirectory;
+    public FileObject applicationDirectory;
 
     protected ApplicationContext applicationContext;
 
@@ -109,7 +111,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     @Bean
     public Persistence getPersistence(
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
-            @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) {
+            @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
         Persistence persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         return persistence;

@@ -2,9 +2,7 @@ package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
-import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.servlets.PortofinoListener;
 import io.reactivex.disposables.Disposable;
 import org.apache.commons.configuration.Configuration;
@@ -12,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigRegistry;
 import org.springframework.context.event.ContextClosedEvent;
@@ -106,7 +102,7 @@ public class PortofinoSpringServletContainerInitializer implements ServletContai
                 ConfigurableEnvironment environment = parent.getEnvironment();
                 MutablePropertySources sources = environment.getPropertySources();
                 Configuration configuration =
-                        (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+                        (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
                 sources.addFirst(
                         new ConfigurationPropertySource("portofino.properties", configuration));
                 AnnotationConfigRegistry annotationConfig = (AnnotationConfigRegistry) parent;

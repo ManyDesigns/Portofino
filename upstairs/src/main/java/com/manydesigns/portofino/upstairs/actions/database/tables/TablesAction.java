@@ -19,6 +19,9 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONStringer;
@@ -95,7 +98,7 @@ public class TablesAction extends AbstractResourceAction {
     }
 
     @GET
-    public List<Map> getTables() {
+    public List<Map> getTables() throws FileSystemException {
         List<Map> treeTables = new ArrayList<>();
 
         String lastDatabase = null;
@@ -114,9 +117,9 @@ public class TablesAction extends AbstractResourceAction {
                 lastSchema = null;
             }
             if(!table.getSchemaName().equals(lastSchema)) {
-                File changelogFile = persistence.getLiquibaseChangelogFile(table.getSchema());
+                FileObject changelogFile = persistence.getLiquibaseChangelogFile(table.getSchema());
                 lastSchema = table.getSchemaName();
-                schema = createNode(table.getSchema().getSchemaName(), changelogFile.isFile());
+                schema = createNode(table.getSchema().getSchemaName(), changelogFile.getType() == FileType.FILE);
                 ((List)database.get("children")).add(schema);
             }
             ((List)schema.get("children")).add(createLeaf(table.getTableName(), table.getActualEntityName()));

@@ -45,6 +45,9 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileType;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -56,9 +59,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -90,8 +91,8 @@ public class Persistence {
     protected Model model;
     protected final Map<String, HibernateDatabaseSetup> setups;
 
-    protected final File appDir;
-    protected final File appModelFile;
+    protected final FileObject appDir;
+    protected final FileObject appModelFile;
     protected final Configuration configuration;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
 
@@ -112,13 +113,13 @@ public class Persistence {
     // Constructors
     //**************************************************************************
 
-    public Persistence(File appDir, Configuration configuration, DatabasePlatformsRegistry databasePlatformsRegistry) {
+    public Persistence(FileObject appDir, Configuration configuration, DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
         this.appDir = appDir;
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
 
-        appModelFile = new File(appDir, APP_MODEL_FILE);
-        logger.info("Application model file: {}", appModelFile.getAbsolutePath());
+        appModelFile = appDir.getChild(APP_MODEL_FILE);
+        logger.info("Application model file: {}", appModelFile.getName().getPath());
 
         setups = new HashMap<>();
     }
@@ -128,32 +129,33 @@ public class Persistence {
     //**************************************************************************
 
     public synchronized void loadXmlModel() {
-        logger.info("Loading xml model from file: {}", appModelFile.getAbsolutePath());
+        logger.info("Loading xml model from file: {}", appModelFile.getName().getPath());
 
-        try {
+        try(InputStream inputStream = appModelFile.getContent().getInputStream()) {
             JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
             Unmarshaller um = jc.createUnmarshaller();
-            Model model = (Model) um.unmarshal(appModelFile);
-            File modelDir = getModelDirectory();
+            Model model = (Model) um.unmarshal(inputStream);
+            FileObject modelDir = getModelDirectory();
             for(Database database : model.getDatabases()) {
-                File databaseDir = new File(modelDir, database.getDatabaseName());
+                FileObject databaseDir = modelDir.getChild(database.getDatabaseName());
                 for(Schema schema : database.getSchemas()) {
-                    File schemaDir = new File(databaseDir, schema.getSchemaName());
-                    if(schemaDir.isDirectory()) {
+                    FileObject schemaDir = databaseDir.getChild(schema.getSchemaName());
+                    if(schemaDir.getType() == FileType.FOLDER) {
                         logger.debug("Schema directory {} exists", schemaDir);
-                        File[] tableFiles = schemaDir.listFiles(new FilenameFilter() {
-                            @Override
-                            public boolean accept(File dir, String name) {
-                                return name.endsWith(".table.xml");
+                        FileObject[] tableFiles = schemaDir.getChildren();
+                        for(FileObject tableFile : tableFiles) {
+                            if(!tableFile.getName().getBaseName().endsWith(".table.xml")) {
+                                continue;
                             }
-                        });
-                        for(File tableFile : tableFiles) {
-                            Table table = (Table) um.unmarshal(tableFile);
-                            if(!tableFile.getName().equalsIgnoreCase(table.getTableName() + ".table.xml")) {
-                                throw new Exception("Found table " + table.getTableName() + " defined in file " + tableFile);
+                            try(InputStream tableInputStream = tableFile.getContent().getInputStream()) {
+                                Table table = (Table) um.unmarshal(tableInputStream);
+                                if (!tableFile.getName().getBaseName().equalsIgnoreCase(table.getTableName() + ".table.xml")) {
+                                    logger.error("Skipping table " + table.getTableName() + " defined in file " + tableFile);
+                                    continue;
+                                }
+                                table.afterUnmarshal(um, schema);
+                                schema.getTables().add(table);
                             }
-                            table.afterUnmarshal(um, schema);
-                            schema.getTables().add(table);
                         }
                     } else {
                         logger.debug("Schema directory {} does not exist", schemaDir);
@@ -168,38 +170,32 @@ public class Persistence {
         }
     }
 
-    public File getModelDirectory() {
-        return new File(appModelFile.getParentFile(), FilenameUtils.getBaseName(appModelFile.getName()));
+    public FileObject getModelDirectory() throws FileSystemException {
+        return appModelFile.getParent().getChild(FilenameUtils.getBaseName(appModelFile.getName().getBaseName()));
     }
 
     public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
-        ResourceAccessor resourceAccessor =
-                new FileSystemResourceAccessor(appDir.getAbsolutePath());
+        ResourceAccessor resourceAccessor = new FileSystemResourceAccessor(appDir.getName().getPath());
         ConnectionProvider connectionProvider =
                 database.getConnectionProvider();
         for(Schema schema : database.getSchemas()) {
             String schemaName = schema.getSchemaName();
-            File changelogFile = getLiquibaseChangelogFile(schema);
-            if(!changelogFile.isFile()) {
-                logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
-                continue;
-            }
-            logger.info("Running changelog file: {}", changelogFile);
             try(Connection connection = connectionProvider.acquireConnection()) {
+                FileObject changelogFile = getLiquibaseChangelogFile(schema);
+                if(changelogFile.getType() != FileType.FILE) {
+                    logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
+                    continue;
+                }
+                logger.info("Running changelog file: {}", changelogFile);
                 JdbcConnection jdbcConnection = new JdbcConnection(connection);
                 liquibase.database.Database lqDatabase =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                 lqDatabase.setDefaultSchemaName(schema.getActualSchemaName());
-                String relativeChangelogPath =
-                        ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
-                Liquibase lq = new Liquibase(
-                        relativeChangelogPath,
-                        resourceAccessor,
-                        lqDatabase);
+                String relativeChangelogPath = appDir.getName().getRelativeName(changelogFile.getName());
+                Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase);
 
                 String[] contexts = configuration.getStringArray(APP_CONTEXT);
-
                 logger.info("Using context {}", Arrays.toString(contexts));
                 lq.update(new Contexts(contexts));
 
@@ -212,31 +208,36 @@ public class Persistence {
 
     public synchronized void saveXmlModel() throws IOException, JAXBException, ConfigurationException {
         //TODO gestire conflitti con modifiche esterne?
-        File tempFile = File.createTempFile(appModelFile.getName(), "");
+        File tempFile = File.createTempFile(appModelFile.getName().getBaseName(), "");
 
         JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         m.marshal(model, tempFile);
 
-        ElementsFileUtils.moveFileSafely(tempFile, appModelFile.getAbsolutePath());
+        ElementsFileUtils.moveFileSafely(tempFile, appModelFile.getName().getPath());
 
-        File modelDir = getModelDirectory();
+        FileObject modelDir = getModelDirectory();
         for(Database database : model.getDatabases()) {
-            File databaseDir = new File(modelDir, database.getDatabaseName());
+            FileObject databaseDir = modelDir.getChild(database.getDatabaseName());
             for(Schema schema : database.getSchemas()) {
-                File schemaDir = new File(databaseDir, schema.getSchemaName());
-                if(schemaDir.isDirectory() || schemaDir.mkdirs()) {
+                FileObject schemaDir = databaseDir.getChild(schema.getSchemaName());
+                if(schemaDir.getType() == FileType.FOLDER) {
+                    schemaDir.createFolder();
                     logger.debug("Schema directory {} exists", schemaDir);
-                    File[] tableFiles = schemaDir.listFiles((dir, name) -> name.endsWith(".table.xml"));
-                    for(File tableFile : tableFiles) {
-                        if(!tableFile.delete()) {
-                            logger.warn("Could not delete table file {}", tableFile.getAbsolutePath());
+                    FileObject[] tableFiles = schemaDir.getChildren();
+                    for(FileObject tableFile : tableFiles) {
+                        if(tableFile.getName().getBaseName().endsWith(".table.xml")) {
+                            if (!tableFile.delete()) {
+                                logger.warn("Could not delete table file {}", tableFile.getName().getPath());
+                            }
                         }
                     }
                     for(Table table : schema.getTables()) {
-                        File tableFile = new File(schemaDir, table.getTableName() + ".table.xml");
-                        m.marshal(table, tableFile);
+                        FileObject tableFile = schemaDir.getChild(table.getTableName() + ".table.xml");
+                        try(OutputStream outputStream = tableFile.getContent().getOutputStream()) {
+                            m.marshal(table, outputStream);
+                        }
                     }
                 } else {
                     logger.debug("Schema directory {} does not exist", schemaDir);
@@ -412,16 +413,16 @@ public class Persistence {
         return getConfiguration().getString(PortofinoProperties.APP_NAME);
     }
 
-    public File getLiquibaseChangelogFile(Schema schema) {
+    public FileObject getLiquibaseChangelogFile(Schema schema) throws FileSystemException {
         if(schema == null) {
             return null;
         }
-        File dbDir = new File(getModelDirectory(), schema.getDatabaseName());
-        File schemaDir = new File(dbDir, schema.getSchemaName());
-        return new File(schemaDir, changelogFileNameTemplate);
+        FileObject dbDir = getModelDirectory().getChild(schema.getDatabaseName());
+        FileObject schemaDir = dbDir.getChild(schema.getSchemaName());
+        return schemaDir.getChild(changelogFileNameTemplate);
     }
 
-    public File getAppModelFile() {
+    public FileObject getAppModelFile() {
         return appModelFile;
     }
 

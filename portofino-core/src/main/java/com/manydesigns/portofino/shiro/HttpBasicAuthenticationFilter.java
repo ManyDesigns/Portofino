@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.modules.BaseModule;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -62,7 +62,7 @@ public class HttpBasicAuthenticationFilter extends PathMatchingFilter {
                     logger.warn("Failed HTTP basic authentication to " + httpRequest.getRequestURL(), e);
                     HttpServletResponse httpResponse = WebUtils.toHttp(response);
                     httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    Configuration config = (Configuration) request.getServletContext().getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+                    Configuration config = (Configuration) request.getServletContext().getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
                     String authcHeader = HttpServletRequest.BASIC_AUTH + " realm=\"" + config.getString(PortofinoProperties.APP_NAME) + "\"";
                     httpResponse.setHeader("WWW-Authenticate", authcHeader);
                     return false;

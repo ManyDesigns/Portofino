@@ -84,7 +84,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
-    public File applicationDirectory;
+    public FileObject applicationDirectory;
 
     @Autowired
     public CodeBase codeBase;
@@ -119,7 +119,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
         logger.debug("Initializing dispatcher");
         ActionLogic.init(configuration);
 
-        File actionsDirectory = new File(applicationDirectory, "actions");
+        File actionsDirectory = new File(applicationDirectory.getName().getPath(), "actions");
         logger.info("Pages directory: " + actionsDirectory);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
 
@@ -213,7 +213,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
                     }
                 } else {
                     String extension = file.getName().getExtension();
-                    String className = file.getName().getRelativeName(codeBase.getRoot().getName());
+                    String className = codeBase.getRoot().getName().getRelativeName(file.getName());
                     if(!StringUtils.isEmpty(extension)) {
                         className = className.substring(0, className.length() - extension.length() - 1);
                     }

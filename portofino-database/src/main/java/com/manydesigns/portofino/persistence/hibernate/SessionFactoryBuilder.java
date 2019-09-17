@@ -323,11 +323,11 @@ public class SessionFactoryBuilder {
             annotation.addMemberValue("name", new StringMemberValue(column.getColumnName(), constPool));
             annotation.addMemberValue("nullable", new BooleanMemberValue(column.isNullable(), constPool));
             if(column.getLength() != null) {
-                annotation.addMemberValue("precision", new IntegerMemberValue(column.getLength(), constPool));
-                annotation.addMemberValue("length", new IntegerMemberValue(column.getLength(), constPool));
+                annotation.addMemberValue("precision", new IntegerMemberValue(constPool, column.getLength()));
+                annotation.addMemberValue("length", new IntegerMemberValue(constPool, column.getLength()));
             }
             if(column.getScale() != null) {
-                annotation.addMemberValue("scale", new IntegerMemberValue(column.getScale(), constPool));
+                annotation.addMemberValue("scale", new IntegerMemberValue(constPool, column.getScale()));
             }
             fieldAnnotations.addAnnotation(annotation);
 

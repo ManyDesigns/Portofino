@@ -59,8 +59,6 @@ public class BaseModule implements Module {
     // Constants
     //**************************************************************************
 
-    public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
-    public final static String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public final static String RESOURCE_BUNDLE_MANAGER = "com.manydesigns.portofino.resourceBundleManager";
     public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
 

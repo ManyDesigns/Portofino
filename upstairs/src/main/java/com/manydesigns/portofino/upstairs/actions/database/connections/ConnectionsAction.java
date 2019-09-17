@@ -18,6 +18,8 @@ import com.manydesigns.portofino.upstairs.actions.database.connections.support.C
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -86,8 +88,8 @@ public class ConnectionsAction extends AbstractResourceAction {
             js.key("selected").value(schema.selected);
 
             Schema dbSchema = DatabaseLogic.findSchemaByName(persistence.getModel(), databaseName, schema.schemaName);
-            File changelogFile = persistence.getLiquibaseChangelogFile(dbSchema);
-            js.key("liquibase").value(changelogFile != null && changelogFile.isFile());
+            FileObject changelogFile = persistence.getLiquibaseChangelogFile(dbSchema);
+            js.key("liquibase").value(changelogFile != null && changelogFile.getType() == FileType.FILE);
             js.endObject();
         }
         js.endArray();

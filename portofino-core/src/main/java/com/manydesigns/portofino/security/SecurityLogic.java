@@ -22,11 +22,11 @@ package com.manydesigns.portofino.security;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.shiro.GroupPermission;
 import com.manydesigns.portofino.shiro.ActionPermission;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -196,7 +196,7 @@ public class SecurityLogic {
     public static boolean isAdministrator(ServletRequest request) {
         ServletContext servletContext = ElementsThreadLocals.getServletContext();
         Configuration conf =
-                (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+                (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
         return isAdministrator(conf);
     }
 
@@ -261,7 +261,7 @@ public class SecurityLogic {
         boolean isNotAdmin = !isAdministrator(request);
         if (isNotAdmin) {
             ServletContext servletContext = request.getServletContext();
-            Configuration configuration = (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+            Configuration configuration = (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
             Permissions permissions;
             String resource;
             boolean allowed;
