@@ -377,7 +377,7 @@ public class ActionLogic {
         }
         FileObject configurationFile;
         try {
-            configurationFile = actionInstance.getDirectory().getChild("configuration.xml");
+            configurationFile = actionInstance.getDirectory().resolveFile("configuration.xml");
         } catch (FileSystemException e) {
             throw new RuntimeException(e);
         }

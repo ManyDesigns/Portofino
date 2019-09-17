@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.elements.fields.search.BaseCriteria;
 import com.manydesigns.elements.fields.search.TextMatchMode;

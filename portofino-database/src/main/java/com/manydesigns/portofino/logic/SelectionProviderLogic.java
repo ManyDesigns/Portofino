@@ -60,8 +60,8 @@ public class SelectionProviderLogic {
 
             boolean active = true;
             if(valueAndLabel.length > 2 * fieldCount) {
-                Object booleanValue = OgnlUtils.convertValue(valueAndLabel[fieldCount * 2], Boolean.class);
-                active = booleanValue instanceof Boolean && (Boolean) booleanValue;
+                Boolean booleanValue = OgnlUtils.convertValue(valueAndLabel[fieldCount * 2], Boolean.class);
+                active = booleanValue != null && booleanValue;
             }
 
             selectionProvider.appendRow(values, labels, active);

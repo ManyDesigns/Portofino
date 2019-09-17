@@ -41,10 +41,6 @@ public class H2Module implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
     @Autowired
     public Configuration configuration;
 
@@ -52,13 +48,6 @@ public class H2Module implements Module {
     DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(H2Module.class);
 
     @Override
     public String getModuleVersion() {

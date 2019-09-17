@@ -179,7 +179,7 @@ public class ActionInstance {
         FileObject baseDir = directory;
         if(!parameters.isEmpty()) {
             try {
-                baseDir = baseDir.getChild(DETAIL);
+                baseDir = baseDir.resolveFile(DETAIL);
             } catch (FileSystemException e) {
                 throw new RuntimeException(e);
             }

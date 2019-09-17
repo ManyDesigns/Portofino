@@ -36,7 +36,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
-import com.manydesigns.portofino.database.TableCriteria;
+import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;

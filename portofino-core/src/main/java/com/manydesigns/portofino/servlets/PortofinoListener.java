@@ -175,7 +175,7 @@ public class PortofinoListener extends DispatcherInitializer
         }
         if(applicationDirectory == null) {
             try {
-                applicationDirectory = manager.resolveFile(serverInfo.getRealPath()).getChild("WEB-INF");
+                applicationDirectory = manager.resolveFile(serverInfo.getRealPath()).resolveFile("WEB-INF");
             } catch (FileSystemException e) {
                 logger.error("Failed to obtain application real path", e);
                 throw new RuntimeException(e);
@@ -206,7 +206,7 @@ public class PortofinoListener extends DispatcherInitializer
             while (messagesSearchPaths.hasMoreElements()) {
                 resourceBundleManager.addSearchPath(messagesSearchPaths.nextElement().toString());
             }
-            FileObject appMessages = applicationDirectory.getChild(PORTOFINO_MESSAGES_FILE_NAME);
+            FileObject appMessages = applicationDirectory.resolveFile(PORTOFINO_MESSAGES_FILE_NAME);
             resourceBundleManager.addSearchPath(appMessages.getName().getPath());
         } catch (IOException e) {
             logger.warn("Could not initialize resource bundle manager", e);
@@ -266,7 +266,7 @@ public class PortofinoListener extends DispatcherInitializer
 
     @Override
     protected FileObject getCodeBaseRoot() throws FileSystemException {
-        FileObject codeBaseRoot = applicationDirectory.getChild("classes");
+        FileObject codeBaseRoot = applicationDirectory.resolveFile("classes");
         String classpath = codeBaseRoot.getName().getPath();
         logger.info("Initializing codebase with classpath: " + classpath);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(new File(classpath));
@@ -301,7 +301,7 @@ public class PortofinoListener extends DispatcherInitializer
     //**************************************************************************
 
     protected void loadConfiguration() throws ConfigurationException, FileSystemException {
-        FileObject configurationFile = applicationDirectory.getChild("portofino.properties");
+        FileObject configurationFile = applicationDirectory.resolveFile("portofino.properties");
         configuration =  new PropertiesConfiguration(configurationFile.getURL());
 
         String localConfigurationPath = null;
@@ -317,7 +317,7 @@ public class PortofinoListener extends DispatcherInitializer
                 logger.warn("Configuration file " + localConfigurationPath + " does not exist");
             }
         } else {
-            localConfigurationFile = applicationDirectory.getChild("portofino-local.properties");
+            localConfigurationFile = applicationDirectory.resolveFile("portofino-local.properties");
         }
         if (localConfigurationFile.exists()) {
             logger.info("Local configuration file: {}", localConfigurationFile);

@@ -22,13 +22,9 @@ package com.manydesigns.portofino.persistence.hibernate;
 
 import com.manydesigns.portofino.model.database.Database;
 import org.hibernate.*;
-import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.persister.entity.EntityPersister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,87 +82,7 @@ public class HibernateDatabaseSetup {
 
     public Session createSession() {
         Session session = sessionFactory.openSession();
-        return new SessionDelegatorBaseImpl((SessionImplementor) session) {
-            @Override
-            public EntityPersister getEntityPersister(String entityName, Object object) throws HibernateException {
-                return super.getEntityPersister(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public Object get(String entityName, Serializable id) {
-                return super.get(translateEntityNameFromJpaToHibernate(entityName), id);
-            }
-
-            @Override
-            public Object get(String entityName, Serializable id, LockMode lockMode) {
-                return super.get(translateEntityNameFromJpaToHibernate(entityName), id, lockMode);
-            }
-
-            @Override
-            public Object get(String entityName, Serializable id, LockOptions lockOptions) {
-                return super.get(translateEntityNameFromJpaToHibernate(entityName), id, lockOptions);
-            }
-
-            @Override
-            public Object load(String entityName, Serializable id, LockOptions lockOptions) {
-                return super.load(translateEntityNameFromJpaToHibernate(entityName), id, lockOptions);
-            }
-
-            @Override
-            public Object load(String entityName, Serializable id) {
-                return super.load(translateEntityNameFromJpaToHibernate(entityName), id);
-            }
-
-            @Override
-            public void replicate(String entityName, Object object, ReplicationMode replicationMode) {
-                super.replicate(translateEntityNameFromJpaToHibernate(entityName), object, replicationMode);
-            }
-
-            @Override
-            public Serializable save(String entityName, Object object) {
-                return super.save(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public void saveOrUpdate(String entityName, Object object) {
-                super.saveOrUpdate(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public void update(String entityName, Object object) {
-                super.update(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public Object merge(String entityName, Object object) {
-                return super.merge(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public void persist(String entityName, Object object) {
-                super.persist(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public void delete(String entityName, Object object) {
-                super.delete(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public void lock(String entityName, Object object, LockMode lockMode) {
-                super.lock(translateEntityNameFromJpaToHibernate(entityName), object, lockMode);
-            }
-
-            @Override
-            public void refresh(String entityName, Object object) {
-                super.refresh(translateEntityNameFromJpaToHibernate(entityName), object);
-            }
-
-            @Override
-            public void refresh(String entityName, Object object, LockOptions lockOptions) {
-                super.refresh(translateEntityNameFromJpaToHibernate(entityName), object, lockOptions);
-            }
-        };
+        return new SessionDelegator(this, session);
     }
 
     public String translateEntityNameFromJpaToHibernate(String entityName) {

@@ -46,7 +46,7 @@ public class PortofinoSpringConfiguration {
             @Autowired @Qualifier(PORTOFINO_CONFIGURATION) Configuration configuration,
             @Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject applicationDirectory) throws FileSystemException {
         String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
-        return applicationDirectory.getChild(actionsDirectory);
+        return applicationDirectory.resolveFile(actionsDirectory);
     }
 
     @Bean

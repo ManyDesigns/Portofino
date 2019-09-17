@@ -118,7 +118,7 @@ public class Persistence {
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
 
-        appModelFile = appDir.getChild(APP_MODEL_FILE);
+        appModelFile = appDir.resolveFile(APP_MODEL_FILE);
         logger.info("Application model file: {}", appModelFile.getName().getPath());
 
         setups = new HashMap<>();
@@ -137,9 +137,9 @@ public class Persistence {
             Model model = (Model) um.unmarshal(inputStream);
             FileObject modelDir = getModelDirectory();
             for(Database database : model.getDatabases()) {
-                FileObject databaseDir = modelDir.getChild(database.getDatabaseName());
+                FileObject databaseDir = modelDir.resolveFile(database.getDatabaseName());
                 for(Schema schema : database.getSchemas()) {
-                    FileObject schemaDir = databaseDir.getChild(schema.getSchemaName());
+                    FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
                     if(schemaDir.getType() == FileType.FOLDER) {
                         logger.debug("Schema directory {} exists", schemaDir);
                         FileObject[] tableFiles = schemaDir.getChildren();
@@ -171,7 +171,7 @@ public class Persistence {
     }
 
     public FileObject getModelDirectory() throws FileSystemException {
-        return appModelFile.getParent().getChild(FilenameUtils.getBaseName(appModelFile.getName().getBaseName()));
+        return appModelFile.getParent().resolveFile(FilenameUtils.getBaseName(appModelFile.getName().getBaseName()));
     }
 
     public void runLiquibase(Database database) {
@@ -219,9 +219,9 @@ public class Persistence {
 
         FileObject modelDir = getModelDirectory();
         for(Database database : model.getDatabases()) {
-            FileObject databaseDir = modelDir.getChild(database.getDatabaseName());
+            FileObject databaseDir = modelDir.resolveFile(database.getDatabaseName());
             for(Schema schema : database.getSchemas()) {
-                FileObject schemaDir = databaseDir.getChild(schema.getSchemaName());
+                FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
                 if(schemaDir.getType() == FileType.FOLDER) {
                     schemaDir.createFolder();
                     logger.debug("Schema directory {} exists", schemaDir);
@@ -234,7 +234,7 @@ public class Persistence {
                         }
                     }
                     for(Table table : schema.getTables()) {
-                        FileObject tableFile = schemaDir.getChild(table.getTableName() + ".table.xml");
+                        FileObject tableFile = schemaDir.resolveFile(table.getTableName() + ".table.xml");
                         try(OutputStream outputStream = tableFile.getContent().getOutputStream()) {
                             m.marshal(table, outputStream);
                         }
@@ -250,6 +250,7 @@ public class Persistence {
 
     public synchronized void initModel() {
         logger.info("Cleaning up old setups");
+        closeSessions();
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
             String databaseName = current.getKey();
             logger.info("Cleaning up old setup for: {}", databaseName);
@@ -280,8 +281,9 @@ public class Persistence {
                 logger.error("Could not create connection provider for " + database, e);
             }
         }
-
-        cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
+        if(cacheResetListenerRegistry != null) {
+            cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
+        }
     }
 
     //**************************************************************************
@@ -417,9 +419,9 @@ public class Persistence {
         if(schema == null) {
             return null;
         }
-        FileObject dbDir = getModelDirectory().getChild(schema.getDatabaseName());
-        FileObject schemaDir = dbDir.getChild(schema.getSchemaName());
-        return schemaDir.getChild(changelogFileNameTemplate);
+        FileObject dbDir = getModelDirectory().resolveFile(schema.getDatabaseName());
+        FileObject schemaDir = dbDir.resolveFile(schema.getSchemaName());
+        return schemaDir.resolveFile(changelogFileNameTemplate);
     }
 
     public FileObject getAppModelFile() {

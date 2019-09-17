@@ -45,10 +45,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SessionFactoryBuilder {
@@ -444,8 +441,10 @@ public class SessionFactoryBuilder {
 
     public void mapRelationships(Table table) throws NotFoundException, CannotCompileException {
         for(ForeignKey foreignKey : table.getForeignKeys()) {
-            mapManyToOne(foreignKey);
-            mapOneToMany(foreignKey);
+            if(checkValidFk(foreignKey)) {
+                mapManyToOne(foreignKey);
+                mapOneToMany(foreignKey);
+            }
         }
     }
 
@@ -476,6 +475,32 @@ public class SessionFactoryBuilder {
         annotation.addMemberValue("value", joinColumns);
 
         finalizeRelationshipProperty(cc, field, annotation, fieldAnnotations);
+    }
+
+    protected boolean checkValidFk(ForeignKey foreignKey) {
+        Table toTable = foreignKey.getToTable();
+        //Check that referenced columns coincide with the primary key
+        Set<Column> fkColumns = new HashSet<>();
+        Set<Column> pkColumns = new HashSet<>(toTable.getPrimaryKey().getColumns());
+        for(Reference reference : foreignKey.getReferences()) {
+            fkColumns.add(reference.getActualToColumn());
+        }
+        if(!fkColumns.equals(pkColumns)) {
+            logger.error(
+                    "The foreign key " + foreignKey.getQualifiedName() + " does not refer to " +
+                    "the exact primary key of table " + toTable.getQualifiedName() +
+                    ", this is not supported.");
+            return false;
+        }
+        try {
+            getMappedClass(toTable);
+        } catch (NotFoundException e) {
+            logger.error(
+                    "The foreign key " + foreignKey.getQualifiedName() + " refers to unmapped table " +
+                    toTable.getQualifiedName() + ", skipping.");
+            return false;
+        }
+        return true;
     }
 
     protected void mapOneToMany(ForeignKey foreignKey) throws NotFoundException, CannotCompileException {

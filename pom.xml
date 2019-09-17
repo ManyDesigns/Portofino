@@ -134,7 +134,6 @@
         <module>portofino-db2</module>
         <module>portofino-derby</module>
         <module>portofino-googlecloudsql</module>
-        <module>portofino-h2</module>
         <module>portofino-mssql</module>
         <module>portofino-mysql</module>
         <module>portofino-oracle</module>
