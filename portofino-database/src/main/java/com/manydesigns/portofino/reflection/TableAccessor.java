@@ -167,9 +167,7 @@ public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAcc
 
     public Object newInstance() {
         if (javaClassAccessor == null) {
-            HashMap<String, Object> obj =  new HashMap<String, Object>();
-            obj.put("$type$", table.getEntityName());
-            return obj;
+            return new HashMap<String, Object>();
         } else {
             return javaClassAccessor.newInstance();
         }

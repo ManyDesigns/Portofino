@@ -373,14 +373,15 @@ public class SessionFactoryBuilder {
             annotation.addMemberValue("sequenceName", new StringMemberValue(((SequenceGenerator) generator).getName(), constPool));
             fieldAnnotations.addAnnotation(annotation);
         } else if (generator instanceof TableGenerator) {
+            TableGenerator tableGenerator = (TableGenerator) generator;
             addGeneratedValueAnnotation(GenerationType.TABLE, generatorName, fieldAnnotations, constPool);
             Annotation annotation = new Annotation(javax.persistence.TableGenerator.class.getName(), constPool);
             annotation.addMemberValue("name", new StringMemberValue(generatorName, constPool));
             annotation.addMemberValue("schema", new StringMemberValue(table.getSchema().getActualSchemaName(), constPool));
-            annotation.addMemberValue("table", new StringMemberValue(((TableGenerator) generator).getTable(), constPool));
-            annotation.addMemberValue("pkColumnName", new StringMemberValue(((TableGenerator) generator).getKeyColumn(), constPool));
-            annotation.addMemberValue("pkColumnValue", new StringMemberValue(((TableGenerator) generator).getKeyValue(), constPool));
-            annotation.addMemberValue("valueColumnName", new StringMemberValue(((TableGenerator) generator).getValueColumn(), constPool));
+            annotation.addMemberValue("table", new StringMemberValue(tableGenerator.getTable(), constPool));
+            annotation.addMemberValue("pkColumnName", new StringMemberValue(tableGenerator.getKeyColumn(), constPool));
+            annotation.addMemberValue("pkColumnValue", new StringMemberValue(tableGenerator.getKeyValue(), constPool));
+            annotation.addMemberValue("valueColumnName", new StringMemberValue(tableGenerator.getValueColumn(), constPool));
             //TODO support additional parameters for the generator?
             fieldAnnotations.addAnnotation(annotation);
         } else {

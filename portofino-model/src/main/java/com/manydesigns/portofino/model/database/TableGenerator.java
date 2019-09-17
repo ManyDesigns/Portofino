@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
 @XmlType(propOrder = {"table","keyColumn","keyValue","valueColumn"})
-public class TableGenerator extends Generator{
+public class TableGenerator extends Generator {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 

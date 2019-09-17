@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class SequenceGenerator extends Generator{
+public class SequenceGenerator extends Generator {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 

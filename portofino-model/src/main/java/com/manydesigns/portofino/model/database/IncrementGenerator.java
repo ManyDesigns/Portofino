@@ -33,7 +33,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class IncrementGenerator extends Generator{
+public class IncrementGenerator extends Generator {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 

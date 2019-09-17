@@ -7,9 +7,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
@@ -58,14 +56,52 @@ public class PersistenceTest {
         persistence.start();
         setupJPetStore();
         setupHibernateTest();
-        persistence.syncDataModel("jpetstore");
-        persistence.syncDataModel("hibernatetest");
         persistence.initModel();
     }
 
     @AfterMethod
     public void teardown() {
         persistence.stop();
+    }
+
+    protected void setupJPetStore() throws Exception {
+        Session session = persistence.getSession("jpetstore");
+        session.doWork(new Work() {
+            @Override
+            public void execute(Connection connection) throws SQLException {
+                InputStreamReader reader =
+                        new InputStreamReader(
+                                getClass().getResourceAsStream("sql/jpetstore-postgres-schema.sql"));
+                RunScript.execute(connection, reader);
+                reader =
+                        new InputStreamReader(
+                                getClass().getResourceAsStream("sql/jpetstore-postgres-dataload.sql"));
+                RunScript.execute(connection, reader);
+            }
+        });
+        session.getTransaction().commit();
+        persistence.syncDataModel("jpetstore");
+        //Table ordersTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "ORDERS");
+        //ordersTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new TableGenerator());
+        Table supplierTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "SUPPLIER");
+        supplierTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new IncrementGenerator());
+        //Table testTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "TEST");
+        //testTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new SequenceGenerator());
+    }
+
+    protected void setupHibernateTest() throws Exception {
+        Session session = persistence.getSession("hibernatetest");
+        session.doWork(new Work() {
+            @Override
+            public void execute(Connection connection) throws SQLException {
+                InputStreamReader reader =
+                        new InputStreamReader(
+                                getClass().getResourceAsStream("sql/hibernatetest.sql"));
+                RunScript.execute(connection, reader);
+            }
+        });
+        session.getTransaction().commit();
+        persistence.syncDataModel("hibernatetest");
     }
 
     public void testReadProdotti() {
@@ -192,15 +228,9 @@ public class PersistenceTest {
 
         persistence.closeSessions();
 
-        //e ora cancello
-        try {
-            session = persistence.getSession("jpetstore");
-            session.delete("lineitem", lineItem);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            fail();
-        }
+        session = persistence.getSession("jpetstore");
+        session.delete("lineitem", lineItem);
+        session.getTransaction().commit();
         persistence.closeSessions();
     }
 
@@ -215,26 +245,20 @@ public class PersistenceTest {
     }
 
     public void testDeleteCategoria() {
-        try {
-            Map<String, Object> worms = new HashMap<String, Object>();
-            worms.put("$type$", "category");
-            worms.put("catid", "VERMI");
-            worms.put("name", "worms");
-            worms.put("descn",
-                    "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
-                            "Worms</font>");
+        Map<String, Object> worms = new HashMap<String, Object>();
+        worms.put("$type$", "category");
+        worms.put("catid", "VERMI");
+        worms.put("name", "worms");
+        worms.put("descn",
+                "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
+                        "Worms</font>");
 
-            Session session = persistence.getSession("jpetstore");
-            session.save("category", worms);
-            session.getTransaction().commit();
-            session.beginTransaction();
-            session.delete("category", worms);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-
+        Session session = persistence.getSession("jpetstore");
+        session.save("category", worms);
+        session.getTransaction().commit();
+        session.beginTransaction();
+        session.delete("category", worms);
+        session.getTransaction().commit();
     }
 
     public void testGetObjByPk(){
@@ -385,36 +409,97 @@ public class PersistenceTest {
         }
     }
 
-    protected void setupJPetStore() {
+    public void testAutoIncrementGenerator(){
+        Map<String, Object> supplier = new HashMap<>();
+        supplier.put("status", "99");
+        supplier.put("name", "Giampiero");
         Session session = persistence.getSession("jpetstore");
-        session.doWork(new Work() {
-            @Override
-            public void execute(Connection connection) throws SQLException {
-                InputStreamReader reader =
-                        new InputStreamReader(
-                                getClass().getResourceAsStream("sql/jpetstore-postgres-schema.sql"));
-                RunScript.execute(connection, reader);
-                reader =
-                        new InputStreamReader(
-                                getClass().getResourceAsStream("sql/jpetstore-postgres-dataload.sql"));
-                RunScript.execute(connection, reader);
-            }
-        });
+        session.save("supplier", supplier);
         session.getTransaction().commit();
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "jpetstore", "PUBLIC", "SUPPLIER");
+        assertNotNull(table);
+        TableAccessor tableAccessor = new TableAccessor(table);
+        TableCriteria criteria = new TableCriteria(table);
+        final BigInteger expectedId = new BigInteger("3");
+        try {
+            criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
+            List listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            assertEquals(1, listObjs.size());
+            Map<String,String> supp = (Map<String, String>) listObjs.get(0);
+            String name = supp.get("name");
+            assertEquals("Giampiero", name);
+        } catch (NoSuchFieldException e) {
+            fail(e.getMessage(), e);
+        }
     }
 
-    protected void setupHibernateTest() {
+    /*public void testSequenceGenerator(){
+        Map<String, Object> supplier = new HashMap<>();
+        final String testEntity = "test";
+        supplier.put("$type$", testEntity);
         Session session = persistence.getSession("hibernatetest");
-        session.doWork(new Work() {
-            @Override
-            public void execute(Connection connection) throws SQLException {
-                InputStreamReader reader =
-                        new InputStreamReader(
-                                getClass().getResourceAsStream("sql/hibernatetest.sql"));
-                RunScript.execute(connection, reader);
-            }
-        });
+        session.save(testEntity, supplier);
         session.getTransaction().commit();
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "hibernatetest", "PUBLIC", "test");
+        TableAccessor tableAccessor = new TableAccessor(table);
+        TableCriteria criteria = new TableCriteria(table);
+        final long expectedId = 1;
+        try {
+            criteria.eq(tableAccessor.getProperty("id"), expectedId);
+            List listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            assertEquals(1, listObjs.size());
+        } catch (NoSuchFieldException e) {
+            fail(e.getMessage(), e);
+        }
     }
 
+    public void testTableGenerator(){
+        Map<String, Object> order = new HashMap<>();
+        final int expectedId = 1000;
+        String ordersEntity = "orders";
+        order.put("$type$", ordersEntity);
+        order.put("userid", "99");
+        order.put("orderdate", new Date());
+        order.put("shipaddr1", "99");
+        order.put("shipaddr2", "99");
+        order.put("shipcity", "99");
+        order.put("shipstate", "99");
+        order.put("shipzip", "99");
+        order.put("billaddr1", "99");
+        order.put("billaddr2", "99");
+        order.put("billcity", "99");
+        order.put("billstate", "99");
+        order.put("billzip", "99");
+        order.put("billcountry", "99");
+        order.put("courier", "99");
+        order.put("totalprice", new BigDecimal(99L));
+        order.put("billtofirstname", "99");
+        order.put("billtolastname", "99");
+        order.put("shiptofirstname", "99");
+        order.put("shiptolastname", "99");
+        order.put("shipcountry", "99");
+        order.put("creditcard", "99");
+        order.put("exprdate", "99");
+        order.put("cardtype", "99");
+        order.put("locale", "99");
+        Session session = persistence.getSession("jpetstore");
+        session.save(ordersEntity, order);
+        QueryUtils.commit(persistence, "jpetstore");
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "jpetstore", "PUBLIC", "orders");
+        TableAccessor tableAccessor = new TableAccessor(table);
+        TableCriteria criteria = new TableCriteria(table);
+        try {
+            criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
+            List listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            assertEquals(1, listObjs.size());
+            Map<String,String> supp = (Map<String, String>) listObjs.get(0);
+            String name = supp.get("userid");
+            assertEquals("99", name);
+        } catch (NoSuchFieldException e) {
+            fail("orderid property not found", e);
+        }
+    }*/
 }
