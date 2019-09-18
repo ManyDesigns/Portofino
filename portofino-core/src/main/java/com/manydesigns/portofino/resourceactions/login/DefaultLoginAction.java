@@ -118,9 +118,10 @@ public class DefaultLoginAction extends AbstractResourceAction {
     public String renewToken() {
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
+            Object principal = subject.getPrincipal();
             subject.logout();
             PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
-            String token = portofinoRealm.generateWebToken(subject.getPrincipal());
+            String token = portofinoRealm.generateWebToken(principal);
             subject.login(new JSONWebToken(token));
             return token;
         } else {
