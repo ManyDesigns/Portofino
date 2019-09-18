@@ -364,8 +364,8 @@
                                         </ports>
                                         <links>
                                             <!-- Choose one or more of these. You're free to remove unused images. -->
-                                            <link>${project.artifactId}-database-postgres:db</link>
-                                            <link>${project.artifactId}-database-mysql:db</link>
+                                            <link>${project.artifactId}-database-postgresql:postgresql</link>
+                                            <link>${project.artifactId}-database-mysql:mysql</link>
                                         </links>
                                         <volumes>
                                             <bind>
@@ -375,10 +375,10 @@
                                     </run>
                                 </image>
                                 <image>
-                                    <alias>${project.artifactId}-database-postgres</alias>
-                                    <name>${project.groupId}/${project.artifactId}-database:${project.version}</name>
+                                    <alias>${project.artifactId}-database-postgresql</alias>
+                                    <name>${project.groupId}/${project.artifactId}-database-postgresql:${project.version}</name>
                                     <build>
-                                        <contextDir>${project.basedir}/src/main/docker/database/postgres</contextDir>
+                                        <contextDir>${project.basedir}/src/main/docker/database/postgresql</contextDir>
                                     </build>
                                     <run>
                                         <ports>
@@ -393,7 +393,7 @@
                                 </image>
                                 <image>
                                     <alias>${project.artifactId}-database-mysql</alias>
-                                    <name>${project.groupId}/${project.artifactId}-database:${project.version}</name>
+                                    <name>${project.groupId}/${project.artifactId}-database-mysql:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/database/mysql</contextDir>
                                     </build>
@@ -406,7 +406,7 @@
                                             <!-- <port>13306:3306</port> -->
                                         </ports>
                                         <wait>
-                                            <log>database system is ready to accept connections</log>
+                                            <log>mysqld: ready for connections</log>
                                             <time>20000</time>
                                         </wait>
                                     </run>
