@@ -305,10 +305,115 @@
         </profile>
         <!-- See web.xml for an explanation -->
         <profile>
+            <!-- Used for development, see web.xml for an explanation. -->
             <id>portofino-development</id>
             <properties>
                 <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
             </properties>
+        </profile>
+        <profile>
+            <!-- Build Docker images and launch the application. -->
+            <id>docker</id>
+            <properties>
+                <portofino.application.directory>/application</portofino.application.directory>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.31.0</version>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <alias>${project.artifactId}</alias>
+                                    <name>${project.groupId}/${project.artifactId}:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/application</contextDir>
+                                        <assembly>
+                                            <descriptor>${project.basedir}/src/main/docker/application/assembly.xml</descriptor>
+                                        </assembly>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>${project.artifactId}-debug</alias>
+                                    <name>${project.groupId}/${project.artifactId}-debug:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/application/debug</contextDir>
+                                    </build>
+                                    <run>
+                                        <ports>
+                                            <!-- Tomcat HTTP port -->
+                                            <port>8080:8080</port>
+                                            <!-- JPDA port for remote debugging -->
+                                            <port>8000:8000</port>
+                                        </ports>
+                                        <links>
+                                            <!-- Choose one or more of these. You're free to remove unused images. -->
+                                            <link>${project.artifactId}-database-postgres:db</link>
+                                            <link>${project.artifactId}-database-mysql:db</link>
+                                        </links>
+                                        <volumes>
+                                            <bind>
+                                                <volume>${project.basedir}/src/main/webapp/WEB-INF:/application</volume>
+                                            </bind>
+                                        </volumes>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>${project.artifactId}-database-postgres</alias>
+                                    <name>${project.groupId}/${project.artifactId}-database:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/database/postgres</contextDir>
+                                    </build>
+                                    <run>
+                                        <ports>
+                                            <!-- Here you can expose the database to outside tools (e.g., pgAdmin) -->
+                                            <!-- <port>15432:5432</port> -->
+                                        </ports>
+                                        <wait>
+                                            <log>database system is ready to accept connections</log>
+                                            <time>20000</time>
+                                        </wait>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>${project.artifactId}-database-mysql</alias>
+                                    <name>${project.groupId}/${project.artifactId}-database:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/database/mysql</contextDir>
+                                    </build>
+                                    <run>
+                                        <env>
+                                            <MYSQL_ROOT_PASSWORD>root</MYSQL_ROOT_PASSWORD>
+                                        </env>
+                                        <ports>
+                                            <!-- Here you can expose the database to outside tools (e.g., MySQL workbench) -->
+                                            <!-- <port>13306:3306</port> -->
+                                        </ports>
+                                        <wait>
+                                            <log>database system is ready to accept connections</log>
+                                            <time>20000</time>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>docker:build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>
