@@ -930,6 +930,20 @@ public class ApplicationWizard extends AbstractPageAction {
             setupUsers();
         }
         try {
+            if(connectionProvider instanceof JdbcConnectionProvider) {
+                JdbcConnectionProvider jdbcConnectionProvider = (JdbcConnectionProvider) connectionProvider;
+                //By default, store connection properties in portofino.properties
+                String s;
+                s = jdbcConnectionProvider.getUrl();
+                jdbcConnectionProvider.setUrl(null);
+                jdbcConnectionProvider.setActualUrl(s);
+                s = jdbcConnectionProvider.getUsername();
+                jdbcConnectionProvider.setUsername(null);
+                jdbcConnectionProvider.setActualUsername(s);
+                s = jdbcConnectionProvider.getPassword();
+                jdbcConnectionProvider.setPassword(null);
+                jdbcConnectionProvider.setActualPassword(s);
+            }
             persistence.initModel();
             persistence.saveXmlModel();
         } catch (Exception e) {
