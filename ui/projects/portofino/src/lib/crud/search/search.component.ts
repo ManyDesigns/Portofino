@@ -12,7 +12,7 @@ import {
   ClassAccessor,
   isDateProperty,
   isEnabled,
-  isInSummary,
+  isInSummary, isPassword,
   isSearchable,
   Property, SelectionOption
 } from "../../class-accessor";
@@ -136,6 +136,8 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
               return this.translate.get("Blob not found");
             }
           };
+        } else if(isPassword(property)) {
+          field.value = () => of("●●●●●●●");
         }
         this.resultFields.push(field);
         this.datatableColumns.push(property.name);

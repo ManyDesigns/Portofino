@@ -71,7 +71,7 @@ class Security extends AbstractPortofinoRealm {
 
         SimpleAuthenticationInfo info =
                 new SimpleAuthenticationInfo(
-                        cleanUser(principal), plainTextPassword.toCharArray(), getName());
+                        cleanUserPrincipal(principal), plainTextPassword.toCharArray(), getName());
         return info;
     }
 
@@ -103,7 +103,7 @@ class Security extends AbstractPortofinoRealm {
 
         SimpleAuthenticationInfo info =
                 new SimpleAuthenticationInfo(
-                        cleanUser(principal), token, getName());
+                        cleanUserPrincipal(principal), token, getName());
         return info;
     }
 
@@ -131,7 +131,7 @@ class Security extends AbstractPortofinoRealm {
 
         SimpleAuthenticationInfo info =
                 new SimpleAuthenticationInfo(
-                        cleanUser(principal), token, getName());
+                        cleanUserPrincipal(principal), token, getName());
         return info;
     }
 
@@ -141,7 +141,8 @@ class Security extends AbstractPortofinoRealm {
         principal.last_access_ip = request.getRemoteAddr();
     }
 
-    protected Map cleanUser(user) {
+    @Override
+    protected Object cleanUserPrincipal(user) {
         Map cleanUser = new HashMap()
         user.each { k, v ->
             if (v instanceof List || v instanceof Map) {

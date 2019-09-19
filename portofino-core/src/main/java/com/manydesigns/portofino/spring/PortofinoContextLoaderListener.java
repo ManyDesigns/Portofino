@@ -51,6 +51,8 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     public static final String PORTOFINO_CONTEXT_LOADER_LISTENER = PortofinoContextLoaderListener.class.getName();
 
     protected static final ThreadLocal<Boolean> reloadingUserContext = ThreadLocal.withInitial(() -> false);
+    protected static final
+    AtomicBoolean refreshing = new AtomicBoolean(false);
     private static final Logger logger = LoggerFactory.getLogger(PortofinoContextLoaderListener.class);
 
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
@@ -104,7 +106,6 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         ConfigurableWebApplicationContext userContext = new AnnotationConfigWebApplicationContext();
         userContext.setParent(parentContext);
         userContext.setId("portofino-user");
-        AtomicBoolean refreshing = new AtomicBoolean(false);
         userContext.addApplicationListener(event -> {
             if(event instanceof ContextClosedEvent) {
                 if(reloadingUserContext.get()) {

@@ -98,7 +98,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
             usernamePasswordToken.setRememberMe(false);
             subject.login(usernamePasswordToken);
-            logger.info("User {} login", ShiroUtils.getUserId(subject));
+            logger.info("User {} logged in", ShiroUtils.getUserId(subject));
             Object principal = subject.getPrincipal();
             subject.logout();
             PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();

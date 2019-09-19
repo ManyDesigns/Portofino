@@ -25,7 +25,11 @@ public interface CodeBase {
         return new CodeBaseClassLoader(this);
     }
 
-    void clear() throws Exception;
+    default void clear() throws Exception {
+        clear(true);
+    }
+
+    void clear(boolean recursively) throws Exception;
 
     CodeBase getParent();
 
