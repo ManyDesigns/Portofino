@@ -136,13 +136,14 @@ public class Type {
             case Types.BIGINT:
                 return Long.class;
             case Types.BIT:
-                return Boolean.class;
             case Types.BOOLEAN:
                 return Boolean.class;
             case Types.CHAR:
             case Types.VARCHAR:
             case Types.NCHAR:
             case Types.NVARCHAR:
+            case Types.CLOB:
+            case Types.LONGVARCHAR:
                 return String.class;
             case Types.DATE:
                 return java.sql.Date.class;
@@ -158,7 +159,6 @@ public class Type {
                     return getDefaultIntegerType(precision);
                 }
             case Types.DOUBLE:
-                return Double.class;
             case Types.REAL:
                 return Double.class;
             case Types.FLOAT:
@@ -170,15 +170,8 @@ public class Type {
             case Types.TINYINT:
                 return Byte.class;
             case Types.BINARY:
-                return byte[].class;
             case Types.BLOB:
-                 return byte[].class;
-            case Types.CLOB:
-                return String.class;
             case Types.LONGVARBINARY:
-                return byte[].class;
-            case Types.LONGVARCHAR:
-                return String.class;
             case Types.VARBINARY:
                 return byte[].class;
             case Types.ARRAY:
@@ -311,63 +304,11 @@ public class Type {
             return precisionRequired;
         }
         switch (jdbcType) {
-            case Types.BIGINT:
-                return false;
-            case Types.BIT:
-                return false;
-            case Types.BOOLEAN:
-                return false;
             case Types.CHAR:
-                return true;
             case Types.VARCHAR:
-                return true;
-            case Types.DATE:
-                return false;
-            case Types.TIME:
-                return false;
-            case Types.TIMESTAMP:
-                return false;
             case Types.DECIMAL:
-                return true;
             case Types.NUMERIC:
                 return true;
-            case Types.DOUBLE:
-                return false;
-            case Types.REAL:
-                return false;
-            case Types.FLOAT:
-                return false;
-            case Types.INTEGER:
-                return false;
-            case Types.SMALLINT:
-                return false;
-            case Types.TINYINT:
-                return false;
-            case Types.BINARY:
-                return false;
-            case Types.BLOB:
-                 return false;
-            case Types.CLOB:
-                return false;
-            case Types.LONGVARBINARY:
-                return false;
-            case Types.LONGVARCHAR:
-                return false;
-            case Types.VARBINARY:
-                return false;
-            case Types.ARRAY:
-                return false;
-            case Types.DATALINK:
-                return false;
-            case Types.DISTINCT:
-            case Types.JAVA_OBJECT:
-                return false;
-            case Types.NULL:
-            case Types.OTHER:
-            case Types.REF:
-                return false;
-            case Types.STRUCT:
-                return false;
             default:
                 return false;
         }
@@ -379,63 +320,9 @@ public class Type {
             return scaleRequired;
         }
         switch (jdbcType) {
-            case Types.BIGINT:
-                return false;
-            case Types.BIT:
-                return false;
-            case Types.BOOLEAN:
-                return false;
-            case Types.CHAR:
-                return false;
-            case Types.VARCHAR:
-                return false;
-            case Types.DATE:
-                return false;
-            case Types.TIME:
-                return false;
-            case Types.TIMESTAMP:
-                return false;
             case Types.DECIMAL:
-                return true;
             case Types.NUMERIC:
                 return true;
-            case Types.DOUBLE:
-                return false;
-            case Types.REAL:
-                return false;
-            case Types.FLOAT:
-                return false;
-            case Types.INTEGER:
-                return false;
-            case Types.SMALLINT:
-                return false;
-            case Types.TINYINT:
-                return false;
-            case Types.BINARY:
-                return false;
-            case Types.BLOB:
-                 return false;
-            case Types.CLOB:
-                return false;
-            case Types.LONGVARBINARY:
-                return false;
-            case Types.LONGVARCHAR:
-                return false;
-            case Types.VARBINARY:
-                return false;
-            case Types.ARRAY:
-                return false;
-            case Types.DATALINK:
-                return false;
-            case Types.DISTINCT:
-            case Types.JAVA_OBJECT:
-                return false;
-            case Types.NULL:
-            case Types.OTHER:
-            case Types.REF:
-                return false;
-            case Types.STRUCT:
-                return false;
             default:
                 return false;
         }

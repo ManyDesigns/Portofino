@@ -183,11 +183,11 @@ public class UpstairsAction extends AbstractResourceAction {
 
     @Nullable
     public String getColumnName(Column column) {
-        String userTokenProperty = null;
+        String columnName = null;
         if (column != null) {
-            userTokenProperty = column.getColumnName();
+            columnName = column.getColumnName();
         }
-        return userTokenProperty;
+        return columnName;
     }
 
     protected Table getTable(TableInfo tableInfo) {
@@ -657,16 +657,24 @@ public class UpstairsAction extends AbstractResourceAction {
         bindings.put("hashIterations", "1");
         String[] algoAndEncoding = encryptionAlgorithm.split(":");
         bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
-        if(algoAndEncoding[1].equals("plaintext")) {
-            bindings.put("hashFormat", "null");
-        } else if(algoAndEncoding[1].equals("hex")) {
-            bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
-        } else if(algoAndEncoding[1].equals("base64")) {
-            bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
+        switch (algoAndEncoding[1]) {
+            case "plaintext":
+                bindings.put("hashFormat", "null");
+                break;
+            case "hex":
+                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
+                break;
+            case "base64":
+                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported encoding: " + algoAndEncoding[1]);
         }
         File codeBaseRoot = new File(actionsDirectory.getParentFile(), "classes");
-        try(FileWriter fw = new FileWriter(new File(codeBaseRoot, "Security.groovy"))) {
+        File securityGroovyFile = new File(codeBaseRoot, "Security.groovy");
+        try(FileWriter fw = new FileWriter(securityGroovyFile)) {
             template.make(bindings).writeTo(fw);
+            logger.info("Security.groovy written to " + securityGroovyFile.getParentFile().getAbsolutePath());
         }
     }
 
