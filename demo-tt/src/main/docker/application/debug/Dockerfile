@@ -1,4 +1,4 @@
-FROM portofino/demo-tt:${project.version}
+FROM demo-tt:${project.version}
 #Link to database
 ADD portofino-local.properties $CATALINA_HOME/webapps/ROOT/WEB-INF/
 #For remote debugging (remember to open the port)
