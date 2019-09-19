@@ -14,6 +14,7 @@
                 <include>org.postgresql:postgresql</include>
             </includes>
             <scope>provided</scope>
+            <outputDirectory>lib</outputDirectory>
         </dependencySet>
     </dependencySets>
 </assembly>
