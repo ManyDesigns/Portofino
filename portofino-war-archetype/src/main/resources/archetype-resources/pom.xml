@@ -327,7 +327,7 @@
                             <images>
                                 <image>
                                     <alias>${project.artifactId}</alias>
-                                    <name>${project.groupId}/${project.artifactId}:${project.version}</name>
+                                    <name>${project.artifactId}:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/application</contextDir>
                                         <assembly>
@@ -340,7 +340,7 @@
                                 </image>
                                 <image>
                                     <alias>${project.artifactId}-debug</alias>
-                                    <name>${project.groupId}/${project.artifactId}-debug:${project.version}</name>
+                                    <name>${project.artifactId}-debug:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/application/debug</contextDir>
                                     </build>
@@ -365,7 +365,7 @@
                                 </image>
                                 <image>
                                     <alias>${project.artifactId}-database-postgresql</alias>
-                                    <name>${project.groupId}/${project.artifactId}-database-postgresql:${project.version}</name>
+                                    <name>${project.artifactId}-database-postgresql:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/database/postgresql</contextDir>
                                     </build>
@@ -382,7 +382,7 @@
                                 </image>
                                 <image>
                                     <alias>${project.artifactId}-database-mysql</alias>
-                                    <name>${project.groupId}/${project.artifactId}-database-mysql:${project.version}</name>
+                                    <name>${project.artifactId}-database-mysql:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/database/mysql</contextDir>
                                     </build>

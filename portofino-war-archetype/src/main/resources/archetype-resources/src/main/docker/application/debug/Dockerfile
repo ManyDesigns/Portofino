@@ -1,4 +1,4 @@
-FROM ${project.groupId}/${project.artifactId}:${project.version}
+FROM ${project.artifactId}:${project.version}
 #Link to database
 COPY portofino-local.properties $CATALINA_HOME/webapps/ROOT/WEB-INF/
 #For remote debugging (remember to open the port)

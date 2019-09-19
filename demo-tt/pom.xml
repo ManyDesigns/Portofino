@@ -251,7 +251,7 @@
                             <images>
                                 <image>
                                     <alias>demo-tt</alias>
-                                    <name>portofino/demo-tt:${project.version}</name>
+                                    <name>demo-tt:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/application</contextDir>
                                         <assembly>
@@ -264,7 +264,7 @@
                                 </image>
                                 <image>
                                     <alias>demo-tt-debug</alias>
-                                    <name>portofino/demo-tt-debug:${project.version}</name>
+                                    <name>demo-tt-debug:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/application/debug</contextDir>
                                     </build>
@@ -287,7 +287,7 @@
                                 </image>
                                 <image>
                                     <alias>demo-tt-database</alias>
-                                    <name>portofino/demo-tt/database:${project.version}</name>
+                                    <name>demo-tt-database:${project.version}</name>
                                     <build>
                                         <contextDir>${project.basedir}/src/main/docker/database</contextDir>
                                     </build>
