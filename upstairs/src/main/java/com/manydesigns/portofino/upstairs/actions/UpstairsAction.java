@@ -127,12 +127,8 @@ public class UpstairsAction extends AbstractResourceAction {
                 TemplateEngine engine = new SimpleTemplateEngine();
                 Template template = engine.createTemplate(
                         UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudPage.groovy"));
-                String userPasswordColumn = null;
                 Table userTable = getTable(wizard.usersTable);
-                Column usersPasswordProperty = wizard.userPasswordProperty;
-                if(usersPasswordProperty != null) {
-                    userPasswordColumn = usersPasswordProperty.getColumnName();
-                }
+                Column userPasswordColumn = getColumn(userTable, wizard.userPasswordProperty);
                 boolean userCrudCreated = false;
                 for(TableInfo tableInfo : tables) {
                     if(tableInfo.selected) {
@@ -157,20 +153,6 @@ public class UpstairsAction extends AbstractResourceAction {
                         createCrudAction(database.getConnectionProvider(), dir, userTable, template, userTable, userPasswordColumn, createdPages);
                     }
                     setupUserPages(database.getConnectionProvider(), template, userTable, createdPages);
-                    try {
-                        String userEmailProperty = getColumnName(wizard.userEmailProperty);
-                        String userTokenProperty = getColumnName(wizard.userTokenProperty);
-                        setupUsers(
-                                database.getConnectionProvider(), userTable, wizard.userIdProperty.getColumnName(),
-                                wizard.userNameProperty.getColumnName(), userPasswordColumn, userEmailProperty,
-                                userTokenProperty, getTable(wizard.groupsTable), getColumnName(wizard.groupIdProperty),
-                                getColumnName(wizard.groupNameProperty), getTable(wizard.userGroupTable),
-                                getColumnName(wizard.groupLinkProperty), getColumnName(wizard.userLinkProperty),
-                                wizard.adminGroupName, wizard.encryptionAlgorithm);
-                    } catch (Exception e) {
-                        logger.error("Couldn't configure users", e);
-                        RequestMessages.addWarningMessage(ElementsThreadLocals.getText("couldnt.set.up.user.management._", e));
-                    }
                 }
                 break;
             case "none":
@@ -181,13 +163,32 @@ public class UpstairsAction extends AbstractResourceAction {
         return createdPages;
     }
 
-    @Nullable
-    public String getColumnName(Column column) {
-        String columnName = null;
-        if (column != null) {
-            columnName = column.getColumnName();
+    @POST
+    @Path("application/security")
+    public void createSecurityGrooyv(WizardInfo wizard) {
+        String databaseName = (String) (wizard.connectionProvider).get("name");
+        Database database = DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+        if(database == null) {
+            throw new WebApplicationException("The database does not exist: " + databaseName);
         }
-        return columnName;
+        Table userTable = getTable(wizard.usersTable);
+        if(userTable != null) {
+            try {
+                setupSecurityGroovy(database.getConnectionProvider(), userTable, wizard);
+            } catch (Exception e) {
+                logger.error("Couldn't configure users", e);
+                throw new WebApplicationException(e);
+            }
+        }
+    }
+
+    @Nullable
+    public Column getColumn(Table table, Column column) {
+        if (table != null && column != null) {
+            return DatabaseLogic.findColumnByName(table, column.getColumnName());
+        } else {
+            return null;
+        }
     }
 
     protected Table getTable(TableInfo tableInfo) {
@@ -199,7 +200,7 @@ public class UpstairsAction extends AbstractResourceAction {
 
     protected ActionDescriptor createCrudAction(
             ConnectionProvider connectionProvider, File dir, Table table, Template template,
-            Table userTable, String userPasswordColumn, List<Map> createdPages) throws Exception {
+            Table userTable, Column userPasswordColumn, List<Map> createdPages) throws Exception {
         String query = "from " + table.getActualEntityName() + " order by id desc";
         HashMap<String, String> bindings = new HashMap<>();
         bindings.put("parentName", "");
@@ -211,7 +212,7 @@ public class UpstairsAction extends AbstractResourceAction {
     protected ActionDescriptor createCrudAction(
             ConnectionProvider connectionProvider,
             File dir, Table table, String query,
-            Template template, Map<String, String> bindings, Table userTable, String userPasswordColumn, List<Map> createdPages, int depth)
+            Template template, Map<String, String> bindings, Table userTable, Column userPasswordColumn, List<Map> createdPages, int depth)
             throws Exception {
         if(dir.exists()) {
             RequestMessages.addWarningMessage(
@@ -231,7 +232,7 @@ public class UpstairsAction extends AbstractResourceAction {
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
-                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, userTable, userPasswordColumn);
+                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, column.equals(userPasswordColumn));
             }
 
             FileObject directory = VFS.getManager().toFileObject(dir);
@@ -305,7 +306,7 @@ public class UpstairsAction extends AbstractResourceAction {
     protected void createChildCrudPage(
             ConnectionProvider connectionProvider,
             File dir, Template template, String parentName, Collection<Reference> references,
-            Reference ref, Table userTable, String userPasswordColumn, List<Map> createdPages, int depth)
+            Reference ref, Table userTable, Column userPasswordColumn, List<Map> createdPages, int depth)
             throws Exception {
         Column fromColumn = ref.getActualFromColumn();
         Table fromTable = fromColumn.getTable();
@@ -319,7 +320,7 @@ public class UpstairsAction extends AbstractResourceAction {
                         " order by id desc";
         String childDirName = entityName;
         boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
-        if(multipleRoles) {
+        if (multipleRoles) {
             childDirName += "-as-" + linkToParentProperty;
         }
         File childDir = new File(new File(dir, ActionInstance.DETAIL), childDirName);
@@ -335,8 +336,8 @@ public class UpstairsAction extends AbstractResourceAction {
 
     protected boolean isMultipleRoles(Table fromTable, Reference ref, Collection<Reference> references) {
         boolean multipleRoles = false;
-        for(Reference ref2 : references) {
-            if(ref2 != ref && ref2.getActualFromColumn().getTable().equals(fromTable)) {
+        for (Reference ref2 : references) {
+            if (ref2 != ref && ref2.getActualFromColumn().getTable().equals(fromTable)) {
                 multipleRoles = true;
                 break;
             }
@@ -346,9 +347,9 @@ public class UpstairsAction extends AbstractResourceAction {
 
     protected int setupColumn
             (ConnectionProvider connectionProvider, Column column, CrudConfiguration configuration,
-             int columnsInSummary, String linkToParentProperty, Table userTable, String userPasswordColumn) {
+             int columnsInSummary, String linkToParentProperty, boolean isPassword) {
 
-        if(column.getActualJavaType() == null) {
+        if (column.getActualJavaType() == null) {
             logger.debug("Column without a javaType, skipping: {}", column.getQualifiedName());
             return columnsInSummary;
         }
@@ -359,25 +360,24 @@ public class UpstairsAction extends AbstractResourceAction {
                 !(linkToParentProperty != NO_LINK_TO_PARENT &&
                         column.getActualPropertyName().equals(linkToParentProperty))
                         && !isUnsupportedProperty(column);
-        boolean propertyIsUserPassword = table == userTable && column.getColumnName().equals(userPasswordColumn);
         boolean inPk = DatabaseLogic.isInPk(column);
         boolean inFk = DatabaseLogic.isInFk(column);
         boolean inSummary =
                 enabled &&
                         (inPk || columnsInSummary < maxColumnsInSummary) &&
-                        !propertyIsUserPassword;
+                        !isPassword;
         boolean updatable = enabled && !column.isAutoincrement() && !inPk;
         boolean insertable = enabled && !column.isAutoincrement();
 
-        if(!configuration.isLargeResultSet()) {
+        if (!configuration.isLargeResultSet()) {
             detectBooleanColumn(connectionProvider, table, column);
         }
 
-        if(enabled && inPk && !inFk &&
+        if (enabled && inPk && !inFk &&
                 Number.class.isAssignableFrom(column.getActualJavaType()) &&
                 !column.isAutoincrement()) {
-            for(PrimaryKeyColumn pkc : table.getPrimaryKey().getPrimaryKeyColumns()) {
-                if(pkc.getActualColumn().equals(column)) {
+            for (PrimaryKeyColumn pkc : table.getPrimaryKey().getPrimaryKeyColumns()) {
+                if (pkc.getActualColumn().equals(column)) {
                     pkc.setGenerator(new IncrementGenerator(pkc));
                     insertable = false;
                     break;
@@ -385,20 +385,20 @@ public class UpstairsAction extends AbstractResourceAction {
             }
         }
 
-        if(propertyIsUserPassword) {
+        if (isPassword) {
             Annotation annotation = DatabaseLogic.findAnnotation(column, Password.class);
-            if(annotation == null) {
+            if (annotation == null) {
                 column.getAnnotations().add(new Annotation(column, Password.class.getName()));
             }
             insertable = false;
             updatable = false;
         }
 
-        if(!propertyIsUserPassword &&
-           column.getActualJavaType() == String.class &&
-           (column.getLength() == null || column.getLength() > MULTILINE_THRESHOLD)) {
+        if (!isPassword &&
+                column.getActualJavaType() == String.class &&
+                (column.getLength() == null || column.getLength() > MULTILINE_THRESHOLD)) {
             Annotation annotation = DatabaseLogic.findAnnotation(column, Multiline.class);
-            if(annotation == null) {
+            if (annotation == null) {
                 annotation = new Annotation(column, Multiline.class.getName());
                 annotation.getValues().add("true");
                 column.getAnnotations().add(annotation);
@@ -410,7 +410,7 @@ public class UpstairsAction extends AbstractResourceAction {
         crudProperty.setName(column.getActualPropertyName());
         crudProperty.setInsertable(insertable);
         crudProperty.setUpdatable(updatable);
-        if(inSummary) {
+        if (inSummary) {
             crudProperty.setInSummary(true);
             crudProperty.setSearchable(true);
             columnsInSummary++;
@@ -625,37 +625,33 @@ public class UpstairsAction extends AbstractResourceAction {
         }
     }
 
-    protected void setupUsers(
-            ConnectionProvider connectionProvider,
-            Table userTable, String userIdProperty, String userNameProperty, String userPasswordProperty,
-            String userEmailProperty, String userTokenProperty,
-            Table groupTable, String groupIdProperty, String groupNameProperty,
-            Table userGroupTable, String groupLinkProperty, String userLinkProperty, String adminGroupName,
-            String encryptionAlgorithm) throws Exception {
+    protected void setupSecurityGroovy(ConnectionProvider connectionProvider, Table userTable, WizardInfo wizard) throws Exception {
         TemplateEngine engine = new SimpleTemplateEngine();
         Template template = engine.createTemplate(
                 UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/Security.groovy"));
         Map<String, String> bindings = new HashMap<String, String>();
         bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
         bindings.put("userTableEntityName", userTable.getActualEntityName());
-        bindings.put("userIdProperty", userIdProperty);
-        bindings.put("userNameProperty", userNameProperty);
-        bindings.put("passwordProperty", userPasswordProperty);
-        bindings.put("userEmailProperty", userEmailProperty);
-        bindings.put("userTokenProperty", userTokenProperty);
+        bindings.put("userIdProperty", getPropertyName(userTable, wizard.userIdProperty));
+        bindings.put("userNameProperty", getPropertyName(userTable, wizard.userNameProperty));
+        bindings.put("passwordProperty", getPropertyName(userTable, wizard.userPasswordProperty));
+        bindings.put("userEmailProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userEmailProperty)));
+        bindings.put("userTokenProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userTokenProperty)));
 
-        bindings.put("groupTableEntityName", groupTable != null ? groupTable.getActualEntityName() : "");
-        bindings.put("groupIdProperty", StringUtils.defaultString(groupIdProperty));
-        bindings.put("groupNameProperty", StringUtils.defaultString(groupNameProperty));
+        Table groupsTable = getTable(wizard.groupsTable);
+        bindings.put("groupTableEntityName", groupsTable != null ? groupsTable.getActualEntityName() : "");
+        bindings.put("groupIdProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupIdProperty)));
+        bindings.put("groupNameProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupNameProperty)));
 
+        Table userGroupTable = getTable(wizard.groupsTable);
         bindings.put("userGroupTableEntityName",
                 userGroupTable != null ? userGroupTable.getActualEntityName() : "");
-        bindings.put("groupLinkProperty", StringUtils.defaultString(groupLinkProperty));
-        bindings.put("userLinkProperty", StringUtils.defaultString(userLinkProperty));
-        bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
+        bindings.put("groupLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.groupLinkProperty)));
+        bindings.put("userLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.userLinkProperty)));
+        bindings.put("adminGroupName", StringUtils.defaultString(wizard.adminGroupName));
 
         bindings.put("hashIterations", "1");
-        String[] algoAndEncoding = encryptionAlgorithm.split(":");
+        String[] algoAndEncoding = wizard.encryptionAlgorithm.split(":");
         bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
         switch (algoAndEncoding[1]) {
             case "plaintext":
@@ -675,6 +671,15 @@ public class UpstairsAction extends AbstractResourceAction {
         try(FileWriter fw = new FileWriter(securityGroovyFile)) {
             template.make(bindings).writeTo(fw);
             logger.info("Security.groovy written to " + securityGroovyFile.getParentFile().getAbsolutePath());
+        }
+    }
+
+    protected String getPropertyName(Table table, Column column) {
+        column = getColumn(table, column);
+        if(column == null) {
+            return null;
+        } else {
+            return column.getActualPropertyName();
         }
     }
 
