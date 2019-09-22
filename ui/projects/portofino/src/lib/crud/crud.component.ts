@@ -349,6 +349,9 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
   properties = [];
   selectionProviders = [];
 
+  isValid(): boolean {
+    return super.isValid();
+  }
 
   protected setupPageConfigurationForm(pageConfiguration) {
     super.setupPageConfigurationForm(pageConfiguration);

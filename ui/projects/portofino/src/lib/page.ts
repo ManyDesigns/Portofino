@@ -148,6 +148,11 @@ export class PageSettingsPanel {
     });
   }
 
+  isValid() {
+    console.log("aaa", this.form)
+    return this.form.valid;
+  }
+
   hide(saved: boolean) {
     this.active = false;
     this.callback(saved);
@@ -243,7 +248,8 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   private setupBasicPageButtons() {
     declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'configuration'
+      color: 'primary', icon: 'save', text: 'Save', list: 'configuration',
+      enabledIf: () => this.settingsPanel.isValid()
     }, this, 'saveConfiguration', null);
     declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'configuration'
