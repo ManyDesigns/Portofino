@@ -33,6 +33,7 @@ import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import io.reactivex.subjects.BehaviorSubject;
 import liquibase.Contexts;
@@ -317,6 +318,9 @@ public class Persistence {
 
     public synchronized void syncDataModel(String databaseName) throws Exception {
         Database sourceDatabase = DatabaseLogic.findDatabaseByName(model, databaseName);
+        if(sourceDatabase == null) {
+            throw new IllegalArgumentException("Database " + databaseName + " does not exist");
+        }
         if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
             runLiquibase(sourceDatabase);
         } else {
@@ -373,10 +377,14 @@ public class Persistence {
 
     public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
         Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
-        assert database != null;
+        if(database == null) {
+            throw new IllegalArgumentException("Database " + databaseName + " does not exist");
+        }
         Table table = DatabaseLogic.findTableByEntityName(database, entityName);
-        assert table != null;
-        return new TableAccessor(table);
+        if(table == null) {
+            throw new IllegalArgumentException("Table " + entityName + " not found in database " + databaseName);
+        }
+        return table instanceof View ? new ViewAccessor((View) table) : new TableAccessor(table);
     }
 
     //**************************************************************************

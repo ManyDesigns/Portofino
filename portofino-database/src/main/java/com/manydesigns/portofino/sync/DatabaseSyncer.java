@@ -34,6 +34,7 @@ import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.SnapshotControl;
 import liquibase.snapshot.SnapshotGeneratorFactory;
 import liquibase.structure.core.ForeignKeyConstraintType;
+import liquibase.structure.core.Relation;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +134,7 @@ public class DatabaseSyncer {
         logger.info("Synchronizing schema: {}", sourceSchema.getActualSchemaName());
         targetSchema.setSchemaName(sourceSchema.getSchemaName());
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
+        syncViews(databaseSnapshot, sourceSchema, targetSchema);
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);
         syncForeignKeys(databaseSnapshot, sourceSchema, targetSchema);
         return targetSchema;
@@ -149,11 +151,7 @@ public class DatabaseSyncer {
             Table targetFromTable = DatabaseLogic.findTableByNameIgnoreCase(targetSchema, fkTableName);
             if (targetFromTable == null) {
                 logger.error("Table '{}' not found in schema '{}'. Skipping foreign key: {}",
-                        new Object[] {
-                                fkTableName,
-                                targetSchema.getSchemaName(),
-                                fkName
-                        });
+                                fkTableName, targetSchema.getSchemaName(), fkName);
                 continue;
             }
 
@@ -424,6 +422,38 @@ public class DatabaseSyncer {
         }
     }
 
+    protected void syncViews(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
+        logger.info("Synchronizing views");
+        for (liquibase.structure.core.View liquibaseView : databaseSnapshot.get(liquibase.structure.core.View.class)) {
+            String viewName = liquibaseView.getName();
+            logger.info("Processing view: {}", viewName);
+            Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, viewName);
+            if(sourceTable == null) {
+                logger.debug("Added new table: {}", viewName);
+                sourceTable = new Table();
+            }
+            View targetView = new View(targetSchema);
+            if(sourceTable instanceof View) {
+                View sourceView = (View) sourceTable;
+                targetView.setInsertable(sourceView.isInsertable());
+                targetView.setUpdatable(sourceView.isUpdatable());
+            }
+            targetSchema.getTables().add(targetView);
+
+            targetView.setTableName(viewName);
+
+            logger.debug("Merging view attributes and annotations");
+            targetView.setEntityName(sourceTable.getEntityName());
+            targetView.setJavaClass(sourceTable.getJavaClass());
+            targetView.setShortName(sourceTable.getShortName());
+            copyAnnotations(sourceTable, targetView);
+
+            syncColumns(liquibaseView, sourceTable, targetView);
+
+            copySelectionProviders(sourceTable, targetView);
+        }
+    }
+
     protected void copySelectionProviders(Table sourceTable, Table targetTable) {
         for(ModelSelectionProvider sourceSP : sourceTable.getSelectionProviders()) {
             ModelSelectionProvider targetSP =
@@ -445,9 +475,9 @@ public class DatabaseSyncer {
     }
 
     protected void syncColumns
-            (liquibase.structure.core.Table liquibaseTable, final Table sourceTable, Table targetTable) {
+            (Relation relation, final Table sourceTable, Table targetTable) {
         logger.debug("Synchronizing columns");
-        for(liquibase.structure.core.Column liquibaseColumn : liquibaseTable.getColumns()) {
+        for(liquibase.structure.core.Column liquibaseColumn : relation.getColumns()) {
             logger.debug("Processing column: {}", liquibaseColumn.getName());
 
             Column targetColumn = new Column(targetTable);

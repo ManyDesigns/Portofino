@@ -21,6 +21,8 @@
 package com.manydesigns.portofino.resourceactions.crud;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.annotations.Insertable;
+import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -170,6 +172,13 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
+    public boolean isCreateEnabled() {
+        return classAccessor != null &&
+               (classAccessor.getAnnotation(Insertable.class) == null ||
+                classAccessor.getAnnotation(Insertable.class).value());
+    }
+
+    @Override
     protected void doSave(Object object) {
         try {
             session.save(baseTable.getActualEntityName(), object);
@@ -177,6 +186,13 @@ public class CrudAction extends AbstractCrudAction<Object> {
             logger.warn("Constraint violation in save", e);
             throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
         }
+    }
+
+    @Override
+    public boolean isEditEnabled() {
+        return classAccessor != null &&
+               (classAccessor.getAnnotation(Updatable.class) == null ||
+                classAccessor.getAnnotation(Updatable.class).value());
     }
 
     @Override

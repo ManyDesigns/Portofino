@@ -4,14 +4,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Changed
-- Updated Hibernate to version 5.x
-    - Session factory is now configured with annotated Java classes generated at runtime
-- Guarantee that Portofino 5 can run without a Java compiler (JDK) available 
-
 ### Added
+- Map database views, by default as read-only, but overridable.
+- Support non insertable and/or non updatable entities in CRUD actions.
 - Support for MariaDB Connector/J.
 - Simple automatic JWT renewal (this means that user sessions do not expire during regular user activity).
+
+### Changed
+- Updated Hibernate to version 5.x
+    - Session factory is now configured with annotated Java classes generated at runtime.
+    - Annotations are propagated from model to annotated classes.
+- Guarantee that Portofino 5 can run without a Java compiler (JDK) available.
+- Replaced `java.io.File` with Apache Commons VFS `FileObject` in persistence. **This is a breaking API change.**
 
 ### Fixed
 - Save/update exception not handled properly.

@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -48,6 +49,10 @@ public abstract class AbstractAnnotatedAccessor extends com.manydesigns.elements
     //**************************************************************************
     // Constructors
     //**************************************************************************
+
+    public AbstractAnnotatedAccessor(Annotation... annotations) {
+        this(Arrays.asList(annotations));
+    }
 
     public AbstractAnnotatedAccessor(@Nullable Collection<Annotation> annotations) {
         super();

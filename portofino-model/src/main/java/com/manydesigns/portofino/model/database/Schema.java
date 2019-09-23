@@ -51,8 +51,9 @@ public class Schema implements ModelObject {
     //**************************************************************************
 
     protected Database database;
-    protected final List<Table> immediateTables;
     protected final List<Table> tables = new ArrayList<Table>();
+    @Deprecated
+    protected final List<Table> immediateTables;
 
     protected String schemaName;
     protected String actualSchemaName;
@@ -168,6 +169,7 @@ public class Schema implements ModelObject {
         this.catalog = catalog;
     }
 
+    @Deprecated
     @XmlElementWrapper(name="tables")
     @XmlElement(name = "table", type = Table.class)
     public List<Table> getImmediateTables() {

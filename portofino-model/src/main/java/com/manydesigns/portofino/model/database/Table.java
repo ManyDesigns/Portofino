@@ -199,7 +199,6 @@ public class Table implements ModelObject, Annotated {
         return tableName;
     }
 
-
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }

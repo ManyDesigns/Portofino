@@ -69,7 +69,7 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
     //**************************************************************************
 
     public CrudAccessor(@NotNull final CrudConfiguration crudConfiguration, @NotNull ClassAccessor nestedAccessor) {
-        super(null);
+        super();
         this.crudConfiguration = crudConfiguration;
         this.nestedAccessor = nestedAccessor;
         PropertyAccessor[] columnAccessors = nestedAccessor.getProperties();
@@ -225,7 +225,7 @@ public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAcce
 
     @Override
     public Annotation[] getAnnotations() {
-        List<Annotation> allAnnotations = new ArrayList<Annotation>(annotations.values());
+        List<Annotation> allAnnotations = new ArrayList<>(annotations.values());
         for(Annotation nestedAnnotation : nestedAccessor.getAnnotations()) {
             if(!annotations.containsKey(nestedAnnotation.annotationType())) {
                 allAnnotations.add(nestedAnnotation);

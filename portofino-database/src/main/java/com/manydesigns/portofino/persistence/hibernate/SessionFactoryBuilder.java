@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.persistence.hibernate;
 
+import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.model.database.Column;
@@ -9,6 +10,7 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.model.database.TableGenerator;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.modules.ModuleStatus;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
@@ -20,6 +22,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.hibernate.EntityMode;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 import org.hibernate.boot.Metadata;
@@ -34,6 +37,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
 import org.jadira.usertype.dateandtime.joda.PersistentDateTime;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +46,9 @@ import javax.persistence.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.Types;
@@ -305,8 +312,75 @@ public class SessionFactoryBuilder {
         annotation.addMemberValue("name", new StringMemberValue(table.getActualEntityName(), constPool));
         classAnnotations.addAnnotation(annotation);
 
+        table.getAnnotations().forEach(ann -> {
+            Class annotationClass = ann.getJavaAnnotationClass();
+            if(javax.persistence.Table.class.equals(annotationClass) || Entity.class.equals(annotationClass)) {
+                logger.warn("@Table or @Entity specified on table {}, skipping annotation {}", table.getQualifiedName(), annotationClass);
+                return;
+            }
+            Annotation classAnn = convertAnnotation(constPool, ann);
+            if (classAnn != null) {
+                classAnnotations.addAnnotation(classAnn);
+            }
+            if(annotationClass == Updatable.class && !((Updatable) ann.getJavaAnnotation()).value()) {
+                classAnnotations.addAnnotation(new Annotation(Immutable.class.getName(), constPool));
+            }
+        });
+
         setupColumns(table, cc, constPool);
         return cc;
+    }
+
+    @Nullable
+    protected Annotation convertAnnotation(
+            ConstPool constPool, com.manydesigns.portofino.model.Annotation portofinoAnnotation) {
+        java.lang.annotation.Annotation javaAnnotation = portofinoAnnotation.getJavaAnnotation();
+        if(javaAnnotation == null) {
+            return null;
+        }
+        Class<?> annotationType = javaAnnotation.annotationType();
+        Annotation annotation = new Annotation(annotationType.getName(), constPool);
+        for(Method method : annotationType.getMethods()) {
+            if(Modifier.isStatic(method.getModifiers()) ||
+               method.getDeclaringClass() == Object.class ||
+               method.getDeclaringClass() == java.lang.annotation.Annotation.class ||
+               method.getParameterCount() > 0) {
+                logger.debug("Skipping " + method);
+                continue;
+            }
+            try {
+                Object result = method.invoke(javaAnnotation);
+                if(result == null) {
+                    continue;
+                }
+                Class<?> returnType = method.getReturnType();
+                if(returnType == String.class) {
+                    annotation.addMemberValue(method.getName(), new StringMemberValue((String) result, constPool));
+                } else if(returnType == Integer.class || returnType == Integer.TYPE) {
+                    annotation.addMemberValue(method.getName(), new IntegerMemberValue(constPool, (Integer) result));
+                } else if(returnType == Long.class || returnType == Long.TYPE) {
+                    annotation.addMemberValue(method.getName(), new LongMemberValue((Long) result, constPool));
+                } else if(returnType == Float.class || returnType == Float.TYPE) {
+                    annotation.addMemberValue(method.getName(), new DoubleMemberValue((Double) result, constPool));
+                } else if(returnType == Double.class || returnType == Double.TYPE) {
+                    annotation.addMemberValue(method.getName(), new DoubleMemberValue((Double) result, constPool));
+                } else if(returnType == Character.class || returnType == Character.TYPE) {
+                    annotation.addMemberValue(method.getName(), new CharMemberValue((Character) result, constPool));
+                } else if(returnType == Boolean.class || returnType == Boolean.TYPE) {
+                    annotation.addMemberValue(method.getName(), new BooleanMemberValue((Boolean) result, constPool));
+                } else if(returnType == Class.class) {
+                    annotation.addMemberValue(method.getName(), new ClassMemberValue(((Class) result).getName(), constPool));
+                } else if(returnType.isEnum()) {
+                    EnumMemberValue value = new EnumMemberValue(constPool);
+                    value.setType(returnType.getName());
+                    value.setValue(((Enum<?>) result).name());
+                    annotation.addMemberValue(method.getName(), value);
+                }
+            } catch (Exception e) {
+                logger.warn("Skipping " + method + " as it errored", e);
+            }
+        }
+        return annotation;
     }
 
     protected void setupColumns(Table table, CtClass cc, ConstPool constPool) throws CannotCompileException, NotFoundException {
@@ -344,6 +418,21 @@ public class SessionFactoryBuilder {
             }
 
             setupColumnType(column, fieldAnnotations, constPool);
+
+            column.getAnnotations().forEach(ann -> {
+                Class annotationClass = ann.getJavaAnnotationClass();
+                if(javax.persistence.Column.class.equals(annotationClass) ||
+                   Id.class.equals(annotationClass) ||
+                   org.hibernate.annotations.Type.class.equals(annotationClass)) {
+                    logger.warn("@Column or @Id or @Type specified on column {}, skipping annotation {}", column.getQualifiedName(), annotationClass);
+                    return;
+                }
+                Annotation fieldAnn = convertAnnotation(constPool, ann);
+                if (fieldAnn != null) {
+                    fieldAnnotations.addAnnotation(fieldAnn);
+                }
+            });
+
 
             field.getFieldInfo().addAttribute(fieldAnnotations);
             cc.addField(field);
