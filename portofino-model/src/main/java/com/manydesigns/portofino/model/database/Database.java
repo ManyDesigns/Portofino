@@ -86,7 +86,12 @@ public class Database implements ModelObject {
     public void reset() {}
 
     public void init(Model model, Configuration configuration) {
-        assert databaseName != null;
+        if(databaseName == null) {
+            throw new IllegalStateException("Database name is null");
+        }
+        if(databaseName.contains("/") || databaseName.contains("\\")) {
+            throw new IllegalStateException("Database name contains slashes or backslashes: " + databaseName);
+        }
     }
 
     public void link(Model model, Configuration configuration) {}

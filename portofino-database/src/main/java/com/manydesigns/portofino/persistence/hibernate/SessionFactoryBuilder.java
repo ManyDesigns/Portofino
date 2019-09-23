@@ -106,7 +106,9 @@ public class SessionFactoryBuilder {
         try {
 
             CtClass baseClass = generateBaseClass();
-            try(OutputStream outputStream = root.resolveFile(database.getDatabaseName() + FileName.SEPARATOR_CHAR + "BaseEntity.class").getContent().getOutputStream()) {
+            FileObject baseClassFile = root.resolveFile(
+                    database.getDatabaseName() + FileName.SEPARATOR_CHAR + "BaseEntity.class");
+            try(OutputStream outputStream = baseClassFile.getContent().getOutputStream()) {
                 outputStream.write(baseClass.toBytecode());
             }
 
