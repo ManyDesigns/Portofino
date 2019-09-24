@@ -111,5 +111,5 @@ export const TRANSLATIONS_IT = {
   "Wizard": "Wizard",
   "_ not found": "{{what}} non trovato",
   "_ is required.": "{{label}} è obbligatorio.",
-  '_: max _.': "{label}: max {max}.",
+  '_: max _.': "{{label}}: max {max}.",
 };

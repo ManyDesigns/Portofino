@@ -173,12 +173,19 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return context.getActionPath();
     }
 
+    /**
+     * Returns the absolute URI of the REST API root. The API root can be set in the web.xml descriptor with the init
+     * parameter <code>portofino.api.root</code>. It can be an absolute URL or a relative URL; if it's relative,
+     * it is completed with the resource's protocol, host and port.
+     * @return the URI of the REST API root.
+     */
     public String getApiRootUri() {
         ServletContext servletContext = getContext().getServletContext();
         String apiRoot = servletContext.getInitParameter("portofino.api.root");
         if (apiRoot == null) {
-            apiRoot = "http://localhost:8080";
-        } else if (apiRoot.contains("://")) {
+            apiRoot = "";
+        }
+        if (apiRoot.contains("://")) {
             //Keep as is
         } else if (!apiRoot.startsWith("/")) {
             apiRoot = servletContext.getContextPath() + "/" + apiRoot;
@@ -194,7 +201,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     public String getAbsoluteActionPath() {
-        return getApiRootUri() + getActionPath();
+        String actionPath = getActionPath();
+        if(actionPath.startsWith("/")) {
+            actionPath = actionPath.substring(1);
+        }
+        return getApiRootUri() + actionPath;
     }
 
     //--------------------------------------------------------------------------

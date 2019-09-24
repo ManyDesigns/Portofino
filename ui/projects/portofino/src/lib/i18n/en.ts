@@ -8,6 +8,6 @@ export const TRANSLATIONS_EN = {
   "permission: crud-edit": "Edit",
   "permission: crud-delete": "Delete",
   "_ is required.": "{{label}} is required.",
-  '_: max _.': "{label}: max {max}.",
+  '_: max _.': "{{label}}: max {{max}}.",
   'Invalid date, _ expected.': "Invalid date, {{dateFormat}} expected."
 };
