@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Support for MariaDB Connector/J.
 - Simple automatic JWT renewal (this means that user sessions do not expire during regular user activity).
+- Possibility to override buttons in subclasses [[#253]](https://github.com/ManyDesigns/Portofino/issues/253).
 
 ### Changed
 - JWT expiration property is now called `jwt.expiration`.

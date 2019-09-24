@@ -14,8 +14,7 @@ import {BlobFile, Configuration, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
 import {Field, Form, FormComponent} from "../form";
 import {NotificationService} from "../notifications/notification.service";
-import {Button, ButtonInfo, getButtons} from "../buttons";
-import {WithButtons} from "../button.component";
+import {Button, ButtonInfo, getButtons, WithButtons} from "../buttons";
 import {TranslateService} from "@ngx-translate/core";
 
 export abstract class BaseDetailComponent implements WithButtons, OnDestroy {

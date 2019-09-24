@@ -13,10 +13,9 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
-import {declareButton, getButtons} from "./buttons";
+import {declareButton, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, map, mergeMap} from "rxjs/operators";
-import {WithButtons} from "./button.component";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
 

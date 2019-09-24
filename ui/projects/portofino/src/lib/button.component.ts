@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {ButtonInfo} from "./buttons";
+import {ButtonInfo, WithButtons} from "./buttons";
 
 @Component({
   selector: 'portofino-button',
@@ -15,10 +15,6 @@ export class ButtonComponent {
   button: ButtonInfo;
   @Input()
   component: any;
-}
-
-export interface WithButtons {
-  getButtons(list: string): ButtonInfo[] | null;
 }
 
 @Component({
