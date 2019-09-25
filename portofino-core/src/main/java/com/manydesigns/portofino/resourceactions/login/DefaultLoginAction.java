@@ -98,7 +98,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
             usernamePasswordToken.setRememberMe(false);
             subject.login(usernamePasswordToken);
-            logger.info("User {} login", ShiroUtils.getUserId(subject));
+            logger.info("User {} logged in", ShiroUtils.getUserId(subject));
             Object principal = subject.getPrincipal();
             subject.logout();
             PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
@@ -118,9 +118,10 @@ public class DefaultLoginAction extends AbstractResourceAction {
     public String renewToken() {
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
+            Object principal = subject.getPrincipal();
             subject.logout();
             PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
-            String token = portofinoRealm.generateWebToken(subject.getPrincipal());
+            String token = portofinoRealm.generateWebToken(principal);
             subject.login(new JSONWebToken(token));
             return token;
         } else {
@@ -145,11 +146,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     public String userInfo(Subject subject, PortofinoRealm portofinoRealm, String jwt) {
         boolean administrator = SecurityLogic.isAdministrator(portofinoConfiguration);
-        Session session = subject.getSession(true);
         JSONStringer stringer = new JSONStringer();
         stringer.
             object().
-                key("portofinoSessionId").value(session.getId()).
                 key("userId").value(ShiroUtils.getUserId(subject)).
                 key("displayName").value(portofinoRealm.getUserPrettyName((Serializable) subject.getPrincipal())).
                 key("administrator").value(administrator).

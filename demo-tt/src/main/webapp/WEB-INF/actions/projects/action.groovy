@@ -1,20 +1,15 @@
 package com.manydesigns.portofino.resourceactions.crud
 
-import com.manydesigns.portofino.resourceactions.crud.CrudAction
-import com.manydesigns.portofino.tt.Refresh
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
-import com.manydesigns.portofino.operations.GuardType
-import com.manydesigns.portofino.operations.annotations.Guard
+import com.manydesigns.portofino.resourceactions.crud.CrudAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import org.springframework.beans.factory.annotation.Autowired
-
-import javax.ws.rs.GET
+import com.manydesigns.portofino.tt.Refresh
+import com.manydesigns.portofino.tt.TtUtils
 import org.apache.shiro.SecurityUtils
+import org.springframework.beans.factory.annotation.Autowired
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -24,6 +19,10 @@ class ProjectsCrudAction extends CrudAction {
     Refresh refresh
 
     Object old
+
+    static {
+        logger.info("Loaded action - ${ProjectsCrudAction.class.hashCode()} - ${Refresh.class.hashCode()}")
+    }
 
     //**************************************************************************
     // Role checking

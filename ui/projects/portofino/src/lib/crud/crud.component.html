@@ -33,13 +33,41 @@
       <legend>{{'Properties' | translate}}</legend>
       <table class="mat-table">
         <tr class="mat-header-row">
-          <th class="mat-header-cell">{{'Enabled' | translate}}</th>
-          <th class="mat-header-cell">{{'Name' | translate}}</th>
-          <th class="mat-header-cell">{{'Label' | translate}}</th>
-          <th class="mat-header-cell">{{'Insertable' | translate}}</th>
-          <th class="mat-header-cell">{{'Updatable' | translate}}</th>
-          <th class="mat-header-cell">{{'In Summary' | translate}}</th>
-          <th class="mat-header-cell">{{'Searchable' | translate}}</th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Enabled' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Name' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Label' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Insertable' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Updatable' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'In Summary' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Searchable' | translate}}</button>
+            </div>
+          </th>
         </tr>
         <tr *ngFor="let p of settingsPanel['properties']" class="mat-row">
           <td class="mat-cell"><mat-checkbox [(ngModel)]="p.enabled"></mat-checkbox></td>
@@ -56,10 +84,26 @@
       <legend>{{'Selection providers' | translate}}</legend>
       <table class="mat-table">
         <tr class="mat-header-row">
-          <th class="mat-header-cell">{{'Properties' | translate}}</th>
-          <th class="mat-header-cell">{{'Selection Provider' | translate}}</th>
-          <th class="mat-header-cell">{{'Display Mode' | translate}}</th>
-          <th class="mat-header-cell">{{'Search Display Mode' | translate}}</th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Properties' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Selection Provider' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Display Mode' | translate}}</button>
+            </div>
+          </th>
+          <th class="mat-header-cell">
+            <div class="mat-sort-header-container">
+              <button class="mat-sort-header-button">{{'Search Display Mode' | translate}}</button>
+            </div>
+          </th>
         </tr>
         <tr *ngFor="let sp of settingsPanel['selectionProviders']" class="mat-row">
           <td class="mat-cell">

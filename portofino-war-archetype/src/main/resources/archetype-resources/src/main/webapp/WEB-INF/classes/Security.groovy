@@ -1,8 +1,8 @@
-import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
+import com.manydesigns.portofino.security.SecurityLogic
+import com.manydesigns.portofino.shiro.*
+import org.apache.shiro.authc.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.apache.shiro.authc.*
 
 class Security extends AbstractPortofinoRealm {
 

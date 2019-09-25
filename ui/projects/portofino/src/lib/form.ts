@@ -150,7 +150,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   set controls(controls: FormGroup) {
     this._controls = controls;
     if(controls && this.form) {
-      this.reset(this.form, false);
+      this.reset(this.form);
     }
   }
   get controls() {
@@ -202,11 +202,8 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.formReset.complete();
   }
 
-  protected reset(form: Form, andControls = true) {
+  protected reset(form: Form) {
     this.setupForm(form, this.controls);
-    if(andControls) {
-      this.controls = Object.assign(new FormGroup({}), this.controls);
-    }
     this.formReset.emit(this);
   }
 
@@ -252,6 +249,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
           formArray.setControl(i, formGroup); //TODO maybe reuse existing?
         }
+        formGroup.setParent(formArray);
       });
     } else {
       control = new FormArray([]);
@@ -259,8 +257,10 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
         let formGroup = new FormGroup({});
         this.setupForm(f, formGroup);
         (control as FormArray).push(formGroup);
+        formGroup.setParent(control as FormArray);
       });
       formGroup.setControl(v.name, control);
+      control.setParent(formGroup);
     }
   }
 
@@ -269,6 +269,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
     const control = new FormGroup({});
     const name = v['name'];
     formGroup.setControl(name, control);
+    control.setParent(formGroup);
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(v['component']);
     const viewContainerRef = this.dynamicComponents.find(c => c.name == name).viewContainerRef;
     viewContainerRef.clear();
@@ -290,6 +291,7 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
       control = new FormGroup({});
       this.setupForm(v.contents, control as FormGroup);
       formGroup.setControl(v.name, control);
+      control.setParent(formGroup);
     }
   }
 
@@ -307,10 +309,13 @@ export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
       subGroup.setControl("confirmPassword", new FormControl(initialState, getValidators(property)));
       subGroup.setValidators(samePasswordChecker("password", "confirmPassword"));
       formGroup.setControl(property.name, subGroup);
+      subGroup.setParent(formGroup);
     } else if (control instanceof FormControl) {
       control.reset(initialState);
     } else {
-      formGroup.setControl(property.name, new FormControl(initialState, getValidators(property)));
+      const newControl = new FormControl(initialState, getValidators(property));
+      formGroup.setControl(property.name, newControl);
+      newControl.setParent(formGroup);
     }
   }
 

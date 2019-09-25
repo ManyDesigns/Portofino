@@ -1,4 +1,5 @@
 import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.tt.Dependency
 import com.manydesigns.portofino.tt.NotificationsJob
 import com.manydesigns.portofino.tt.Refresh
 import com.manydesigns.portofino.tt.TtUtils
@@ -69,7 +70,12 @@ class SpringConfiguration {
 
     @Bean
     Refresh getRefresh() {
-        return new Refresh();
+        new Refresh()
+    }
+
+    @Bean
+    Dependency getDependency() {
+        new Dependency()
     }
 
 }

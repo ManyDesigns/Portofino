@@ -115,7 +115,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     public String generateWebToken(Object principal) {
         Key key = getJWTKey();
         Map<String, Object> claims = new HashMap<>();
-        claims.put("principal", principal);
+        claims.put("principal", getPrincipalForWebToken(principal));
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream;
         try {
@@ -132,6 +132,20 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
                 setExpiration(new DateTime().plusMinutes(expireAfterMinutes).toDate()).
                 signWith(key, SignatureAlgorithm.HS512).
                 compact();
+    }
+
+    protected Object getPrincipalForWebToken(Object principal) {
+        return cleanUserPrincipal(principal);
+    }
+
+    /**
+     * Clean the user principal making it suitable for JSON serialization. For example, if it is a map, remove
+     * circular references. By default, this returns the principal as-is.
+     * @param principal the principal.
+     * @return
+     */
+    protected Object cleanUserPrincipal(Object principal) {
+        return principal;
     }
 
     @NotNull

@@ -81,8 +81,8 @@ public class GroovyCodeBase extends AbstractCodeBase {
     }
 
     @Override
-    public void clear() throws Exception {
-        super.clear();
+    public void clear(boolean recursively) throws Exception {
+        super.clear(recursively);
         resetGroovyScriptEngine();
     }
 }

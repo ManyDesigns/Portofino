@@ -8,7 +8,7 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {MainPageDirective} from "./content.directive";
 import {Subscription} from "rxjs";
@@ -43,17 +43,19 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscriptions.push(this.authenticationService.logins.subscribe(() => this.reloadPage()));
-    this.subscriptions.push(this.authenticationService.logouts.subscribe(() => this.router.navigateByUrl("/")));
+    this.subscriptions.push(this.authenticationService.logouts.subscribe(() => this.navigateToRootPage()));
     this.subscriptions.push(this.authenticationService.declinedLogins.subscribe(() => {
       //Give the page a chance to handle it
-      if(!this.pageService.page || this.pageService.page.handleDeclinedLogin()) {
-        if(this.isRootPage()) {
-          window.location.reload(); //TODO
-        } else {
-          this.router.navigateByUrl("/");
-        }
-      }
+      if(!this.pageService.page || this.pageService.page.handleDeclinedLogin()) { this.navigateToRootPage(); }
     }));
+  }
+
+  protected navigateToRootPage() {
+    if (this.isRootPage()) {
+      window.location.reload(); //TODO
+    } else {
+      this.router.navigateByUrl("/");
+    }
   }
 
   ngAfterViewInit() {
@@ -73,7 +75,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   protected reloadPage() {
-    if (this.router.url && this.router.url != "/") {
+    if (!this.isRootPage()) {
       this.router.navigateByUrl(this.router.url);
     } else {
       window.location.reload(); //TODO

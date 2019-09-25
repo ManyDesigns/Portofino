@@ -1,23 +1,25 @@
 package com.manydesigns.portofino.tt
 
+import com.manydesigns.portofino.persistence.Persistence
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 
 import javax.annotation.PostConstruct
 
 /**
  * Sample class showcasing Spring context reload support.
  */
-@Component
-class Refresh {
+@Service
+class Dependency {
     Logger logger = LoggerFactory.getLogger(this.class)
 
     boolean changeMe = true
 
     @Autowired
-    Dependency dependency
+    Persistence persistence
 
     @PostConstruct
     void hello() {

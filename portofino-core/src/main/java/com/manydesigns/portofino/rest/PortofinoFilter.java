@@ -157,8 +157,12 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         if (principal == null) {
             logger.debug("No user found");
         } else {
-            userId = ShiroUtils.getUserId(subject);
-            logger.debug("Retrieved userId={}", userId);
+            try {
+                userId = ShiroUtils.getUserId(subject);
+                logger.debug("Retrieved userId = {}", userId);
+            } catch (Exception e) {
+                logger.warn("Could not retrieve user id. This usually happens if Security.groovy has been changed in an incompatible way.", e);
+            }
         }
 
         logger.debug("Setting up logging MDC");

@@ -10,8 +10,8 @@
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
     {{ '_ is required.' | translate:{ label: property.label } }}
   </mat-error>
-  <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger">
-    {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxLength').message } }}
+  <mat-error *ngIf="control.hasError('maxlength')" class="alert alert-danger">
+    {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxlength').message } }}
   </mat-error>
   <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
     <ng-container *ngFor="let error of control.getError('server-side')">
@@ -27,8 +27,8 @@
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
       {{ '_ is required.' | translate:{ label: property.label } }}
     </mat-error>
-    <mat-error *ngIf="control.hasError('maxLength')" class="alert alert-danger">
-      {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxLength').message } }}
+    <mat-error *ngIf="control.hasError('maxlength')" class="alert alert-danger">
+      {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxlength').message } }}
     </mat-error>
     <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">

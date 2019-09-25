@@ -67,7 +67,6 @@ public class NotificationsJob implements Job {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-
     public final static Logger logger =
             LoggerFactory.getLogger(NotificationsJob.class);
 
@@ -75,17 +74,17 @@ public class NotificationsJob implements Job {
             "WHERE act.project IS NOT NULL AND act.notifications_sent is null ORDER BY act.id ASC";
 
     @Autowired
-    public ServletContext servletContext;
+    public ServletContext servletContext
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
+    public Configuration configuration
 
     @Autowired
-    Persistence persistence;
+    Persistence persistence
 
     @Autowired
-    MailQueue mailQueue;
+    MailQueue mailQueue
 
     void execute(JobExecutionContext context) {
         List<ActivityItem> activityItems = new ArrayList<ActivityItem>();

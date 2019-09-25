@@ -3,6 +3,8 @@ package com.manydesigns.portofino.code;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import org.apache.commons.vfs2.FileObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public abstract class AbstractCodeBase implements CodeBase {
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCodeBase.class);
     protected CodeBase parent;
     protected final ConcurrentMap<String, WeakReference<Class>> knownClasses = new ConcurrentHashMap<>();
     protected final Subject<Class> reloads = PublishSubject.create();
@@ -35,7 +38,8 @@ public abstract class AbstractCodeBase implements CodeBase {
     }
 
     protected void parentClassReloaded(Class c) throws Exception {
-        clear();
+        logger.debug("Parent class {} reloaded, clearing codebase", c.getName());
+        clear(false);
     }
 
     @Override
@@ -80,9 +84,9 @@ public abstract class AbstractCodeBase implements CodeBase {
     }
 
     @Override
-    public void clear() throws Exception {
-        if(parent != null) {
-            parent.clear();
+    public void clear(boolean recursively) throws Exception {
+        if(recursively && parent != null) {
+            parent.clear(recursively);
         }
     }
 

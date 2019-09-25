@@ -2,8 +2,6 @@ package com.manydesigns.portofino.upstairs.appwizard
 
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.elements.util.RandomUtil
-import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.logic.SecurityLogic
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
@@ -11,6 +9,7 @@ import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.reflection.TableAccessor
+import com.manydesigns.portofino.security.SecurityLogic
 import com.manydesigns.portofino.util.PkHelper
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.crypto.hash.DefaultHashService
@@ -27,6 +26,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
+import org.springframework.beans.factory.annotation.Autowired
 
 public class Security extends AbstractPortofinoRealm {
 
@@ -88,9 +88,8 @@ public class Security extends AbstractPortofinoRealm {
                 groups.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
             }
             /////////////////////////////////////////////////////////////////
-        } else {
+        } else if(principal instanceof Map) {
             //Load groups from the database
-            assert principal instanceof Map;
             Session session = persistence.getSession(databaseName);
             def queryString = """
                 select distinct g.${groupNameProperty}
@@ -144,29 +143,31 @@ public class Security extends AbstractPortofinoRealm {
         List result = session.createQuery(criteria).list()
 
         if (result.size() == 1) {
-            def user = cleanUser(result[0])
+            def user = cleanUserPrincipal(result[0])
             return new SimpleAuthenticationInfo(user, user[passwordProperty], name)
         } else {
             throw new IncorrectCredentialsException("Login failed");
         }
     }
 
-    protected Map cleanUser(user) {
-        try {
-            user.hashCode()
-        } catch (StackOverflowError ignored) {
-            logger.warn("The user entity has self-references that make it unusable as a principal. Returning a non-persistent map with no references.")
-            Map cleanUser = new HashMap()
-            user.each { k, v ->
-                if (v instanceof List || v instanceof Map) {
-                    logger.debug("Skipping {}", k)
-                } else {
-                    cleanUser.put(k, v)
-                }
+    @Override
+    protected Object cleanUserPrincipal(user) {
+        Map cleanUser = new HashMap()
+        boolean skipped = false
+        user.each { k, v ->
+            if (v instanceof List || v instanceof Map) {
+                logger.debug("Skipping {}", k)
+                skipped = true
+            } else {
+                cleanUser.put(k, v)
             }
-            user = cleanUser
         }
-        user
+        if(skipped) {
+            logger.debug("The user entity has potential self-references that make it unusable as a principal, because it must be serializable to JSON. Returning a non-persistent map with no references.")
+            return cleanUser
+        } else {
+            return user
+        }
     }
 
     AuthenticationInfo loadAuthenticationInfo(PasswordResetToken token) {
@@ -188,7 +189,7 @@ public class Security extends AbstractPortofinoRealm {
             session.update(userTableEntityName, (Object) user);
             session.transaction.commit();
             SimpleAuthenticationInfo info =
-                new SimpleAuthenticationInfo(user, hashedPassword, getName());
+                new SimpleAuthenticationInfo(cleanUserPrincipal(user), hashedPassword, getName());
             return info;
         } else {
             throw new IncorrectCredentialsException("Invalid token");
@@ -213,7 +214,7 @@ public class Security extends AbstractPortofinoRealm {
             session.update(userTableEntityName, (Object) user);
             session.transaction.commit();
             SimpleAuthenticationInfo info =
-                new SimpleAuthenticationInfo(user, encryptPassword(token.credentials), getName());
+                new SimpleAuthenticationInfo(cleanUserPrincipal(user), encryptPassword(token.credentials), getName());
             return info;
         } else {
             throw new IncorrectCredentialsException("Invalid token");

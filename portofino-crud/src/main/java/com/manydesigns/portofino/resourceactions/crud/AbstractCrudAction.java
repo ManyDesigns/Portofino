@@ -673,7 +673,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * @return the search URL.
      */
     protected String calculateBaseSearchUrl() {
-        String baseUrl = Util.getAbsoluteUrl(context.getActionPath());
+        String baseUrl = getAbsoluteActionPath();
         if(pk != null) {
             for(int i = 0; i < pk.length; i++) {
                 int lastSlashIndex = baseUrl.lastIndexOf('/');
@@ -681,6 +681,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             }
         }
         return baseUrl;
+    }
+
+    protected String generateObjectUrl(Object o) {
+        return generateObjectUrl(calculateBaseSearchUrl(), o);
     }
 
     protected String generateObjectUrl(String baseUrl, int index) {
@@ -1435,7 +1439,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     /**
-     * Encodes the exploded object indentifier to include it in a URL.
+     * Encodes the exploded object identifier to include it in a URL.
      * @param pk the object identifier as a String array.
      * @return the string to append to the URL.
      */
@@ -1671,10 +1675,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     protected Response objectCreated() throws URISyntaxException {
         form.readFromObject(object); //Re-read so that the full object is returned
-        OgnlTextFormat textFormat = getReadURLFormat();
         return Response.status(Response.Status.CREATED).
                 entity(form).
-                location(new URI(textFormat.format(object))).
+                location(new URI(generateObjectUrl(object))).
                 build();
     }
 

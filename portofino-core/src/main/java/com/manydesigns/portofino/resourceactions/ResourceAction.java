@@ -38,13 +38,15 @@ public interface ResourceAction extends SecureResource {
     void setContext(ActionContext context);
 
     /**
-     * Returns the action that comes before this action the the matched path.
-     * @since 5.0.0-SNAPSHOT
+     * Returns the action that comes before this action in the matched request path.
+     * @since 5.0.0
+     * @return the parent {@link ResourceAction}.
      */
     ResourceAction getParent();
 
     /**
      * Returns the ActionInstance of this element.
+     * @return the {@link ActionInstance}.
      */
     ActionInstance getActionInstance();
 
@@ -55,7 +57,7 @@ public interface ResourceAction extends SecureResource {
 
     /**
      * Lifecycle method invoked just before the resource method is invoked via REST.
-     * @since 5.0.0-SNAPSHOT
+     * @since 5.0.0
      */
     void prepareForExecution();
 

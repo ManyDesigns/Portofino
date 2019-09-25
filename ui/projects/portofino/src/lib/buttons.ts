@@ -1,4 +1,4 @@
-import { ThemePalette } from "@angular/material/core";
+import {ThemePalette} from "@angular/material/core";
 
 export const BUTTONS = "__portofinoButtons__";
 
@@ -35,6 +35,8 @@ export function declareButton(info: ButtonInfo | any, target, methodName: string
   if(!target[BUTTONS].hasOwnProperty(info.list)) {
     target[BUTTONS][info.list] = [];
   }
+  //Override
+  target[BUTTONS][info.list] = target[BUTTONS][info.list].filter(i => i.methodName != info.methodName);
   target[BUTTONS][info.list].push(info);
 }
 
@@ -47,4 +49,8 @@ export function Button(info: ButtonInfo | any) {
 export function getButtons(component, list: string = 'default'): ButtonInfo[] | null {
   const allButtons = component[BUTTONS];
   return allButtons ? allButtons[list] : null;
+}
+
+export interface WithButtons {
+  getButtons(list: string): ButtonInfo[] | null;
 }

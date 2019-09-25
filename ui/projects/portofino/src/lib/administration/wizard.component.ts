@@ -91,8 +91,14 @@ export class WizardComponent extends Page implements OnInit {
           });
         }, 1)).subscribe( //Note concurrent: 1. It is necessary for calls to be executed sequentially.
           () => {},
-          error => this.notificationService.info("Error " + error), //TODO describe, I18n
-          () => this.notificationService.info(this.translate.instant("Application created.")));
+          error => this.notificationService.error("Error " + error), //TODO describe, I18n
+          () => {
+            this.notificationService.info(this.translate.instant("Pages created."));
+            this.http.post(`${url}/security`, wizard).subscribe(
+              () => this.notificationService.info(this.translate.instant("Application created.")),
+              ()  => this.notificationService.error(this.translate.get("Error creating Security.groovy"))
+            );
+          });
       } else {
         this.notificationService.info(this.translate.instant("Local API not available. Only the application backend has been created."));
       }
