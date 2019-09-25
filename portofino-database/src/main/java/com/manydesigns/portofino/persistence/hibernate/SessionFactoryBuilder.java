@@ -522,7 +522,9 @@ public class SessionFactoryBuilder {
                 ArrayMemberValue parameters = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
                 List<AnnotationMemberValue> typeParams = new ArrayList<>();
                 for(Map.Entry param : databaseSpecificType.parameters.entrySet()) {
-                    typeParams.add(new AnnotationMemberValue(makeParameterAnnotation(param.getKey().toString(), String.valueOf(param.getValue()), constPool), constPool));
+                    Annotation typeParam = makeParameterAnnotation(
+                            param.getKey().toString(), String.valueOf(param.getValue()), constPool);
+                    typeParams.add(new AnnotationMemberValue(typeParam, constPool));
                 }
                 parameters.setValue(typeParams.toArray(new AnnotationMemberValue[0]));
                 annotation.addMemberValue("parameters", parameters);
