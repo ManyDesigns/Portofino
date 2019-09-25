@@ -146,11 +146,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     public String userInfo(Subject subject, PortofinoRealm portofinoRealm, String jwt) {
         boolean administrator = SecurityLogic.isAdministrator(portofinoConfiguration);
-        Session session = subject.getSession(true);
         JSONStringer stringer = new JSONStringer();
         stringer.
             object().
-                key("portofinoSessionId").value(session.getId()).
                 key("userId").value(ShiroUtils.getUserId(subject)).
                 key("displayName").value(portofinoRealm.getUserPrettyName((Serializable) subject.getPrincipal())).
                 key("administrator").value(administrator).

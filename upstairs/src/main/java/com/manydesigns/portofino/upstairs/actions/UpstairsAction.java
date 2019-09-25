@@ -643,7 +643,7 @@ public class UpstairsAction extends AbstractResourceAction {
         bindings.put("groupIdProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupIdProperty)));
         bindings.put("groupNameProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupNameProperty)));
 
-        Table userGroupTable = getTable(wizard.groupsTable);
+        Table userGroupTable = getTable(wizard.userGroupTable);
         bindings.put("userGroupTableEntityName",
                 userGroupTable != null ? userGroupTable.getActualEntityName() : "");
         bindings.put("groupLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.groupLinkProperty)));

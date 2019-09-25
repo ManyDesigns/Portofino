@@ -88,9 +88,8 @@ public class Security extends AbstractPortofinoRealm {
                 groups.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
             }
             /////////////////////////////////////////////////////////////////
-        } else {
+        } else if(principal instanceof Map) {
             //Load groups from the database
-            assert principal instanceof Map;
             Session session = persistence.getSession(databaseName);
             def queryString = """
                 select distinct g.${groupNameProperty}
