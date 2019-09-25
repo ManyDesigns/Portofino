@@ -34,7 +34,7 @@ import liquibase.database.jvm.JdbcConnection;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -46,8 +46,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.*;
 import java.util.*;
 
@@ -74,7 +74,7 @@ public class UpstairsAction extends AbstractResourceAction {
 
     @Autowired
     @Qualifier(ACTIONS_DIRECTORY)
-    File actionsDirectory;
+    FileObject actionsDirectory;
 
     @SuppressWarnings({"RedundantStringConstructorCall"})
     public static final String NO_LINK_TO_PARENT = new String();
@@ -143,13 +143,13 @@ public class UpstairsAction extends AbstractResourceAction {
                         if(table == userTable) {
                             userCrudCreated = true;
                         }
-                        File dir = new File(actionsDirectory, table.getActualEntityName());
+                        FileObject dir = actionsDirectory.resolveFile(table.getActualEntityName());
                         createCrudAction(database.getConnectionProvider(), dir, table, template, userTable, userPasswordColumn, createdPages);
                     }
                 }
                 if(userTable != null) {
                     if(!userCrudCreated) {
-                        File dir = new File(actionsDirectory, userTable.getActualEntityName());
+                        FileObject dir = actionsDirectory.resolveFile(userTable.getActualEntityName());
                         createCrudAction(database.getConnectionProvider(), dir, userTable, template, userTable, userPasswordColumn, createdPages);
                     }
                     setupUserPages(database.getConnectionProvider(), template, userTable, createdPages);
@@ -199,7 +199,7 @@ public class UpstairsAction extends AbstractResourceAction {
     }
 
     protected ActionDescriptor createCrudAction(
-            ConnectionProvider connectionProvider, File dir, Table table, Template template,
+            ConnectionProvider connectionProvider, FileObject dir, Table table, Template template,
             Table userTable, Column userPasswordColumn, List<Map> createdPages) throws Exception {
         String query = "from " + table.getActualEntityName() + " order by id desc";
         HashMap<String, String> bindings = new HashMap<>();
@@ -211,14 +211,15 @@ public class UpstairsAction extends AbstractResourceAction {
 
     protected ActionDescriptor createCrudAction(
             ConnectionProvider connectionProvider,
-            File dir, Table table, String query,
+            FileObject dir, Table table, String query,
             Template template, Map<String, String> bindings, Table userTable, Column userPasswordColumn, List<Map> createdPages, int depth)
             throws Exception {
         if(dir.exists()) {
             RequestMessages.addWarningMessage(
-                    ElementsThreadLocals.getText("directory.exists.page.not.created._", dir.getAbsolutePath()));
-        } else if(dir.mkdirs()) {
-            logger.info("Creating CRUD action {}", dir.getAbsolutePath());
+                    ElementsThreadLocals.getText("directory.exists.page.not.created._", dir.getName().getPath()));
+        } else {
+            dir.createFolder();
+            logger.info("Creating CRUD action {}", dir.getName().getPath());
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(table.getDatabaseName());
             configuration.setupDefaults();
@@ -235,34 +236,34 @@ public class UpstairsAction extends AbstractResourceAction {
                 summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, column.equals(userPasswordColumn));
             }
 
-            FileObject directory = VFS.getManager().toFileObject(dir);
-            ActionLogic.saveConfiguration(directory, configuration);
+            ActionLogic.saveConfiguration(dir, configuration);
             ActionDescriptor action = new ActionDescriptor();
-            ActionLogic.saveActionDescriptor(directory, action);
-            File actionFile = new File(dir, "action.groovy");
-            try(FileWriter fileWriter = new FileWriter(actionFile)) {
+            ActionLogic.saveActionDescriptor(dir, action);
+            FileObject actionFile = dir.resolveFile("action.groovy");
+            try(Writer fileWriter = new OutputStreamWriter(actionFile.getContent().getOutputStream())) {
                 template.make(bindings).writeTo(fileWriter);
             }
 
             logger.debug("Creating _detail directory");
-            File detailDir = new File(dir, ActionInstance.DETAIL);
-            if(!detailDir.isDirectory() && !detailDir.mkdir()) {
-                logger.warn("Could not create detail directory {}", detailDir.getAbsolutePath());
+            FileObject detailDir = dir.resolveFile(ActionInstance.DETAIL);
+            if(detailDir.getType() != FileType.FOLDER) {
+                logger.warn("Invalid detail directory {}", detailDir.getName().getPath());
                 RequestMessages.addWarningMessage(
-                        ElementsThreadLocals.getText("couldnt.create.directory", detailDir.getAbsolutePath()));
+                        ElementsThreadLocals.getText("invalid.detail.directory", detailDir.getName().getPath()));
             }
+            detailDir.createFolder();
 
-            String path = dir.getName();
-            File parent = dir.getParentFile().getParentFile(); //two because of _detail
+            String path = dir.getName().getBaseName();
+            FileObject parent = dir.getParent().getParent(); //two because of _detail
             for(int i = 1; i < depth; i++) {
-                path =  parent.getName() + "/" + ActionInstance.DETAIL + "/" + path;
-                parent = parent.getParentFile().getParentFile();
+                path = parent.getName().getBaseName() + "/" + ActionInstance.DETAIL + "/" + path;
+                parent = parent.getParent().getParent();
             }
             Map<String, Object> pageInfo = new HashMap<>();
             pageInfo.put("path", path);
             pageInfo.put("detail", depth > 1);
             pageInfo.put("type", "crud");
-            pageInfo.put("title", Util.guessToWords(dir.getName()));
+            pageInfo.put("title", Util.guessToWords(dir.getName().getBaseName()));
             createdPages.add(pageInfo);
 
             if(depth < maxDepth) {
@@ -272,10 +273,6 @@ public class UpstairsAction extends AbstractResourceAction {
                 }
             }
             return action;
-        } else {
-            logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
-            RequestMessages.addWarningMessage(
-                    ElementsThreadLocals.getText("couldnt.create.directory", dir.getAbsolutePath()));
         }
         return null;
     }
@@ -305,7 +302,7 @@ public class UpstairsAction extends AbstractResourceAction {
 
     protected void createChildCrudPage(
             ConnectionProvider connectionProvider,
-            File dir, Template template, String parentName, Collection<Reference> references,
+            FileObject dir, Template template, String parentName, Collection<Reference> references,
             Reference ref, Table userTable, Column userPasswordColumn, List<Map> createdPages, int depth)
             throws Exception {
         Column fromColumn = ref.getActualFromColumn();
@@ -323,7 +320,7 @@ public class UpstairsAction extends AbstractResourceAction {
         if (multipleRoles) {
             childDirName += "-as-" + linkToParentProperty;
         }
-        File childDir = new File(new File(dir, ActionInstance.DETAIL), childDirName);
+        FileObject childDir = dir.resolveFile(ActionInstance.DETAIL).resolveFile(childDirName);
 
         Map<String, String> bindings = new HashMap<>();
         bindings.put("parentName", parentName);
@@ -602,7 +599,7 @@ public class UpstairsAction extends AbstractResourceAction {
                 if(multipleRoles) {
                     dirName += "-as-" + linkToUserProperty;
                 }
-                File dir = new File(actionsDirectory, dirName);
+                FileObject dir = actionsDirectory.resolveFile(dirName);
 
                 Map<String, String> bindings = new HashMap<>();
                 bindings.put("parentName", "securityUtils");
@@ -619,7 +616,7 @@ public class UpstairsAction extends AbstractResourceAction {
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);
                     action.setPermissions(permissions);
-                    ActionLogic.saveActionDescriptor(VFS.getManager().toFileObject(dir), action);
+                    ActionLogic.saveActionDescriptor(dir, action);
                 }
             }
         }
@@ -666,11 +663,11 @@ public class UpstairsAction extends AbstractResourceAction {
             default:
                 throw new IllegalArgumentException("Unsupported encoding: " + algoAndEncoding[1]);
         }
-        File codeBaseRoot = new File(actionsDirectory.getParentFile(), "classes");
-        File securityGroovyFile = new File(codeBaseRoot, "Security.groovy");
-        try(FileWriter fw = new FileWriter(securityGroovyFile)) {
+        FileObject codeBaseRoot = actionsDirectory.getParent().resolveFile("classes");
+        FileObject securityGroovyFile = codeBaseRoot.resolveFile("Security.groovy");
+        try(Writer fw = new OutputStreamWriter(securityGroovyFile.getContent().getOutputStream())) {
             template.make(bindings).writeTo(fw);
-            logger.info("Security.groovy written to " + securityGroovyFile.getParentFile().getAbsolutePath());
+            logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
         }
     }
 

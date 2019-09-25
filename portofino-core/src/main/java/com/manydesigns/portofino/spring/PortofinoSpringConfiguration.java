@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import javax.servlet.ServletContext;
@@ -29,7 +28,6 @@ public class PortofinoSpringConfiguration {
     public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
 
     protected ServletContext servletContext;
-    protected ApplicationContext applicationContext;
 
     @Bean(name = PORTOFINO_CONFIGURATION)
     public Configuration getPortofinoConfiguration() {
