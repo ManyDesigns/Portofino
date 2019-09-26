@@ -30,8 +30,8 @@ import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
+import com.manydesigns.portofino.i18n.I18nUtils;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration.*;
@@ -75,9 +75,9 @@ public class PortofinoListener extends DispatcherInitializer
 
     public static final String SEPARATOR =
             "----------------------------------------" +
-                    "----------------------------------------";
+            "----------------------------------------";
     
-    public static final String PORTOFINO_MESSAGES_FILE_NAME = "portofino-messages.properties";
+    public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
 
     //**************************************************************************
     // Fields
@@ -149,7 +149,7 @@ public class PortofinoListener extends DispatcherInitializer
         servletContext = servletContextEvent.getServletContext();
 
         serverInfo = new ServerInfo(servletContext);
-        servletContext.setAttribute(BaseModule.SERVER_INFO, serverInfo);
+        servletContext.setAttribute(SERVER_INFO, serverInfo);
 
         setupCommonsConfiguration();
 
@@ -199,19 +199,7 @@ public class PortofinoListener extends DispatcherInitializer
             logger.error("Could not initialize KeyManager", e);
         }
 
-        logger.debug("Installing I18n ResourceBundleManager");
-        ResourceBundleManager resourceBundleManager = new ResourceBundleManager();
-        try {
-            Enumeration<URL> messagesSearchPaths = getClass().getClassLoader().getResources(PORTOFINO_MESSAGES_FILE_NAME);
-            while (messagesSearchPaths.hasMoreElements()) {
-                resourceBundleManager.addSearchPath(messagesSearchPaths.nextElement().toString());
-            }
-            FileObject appMessages = applicationDirectory.resolveFile(PORTOFINO_MESSAGES_FILE_NAME);
-            resourceBundleManager.addSearchPath(appMessages.getName().getPath());
-        } catch (IOException e) {
-            logger.warn("Could not initialize resource bundle manager", e);
-        }
-        servletContext.setAttribute(BaseModule.RESOURCE_BUNDLE_MANAGER, resourceBundleManager);
+        I18nUtils.setupResourceBundleManager(applicationDirectory, servletContext);
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {

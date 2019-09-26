@@ -32,10 +32,15 @@ package com.manydesigns.portofino.i18n;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.portofino.modules.BaseModule;
+import org.apache.commons.vfs2.FileObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -46,13 +51,33 @@ import java.util.ResourceBundle;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class I18nUtils {
-    public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+
+    public final static String RESOURCE_BUNDLE_MANAGER = "com.manydesigns.portofino.resourceBundleManager";
+    public static final String PORTOFINO_MESSAGES_FILE_NAME = "portofino-messages.properties";
+
+    private static final Logger logger = LoggerFactory.getLogger(I18nUtils.class);
+
+    public static void setupResourceBundleManager(FileObject applicationDirectory, ServletContext servletContext) {
+        logger.debug("Installing I18n ResourceBundleManager");
+        ResourceBundleManager resourceBundleManager = new ResourceBundleManager();
+        try {
+            Enumeration<URL> messagesSearchPaths = I18nUtils.class.getClassLoader().getResources(PORTOFINO_MESSAGES_FILE_NAME);
+            while (messagesSearchPaths.hasMoreElements()) {
+                resourceBundleManager.addSearchPath(messagesSearchPaths.nextElement().toString());
+            }
+            FileObject appMessages = applicationDirectory.resolveFile(PORTOFINO_MESSAGES_FILE_NAME);
+            resourceBundleManager.addSearchPath(appMessages.getName().getPath());
+        } catch (IOException e) {
+            logger.warn("Could not initialize resource bundle manager", e);
+        }
+        servletContext.setAttribute(I18nUtils.RESOURCE_BUNDLE_MANAGER, resourceBundleManager);
+    }
 
     public static void setupTextProvider(ServletContext servletContext, ServletRequest request) {
         Locale locale = request.getLocale();
         ResourceBundleManager resourceBundleManager =
-                (ResourceBundleManager) servletContext.getAttribute(BaseModule.RESOURCE_BUNDLE_MANAGER);
+                (ResourceBundleManager) servletContext.getAttribute(RESOURCE_BUNDLE_MANAGER);
         ResourceBundle portofinoResourceBundle = resourceBundleManager.getBundle(locale);
 
         //Setup Elements I18n

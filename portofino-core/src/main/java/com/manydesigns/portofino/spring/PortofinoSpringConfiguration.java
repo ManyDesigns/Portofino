@@ -4,6 +4,7 @@ import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.HierarchicalBlobManager;
 import com.manydesigns.elements.blobs.SimpleBlobManager;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import org.apache.commons.configuration.Configuration;
@@ -85,5 +86,11 @@ public class PortofinoSpringConfiguration {
             return new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         }
     }
+
+    @Bean
+    public CacheResetListenerRegistry getCacheResetListenerRegistry() {
+        return new CacheResetListenerRegistry();
+    }
+
 
 }

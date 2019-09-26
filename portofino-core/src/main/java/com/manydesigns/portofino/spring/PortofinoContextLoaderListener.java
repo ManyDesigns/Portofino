@@ -2,7 +2,6 @@ package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoListener;
 import io.reactivex.disposables.Disposable;
@@ -148,7 +147,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         ConfigurableEnvironment environment = parentContext.getEnvironment();
         MutablePropertySources sources = environment.getPropertySources();
         Configuration configuration =
-                (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+                (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
         sources.addFirst(
                 new ConfigurationPropertySource("portofino.properties", configuration));
         AnnotationConfigRegistry annotationConfig = (AnnotationConfigRegistry) parentContext;
