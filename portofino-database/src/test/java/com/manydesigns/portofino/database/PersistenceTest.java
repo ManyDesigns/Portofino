@@ -503,4 +503,32 @@ public class PersistenceTest {
             fail("orderid property not found", e);
         }
     }*/
+
+    public void testViews() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "hibernatetest", "PUBLIC", "TEST_VIEW_1");
+        assertNotNull(table);
+        assertTrue(table instanceof View);
+        View view = (View) table;
+        assertFalse(view.isInsertable());
+        assertFalse(view.isUpdatable());
+        Session session = persistence.getSession("hibernatetest");
+        try {
+            session.createQuery("from test_view_1").list();
+            fail("View should not be mapped by default because it has no pk.");
+        } catch (IllegalArgumentException e) {
+            //OK
+        }
+        persistence.closeSessions();
+
+        PrimaryKey pk = new PrimaryKey(view);
+        view.setPrimaryKey(pk);
+        PrimaryKeyColumn id = new PrimaryKeyColumn(pk);
+        id.setColumnName("ID");
+        pk.getPrimaryKeyColumns().add(id);
+        persistence.initModel();
+        session = persistence.getSession("hibernatetest");
+        List list = session.createQuery("from test_view_1").list();
+        assertEquals(2, list.size());
+    }
 }

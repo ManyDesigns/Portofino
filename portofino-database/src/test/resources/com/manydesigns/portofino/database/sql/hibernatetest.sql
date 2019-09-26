@@ -197,3 +197,5 @@ CREATE TABLE test
 DROP TABLE IF EXISTS public.test_no_pk;
 CREATE TABLE test_no_pk(id bigint);
 
+DROP VIEW IF EXISTS public.test_view_1;
+CREATE VIEW public.test_view_1 AS SELECT * from public.table3;

@@ -402,6 +402,7 @@ public class Persistence {
 
     public void stop() {
         status.onNext(Status.STOPPING);
+        closeSessions();
         for(HibernateDatabaseSetup setup : setups.values()) {
             //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
             //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
