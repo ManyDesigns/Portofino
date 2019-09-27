@@ -99,7 +99,7 @@
         <hibernate.version>4.3.11.Final</hibernate.version>
         <jackson.version>2.9.6</jackson.version> <!-- >=2.8.10 for current jersey version -->
         <javassist.version>3.18.1-GA</javassist.version> <!-- Jersey -->
-        <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
+        <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged-->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.27</jersey.version>
         <jfreechart.version>1.0.12</jfreechart.version>
@@ -164,8 +164,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
                 <version>${javax.mail.version}</version>
                 <scope>compile</scope>
             </dependency>

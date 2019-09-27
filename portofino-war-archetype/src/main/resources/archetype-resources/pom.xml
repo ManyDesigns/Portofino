@@ -146,8 +146,8 @@
         </dependency>
         <!-- javax.mail. Some application servers natively provide it. -->
         <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
             <scope>compile</scope>
         </dependency>
         <!-- Quartz integration. -->
