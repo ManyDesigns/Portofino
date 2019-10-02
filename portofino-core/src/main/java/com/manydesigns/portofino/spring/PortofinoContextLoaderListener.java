@@ -37,12 +37,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *     <li><strong>Parent context</strong> - defines Portofino's own beans and modules. It's created once at application startup and destroyed once at shutdown.</li>
  *     <li><strong>User context</strong> - defines beans according to the user-provided SpringConfiguration class, if any. Otherwise it's an empty context.
  *     This context is reloaded automatically whenever the source code of class annotated with
- *     {@link Component}. {@link org.springframework.context.annotation.Configuration}, @{@link Repository} or @{@link Service} changes,
+ *     {@link Component}, {@link org.springframework.context.annotation.Configuration}, @{@link Repository} or @{@link Service} changes,
  *     and it can also be refreshed programmatically, via the {@link #refresh()} method. Note that such capability is meant to aid development, and NOT as a
  *     kind of hotswap for production. Requests will fail during a context reload. In fact, in production it can be deactivated by setting
  *     the init parameter <code>reloadContextWhenSourcesChange</code> to <code>false</code> in the deployment descriptor (<code>web.xml</code>).</li>
- *     <li><strong>Bridge context</strong> - a singleton application context meant to be exposed to outside consumers, in particular Jersey's HK2-Spring bridge,
- *     which cannot handle context reloads as it holds the context instance in its guts. This is created and destroyed only once.</li>
+ *     <li><strong>Bridge context</strong> - a singleton application context meant to be exposed to outside consumers.
+ *     It has the user context as a parent and it's created and destroyed only once.</li>
  * </ol>
  */
 public class PortofinoContextLoaderListener extends ContextLoaderListener {

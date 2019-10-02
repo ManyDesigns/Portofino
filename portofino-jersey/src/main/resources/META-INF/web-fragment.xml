@@ -5,11 +5,4 @@
         version="3.0">
     <name>jersey</name>
 
-    <!-- The Spring context is configured programmatically, however the Jersey/Spring integration looks for
-         this parameter to decide whether to create a context or not. -->
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value></param-value>
-    </context-param>
-
 </web-fragment>
