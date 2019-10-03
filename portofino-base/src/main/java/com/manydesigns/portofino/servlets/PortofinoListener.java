@@ -366,8 +366,10 @@ public class PortofinoListener
         File configurationFile = new File(applicationDirectory, "portofino.properties");
         configuration =  new PropertiesConfiguration(configurationFile);
 
-        File localConfigurationFile =
-                new File(applicationDirectory, "portofino-local.properties");
+        String localConfigurationPath = configuration.getString(
+                "portofino-local.properties",
+                new File(applicationDirectory, "portofino-local.properties").getAbsolutePath());
+        File localConfigurationFile = new File(localConfigurationPath);
         if (localConfigurationFile.exists()) {
             logger.info("Local configuration found: {}", localConfigurationFile);
             PropertiesConfiguration localConfiguration =
@@ -377,6 +379,8 @@ public class PortofinoListener
             compositeConfiguration.addConfiguration(localConfiguration, true);
             compositeConfiguration.addConfiguration(configuration);
             configuration = compositeConfiguration;
+        } else {
+            logger.info("No local configuration found at {}", localConfigurationPath);
         }
     }
 

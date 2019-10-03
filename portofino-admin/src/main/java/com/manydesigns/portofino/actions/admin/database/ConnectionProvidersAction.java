@@ -169,8 +169,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         buildConnectionProviderForm(Mode.VIEW);
         form.readFromObject(connectionProviderForm);
 
-        if (ConnectionProvider.STATUS_CONNECTED
-                .equals(connectionProvider.getStatus())) {
+        if (ConnectionProvider.STATUS_CONNECTED.equals(connectionProvider.getStatus())) {
             configureDetected();
         }
 
@@ -354,8 +353,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 CommonsConfigurationUtils.save(configuration);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connection.provider.updated.successfully"));
             } catch (Exception e) {
-                String msg = "Cannot save model: " +
-                        ExceptionUtils.getRootCauseMessage(e);
+                String msg = "Cannot save model: " + ExceptionUtils.getRootCauseMessage(e);
                 SessionMessages.addErrorMessage(msg);
                 logger.error(msg, e);
             }
