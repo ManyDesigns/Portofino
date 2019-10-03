@@ -55,6 +55,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -298,15 +299,12 @@ public class PortofinoListener extends DispatcherInitializer
         } catch (SecurityException e) {
             logger.warn("Reading system properties is forbidden. Will read configuration file from standard location.", e);
         }
-        FileObject localConfigurationFile;
-        if(localConfigurationPath != null) {
-            localConfigurationFile = VFS.getManager().resolveFile(localConfigurationPath);
-            if(!localConfigurationFile.exists()) {
-                logger.warn("Configuration file " + localConfigurationPath + " does not exist");
-            }
-        } else {
-            localConfigurationFile = applicationDirectory.resolveFile("portofino-local.properties");
+        if(localConfigurationPath == null) {
+            localConfigurationPath = configuration.getString(
+                    "portofino-local.properties",
+                    applicationDirectory.resolveFile("portofino-local.properties").getName().getPath());
         }
+        FileObject localConfigurationFile = VFS.getManager().resolveFile(localConfigurationPath);
         if (localConfigurationFile.exists()) {
             logger.info("Local configuration file: {}", localConfigurationFile);
             PropertiesConfiguration localConfiguration =
@@ -315,6 +313,8 @@ public class PortofinoListener extends DispatcherInitializer
             compositeConfiguration.addConfiguration(localConfiguration, true);
             compositeConfiguration.addConfiguration(configuration);
             configuration = compositeConfiguration;
+        } else {
+            logger.info("No local configuration found at {}", localConfigurationPath);
         }
     }
 

@@ -909,4 +909,18 @@
             <column name="n"/>
         </createIndex>
     </changeSet>
+
+    <changeSet id="tt-247-admin-user" author="Alessio Stalla">
+        <insert tableName="users">
+            <column name="email" value="admin@example.com" />
+            <column name="password" value="d033e22ae348aeb5660fc2140aec35850c4da997" />
+            <column name="first_name" value="Ad" />
+            <column name="last_name" value="Min" />
+            <column name="registration" valueDate="2019-09-01T00:00:00" />
+            <column name="registration_ip" value="127.0.0.1" />
+            <column name="validated" valueDate="2019-09-01T00:00:00" />
+            <column name="admin" valueBoolean="true" />
+            <column name="project_manager" valueBoolean="true" />
+        </insert>
+    </changeSet>
 </databaseChangeLog>
