@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class PortofinoRoot extends AbstractResourceAction {
 
@@ -46,6 +47,8 @@ public class PortofinoRoot extends AbstractResourceAction {
     protected ServletContext servletContext;
     @Context
     protected HttpServletResponse response;
+    @Context
+    protected HttpServletRequest request;
 
     protected ResourceResolver resourceResolver;
 
@@ -93,13 +96,15 @@ public class PortofinoRoot extends AbstractResourceAction {
         ActionDescriptor rootActionDescriptor = ActionLogic.getActionDescriptor(location);
         ActionInstance actionInstance = new ActionInstance(null, location, rootActionDescriptor, getClass());
         setActionInstance(actionInstance);
-        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         ActionContext context = new ActionContext();
         context.setServletContext(servletContext);
         context.setRequest(request);
         context.setResponse(response);
         context.setActionPath("/");
         setContext(context);
+
+        applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        autowire(this);
         return this;
     }
 

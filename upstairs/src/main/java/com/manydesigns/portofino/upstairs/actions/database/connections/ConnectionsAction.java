@@ -149,15 +149,14 @@ public class ConnectionsAction extends AbstractResourceAction {
 
     protected Response saveConnectionProvider(
             ConnectionProvider connectionProvider, JSONObject jsonObject,
-            BiFunction<ConnectionProvider, Form, Response> handler) throws ConfigurationException {
+            BiFunction<ConnectionProvider, Form, Response> handler) {
         ConnectionProviderDetail cp = new ConnectionProviderDetail(connectionProvider);
         Form form = new FormBuilder(ConnectionProviderDetail.class).configMode(Mode.EDIT).build();
-        if(cp.getJndiResource() != null) {
-            Field jndiResource = form.findFieldByPropertyName("jndiResource");
+        Field jndiResource = form.findFieldByPropertyName("jndiResource");
+        if(connectionProvider instanceof JndiConnectionProvider) {
             form.get(0).clear();
             form.get(0).add(jndiResource);
         } else {
-            Field jndiResource = form.findFieldByPropertyName("jndiResource");
             form.get(0).remove(jndiResource);
         }
         form.readFromObject(cp);

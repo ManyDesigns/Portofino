@@ -51,6 +51,7 @@ import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -93,6 +94,8 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected CodeBase codeBase;
     @Autowired
     protected ActionRegistry actionRegistry;
+    @Autowired
+    protected ApplicationContext applicationContext;
     @Context
     protected UriInfo uriInfo;
 
@@ -115,6 +118,15 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         if(resource instanceof ResourceAction) {
             initResourceAction((ResourceAction) resource, getActionInstance(), uriInfo);
         }
+    }
+
+    @Override
+    protected void initSubResource(Object resource) {
+        autowire(resource);
+    }
+
+    protected void autowire(Object bean) {
+        applicationContext.getAutowireCapableBeanFactory().autowireBean(bean);
     }
 
     public static void initResourceAction(ResourceAction resourceAction, ActionInstance parentActionInstance, UriInfo uriInfo) {
