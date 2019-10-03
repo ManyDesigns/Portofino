@@ -27,7 +27,7 @@ import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
@@ -76,10 +76,8 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
             datePattern = dateFormatAnnotation.value();
         } else {
             //TODO provide defaults for time, date
-            Configuration elementsConfiguration =
-                    ElementsProperties.getConfiguration();
-            datePattern = elementsConfiguration.getString(
-                    ElementsProperties.FIELDS_DATE_FORMAT);
+            Configuration elementsConfiguration = ElementsProperties.getConfiguration();
+            datePattern = elementsConfiguration.getString(ElementsProperties.FIELDS_DATE_FORMAT);
         }
         dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
         setSize(dateTimeFormatter.getParser().estimateParsedLength());

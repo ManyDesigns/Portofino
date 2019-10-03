@@ -25,7 +25,9 @@ import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +46,6 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
-import java.io.File;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +65,12 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public ServletContext servletContext;
 
     @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
+
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
+    public FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
@@ -112,7 +118,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public Persistence getPersistence(
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
-        Persistence persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
+        Persistence persistence = new Persistence(applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         return persistence;
     }

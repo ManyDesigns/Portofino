@@ -25,9 +25,8 @@ import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -72,10 +71,8 @@ public abstract class AbstractDateSearchField extends RangeSearchField {
         if (dateFormatAnnotation != null) {
             datePattern = dateFormatAnnotation.value();
         } else {
-            Configuration elementsConfiguration =
-                    ElementsProperties.getConfiguration();
-            datePattern = elementsConfiguration.getString(
-                    ElementsProperties.FIELDS_DATE_FORMAT);
+            Configuration elementsConfiguration = ElementsProperties.getConfiguration();
+            datePattern = elementsConfiguration.getString(ElementsProperties.FIELDS_DATE_FORMAT);
         }
         dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
         setSize(dateTimeFormatter.getParser().estimateParsedLength());

@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.persistence;
 
-import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
@@ -42,8 +41,10 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
@@ -95,6 +96,7 @@ public class Persistence {
     protected final FileObject appDir;
     protected final FileObject appModelFile;
     protected final Configuration configuration;
+    protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
 
     public enum Status {
@@ -114,9 +116,10 @@ public class Persistence {
     // Constructors
     //**************************************************************************
 
-    public Persistence(FileObject appDir, Configuration configuration, DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
+    public Persistence(FileObject appDir, Configuration configuration, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile, DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
         this.appDir = appDir;
         this.configuration = configuration;
+        this.configurationFile = configurationFile;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
 
         appModelFile = appDir.resolveFile(APP_MODEL_FILE);
@@ -246,7 +249,10 @@ public class Persistence {
             }
         }
         logger.info("Saved xml model to file: {}", appModelFile);
-        CommonsConfigurationUtils.save(configuration);
+        if(configurationFile != null) {
+            configurationFile.save();
+            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+        }
     }
 
     public synchronized void initModel() {

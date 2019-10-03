@@ -23,8 +23,8 @@ package com.manydesigns.elements.configuration;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.apache.commons.configuration2.interpol.Lookup;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.text.StrLookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class BeanLookup extends StrLookup {
+public class BeanLookup implements Lookup {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 

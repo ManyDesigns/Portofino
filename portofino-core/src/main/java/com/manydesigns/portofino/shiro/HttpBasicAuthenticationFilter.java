@@ -2,7 +2,7 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;

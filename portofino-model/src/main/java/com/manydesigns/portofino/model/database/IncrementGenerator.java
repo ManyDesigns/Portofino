@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

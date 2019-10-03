@@ -24,7 +24,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.crud.CrudAction;
 import com.manydesigns.portofino.resourceactions.m2m.ManyToManyAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

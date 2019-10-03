@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.model;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

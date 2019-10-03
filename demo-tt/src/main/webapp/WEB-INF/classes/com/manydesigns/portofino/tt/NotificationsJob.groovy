@@ -41,7 +41,7 @@ import com.manydesigns.mail.setup.MailProperties
 import com.manydesigns.portofino.i18n.I18nUtils
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
-import org.apache.commons.configuration.Configuration
+import org.apache.commons.configuration2.Configuration
 import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions

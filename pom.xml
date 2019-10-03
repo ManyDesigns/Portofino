@@ -81,8 +81,8 @@
         </developer>
     </developers>
     <properties>
-        <commons.collections.version>3.2.2</commons.collections.version><!--Hibernate uses 3.1, Commons-configuration uses 3.2.1, 3.2.2 has an important security fix -->
-        <commons.configuration.version>1.10</commons.configuration.version>
+        <commons.collections.version>3.2.2</commons.collections.version>
+        <commons.configuration.version>2.5</commons.configuration.version>
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
@@ -95,7 +95,7 @@
         <jackson.version>2.9.9</jackson.version>
         <jackson.databind.version>2.9.10</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
-        <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged-->
+        <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.27</jersey.version>
         <jjwt.version>0.10.7</jjwt.version>
@@ -286,11 +286,6 @@
                 <version>6.14.3</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <scope>test</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -472,7 +467,7 @@
                         <configuration>
                             <links>
                                 <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
-                                <link>https://commons.apache.org/proper/commons-configuration/javadocs/v${commons.configuration.version}/apidocs/</link>
+                                <!--<link>https://commons.apache.org/proper/commons-configuration/javadocs/v${commons.configuration.version}/apidocs/</link>-->
                                 <link>http://docs.jboss.org/hibernate/orm/4.3/javadocs/</link>
                                 <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
                                 <link>http://www.joda.org/joda-time/apidocs/</link>

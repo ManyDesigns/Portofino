@@ -7,7 +7,9 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
@@ -27,12 +29,19 @@ public class PortofinoSpringConfiguration {
     public static final String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
     public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
+    public final static String PORTOFINO_CONFIGURATION_FILE = "com.manydesigns.portofino.portofinoConfigurationFile";
 
     protected ServletContext servletContext;
 
     @Bean(name = PORTOFINO_CONFIGURATION)
     public Configuration getPortofinoConfiguration() {
         return (Configuration) getServletContext().getAttribute(PORTOFINO_CONFIGURATION);
+    }
+
+    @Bean(name = PORTOFINO_CONFIGURATION_FILE)
+    public FileBasedConfigurationBuilder<PropertiesConfiguration> getPortofinoConfigurationFile() {
+        Object attribute = getServletContext().getAttribute(PORTOFINO_CONFIGURATION_FILE);
+        return (FileBasedConfigurationBuilder<PropertiesConfiguration>) attribute;
     }
 
     @Bean(name = APPLICATION_DIRECTORY)

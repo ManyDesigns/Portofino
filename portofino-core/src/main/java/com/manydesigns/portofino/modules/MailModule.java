@@ -25,7 +25,7 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.PortofinoProperties;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

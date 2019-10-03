@@ -26,7 +26,7 @@ import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,8 +162,8 @@ public class Annotation implements ModelObject {
         if(values.isEmpty()) {
             return null;
         }
-        AnnotationsManager annotationsManager =
-                AnnotationsManager.getManager();
+        //Legacy
+        AnnotationsManager annotationsManager = AnnotationsManager.getManager();
 
         Class annotationImplClass =
                 annotationsManager.getAnnotationImplementationClass(

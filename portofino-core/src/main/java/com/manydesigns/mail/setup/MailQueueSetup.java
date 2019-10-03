@@ -25,7 +25,7 @@ import com.manydesigns.mail.queue.LockingMailQueue;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.sender.DefaultMailSender;
 import com.manydesigns.mail.sender.MailSender;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.i18n;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 
 import java.util.*;
 

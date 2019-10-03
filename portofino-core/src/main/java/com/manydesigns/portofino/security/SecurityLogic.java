@@ -27,7 +27,7 @@ import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.shiro.GroupPermission;
 import com.manydesigns.portofino.shiro.ActionPermission;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;

@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.spring;
-
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.env.EnumerablePropertySource;
 

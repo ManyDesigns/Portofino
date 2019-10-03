@@ -28,7 +28,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +92,7 @@ public class FieldsManager implements FieldHelper {
     //**************************************************************************
 
     public FieldsManager() {
-        helperList = new ArrayList<FieldHelper>();
+        helperList = new ArrayList<>();
         String[] fields = elementsConfiguration.getStringArray(
                 ElementsProperties.FIELDS_LIST);
         if (fields == null) {

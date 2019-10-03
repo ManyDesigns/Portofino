@@ -20,11 +20,17 @@
 
 package com.manydesigns.elements;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.BuilderParameters;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -84,8 +90,10 @@ public final class ElementsProperties {
 
     public static void addConfiguration(String resource) {
         try {
-            configuration.addConfiguration(
-                    new PropertiesConfiguration(resource));
+            Configurations configurations = new Configurations();
+            BuilderParameters parameters =
+                    new Parameters().properties().setListDelimiterHandler(new DefaultListDelimiterHandler(',')).setFileName(resource);
+            configuration.addConfiguration(configurations.propertiesBuilder(resource).configure(parameters).getConfiguration());
         } catch (Exception e) {
             logger.warn(String.format(
                     "Error loading properties from: %s", resource), e);

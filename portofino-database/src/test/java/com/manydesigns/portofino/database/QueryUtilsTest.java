@@ -6,7 +6,7 @@ import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.testng.annotations.Test;
 
 import static org.testng.AssertJUnit.assertEquals;

@@ -20,10 +20,14 @@
 
 package com.manydesigns.portofino.i18n;
 
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.DefaultReloadingDetectorFactory;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.builder.fluent.PropertiesBuilderParameters;
+import org.apache.commons.configuration2.convert.DisabledListDelimiterHandler;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +84,7 @@ public class ResourceBundleManager {
         if(bundle == null) {
             CompositeConfiguration configuration = new CompositeConfiguration();
             Iterator<String> iterator = searchPaths.descendingIterator();
+            Configurations configurations = new Configurations();
             while(iterator.hasNext()) {
                 String path = iterator.next();
                 int index = path.lastIndexOf('/') + 1;
@@ -87,29 +92,29 @@ public class ResourceBundleManager {
                 int suffixIndex = path.length() - ".properties".length();
                 String resourceBundleBaseName = path.substring(index, suffixIndex);
                 String bundleName = getBundleFileName(resourceBundleBaseName, locale);
+                PropertiesBuilderParameters builderParams =
+                        new Parameters()
+                                .properties()
+                                .setReloadingDetectorFactory(new DefaultReloadingDetectorFactory());
                 PropertiesConfiguration conf;
                 try {
-                    conf = new PropertiesConfiguration();
-                    conf.setFileName(basePath + bundleName);
-                    conf.setDelimiterParsingDisabled(true);
-                    conf.load();
+                    conf = configurations.propertiesBuilder(basePath + bundleName)
+                            .configure(builderParams)
+                            .getConfiguration();
                 } catch (ConfigurationException e) {
                     logger.debug("Couldn't load resource bundle for locale " + locale + " from " + basePath, e);
                     //Fall back to default .properties without _locale
                     try {
                         String defaultBundleName = basePath + resourceBundleBaseName + ".properties";
-                        conf = new PropertiesConfiguration();
-                        conf.setFileName(defaultBundleName);
-                        conf.setDelimiterParsingDisabled(true);
-                        conf.load();
+                        conf = configurations.propertiesBuilder(defaultBundleName)
+                                .configure(builderParams)
+                                .getConfiguration();
                     } catch (ConfigurationException e1) {
                         logger.debug("Couldn't load default resource bundle from " + basePath, e1);
                         conf = null;
                     }
                 }
                 if(conf != null) {
-                    FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
-                    conf.setReloadingStrategy(reloadingStrategy);
                     configuration.addConfiguration(conf);
                 }
             }

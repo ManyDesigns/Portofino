@@ -22,7 +22,7 @@ package com.manydesigns.elements.reflection;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.impl.LabelImpl;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 
 import java.lang.annotation.Annotation;
 

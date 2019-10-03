@@ -13,8 +13,9 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Criteria;
@@ -52,7 +53,7 @@ public class PersistenceTest {
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
         persistence = new Persistence(
-                VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model"), configuration, databasePlatformsRegistry);
+                VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model"), configuration, null, databasePlatformsRegistry);
         persistence.start();
         setupJPetStore();
         setupHibernateTest();

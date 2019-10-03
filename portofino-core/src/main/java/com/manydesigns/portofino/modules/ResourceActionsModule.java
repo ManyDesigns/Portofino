@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionLogic;
@@ -36,8 +35,9 @@ import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -80,7 +80,12 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
     public ServletContext servletContext;
 
     @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
+
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
+    public FileBasedConfigurationBuilder configurationFile;
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
@@ -139,7 +144,8 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
             logger.warn("No jwt.secret property was set, so we generated one: {}.", jwtSecret);
             configuration.setProperty("jwt.secret", jwtSecret);
             try {
-                CommonsConfigurationUtils.save(configuration);
+                configurationFile.save();
+                logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
             } catch (ConfigurationException e) {
                 logger.warn("Configuration could not be saved", e);
             }

@@ -3,21 +3,19 @@ package com.manydesigns.portofino.upstairs.actions.database.connections;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderDetail;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderSummary;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -31,9 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -142,7 +137,7 @@ public class ConnectionsAction extends AbstractResourceAction {
     @PUT
     @Path("{databaseName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response saveConnection(@PathParam("databaseName") String databaseName, String jsonInput) throws ConfigurationException {
+    public Response saveConnection(@PathParam("databaseName") String databaseName, String jsonInput) {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         return saveConnectionProvider(connectionProvider, new JSONObject(jsonInput), this::doSaveConnectionProvider);
     }

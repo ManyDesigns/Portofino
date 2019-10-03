@@ -22,7 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.ee.servlet.QuartzInitializerListener;

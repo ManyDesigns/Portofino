@@ -5,7 +5,7 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoListener;
 import io.reactivex.disposables.Disposable;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +70,15 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        servletContext = event.getServletContext();
-        bridgeContext.setId("portofino-bridge");
-        super.contextInitialized(event);
-        servletContext.setAttribute(PORTOFINO_CONTEXT_LOADER_LISTENER, this);
+        try {
+            ElementsThreadLocals.setupDefaultElementsContext();
+            servletContext = event.getServletContext();
+            bridgeContext.setId("portofino-bridge");
+            super.contextInitialized(event);
+            servletContext.setAttribute(PORTOFINO_CONTEXT_LOADER_LISTENER, this);
+        } finally {
+            ElementsThreadLocals.removeElementsContext();
+        }
     }
 
     public static PortofinoContextLoaderListener get(ServletContext servletContext) {

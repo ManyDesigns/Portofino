@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.upstairs.actions.settings;
 
-import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -29,14 +28,17 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.upstairs.Settings;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -55,7 +57,12 @@ public class SettingsAction extends AbstractResourceAction {
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
     @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
+
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
+    public FileBasedConfigurationBuilder configurationFile;
 
     //--------------------------------------------------------------------------
     // Logging
@@ -117,8 +124,8 @@ public class SettingsAction extends AbstractResourceAction {
                    configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES) != null) {
                     configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES, settings.preloadGroovyClasses);
                 }
-                CommonsConfigurationUtils.save(configuration);
-                logger.info("Configuration saved");
+                configurationFile.save();
+                logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
                 return form;
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);

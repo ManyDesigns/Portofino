@@ -31,7 +31,6 @@ import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
@@ -575,7 +574,6 @@ public class UpstairsAction extends AbstractResourceAction {
 
     protected void setupUserPages(
             ConnectionProvider connectionProvider, Template template, Table userTable, List<Map> createdPages) throws Exception {
-        Configuration conf = portofinoConfiguration;
         List<Reference> references = computeChildren(userTable);
         if(references != null) {
             for(Reference ref : references) {
@@ -611,7 +609,7 @@ public class UpstairsAction extends AbstractResourceAction {
                         createdPages, 1);
                 if(action != null) {
                     Group group = new Group();
-                    group.setName(SecurityLogic.getAnonymousGroup(conf));
+                    group.setName(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
                     group.setAccessLevel(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);

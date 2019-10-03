@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Map database views, by default as read-only, but overridable.
 - Support non insertable and/or non updatable entities in CRUD actions.
 - Annotations are propagated from model to annotated classes.
+- Support for development and debug with Docker, both in demo-tt and in the archetype.
 
 ### Changed
 - Updated Hibernate to version 5.x

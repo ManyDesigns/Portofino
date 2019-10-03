@@ -21,12 +21,10 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

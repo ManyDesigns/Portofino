@@ -23,7 +23,7 @@ package com.manydesigns.elements.annotations;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.util.InstanceBuilder;
 import com.manydesigns.elements.util.ReflectionUtil;
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +87,7 @@ public class AnnotationsManager {
     //**************************************************************************
 
     public AnnotationsManager() {
-        annotationClassMap = new HashMap<Class, Class>();
+        annotationClassMap = new HashMap<>();
         Properties mappings = elementsConfiguration.getProperties(
                 ElementsProperties.ANNOTATIONS_IMPLEMENTATION_LIST);
         if (mappings == null) {

@@ -20,7 +20,7 @@
 
 package com.manydesigns.elements.reflection;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -38,7 +38,7 @@ public class CommonsConfigurationAccessor implements ClassAccessor {
     protected final List<CommonsConfigurationEntryAccessor> accessors;
 
     public CommonsConfigurationAccessor(Configuration configuration) {
-        accessors = new ArrayList<CommonsConfigurationEntryAccessor>();
+        accessors = new ArrayList<>();
         int i = 0;
         Iterator keys = configuration.getKeys();
         while (keys.hasNext()) {

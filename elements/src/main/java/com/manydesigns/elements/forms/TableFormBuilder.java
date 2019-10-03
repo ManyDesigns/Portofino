@@ -228,7 +228,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
             for (PropertyAccessor propertyAccessor : propertyAccessors) {
                 Field field = buildField(propertyAccessor, rowPrefix);
                 if (field == null) {
-                    logger.warn("Cannot instanciate field for property {}",
+                    logger.warn("Cannot instantiate field for property {}",
                             propertyAccessor);
                 } else {
                     row.add(field);
@@ -287,8 +287,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
     protected Field buildField(PropertyAccessor propertyAccessor, String rowPrefix) {
         Field field = null;
         String fieldName = propertyAccessor.getName();
-        for (Map.Entry<String[], SelectionProvider> current
-                : selectionProviders.entrySet()) {
+        for (Map.Entry<String[], SelectionProvider> current : selectionProviders.entrySet()) {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {

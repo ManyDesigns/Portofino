@@ -20,7 +20,8 @@
 
 package com.manydesigns.portofino.model;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
+
 import javax.xml.bind.Unmarshaller;
 
 /*

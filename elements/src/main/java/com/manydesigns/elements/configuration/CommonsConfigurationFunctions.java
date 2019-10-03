@@ -20,7 +20,7 @@
 
 package com.manydesigns.elements.configuration;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

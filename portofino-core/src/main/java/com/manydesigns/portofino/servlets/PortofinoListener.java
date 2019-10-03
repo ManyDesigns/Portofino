@@ -31,11 +31,21 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import com.manydesigns.portofino.i18n.I18nUtils;
-import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import org.apache.commons.configuration.*;
-import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
+import org.apache.commons.configuration2.BaseConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.BuilderParameters;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.builder.fluent.PropertiesBuilderParameters;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.interpol.ConfigurationInterpolator;
+import org.apache.commons.configuration2.interpol.Lookup;
 import org.apache.commons.vfs2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,12 +60,10 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -86,6 +94,7 @@ public class PortofinoListener extends DispatcherInitializer
 
     protected Configuration elementsConfiguration;
     protected Configuration configuration;
+    protected FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
 
     protected FileObject applicationDirectory;
 
@@ -152,12 +161,10 @@ public class PortofinoListener extends DispatcherInitializer
         serverInfo = new ServerInfo(servletContext);
         servletContext.setAttribute(SERVER_INFO, serverInfo);
 
-        setupCommonsConfiguration();
-
         elementsConfiguration = ElementsProperties.getConfiguration();
 
         String applicationDirectoryPath = servletContext.getInitParameter("portofino.application.directory");
-        FileSystemManager manager = null;
+        FileSystemManager manager;
         try {
             manager = VFS.getManager();
         } catch (FileSystemException e) {
@@ -165,7 +172,9 @@ public class PortofinoListener extends DispatcherInitializer
             throw new RuntimeException(e);
         }
         if(applicationDirectoryPath != null) try {
-            applicationDirectoryPath = (String) PropertyConverter.interpolate(applicationDirectoryPath, new BaseConfiguration());
+            ConfigurationInterpolator interpolator = new BaseConfiguration().getInterpolator();
+            interpolator.registerLookups(getConfigurationLookups());
+            applicationDirectoryPath = (String) interpolator.interpolate(applicationDirectoryPath);
             applicationDirectory = manager.resolveFile(applicationDirectoryPath);
             if(applicationDirectory.getType() != FileType.FOLDER) {
                 logger.error("Configured application directory " + applicationDirectoryPath + " is not a directory");
@@ -192,6 +201,7 @@ public class PortofinoListener extends DispatcherInitializer
         }
         servletContext.setAttribute(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, applicationDirectory);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
+        servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, configurationFile);
 
         try {
             logger.info("Initializing KeyManager ");
@@ -291,7 +301,15 @@ public class PortofinoListener extends DispatcherInitializer
 
     protected void loadConfiguration() throws ConfigurationException, FileSystemException {
         FileObject configurationFile = applicationDirectory.resolveFile("portofino.properties");
-        configuration =  new PropertiesConfiguration(configurationFile.getURL());
+        PropertiesBuilderParameters parameters =
+                new Parameters()
+                        .properties()
+                        .setPrefixLookups(getConfigurationLookups())
+                        .setListDelimiterHandler(new DefaultListDelimiterHandler(','));
+        String path = configurationFile.getName().getPath();
+        parameters.setFileName(path);
+        this.configurationFile = new Configurations().propertiesBuilder(path).configure(parameters);
+        configuration =  this.configurationFile.getConfiguration();
 
         String localConfigurationPath = null;
         try {
@@ -307,9 +325,12 @@ public class PortofinoListener extends DispatcherInitializer
         FileObject localConfigurationFile = VFS.getManager().resolveFile(localConfigurationPath);
         if (localConfigurationFile.exists()) {
             logger.info("Local configuration file: {}", localConfigurationFile);
-            PropertiesConfiguration localConfiguration =
-                    new PropertiesConfiguration(localConfigurationFile.getURL());
+            parameters.setFileName(localConfigurationPath);
+            this.configurationFile = new Configurations().propertiesBuilder(localConfigurationPath).configure(parameters);
+            PropertiesConfiguration localConfiguration = this.configurationFile.getConfiguration();
             CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
+            //Note: order is important. The localConfiguration must be added here, and not in the constructor,
+            //otherwise it is consulted last and not first.
             compositeConfiguration.addConfiguration(localConfiguration, true);
             compositeConfiguration.addConfiguration(configuration);
             configuration = compositeConfiguration;
@@ -318,10 +339,10 @@ public class PortofinoListener extends DispatcherInitializer
         }
     }
 
-    public void setupCommonsConfiguration() {
-        logger.debug("Setting up commons-configuration lookups...");
-        BeanLookup serverInfoLookup = new BeanLookup(serverInfo);
-        ConfigurationInterpolator.registerGlobalLookup("serverInfo", serverInfoLookup);
+    public Map<String, Lookup> getConfigurationLookups() {
+        Map<String, Lookup> lookupMap = new HashMap<>();
+        lookupMap.put("serverInfo", new BeanLookup(serverInfo));
+        return lookupMap;
     }
 
     @Override
