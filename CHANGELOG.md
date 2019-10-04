@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     - Session factory is now configured with annotated Java classes generated at runtime.
 - Ensured that Portofino 5 can run without a Java compiler (JDK) available.
 - Replaced `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`. **This is a breaking API change.**
+- Updated all uses of Commons Configuration to version 2.5, including Commons Configuration 1.x uses. **This is a breaking API change.**
 
 ## [5.0.3] - 2019-09-25
 

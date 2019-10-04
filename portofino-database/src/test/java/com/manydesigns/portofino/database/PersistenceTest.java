@@ -7,6 +7,8 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
+import com.manydesigns.portofino.model.Annotation;
+import com.manydesigns.portofino.model.Property;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -15,7 +17,6 @@ import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Criteria;
@@ -27,6 +28,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import javax.persistence.metamodel.EntityType;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -292,7 +294,7 @@ public class PersistenceTest {
             assertEquals(bird, ((Map) o).get("fk_product_1"));
         }
 
-        pk = new HashMap<String, Object>();
+        pk = new HashMap<>();
         pk.put("regione", "liguria");
         pk.put("provincia", "genova");
         pk.put("comune", "rapallo");
@@ -531,5 +533,21 @@ public class PersistenceTest {
         session = persistence.getSession("hibernatetest");
         List list = session.createQuery("from test_view_1").list();
         assertEquals(2, list.size());
+    }
+
+    public void testAnnotations() {
+        Session session = persistence.getSession("hibernatetest");
+        try {
+            session.createNamedQuery("all_questions", Map.class).list();
+            fail("Exception expected");
+        } catch (Exception e) {}
+        Table table = DatabaseLogic.findTableByName(persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
+        assertNotNull(table);
+        Annotation nq = new Annotation(table, "javax.persistence.NamedQuery");
+        nq.setProperties(Arrays.asList(new Property("name", "all_questions"), new Property("query", "from domanda")));
+        table.getAnnotations().add(nq);
+        persistence.initModel();
+        session = persistence.getSession("hibernatetest");
+        session.createNamedQuery("all_questions", Map.class).list();
     }
 }

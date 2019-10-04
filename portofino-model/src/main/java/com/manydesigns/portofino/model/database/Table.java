@@ -25,6 +25,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,7 @@ public class Table implements ModelObject, Annotated {
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class actualJavaClass;
     protected String actualEntityName;
-    protected final List<String> syntheticPropertyNames = new ArrayList<String>();
+    protected final List<String> syntheticPropertyNames = new ArrayList<>();
 
     //**************************************************************************
     // Logging
@@ -85,11 +86,11 @@ public class Table implements ModelObject, Annotated {
     // Constructors and init
     //**************************************************************************
     public Table() {
-        columns = new ArrayList<Column>();
-        foreignKeys = new ArrayList<ForeignKey>();
-        oneToManyRelationships = new ArrayList<ForeignKey>();
-        annotations = new ArrayList<Annotation>();
-        selectionProviders = new ArrayList<ModelSelectionProvider>();
+        columns = new ArrayList<>();
+        foreignKeys = new ArrayList<>();
+        oneToManyRelationships = new ArrayList<>();
+        annotations = new ArrayList<>();
+        selectionProviders = new ArrayList<>();
     }
 
     public Table(Schema schema) {
@@ -258,8 +259,8 @@ public class Table implements ModelObject, Annotated {
     }
 
     @XmlElementWrapper(name="annotations")
-    @XmlElement(name = "annotation",
-            type = Annotation.class)
+    @XmlElement(name = "annotation", type = Annotation.class)
+    @NotNull
     public List<Annotation> getAnnotations() {
         return annotations;
     }

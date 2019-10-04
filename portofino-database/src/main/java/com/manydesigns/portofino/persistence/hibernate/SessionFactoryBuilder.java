@@ -10,7 +10,6 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.model.database.TableGenerator;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.modules.ModuleStatus;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
@@ -46,7 +45,6 @@ import javax.persistence.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -302,7 +300,6 @@ public class SessionFactoryBuilder {
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
         AnnotationsAttribute classAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-        ccFile.addAttribute(classAnnotations);
         javassist.bytecode.annotation.Annotation annotation;
 
         annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Table.class.getName(), constPool);
@@ -328,7 +325,7 @@ public class SessionFactoryBuilder {
                 classAnnotations.addAnnotation(new Annotation(Immutable.class.getName(), constPool));
             }
         });
-
+        ccFile.addAttribute(classAnnotations);
         setupColumns(table, cc, constPool);
         return cc;
     }
