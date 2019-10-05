@@ -25,6 +25,7 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.database.platforms.GenericDatabasePlatform;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -110,7 +111,6 @@ public abstract class ConnectionProvider {
         configuration = databasePlatformsRegistry.getPortofinoConfiguration();
         String databaseName = getDatabase().getDatabaseName();
         try(Connection conn = acquireConnection()) {
-
             DatabaseMetaData metadata = conn.getMetaData();
 
             databaseProductName = metadata.getDatabaseProductName();
@@ -152,18 +152,16 @@ public abstract class ConnectionProvider {
                 Collections.sort(types, new TypeComparator());
             }
 
-            databasePlatform =
-                    databasePlatformsRegistry.findApplicableAbstraction(this);
+            databasePlatform = databasePlatformsRegistry.findApplicableAbstraction(this);
             if (databasePlatform == null) {
-                status = STATUS_ERROR;
-                errorMessage = MessageFormat.format(
-                        "Database platform not found for {0}",
-                        databaseProductName);
+                errorMessage = MessageFormat.format("Database platform not found for {0}, using generic one", databaseProductName);
                 logger.warn(errorMessage);
+                databasePlatform = new GenericDatabasePlatform();
             } else {
-                status = STATUS_CONNECTED;
                 errorMessage = null;
             }
+
+            status = STATUS_CONNECTED;
         } catch (Throwable e) {
             status = STATUS_ERROR;
             errorMessage = e.getMessage();
