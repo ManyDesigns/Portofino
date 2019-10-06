@@ -61,18 +61,15 @@ public class PortofinoJobFactory extends SimpleJobFactory {
     public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
         Job job = instantiateJob(bundle);
         applicationContext.getAutowireCapableBeanFactory().autowireBean(job);
-        return new Job() {
-            @Override
-            public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        return jobExecutionContext -> {
+            try {
+                job.execute(jobExecutionContext);
+            } finally {
                 try {
-                    job.execute(jobExecutionContext);
-                } finally {
-                    try {
-                        //In a different class to make the database module optional at runtime
-                        SessionCleaner.closeSessions(applicationContext);
-                    } catch (NoClassDefFoundError e) {
-                        logger.debug("Database module not available, not closing sessions", e);
-                    }
+                    //In a different class to make the database module optional at runtime
+                    SessionCleaner.closeSessions(applicationContext);
+                } catch (NoClassDefFoundError e) {
+                    logger.debug("Database module not available, not closing sessions", e);
                 }
             }
         };
@@ -80,7 +77,7 @@ public class PortofinoJobFactory extends SimpleJobFactory {
 
     protected Job instantiateJob(TriggerFiredBundle bundle) throws SchedulerException {
         JobDetail jobDetail = bundle.getJobDetail();
-        Class jobClass = jobDetail.getJobClass();
+        Class<?> jobClass = jobDetail.getJobClass();
         //Attempt to reload
         try {
             Class newClass = codeBase.loadClass(jobClass.getName());
@@ -94,7 +91,7 @@ public class PortofinoJobFactory extends SimpleJobFactory {
         }
         Job job;
         try {
-            job = (Job) jobClass.newInstance();
+            job = (Job) jobClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new SchedulerException("Problem instantiating class '" + jobDetail.getJobClass().getName() + "'", e);
         }

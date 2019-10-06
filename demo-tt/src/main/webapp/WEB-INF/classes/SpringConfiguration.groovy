@@ -47,10 +47,10 @@ class SpringConfiguration {
         subscription.dispose()
     }
 
-    JobKey scheduleJob(Class clazz, String jobName, int pollSecInterval, String jobGroup) {
+    JobKey scheduleJob(Class jobClass, String jobName, int pollSecInterval, String jobGroup) {
         try {
             JobDetail job = JobBuilder
-                    .newJob(clazz)
+                    .newJob(jobClass)
                     .withIdentity(jobName + ".job", jobGroup)
                     .build();
 

@@ -22,7 +22,7 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>provided</scope> <!-- Persistence integration is optional -->
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

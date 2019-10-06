@@ -23,8 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
 import org.apache.commons.configuration2.Configuration;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -37,6 +36,7 @@ import org.springframework.context.ApplicationContextAware;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -117,6 +117,24 @@ public class QuartzModule implements Module, ApplicationContextAware {
             if(startOnLoad) {
                 scheduler.start();
             }
+
+            try {
+                int seconds = configuration.getInt("database.failed.connections.retry.every.seconds", 60);
+                if(seconds > 0) {
+                    Class jobClass = Class.forName("com.manydesigns.portofino.quartz.FailedDatabaseConnectionRetryJob");
+                    JobDetail job = JobBuilder.newJob(jobClass).build();
+
+                    Trigger trigger = TriggerBuilder.newTrigger()
+                            .startAt(new Date())
+                            .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(seconds))
+                            .build();
+
+                    scheduler.scheduleJob(job, trigger);
+                }
+            } catch (NoClassDefFoundError e) {
+                logger.debug("Database module not available, not retrying failed connections", e);
+            }
+
             status = ModuleStatus.STARTED;
         } catch (Exception e) {
             logger.error("Quartz Scheduler failed to initialize", e);

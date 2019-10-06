@@ -82,7 +82,7 @@ public class Persistence {
     //**************************************************************************
 
     public static final String APP_MODEL_FILE = "portofino-model.xml";
-    public static final String APP_CONTEXT = "liquibase.context";
+    public static final String LIQUIBASE_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
 
     //**************************************************************************
@@ -199,13 +199,11 @@ public class Persistence {
                 String relativeChangelogPath = appDir.getName().getRelativeName(changelogFile.getName());
                 Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase);
 
-                String[] contexts = configuration.getStringArray(APP_CONTEXT);
+                String[] contexts = configuration.getStringArray(LIQUIBASE_CONTEXT);
                 logger.info("Using context {}", Arrays.toString(contexts));
                 lq.update(new Contexts(contexts));
-
             } catch (Exception e) {
-                String msg = "Couldn't update database: " + schemaName;
-                logger.error(msg, e);
+                logger.error("Couldn't update database: " + schemaName, e);
             }
         }
     }
@@ -273,23 +271,40 @@ public class Persistence {
         setups.clear();
         model.init(configuration);
         for (Database database : model.getDatabases()) {
-            try {
-                ConnectionProvider connectionProvider = database.getConnectionProvider();
-                connectionProvider.init(databasePlatformsRegistry);
-                if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
-                    SessionFactoryBuilder builder = new SessionFactoryBuilder(database);
-                    SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
-                    HibernateDatabaseSetup setup =
-                            new HibernateDatabaseSetup(database, sessionFactoryAndCodeBase.sessionFactory);
-                    String databaseName = database.getDatabaseName();
-                    setups.put(databaseName, setup);
-                }
-            } catch (Exception e) {
-                logger.error("Could not create connection provider for " + database, e);
-            }
+            initConnectionProvider(database);
         }
         if(cacheResetListenerRegistry != null) {
             cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
+        }
+    }
+
+    protected void initConnectionProvider(Database database) {
+        try {
+            ConnectionProvider connectionProvider = database.getConnectionProvider();
+            connectionProvider.init(databasePlatformsRegistry);
+            if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
+                SessionFactoryBuilder builder = new SessionFactoryBuilder(database);
+                SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
+                HibernateDatabaseSetup setup =
+                        new HibernateDatabaseSetup(database, sessionFactoryAndCodeBase.sessionFactory);
+                String databaseName = database.getDatabaseName();
+                setups.put(databaseName, setup);
+            }
+        } catch (Exception e) {
+            logger.error("Could not create connection provider for " + database, e);
+        }
+    }
+
+    public void retryFailedConnections() {
+        Status currentStatus = status.getValue();
+        if(currentStatus != Status.STARTED) {
+            throw new IllegalStateException("Persistence not started: " + currentStatus);
+        }
+        for (Database database : model.getDatabases()) {
+            if (!ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
+                logger.info("Retrying failed connection to database " + database.getDatabaseName());
+                initConnectionProvider(database);
+            }
         }
     }
 
@@ -401,7 +416,9 @@ public class Persistence {
         status.onNext(Status.STARTING);
         loadXmlModel();
         for(Database database : model.getDatabases()) {
-            runLiquibase(database);
+            if(ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
+                runLiquibase(database);
+            }
         }
         status.onNext(Status.STARTED);
     }
