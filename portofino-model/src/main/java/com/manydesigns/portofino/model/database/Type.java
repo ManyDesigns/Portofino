@@ -30,6 +30,10 @@ import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -233,9 +237,9 @@ public class Type {
                     return new Class[] { String.class };
                 }
             } else if(defaultJavaType == Timestamp.class) {
-                return new Class[] { Timestamp.class, java.sql.Date.class, DateTime.class };
+                return new Class[] { Timestamp.class, DateTime.class, java.sql.Date.class, LocalDateTime.class, ZonedDateTime.class, Instant.class };
             } else if(defaultJavaType == java.sql.Date.class) {
-                return new Class[] { java.sql.Date.class, Timestamp.class, DateTime.class };
+                return new Class[] { java.sql.Date.class, DateTime.class, LocalDate.class, Timestamp.class }; //TODO Joda LocalDate as well?
             } else {
                 if(defaultJavaType != null) {
                     return new Class[] { defaultJavaType };

@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.testng.Assert.*;
@@ -549,5 +550,17 @@ public class PersistenceTest {
         persistence.initModel();
         session = persistence.getSession("hibernatetest");
         session.createNamedQuery("all_questions", Map.class).list();
+    }
+
+    public void testDateAndTimeAPIMapping() {
+        Table table = DatabaseLogic.findTableByName(persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
+        assertNotNull(table);
+        Column column = DatabaseLogic.findColumnByName(table, "DATA");
+        assertNotNull(column);
+        assertEquals(java.sql.Date.class, column.getActualJavaType());
+        column.setJavaType(LocalDate.class.getName());
+        persistence.initModel();
+        Map domanda = (Map) persistence.getSession("hibernatetest").get("domanda", "0001");
+        assertEquals(LocalDate.of(2010, 9, 27), domanda.get("data"));
     }
 }
