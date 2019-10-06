@@ -8,11 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Map database views, by default as read-only, but overridable.
 - Support non insertable and/or non updatable entities in CRUD actions.
 - Annotations are propagated from model to annotated classes.
+- Ability to map Java 8+ Date and Time API values.
+- Generic database platform for unrecognized databases.
 - Support for development and debug with Docker, both in demo-tt and in the archetype.
 
 ### Changed
-- Updated Hibernate to version 5.x
-    - Session factory is now configured with annotated Java classes generated at runtime.
+- **Updated Hibernate to the 5.x branch**, in particular to version 5.4.6.Final.
+    - The Hibernate Session factory is now configured with annotated Java classes generated at runtime. The ad-hoc code for Hibernate 4 has been removed.
 - Ensured that Portofino 5 can run without a Java compiler (JDK) available.
 - Replaced `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`. **This is a breaking API change.**
 - Updated all uses of Commons Configuration to version 2.5, including Commons Configuration 1.x uses. **This is a breaking API change.**
