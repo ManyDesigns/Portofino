@@ -21,7 +21,7 @@ import com.manydesigns.portofino.resourceactions.m2m.ManyToManyAction
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 @SupportsPermissions(ManyToManyAction.PERMISSION_UPDATE)
-class MyManyToManyAction extends ManyToManyAction {
+class %{#generatedClassName} extends ManyToManyAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here

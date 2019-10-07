@@ -20,7 +20,7 @@ import com.manydesigns.portofino.resourceactions.custom.*
 import javax.ws.rs.GET
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class %{#generatedClassName} extends CustomAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
