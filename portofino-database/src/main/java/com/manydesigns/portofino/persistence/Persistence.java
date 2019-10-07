@@ -81,7 +81,8 @@ public class Persistence {
     // Constants
     //**************************************************************************
 
-    public static final String APP_MODEL_FILE = "portofino-model.xml";
+    public static final String APP_MODEL_DIRECTORY = "portofino-model";
+    public static final String APP_MODEL_FILE = APP_MODEL_DIRECTORY + ".xml";
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
 
@@ -94,7 +95,6 @@ public class Persistence {
     protected final Map<String, HibernateDatabaseSetup> setups;
 
     protected final FileObject appDir;
-    protected final FileObject appModelFile;
     protected final Configuration configuration;
     protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
@@ -122,8 +122,11 @@ public class Persistence {
         this.configurationFile = configurationFile;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
 
-        appModelFile = appDir.resolveFile(APP_MODEL_FILE);
-        logger.info("Application model file: {}", appModelFile.getName().getPath());
+        if(getModelFile().exists()) {
+            logger.info("Application model file: {}", getModelFile().getName().getPath());
+        } else {
+            logger.info("Application model directory: {}", getModelDirectory().getName().getPath());
+        }
 
         setups = new HashMap<>();
     }
@@ -133,49 +136,94 @@ public class Persistence {
     //**************************************************************************
 
     public synchronized void loadXmlModel() {
-        logger.info("Loading xml model from file: {}", appModelFile.getName().getPath());
-
-        try(InputStream inputStream = appModelFile.getContent().getInputStream()) {
+        try {
             JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
             Unmarshaller um = jc.createUnmarshaller();
-            Model model = (Model) um.unmarshal(inputStream);
-            FileObject modelDir = getModelDirectory();
-            for(Database database : model.getDatabases()) {
-                FileObject databaseDir = modelDir.resolveFile(database.getDatabaseName());
-                for(Schema schema : database.getSchemas()) {
-                    FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
-                    if(schemaDir.getType() == FileType.FOLDER) {
-                        logger.debug("Schema directory {} exists", schemaDir);
-                        FileObject[] tableFiles = schemaDir.getChildren();
-                        for(FileObject tableFile : tableFiles) {
-                            if(!tableFile.getName().getBaseName().endsWith(".table.xml")) {
-                                continue;
-                            }
-                            try(InputStream tableInputStream = tableFile.getContent().getInputStream()) {
-                                Table table = (Table) um.unmarshal(tableInputStream);
-                                if (!tableFile.getName().getBaseName().equalsIgnoreCase(table.getTableName() + ".table.xml")) {
-                                    logger.error("Skipping table " + table.getTableName() + " defined in file " + tableFile);
-                                    continue;
-                                }
-                                table.afterUnmarshal(um, schema);
-                                schema.getTables().add(table);
-                            }
-                        }
-                    } else {
-                        logger.debug("Schema directory {} does not exist", schemaDir);
-                    }
+            FileObject appModelFile = getModelFile();
+            if(appModelFile.exists()) {
+                logger.info("Loading legacy xml model from file: {}", appModelFile.getName().getPath());
+                try (InputStream inputStream = appModelFile.getContent().getInputStream()) {
+                    model = (Model) um.unmarshal(inputStream);
+                } catch (Exception e) {
+                    String msg = "Cannot load/parse model: " + appModelFile;
+                    logger.error(msg, e);
                 }
+            } else {
+                logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
+                model = new Model();
             }
-            this.model = model;
+            FileObject modelDir = getModelDirectory();
+            for (FileObject databaseDir : modelDir.getChildren()) {
+                loadXmlDatabase(um, model, databaseDir);
+            }
             initModel();
         } catch (Exception e) {
-            String msg = "Cannot load/parse model: " + appModelFile;
-            logger.error(msg, e);
+            logger.error("Cannot load/parse model", e);
         }
     }
 
+    protected void loadXmlDatabase(Unmarshaller um, Model model, FileObject databaseDir) throws IOException, JAXBException {
+        if(!databaseDir.getType().equals(FileType.FOLDER)) {
+            logger.error("Not a directory: " + databaseDir.getName().getPath());
+            return;
+        }
+        String databaseName = databaseDir.getName().getBaseName();
+        FileObject databaseFile = databaseDir.resolveFile("database.xml");
+
+        Database database;
+        if(databaseFile.exists()) {
+            logger.info("Loading database connection from " + databaseFile.getName().getPath());
+            try(InputStream inputStream = databaseFile.getContent().getInputStream()) {
+                database = (Database) um.unmarshal(inputStream);
+                database.afterUnmarshal(um, model);
+                if(!databaseName.equals(database.getDatabaseName())) {
+                    logger.error("Database named {} defined in directory named {}, skipping", database.getDatabaseName(), databaseName);
+                    return;
+                }
+                model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
+                model.getDatabases().add(database);
+            }
+        } else {
+            database = DatabaseLogic.findDatabaseByName(model, databaseName);
+            if(database != null) {
+                logger.info("Using legacy database defined in portofino-model.xml: " + databaseName + "; it will be automatically migrated to database.xml upon save.");
+            } else {
+                logger.warn("No database defined in " + databaseDir.getName().getPath());
+                return;
+            }
+        }
+
+        for(Schema schema : database.getSchemas()) {
+            FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
+            if(schemaDir.getType() == FileType.FOLDER) {
+                logger.debug("Schema directory {} exists", schemaDir);
+                FileObject[] tableFiles = schemaDir.getChildren();
+                for(FileObject tableFile : tableFiles) {
+                    if(!tableFile.getName().getBaseName().endsWith(".table.xml")) {
+                        continue;
+                    }
+                    try(InputStream tableInputStream = tableFile.getContent().getInputStream()) {
+                        Table table = (Table) um.unmarshal(tableInputStream);
+                        if (!tableFile.getName().getBaseName().equalsIgnoreCase(table.getTableName() + ".table.xml")) {
+                            logger.error("Skipping table " + table.getTableName() + " defined in file " + tableFile);
+                            continue;
+                        }
+                        table.afterUnmarshal(um, schema);
+                        schema.getTables().add(table);
+                    }
+                }
+            } else {
+                logger.debug("Schema directory {} does not exist", schemaDir);
+            }
+        }
+    }
+
+    public FileObject getModelFile() throws FileSystemException {
+        return appDir.resolveFile(APP_MODEL_FILE);
+    }
+
     public FileObject getModelDirectory() throws FileSystemException {
-        return appModelFile.getParent().resolveFile(FilenameUtils.getBaseName(appModelFile.getName().getBaseName()));
+        return appDir.resolveFile(APP_MODEL_DIRECTORY);
     }
 
     public void runLiquibase(Database database) {
@@ -210,18 +258,18 @@ public class Persistence {
 
     public synchronized void saveXmlModel() throws IOException, JAXBException, ConfigurationException {
         //TODO gestire conflitti con modifiche esterne?
-        File tempFile = File.createTempFile(appModelFile.getName().getBaseName(), "");
-
         JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        m.marshal(model, tempFile);
-
-        ElementsFileUtils.moveFileSafely(tempFile, appModelFile.getName().getPath());
 
         FileObject modelDir = getModelDirectory();
         for(Database database : model.getDatabases()) {
             FileObject databaseDir = modelDir.resolveFile(database.getDatabaseName());
+            FileObject databaseFile = databaseDir.resolveFile("database.xml");
+            databaseFile.createFile();
+            try(OutputStream outputStream = databaseFile.getContent().getOutputStream()) {
+                m.marshal(database, outputStream);
+            }
             for(Schema schema : database.getSchemas()) {
                 FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
                 if(schemaDir.getType() == FileType.FOLDER) {
@@ -246,10 +294,16 @@ public class Persistence {
                 }
             }
         }
-        logger.info("Saved xml model to file: {}", appModelFile);
+        logger.info("Saved xml model to directory: {}", modelDir.getName().getPath());
         if(configurationFile != null) {
             configurationFile.save();
             logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+        }
+
+        FileObject appModelFile = getModelFile();
+        if(appModelFile.exists()) {
+            appModelFile.delete();
+            logger.info("Deleted legacy portofino-model.xml file: {}", appModelFile.getName().getPath());
         }
     }
 
@@ -456,8 +510,13 @@ public class Persistence {
         return schemaDir.resolveFile(changelogFileNameTemplate);
     }
 
+    @Deprecated
     public FileObject getAppModelFile() {
-        return appModelFile;
+        try {
+            return getModelFile();
+        } catch (FileSystemException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

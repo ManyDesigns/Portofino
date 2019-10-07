@@ -11,13 +11,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Ability to map Java 8+ Date and Time API values.
 - Generic database platform for unrecognized databases.
 - Support for development and debug with Docker, both in demo-tt and in the archetype.
+- Periodically retry database connections that have failed at startup if Quartz is available.
+- Fallback database platform for unrecognized database systems.
+- Support persistent Java 8+ Date and time API values.
 
 ### Changed
 - **Updated Hibernate to the 5.x branch**, in particular to version 5.4.6.Final.
-    - The Hibernate Session factory is now configured with annotated Java classes generated at runtime. The ad-hoc code for Hibernate 4 has been removed.
+    - The Hibernate Session factory is now configured with annotated Java classes generated at runtime.
+      The ad-hoc code for Hibernate 4 has been removed.
 - Ensured that Portofino 5 can run without a Java compiler (JDK) available.
-- Replaced `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`. **This is a breaking API change.**
-- Updated all uses of Commons Configuration to version 2.5, including Commons Configuration 1.x uses. **This is a breaking API change.**
+- Deprecated the single `portofino-model.xml` file in favor of multiple `portofino-model/<database-name>/database.xml` files.
+  Legacy files are supported and converted to the new format upon save.
+- Replaced `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`.
+  **This is a breaking API change.**
+- Updated all uses of Commons Configuration to version 2.5, including Commons Configuration 1.x uses.
+  **This is a breaking API change.**
 
 ## [5.0.3] - 2019-09-25
 

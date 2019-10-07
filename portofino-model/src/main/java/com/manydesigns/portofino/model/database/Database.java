@@ -41,6 +41,7 @@ import java.util.List;
 */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas"})
+@XmlRootElement
 public class Database implements ModelObject {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
@@ -70,7 +71,7 @@ public class Database implements ModelObject {
     // Constructors
     //**************************************************************************
     public Database() {
-        this.schemas = new ArrayList<Schema>();
+        this.schemas = new ArrayList<>();
     }
 
     //**************************************************************************
