@@ -9,6 +9,7 @@ import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.reflection.TableAccessor
+import com.manydesigns.portofino.shiro.google.GoogleToken
 import com.manydesigns.portofino.util.PkHelper
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.crypto.hash.DefaultHashService
@@ -166,6 +167,54 @@ public class Security extends AbstractPortofinoRealm {
         }
         user
     }
+
+    AuthenticationInfo loadAuthenticationInfo(GoogleToken googleToken) {
+        boolean checkDomain = portofinoConfiguration.getProperty("google.check.domain")
+        String domain = portofinoConfiguration.getProperty("google.domain")
+        boolean createUserIfNotExists = portofinoConfiguration.getProperty("google.create.user.if.not.exists")
+
+        if (checkDomain) {
+            if (!googleToken.getHd().equals(domain)) {
+                logger.warn("Current google account '{}' is not in the domain '{}'", googleToken.email, domain)
+                throw new AuthenticationException("Login failed")
+            }
+        }
+
+        Session session = persistence.getSession(databaseName);
+        Criteria criteria = session.createCriteria(userTableEntityName);
+        criteria.add(Restrictions.eq(userNameProperty, googleToken.email));
+
+        List result = criteria.list()
+
+        if (result.size() == 1) {
+            def user = cleanUser(result[0])
+            return new SimpleAuthenticationInfo(user, "", name)
+        } else {
+            if (createUserIfNotExists) {
+                Map persistentUser = new HashMap()
+                persistentUser[userNameProperty] = googleToken.getPrincipal()
+                if(!StringUtils.isEmpty(userEmailProperty)) {
+                    persistentUser[userEmailProperty] = googleToken.getEmail()
+                }
+                // ADD ALL THE NOT-NULLABLE COLUMNS
+
+                def tx = session.transaction;
+                if (!tx.isActive())
+                    tx.begin()
+
+                try {
+                    session.save(userTableEntityName, (Object) persistentUser)
+                } catch (ConstraintViolationException e) {
+                    throw new ExistingUserException(e);
+                }
+                tx.commit()
+                return new SimpleAuthenticationInfo(persistentUser, "", name)
+            } else {
+                throw new IncorrectCredentialsException("Login failed");
+            }
+        }
+    }
+
 
     AuthenticationInfo loadAuthenticationInfo(PasswordResetToken token) {
         if(StringUtils.isEmpty(userTokenProperty)) {

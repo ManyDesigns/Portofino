@@ -160,6 +160,7 @@
         <module>portofino-war-archetype</module>
         <!-- Applications -->
         <module>demo-tt</module>
+        <module>portofino-google</module>
     </modules>
     <dependencyManagement>
         <dependencies>

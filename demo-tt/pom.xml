@@ -121,6 +121,12 @@
             <version>9.3-1102-jdbc4</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-google</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>

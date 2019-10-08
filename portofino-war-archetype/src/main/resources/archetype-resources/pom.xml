@@ -247,6 +247,13 @@
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Google Authentication -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-google</artifactId>
+            <version>${portofino.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>

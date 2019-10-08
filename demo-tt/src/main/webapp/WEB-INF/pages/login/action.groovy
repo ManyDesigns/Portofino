@@ -1,10 +1,10 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.FormBuilder
-import com.manydesigns.portofino.pageactions.login.DefaultLoginAction
+import com.manydesigns.portofino.pageactions.google.GoogleLoginAction
 import com.manydesigns.portofino.shiro.PortofinoRealm
 
-class MyLogin extends DefaultLoginAction {
+class MyLogin extends GoogleLoginAction {
 
     @Override
     protected String getRememberedUserName(Serializable principal) {

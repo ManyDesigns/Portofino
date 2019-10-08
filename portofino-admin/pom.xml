@@ -55,6 +55,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-google</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>fancytree</artifactId>
             <version>2.11.0</version>
