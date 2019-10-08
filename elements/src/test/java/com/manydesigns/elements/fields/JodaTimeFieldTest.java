@@ -63,7 +63,7 @@ public class JodaTimeFieldTest extends AbstractElementsTest {
     @DateFormat("yyyy-MM-dd")
     public DateTime date;
 
-    @Ignore
+    @Test(enabled = false)
     public void testDSTSwitch() throws NoSuchFieldException {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"));
         setupFields(Mode.EDIT);
