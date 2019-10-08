@@ -32,13 +32,6 @@ class Security extends AbstractPortofinoRealm {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    protected String databaseName = "tt";
-
-    protected String userTableEntityName = "users";
-    protected String userIdProperty = "id";
-    protected String userNameProperty = "email";
-    protected String userEmailProperty = "";
-
     @Inject(DatabaseModule.PERSISTENCE)
     Persistence persistence;
 
@@ -99,9 +92,9 @@ class Security extends AbstractPortofinoRealm {
             }
         }
 
-        Session session = persistence.getSession(databaseName);
-        Criteria criteria = session.createCriteria(userTableEntityName);
-        criteria.add(Restrictions.eq(userNameProperty, googleToken.email));
+        Session session = persistence.getSession("tt");
+        Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("email", googleToken.email));
 
         List result = criteria.list()
 
@@ -111,18 +104,20 @@ class Security extends AbstractPortofinoRealm {
         } else {
             if (createUserIfNotExists) {
                 Map persistentUser = new HashMap()
-                persistentUser[userNameProperty] = googleToken.getPrincipal()
-                if(!StringUtils.isEmpty(userEmailProperty)) {
-                    persistentUser[userEmailProperty] = googleToken.getEmail()
-                }
-                // ADD ALL THE NOT-NULLABLE COLUMNS
+                persistentUser["email"] = googleToken.getPrincipal()
+                persistentUser["first_name"] = googleToken.getGiven_name()
+                persistentUser["last_name"] = googleToken.getFamily_name()
+                persistentUser["registration"] = new Date()
+                persistentUser["registration_ip"] = "localhost"
+                persistentUser["admin"] = false
+                persistentUser["project_manager"] = false
 
                 def tx = session.transaction;
                 if (!tx.isActive())
                     tx.begin()
 
                 try {
-                    session.save(userTableEntityName, (Object) persistentUser)
+                    session.save("users", (Object) persistentUser)
                 } catch (ConstraintViolationException e) {
                     throw new ExistingUserException(e);
                 }

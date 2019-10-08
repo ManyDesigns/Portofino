@@ -58,7 +58,7 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-google</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.webjars.bower</groupId>

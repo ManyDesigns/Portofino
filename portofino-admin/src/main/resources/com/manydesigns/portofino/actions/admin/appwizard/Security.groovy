@@ -168,6 +168,8 @@ public class Security extends AbstractPortofinoRealm {
         user
     }
 
+//    Please uncomment this to enable Google OAuth
+    /*
     AuthenticationInfo loadAuthenticationInfo(GoogleToken googleToken) {
         boolean checkDomain = portofinoConfiguration.getProperty("google.check.domain")
         String domain = portofinoConfiguration.getProperty("google.domain")
@@ -196,7 +198,7 @@ public class Security extends AbstractPortofinoRealm {
                 if(!StringUtils.isEmpty(userEmailProperty)) {
                     persistentUser[userEmailProperty] = googleToken.getEmail()
                 }
-                // ADD ALL THE NOT-NULLABLE COLUMNS
+                // Remember to add all the non-nullable columns
 
                 def tx = session.transaction;
                 if (!tx.isActive())
@@ -213,8 +215,7 @@ public class Security extends AbstractPortofinoRealm {
                 throw new IncorrectCredentialsException("Login failed");
             }
         }
-    }
-
+    }*/
 
     AuthenticationInfo loadAuthenticationInfo(PasswordResetToken token) {
         if(StringUtils.isEmpty(userTokenProperty)) {
@@ -269,6 +270,8 @@ public class Security extends AbstractPortofinoRealm {
 
     @Override
     boolean supports(AuthenticationToken token) {
+//        Please uncomment this to enable Google OAuth
+//        if (token instanceof GoogleToken) return true;
         if(token instanceof PasswordResetToken || token instanceof SignUpToken) {
             return !StringUtils.isEmpty(userTokenProperty);
         }
