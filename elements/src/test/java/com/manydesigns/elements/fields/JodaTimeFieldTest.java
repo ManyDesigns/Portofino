@@ -38,6 +38,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.util.TimeZone;
@@ -62,6 +63,7 @@ public class JodaTimeFieldTest extends AbstractElementsTest {
     @DateFormat("yyyy-MM-dd")
     public DateTime date;
 
+    @Ignore
     public void testDSTSwitch() throws NoSuchFieldException {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"));
         setupFields(Mode.EDIT);
