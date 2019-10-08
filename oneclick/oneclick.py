@@ -1,23 +1,21 @@
 #! /usr/bin/env python
 
-'''
+"""
 You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "5.0.0"
-tomcat_dir = "apache-tomcat-9.0.16"
+portofino_version = "5.1.0"
+tomcat_dir = "apache-tomcat-9.0.26"
 portofino_path = "~/projects/portofino5"
-tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.16/bin/apache-tomcat-9.0.16.zip"
-drivers = [["org/postgresql/postgresql/42.2.5/", "postgresql-42.2.5.jar"],
-           ["mysql/mysql-connector-java/8.0.15/", "mysql-connector-java-8.0.15.jar"],
+tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.26/bin/apache-tomcat-9.0.26.zip"
+drivers = [["org/postgresql/postgresql/42.2.8/", "postgresql-42.2.8.jar"],
+           ["mysql/mysql-connector-java/8.0.17/", "mysql-connector-java-8.0.17.jar"],
            ["net/sourceforge/jtds/jtds/1.3.1/", "jtds-1.3.1.jar"]]
-
-'''
+"""
 
 import local
 import urllib
-import zipfile
 import shutil
 import os
 
@@ -35,7 +33,7 @@ print """//////////////////////
 Portofino build script
 //////////////////////"""
 
-if(os.path.exists(base_path)):
+if os.path.exists(base_path):
     shutil.rmtree(build_path)
 
 os.makedirs(base_path)
@@ -49,7 +47,7 @@ urllib._urlopener = MyURLopener()
 
 urllib.urlretrieve(local.tomcat_url, tomcat_zip)
 
-if(os.path.exists(tomcat_path)):
+if os.path.exists(tomcat_path):
     shutil.rmtree(tomcat_path)
 
 os.system("unzip " + tomcat_zip + " -d " + base_path)
@@ -77,7 +75,6 @@ print "Building oneclick..."
 os.system("mvn -version")
 os.system("cd " + oneclick_path + "; mvn clean package")
 
-
 shutil.copy(oneclick_path + "/target/portofino-oneclick-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")
 
 shutil.copy("setenv.sh", tomcat_path + "/bin")
@@ -97,7 +94,7 @@ cwd = os.getcwd()
 os.chdir(build_path)
 try:
     zipfile = portofino_dir + ".zip"
-    if(os.path.exists(zipfile)):
+    if os.path.exists(zipfile):
         os.remove(zipfile)
     os.system("zip -r " + zipfile + " " + portofino_dir)
 finally:
