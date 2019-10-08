@@ -575,7 +575,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if (innerAccessor == null) {
             return;
         }
-        classAccessor = new CrudAccessor(crudConfiguration, innerAccessor);
+        classAccessor = filterAccordingToPermissions(new CrudAccessor(crudConfiguration, innerAccessor));
         pkHelper = new PkHelper(classAccessor);
         maxParameters = classAccessor.getKeyProperties().length;
     }

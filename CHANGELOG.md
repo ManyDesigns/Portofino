@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Periodically retry database connections that have failed at startup if Quartz is available.
 - Fallback database platform for unrecognized database systems.
 - Support persistent Java 8+ Date and time API values.
+- Filter CRUD fields according to permissions (at the level of the ClassAccessor).
+- Filter configuration fields according to permissions. In particular, the CRUD query is hidden if the user is not a developer.
 
 ### Changed
 - **Updated Hibernate to the 5.x branch**, in particular to version 5.4.6.Final.

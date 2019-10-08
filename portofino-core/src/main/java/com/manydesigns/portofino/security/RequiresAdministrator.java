@@ -26,16 +26,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a handler method or an action class as accessible only by the administrator(s).
+ * Marks a method of a REST resource or a property of a form accessible only by an administrator.
  * 
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresAdministrator {
-    public static final String copyright =
+    String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 }

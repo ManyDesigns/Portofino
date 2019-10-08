@@ -26,19 +26,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Declares the minimum set of permissions that the user must have in order to invoke a specific method
- * (handler) or any method on a class (action).
+ * Declares the minimum set of permissions that the user must have in order to invoke a specific method on a REST
+ * resource or to access a property of a form.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresPermissions {
-    public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
 
     AccessLevel level() default AccessLevel.VIEW;
     String[] permissions() default {};

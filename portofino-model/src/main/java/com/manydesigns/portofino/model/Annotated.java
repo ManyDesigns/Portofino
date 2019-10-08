@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -29,9 +30,15 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface Annotated {
-    public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
 
     List<Annotation> getAnnotations();
 
+    @SuppressWarnings("unchecked")
+    default <T extends java.lang.annotation.Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
+        return (Optional<T>) getAnnotations().stream()
+                .filter(a -> annotationClass.isAssignableFrom(a.getJavaAnnotationClass()))
+                .map(Annotation::getJavaAnnotation)
+                .findFirst();
+    }
 }

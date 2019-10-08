@@ -29,6 +29,8 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
+import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.annotation.*;
@@ -136,6 +138,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
     @Required
     @Multiline
     @XmlAttribute(required = true)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public String getQuery() {
         return query;
     }

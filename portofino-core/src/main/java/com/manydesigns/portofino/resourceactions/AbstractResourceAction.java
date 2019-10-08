@@ -22,8 +22,14 @@ package com.manydesigns.portofino.resourceactions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.FilteredClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.actions.ActionLogic;
@@ -47,6 +53,8 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -373,8 +381,22 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     // Configuration
     ////////////////
 
+    @Nullable
+    protected Class<?> getConfigurationClass() {
+        return ResourceActionLogic.getConfigurationClass(getClass());
+    }
+
+    @NotNull
+    protected ClassAccessor getConfigurationClassAccessor() {
+        Class<?> configurationClass = getConfigurationClass();
+        if(configurationClass == null) {
+            return null;
+        }
+        return JavaClassAccessor.getClassAccessor(configurationClass);
+    }
+
     /**
-     * Returns the configuration of this action.
+     * Returns the configuration of this action, filtered using permissions.
      * @return the configuration.
      */
     @io.swagger.v3.oas.annotations.Operation(
@@ -386,7 +408,44 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Object getConfiguration() {
-        return actionInstance.getConfiguration();
+        Object configuration = actionInstance.getConfiguration();
+        if(getConfigurationClass() == null) {
+            return configuration;
+        }
+        ClassAccessor classAccessor = getConfigurationClassAccessor();
+        FilteredClassAccessor filteredClassAccessor = filterAccordingToPermissions(classAccessor);
+        FormBuilder formBuilder = new FormBuilder(filteredClassAccessor);
+        Form form = formBuilder.configMode(Mode.EDIT).build();
+
+        form.readFromObject(configuration);
+        Object filtered = classAccessor.newInstance();
+        form.writeToObject(filtered);
+        return filtered;
+    }
+
+    @NotNull
+    protected FilteredClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
+        Permissions permissions = SecurityLogic.calculateActualPermissions(actionInstance);
+        Subject subject = SecurityUtils.getSubject();
+        return filterAccordingToPermissions(classAccessor, permissions, subject);
+    }
+
+    @NotNull
+    protected FilteredClassAccessor filterAccordingToPermissions(
+            ClassAccessor classAccessor, Permissions permissions, Subject subject) {
+        List<String> fields = new ArrayList<>();
+        for(PropertyAccessor property : classAccessor.getProperties()) {
+            RequiresPermissions requiresPermissions = property.getAnnotation(RequiresPermissions.class);
+            boolean permitted =
+                    requiresPermissions == null ||
+                    SecurityLogic.hasPermissions(getPortofinoConfiguration(), permissions, subject, requiresPermissions);
+            if(permitted) {
+                fields.add(property.getName());
+            } else {
+                logger.debug("Property not permitted, filtering: {}", property.getName());
+            }
+        }
+        return FilteredClassAccessor.include(classAccessor, fields.toArray(new String[0]));
     }
 
     @io.swagger.v3.oas.annotations.Operation(
@@ -428,15 +487,16 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":configuration/classAccessor")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public String getConfigurationAccessor() {
-        Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(getClass());
-        if(configurationClass == null) {
+        Class<?> configurationClass = getConfigurationClass();
+        if (configurationClass == null) {
             return null;
         }
-        JavaClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(configurationClass);
+        ClassAccessor classAccessor = getConfigurationClassAccessor();
         JSONStringer jsonStringer = new JSONStringer();
         ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
         return jsonStringer.toString();
     }
+
 
     ////////////////
     // Configuration
