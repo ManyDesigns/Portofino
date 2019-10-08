@@ -63,6 +63,7 @@ public class DateFieldTest extends AbstractElementsTest {
     @DateFormat("yyyy-MM-dd")
     public Date date;
 
+    @Test(enabled = false)
     public void testDSTSwitch() {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"));
         setupFields(Mode.EDIT);

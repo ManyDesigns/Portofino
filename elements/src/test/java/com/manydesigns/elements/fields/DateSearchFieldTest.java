@@ -108,6 +108,7 @@ public class DateSearchFieldTest extends AbstractElementsTest {
         assertEquals (dateField.getMaxValue(), ((BaseCriteria.BetweenCriterion) criteria.get(0)).getMax());
     }
 
+    @Test(enabled = false)
     public void testDSTSwitch() {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"));
         setupFields();
