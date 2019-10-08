@@ -46,9 +46,6 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
 
     protected String name;
 
-    protected int currentColumn;
-    protected boolean rowOpened;
-
     public FieldSet(String name, int nColumns, Mode mode) {
         this.name = name;
         this.nColumns = nColumns;
@@ -70,20 +67,20 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
                 xb.writeLegend(name, null);
             }
 
-            currentColumn = 0;
-            rowOpened = false;
+            int currentColumn = 0;
 
             for (FormElement current : this) {
                 int colSpan = Math.min(current.getColSpan(), nColumns);
-                if (current.isForceNewRow()
-                        || currentColumn + colSpan > nColumns) {
-                    closeCurrentRow(xb);
+                if (current.isForceNewRow() || currentColumn + colSpan > nColumns) {
+                    if(currentColumn > 0) {
+                        closeCurrentRow(xb, currentColumn);
+                        currentColumn = 0;
+                    }
                 }
 
                 if (currentColumn == 0) {
                     xb.openElement("div");
                     xb.addAttribute("class", "row");
-                    rowOpened = true;
                 }
 
                 xb.openElement("div");
@@ -94,27 +91,25 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
                 currentColumn = currentColumn + colSpan;
 
                 if (currentColumn >= nColumns) {
-                    closeCurrentRow(xb);
+                    closeCurrentRow(xb, currentColumn);
+                    currentColumn = 0;
                 }
             }
 
-            closeCurrentRow(xb);
+            if(currentColumn > 0) {
+                closeCurrentRow(xb, currentColumn);
+            }
             xb.closeElement("fieldset");
         }
     }
 
-    protected void closeCurrentRow(XhtmlBuffer xb) {
-        if (!rowOpened) {
-            return;
-        }
+    protected void closeCurrentRow(XhtmlBuffer xb, int currentColumn) {
         if (currentColumn < nColumns) {
             xb.openElement("div");
             xb.addAttribute("class", "col-md-" + ((nColumns - currentColumn) * (12 / nColumns)));
             xb.closeElement("div");
         }
         xb.closeElement("div");
-        currentColumn = 0;
-        rowOpened = false;
     }
 
     public String getName() {
@@ -168,5 +163,9 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
             value.put(current.getName(), current.getValue());
         }
         return value;
+    }
+
+    public int getNColumns() {
+        return nColumns;
     }
 }

@@ -126,7 +126,7 @@ public class RangeSearchField extends AbstractSearchField {
                 minValue = maxValue;
                 maxValue = tmp;
             }
-        } else {
+        } else if(minValue == null && maxValue == null) {
             //Fall back to read the non-ranged value, if present
             minStringValue = StringUtils.trimToNull(req.getParameter(inputName));
             minValue = readValue(minStringValue, type);

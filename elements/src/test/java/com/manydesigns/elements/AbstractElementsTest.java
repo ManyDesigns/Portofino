@@ -94,7 +94,7 @@ public abstract class AbstractElementsTest {
     }
 
     @AfterMethod
-    public void tearDown() {
+    public void tearDown() throws Exception {
         ElementsThreadLocals.removeElementsContext();
     }
 
