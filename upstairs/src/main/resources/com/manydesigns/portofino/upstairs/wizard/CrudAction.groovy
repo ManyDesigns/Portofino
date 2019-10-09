@@ -1,5 +1,3 @@
-package com.manydesigns.portofino.upstairs.appwizard
-
 import javax.servlet.*
 
 import com.manydesigns.elements.messages.*
@@ -22,7 +20,7 @@ import com.manydesigns.portofino.resourceactions.crud.*
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
-class CrudPage extends CrudAction {
+class $generatedClassName extends CrudAction {
 
     String linkToParentProperty = "$linkToParentProperty";
     String parentName = "$parentName";

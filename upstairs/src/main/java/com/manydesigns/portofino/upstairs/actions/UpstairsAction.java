@@ -5,6 +5,7 @@ import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
@@ -125,7 +126,7 @@ public class UpstairsAction extends AbstractResourceAction {
                 }
                 TemplateEngine engine = new SimpleTemplateEngine();
                 Template template = engine.createTemplate(
-                        UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudPage.groovy"));
+                        UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudAction.groovy"));
                 Table userTable = getTable(wizard.usersTable);
                 Column userPasswordColumn = getColumn(userTable, wizard.userPasswordProperty);
                 boolean userCrudCreated = false;
@@ -202,6 +203,7 @@ public class UpstairsAction extends AbstractResourceAction {
             Table userTable, Column userPasswordColumn, List<Map> createdPages) throws Exception {
         String query = "from " + table.getActualEntityName() + " order by id desc";
         HashMap<String, String> bindings = new HashMap<>();
+        bindings.put("generatedClassName",  "CrudAction_" + RandomUtil.createRandomId());
         bindings.put("parentName", "");
         bindings.put("parentProperty", "nothing");
         bindings.put("linkToParentProperty", NO_LINK_TO_PARENT);
@@ -269,7 +271,7 @@ public class UpstairsAction extends AbstractResourceAction {
             if(depth < maxDepth) {
                 List<Reference> children = computeChildren(table);
                 for(Reference ref : children) {
-                    createChildCrudPage(connectionProvider, dir, template, variable, children, ref, userTable, userPasswordColumn, createdPages, depth);
+                    createChildCrudAction(connectionProvider, dir, template, variable, children, ref, userTable, userPasswordColumn, createdPages, depth);
                 }
             }
             return action;
@@ -300,7 +302,7 @@ public class UpstairsAction extends AbstractResourceAction {
         return children;
     }
 
-    protected void createChildCrudPage(
+    protected void createChildCrudAction(
             ConnectionProvider connectionProvider,
             FileObject dir, Template template, String parentName, Collection<Reference> references,
             Reference ref, Table userTable, Column userPasswordColumn, List<Map> createdPages, int depth)
@@ -323,6 +325,7 @@ public class UpstairsAction extends AbstractResourceAction {
         FileObject childDir = dir.resolveFile(ActionInstance.DETAIL).resolveFile(childDirName);
 
         Map<String, String> bindings = new HashMap<>();
+        bindings.put("generatedClassName",  "CrudAction_" + RandomUtil.createRandomId());
         bindings.put("parentName", parentName);
         bindings.put("parentProperty", parentProperty);
         bindings.put("linkToParentProperty", linkToParentProperty);
@@ -601,6 +604,7 @@ public class UpstairsAction extends AbstractResourceAction {
                 FileObject dir = actionsDirectory.resolveFile(dirName);
 
                 Map<String, String> bindings = new HashMap<>();
+                bindings.put("generatedClassName",  "UserManagementCrudAction");
                 bindings.put("parentName", "securityUtils");
                 bindings.put("parentProperty", "primaryPrincipal.id");
                 bindings.put("linkToParentProperty", linkToUserProperty);
