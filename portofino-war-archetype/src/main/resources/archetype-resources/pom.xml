@@ -56,11 +56,6 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-h2</artifactId>
-            <version>${portofino.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mssql</artifactId>
             <version>${portofino.version}</version>
         </dependency>
