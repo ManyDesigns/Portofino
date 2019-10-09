@@ -153,8 +153,10 @@ public class Persistence {
                 model = new Model();
             }
             FileObject modelDir = getModelDirectory();
-            for (FileObject databaseDir : modelDir.getChildren()) {
-                loadXmlDatabase(um, model, databaseDir);
+            if(modelDir.exists()) {
+                for (FileObject databaseDir : modelDir.getChildren()) {
+                    loadXmlDatabase(um, model, databaseDir);
+                }
             }
             initModel();
         } catch (Exception e) {
@@ -263,6 +265,7 @@ public class Persistence {
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
         FileObject modelDir = getModelDirectory();
+        modelDir.createFolder();
         for(Database database : model.getDatabases()) {
             FileObject databaseDir = modelDir.resolveFile(database.getDatabaseName());
             FileObject databaseFile = databaseDir.resolveFile("database.xml");
