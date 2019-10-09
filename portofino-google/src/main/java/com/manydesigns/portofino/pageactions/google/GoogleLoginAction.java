@@ -61,6 +61,7 @@ public class GoogleLoginAction extends DefaultLoginAction {
                 logger.error(errorMessage);
             } else {
                 String l = response.readEntity(String.class);
+                logger.debug("Google response: {}", l);
                 ObjectMapper mapper = new ObjectMapper();
                 Map m = null;
                 try {
@@ -73,7 +74,7 @@ public class GoogleLoginAction extends DefaultLoginAction {
                     logger.info("Google data retrieved successfully for User with email '{}'", m.get("email"));
                 } catch (AuthenticationException e) {
                     String errMsg = MessageFormat.format(
-                            ElementsThreadLocals.getText("login.failed.for.user._"), m.get("email"));
+                            ElementsThreadLocals.getText("login.failed.for.user._"), (m != null ? m.get("email"): null));
                     logger.warn(errMsg);
                     SessionMessages.addErrorMessage(errMsg);
                 } catch (Exception e) {
