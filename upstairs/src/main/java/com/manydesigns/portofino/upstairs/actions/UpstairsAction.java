@@ -245,12 +245,13 @@ public class UpstairsAction extends AbstractResourceAction {
 
             logger.debug("Creating _detail directory");
             FileObject detailDir = dir.resolveFile(ActionInstance.DETAIL);
-            if(detailDir.getType() != FileType.FOLDER) {
+            if(detailDir.exists() && detailDir.getType() != FileType.FOLDER) {
                 logger.warn("Invalid detail directory {}", detailDir.getName().getPath());
                 RequestMessages.addWarningMessage(
                         ElementsThreadLocals.getText("invalid.detail.directory", detailDir.getName().getPath()));
+            } else {
+                detailDir.createFolder();
             }
-            detailDir.createFolder();
 
             String path = dir.getName().getBaseName();
             FileObject parent = dir.getParent().getParent(); //two because of _detail
