@@ -39,6 +39,7 @@ import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
+import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -64,6 +65,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -219,23 +221,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected void setupConfigurationForm(FormBuilder formBuilder) {
-        super.setupConfigurationForm(formBuilder);
-        SelectionProvider databaseSelectionProvider =
-                SelectionProviderLogic.createSelectionProvider(
-                        "database",
-                        persistence.getModel().getDatabases(),
-                        Database.class,
-                        null,
-                        new String[]{"databaseName"});
-
-        formBuilder
-                .configFields(CRUD_CONFIGURATION_FIELDS)
-                .configFieldSetNames("Crud")
-                .configSelectionProvider(databaseSelectionProvider, "database");
-    }
-
-    @Override
     protected boolean saveConfiguration(Object configuration) {
         CrudConfiguration crudConfiguration = (CrudConfiguration) configuration;
         List<SelectionProviderReference> sps = new ArrayList<>(crudConfiguration.getSelectionProviders());
@@ -253,6 +238,20 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 crudConfiguration.getSelectionProviders().add(sp);
             }
         });
+        List<CrudProperty> crudProperties = this.crudConfiguration.getProperties();
+        crudConfiguration.getProperties().forEach(p1 -> {
+            crudProperties.forEach(p2 -> {
+                if(p1.getName().equals(p2.getName())) {
+                    p2.setEnabled(p1.isEnabled());
+                    p2.setInsertable(p1.isInsertable());
+                    p2.setInSummary(p1.isInSummary());
+                    p2.setLabel(p1.getLabel());
+                    p2.setSearchable(p1.isSearchable());
+                    p2.setUpdatable(p1.isUpdatable());
+                }
+            });
+        });
+        crudConfiguration.setProperties(crudProperties);
         return super.saveConfiguration(crudConfiguration);
     }
 

@@ -127,6 +127,11 @@ public class JavaPropertyAccessor extends AbstractAnnotatedAccessor implements P
         }
     }
 
+    @Override
+    public boolean isWritable() {
+        return setter != null;
+    }
+
     //**************************************************************************
     // Overrides
     //**************************************************************************

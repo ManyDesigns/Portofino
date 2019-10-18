@@ -1294,18 +1294,6 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         return selectionProviderEdits;
     }
 
-    protected void buildConfigurationForm() {
-        FormBuilder formBuilder = new FormBuilder(ResourceActionLogic.getConfigurationClass(getClass()));
-        setupConfigurationForm(formBuilder);
-        crudConfigurationForm = formBuilder.build();
-    }
-
-    protected void setupConfigurationForm(FormBuilder formBuilder) {}
-
-    public boolean isRequiredFieldsPresent() {
-        return form.isRequiredFieldsPresent();
-    }
-
     //**************************************************************************
     // Selection providers
     //**************************************************************************

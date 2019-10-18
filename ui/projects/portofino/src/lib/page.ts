@@ -148,7 +148,6 @@ export class PageSettingsPanel {
   }
 
   isValid() {
-    console.log("aaa", this.form)
     return this.form.valid;
   }
 

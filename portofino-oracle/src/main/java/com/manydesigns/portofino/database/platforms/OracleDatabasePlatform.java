@@ -70,13 +70,7 @@ public class OracleDatabasePlatform extends AbstractDatabasePlatform {
     @Override
     public List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
         List<String[]> schemaNames = super.getSchemaNames(databaseMetaData);
-        Iterator<String[]> it = schemaNames.iterator();
-        while (it.hasNext()) {
-            String[] schemaName = it.next();
-            if("SYS".equals(schemaName[1]) || "SYSTEM".equals(schemaName[1])) {
-                it.remove();
-            }
-        }
+        schemaNames.removeIf(schemaName -> "SYS".equals(schemaName[1]) || "SYSTEM".equals(schemaName[1]));
         return schemaNames;
     }
 }

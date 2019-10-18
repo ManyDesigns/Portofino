@@ -37,14 +37,18 @@ public interface PropertyAccessor extends AnnotatedElement {
     // Property description
     //**************************************************************************
 
-    public String getName();
-    public Class getType();
-    public int getModifiers();
+    String getName();
+    Class getType();
+    int getModifiers();
 
     //**************************************************************************
     // Accessors
     //**************************************************************************
 
-    public Object get(Object obj);
-    public void set(Object obj, Object value);
+    Object get(Object obj);
+    void set(Object obj, Object value);
+
+    default boolean isWritable() {
+        return true;
+    }
 }

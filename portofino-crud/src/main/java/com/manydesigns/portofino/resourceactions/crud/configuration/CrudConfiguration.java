@@ -53,9 +53,13 @@ public class CrudConfiguration implements ResourceActionConfiguration, Configura
         @XmlElement(name="property",type=CrudProperty.class),
         @XmlElement(name="virtual-property",type=VirtualCrudProperty.class),
     })
-    @Enabled(false)
     public List<CrudProperty> getProperties() {
         return properties;
+    }
+
+    public void setProperties(List<CrudProperty> properties) {
+        this.properties.clear();
+        this.properties.addAll(properties);
     }
 
     @Label("name")

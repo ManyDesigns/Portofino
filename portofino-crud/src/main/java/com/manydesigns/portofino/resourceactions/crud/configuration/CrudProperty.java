@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.resourceactions.crud.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
@@ -42,6 +43,7 @@ import java.util.List;
 
 @XmlAccessorType(value = XmlAccessType.NONE)
 @XmlType(propOrder = {"enabled","name", "label","insertable","updatable","inSummary","searchable","annotations"})
+@JsonIgnoreProperties(ignoreUnknown = true) //Deserialize VirtualProperties as normal properties as we're only interested in common fields for now
 public class CrudProperty implements Annotated {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";

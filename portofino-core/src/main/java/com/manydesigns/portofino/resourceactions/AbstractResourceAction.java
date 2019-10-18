@@ -414,12 +414,13 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         }
         ClassAccessor classAccessor = getConfigurationClassAccessor();
         FilteredClassAccessor filteredClassAccessor = filterAccordingToPermissions(classAccessor);
-        FormBuilder formBuilder = new FormBuilder(filteredClassAccessor);
-        Form form = formBuilder.configMode(Mode.EDIT).build();
-
-        form.readFromObject(configuration);
-        Object filtered = classAccessor.newInstance();
-        form.writeToObject(filtered);
+        ResourceActionConfiguration filtered = (ResourceActionConfiguration) classAccessor.newInstance();
+        for(PropertyAccessor propertyAccessor : filteredClassAccessor.getProperties()) {
+            if(propertyAccessor.isWritable()) {
+                propertyAccessor.set(filtered, propertyAccessor.get(configuration));
+            }
+        }
+        filtered.init();
         return filtered;
     }
 

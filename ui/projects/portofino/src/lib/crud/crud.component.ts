@@ -390,7 +390,7 @@ export class CrudPageSettingsPanel extends PageSettingsPanel {
       this.selectionProviders = sps;
     });
     config.properties.forEach(p => {
-      this.properties.push(Object.assign({}, p.property));
+      this.properties.push(Object.assign({}, p.property ? p.property : p['virtual-property']));
     });
     if(crud.classAccessor) {
       crud.classAccessor.properties.forEach(p => {

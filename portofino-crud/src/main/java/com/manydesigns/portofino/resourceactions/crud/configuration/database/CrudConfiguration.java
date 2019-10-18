@@ -156,6 +156,11 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
         return selectionProviders;
     }
 
+    public void setSelectionProviders(List<SelectionProviderReference> selectionProviders) {
+        this.selectionProviders.clear();
+        this.selectionProviders.addAll(selectionProviders);
+    }
+
     public Table getActualTable() {
         return actualTable;
     }
