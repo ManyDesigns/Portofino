@@ -82,6 +82,7 @@ public class GoogleLoginAction extends DefaultLoginAction {
                 }
             }
         }
-        return new RedirectResolution(pageInstance.getPath());
+
+        return redirectToReturnUrl();
     }
 }
