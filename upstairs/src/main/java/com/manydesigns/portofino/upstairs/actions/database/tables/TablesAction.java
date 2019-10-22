@@ -251,7 +251,7 @@ public class TablesAction extends AbstractResourceAction {
                                 break;
                             }
                             a = new Annotation(DATE_FORMAT);
-                            a.getValues().add(value);
+                            a.getProperties().add(new Property("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "decimalFormat":
@@ -263,12 +263,12 @@ public class TablesAction extends AbstractResourceAction {
                                 break;
                             }
                             a = new Annotation(DECIMAL_FORMAT);
-                            a.getValues().add(value);
+                            a.getProperties().add(new Property("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "fieldSize":
                             a = new Annotation(FIELD_SIZE);
-                            a.getValues().add(value);
+                            a.getProperties().add(new Property("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "fileBlob":
@@ -279,7 +279,7 @@ public class TablesAction extends AbstractResourceAction {
                             break;
                         case "highlightLinks":
                             a = new Annotation(HIGHLIGHT_LINKS);
-                            a.getValues().add(value);
+                            a.getProperties().add(new Property("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "minValue":
@@ -288,7 +288,7 @@ public class TablesAction extends AbstractResourceAction {
                             } else {
                                 a = new Annotation(MIN_DECIMAL_VALUE);
                             }
-                            a.getValues().add(value);
+                            a.getProperties().add(new Property("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "maxValue":
@@ -297,13 +297,13 @@ public class TablesAction extends AbstractResourceAction {
                             } else {
                                 a = new Annotation(MAX_DECIMAL_VALUE);
                             }
-                            a.getValues().add(value);
+                            a.getProperties().add(new Property("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "regexp":
                             a = new Annotation(REGEXP);
-                            a.getValues().add(value);
-                            a.getValues().add("elements.error.field.regexp.format"); //Default error message
+                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new Property("errorMessage", "elements.error.field.regexp.format")); //Default error message
                             existing.getAnnotations().add(a);
                             break;
                         case "stringFormat":
@@ -312,7 +312,7 @@ public class TablesAction extends AbstractResourceAction {
                             break;
                         case "typeOfContent":
                             a = new Annotation(((Map)e.getValue()).get("v").toString());
-                            a.getValues().add("true");
+                            a.getProperties().add(new Property("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         default:
