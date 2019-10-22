@@ -51,7 +51,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
 
     protected static final ThreadLocal<Boolean> reloadingUserContext = ThreadLocal.withInitial(() -> false);
     protected static final
-    AtomicBoolean refreshing = new AtomicBoolean(false);
+    AtomicBoolean refreshing = new AtomicBoolean(true);
     private static final Logger logger = LoggerFactory.getLogger(PortofinoContextLoaderListener.class);
 
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
@@ -76,6 +76,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
             bridgeContext.setId("portofino-bridge");
             super.contextInitialized(event);
             servletContext.setAttribute(PORTOFINO_CONTEXT_LOADER_LISTENER, this);
+            refreshing.set(false);
         } finally {
             ElementsThreadLocals.removeElementsContext();
         }
@@ -121,28 +122,41 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         });
         CodeBase codeBase = (CodeBase) servletContext.getAttribute(PortofinoListener.CODE_BASE_ATTRIBUTE);
         try {
-            //TODO periodically check SpringConfiguration for changes if reload == true?
             Class userConfigurationClass = codeBase.loadClass("SpringConfiguration");
             ((DefaultResourceLoader) userContext).setClassLoader(codeBase.asClassLoader());
             ((AnnotationConfigRegistry) userContext).register(userConfigurationClass);
-            boolean reload = !"false".equalsIgnoreCase(servletContext.getInitParameter(RELOAD_CONTEXT_WHEN_SOURCES_CHANGE));
-            Disposable subscription = codeBase.getReloads().subscribe(c -> {
-                if(reload && isReloadable(c) && refreshing.compareAndSet(false, true)) {
-                    logger.info("Detected reload of " + c + ", refreshing the application context");
-                    refresh();
-                    refreshing.set(false);
-                }
-            });
-            userContext.addApplicationListener(event -> {
-                if(event instanceof ContextClosedEvent) {
-                    subscription.dispose();
-                }
-            });
+            configureContextReload(userContext, codeBase);
         } catch (Exception e) {
             logger.info("User-defined Spring configuration not found");
             logger.debug("Additional info", e);
         }
         return userContext;
+    }
+
+    protected void configureContextReload(ConfigurableWebApplicationContext userContext, CodeBase codeBase) {
+        boolean reload = !"false".equalsIgnoreCase(servletContext.getInitParameter(RELOAD_CONTEXT_WHEN_SOURCES_CHANGE));
+        //TODO periodically check SpringConfiguration for changes if reload == true?
+        if(reload) {
+            Disposable subscription = codeBase.getReloads().subscribe(c -> {
+                if (isReloadable(c)) {
+                    if (refreshing.compareAndSet(false, true)) {
+                        logger.info("Detected reload of " + c + ", refreshing the application context");
+                        try {
+                            refresh();
+                        } finally {
+                            refreshing.set(false);
+                        }
+                    } else {
+                        logger.warn("Detected reload of " + c + ", but the context is already refreshing");
+                    }
+                }
+            });
+            userContext.addApplicationListener(event -> {
+                if (event instanceof ContextClosedEvent) {
+                    subscription.dispose();
+                }
+            });
+        }
     }
 
     protected void setupParentContext() {
