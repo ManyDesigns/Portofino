@@ -13,10 +13,13 @@ import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.ExistingUserException
 import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
+import com.manydesigns.portofino.shiro.google.GoogleToken
+import org.apache.commons.lang.StringUtils
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
+import org.hibernate.exception.ConstraintViolationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
@@ -75,6 +78,55 @@ class Security extends AbstractPortofinoRealm {
                 new SimpleAuthenticationInfo(
                         cleanUser(principal), plainTextPassword.toCharArray(), getName());
         return info;
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(GoogleToken googleToken) {
+        boolean checkDomain = portofinoConfiguration.getProperty("google.check.domain")
+        String domain = portofinoConfiguration.getProperty("google.domain")
+        boolean createUserIfNotExists = portofinoConfiguration.getProperty("google.create.user.if.not.exists")
+
+        if (checkDomain) {
+            if (!googleToken.getHd().equals(domain)) {
+                logger.warn("Current google account '{}' is not in the domain '{}'", googleToken.email, domain)
+                throw new AuthenticationException("Login failed")
+            }
+        }
+
+        Session session = persistence.getSession("tt");
+        Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("email", googleToken.email));
+
+        List result = criteria.list()
+
+        if (result.size() == 1) {
+            def user = cleanUser(result[0])
+            return new SimpleAuthenticationInfo(user, "", name)
+        } else {
+            if (createUserIfNotExists) {
+                Map persistentUser = new HashMap()
+                persistentUser["email"] = googleToken.getPrincipal()
+                persistentUser["first_name"] = googleToken.getGiven_name()
+                persistentUser["last_name"] = googleToken.getFamily_name()
+                persistentUser["registration"] = new Date()
+                persistentUser["registration_ip"] = "localhost"
+                persistentUser["admin"] = false
+                persistentUser["project_manager"] = false
+
+                def tx = session.transaction;
+                if (!tx.isActive())
+                    tx.begin()
+
+                try {
+                    session.save("users", (Object) persistentUser)
+                } catch (ConstraintViolationException e) {
+                    throw new ExistingUserException(e);
+                }
+                tx.commit()
+                return new SimpleAuthenticationInfo(persistentUser, "", name)
+            } else {
+                throw new IncorrectCredentialsException("Login failed");
+            }
+        }
     }
 
     public AuthenticationInfo loadAuthenticationInfo(
@@ -163,7 +215,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     boolean supports(AuthenticationToken token) {
-        token instanceof PasswordResetToken || token instanceof SignUpToken || super.supports(token)
+        token instanceof PasswordResetToken || token instanceof SignUpToken || token instanceof GoogleToken || super.supports(token)
     }
 
     //--------------------------------------------------------------------------
