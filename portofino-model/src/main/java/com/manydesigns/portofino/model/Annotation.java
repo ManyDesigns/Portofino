@@ -283,4 +283,14 @@ public class Annotation implements ModelObject {
         }
         return null;
     }
+
+    public void setProperty(String name, String value) {
+        Property property = getProperty(name);
+        if(property == null) {
+            property = new Property(name, value);
+            properties.add(property);
+        } else {
+            property.setValue(value);
+        }
+    }
 }

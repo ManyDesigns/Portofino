@@ -41,4 +41,16 @@ public interface Annotated {
                 .map(Annotation::getJavaAnnotation)
                 .findFirst();
     }
+
+    default Optional<Annotation> getAnnotation(String type) {
+        return getAnnotations().stream().filter(a -> a.getType().equals(type)).findFirst();
+    }
+
+    default Annotation ensureAnnotation(final String type) {
+        return getAnnotation(type).orElseGet(() -> {
+            Annotation annotation = new Annotation(this, type);
+            getAnnotations().add(annotation);
+            return annotation;
+        });
+    }
 }

@@ -52,6 +52,8 @@ public class TablesAction extends AbstractResourceAction {
     public static final String DATE_FORMAT = DateFormat.class.getName();
     public static final String DECIMAL_FORMAT = DecimalFormat.class.getName();
     public static final String FIELD_SIZE = FieldSize.class.getName();
+    public static final String MAX_LENGTH = MaxLength.class.getName();
+    public static final String DATABASE_BLOB = DatabaseBlob.class.getName();
     public static final String FILE_BLOB = FileBlob.class.getName();
     public static final String HIGHLIGHT_LINKS = HighlightLinks.class.getName();
     public static final String MIN_INT_VALUE = MinIntValue.class.getName();
@@ -78,6 +80,14 @@ public class TablesAction extends AbstractResourceAction {
         STRING_FORMAT.put(PHONE, "Phone");
         STRING_FORMAT.put(ENCRYPTED, "Encrypted");
     }
+
+    public static final List<String> KNOWN_ANNOTATIONS = Arrays.asList(
+            FIELD_SIZE, MAX_LENGTH, MULTILINE, RICH_TEXT,
+            EMAIL, CAP, CODICE_FISCALE, PARTITA_IVA, PASSWORD, PHONE,
+            HIGHLIGHT_LINKS, REGEXP,
+            DATABASE_BLOB, FILE_BLOB,
+            MIN_DECIMAL_VALUE, MIN_INT_VALUE, MAX_DECIMAL_VALUE, MAX_INT_VALUE,
+            DECIMAL_FORMAT, DATE_FORMAT, ENCRYPTED);
 
     @Autowired
     protected Persistence persistence;
@@ -235,8 +245,8 @@ public class TablesAction extends AbstractResourceAction {
         if(annotationsForm.validate()) {
             BeanUtils.copyProperties(column.getColumn(), existing);
             existing.setTable(table);
-            existing.getAnnotations().clear();
-            Set<Map.Entry<String, ?>> set = column.getAnnotations().entrySet();
+            existing.getAnnotations().removeIf(a -> KNOWN_ANNOTATIONS.contains(a.getType()));
+            Set<Map.Entry<String, Object>> set = column.getAnnotations().entrySet();
             set.forEach(e -> {
                 if(e.getValue() != null) {
                     Annotation a;
@@ -276,6 +286,18 @@ public class TablesAction extends AbstractResourceAction {
                                 a = new Annotation(FILE_BLOB);
                                 existing.getAnnotations().add(a);
                             }
+                            break;
+                        case "databaseBlobContentTypeProperty":
+                            Annotation databaseBlobAnn1 = existing.ensureAnnotation(DATABASE_BLOB);
+                            databaseBlobAnn1.setProperty("contentTypeProperty", value);
+                            break;
+                        case "databaseBlobFileNameProperty":
+                            Annotation databaseBlobAnn2 = existing.ensureAnnotation(DATABASE_BLOB);
+                            databaseBlobAnn2.setProperty("fileNameProperty", value);
+                            break;
+                        case "databaseBlobTimestampProperty":
+                            Annotation databaseBlobAnn3 = existing.ensureAnnotation(DATABASE_BLOB);
+                            databaseBlobAnn3.setProperty("timestampProperty", value);
                             break;
                         case "highlightLinks":
                             a = new Annotation(HIGHLIGHT_LINKS);
@@ -386,7 +408,7 @@ public class TablesAction extends AbstractResourceAction {
                 jsonStringer.key("s").value(true);
                 jsonStringer.endObject();
                 return;
-            } else if(STRING_FORMAT.keySet().contains(annType)) {
+            } else if(STRING_FORMAT.containsKey(annType)) {
                 jsonStringer.key("stringFormat");
                 jsonStringer.object();
                 jsonStringer.key("v").value(annType);
@@ -394,10 +416,22 @@ public class TablesAction extends AbstractResourceAction {
                 jsonStringer.key("s").value(true);
                 jsonStringer.endObject();
                 return;
+            } else if(DATABASE_BLOB.equals(annType)) {
+                jsonStringer.key("databaseBlobContentTypeProperty").value(a.getProperty("contentTypeProperty").getValue());
+                jsonStringer.key("databaseBlobFileNameProperty").value(a.getProperty("fileNameProperty").getValue());
+                jsonStringer.key("databaseBlobTimestampProperty").value(a.getProperty("timestampProperty").getValue());
+                return;
             } else {
-                String msg = "Unsupported annotation: " + annType;
-                logger.error(msg);
-                RequestMessages.addErrorMessage(msg); //TODO i18n
+                jsonStringer.key("annotation");
+                jsonStringer.object();
+                jsonStringer.key("type").value(annType);
+                jsonStringer.key("properties");
+                jsonStringer.array();
+                a.getProperties().forEach(p -> {
+                    jsonStringer.key(p.getName()).value(p.getValue());
+                });
+                jsonStringer.endArray();
+                jsonStringer.endObject();
                 return;
             }
             if(a.getProperties().size() > 1) {

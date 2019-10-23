@@ -29,7 +29,7 @@ class Security extends AbstractPortofinoRealm {
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
     @Autowired
-    Persistence persistence;
+    Persistence persistence
 
     //--------------------------------------------------------------------------
     // Authentication
@@ -37,7 +37,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
-        return loadAuthenticationInfo(token);
+        loadAuthenticationInfo(token)
     }
 
     AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {

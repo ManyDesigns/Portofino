@@ -8,7 +8,7 @@ import java.util.Map;
 public class ColumnAndAnnotations {
 
     private Column column;
-    private Map annotations = new HashMap();
+    private Map<String, Object> annotations = new HashMap<>();
 
     public Column getColumn() {
         return column;
@@ -18,11 +18,11 @@ public class ColumnAndAnnotations {
         this.column = column;
     }
 
-    public Map getAnnotations() {
+    public Map<String, Object> getAnnotations() {
         return annotations;
     }
 
-    public void setAnnotations(Map annotations) {
+    public void setAnnotations(Map<String, Object> annotations) {
         this.annotations = annotations;
     }
 }
