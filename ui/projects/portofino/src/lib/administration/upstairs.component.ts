@@ -96,15 +96,17 @@ export class UpstairsComponent extends Page implements OnInit {
 @Component({
   selector: 'portofino-upstairs-settings',
   template: `
-    <form (submit)="saveSettings()">
-      <mat-card>
-        <mat-card-content><portofino-form #settingsFormComponent [form]="settingsForm"></portofino-form></mat-card-content>
-        <mat-card-actions>
-          <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
-          <portofino-buttons [component]="this"></portofino-buttons>
-        </mat-card-actions>
-      </mat-card>
-  </form>`
+    <div style="padding: 20px;">
+      <form (submit)="saveSettings()">
+        <mat-card>
+          <mat-card-content><portofino-form #settingsFormComponent [form]="settingsForm"></portofino-form></mat-card-content>
+          <mat-card-actions>
+            <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+            <portofino-buttons [component]="this"></portofino-buttons>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>`
 })
 export class SettingsComponent extends Page implements AfterViewInit {
   readonly settingsForm = new Form([
@@ -138,27 +140,29 @@ export class SettingsComponent extends Page implements AfterViewInit {
 
 @Component({
   template: `
-    <mat-card>
-      <mat-card-content>
-        <table *ngIf="parent.settingsPanel.permissions" class="mat-table">
-          <tr class="mat-header-row">
-            <th class="mat-header-cell">{{'Group'|translate}}</th>
-            <th class="mat-header-cell">{{'Access level'|translate}}</th>
-          </tr>
-          <tr *ngFor="let group of parent.settingsPanel.groups" class="mat-row">
-            <td class="mat-cell">{{group.name}}</td>
-            <td class="mat-cell">
-              <mat-select [(ngModel)]="group.level">
-                <mat-option *ngFor="let level of parent.settingsPanel.accessLevels" [value]="level">
-                  {{level}}
-                </mat-option>
-              </mat-select>
-            </td>
-          </tr>
-        </table>
-      </mat-card-content>
-      <mat-card-actions><portofino-buttons [component]="parent" list="permissions"></portofino-buttons></mat-card-actions>
-    </mat-card>`
+    <div style="padding: 20px;">
+      <mat-card>
+        <mat-card-content>
+          <table *ngIf="parent.settingsPanel.permissions" class="mat-table">
+            <tr class="mat-header-row">
+              <th class="mat-header-cell">{{'Group'|translate}}</th>
+              <th class="mat-header-cell">{{'Access level'|translate}}</th>
+            </tr>
+            <tr *ngFor="let group of parent.settingsPanel.groups" class="mat-row">
+              <td class="mat-cell">{{group.name}}</td>
+              <td class="mat-cell">
+                <mat-select [(ngModel)]="group.level">
+                  <mat-option *ngFor="let level of parent.settingsPanel.accessLevels" [value]="level">
+                    {{level}}
+                  </mat-option>
+                </mat-select>
+              </td>
+            </tr>
+          </table>
+        </mat-card-content>
+        <mat-card-actions><portofino-buttons [component]="parent" list="permissions"></portofino-buttons></mat-card-actions>
+      </mat-card>
+    </div>`
 })
 export class PermissionsComponent extends Page implements OnInit {
   ngOnInit(): void {
@@ -169,19 +173,21 @@ export class PermissionsComponent extends Page implements OnInit {
 @Component({
   selector: 'portofino-upstairs-mail-settings',
   template: `
-    <form (submit)="saveSettings()">
-      <mat-card>
-        <mat-card-content>
-          <portofino-form #settingsFormComponent [form]="settingsForm"
-                          fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="default center">
-          </portofino-form>
-        </mat-card-content>
-        <mat-card-actions>
-          <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
-          <portofino-buttons [component]="this"></portofino-buttons>
-        </mat-card-actions>
-      </mat-card>
-  </form>`
+    <div style="padding: 20px;">
+      <form (submit)="saveSettings()">
+        <mat-card>
+          <mat-card-content>
+            <portofino-form #settingsFormComponent [form]="settingsForm"
+                            fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="default center">
+            </portofino-form>
+          </mat-card-content>
+          <mat-card-actions>
+            <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+            <portofino-buttons [component]="this"></portofino-buttons>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </div>`
 })
 export class MailSettingsComponent extends Page implements AfterViewInit {
   readonly settingsForm = new Form([

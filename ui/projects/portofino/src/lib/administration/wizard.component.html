@@ -1,220 +1,222 @@
-<mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
-  <mat-step [stepControl]="step0Form.control">
-    <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
-    {{'Use an existing'|translate}}
-    <mat-form-field>
-      <mat-label>{{'database connection' | translate}}</mat-label>
-      <mat-select [(ngModel)]="wizard.connectionProvider">
-        <mat-option></mat-option>
-        <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <div>
-      <label>{{'or create a new one (choose its type)'}}</label>
-      <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider">
-        <mat-radio-button value="jdbc">JDBC</mat-radio-button>
-        <mat-radio-button value="jndi">JNDI</mat-radio-button>
-      </mat-radio-group>
-    </div>
-    <fieldset>
-      <legend>{{'Connection parameters' | translate}}</legend>
-      <form #step0Form="ngForm">
-        <mat-form-field>
-          <mat-label>{{'Database name' | translate}}</mat-label>
-          <input matInput [(ngModel)]="wizard.databaseName" required name="databaseName"
-                 [disabled]="wizard.connectionProvider">
-        </mat-form-field>
-        <ng-container *ngIf="wizard.newConnectionType == 'jdbc'">
-          <mat-form-field>
-            <mat-label>{{'Driver' | translate}}</mat-label>
-            <mat-select [(ngModel)]="wizard.driver" required name="driver"
-                        [disabled]="wizard.connectionProvider">
-              <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>{{'Connection URL' | translate}}</mat-label>
-            <input matInput [(ngModel)]="wizard.connectionUrl" required name="connectionUrl"
-                   [disabled]="wizard.connectionProvider">
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>{{'Username' | translate}}</mat-label>
-            <input matInput [(ngModel)]="wizard.username" name="username"
-                   [disabled]="wizard.connectionProvider">
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>{{'Password' | translate}}</mat-label>
-            <input matInput type="password" [(ngModel)]="wizard.password" name="password"
-                   [disabled]="wizard.connectionProvider">
-          </mat-form-field>
-        </ng-container>
-        <ng-container *ngIf="wizard.newConnectionType == 'jndi'">
-          <mat-form-field>
-            <mat-label>{{'JNDI resource' | translate}}</mat-label>
-            <input matInput [(ngModel)]="wizard.jndiResource" required name="jndiResource"
-                   [disabled]="wizard.connectionProvider">
-          </mat-form-field>
-        </ng-container>
-      </form>
-    </fieldset>
-    <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
-  </mat-step>
-  <mat-step [editable]="wizard.connectionProvider">
-    <ng-template matStepLabel>{{'Select the database schema(s) to import' | translate}}</ng-template>
-    <h3>{{'Found schemas:'|translate}}</h3>
-    <table class="mat-table">
-      <tr class="mat-header-row">
-        <th class="mat-header-cell"></th>
-        <th class="mat-header-cell">{{'Schema'|translate}}</th>
-        <th class="mat-header-cell">{{'Schema name'|translate}}</th>
-      </tr>
-      <tr *ngFor="let schema of wizard.schemas; let i = index;" class="mat-row">
-        <td class="mat-cell"><mat-checkbox [(ngModel)]="schema.selected"
-                                           name="selected{{i}}"></mat-checkbox></td>
-        <td class="mat-cell">{{schema.schema}}</td>
-        <td class="mat-cell"><input matInput [(ngModel)]="schema.name" name="schemaName{{i}}"/></td>
-      </tr>
-    </table>
-    <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-    <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
-  </mat-step>
-  <mat-step [stepControl]="userGroupForm.control">
-    <ng-template matStepLabel>{{'Configure user management' | translate}}</ng-template>
-    <mat-card>{{"Warning: if you don't leave the fields below empty, the Security.groovy file will be overwritten."|translate}}</mat-card>
-    <fieldset>
-      <legend>{{'Users and groups tables'|translate}}</legend>
+<div style="padding: 20px;">
+  <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
+    <mat-step [stepControl]="step0Form.control">
+      <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
+      {{'Use an existing'|translate}}
       <mat-form-field>
-        <mat-label>{{'Users table' | translate}}</mat-label>
-        <mat-select [(ngModel)]="wizard.usersTable">
+        <mat-label>{{'database connection' | translate}}</mat-label>
+        <mat-select [(ngModel)]="wizard.connectionProvider">
           <mat-option></mat-option>
-          <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
+          <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field>
-        <mat-label>{{'Groups table' | translate}}</mat-label>
-        <mat-select [(ngModel)]="wizard.groupsTable">
-          <mat-option></mat-option>
-          <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>{{'User-group link table' | translate}}</mat-label>
-        <mat-select [(ngModel)]="wizard.userGroupTable">
-          <mat-option></mat-option>
-          <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </fieldset>
-    <form #userGroupForm="ngForm">
-      <fieldset *ngIf="wizard.usersTable">
-        <legend>{{'Users and groups tables configuration'|translate}}</legend>
-        <mat-form-field>
-          <mat-label>{{'User id property' | translate}}</mat-label>
-          <mat-select [(ngModel)]="wizard.userIdProperty" required name="userIdProperty">
-            <mat-option></mat-option>
-            <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{'User name property' | translate}}</mat-label>
-          <mat-select [(ngModel)]="wizard.userNameProperty" required name="userNameProperty">
-            <mat-option></mat-option>
-            <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{'User password property' | translate}}</mat-label>
-          <mat-select [(ngModel)]="wizard.userPasswordProperty" required name="userPasswordProperty">
-            <mat-option></mat-option>
-            <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{'Encryption Algorithm' | translate}}</mat-label>
-          <mat-select [(ngModel)]="wizard.encryptionAlgorithm" required name="encryptionAlgorithm">
-            <mat-option value="SHA-256:base64">{{'SHA-256 (Base64 encoded)'|translate}}</mat-option>
-            <mat-option value="SHA-256:hex">{{'SHA-256 (Hex encoded)'|translate}}</mat-option>
-            <mat-option value="SHA-1:base64">{{'SHA-1 (Base64 encoded)'|translate}}</mat-option>
-            <mat-option value="SHA-1:hex">{{'SHA-1 (Hex encoded)'|translate}}</mat-option>
-            <mat-option value="MD5:base64">{{'MD5 (Base64 encoded)'|translate}}</mat-option>
-            <mat-option value="MD5:hex">{{'MD5 (Hex encoded)'|translate}}</mat-option>
-            <mat-option value="plaintext:plaintext">{{'Plain text'|translate}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{'Email property' | translate}}</mat-label>
-          <mat-select [(ngModel)]="wizard.userEmailProperty" name="userEmailProperty">
-            <mat-option></mat-option>
-            <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>{{'Token property' | translate}}</mat-label>
-          <mat-select [(ngModel)]="wizard.userTokenProperty" name="userTokenProperty">
-            <mat-option></mat-option>
-            <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-        <ng-container *ngIf="wizard.groupsTable && wizard.userGroupTable">
-          <mat-divider></mat-divider>
+      <div>
+        <label>{{'or create a new one (choose its type)'}}</label>
+        <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider">
+          <mat-radio-button value="jdbc">JDBC</mat-radio-button>
+          <mat-radio-button value="jndi">JNDI</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <fieldset>
+        <legend>{{'Connection parameters' | translate}}</legend>
+        <form #step0Form="ngForm">
           <mat-form-field>
-            <mat-label>{{'Group id property' | translate}}</mat-label>
-            <mat-select [(ngModel)]="wizard.groupIdProperty" required name="groupIdProperty">
-              <mat-option></mat-option>
-              <mat-option *ngFor="let c of wizard.groupsTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
-            </mat-select>
+            <mat-label>{{'Database name' | translate}}</mat-label>
+            <input matInput [(ngModel)]="wizard.databaseName" required name="databaseName"
+                   [disabled]="wizard.connectionProvider">
           </mat-form-field>
-          <mat-form-field>
-            <mat-label>{{'Group name property' | translate}}</mat-label>
-            <mat-select [(ngModel)]="wizard.groupNameProperty" required name="groupNameProperty">
-              <mat-option></mat-option>
-              <mat-option *ngFor="let c of wizard.groupsTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>{{'Group link property' | translate}}</mat-label>
-            <mat-select [(ngModel)]="wizard.groupLinkProperty" required name="groupLinkProperty">
-              <mat-option></mat-option>
-              <mat-option *ngFor="let c of wizard.userGroupTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>{{'User link property' | translate}}</mat-label>
-            <mat-select [(ngModel)]="wizard.userLinkProperty" required name="userLinkProperty">
-              <mat-option></mat-option>
-              <mat-option *ngFor="let c of wizard.userGroupTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field>
-            <mat-label>{{'Admin group name' | translate}}</mat-label>
-            <input matInput [(ngModel)]="wizard.adminGroupName" name="adminGroupName" />
-          </mat-form-field>
-        </ng-container>
+          <ng-container *ngIf="wizard.newConnectionType == 'jdbc'">
+            <mat-form-field>
+              <mat-label>{{'Driver' | translate}}</mat-label>
+              <mat-select [(ngModel)]="wizard.driver" required name="driver"
+                          [disabled]="wizard.connectionProvider">
+                <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Connection URL' | translate}}</mat-label>
+              <input matInput [(ngModel)]="wizard.connectionUrl" required name="connectionUrl"
+                     [disabled]="wizard.connectionProvider">
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Username' | translate}}</mat-label>
+              <input matInput [(ngModel)]="wizard.username" name="username"
+                     [disabled]="wizard.connectionProvider">
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Password' | translate}}</mat-label>
+              <input matInput type="password" [(ngModel)]="wizard.password" name="password"
+                     [disabled]="wizard.connectionProvider">
+            </mat-form-field>
+          </ng-container>
+          <ng-container *ngIf="wizard.newConnectionType == 'jndi'">
+            <mat-form-field>
+              <mat-label>{{'JNDI resource' | translate}}</mat-label>
+              <input matInput [(ngModel)]="wizard.jndiResource" required name="jndiResource"
+                     [disabled]="wizard.connectionProvider">
+            </mat-form-field>
+          </ng-container>
+        </form>
       </fieldset>
-    </form>
-    <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-    <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
-  </mat-step>
-  <mat-step>
-    <ng-template matStepLabel>{{'Create the application' | translate}}</ng-template>
-    <h3>{{'Which pages do you want to create?'|translate}}</h3>
-    <mat-radio-group [(ngModel)]="wizard.strategy">
-      <mat-radio-button value="automatic">{{'Let Portofino choose automatically'|translate}}</mat-radio-button>
-      <mat-radio-button value="manual">{{'Select them manually'|translate}}</mat-radio-button>
-      <mat-radio-button value="none">{{"Don't generate any page"|translate}}</mat-radio-button>
-    </mat-radio-group>
-    <div></div>
-    <table *ngIf="wizard.strategy == 'manual'" class="mat-table">
-      <tr class="mat-header-row">
-        <th class="mat-header-cell"></th>
-        <th class="mat-header-cell">{{'Table name'|translate}}</th>
-      </tr>
-      <tr *ngFor="let table of wizard.tables" class="mat-row">
-        <td class="mat-cell"><mat-checkbox [(ngModel)]="table.selected"></mat-checkbox></td>
-        <td class="mat-cell">{{tableName(table)}}</td>
-      </tr>
-    </table>
-    <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-    <button mat-button color="accent" (click)="generateApplication(wizard)">{{'Finish' | translate}}</button>
-  </mat-step>
-</mat-horizontal-stepper>
+      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+    </mat-step>
+    <mat-step [editable]="wizard.connectionProvider">
+      <ng-template matStepLabel>{{'Select the database schema(s) to import' | translate}}</ng-template>
+      <h3>{{'Found schemas:'|translate}}</h3>
+      <table class="mat-table">
+        <tr class="mat-header-row">
+          <th class="mat-header-cell"></th>
+          <th class="mat-header-cell">{{'Schema'|translate}}</th>
+          <th class="mat-header-cell">{{'Schema name'|translate}}</th>
+        </tr>
+        <tr *ngFor="let schema of wizard.schemas; let i = index;" class="mat-row">
+          <td class="mat-cell"><mat-checkbox [(ngModel)]="schema.selected"
+                                             name="selected{{i}}"></mat-checkbox></td>
+          <td class="mat-cell">{{schema.schema}}</td>
+          <td class="mat-cell"><input matInput [(ngModel)]="schema.name" name="schemaName{{i}}"/></td>
+        </tr>
+      </table>
+      <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
+      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+    </mat-step>
+    <mat-step [stepControl]="userGroupForm.control">
+      <ng-template matStepLabel>{{'Configure user management' | translate}}</ng-template>
+      <mat-card>{{"Warning: if you don't leave the fields below empty, the Security.groovy file will be overwritten."|translate}}</mat-card>
+      <fieldset>
+        <legend>{{'Users and groups tables'|translate}}</legend>
+        <mat-form-field>
+          <mat-label>{{'Users table' | translate}}</mat-label>
+          <mat-select [(ngModel)]="wizard.usersTable">
+            <mat-option></mat-option>
+            <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'Groups table' | translate}}</mat-label>
+          <mat-select [(ngModel)]="wizard.groupsTable">
+            <mat-option></mat-option>
+            <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>{{'User-group link table' | translate}}</mat-label>
+          <mat-select [(ngModel)]="wizard.userGroupTable">
+            <mat-option></mat-option>
+            <mat-option *ngFor="let table of wizard.tables; trackBy: trackByTableName" [value]="table">{{tableName(table)}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </fieldset>
+      <form #userGroupForm="ngForm">
+        <fieldset *ngIf="wizard.usersTable">
+          <legend>{{'Users and groups tables configuration'|translate}}</legend>
+          <mat-form-field>
+            <mat-label>{{'User id property' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.userIdProperty" required name="userIdProperty">
+              <mat-option></mat-option>
+              <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'User name property' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.userNameProperty" required name="userNameProperty">
+              <mat-option></mat-option>
+              <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'User password property' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.userPasswordProperty" required name="userPasswordProperty">
+              <mat-option></mat-option>
+              <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Encryption Algorithm' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.encryptionAlgorithm" required name="encryptionAlgorithm">
+              <mat-option value="SHA-256:base64">{{'SHA-256 (Base64 encoded)'|translate}}</mat-option>
+              <mat-option value="SHA-256:hex">{{'SHA-256 (Hex encoded)'|translate}}</mat-option>
+              <mat-option value="SHA-1:base64">{{'SHA-1 (Base64 encoded)'|translate}}</mat-option>
+              <mat-option value="SHA-1:hex">{{'SHA-1 (Hex encoded)'|translate}}</mat-option>
+              <mat-option value="MD5:base64">{{'MD5 (Base64 encoded)'|translate}}</mat-option>
+              <mat-option value="MD5:hex">{{'MD5 (Hex encoded)'|translate}}</mat-option>
+              <mat-option value="plaintext:plaintext">{{'Plain text'|translate}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Email property' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.userEmailProperty" name="userEmailProperty">
+              <mat-option></mat-option>
+              <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>{{'Token property' | translate}}</mat-label>
+            <mat-select [(ngModel)]="wizard.userTokenProperty" name="userTokenProperty">
+              <mat-option></mat-option>
+              <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <ng-container *ngIf="wizard.groupsTable && wizard.userGroupTable">
+            <mat-divider></mat-divider>
+            <mat-form-field>
+              <mat-label>{{'Group id property' | translate}}</mat-label>
+              <mat-select [(ngModel)]="wizard.groupIdProperty" required name="groupIdProperty">
+                <mat-option></mat-option>
+                <mat-option *ngFor="let c of wizard.groupsTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Group name property' | translate}}</mat-label>
+              <mat-select [(ngModel)]="wizard.groupNameProperty" required name="groupNameProperty">
+                <mat-option></mat-option>
+                <mat-option *ngFor="let c of wizard.groupsTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Group link property' | translate}}</mat-label>
+              <mat-select [(ngModel)]="wizard.groupLinkProperty" required name="groupLinkProperty">
+                <mat-option></mat-option>
+                <mat-option *ngFor="let c of wizard.userGroupTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'User link property' | translate}}</mat-label>
+              <mat-select [(ngModel)]="wizard.userLinkProperty" required name="userLinkProperty">
+                <mat-option></mat-option>
+                <mat-option *ngFor="let c of wizard.userGroupTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-label>{{'Admin group name' | translate}}</mat-label>
+              <input matInput [(ngModel)]="wizard.adminGroupName" name="adminGroupName" />
+            </mat-form-field>
+          </ng-container>
+        </fieldset>
+      </form>
+      <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
+      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>{{'Create the application' | translate}}</ng-template>
+      <h3>{{'Which pages do you want to create?'|translate}}</h3>
+      <mat-radio-group [(ngModel)]="wizard.strategy">
+        <mat-radio-button value="automatic">{{'Let Portofino choose automatically'|translate}}</mat-radio-button>
+        <mat-radio-button value="manual">{{'Select them manually'|translate}}</mat-radio-button>
+        <mat-radio-button value="none">{{"Don't generate any page"|translate}}</mat-radio-button>
+      </mat-radio-group>
+      <div></div>
+      <table *ngIf="wizard.strategy == 'manual'" class="mat-table">
+        <tr class="mat-header-row">
+          <th class="mat-header-cell"></th>
+          <th class="mat-header-cell">{{'Table name'|translate}}</th>
+        </tr>
+        <tr *ngFor="let table of wizard.tables" class="mat-row">
+          <td class="mat-cell"><mat-checkbox [(ngModel)]="table.selected"></mat-checkbox></td>
+          <td class="mat-cell">{{tableName(table)}}</td>
+        </tr>
+      </table>
+      <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
+      <button mat-button color="accent" (click)="generateApplication(wizard)">{{'Finish' | translate}}</button>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>
