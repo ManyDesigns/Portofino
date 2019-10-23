@@ -25,7 +25,6 @@ import java.io.File;
 public class PortofinoSpringConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
-    public static final String ACTIONS_DIRECTORY = "actionsDirectory";
     public static final String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
     public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
@@ -47,14 +46,6 @@ public class PortofinoSpringConfiguration {
     @Bean(name = APPLICATION_DIRECTORY)
     public FileObject getApplicationDirectory() {
         return (FileObject) getServletContext().getAttribute(APPLICATION_DIRECTORY);
-    }
-
-    @Bean(name = ACTIONS_DIRECTORY)
-    public FileObject getApplicationDirectory(
-            @Autowired @Qualifier(PORTOFINO_CONFIGURATION) Configuration configuration,
-            @Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject applicationDirectory) throws FileSystemException {
-        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
-        return applicationDirectory.resolveFile(actionsDirectory);
     }
 
     @Bean

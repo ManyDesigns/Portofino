@@ -51,7 +51,7 @@ import java.io.Writer;
 import java.sql.*;
 import java.util.*;
 
-import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.ACTIONS_DIRECTORY;
+import static com.manydesigns.portofino.modules.ResourceActionsModule.ACTIONS_DIRECTORY;
 
 /**
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
@@ -400,7 +400,7 @@ public class UpstairsAction extends AbstractResourceAction {
             Annotation annotation = DatabaseLogic.findAnnotation(column, Multiline.class);
             if (annotation == null) {
                 annotation = new Annotation(column, Multiline.class.getName());
-                annotation.getValues().add("true");
+                annotation.setProperty("value", "true");
                 column.getAnnotations().add(annotation);
             }
         }

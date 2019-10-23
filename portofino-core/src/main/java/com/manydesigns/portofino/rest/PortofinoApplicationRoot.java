@@ -77,11 +77,6 @@ public class PortofinoApplicationRoot extends ApplicationRoot {
         super.beforeScan(reader, openAPI);
         ModelConverters.getInstance().addConverter(new PortofinoModelResolver(Json.mapper()));
     }
-
-    @Override
-    public void afterScan(Reader reader, OpenAPI openAPI) {
-        super.afterScan(reader, openAPI);
-    }
 }
 
 class PortofinoModelResolver extends ModelResolver {

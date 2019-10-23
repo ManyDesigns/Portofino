@@ -30,6 +30,7 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.Destroyable;
+import org.apache.shiro.util.Initializable;
 import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class SecurityClassRealm implements PortofinoRealm, Destroyable {
+public class SecurityClassRealm implements PortofinoRealm, Initializable, Destroyable {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
@@ -74,17 +75,23 @@ public class SecurityClassRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityClassRealm(
-            CodeBase codeBase, String className, ApplicationContext applicationContext) throws Exception {
+    public SecurityClassRealm(CodeBase codeBase, String className, ApplicationContext applicationContext) {
         this.codeBase = codeBase;
         this.className = className;
         this.applicationContext = applicationContext;
-        doEnsureDelegate();
     }
 
     //--------------------------------------------------------------------------
     // Delegation support
     //--------------------------------------------------------------------------
+
+    public void init() {
+        try {
+            doEnsureDelegate();
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 
     private synchronized PortofinoRealm ensureDelegate() {
         if(destroyed) {

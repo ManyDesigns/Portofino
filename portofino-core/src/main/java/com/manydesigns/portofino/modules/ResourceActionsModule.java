@@ -20,17 +20,18 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.resourceactions.custom.CustomAction;
 import com.manydesigns.portofino.resourceactions.form.FormAction;
 import com.manydesigns.portofino.resourceactions.form.TableFormAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
+import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -43,7 +44,6 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
@@ -59,8 +59,10 @@ import org.springframework.context.annotation.Bean;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
-import java.io.File;
 import java.util.UUID;
+
+import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
+import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -71,6 +73,7 @@ import java.util.UUID;
 public class ResourceActionsModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
+    public static final String ACTIONS_DIRECTORY = "actionsDirectory";
 
     //**************************************************************************
     // Fields
@@ -80,7 +83,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
     public ServletContext servletContext;
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
+    @Qualifier(PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
     @Autowired
@@ -88,7 +91,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
     public FileBasedConfigurationBuilder configurationFile;
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
+    @Qualifier(APPLICATION_DIRECTORY)
     public FileObject applicationDirectory;
 
     @Autowired
@@ -120,17 +123,23 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws FileSystemException {
         logger.debug("Initializing dispatcher");
         ActionLogic.init(configuration);
 
-        File actionsDirectory = new File(applicationDirectory.getName().getPath(), "actions");
-        logger.info("Pages directory: " + actionsDirectory);
-        ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
+        FileObject actionsDirectory = getActionsDirectory(configuration, applicationDirectory);
+        logger.info("Actions directory: " + actionsDirectory);
+        //TODO ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
 
         if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false)) {
-            logger.info("Preloading pages");
-            preloadResourceActions(actionsDirectory);
+            logger.info("Preloading actions");
+            try {
+                ResourceResolver resourceResolver =
+                        PortofinoApplicationRoot.getRootFactory().createRoot().getResourceResolver();
+                preloadResourceActions(actionsDirectory, resourceResolver);
+            } catch (Exception e) {
+                logger.warn("Could not preload actions", e);
+            }
         }
         if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false)) {
             logger.info("Preloading Groovy classes");
@@ -166,23 +175,19 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
             }
         }
         logger.debug("Creating SecurityClassRealm");
+        SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
         try {
-            SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
             LifecycleUtils.init(realm);
-            rsm.setRealm(realm);
-            status = ModuleStatus.STARTED;
         } catch (Exception  e) {
-            logger.error("Security class not found or invalid; installing dummy realm", e);
-            SimpleAccountRealm realm = new SimpleAccountRealm();
-            LifecycleUtils.init(realm);
-            rsm.setRealm(realm);
-            status = ModuleStatus.FAILED;
+            logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
         }
+        rsm.setRealm(realm);
+        status = ModuleStatus.STARTED;
     }
 
     @Bean
     public ActionRegistry getResourceActionRegistry() {
-        logger.debug("Creating pageactions registry");
+        logger.debug("Creating actions registry");
         ActionRegistry actionRegistry = new ActionRegistry();
         actionRegistry.register(CustomAction.class);
         actionRegistry.register(FormAction.class);
@@ -190,23 +195,28 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
         return actionRegistry;
     }
 
-    protected void preloadResourceActions(File directory) {
-        /*for(File file : directory.listFiles()) {
-            logger.debug("visit {}", file);
-            if(file.isDirectory()) {
-                if(!file.equals(directory) && !file.equals(directory.getParentFile())) {
-                    preloadResourceActions(file);
-                }
-            } else if("action.groovy".equals(file.getName())) {
-                logger.debug("Preloading actionDescriptor: {}", file);
-                try {
-                    Class<?> clazz = ActionLogic.getActionClass(configuration, directory);
-                    clazz.newInstance();
-                } catch(Throwable t) {
-                    logger.warn("ResourceAction preload failed for actionDescriptor " + file.getAbsolutePath(), t);
+    @Bean(name = ACTIONS_DIRECTORY)
+    public FileObject getActionsDirectory(
+            @Autowired @Qualifier(PORTOFINO_CONFIGURATION) Configuration configuration,
+            @Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject applicationDirectory) throws FileSystemException {
+        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
+        return applicationDirectory.resolveFile(actionsDirectory);
+    }
+
+    protected void preloadResourceActions(FileObject directory, ResourceResolver resourceResolver) throws FileSystemException {
+        for(FileObject child : directory.getChildren()) {
+            logger.debug("visit {}", child);
+            if(child.getType() == FileType.FOLDER) {
+                if(!child.equals(directory) && !child.equals(directory.getParent())) {
+                    try {
+                        resourceResolver.resolve(child, Class.class).getConstructor().newInstance();
+                    } catch(Throwable t) {
+                        logger.warn("ResourceAction preload failed for actionDescriptor " + child.getName().getPath(), t);
+                    }
+                    preloadResourceActions(child, resourceResolver);
                 }
             }
-        }*/
+        }
     }
 
     protected void preloadClasses(FileObject directory) {
