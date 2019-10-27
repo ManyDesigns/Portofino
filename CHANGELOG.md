@@ -16,18 +16,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Support persistent Java 8+ Date and time API values.
 - Filter CRUD fields according to permissions (at the level of the ClassAccessor).
 - Filter configuration fields according to permissions. In particular, the CRUD query is hidden if the user is not a developer.
+- Proper support for `@DatabaseBlob` upstairs.
 
 ### Changed
-- **Updated Hibernate to the 5.x branch**, in particular to version 5.4.6.Final.
+- **Update Hibernate to the 5.x branch**, in particular to version 5.4.6.Final.
     - The Hibernate Session factory is now configured with annotated Java classes generated at runtime.
       The ad-hoc code for Hibernate 4 has been removed.
-- Ensured that Portofino 5 can run without a Java compiler (JDK) available.
-- Deprecated the single `portofino-model.xml` file in favor of multiple `portofino-model/<database-name>/database.xml` files.
+- Ensure that Portofino 5 can run without a Java compiler (JDK) available.
+- Deprecate the single `portofino-model.xml` file in favor of multiple `portofino-model/<database-name>/database.xml` files.
   Legacy files are supported and converted to the new format upon save.
-- Replaced `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`.
+- Replace `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`.
   **This is a breaking API change.**
-- Updated all uses of Commons Configuration to version 2.5, including Commons Configuration 1.x uses.
+- Update all uses of Commons Configuration to version 2.5, including Commons Configuration 1.x uses.
   **This is a breaking API change.**
+  
+### Fixed
+- Virtual properties not saved properly [[#269]](https://github.com/ManyDesigns/Portofino/issues/269).
+- Wizard failing on connections to Oracle databases [[#271]](https://github.com/ManyDesigns/Portofino/issues/271).
+- Minor upstairs, Spring and Security.groovy fixes.
 
 ## [5.0.3] - 2019-09-25
 
