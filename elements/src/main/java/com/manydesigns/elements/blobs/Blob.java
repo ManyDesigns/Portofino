@@ -29,6 +29,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -180,7 +181,11 @@ public class Blob {
     }
 
     public void dispose() {
-        IOUtils.closeQuietly(inputStream);
+        try {
+            inputStream.close();
+        } catch (IOException e) {
+            throw new IOError(e);
+        }
     }
 
     public String getEncryptionType() {

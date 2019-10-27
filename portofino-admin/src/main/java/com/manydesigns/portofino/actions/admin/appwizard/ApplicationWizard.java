@@ -359,13 +359,30 @@ public class ApplicationWizard extends AbstractPageAction {
                 connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
         connectionProvider.releaseConnection(conn);
 
-        selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
+        List<Schema> selectedSchemas = connectionProvider.getDatabase().getSchemas();
+
+        selectableSchemas = new ArrayList<>(schemaNamesFromDb.size());
         for(String[] schemaName : schemaNamesFromDb) {
-            SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1],schemaName[1], schemaNamesFromDb.size() == 1);
+            String logicalName = schemaName[1].toLowerCase();
+            String physicalName = schemaName[1];
+            if(physicalName.equals(logicalName)) {
+                physicalName = null;
+            }
+            for(Schema schema : selectedSchemas) {
+                if(schemaName[1].equals(schema.getSchema())) {
+                    logicalName = schema.getSchemaName();
+                    if(!schemaName[1].equals(logicalName)) {
+                        physicalName = schemaName[1];
+                    }
+                    break;
+                }
+            }
+            boolean selected = schemaNamesFromDb.size() == 1;
+            SelectableSchema schema = new SelectableSchema(schemaName[0], logicalName, physicalName, selected);
             selectableSchemas.add(schema);
         }
         schemasForm = new TableFormBuilder(SelectableSchema.class)
-                .configFields("selected", "schema","schemaName")
+                .configFields("selected", "schema", "schemaName")
                 .configMode(Mode.EDIT)
                 .configNRows(selectableSchemas.size())
                 .configPrefix("schemas_")
@@ -426,10 +443,10 @@ public class ApplicationWizard extends AbstractPageAction {
         } else {
             refModel = persistence.getModel();
         }
-        List<Schema> tempSchemas = new ArrayList<Schema>();
+        List<Schema> tempSchemas = new ArrayList<>();
         Database database = connectionProvider.getDatabase();
         for(SelectableSchema schema : selectableSchemas) {
-            Schema modelSchema = DatabaseLogic.findSchemaByName(database, schema.schema);
+            Schema modelSchema = DatabaseLogic.findSchemaByName(database, schema.schemaName);
             if(schema.selected) {
                 if(modelSchema == null) {
                     modelSchema = new Schema();
@@ -476,7 +493,7 @@ public class ApplicationWizard extends AbstractPageAction {
 
     public Resolution afterSelectSchemas() {
         children = ArrayListMultimap.create();
-        allTables = new ArrayList<Table>();
+        allTables = new ArrayList<>();
         roots = determineRoots(children, allTables);
         Collections.sort(allTables, new Comparator<Table>() {
             public int compare(Table o1, Table o2) {
@@ -756,10 +773,10 @@ public class ApplicationWizard extends AbstractPageAction {
     }
 
     protected List<Table> determineRoots(Multimap<Table, Reference> children, List<Table> allTables) {
-        List<Table> roots = new ArrayList<Table>();
+        List<Table> roots = new ArrayList<>();
         for(SelectableSchema selectableSchema : selectableSchemas) {
             if(selectableSchema.selected) {
-                Schema schema = DatabaseLogic.findSchemaByName(database, selectableSchema.schema);
+                Schema schema = DatabaseLogic.findSchemaByName(database, selectableSchema.schemaName);
                 roots.addAll(schema.getTables());
             }
         }
@@ -966,7 +983,7 @@ public class ApplicationWizard extends AbstractPageAction {
     }
 
     protected void setupCalendar(List<ChildPage> childPages) throws Exception {
-        List<List<String>> calendarDefinitions = new ArrayList<List<String>>();
+        List<List<String>> calendarDefinitions = new ArrayList<>();
         Color[] colors = {
                 Color.RED, new Color(64, 128, 255), Color.CYAN.darker(), Color.GRAY, Color.GREEN.darker(),
                 Color.ORANGE, Color.YELLOW.darker(), Color.MAGENTA.darker(), Color.PINK
@@ -1029,14 +1046,12 @@ public class ApplicationWizard extends AbstractPageAction {
 
                 DispatcherLogic.savePage(dir, page);
                 File actionFile = new File(dir, "action.groovy");
-                try {
+                try(FileWriter fw = new FileWriter(actionFile)) {
                     TemplateEngine engine = new SimpleTemplateEngine();
                     Template template = engine.createTemplate(ApplicationWizard.class.getResource("CalendarPage.groovy"));
-                    Map<String, Object> bindings = new HashMap<String, Object>();
+                    Map<String, Object> bindings = new HashMap<>();
                     bindings.put("calendarDefinitions", calendarDefinitionsStr);
-                    FileWriter fw = new FileWriter(actionFile);
                     template.make(bindings).writeTo(fw);
-                    IOUtils.closeQuietly(fw);
                 } catch (Exception e) {
                     logger.warn("Couldn't create calendar", e);
                     SessionMessages.addWarningMessage("Couldn't create calendar: " + e);
@@ -1112,43 +1127,42 @@ public class ApplicationWizard extends AbstractPageAction {
     }
 
     protected void setupUsers() {
-        try {
+        Map<String, String> bindings = new HashMap<>();
+        bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
+        bindings.put("userTableEntityName", userTable.getActualEntityName());
+        bindings.put("userIdProperty", userIdProperty);
+        bindings.put("userNameProperty", userNameProperty);
+        bindings.put("passwordProperty", userPasswordProperty);
+        bindings.put("userEmailProperty", userEmailProperty);
+        bindings.put("userTokenProperty", userTokenProperty);
+
+        bindings.put("groupTableEntityName",
+                groupTable != null ? groupTable.getActualEntityName() : "");
+        bindings.put("groupIdProperty", StringUtils.defaultString(groupIdProperty));
+        bindings.put("groupNameProperty", StringUtils.defaultString(groupNameProperty));
+
+        bindings.put("userGroupTableEntityName",
+                userGroupTable != null ? userGroupTable.getActualEntityName() : "");
+        bindings.put("groupLinkProperty", StringUtils.defaultString(groupLinkProperty));
+        bindings.put("userLinkProperty", StringUtils.defaultString(userLinkProperty));
+        bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
+
+        bindings.put("hashIterations", "1");
+        String[] algoAndEncoding = encryptionAlgorithm.split(":");
+        bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
+        if(algoAndEncoding[1].equals("plaintext")) {
+            bindings.put("hashFormat", "null");
+        } else if(algoAndEncoding[1].equals("hex")) {
+            bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
+        } else if(algoAndEncoding[1].equals("base64")) {
+            bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
+        }
+
+        File gcp = (File) context.getServletContext().getAttribute(BaseModule.GROOVY_CLASS_PATH);
+        try(FileWriter fw = new FileWriter(new File(gcp, "Security.groovy"))) {
             TemplateEngine engine = new SimpleTemplateEngine();
             Template secTemplate = engine.createTemplate(ApplicationWizard.class.getResource("Security.groovy"));
-            Map<String, String> bindings = new HashMap<String, String>();
-            bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
-            bindings.put("userTableEntityName", userTable.getActualEntityName());
-            bindings.put("userIdProperty", userIdProperty);
-            bindings.put("userNameProperty", userNameProperty);
-            bindings.put("passwordProperty", userPasswordProperty);
-            bindings.put("userEmailProperty", userEmailProperty);
-            bindings.put("userTokenProperty", userTokenProperty);
-
-            bindings.put("groupTableEntityName",
-                    groupTable != null ? groupTable.getActualEntityName() : "");
-            bindings.put("groupIdProperty", StringUtils.defaultString(groupIdProperty));
-            bindings.put("groupNameProperty", StringUtils.defaultString(groupNameProperty));
-
-            bindings.put("userGroupTableEntityName",
-                    userGroupTable != null ? userGroupTable.getActualEntityName() : "");
-            bindings.put("groupLinkProperty", StringUtils.defaultString(groupLinkProperty));
-            bindings.put("userLinkProperty", StringUtils.defaultString(userLinkProperty));
-            bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
-
-            bindings.put("hashIterations", "1");
-            String[] algoAndEncoding = encryptionAlgorithm.split(":");
-            bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
-            if(algoAndEncoding[1].equals("plaintext")) {
-                bindings.put("hashFormat", "null");
-            } else if(algoAndEncoding[1].equals("hex")) {
-                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
-            } else if(algoAndEncoding[1].equals("base64")) {
-                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
-            }
-            File gcp = (File) context.getServletContext().getAttribute(BaseModule.GROOVY_CLASS_PATH);
-            FileWriter fw = new FileWriter(new File(gcp, "Security.groovy"));
             secTemplate.make(bindings).writeTo(fw);
-            IOUtils.closeQuietly(fw);
         } catch (Exception e) {
             logger.warn("Couldn't configure users", e);
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("couldnt.set.up.user.management._", e));

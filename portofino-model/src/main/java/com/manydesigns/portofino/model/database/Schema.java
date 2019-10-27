@@ -87,9 +87,9 @@ public class Schema implements ModelObject {
 
     public String getQualifiedName() {
         if(getDatabaseName() == null) {
-            return schema!=null?schema:schemaName;
+            return schemaName;
         }
-        return MessageFormat.format("{0}.{1}", getDatabaseName(), schema!=null?schema:schemaName);
+        return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
     }
 
     public void reset() {}

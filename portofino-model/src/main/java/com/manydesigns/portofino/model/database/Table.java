@@ -96,7 +96,7 @@ public class Table implements ModelObject, Annotated {
     }
 
     //**************************************************************************
-    // DatamodelObject implementation
+    // ModelObject implementation
     //**************************************************************************
 
     public String getQualifiedName() {

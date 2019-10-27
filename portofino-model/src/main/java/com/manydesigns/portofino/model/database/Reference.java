@@ -97,6 +97,9 @@ public class Reference implements ModelObject {
         Table toTable = owner.getToTable();
         if (toTable != null) {
             actualToColumn = DatabaseLogic.findColumnByName(toTable, toColumn);
+            if(actualToColumn == null) {
+                throw new RuntimeException("Cannot resolve column: " + owner.getFromTable().getQualifiedName() + "." + toColumn);
+            }
         }
     }
 

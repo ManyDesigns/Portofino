@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -34,6 +34,7 @@ import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.SnapshotControl;
 import liquibase.snapshot.SnapshotGeneratorFactory;
 import liquibase.structure.core.ForeignKeyConstraintType;
+import liquibase.structure.core.Relation;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +70,8 @@ public class DatabaseSyncer {
         Database targetDatabase = new Database();
         targetDatabase.setDatabaseName(databaseName);
 
-        Connection conn = null;
-        try {
-            logger.debug("Acquiring connection");
-            conn = connectionProvider.acquireConnection();
-
+        logger.debug("Acquiring connection");
+        try(Connection conn = connectionProvider.acquireConnection()) {
             logger.debug("Creating Liquibase connection");
             DatabaseConnection liquibaseConnection = new JdbcConnection(conn);
 
@@ -109,13 +107,12 @@ public class DatabaseSyncer {
                     sourceSchema = new Schema();
                     sourceSchema.setSchemaName(schemaName);
                     sourceSchema.setSchema(schemaRealName);
+                    sourceSchema.setCatalog(schema.getCatalog());
+                    sourceSchema.setDatabase(sourceDatabase);
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
-                String catalog = null;
-                if(sourceSchema.getCatalog() != null) {
-                    catalog = sourceSchema.getCatalog();
-                }
+                String catalog = sourceSchema.getCatalog();
                 SnapshotControl snapshotControl = new SnapshotControl(liquibaseDatabase);
                 DatabaseSnapshot snapshot =
                         dsgf.createSnapshot(new CatalogAndSchema(catalog, schemaRealName), liquibaseDatabase, snapshotControl);
@@ -124,11 +121,11 @@ public class DatabaseSyncer {
                 Schema targetSchema = new Schema();
                 targetSchema.setDatabase(targetDatabase);
                 targetSchema.setCatalog(catalog);
+                targetSchema.setSchemaName(sourceSchema.getSchemaName());
+                targetSchema.setSchema(sourceSchema.getSchema());
                 targetDatabase.getSchemas().add(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
             }
-        } finally {
-            connectionProvider.releaseConnection(conn);
         }
         targetDatabase.setConnectionProvider(connectionProvider);
         connectionProvider.setDatabase(targetDatabase);
@@ -137,9 +134,6 @@ public class DatabaseSyncer {
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing schema: {}", sourceSchema.getSchema());
-
-        targetSchema.setSchemaName(sourceSchema.getSchemaName());
-        targetSchema.setSchema(sourceSchema.getSchema());
 
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);
@@ -159,9 +153,7 @@ public class DatabaseSyncer {
             Table targetFromTable = DatabaseLogic.findTableByNameIgnoreCase(targetSchema, fkTableName);
             if (targetFromTable == null) {
                 logger.error("Table '{}' not found in schema '{}'. Skipping foreign key: {}",
-                        fkTableName,
-                        targetSchema.getSchemaName(),
-                        fkName);
+                        fkTableName, targetSchema.getSchemaName(), fkName);
                 continue;
             }
 
@@ -176,11 +168,15 @@ public class DatabaseSyncer {
             String pkSchemaName = liquibasePkTable.getSchema().getName();
             String pkTableName = normalizeTableName(liquibasePkTable, databaseSnapshot);
             String logicalSchemaName = pkSchemaName;
-            for(Schema schema : sourceSchema.getDatabase().getSchemas()) {
-                if(schema.getSchema().equals(pkSchemaName)) {
-                    logicalSchemaName = schema.getSchemaName();
-                    logger.debug("Logical name for schema " + pkSchemaName + " is " + logicalSchemaName);
-                    break;
+            if(sourceSchema.getSchema().equals(pkSchemaName)) {
+                logicalSchemaName = sourceSchema.getSchemaName();
+            } else {
+                for (Schema schema : sourceSchema.getDatabase().getSchemas()) {
+                    if (schema.getSchema().equals(pkSchemaName)) {
+                        logicalSchemaName = schema.getSchemaName();
+                        logger.debug("Logical name for schema " + pkSchemaName + " is " + logicalSchemaName);
+                        break;
+                    }
                 }
             }
             targetFK.setToSchema(logicalSchemaName);
@@ -212,8 +208,7 @@ public class DatabaseSyncer {
                 continue;
             }
 
-            ForeignKeyConstraintType updateRule =
-                    liquibaseFK.getUpdateRule();
+            ForeignKeyConstraintType updateRule = liquibaseFK.getUpdateRule();
             if (updateRule == null) {
                 updateRule = ForeignKeyConstraintType.importedKeyRestrict;
                 logger.warn("Foreign key '{}' with null update rule. Using: {}",
@@ -450,9 +445,9 @@ public class DatabaseSyncer {
     }
 
     protected void syncColumns
-            (liquibase.structure.core.Table liquibaseTable, final Table sourceTable, Table targetTable) {
+            (Relation relation, final Table sourceTable, Table targetTable) {
         logger.debug("Synchronizing columns");
-        for(liquibase.structure.core.Column liquibaseColumn : liquibaseTable.getColumns()) {
+        for(liquibase.structure.core.Column liquibaseColumn : relation.getColumns()) {
             logger.debug("Processing column: {}", liquibaseColumn.getName());
 
             Column targetColumn = new Column(targetTable);
@@ -515,22 +510,23 @@ public class DatabaseSyncer {
         }
 
         logger.debug("Sorting columns to preserve their previous order as much as possible");
-        Collections.sort(targetTable.getColumns(), new Comparator<Column>() {
+        targetTable.getColumns().sort(new Comparator<Column>() {
             private int oldIndex(Column c) {
                 int i = 0;
-                for(Column old : sourceTable.getColumns()) {
-                    if(old.getColumnName().equals(c.getColumnName())) {
+                for (Column old : sourceTable.getColumns()) {
+                    if (old.getColumnName().equals(c.getColumnName())) {
                         return i;
                     }
                     i++;
                 }
                 return -1;
             }
+
             public int compare(Column c1, Column c2) {
                 int index1 = oldIndex(c1);
                 int index2 = oldIndex(c2);
-                if(index1 != -1) {
-                    if(index2 != -1) {
+                if (index1 != -1) {
+                    if (index2 != -1) {
                         return Integer.compare(index1, index2);
                     } else {
                         return -1;
@@ -547,9 +543,6 @@ public class DatabaseSyncer {
             Annotation annCopy = new Annotation();
             annCopy.setParent(target);
             annCopy.setType(ann.getType());
-            for(String value : ann.getValues()) {
-                annCopy.getValues().add(value);
-            }
             target.getAnnotations().add(annCopy);
         }
     }
