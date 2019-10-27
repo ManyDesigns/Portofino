@@ -8,6 +8,8 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.util.FormUtil;
+import com.manydesigns.portofino.model.InitVisitor;
+import com.manydesigns.portofino.model.LinkVisitor;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
@@ -251,39 +253,29 @@ public class ConnectionsAction extends AbstractResourceAction {
         List<Schema> selectedSchemas = database.getSchemas();
         List<String> selectedSchemaNames = new ArrayList<>(selectedSchemas.size());
         for(Schema schema : selectedSchemas) {
-            selectedSchemaNames.add(schema.getSchemaName().toLowerCase());
+            selectedSchemaNames.add(schema.getActualSchemaName());
         }
         for(Object schemaObject : schemasJson) {
             JSONObject schema = (JSONObject) schemaObject;
             boolean selected = schema.getBoolean("selected");
-            String schemaName = schema.getString("schema").toLowerCase();
+            String physicalName = schema.getString("name");
             if(selected) {
-                if(selectedSchemaNames.contains(schemaName)) {
-                    for(Schema modelSchema : database.getSchemas()) {
-                        if(modelSchema.getSchemaName().equalsIgnoreCase(schemaName)) {
-                            if(!schema.isNull("name")) {
-                                modelSchema.setActualSchemaName(schema.getString("name"));
-                            }
-                            break;
-                        }
-                    }
-                } else {
+                if(!selectedSchemaNames.contains(physicalName)) {
                     Schema modelSchema = new Schema();
+                    modelSchema.setConfiguration(portofinoConfiguration);
                     modelSchema.setDatabase(database);
-                    modelSchema.setSchemaName(schemaName);
+                    modelSchema.setSchemaName(physicalName);
                     if(!schema.isNull("catalog")) {
                         modelSchema.setCatalog(schema.getString("catalog"));
                     }
-                    if(!schema.isNull("name")) {
-                        modelSchema.setConfiguration(portofinoConfiguration);
-                        modelSchema.setActualSchemaName(schema.getString("name"));
-                    }
+                    new InitVisitor(persistence.getModel(), portofinoConfiguration).visit(modelSchema);
+                    new LinkVisitor(persistence.getModel(), portofinoConfiguration).visit(modelSchema);
                     database.getSchemas().add(modelSchema);
                 }
-            } else if(selectedSchemaNames.contains(schemaName)) {
+            } else if(selectedSchemaNames.contains(physicalName)) {
                 Schema toBeRemoved = null;
                 for(Schema aSchema : database.getSchemas()) {
-                    if(aSchema.getSchemaName().equalsIgnoreCase(schemaName)) {
+                    if(aSchema.getActualSchemaName().equals(physicalName)) {
                         toBeRemoved = aSchema;
                         break;
                     }
@@ -307,15 +299,22 @@ public class ConnectionsAction extends AbstractResourceAction {
             List<SelectableSchema> selectableSchemas = new ArrayList<>(schemaNamesFromDb.size());
             for(String[] schemaName : schemaNamesFromDb) {
                 boolean selected = false;
-                String logicalName = schemaName[1];
+                String logicalName = schemaName[1].toLowerCase();
+                String physicalName = schemaName[1];
+                if(physicalName.equals(logicalName)) {
+                    physicalName = null;
+                }
                 for(Schema schema : selectedSchemas) {
-                    if(schemaName[1].equalsIgnoreCase(schema.getActualSchemaName())) {
+                    if(schemaName[1].equals(schema.getActualSchemaName())) {
                         selected = true;
                         logicalName = schema.getSchemaName();
+                        if(!schemaName[1].equals(logicalName)) {
+                            physicalName = schemaName[1];
+                        }
                         break;
                     }
                 }
-                SelectableSchema schema = new SelectableSchema(schemaName[0], schemaName[1], logicalName, selected);
+                SelectableSchema schema = new SelectableSchema(schemaName[0], physicalName, logicalName, selected);
                 selectableSchemas.add(schema);
             }
             return selectableSchemas;

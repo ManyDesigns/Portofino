@@ -86,7 +86,7 @@ public class SessionFactoryBuilder {
     public SessionFactoryAndCodeBase buildSessionFactory(FileObject root) throws Exception {
         CodeBase codeBase = new JavaCodeBase(root);
         List<Table> mappableTables = database.getAllTables();
-        mappableTables.removeIf(this::checkTableWithValidPrimaryKey);
+        mappableTables.removeIf(this::checkInvalidPrimaryKey);
         List<Table> externallyMappedTables = mappableTables.stream().filter(t -> {
             boolean externallyMapped = t.getActualJavaClass() != null;
             if (externallyMapped) {
@@ -129,14 +129,22 @@ public class SessionFactoryBuilder {
         return buildSessionFactory(codeBase, mappableTables, externallyMappedTables);
     }
 
-    protected boolean checkTableWithValidPrimaryKey(Table table) {
-        if(table.getPrimaryKey() == null) {
-            logger.warn("Skipping table without primary key: {}", table.getQualifiedName());
+    protected boolean checkInvalidPrimaryKey(Table table) {
+        return checkInvalidPrimaryKey(table, true);
+    }
+
+    protected boolean checkInvalidPrimaryKey(Table table, boolean warn) {
+        if(table.getPrimaryKey() == null || table.getPrimaryKey().getPrimaryKeyColumns().isEmpty()) {
+            if(warn) {
+                logger.warn("Skipping table without primary key: {}", table.getQualifiedName());
+            }
             return true;
         }
         List<Column> columnPKList = table.getPrimaryKey().getColumns();
         if(!table.getColumns().containsAll(columnPKList)) {
-            logger.error("Skipping table with primary key that refers to invalid columns: {}", table.getQualifiedName());
+            if(warn) {
+                logger.error("Skipping table with primary key that refers to invalid columns: {}", table.getQualifiedName());
+            }
             return true;
         }
         return false;
@@ -570,6 +578,14 @@ public class SessionFactoryBuilder {
 
     protected boolean checkValidFk(ForeignKey foreignKey) {
         Table toTable = foreignKey.getToTable();
+        if(toTable == null) {
+            logger.error("The foreign key " + foreignKey.getQualifiedName() + " does not refer to any table.");
+            return false;
+        }
+        if(checkInvalidPrimaryKey(toTable, false)) {
+            logger.error("The foreign key " + foreignKey.getQualifiedName() + " refers to a table with absent or invalid primary key.");
+            return false;
+        }
         //Check that referenced columns coincide with the primary key
         Set<Column> fkColumns = new HashSet<>();
         Set<Column> pkColumns = new HashSet<>(toTable.getPrimaryKey().getColumns());

@@ -66,14 +66,14 @@
       <table class="mat-table">
         <tr class="mat-header-row">
           <th class="mat-header-cell"></th>
-          <th class="mat-header-cell">{{'Schema'|translate}}</th>
-          <th class="mat-header-cell">{{'Schema name'|translate}}</th>
+          <th class="mat-header-cell">{{'Logical name'|translate}}</th>
+          <th class="mat-header-cell">{{'Physical name'|translate}}</th>
         </tr>
         <tr *ngFor="let schema of wizard.schemas; let i = index;" class="mat-row">
           <td class="mat-cell"><mat-checkbox [(ngModel)]="schema.selected"
                                              name="selected{{i}}"></mat-checkbox></td>
           <td class="mat-cell">{{schema.schema}}</td>
-          <td class="mat-cell"><input matInput [(ngModel)]="schema.name" name="schemaName{{i}}"/></td>
+          <td class="mat-cell">{{schema.name}}</td>
         </tr>
       </table>
       <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>

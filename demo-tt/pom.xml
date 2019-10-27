@@ -23,12 +23,6 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mysql</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-postgresql</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -116,6 +110,7 @@
             <artifactId>diff</artifactId>
             <version>1.1.11</version>
         </dependency>
+        <!-- This is needed for building the Docker image. -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

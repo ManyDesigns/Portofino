@@ -516,6 +516,7 @@
                                         <enforceBytecodeVersion>
                                             <maxJdkVersion>1.8</maxJdkVersion>
                                         </enforceBytecodeVersion>
+                                        <dependencyConvergence/>
                                     </rules>
                                     <fail>true</fail>
                                 </configuration>
