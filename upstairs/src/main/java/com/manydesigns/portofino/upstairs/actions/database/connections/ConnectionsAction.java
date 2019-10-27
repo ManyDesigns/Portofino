@@ -298,7 +298,6 @@ public class ConnectionsAction extends AbstractResourceAction {
 
             List<SelectableSchema> selectableSchemas = new ArrayList<>(schemaNamesFromDb.size());
             for(String[] schemaName : schemaNamesFromDb) {
-                boolean selected = false;
                 String logicalName = schemaName[1].toLowerCase();
                 String physicalName = schemaName[1];
                 if(physicalName.equals(logicalName)) {
@@ -306,7 +305,6 @@ public class ConnectionsAction extends AbstractResourceAction {
                 }
                 for(Schema schema : selectedSchemas) {
                     if(schemaName[1].equals(schema.getActualSchemaName())) {
-                        selected = true;
                         logicalName = schema.getSchemaName();
                         if(!schemaName[1].equals(logicalName)) {
                             physicalName = schemaName[1];
@@ -314,6 +312,7 @@ public class ConnectionsAction extends AbstractResourceAction {
                         break;
                     }
                 }
+                boolean selected = schemaNamesFromDb.size() == 1;
                 SelectableSchema schema = new SelectableSchema(schemaName[0], physicalName, logicalName, selected);
                 selectableSchemas.add(schema);
             }

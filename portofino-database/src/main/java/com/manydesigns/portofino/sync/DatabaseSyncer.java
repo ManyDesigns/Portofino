@@ -106,6 +106,9 @@ public class DatabaseSyncer {
                     logger.debug("Source schema not found. Creating an empty one.");
                     sourceSchema = new Schema();
                     sourceSchema.setSchemaName(schemaName);
+                    sourceSchema.setActualSchemaName(schemaRealName);
+                    sourceSchema.setCatalog(schema.getCatalog());
+                    sourceSchema.setDatabase(sourceDatabase);
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
