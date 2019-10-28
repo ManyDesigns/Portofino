@@ -460,17 +460,20 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.4</version>
+                        <version>3.1.1</version>
                         <configuration>
+                            <verbose>true</verbose>
+                            <!-- workaround for https://bugs.openjdk.java.net/browse/JDK-8212233 -->
+                            <source>8</source>
                             <links>
                                 <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
-                                <link>https://commons.apache.org/proper/commons-configuration/apidocs/index.html</link>
+                                <link>https://commons.apache.org/proper/commons-configuration/apidocs/</link>
                                 <link>https://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
                                 <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
                                 <link>http://www.joda.org/joda-time/apidocs/</link>
-                                <link>https://docs.oracle.com/javaee/6/api/</link>
+                                <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -link http://shiro.apache.org/static/1.4.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/index.html -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/2.5.7/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/en/java/javase/11/docs/api/ -link https://docs.oracle.com/javaee/6/api/ -encoding UTF-8
+                                -link http://shiro.apache.org/static/1.4.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/2.5.7/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/en/java/javase/11/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
@@ -512,7 +515,7 @@
                                         <enforceBytecodeVersion>
                                             <maxJdkVersion>1.8</maxJdkVersion>
                                         </enforceBytecodeVersion>
-                                        <dependencyConvergence/>
+                                        <!--<dependencyConvergence/>-->
                                     </rules>
                                     <fail>true</fail>
                                 </configuration>

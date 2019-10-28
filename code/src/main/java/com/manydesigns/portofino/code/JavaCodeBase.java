@@ -255,6 +255,7 @@ public class JavaCodeBase extends AbstractCodeBase {
         /**
          * Creates a new instance of ForwardingJavaFileManager.
          * @param fileManager delegate to this file manager
+         * @throws IOException in the unlikely case of I/O errors accessing the RAM virtual filesystem.
          */
         public InMemoryFileManager(JavaFileManager fileManager) throws IOException {
             super(fileManager);
