@@ -306,7 +306,7 @@ public class PortofinoListener extends DispatcherInitializer
                         .properties()
                         .setPrefixLookups(getConfigurationLookups())
                         .setListDelimiterHandler(new DefaultListDelimiterHandler(','));
-        String path = configurationFile.getName().getPath();
+        String path = configurationFile.getName().getURI();
         parameters.setFileName(path);
         this.configurationFile = new Configurations().propertiesBuilder(path).configure(parameters);
         configuration =  this.configurationFile.getConfiguration();
@@ -320,7 +320,7 @@ public class PortofinoListener extends DispatcherInitializer
         if(localConfigurationPath == null) {
             localConfigurationPath = configuration.getString(
                     "portofino-local.properties",
-                    applicationDirectory.resolveFile("portofino-local.properties").getName().getPath());
+                    applicationDirectory.resolveFile("portofino-local.properties").getName().getURI());
         }
         FileObject localConfigurationFile = VFS.getManager().resolveFile(localConfigurationPath);
         if (localConfigurationFile.exists()) {
