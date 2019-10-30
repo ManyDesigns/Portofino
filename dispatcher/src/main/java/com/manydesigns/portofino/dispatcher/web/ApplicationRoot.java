@@ -18,7 +18,8 @@ import javax.ws.rs.core.Context;
 public class ApplicationRoot extends DocumentedApiRoot {
 
     protected static final Logger logger = LoggerFactory.getLogger(ApplicationRoot.class);
-    
+    public static final String PORTOFINO_CONFIGURATION_ATTRIBUTE = "portofino.configuration";
+
     @Context
     protected ServletContext servletContext;
     
@@ -26,7 +27,7 @@ public class ApplicationRoot extends DocumentedApiRoot {
     protected ResourceContext resourceContext;
 
     protected Configuration getConfiguration() {
-        return (Configuration) servletContext.getAttribute("portofino.configuration");
+        return (Configuration) servletContext.getAttribute(PORTOFINO_CONFIGURATION_ATTRIBUTE);
     }
 
     @Path("")

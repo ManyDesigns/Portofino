@@ -31,13 +31,13 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import com.manydesigns.portofino.i18n.I18nUtils;
+import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.BuilderParameters;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
@@ -93,10 +93,7 @@ public class PortofinoListener extends DispatcherInitializer
     //**************************************************************************
 
     protected Configuration elementsConfiguration;
-    protected Configuration configuration;
     protected FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
-
-    protected FileObject applicationDirectory;
 
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
@@ -112,6 +109,7 @@ public class PortofinoListener extends DispatcherInitializer
     // ServletContextListener implementation
     //**************************************************************************
 
+    @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
@@ -122,7 +120,8 @@ public class PortofinoListener extends DispatcherInitializer
                     ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
                     servletContextAttributeMap);
             init(servletContextEvent);
-            super.contextInitialized(servletContextEvent);
+            String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
+            initApplicationRoot(servletContext, actionsDirectory);
 
             String portofinoVersion = PortofinoProperties.getPortofinoVersion();
             String lineSeparator = System.getProperty("line.separator", "\n");
@@ -175,23 +174,23 @@ public class PortofinoListener extends DispatcherInitializer
             ConfigurationInterpolator interpolator = new BaseConfiguration().getInterpolator();
             interpolator.registerLookups(getConfigurationLookups());
             applicationDirectoryPath = (String) interpolator.interpolate(applicationDirectoryPath);
-            applicationDirectory = manager.resolveFile(applicationDirectoryPath);
-            if(applicationDirectory.getType() != FileType.FOLDER) {
+            applicationRoot = manager.resolveFile(applicationDirectoryPath);
+            if(applicationRoot.getType() != FileType.FOLDER) {
                 logger.error("Configured application directory " + applicationDirectoryPath + " is not a directory");
-                applicationDirectory = null;
+                applicationRoot = null;
             }
         } catch (Exception e) {
             logger.error("Configured application directory " + applicationDirectoryPath + " is not valid", e);
         }
-        if(applicationDirectory == null) {
+        if(applicationRoot == null) {
             try {
-                applicationDirectory = manager.resolveFile(serverInfo.getRealPath()).resolveFile("WEB-INF");
+                applicationRoot = manager.resolveFile(serverInfo.getRealPath()).resolveFile("WEB-INF");
             } catch (FileSystemException e) {
                 logger.error("Failed to obtain application real path", e);
                 throw new RuntimeException(e);
             }
         }
-        logger.info("Application directory: {}", applicationDirectory.getName().getPath());
+        logger.info("Application directory: {}", applicationRoot.getName().getPath());
 
         try {
             loadConfiguration();
@@ -199,7 +198,7 @@ public class PortofinoListener extends DispatcherInitializer
             logger.error("Could not load configuration", e);
             throw new Error(e);
         }
-        servletContext.setAttribute(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, applicationDirectory);
+        servletContext.setAttribute(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, applicationRoot);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, configurationFile);
 
@@ -210,7 +209,7 @@ public class PortofinoListener extends DispatcherInitializer
             logger.error("Could not initialize KeyManager", e);
         }
 
-        I18nUtils.setupResourceBundleManager(applicationDirectory, servletContext);
+        I18nUtils.setupResourceBundleManager(applicationRoot, servletContext);
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
@@ -259,13 +258,8 @@ public class PortofinoListener extends DispatcherInitializer
     }
 
     @Override
-    protected String getApplicationDirectoryPath(ServletContext servletContext) {
-        return applicationDirectory.getName().getPath();
-    }
-
-    @Override
     protected FileObject getCodeBaseRoot() throws FileSystemException {
-        FileObject codeBaseRoot = applicationDirectory.resolveFile("classes");
+        FileObject codeBaseRoot = applicationRoot.resolveFile("classes");
         String classpath = codeBaseRoot.getName().getPath();
         logger.info("Initializing codebase with classpath: " + classpath);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(new File(classpath));
@@ -300,7 +294,7 @@ public class PortofinoListener extends DispatcherInitializer
     //**************************************************************************
 
     protected void loadConfiguration() throws ConfigurationException, FileSystemException {
-        FileObject configurationFile = applicationDirectory.resolveFile("portofino.properties");
+        FileObject configurationFile = applicationRoot.resolveFile("portofino.properties");
         PropertiesBuilderParameters parameters =
                 new Parameters()
                         .properties()
@@ -310,6 +304,7 @@ public class PortofinoListener extends DispatcherInitializer
         parameters.setFileName(path);
         this.configurationFile = new Configurations().propertiesBuilder(path).configure(parameters);
         configuration =  this.configurationFile.getConfiguration();
+        servletContext.setAttribute(PortofinoApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, this.configuration);
 
         String localConfigurationPath = null;
         try {
@@ -320,7 +315,7 @@ public class PortofinoListener extends DispatcherInitializer
         if(localConfigurationPath == null) {
             localConfigurationPath = configuration.getString(
                     "portofino-local.properties",
-                    applicationDirectory.resolveFile("portofino-local.properties").getName().getURI());
+                    applicationRoot.resolveFile("portofino-local.properties").getName().getURI());
         }
         FileObject localConfigurationFile = VFS.getManager().resolveFile(localConfigurationPath);
         if (localConfigurationFile.exists()) {

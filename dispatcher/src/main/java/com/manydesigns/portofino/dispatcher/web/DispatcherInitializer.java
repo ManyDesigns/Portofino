@@ -5,9 +5,11 @@ import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
-import com.manydesigns.portofino.dispatcher.configuration.WritableCompositeConfiguration;
-import com.manydesigns.portofino.dispatcher.resolvers.*;
+import com.manydesigns.portofino.dispatcher.resolvers.CachingResourceResolver;
+import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
+import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
+import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -80,7 +82,7 @@ public class DispatcherInitializer implements ServletContextListener {
     protected void loadConfiguration(ServletContext servletContext, FileObject applicationRoot)
             throws FileSystemException, ConfigurationException {
         FileObject configurationFile = applicationRoot.getChild("portofino.properties");
-        WritableCompositeConfiguration compositeConfiguration = new WritableCompositeConfiguration();
+        CombinedConfiguration compositeConfiguration = new CombinedConfiguration();
         if(configurationFile != null) {
             Configurations configurations = new Configurations();
             PropertiesConfiguration configuration = configurations.properties(configurationFile.getURL());
@@ -97,7 +99,7 @@ public class DispatcherInitializer implements ServletContextListener {
             this.configuration = new PropertiesConfiguration();
             logger.warn("portofino.properties file not found in " + applicationRoot);
         }
-        servletContext.setAttribute("portofino.configuration", this.configuration);
+        servletContext.setAttribute(ApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, this.configuration);
     }
 
     protected void initApplicationRoot(ServletContext servletContext, String actionsDirectoryName) {
