@@ -2,7 +2,7 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [5.1.0] - 2019-10-31
 
 ### Added
 - Map database views, by default as read-only, but overridable.
@@ -15,19 +15,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fallback database platform for unrecognized database systems.
 - Support persistent Java 8+ Date and time API values.
 - Filter CRUD fields according to permissions (at the level of the ClassAccessor).
-- Filter configuration fields according to permissions. In particular, the CRUD query is hidden if the user is not a developer.
+- Filter configuration fields according to permissions.
+  In particular, the CRUD query is hidden if the user is not a developer.
 - Proper support for `@DatabaseBlob` upstairs.
 
 ### Changed
-- **Update Hibernate to the 5.x branch**, in particular to version 5.4.6.Final.
-    - The Hibernate Session factory is now configured with annotated Java classes generated at runtime.
-      The ad-hoc code for Hibernate 4 has been removed.
+- **Update Hibernate to the 5.x branch**, in particular to version 5.4.7.Final.
+    The Hibernate Session factory is now configured with annotated Java classes generated at runtime.
+    The ad-hoc code for Hibernate 4 has been removed.
 - Ensure that Portofino 5 can run without a Java compiler (JDK) available.
 - Deprecate the single `portofino-model.xml` file in favor of multiple `portofino-model/<database-name>/database.xml` files.
   Legacy files are supported and converted to the new format upon save.
 - Replace `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`.
   **This is a breaking API change.**
-- Update all uses of Commons Configuration to version 2.5, including Commons Configuration 1.x uses.
+- Update all uses of Commons Configuration to version 2.6, including Commons Configuration 1.x uses.
   **This is a breaking API change.**
   
 ### Fixed

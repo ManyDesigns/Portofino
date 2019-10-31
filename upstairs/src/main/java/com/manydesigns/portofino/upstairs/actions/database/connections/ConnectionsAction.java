@@ -258,7 +258,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         for(Object schemaObject : schemasJson) {
             JSONObject schema = (JSONObject) schemaObject;
             boolean selected = schema.getBoolean("selected");
-            String physicalName = schema.getString("name");
+            String physicalName = schema.getString("schema");
             if(selected) {
                 if(!selectedSchemaNames.contains(physicalName)) {
                     Schema modelSchema = new Schema();

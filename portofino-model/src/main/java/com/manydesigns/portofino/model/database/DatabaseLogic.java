@@ -104,8 +104,7 @@ public class DatabaseLogic {
     // Search objects of a certain kind
     //**************************************************************************
 
-    public static @Nullable Database findDatabaseByName(
-            Model model, String databaseName) {
+    public static @Nullable Database findDatabaseByName(Model model, String databaseName) {
         for (Database database : model.getDatabases()) {
             if (database.getDatabaseName().equals(databaseName)) {
                 return database;

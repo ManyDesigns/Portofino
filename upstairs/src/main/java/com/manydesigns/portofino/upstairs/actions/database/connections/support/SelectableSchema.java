@@ -37,7 +37,7 @@ public class SelectableSchema {
     public final String catalogName;
     @Updatable(false)
     public final String schema;
-    @Updatable(true)
+    @Updatable(false)
     public String schemaName;
     @Label("")
     public boolean selected;
