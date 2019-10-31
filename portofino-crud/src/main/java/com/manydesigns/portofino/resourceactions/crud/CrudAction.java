@@ -259,15 +259,21 @@ public class CrudAction extends AbstractCrudAction<Object> {
     protected ClassAccessor prepare(ActionInstance actionInstance) {
         Database actualDatabase = getCrudConfiguration().getActualDatabase();
         if (actualDatabase == null) {
-            logger.warn("Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
-                        "has an invalid database: " + getCrudConfiguration().getDatabase());
+            String message =
+                    "Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
+                    "refers to an nonexistent database: " + getCrudConfiguration().getDatabase();
+            logger.warn(message);
+            RequestMessages.addErrorMessage(message);
             return null;
         }
 
         baseTable = getCrudConfiguration().getActualTable();
         if (baseTable == null) {
-            logger.warn("Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
-                        "has an invalid table");
+            String message =
+                    "Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
+                    "refers to an invalid table.";
+            logger.warn(message);
+            RequestMessages.addErrorMessage(message);
             return null;
         }
 

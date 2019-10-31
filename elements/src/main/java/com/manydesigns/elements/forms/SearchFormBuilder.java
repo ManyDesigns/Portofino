@@ -103,7 +103,7 @@ public class SearchFormBuilder extends AbstractFormBuilder {
     public SearchFormBuilder configReflectiveFields() {
         logger.debug("configReflectiveFields");
 
-        propertyAccessors = new ArrayList<PropertyAccessor>();
+        propertyAccessors = new ArrayList<>();
 
         for (PropertyAccessor current : classAccessor.getProperties()) {
             if(!isPropertyEnabled(current)) {
