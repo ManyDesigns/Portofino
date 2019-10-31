@@ -8,12 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Map database views, by default as read-only, but overridable.
 - Support non insertable and/or non updatable entities in CRUD actions.
 - Annotations are propagated from model to annotated classes.
-- Ability to map Java 8+ Date and Time API values.
+- Support persistent Java 8+ Date and time API values.
 - Generic database platform for unrecognized databases.
 - Support for development and debug with Docker, both in demo-tt and in the archetype.
 - Periodically retry database connections that have failed at startup if Quartz is available.
 - Fallback database platform for unrecognized database systems.
-- Support persistent Java 8+ Date and time API values.
 - Filter CRUD fields according to permissions (at the level of the ClassAccessor).
 - Filter configuration fields according to permissions.
   In particular, the CRUD query is hidden if the user is not a developer.
@@ -23,13 +22,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Update Hibernate to the 5.x branch**, in particular to version 5.4.7.Final.
     The Hibernate Session factory is now configured with annotated Java classes generated at runtime.
     The ad-hoc code for Hibernate 4 has been removed.
-- Ensure that Portofino 5 can run without a Java compiler (JDK) available.
 - Deprecate the single `portofino-model.xml` file in favor of multiple `portofino-model/<database-name>/database.xml` files.
   Legacy files are supported and converted to the new format upon save.
+- Change the format of annotations in the model and in `configuration.xml`.
+  Annotations in the legacy format are converted upon save.
 - Replace `java.io.File` with Apache Commons VFS `FileObject` in `Persistence`.
   **This is a breaking API change.**
 - Update all uses of Commons Configuration to version 2.6, including Commons Configuration 1.x uses.
   **This is a breaking API change.**
+- Ensure that Portofino 5 can run without a Java compiler (JDK) available.
   
 ### Fixed
 - Virtual properties not saved properly [[#269]](https://github.com/ManyDesigns/Portofino/issues/269).
