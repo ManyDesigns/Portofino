@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.8-SNAPSHOT</version>
+        <version>4.2.8</version>
     </parent>
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
@@ -18,12 +18,6 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-oracle</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

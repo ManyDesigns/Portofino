@@ -45,6 +45,8 @@ import com.manydesigns.portofino.actions.admin.database.forms.ConnectionProvider
 import com.manydesigns.portofino.actions.admin.database.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.model.InitVisitor;
+import com.manydesigns.portofino.model.LinkVisitor;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
@@ -455,6 +457,8 @@ public class ApplicationWizard extends AbstractPageAction {
                     modelSchema.setSchema(schema.schema);
                     modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
+                    new InitVisitor(refModel).visit(modelSchema);
+                    new LinkVisitor(refModel).visit(modelSchema);
                     tempSchemas.add(modelSchema);
                 }
             }
