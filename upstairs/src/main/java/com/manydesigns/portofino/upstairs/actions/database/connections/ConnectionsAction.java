@@ -258,18 +258,21 @@ public class ConnectionsAction extends AbstractResourceAction {
         for(Object schemaObject : schemasJson) {
             JSONObject schema = (JSONObject) schemaObject;
             boolean selected = schema.getBoolean("selected");
-            String physicalName = schema.getString("schema");
+            String logicalName = schema.getString("schema");
+            String physicalName = schema.optString("name");
+            if(physicalName == null) {
+                physicalName = logicalName;
+            }
             if(selected) {
                 if(!selectedSchemaNames.contains(physicalName)) {
                     Schema modelSchema = new Schema();
                     modelSchema.setConfiguration(portofinoConfiguration);
                     modelSchema.setDatabase(database);
-                    modelSchema.setSchemaName(physicalName);
+                    modelSchema.setSchemaName(logicalName);
                     if(!schema.isNull("catalog")) {
                         modelSchema.setCatalog(schema.getString("catalog"));
                     }
-                    new InitVisitor(persistence.getModel(), portofinoConfiguration).visit(modelSchema);
-                    new LinkVisitor(persistence.getModel(), portofinoConfiguration).visit(modelSchema);
+                    modelSchema.setActualSchemaName(physicalName);
                     database.getSchemas().add(modelSchema);
                 }
             } else if(selectedSchemaNames.contains(physicalName)) {

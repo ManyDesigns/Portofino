@@ -99,14 +99,14 @@ public class DatabaseSyncer {
 
             for (Schema schema : schemas) {
                 String schemaName = schema.getSchemaName();
-                String schemaRealName = schema.getActualSchemaName();
-                logger.info("Processing schema: {}", schemaRealName);
+                String actualSchemaName = schema.getActualSchemaName();
+                logger.info("Processing schema: {}", actualSchemaName);
                 Schema sourceSchema = DatabaseLogic.findSchemaByNameIgnoreCase(sourceDatabase, schemaName);
                 if (sourceSchema == null) {
                     logger.debug("Source schema not found. Creating an empty one.");
                     sourceSchema = new Schema();
                     sourceSchema.setSchemaName(schemaName);
-                    sourceSchema.setActualSchemaName(schemaRealName);
+                    sourceSchema.setActualSchemaName(actualSchemaName);
                     sourceSchema.setCatalog(schema.getCatalog());
                     sourceSchema.setDatabase(sourceDatabase);
                 }
@@ -118,12 +118,14 @@ public class DatabaseSyncer {
                 }
                 SnapshotControl snapshotControl = new SnapshotControl(liquibaseDatabase);
                 DatabaseSnapshot snapshot =
-                        dsgf.createSnapshot(new CatalogAndSchema(catalog, schemaRealName), liquibaseDatabase, snapshotControl);
+                        dsgf.createSnapshot(new CatalogAndSchema(catalog, actualSchemaName), liquibaseDatabase, snapshotControl);
 
                 logger.debug("Synchronizing schema");
                 Schema targetSchema = new Schema();
                 targetSchema.setDatabase(targetDatabase);
                 targetSchema.setCatalog(catalog);
+                targetSchema.setSchemaName(sourceSchema.getSchemaName());
+                targetSchema.setActualSchemaName(sourceSchema.getActualSchemaName());
                 targetDatabase.getSchemas().add(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
             }
@@ -135,7 +137,6 @@ public class DatabaseSyncer {
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing schema: {}", sourceSchema.getActualSchemaName());
-        targetSchema.setSchemaName(sourceSchema.getSchemaName());
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
         syncViews(databaseSnapshot, sourceSchema, targetSchema);
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);

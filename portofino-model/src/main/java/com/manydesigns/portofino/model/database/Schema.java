@@ -152,10 +152,12 @@ public class Schema implements ModelObject {
     }
 
     public void setActualSchemaName(String actualSchemaName) {
-        if(StringUtils.isEmpty(actualSchemaName)) {
-            configuration.clearProperty(key);
-        } else if(configuration.containsKey(key) || !schemaName.equals(actualSchemaName)) {
-            configuration.setProperty(key, actualSchemaName);
+        if(key != null) { //key is null when creating/synchronizing a new schema
+            if (StringUtils.isEmpty(actualSchemaName)) {
+                configuration.clearProperty(key);
+            } else if (configuration.containsKey(key) || !schemaName.equals(actualSchemaName)) {
+                configuration.setProperty(key, actualSchemaName);
+            }
         }
         this.actualSchemaName = actualSchemaName;
     }
