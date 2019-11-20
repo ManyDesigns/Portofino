@@ -182,7 +182,8 @@ public class Blob {
 
     public void dispose() {
         try {
-            inputStream.close();
+            if(inputStream!=null)
+                inputStream.close();
         } catch (IOException e) {
             throw new IOError(e);
         }
