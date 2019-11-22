@@ -163,7 +163,7 @@ public class Annotation implements ModelObject {
         }
 
         if (javaAnnotation == null) {
-            logger.warn("Cannot instanciate annotation: {}", javaAnnotationClass);
+            logger.warn("Cannot instantiate annotation: {}", javaAnnotationClass);
         }
     }
 

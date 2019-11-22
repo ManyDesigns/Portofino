@@ -543,6 +543,9 @@ public class DatabaseSyncer {
             Annotation annCopy = new Annotation();
             annCopy.setParent(target);
             annCopy.setType(ann.getType());
+            for(String value : ann.getValues()) {
+                annCopy.getValues().add(value);
+            }
             target.getAnnotations().add(annCopy);
         }
     }
