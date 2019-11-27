@@ -44,7 +44,7 @@ public interface SelectionModel {
 
     String getOption(int index, Object value, boolean includeInactive);
 
-    public static class Option {
+    class Option {
         public final Object value;
         public final String label;
         public final boolean active;
