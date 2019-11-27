@@ -74,8 +74,8 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     }
 
     public void setup() {
-        crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
-        Set<String> configuredSPs = new HashSet<String>();
+        crudSelectionProviders = new ArrayList<>();
+        Set<String> configuredSPs = new HashSet<>();
         for(SelectionProviderReference ref : crudAction.getCrudConfiguration().getSelectionProviders()) {
             boolean added;
             if(ref.getForeignKey() != null) {

@@ -291,7 +291,6 @@ public class DefaultSelectionProvider implements SelectionProvider {
             for (OptionProvider.Option option : ensureOptions()) {
                 Object[] currentValueRow = option.getValues();
                 String[] currentLabelRow = option.getLabels();
-                boolean matching = true;
                 for (int j = 0; j < fieldCount; j++) {
                     Object cellValue = currentValueRow[j];
                     String cellLabel = currentLabelRow[j];
@@ -299,24 +298,24 @@ public class DefaultSelectionProvider implements SelectionProvider {
                     String labelSearch = labelSearches[j];
 
                     //#163 cellLabel != null
-                    if (matching && cellLabel != null && matchLabel(cellLabel, labelSearch)) {
+                    if (cellLabel != null && matchLabel(cellLabel, labelSearch)) {
                         Option currentOption = optionsArray[j].get(cellValue);
                         if(currentOption == null || !currentOption.active) {
                             optionsArray[j].put(cellValue, new Option(cellValue, cellLabel, option.isActive()));
                         }
                     }
 
-                    if (matching && value != null && value.equals(cellValue)) {
+                    if (value != null && value.equals(cellValue)) {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }
-                    } else if (matching && value instanceof Object[] &&
+                    } else if (value instanceof Object[] &&
                                ArrayUtils.contains((Object[]) value, cellValue)) {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }
                     } else {
-                        matching = false;
+                        break;
                     }
                 }
             }
