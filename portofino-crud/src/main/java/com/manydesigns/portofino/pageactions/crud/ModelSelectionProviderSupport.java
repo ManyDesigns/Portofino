@@ -24,10 +24,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.ShortName;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.DisplayMode;
-import com.manydesigns.elements.options.SearchDisplayMode;
-import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.options.*;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
@@ -41,11 +38,14 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Support object for standard (model-based, i.e. HQL or SQL) selection providers.
@@ -183,7 +183,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
         if(!anyActiveProperty) {
             //Dummy
             selectionProvider = SelectionProviderLogic.createSelectionProvider(
-                    current.getName(), 0, new Class[0], Collections.<Object[]>emptyList());
+                    current.getName(), new Class[0], Collections.emptyList());
         } else {
             selectionProvider = createSelectionProvider(current, fieldNames, fieldTypes, dm, sdm);
         }
@@ -267,85 +267,114 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     }
 
     protected DefaultSelectionProvider createSelectionProvider(
-            DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes,
+            DatabaseSelectionProvider sp, String[] fieldNames, Class[] fieldTypes,
             DisplayMode dm, SearchDisplayMode sdm) {
-        DefaultSelectionProvider selectionProvider = null;
-        String name = current.getName();
-        String databaseName = current.getToDatabase();
-        String sql = current.getSql();
-        String hql = current.getHql();
+        OptionProvider optionProvider;
+        String name = sp.getName();
+        String databaseName = sp.getToDatabase();
+        String sql = sp.getSql();
+        String hql = sp.getHql();
         if (!StringUtils.isEmpty(sql)) {
-            Session session = persistence.getSession(databaseName);
-            OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
-            String formatString = sqlFormat.getFormatString();
-            Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
-            QueryStringWithParameters cacheKey = new QueryStringWithParameters(formatString, parameters);
-            Collection<Object[]> objects = getFromQueryCache(current, cacheKey);
-            if(objects == null) {
-                logger.debug("Query not in cache: {}", formatString);
-                try {
-                    objects = QueryUtils.runSql(session, formatString, parameters);
-                } catch (Exception e) {
-                    logger.error("Exception in populating selection provider " + name, e);
-                    return null;
-                }
-                putInQueryCache(current, cacheKey, objects);
-            }
-            selectionProvider =
-                    SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
-            selectionProvider.setDisplayMode(dm);
-            selectionProvider.setSearchDisplayMode(sdm);
+            optionProvider = createSQLOptionProvider(sp, fieldTypes, name, databaseName, sql);
         } else if (!StringUtils.isEmpty(hql)) {
-            Database database =
-                    DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
-            Table table = QueryUtils.getTableFromQueryString(database, hql);
-            if(table == null) {
-                logger.error("Selection provider {} has a HQL query that " +
-                             "refers to an entity that does not exist ({})", name, hql);
-                return null;
-            }
-            String entityName = table.getActualEntityName();
-            Session session = persistence.getSession(databaseName);
-            QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
-
-            Collection<Object> objects = getFromQueryCache(current, queryWithParameters);
-            if(objects == null) {
-                String queryString = queryWithParameters.getQueryString();
-                Object[] parameters = queryWithParameters.getParameters();
-                logger.debug("Query not in cache: {}", queryString);
-                try {
-                    objects = QueryUtils.runHqlQuery(session, queryString, parameters);
-                } catch (Exception e) {
-                    logger.error("Exception in populating selection provider " + name, e);
-                    return null;
-                }
-                putInQueryCache(current, queryWithParameters, objects);
-            }
-
-            TableAccessor tableAccessor =
-                    persistence.getTableAccessor(databaseName, entityName);
-            ShortName shortNameAnnotation =
-                    tableAccessor.getAnnotation(ShortName.class);
-            TextFormat[] textFormats = null;
-            //L'ordinamento e' usato solo in caso di chiave singola
-            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
-                textFormats = new TextFormat[] {
-                    OgnlTextFormat.create(shortNameAnnotation.value())
-                };
-            }
-
-            selectionProvider = SelectionProviderLogic.createSelectionProvider
-                    (name, objects, tableAccessor.getKeyProperties(), textFormats);
-            selectionProvider.setDisplayMode(dm);
-            selectionProvider.setSearchDisplayMode(sdm);
-
-            if(current instanceof ForeignKey) {
-                selectionProvider.sortByLabel();
-            }
+            optionProvider = createHQLOptionProvider(sp, name, databaseName, hql);
         } else {
-            logger.warn("ModelSelection provider '{}': both 'hql' and 'sql' are null", name);
+            logger.error("ModelSelection provider '{}': both 'hql' and 'sql' are null", name);
+            return null;
         }
+        if(optionProvider == null) {
+            logger.debug("Could not create optionProvider");
+            return null;
+        }
+        DefaultSelectionProvider selectionProvider =
+                new DefaultSelectionProvider(name, fieldNames.length, optionProvider);
+        selectionProvider.setDisplayMode(dm);
+        selectionProvider.setSearchDisplayMode(sdm);
         return selectionProvider;
+    }
+
+    protected OptionProvider createHQLOptionProvider(
+            DatabaseSelectionProvider selectionProvider, String name, String databaseName, String hql) {
+        Database database =
+                DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+        Table table = QueryUtils.getTableFromQueryString(database, hql);
+        if(table == null) {
+            logger.error("Selection provider {} has a HQL query that " +
+                    "refers to an entity that does not exist ({})", name, hql);
+            return null;
+        }
+        OptionProvider optionProvider;
+        optionProvider = new OptionProvider() {
+            @Override
+            public List<Option> getOptions() {
+                String entityName = table.getActualEntityName();
+                Session session = persistence.getSession(databaseName);
+                QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
+
+                Collection<Object> objects = getFromQueryCache(selectionProvider, queryWithParameters);
+                if(objects == null) {
+                    String queryString = queryWithParameters.getQueryString();
+                    Object[] parameters = queryWithParameters.getParameters();
+                    logger.debug("Query not in cache: {}", queryString);
+                    try {
+                        objects = QueryUtils.runHqlQuery(session, queryString, parameters);
+                    } catch (Exception e) {
+                        logger.error("Exception in populating selection provider " + name, e);
+                        return null;
+                    }
+                    putInQueryCache(selectionProvider, queryWithParameters, objects);
+                }
+
+                TableAccessor tableAccessor =
+                        persistence.getTableAccessor(databaseName, entityName);
+                ShortName shortNameAnnotation =
+                        tableAccessor.getAnnotation(ShortName.class);
+                TextFormat[] textFormats = null;
+                //L'ordinamento e' usato solo in caso di chiave singola
+                if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
+                    textFormats = new TextFormat[] {
+                            OgnlTextFormat.create(shortNameAnnotation.value())
+                    };
+                }
+                final TextFormat[] actualTextFormats = textFormats;
+                Stream<Option> optionStream =
+                        objects.stream().map(o -> SelectionProviderLogic.getOption(name, tableAccessor.getKeyProperties(), actualTextFormats, o));
+                if(selectionProvider instanceof ForeignKey) {
+                    optionStream = optionStream.sorted(DefaultSelectionProvider.OPTION_COMPARATOR_BY_LABEL);
+                }
+                return optionStream.collect(Collectors.toList());
+            }
+        };
+        return optionProvider;
+    }
+
+    @NotNull
+    protected OptionProvider createSQLOptionProvider(
+            DatabaseSelectionProvider selectionProvider, Class[] fieldTypes, String name, String databaseName, String sql) {
+        OptionProvider optionProvider;
+        optionProvider = new OptionProvider() {
+            @Override
+            public List<Option> getOptions() {
+                Session session = persistence.getSession(databaseName);
+                OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
+                String formatString = sqlFormat.getFormatString();
+                Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
+                QueryStringWithParameters cacheKey = new QueryStringWithParameters(formatString, parameters);
+                Collection<Object[]> objects = getFromQueryCache(selectionProvider, cacheKey);
+                if(objects == null) {
+                    logger.debug("Query not in cache: {}", formatString);
+                    try {
+                        objects = QueryUtils.runSql(session, formatString, parameters);
+                    } catch (Exception e) {
+                        logger.error("Exception in populating selection provider " + name, e);
+                        return null;
+                    }
+                    putInQueryCache(selectionProvider, cacheKey, objects);
+                }
+                return objects.stream().map(o -> SelectionProviderLogic.getOption(fieldTypes, o)).collect(Collectors.toList());
+            }
+        };
+        return optionProvider;
     }
 
     protected void putInQueryCache(

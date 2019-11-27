@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Objects;
 
 /*
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -325,18 +326,15 @@ public class SelectField extends AbstractField<Object> {
             }
         }
 
-        for (Map.Entry<Object,SelectionModel.Option> option :
-                options.entrySet()) {
+        for (Map.Entry<Object,SelectionModel.Option> option : options.entrySet()) {
             if(!option.getValue().active) {
                 continue;
             }
             Object optionValue = option.getKey();
-            String optionStringValue =
-                    (String) OgnlUtils.convertValue(optionValue, String.class);
+            String optionStringValue = OgnlUtils.convertValue(optionValue, String.class);
             optionStringValue = StringUtils.defaultString(optionStringValue);
             String optionLabel = option.getValue().label;
-            checked =  (optionValue == value) ||
-                       (optionValue != null && optionValue.equals(value));
+            checked = Objects.equals(optionValue, value);
             xb.writeOption(optionStringValue, checked, optionLabel);
         }
         xb.closeElement("select");
