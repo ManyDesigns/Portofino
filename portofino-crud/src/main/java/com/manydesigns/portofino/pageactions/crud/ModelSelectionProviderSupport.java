@@ -57,7 +57,7 @@ import java.util.stream.Stream;
  */
 public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     public static final Logger logger =
             LoggerFactory.getLogger(ModelSelectionProviderSupport.class);
@@ -74,8 +74,8 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     }
 
     public void setup() {
-        crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
-        Set<String> configuredSPs = new HashSet<String>();
+        crudSelectionProviders = new ArrayList<>();
+        Set<String> configuredSPs = new HashSet<>();
         for(SelectionProviderReference ref : crudAction.getCrudConfiguration().getSelectionProviders()) {
             boolean added;
             if(ref.getForeignKey() != null) {

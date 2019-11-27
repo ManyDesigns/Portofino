@@ -298,7 +298,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
                     String labelSearch = labelSearches[j];
 
                     //#163 cellLabel != null
-                    if (matching && cellLabel != null && matchLabel(cellLabel, labelSearch)) {
+                    if (cellLabel != null && matchLabel(cellLabel, labelSearch)) {
                         Option currentOption = optionsArray[j].get(cellValue);
                         if(currentOption == null || !currentOption.active) {
                             optionsArray[j].put(cellValue, new Option(cellValue, cellLabel, option.isActive()));
@@ -309,14 +309,13 @@ public class DefaultSelectionProvider implements SelectionProvider {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }
-                    } else if (matching && value != null &&
-                            value instanceof Object[]
-                            && ArrayUtils.contains((Object[]) value, cellValue)) {
+                    } else if (value instanceof Object[] &&
+                               ArrayUtils.contains((Object[]) value, cellValue)) {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }
                     } else {
-                        matching = false;
+                        break;
                     }
                 }
             }
@@ -327,16 +326,16 @@ public class DefaultSelectionProvider implements SelectionProvider {
         }
     }
 
-    private boolean matchLabel(String cellLabel, String labelSearch2) {
-        if (labelSearch2 == null || labelSearch2.length() == 0) {
+    private boolean matchLabel(String cellLabel, String labelSearch) {
+        if (labelSearch == null || labelSearch.length() == 0) {
             return true;
         }
         cellLabel = cellLabel.toLowerCase();
-        labelSearch2 = labelSearch2.toLowerCase();
+        labelSearch = labelSearch.toLowerCase();
         String[] cellLabelArray =
                 StringUtils.split(cellLabel, NON_WORD_CHARACTERS);
         String[] searchLabelArray =
-                StringUtils.split(labelSearch2, NON_WORD_CHARACTERS);
+                StringUtils.split(labelSearch, NON_WORD_CHARACTERS);
         for (int i = 0; i <= cellLabelArray.length - searchLabelArray.length; i++) {
             boolean allMatch = true;
             for(int j = 0; j < searchLabelArray.length; j++) {
