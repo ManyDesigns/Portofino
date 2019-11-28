@@ -229,7 +229,7 @@
         <profile>
             <id>docker</id>
             <properties>
-                <portofino.application.directory>/application</portofino.application.directory>
+                <portofino.application.directory>${env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
             </properties>
             <build>
                 <plugins>

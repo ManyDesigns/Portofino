@@ -46,6 +46,7 @@ import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.interpol.ConfigurationInterpolator;
 import org.apache.commons.configuration2.interpol.Lookup;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +88,7 @@ public class PortofinoListener extends DispatcherInitializer
             "----------------------------------------";
     
     public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
+    public static final String PORTOFINO_CONFIGURATION_FILE_PROPERTY = "portofino.configuration.file";
 
     //**************************************************************************
     // Fields
@@ -162,7 +164,7 @@ public class PortofinoListener extends DispatcherInitializer
 
         elementsConfiguration = ElementsProperties.getConfiguration();
 
-        String applicationDirectoryPath = servletContext.getInitParameter("portofino.application.directory");
+        String applicationDirectoryPath = servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER);
         FileSystemManager manager;
         try {
             manager = VFS.getManager();
@@ -174,16 +176,19 @@ public class PortofinoListener extends DispatcherInitializer
             ConfigurationInterpolator interpolator = new BaseConfiguration().getInterpolator();
             interpolator.registerLookups(getConfigurationLookups());
             applicationDirectoryPath = (String) interpolator.interpolate(applicationDirectoryPath);
-            applicationRoot = manager.resolveFile(applicationDirectoryPath);
-            if(applicationRoot.getType() != FileType.FOLDER) {
-                logger.error("Configured application directory " + applicationDirectoryPath + " is not a directory");
-                applicationRoot = null;
+            if(!StringUtils.isEmpty(applicationDirectoryPath)) {
+                applicationRoot = manager.resolveFile(applicationDirectoryPath);
+                if (applicationRoot.getType() != FileType.FOLDER) {
+                    logger.error("Configured application directory " + applicationDirectoryPath + " is not a directory");
+                    applicationRoot = null;
+                }
             }
         } catch (Exception e) {
             logger.error("Configured application directory " + applicationDirectoryPath + " is not valid", e);
         }
         if(applicationRoot == null) {
             try {
+                logger.info("Using default application directory (WEB-INF)");
                 applicationRoot = manager.resolveFile(serverInfo.getRealPath()).resolveFile("WEB-INF");
             } catch (FileSystemException e) {
                 logger.error("Failed to obtain application real path", e);
@@ -308,9 +313,14 @@ public class PortofinoListener extends DispatcherInitializer
 
         String localConfigurationPath = null;
         try {
-            localConfigurationPath = System.getProperty("portofino.configuration.file");
+            localConfigurationPath = System.getProperty(PORTOFINO_CONFIGURATION_FILE_PROPERTY);
         } catch (SecurityException e) {
             logger.warn("Reading system properties is forbidden. Will read configuration file from standard location.", e);
+        }
+        String localConfigurationFromDeploymentDescriptor = servletContext.getInitParameter(PORTOFINO_CONFIGURATION_FILE_PROPERTY);
+        if(localConfigurationFromDeploymentDescriptor != null) {
+            logger.debug("Read configuration file location from deployment descriptor");
+            localConfigurationPath = localConfigurationFromDeploymentDescriptor;
         }
         if(localConfigurationPath == null) {
             localConfigurationPath = configuration.getString(

@@ -32,7 +32,8 @@ import java.lang.reflect.Constructor;
  * Created by alessio on 28/07/16.
  */
 public class DispatcherInitializer implements ServletContextListener {
-    
+
+    public static final String PORTOFINO_APPLICATION_DIRECTORY_PARAMETER = "portofino.application.directory";
     protected FileObject applicationRoot;
     protected Configuration configuration;
     private static final Logger logger = LoggerFactory.getLogger(DispatcherInitializer.class);
@@ -76,7 +77,7 @@ public class DispatcherInitializer implements ServletContextListener {
     }
 
     protected String getApplicationDirectoryPath(ServletContext servletContext) {
-        return servletContext.getInitParameter("portofino.application.directory");
+        return servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER);
     }
 
     protected void loadConfiguration(ServletContext servletContext, FileObject applicationRoot)
