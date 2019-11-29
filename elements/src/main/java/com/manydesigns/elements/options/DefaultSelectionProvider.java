@@ -55,7 +55,6 @@ public class DefaultSelectionProvider implements SelectionProvider {
     protected final String name;
     protected final int fieldCount;
     protected final OptionProvider optionProvider;
-    protected List<OptionProvider.Option> options;
 
     protected DisplayMode displayMode;
     protected SearchDisplayMode searchDisplayMode;
@@ -102,11 +101,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
     // Options
     //**************************************************************************
 
-    protected List<OptionProvider.Option> ensureOptions() {
-        if(options != null) {
-            return options;
-        }
-        return options = optionProvider.getOptions();
+    public List<OptionProvider.Option> getOptions() {
+        return optionProvider.getOptions();
     }
 
     //**************************************************************************
@@ -134,7 +130,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
         if(option.values.length != fieldCount) {
             throw new IllegalArgumentException("Field count mismatch");
         }
-        ensureOptions().add(option);
+        getOptions().add(option);
     }
 
     @Deprecated
@@ -158,7 +154,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     public void ensureActive(Object... values) {
         OptionProvider.Option option = null;
-        ListIterator<OptionProvider.Option> iterator = ensureOptions().listIterator();
+        ListIterator<OptionProvider.Option> iterator = getOptions().listIterator();
         while(iterator.hasNext()) {
             OptionProvider.Option current = iterator.next();
             boolean found = true;
@@ -180,12 +176,12 @@ public class DefaultSelectionProvider implements SelectionProvider {
                 labels[i] = ObjectUtils.toString(values[i]);
             }
             option = new OptionProvider.Option(values, labels, true);
-            ensureOptions().add(option);
+            getOptions().add(option);
         }
     }
 
     public void sortByLabel() {
-        ensureOptions().sort(OPTION_COMPARATOR_BY_LABEL);
+        getOptions().sort(OPTION_COMPARATOR_BY_LABEL);
     }
 
     private static class StaticOptionProvider implements OptionProvider {
@@ -235,13 +231,16 @@ public class DefaultSelectionProvider implements SelectionProvider {
         }
 
         public Object getValue(int index) {
-            validate();
+            if(values[index] != null) {
+                validate(); //Potentially, this will set it this.values[index] to null, but it will never set it to a non-null value
+            }
             return values[index];
         }
 
         public void setValue(int index, Object value) {
+            Object previousValue = this.values[index];
             this.values[index] = value;
-            needsValidation = true;
+            needsValidation = needsValidation || !Objects.equals(previousValue, value);
         }
 
         public void setLabelSearch(int index, String labelSearch) {
@@ -288,7 +287,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
             }
 
             int maxMatchingIndex = -1;
-            for (OptionProvider.Option option : ensureOptions()) {
+            for (OptionProvider.Option option : DefaultSelectionProvider.this.getOptions()) {
                 Object[] currentValueRow = option.getValues();
                 String[] currentLabelRow = option.getLabels();
                 for (int j = 0; j < fieldCount; j++) {
