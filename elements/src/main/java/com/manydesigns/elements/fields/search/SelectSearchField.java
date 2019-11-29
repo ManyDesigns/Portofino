@@ -75,7 +75,7 @@ public class SelectSearchField extends AbstractSearchField {
                 assert(values.length == labels.length);
                 DefaultSelectionProvider sp = new DefaultSelectionProvider(accessor.getName(), 1);
                 for(int i = 0; i < values.length; i++) {
-                    sp.appendRow(values[i], labels[i], true);
+                    sp.appendOption(values[i], labels[i], true);
                 }
                 selectionModel = sp.createSelectionModel();
                 displayMode = annotation.searchDisplayMode();
@@ -107,9 +107,7 @@ public class SelectSearchField extends AbstractSearchField {
             return;
         }
         Object[] values = getValues();
-        if (null==values){
-            return;
-        } else {
+        if (null != values) {
             for (Object value : values){
                 String valueString = OgnlUtils.convertValueToString(value);
                 appendToSearchString(sb, inputName, valueString, encoding);

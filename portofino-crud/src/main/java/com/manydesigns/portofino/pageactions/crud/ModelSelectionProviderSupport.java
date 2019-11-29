@@ -303,78 +303,69 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                     "refers to an entity that does not exist ({})", name, hql);
             return null;
         }
-        OptionProvider optionProvider;
-        optionProvider = new OptionProvider() {
-            @Override
-            public List<Option> getOptions() {
-                String entityName = table.getActualEntityName();
-                Session session = persistence.getSession(databaseName);
-                QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
+        return new MemoizingOptionProvider(() -> {
+            String entityName = table.getActualEntityName();
+            Session session = persistence.getSession(databaseName);
+            QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
 
-                Collection<Object> objects = getFromQueryCache(selectionProvider, queryWithParameters);
-                if(objects == null) {
-                    String queryString = queryWithParameters.getQueryString();
-                    Object[] parameters = queryWithParameters.getParameters();
-                    logger.debug("Query not in cache: {}", queryString);
-                    try {
-                        objects = QueryUtils.runHqlQuery(session, queryString, parameters);
-                    } catch (Exception e) {
-                        logger.error("Exception in populating selection provider " + name, e);
-                        return null;
-                    }
-                    putInQueryCache(selectionProvider, queryWithParameters, objects);
+            Collection<Object> objects = getFromQueryCache(selectionProvider, queryWithParameters);
+            if (objects == null) {
+                String queryString = queryWithParameters.getQueryString();
+                Object[] parameters = queryWithParameters.getParameters();
+                logger.debug("Query not in cache: {}", queryString);
+                try {
+                    objects = QueryUtils.runHqlQuery(session, queryString, parameters);
+                } catch (Exception e) {
+                    logger.error("Exception in populating selection provider " + name, e);
+                    return null;
                 }
-
-                TableAccessor tableAccessor =
-                        persistence.getTableAccessor(databaseName, entityName);
-                ShortName shortNameAnnotation =
-                        tableAccessor.getAnnotation(ShortName.class);
-                TextFormat[] textFormats = null;
-                //L'ordinamento e' usato solo in caso di chiave singola
-                if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
-                    textFormats = new TextFormat[] {
-                            OgnlTextFormat.create(shortNameAnnotation.value())
-                    };
-                }
-                final TextFormat[] actualTextFormats = textFormats;
-                Stream<Option> optionStream =
-                        objects.stream().map(o -> SelectionProviderLogic.getOption(name, tableAccessor.getKeyProperties(), actualTextFormats, o));
-                if(selectionProvider instanceof ForeignKey) {
-                    optionStream = optionStream.sorted(DefaultSelectionProvider.OPTION_COMPARATOR_BY_LABEL);
-                }
-                return optionStream.collect(Collectors.toList());
+                putInQueryCache(selectionProvider, queryWithParameters, objects);
             }
-        };
-        return optionProvider;
+
+            TableAccessor tableAccessor =
+                    persistence.getTableAccessor(databaseName, entityName);
+            ShortName shortNameAnnotation =
+                    tableAccessor.getAnnotation(ShortName.class);
+            TextFormat[] textFormats = null;
+            //L'ordinamento e' usato solo in caso di chiave singola
+            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
+                textFormats = new TextFormat[]{
+                        OgnlTextFormat.create(shortNameAnnotation.value())
+                };
+            }
+            final TextFormat[] actualTextFormats = textFormats;
+            Stream<OptionProvider.Option> optionStream =
+                    objects.stream().map(o -> SelectionProviderLogic.getOption(
+                            name, tableAccessor.getKeyProperties(), actualTextFormats, o));
+            if (selectionProvider instanceof ForeignKey) {
+                optionStream = optionStream.sorted(DefaultSelectionProvider.OPTION_COMPARATOR_BY_LABEL);
+            }
+            return optionStream.collect(Collectors.toList());
+        });
     }
 
     @NotNull
     protected OptionProvider createSQLOptionProvider(
             DatabaseSelectionProvider selectionProvider, Class[] fieldTypes, String name, String databaseName, String sql) {
-        OptionProvider optionProvider;
-        optionProvider = new OptionProvider() {
-            @Override
-            public List<Option> getOptions() {
-                Session session = persistence.getSession(databaseName);
-                OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
-                String formatString = sqlFormat.getFormatString();
-                Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
-                QueryStringWithParameters cacheKey = new QueryStringWithParameters(formatString, parameters);
-                Collection<Object[]> objects = getFromQueryCache(selectionProvider, cacheKey);
-                if(objects == null) {
-                    logger.debug("Query not in cache: {}", formatString);
-                    try {
-                        objects = QueryUtils.runSql(session, formatString, parameters);
-                    } catch (Exception e) {
-                        logger.error("Exception in populating selection provider " + name, e);
-                        return null;
-                    }
-                    putInQueryCache(selectionProvider, cacheKey, objects);
+        return new MemoizingOptionProvider(() -> {
+            Session session = persistence.getSession(databaseName);
+            OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
+            String formatString = sqlFormat.getFormatString();
+            Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
+            QueryStringWithParameters cacheKey = new QueryStringWithParameters(formatString, parameters);
+            Collection<Object[]> objects = getFromQueryCache(selectionProvider, cacheKey);
+            if (objects == null) {
+                logger.debug("Query not in cache: {}", formatString);
+                try {
+                    objects = QueryUtils.runSql(session, formatString, parameters);
+                } catch (Exception e) {
+                    logger.error("Exception in populating selection provider " + name, e);
+                    return null;
                 }
-                return objects.stream().map(o -> SelectionProviderLogic.getOption(fieldTypes, o)).collect(Collectors.toList());
+                putInQueryCache(selectionProvider, cacheKey, objects);
             }
-        };
-        return optionProvider;
+            return objects.stream().map(o -> SelectionProviderLogic.getOption(fieldTypes, o)).collect(Collectors.toList());
+        });
     }
 
     protected void putInQueryCache(
