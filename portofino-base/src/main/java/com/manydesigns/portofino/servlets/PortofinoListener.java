@@ -205,6 +205,7 @@ public class PortofinoListener
             KeyManager.init(configuration);
         } catch (Exception e) {
             logger.error("Could not initialize KeyManager", e);
+            throw new RuntimeException("Could not initialize KeyManager");
         }
 
         servletContext.setAttribute(BaseModule.TEMPORARY_BLOB_MANAGER, tempBlobManager);
