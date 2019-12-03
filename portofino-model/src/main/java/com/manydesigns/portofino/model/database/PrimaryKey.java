@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -24,6 +24,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ import java.util.List;
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class PrimaryKey implements ModelObject {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -68,8 +69,8 @@ public class PrimaryKey implements ModelObject {
     //**************************************************************************
 
     public PrimaryKey() {
-        columns = new ArrayList<Column>();
-        primaryKeyColumns = new ArrayList<PrimaryKeyColumn>();
+        columns = new ArrayList<>();
+        primaryKeyColumns = new ArrayList<>();
     }
 
     public PrimaryKey(Table table) {
@@ -95,7 +96,7 @@ public class PrimaryKey implements ModelObject {
         valid = true;
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert table != null;
 
 // Liquibase on MySQL returns null primaryKey name if the name is "PRIMARY"
@@ -109,7 +110,7 @@ public class PrimaryKey implements ModelObject {
 
     }
 
-    public void link(Model model) {
+    public void link(Model model, Configuration configuration) {
         for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             Column column = pkc.getActualColumn();
             if (column == null) {

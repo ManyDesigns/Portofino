@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -21,12 +21,12 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -39,13 +39,13 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Model {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected final LinkedList<Database> databases;
+    protected final ArrayList<Database> databases;
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -54,23 +54,23 @@ public class Model {
     //**************************************************************************
 
     public Model() {
-        this.databases = new LinkedList<Database>();
+        this.databases = new ArrayList<Database>();
     }
 
     //**************************************************************************
     // Reset / init
     //**************************************************************************
 
-    public void init() {
+    public void init(Configuration configuration) {
         for (Database database : databases) {
-            init(database);
+            init(database, configuration);
         }
     }
 
-    public void init(ModelObject rootObject) {
+    public void init(ModelObject rootObject, Configuration configuration) {
         new ResetVisitor().visit(rootObject);
-        new InitVisitor(this).visit(rootObject);
-        new LinkVisitor(this).visit(rootObject);
+        new InitVisitor(this, configuration).visit(rootObject);
+        new LinkVisitor(this, configuration).visit(rootObject);
     }
 
     //**************************************************************************

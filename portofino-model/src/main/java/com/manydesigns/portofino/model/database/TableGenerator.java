@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
+import org.apache.commons.configuration.Configuration;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -35,9 +36,9 @@ import javax.xml.bind.annotation.XmlType;
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
 @XmlType(propOrder = {"table","keyColumn","keyValue","valueColumn"})
-public class TableGenerator extends Generator{
+public class TableGenerator extends Generator {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -59,8 +60,8 @@ public class TableGenerator extends Generator{
         super.reset();
     }
 
-    public void init(Model model) {
-        super.init(model);
+    public void init(Model model, Configuration configuration) {
+        super.init(model, configuration);
         assert table != null;
         assert keyColumn != null;
         assert keyValue != null;

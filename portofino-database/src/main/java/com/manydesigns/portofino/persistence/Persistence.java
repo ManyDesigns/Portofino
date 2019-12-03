@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -72,7 +72,7 @@ import java.util.Map;
  */
 public class Persistence {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Constants
@@ -178,11 +178,11 @@ public class Persistence {
         }
     }
 
-    protected File getModelDirectory() {
+    public File getModelDirectory() {
         return new File(appModelFile.getParentFile(), FilenameUtils.getBaseName(appModelFile.getName()));
     }
 
-    protected void runLiquibase(Database database) {
+    public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
         ResourceAccessor resourceAccessor =
                 new FileSystemResourceAccessor(appDir.getAbsolutePath());
@@ -288,7 +288,7 @@ public class Persistence {
         }
 
         setups.clear();
-        model.init();
+        model.init(configuration);
         for (Database database : model.getDatabases()) {
             try {
                 ConnectionProvider connectionProvider = database.getConnectionProvider();
@@ -341,6 +341,11 @@ public class Persistence {
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
         return configuration;
     }
+
+    public org.apache.commons.configuration.Configuration getConfiguration() {
+        return configuration;
+    }
+
 
     public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
         return databasePlatformsRegistry;

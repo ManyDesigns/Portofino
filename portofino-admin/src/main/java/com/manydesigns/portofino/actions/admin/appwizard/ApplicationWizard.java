@@ -457,8 +457,8 @@ public class ApplicationWizard extends AbstractPageAction {
                     modelSchema.setSchema(schema.schema);
                     modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
-                    new InitVisitor(refModel).visit(modelSchema);
-                    new LinkVisitor(refModel).visit(modelSchema);
+                    new InitVisitor(refModel,portofinoConfiguration).visit(modelSchema);
+                    new LinkVisitor(refModel,portofinoConfiguration).visit(modelSchema);
                     tempSchemas.add(modelSchema);
                 }
             }
@@ -485,7 +485,7 @@ public class ApplicationWizard extends AbstractPageAction {
         }
         Model model = new Model();
         model.getDatabases().add(targetDatabase);
-        model.init();
+        model.init(portofinoConfiguration);
         this.database = targetDatabase;
         context.getRequest().getSession().setAttribute(databaseSessionKey, this.database);
         return targetDatabase;

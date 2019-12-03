@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -37,7 +38,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(value = XmlAccessType.NONE)
 public abstract class Generator implements ModelObject {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
     //**************************************************************************
     // Fields
     //**************************************************************************
@@ -76,11 +77,11 @@ public abstract class Generator implements ModelObject {
 
     public void reset() {}
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert primaryKeyColumn != null;
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model;
 
+import org.apache.commons.configuration.Configuration;
 import javax.xml.bind.Unmarshaller;
 
 /*
@@ -30,13 +31,13 @@ import javax.xml.bind.Unmarshaller;
 */
 public interface ModelObject {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     void afterUnmarshal(Unmarshaller u, Object parent);
 
     void reset();
-    void init(Model model);
-    void link(Model model);
+    void init(Model model, Configuration configuration);
+    void link(Model model, Configuration configuration);
 
     void visitChildren(ModelObjectVisitor visitor);
 

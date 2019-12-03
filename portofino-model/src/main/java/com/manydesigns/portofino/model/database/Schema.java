@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,9 +23,10 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
@@ -39,10 +40,10 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"catalog", "schemaName","schema","immediateTables"})
+@XmlType(propOrder = {"catalog", "schemaName", "immediateTables"})
 public class Schema implements ModelObject {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -55,7 +56,10 @@ public class Schema implements ModelObject {
     protected String schemaName;
     protected String schema;
     protected String catalog;
-    
+
+    protected Configuration configuration;
+    protected String key;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -94,14 +98,20 @@ public class Schema implements ModelObject {
 
     public void reset() {}
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert database != null;
         assert schemaName != null;
-        if( schema == null )
+        this.configuration = configuration;
+        key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + schemaName;
+        if(schema == null) {
+            schema = configuration.getString(key);
+        }
+        if(schema == null) {
             schema = schemaName;
+        }
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Table table : tables) {
@@ -163,6 +173,13 @@ public class Schema implements ModelObject {
         return tables;
     }
 
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     //**************************************************************************
     // Get all objects of a certain kind

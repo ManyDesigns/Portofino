@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.model;
 
+import org.apache.commons.configuration.Configuration;
+
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -28,14 +30,16 @@ package com.manydesigns.portofino.model;
 */
 public class LinkVisitor extends ModelObjectVisitor {
 
-    private Model model;
+    private final Model model;
+    private final Configuration configuration;
 
-    public LinkVisitor(Model model) {
+    public LinkVisitor(Model model, Configuration configuration) {
         this.model = model;
+        this.configuration = configuration;
     }
 
     @Override
     public void visitNodeBeforeChildren(ModelObject node) {
-        node.link(model);
+        node.link(model, configuration);
     }
 }

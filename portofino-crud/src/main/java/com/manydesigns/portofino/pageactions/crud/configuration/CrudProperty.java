@@ -23,6 +23,7 @@ package com.manydesigns.portofino.pageactions.crud.configuration;
 import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,12 +76,12 @@ public class CrudProperty implements Annotated {
     // Configuration implementation
     //**************************************************************************
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert name != null;
         for(Annotation annotation : annotations) {
             annotation.reset();
-            annotation.init(model);
-            annotation.link(model);
+            annotation.init(model, configuration);
+            annotation.link(model, configuration);
         }
     }
 

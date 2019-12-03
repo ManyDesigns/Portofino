@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ import java.util.List;
 @XmlType(propOrder = {"tableName", "entityName", "shortName", "javaClass","annotations","columns","foreignKeys","primaryKey","selectionProviders"})
 public class Table implements ModelObject, Annotated {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -71,7 +72,7 @@ public class Table implements ModelObject, Annotated {
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class actualJavaClass;
     protected String actualEntityName;
-    protected final List<String> syntheticPropertyNames = new ArrayList<String>();
+    protected final List<String> syntheticPropertyNames = new ArrayList<>();
 
     //**************************************************************************
     // Logging
@@ -117,7 +118,7 @@ public class Table implements ModelObject, Annotated {
         oneToManyRelationships.clear();
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert schema != null;
         assert tableName != null;
         
@@ -143,7 +144,7 @@ public class Table implements ModelObject, Annotated {
         actualEntityName = calculatedEntityName;
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Column column : columns) {

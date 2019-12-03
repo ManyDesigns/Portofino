@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.model;
 
+import org.apache.commons.configuration.Configuration;
+
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -28,14 +30,16 @@ package com.manydesigns.portofino.model;
 */
 public class InitVisitor extends ModelObjectVisitor {
 
-    private Model model;
+    private final Model model;
+    private final Configuration configuration;
 
-    public InitVisitor(Model model) {
+    public InitVisitor(Model model, Configuration configuration) {
         this.model = model;
+        this.configuration = configuration;
     }
 
     @Override
     public void visitNodeBeforeChildren(ModelObject node) {
-        node.init(model);
+        node.init(model, configuration);
     }
 }

@@ -4,8 +4,11 @@ import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.BootstrapSizes;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
+import com.manydesigns.portofino.modules.DatabaseModule;
+import com.manydesigns.portofino.persistence.Persistence;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -41,11 +44,18 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     protected Integer rowsPerPage;
     protected Integer columns = 1;
 
+    @Inject(DatabaseModule.PERSISTENCE)
+    public Persistence persistence;
+
     public CrudConfiguration() {
         properties = new ArrayList<CrudProperty>();
     }
 
-    public void init() {}
+    public void init() {
+        for (CrudProperty property : properties) {
+            property.init(persistence.getModel(), persistence.getConfiguration());
+        }
+    }
 
     public void setupDefaults() {
         rowsPerPage = 10;

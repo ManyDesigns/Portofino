@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -22,6 +22,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Pair;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ import java.text.MessageFormat;
 public class ForeignKey extends DatabaseSelectionProvider
         implements HasReferences {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Fields (physical JDBC)
@@ -54,7 +55,13 @@ public class ForeignKey extends DatabaseSelectionProvider
     // Fields (logical)
     //**************************************************************************
 
+    /**
+     * Name of the property containing many values (e.g. cities)
+     */
     protected String manyPropertyName;
+    /**
+     * Name of the property referring to a single value (e.g. country)
+     */
     protected String onePropertyName;
     protected String toTableName;
 
@@ -104,8 +111,8 @@ public class ForeignKey extends DatabaseSelectionProvider
     }
 
     @Override
-    public void init(Model model) {
-        super.init(model);
+    public void init(Model model, Configuration configuration) {
+        super.init(model, configuration);
 
         assert fromTable != null;
         assert name != null;
@@ -121,8 +128,8 @@ public class ForeignKey extends DatabaseSelectionProvider
     }
 
     @Override
-    public void link(Model model) {
-        super.link(model);
+    public void link(Model model, Configuration configuration) {
+        super.link(model, configuration);
         toTable = DatabaseLogic.findTableByName(model, toDatabase, toSchema, toTableName);
         if(toTable != null) {
             // wire up Table.oneToManyRelationships

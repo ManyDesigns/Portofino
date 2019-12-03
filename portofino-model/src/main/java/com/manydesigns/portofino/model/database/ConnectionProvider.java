@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -25,6 +25,7 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ import java.util.Date;
 @XmlAccessorType(XmlAccessType.NONE)
 public abstract class ConnectionProvider {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Constants
@@ -82,6 +83,7 @@ public abstract class ConnectionProvider {
     protected Date lastTested;
     protected Database database;
     protected String hibernateDialect;
+    protected Configuration configuration;
 
     //**************************************************************************
     // Logging
@@ -105,6 +107,7 @@ public abstract class ConnectionProvider {
     //**************************************************************************
 
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
+        configuration = databasePlatformsRegistry.getPortofinoConfiguration();
         Connection conn = null;
         ResultSet typeRs = null;
         String databaseName = getDatabase().getDatabaseName();

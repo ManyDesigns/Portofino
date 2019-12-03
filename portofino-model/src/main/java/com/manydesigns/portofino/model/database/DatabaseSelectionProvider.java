@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -22,6 +22,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ import java.util.List;
 @XmlType(propOrder = {"name","toDatabase","references","hql", "sql"})
 public class DatabaseSelectionProvider implements ModelSelectionProvider {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     protected final List<Reference> references;
 
@@ -63,7 +64,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
     //**************************************************************************
 
     public DatabaseSelectionProvider() {
-        references = new ArrayList<Reference>();
+        references = new ArrayList<>();
     }
 
     public DatabaseSelectionProvider(Table fromTable) {
@@ -81,12 +82,13 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
 
     public void reset() {}
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
+        assert fromTable != null;
         if(name == null) {
             throw new RuntimeException("name is required. Parent: " + fromTable.getQualifiedName());
         }
         if(toDatabase == null) {
-            if(fromTable != null && fromTable.getSchema() != null) {
+            if(fromTable.getSchema() != null) {
                 toDatabase = fromTable.getSchema().getDatabaseName();
             }
             if(toDatabase == null) {
@@ -95,7 +97,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
         }
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Reference reference : references) {

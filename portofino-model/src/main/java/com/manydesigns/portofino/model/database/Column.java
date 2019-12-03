@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ import java.util.List;
 @XmlType(propOrder = {"columnName", "columnType", "length", "scale", "jdbcType" ,"autoincrement","nullable","javaType","propertyName","annotations"})
 public class Column implements ModelObject, Annotated {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2019 ManyDesigns srl";
 
     //**************************************************************************
     // Fields (physical JDBC)
@@ -51,7 +52,7 @@ public class Column implements ModelObject, Annotated {
     protected Table table;
     protected String columnName;
     protected int jdbcType;
-    protected String  columnType;
+    protected String columnType;
     protected boolean nullable;
     protected boolean autoincrement;
     protected Integer length;
@@ -79,7 +80,7 @@ public class Column implements ModelObject, Annotated {
     // Constructors and init
     //**************************************************************************
     public Column() {
-        annotations = new ArrayList<Annotation>();
+        annotations = new ArrayList<>();
     }
 
     public Column(Table table) {
@@ -105,7 +106,7 @@ public class Column implements ModelObject, Annotated {
         actualJavaType = null;
     }
 
-    public void init(Model model) {
+    public void init(Model model, Configuration configuration) {
         assert table != null;
         //TODO questi assert dovrebbero essere test + throw exception
         assert columnName != null;
@@ -135,7 +136,7 @@ public class Column implements ModelObject, Annotated {
         }
     }
 
-    public void link(Model model) {}
+    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Annotation annotation : annotations) {
