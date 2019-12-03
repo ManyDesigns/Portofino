@@ -10,13 +10,16 @@ portofino.dataTable = function(elem) {
             return false;
         }
     }
+    function onDelete() {
+        return confirm (elem.find(".crud-confirm-bulk-delete").html());
+    }
+
     function setupDataTable() {
         var linkLoaderFunction = makeLoaderFunction(elem);
         elem.find("a.paginator-link").click(linkLoaderFunction);
         elem.find("a.sort-link").click(linkLoaderFunction);
-        elem.find("button[name=bulkDelete]").click(function() {
-            return confirm (elem.find(".crud-confirm-bulk-delete").html());
-        });
+
+        $('button[name=bulkDelete]:not(.bound)').addClass('bound').on('click',  onDelete);
     }
 
     setupDataTable();
@@ -70,6 +73,14 @@ $(function() {
         });
 
         var dataTable = new portofino.dataTable(form.find(".portofino-datatable"));
+
+        function replaceQueryParam(param, newval, search) {
+            var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
+            var query = search.replace(regex, "$1").replace(/&$/, '');
+
+            return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
+        }
+
         function search() {
             var href = form.attr("action");
             form.find("input[name=firstResult]").val("");
@@ -89,6 +100,5 @@ $(function() {
             search();
             return false;
         });
-        search();
     });
 });

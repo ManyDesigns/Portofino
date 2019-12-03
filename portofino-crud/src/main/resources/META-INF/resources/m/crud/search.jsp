@@ -39,11 +39,8 @@
                 </div>
             </c:if>
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-            <div class="portofino-datatable"></div>
 
-            <noscript>
-                <jsp:include page="datatable.jsp"/>
-            </noscript>
+            <jsp:include page="datatable.jsp"/>
 
             <div class="row">
                 <div class="col-md-12">
