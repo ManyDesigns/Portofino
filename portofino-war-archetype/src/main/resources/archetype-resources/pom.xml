@@ -333,7 +333,7 @@
             <!-- Build Docker images and launch the application. -->
             <id>docker</id>
             <properties>
-                <portofino.application.directory>/application</portofino.application.directory>
+                <portofino.application.directory>${dollar}{env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
             </properties>
             <build>
                 <plugins>

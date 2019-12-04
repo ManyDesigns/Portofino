@@ -1,5 +1,6 @@
 FROM tomcat:8.5.42-jdk8-slim
 ENV CATALINA_HOME /usr/local/tomcat
+ENV PORTOFINO_APPLICATION_DIRECTORY=$CATALINA_HOME/webapps/ROOT/WEB-INF/
 RUN mkdir -p $CATALINA_HOME/webapps/ROOT/WEB-INF/
 COPY maven/lib/* $CATALINA_HOME/lib/
 COPY maven/ROOT.war $CATALINA_HOME/webapps/ROOT.war
