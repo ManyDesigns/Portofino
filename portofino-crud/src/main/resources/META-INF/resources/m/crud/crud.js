@@ -31,6 +31,7 @@ portofino.dataTable = function(elem) {
         }
         var additionalParameters = (href.indexOf("?") > -1 ? "&" : "?") + "getSearchResultsPage=";
         var url = href + additionalParameters;
+        window.history.pushState("", "", href);
         var datatableDescription = {
             url: url
         };
@@ -73,13 +74,6 @@ $(function() {
         });
 
         var dataTable = new portofino.dataTable(form.find(".portofino-datatable"));
-
-        function replaceQueryParam(param, newval, search) {
-            var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
-            var query = search.replace(regex, "$1").replace(/&$/, '');
-
-            return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
-        }
 
         function search() {
             var href = form.attr("action");
