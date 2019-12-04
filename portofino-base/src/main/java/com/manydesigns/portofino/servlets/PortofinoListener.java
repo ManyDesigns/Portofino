@@ -40,6 +40,7 @@ import com.manydesigns.portofino.stripes.ResolverUtil;
 import groovy.util.GroovyScriptEngine;
 import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -146,7 +147,9 @@ public class PortofinoListener
 
         String applicationDirectoryPath = servletContext.getInitParameter("portofino.application.directory");
         if(applicationDirectoryPath != null) try {
-            applicationDirectoryPath = (String) PropertyConverter.interpolate(applicationDirectoryPath, new BaseConfiguration());
+            ConfigurationInterpolator interpolator = new BaseConfiguration().getInterpolator();
+            interpolator.registerLookup("serverInfo", new BeanLookup(serverInfo));
+            applicationDirectoryPath = new StrSubstitutor(interpolator).replace(applicationDirectoryPath);
             applicationDirectory = new File(applicationDirectoryPath);
             if(!applicationDirectory.isDirectory()) {
                 logger.error("Configured application directory " + applicationDirectoryPath + " is not a directory");
@@ -156,6 +159,7 @@ public class PortofinoListener
             logger.error("Configured application directory " + applicationDirectoryPath + " is not valid", e);
         }
         if(applicationDirectory == null) {
+            logger.info("Using default application directory (WEB-INF)");
             applicationDirectory = new File(serverInfo.getRealPath(), "WEB-INF");
         }
         logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());

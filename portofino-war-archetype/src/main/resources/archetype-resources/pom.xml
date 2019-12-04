@@ -326,7 +326,7 @@
             <!-- Used for development, see web.xml for an explanation. -->
             <id>portofino-development</id>
             <properties>
-                <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
+                <portofino.application.directory>${project.basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
             </properties>
         </profile>
         <profile>
@@ -376,7 +376,7 @@
                                         </links>
                                         <volumes>
                                             <bind>
-                                                <volume>${project.basedir}/src/main/webapp/WEB-INF:/application</volume>
+                                                <volume>${project.basedir}/src/main/webapp:/application</volume>
                                             </bind>
                                         </volumes>
                                     </run>
