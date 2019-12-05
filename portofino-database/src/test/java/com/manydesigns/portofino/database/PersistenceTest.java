@@ -28,8 +28,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.persistence.metamodel.EntityType;
+import javax.persistence.criteria.CriteriaQuery;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -108,10 +109,22 @@ public class PersistenceTest {
         persistence.syncDataModel("hibernatetest");
     }
 
+    protected Serializable makeEntity(String className, Map<String, Object> data) {
+        return new HashMap<>(data);
+    }
+
+    protected void set(Object entity, String property, Object value) {
+        ((Map) entity).put(property, value);
+    }
+
+    protected <T> T get(Object entity, String property) {
+        return (T) ((Map) entity).get(property);
+    }
+
     public void testReadProdotti() {
         Session session = persistence.getSession("jpetstore");
-        Criteria criteria = session.createCriteria("product");
-        List resultProd = new ArrayList(criteria.list());
+        CriteriaQuery criteria = QueryUtils.createCriteria(session,"product").getFirst();
+        List resultProd = new ArrayList(session.createQuery(criteria).list());
 
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
@@ -119,51 +132,41 @@ public class PersistenceTest {
 
     public void testSearchAndReadCategorieProdotti() {
         Session session = persistence.getSession("jpetstore");
-        Criteria criteria = session.createCriteria("category");
-        List resultCat = new ArrayList(criteria.list());
-
+        CriteriaQuery criteria = QueryUtils.createCriteria(session,"category").getFirst();
+        List resultCat = new ArrayList(session.createQuery(criteria).list());
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
 
+        resultCat.forEach(cat -> {
+            assertNotNull(get(cat, "name"));
+        });
 
-        Map categoria0 = (Map<String, Object>) resultCat.get(0);
-        assertEquals("jpetstore.PUBLIC.category", categoria0.get("$type$"));
-        assertNotNull(categoria0.get("name"));
-        Map categoria1 = (Map<String, Object>)resultCat.get(1);
-        assertNotNull(categoria0.get("name"));
-        Map categoria2 = (Map<String, Object>)resultCat.get(2);
-        assertNotNull(categoria0.get("name"));
-        Map categoria3 = (Map<String, Object>)resultCat.get(3);
-        assertNotNull(categoria0.get("name"));
-        Map categoria4 = (Map<String, Object>)resultCat.get(4);
-        assertNotNull(categoria0.get("name"));
-
-        criteria = session.createCriteria("product");
-        List resultProd = new ArrayList(criteria.list());
+        criteria = QueryUtils.createCriteria(session,"product").getFirst();
+        List resultProd = new ArrayList(session.createQuery(criteria).list());
 
         Table table = DatabaseLogic.findTableByName(
                 persistence.getModel(), "jpetstore", "PUBLIC", "CATEGORY");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
-        HashMap<String, String> category= findCategory(tableAccessor, tableCriteria);
+        findCategory(tableAccessor, tableCriteria);
 
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
-        Map prd0 = (Map<String, Object>)resultProd.get(0);
-        assertEquals("FI-SW-01", prd0.get("productid") );
-        assertEquals("Angelfish", prd0.get("name"));
+        Object prd0 = resultProd.get(0);
+        assertEquals("FI-SW-01", get(prd0, "productid") );
+        assertEquals("Angelfish", get(prd0, "name"));
     }
 
-    private HashMap<String, String> findCategory(TableAccessor tableAccessor, TableCriteria criteria) {
-        HashMap<String, String> category=null;
+    private Object findCategory(TableAccessor tableAccessor, TableCriteria criteria) {
+        Object category = null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
             Session session = persistence.getSession(tableAccessor.getTable().getDatabaseName());
             List<Object> listObjs = QueryUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
-            category = (HashMap<String, String>) listObjs.get(0);
-            String catid = category.get("catid");
+            category = listObjs.get(0);
+            String catid = get(category, "catid");
             assertEquals("FISH", catid);
         } catch (NoSuchFieldException e) {
             fail(e.getMessage(), e);
@@ -183,10 +186,10 @@ public class PersistenceTest {
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
-        Map<String, String> categoria0 =  findCategory(tableAccessor, tableCriteria);
-        assertEquals("jpetstore.PUBLIC.category", categoria0.get("$type$"));
-        assertEquals("Fish", categoria0.get("name"));
-        categoria0.put("name", "Pesciu");
+        Object categoria0 = findCategory(tableAccessor, tableCriteria);
+        assertEquals("jpetstore.public.category", getEntityName(categoria0));
+        assertEquals("Fish", get(categoria0, "name"));
+        set(categoria0, "name", "Pesciu");
         session.update("category", categoria0);
         session.getTransaction().commit();
         persistence.closeSessions();
@@ -194,18 +197,21 @@ public class PersistenceTest {
         //Controllo l'aggiornamento e riporto le cose come stavano
         tableCriteria = new TableCriteria(table);
         categoria0 =  findCategory(tableAccessor, tableCriteria);
-        assertEquals("jpetstore.PUBLIC.category", categoria0.get("$type$"));
-        assertEquals("Pesciu", categoria0.get("name"));
-        categoria0.put("name", "Fish");
+        assertEquals("jpetstore.public.category", getEntityName(categoria0));
+        assertEquals("Pesciu", get(categoria0, "name"));
+        set(categoria0, "name", "Fish");
         session = persistence.getSession("jpetstore");
         session.update("category", categoria0);
         session.getTransaction().commit();
         persistence.closeSessions();
     }
 
+    protected Object getEntityName(Object entity) {
+        return get(entity, "$type$");
+    }
+
     public void testSaveCategoria() {
-        Map<String, Object> worms = new HashMap<String, Object>();
-        worms.put("$type$", "category");
+        Map<String, Object> worms = new HashMap<>();
         worms.put("catid", "VERMI");
         worms.put("name", "worms");
         worms.put("descn",
@@ -213,18 +219,18 @@ public class PersistenceTest {
                         "Worms</font>");
 
         Session session = persistence.getSession("jpetstore");
-        session.save("category", worms);
+        session.save("category", makeEntity("jpetstore.public.Category", worms));
         session.getTransaction().commit();
     }
 
     public void testSaveLineItem() {
-        Map<String, Object> lineItem = new HashMap<String, Object>();
-        lineItem.put("$type$", "lineitem");
-        lineItem.put("orderid", new BigInteger("2"));
-        lineItem.put("linenum", new BigInteger("2"));
-        lineItem.put("itemid", "test");
-        lineItem.put("quantity", new BigInteger("20"));
-        lineItem.put("unitprice", new BigDecimal(10.80));
+        Map<String, Object> lineItemData = new HashMap<>();
+        lineItemData.put("orderid", new BigInteger("2"));
+        lineItemData.put("linenum", new BigInteger("2"));
+        lineItemData.put("itemid", "test");
+        lineItemData.put("quantity", new BigInteger("20"));
+        lineItemData.put("unitprice", new BigDecimal(10.80));
+        Object lineItem = makeEntity("jpetstore.public.Lineitem", lineItemData);
 
         Session session = persistence.getSession("jpetstore");
         session.save("lineitem", lineItem);
@@ -239,68 +245,67 @@ public class PersistenceTest {
     }
 
     public void testSaveTestElement() throws Exception {
-        Map<String, Object> testItem = new HashMap<String, Object>();
-        testItem.put("$type$", "table1");
-        testItem.put("testo", "esempio");
+        Map<String, Object> testItemData = new HashMap<>();
+        testItemData.put("testo", "esempio");
         //salvo
         Session session = persistence.getSession("hibernatetest");
-        session.save("table1", testItem);
+        session.save("table1", makeEntity("hibernatetest.public.Table1", testItemData));
         session.getTransaction().commit();
     }
 
     public void testDeleteCategoria() {
-        Map<String, Object> worms = new HashMap<String, Object>();
-        worms.put("$type$", "category");
+        Map<String, Object> worms = new HashMap<>();
         worms.put("catid", "VERMI");
         worms.put("name", "worms");
         worms.put("descn",
                 "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                         "Worms</font>");
+        Object wormsEntity = makeEntity("jpetstore.public.Category", worms);
 
         Session session = persistence.getSession("jpetstore");
-        session.save("category", worms);
+        session.save("category", wormsEntity);
         session.getTransaction().commit();
         session.beginTransaction();
-        session.delete("category", worms);
+        session.delete("category", wormsEntity);
         session.getTransaction().commit();
     }
 
     public void testGetObjByPk(){
         //Test Chiave singola
-        HashMap<String, Object> pk = new HashMap<String, Object>();
+        HashMap<String, Object> pk = new HashMap<>();
         pk.put("catid", "BIRDS");
         Object bird =  QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", pk);
-        assertEquals("Birds", ((Map) bird).get("name"));
+                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+        assertEquals("Birds", get(bird, "name"));
 
         //Test Chiave composta
-        pk = new HashMap<String, Object>();
+        pk = new HashMap<>();
         pk.put("orderid", new BigInteger("1"));
         pk.put("linenum", new BigInteger("1"));
-        Map lineItem = (Map) QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "lineitem", pk);
-        assertEquals("EST-1", lineItem.get("itemid"));
+        Object lineItem = QueryUtils.getObjectByPk
+                (persistence, "jpetstore", "lineitem", makeEntity("jpetstore.public.Lineitem", pk));
+        assertEquals("EST-1", get(lineItem, "itemid"));
     }
 
     public void testForeignKeyNavigation() {
-        HashMap<String, Object> pk = new HashMap<String, Object>();
+        HashMap<String, Object> pk = new HashMap<>();
         pk.put("catid", "BIRDS");
-        Map bird = (Map) QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", pk);
-        assertEquals("Birds", bird.get("name"));
-        assertTrue(bird.get("fk_product_1") instanceof Collection);
-        assertFalse(((Collection) bird.get("fk_product_1")).isEmpty());
-        for(Object o : ((Collection) bird.get("fk_product_1"))) {
+        Object bird = QueryUtils.getObjectByPk
+                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+        assertEquals("Birds", get(bird, "name"));
+        assertTrue(get(bird, "fk_product_1") instanceof Collection);
+        assertFalse(((Collection) get(bird, "fk_product_1")).isEmpty());
+        for(Object o : ((Collection) get(bird, "fk_product_1"))) {
             assertNotNull(o);
-            assertEquals(bird, ((Map) o).get("fk_product_1"));
+            assertEquals(bird, get(o, "fk_product_1"));
         }
 
         pk = new HashMap<>();
         pk.put("regione", "liguria");
         pk.put("provincia", "genova");
         pk.put("comune", "rapallo");
-        Map comune = (Map) QueryUtils.getObjectByPk
-                (persistence, "hibernatetest", "comune", pk);
+        Object comune = QueryUtils.getObjectByPk
+                (persistence, "hibernatetest", "comune", makeEntity("hibernatetest.public.Comune", pk));
 
         /* not supported.
         assertTrue(comune.get("domanda_comune_fkey") instanceof Collection);
@@ -310,11 +315,10 @@ public class PersistenceTest {
             assertEquals(pk.get("comune"), ((Map) ((Map) o).get("domanda_comune_fkey")).get("comune"));
         }*/
 
-        assertTrue(comune.get("domanda_regione_fkey") instanceof Collection);
-        assertFalse(((Collection) comune.get("domanda_regione_fkey")).isEmpty());
-        for(Object o : ((Collection) comune.get("domanda_regione_fkey"))) {
+        assertTrue(get(comune, "domanda_regione_fkey") instanceof Collection);
+        assertFalse(((Collection) get(comune, "domanda_regione_fkey")).isEmpty());
+        for(Object o : ((Collection) get(comune, "domanda_regione_fkey"))) {
             assertNotNull(o);
-            //assertEquals(pk.get("comune"), ((Map) ((Map) o).get("domanda_comune_fkey")).get("comune"));
         }
     }
 
@@ -322,8 +326,8 @@ public class PersistenceTest {
         HashMap<String, Object> pk = new HashMap<String, Object>();
         pk.put("catid", "BIRDS");
         Object bird = QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", pk);
-        assertEquals("Birds", ((Map) bird).get("name"));
+                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+        assertEquals("Birds", get(bird, "name"));
 
         List objs = QueryUtils.getRelatedObjects(persistence, "jpetstore", "category",
                 bird, "fk_product_1");
@@ -393,16 +397,15 @@ public class PersistenceTest {
         assertEquals(strDate, dateField.getStringValue());
     }
 
-    public void testFkComposite(){
+    public void testFkComposite() throws Exception {
         Session session = persistence.getSession("hibernatetest");
         List<Object> list2 = session.createCriteria("table2").list();
-        HashMap map = (HashMap)list2.get(0);
-        List obj =  (List) map.get("table3_t2_id1_fkey");
+        Object map = list2.get(0);
+        List obj =  (List) get(map, "table3_t2_id1_fkey");
         assertNotNull(obj);
         assertTrue(obj.size()>0);
-        Map obj2 = (Map) ((Map)obj.get(0)).get("table3_t2_id1_fkey");
+        Object obj2 = get(obj.get(0), "table3_t2_id1_fkey");
         assertNotNull(obj2);
-        assertEquals(5, obj2.keySet().size());
     }
 
     public void tablesWithNoPKAreSkipped() {
@@ -415,9 +418,10 @@ public class PersistenceTest {
     }
 
     public void testAutoIncrementGenerator(){
-        Map<String, Object> supplier = new HashMap<>();
-        supplier.put("status", "99");
-        supplier.put("name", "Giampiero");
+        Map<String, Object> supplierData = new HashMap<>();
+        supplierData.put("status", "99");
+        supplierData.put("name", "Giampiero");
+        Object supplier = makeEntity("jpetstore.public.Supplier", supplierData);
         Session session = persistence.getSession("jpetstore");
         session.save("supplier", supplier);
         session.getTransaction().commit();
@@ -431,8 +435,8 @@ public class PersistenceTest {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
             List listObjs = QueryUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
-            Map<String,String> supp = (Map<String, String>) listObjs.get(0);
-            String name = supp.get("name");
+            Object supp = listObjs.get(0);
+            String name = get(supp, "name");
             assertEquals("Giampiero", name);
         } catch (NoSuchFieldException e) {
             fail(e.getMessage(), e);
@@ -549,7 +553,8 @@ public class PersistenceTest {
         table.getAnnotations().add(nq);
         persistence.initModel();
         session = persistence.getSession("hibernatetest");
-        session.createNamedQuery("all_questions", Map.class).list();
+        List<Object> allQuestions = session.createNamedQuery("all_questions", Object.class).list();
+        assertEquals(2, allQuestions.size());
     }
 
     public void testDateAndTimeAPIMapping() {
@@ -560,7 +565,8 @@ public class PersistenceTest {
         assertEquals(java.sql.Date.class, column.getActualJavaType());
         column.setJavaType(LocalDate.class.getName());
         persistence.initModel();
-        Map domanda = (Map) persistence.getSession("hibernatetest").get("domanda", "0001");
-        assertEquals(LocalDate.of(2010, 9, 27), domanda.get("data"));
+        Object domanda = persistence.getSession("hibernatetest").get("domanda", "0001");
+        assertEquals(LocalDate.of(2010, 9, 27), get(domanda,"data"));
     }
+
 }

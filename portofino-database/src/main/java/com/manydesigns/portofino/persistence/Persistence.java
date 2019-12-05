@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.persistence;
 
-import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
@@ -45,7 +44,6 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -343,7 +341,9 @@ public class Persistence {
                 SessionFactoryBuilder builder = new SessionFactoryBuilder(database);
                 SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
                 HibernateDatabaseSetup setup =
-                        new HibernateDatabaseSetup(database, sessionFactoryAndCodeBase.sessionFactory);
+                        new HibernateDatabaseSetup(
+                                database, sessionFactoryAndCodeBase.sessionFactory,
+                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode());
                 String databaseName = database.getDatabaseName();
                 setups.put(databaseName, setup);
             }
@@ -420,11 +420,15 @@ public class Persistence {
     }
 
     protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
-        HibernateDatabaseSetup setup = setups.get(databaseName);
+        HibernateDatabaseSetup setup = getDatabaseSetup(databaseName);
         if (setup == null) {
             throw new Error("No setup exists for database: " + databaseName);
         }
         return setup;
+    }
+
+    public HibernateDatabaseSetup getDatabaseSetup(String databaseName) {
+        return setups.get(databaseName);
     }
 
     public void closeSessions() {

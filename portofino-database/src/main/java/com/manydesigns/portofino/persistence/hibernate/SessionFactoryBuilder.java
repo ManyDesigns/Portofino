@@ -15,6 +15,7 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.*;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -72,6 +73,10 @@ public class SessionFactoryBuilder {
         String falseString = database.getFalseString();
         if (falseString != null) {
             this.falseString = "null".equalsIgnoreCase(falseString) ? null : falseString;
+        }
+        String entityModeName = database.getEntityMode();
+        if(!StringUtils.isEmpty(entityModeName)) {
+            entityMode = EntityMode.parse(entityModeName);
         }
     }
 
@@ -166,6 +171,9 @@ public class SessionFactoryBuilder {
                 Class persistentClass = getPersistentClass(table, codeBase);
                 sources.addAnnotatedClass(persistentClass);
                 classLoaderService.classes.put(persistentClass.getName(), persistentClass);
+                if(entityMode == EntityMode.POJO) {
+                    table.setActualJavaClass(persistentClass);
+                }
             }
             for(Table table : externallyMappedTables) {
                 sources.addAnnotatedClass(table.getActualJavaClass());
@@ -187,8 +195,6 @@ public class SessionFactoryBuilder {
                     }
                 }
             });
-        } else {
-            throw new IllegalStateException("Unsupported entity mode: " + entityMode);
         }
         org.hibernate.boot.SessionFactoryBuilder sessionFactoryBuilder = metadata.getSessionFactoryBuilder();
         return new SessionFactoryAndCodeBase(sessionFactoryBuilder.build(), codeBase);
@@ -236,13 +242,38 @@ public class SessionFactoryBuilder {
     }
 
     @NotNull
-    private String getMappedClassName(Table table) {
-        //TODO translate to CamelCase when entityMode is POJO
-        //TODO sanitize names so that they are valid Java identifiers
-        //TODO avoid clashes with externally mapped classes
+    public String getMappedClassName(Table table) {
+        return getMappedClassName(table, entityMode);
+    }
+
+    @NotNull
+    public static String getMappedClassName(Table table, EntityMode entityMode) {
         return table.getActualJavaClass() == null ?
-                table.getSchema().getQualifiedName() + "." + table.getActualEntityName() :
-                table.getJavaClass();
+                deriveMappedClassName(table, entityMode) :
+                table.getActualJavaClass().getName();
+    }
+
+    @NotNull
+    public static String deriveMappedClassName(Table table, EntityMode entityMode) {
+        String packageName = table.getSchema().getQualifiedName().toLowerCase();
+        String className = table.getActualEntityName();
+        if(entityMode == EntityMode.POJO) {
+            className = Arrays.stream(StringUtils.split(className, "_- "))
+                    .map(StringUtils::capitalize)
+                    .collect(Collectors.joining());
+        } else {
+            className = className.replaceAll("-|\\h", "");
+        }
+        if(Character.isDigit(className.charAt(0))) {
+            className = "_" + className;
+        }
+        String fullName = packageName + "." + className;
+        for(Table other : table.getSchema().getDatabase().getAllTables()) {
+            if(other != table && other.getActualJavaClass() != null && other.getActualJavaClass().getName().equals(fullName)) {
+                fullName += "_1";
+            }
+        }
+        return fullName;
     }
 
     public Class getPersistentClass(Table table, CodeBase codeBase) throws IOException, ClassNotFoundException {
@@ -660,4 +691,7 @@ public class SessionFactoryBuilder {
         }
     }
 
+    public EntityMode getEntityMode() {
+        return entityMode;
+    }
 }

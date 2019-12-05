@@ -56,6 +56,7 @@ public class Database implements ModelObject {
 
     protected String trueString = null;
     protected String falseString = null;
+    protected String entityMode = null;
 
     protected ConnectionProvider connectionProvider;
 
@@ -65,7 +66,6 @@ public class Database implements ModelObject {
     //**************************************************************************
 
     public static final Logger logger = LoggerFactory.getLogger(Database.class);
-
 
     //**************************************************************************
     // Constructors
@@ -197,5 +197,14 @@ public class Database implements ModelObject {
 
     public void setConnectionProvider(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
+    }
+
+    @XmlAttribute(required = false)
+    public String getEntityMode() {
+        return entityMode;
+    }
+
+    public void setEntityMode(String entityMode) {
+        this.entityMode = entityMode;
     }
 }

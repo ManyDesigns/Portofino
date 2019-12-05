@@ -56,8 +56,7 @@ public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAcc
     protected final ColumnAccessor[] keyColumnAccessors;
     protected ClassAccessor javaClassAccessor = null;
 
-    public final static Logger logger =
-            LoggerFactory.getLogger(TableAccessor.class);
+    public final static Logger logger = LoggerFactory.getLogger(TableAccessor.class);
 
     //**************************************************************************
     // Constructors and initialization

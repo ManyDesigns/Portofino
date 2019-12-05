@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.persistence.hibernate;
 
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.database.Database;
 import org.hibernate.*;
 import org.slf4j.Logger;
@@ -40,18 +41,22 @@ public class HibernateDatabaseSetup {
 
     protected final Database database;
     protected final SessionFactory sessionFactory;
+    protected final CodeBase codeBase;
     protected final ThreadLocal<Session> threadSessions;
+    protected final EntityMode entityMode;
     protected final Map<String, String> jpaEntityNameToClassNameMap = new HashMap<>();
 
         public static final Logger logger =
             LoggerFactory.getLogger(HibernateDatabaseSetup.class);
 
-    public HibernateDatabaseSetup(Database database, SessionFactory sessionFactory) {
+    public HibernateDatabaseSetup(Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode) {
         this.database = database;
         this.sessionFactory = sessionFactory;
+        this.codeBase = codeBase;
+        this.entityMode = entityMode;
         threadSessions = new ThreadLocal<>();
         database.getAllTables().forEach(t -> {
-            jpaEntityNameToClassNameMap.put(t.getActualEntityName(), t.getSchema().getQualifiedName() + "." + t.getActualEntityName());
+            jpaEntityNameToClassNameMap.put(t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode));
         });
     }
 
@@ -96,5 +101,17 @@ public class HibernateDatabaseSetup {
 
     public void removeThreadSession() {
         threadSessions.remove();
+    }
+
+    public Database getDatabase() {
+        return database;
+    }
+
+    public CodeBase getCodeBase() {
+        return codeBase;
+    }
+
+    public EntityMode getEntityMode() {
+        return entityMode;
     }
 }

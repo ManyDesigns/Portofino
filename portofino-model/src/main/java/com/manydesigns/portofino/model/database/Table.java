@@ -234,6 +234,13 @@ public class Table implements ModelObject, Annotated {
         return actualJavaClass;
     }
 
+    public void setActualJavaClass(Class actualJavaClass) {
+        this.actualJavaClass = actualJavaClass;
+        if(this.javaClass != null) {
+            this.javaClass = actualJavaClass.getName();
+        }
+    }
+
     @XmlElementWrapper(name="foreignKeys")
     @XmlElement(name = "foreignKey",
             type = ForeignKey.class)
