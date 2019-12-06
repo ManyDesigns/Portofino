@@ -82,7 +82,7 @@ public class ReflectionUtil {
             logger.debug("Found constructor: {}", constructor);
             return constructor;
         } catch (Throwable e) {
-            logger.debug("Could not find construtor for class: {}", aClass);
+            logger.debug("Could not find constructor for class: {}", aClass);
             return null;
         }
     }

@@ -2,6 +2,16 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+- Barebones support for mapping tables as POJO's (objects) rather than maps.
+- Sample AWS ECS task definition in demo-tt.
+
+### Changed
+- Improve performance of selection providers by asking for data lazily in certain cases.
+- Properly support Docker deployments using the image built by the standard pom of archetype-generated projects.
+
 ## [5.1.0] - 2019-10-31
 
 ### Added
