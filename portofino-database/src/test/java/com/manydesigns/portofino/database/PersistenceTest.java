@@ -177,12 +177,13 @@ public class PersistenceTest {
     public void testSearchAndUpdateCategorie() {
         Table table = DatabaseLogic.findTableByName(
                 persistence.getModel(), "jpetstore", "PUBLIC", "CATEGORY");
+        assertNotNull(table);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
 
         Session session = persistence.getSession("jpetstore");
-        Criteria criteria = session.createCriteria("category");
-        List resultCat = new ArrayList(criteria.list());
+        CriteriaQuery<Object> criteria = QueryUtils.createCriteria(session, "category").getFirst();
+        List<Object> resultCat = new ArrayList<>(session.createQuery(criteria).list());
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
@@ -229,7 +230,7 @@ public class PersistenceTest {
         lineItemData.put("linenum", new BigInteger("2"));
         lineItemData.put("itemid", "test");
         lineItemData.put("quantity", new BigInteger("20"));
-        lineItemData.put("unitprice", new BigDecimal(10.80));
+        lineItemData.put("unitprice", new BigDecimal("10.80"));
         Object lineItem = makeEntity("jpetstore.public.Lineitem", lineItemData);
 
         Session session = persistence.getSession("jpetstore");
@@ -247,7 +248,6 @@ public class PersistenceTest {
     public void testSaveTestElement() throws Exception {
         Map<String, Object> testItemData = new HashMap<>();
         testItemData.put("testo", "esempio");
-        //salvo
         Session session = persistence.getSession("hibernatetest");
         session.save("table1", makeEntity("hibernatetest.public.Table1", testItemData));
         session.getTransaction().commit();
@@ -399,9 +399,9 @@ public class PersistenceTest {
 
     public void testFkComposite() throws Exception {
         Session session = persistence.getSession("hibernatetest");
-        List<Object> list2 = session.createCriteria("table2").list();
+        List<Object> list2 = session.createQuery(QueryUtils.createCriteria(session, "table2").getFirst()).list();
         Object map = list2.get(0);
-        List obj =  (List) get(map, "table3_t2_id1_fkey");
+        List<?> obj = get(map, "table3_t2_id1_fkey");
         assertNotNull(obj);
         assertTrue(obj.size()>0);
         Object obj2 = get(obj.get(0), "table3_t2_id1_fkey");
@@ -433,7 +433,7 @@ public class PersistenceTest {
         final BigInteger expectedId = new BigInteger("3");
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
-            List listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            List<?> listObjs = QueryUtils.getObjects(session, criteria, null, null);
             assertEquals(1, listObjs.size());
             Object supp = listObjs.get(0);
             String name = get(supp, "name");
@@ -536,7 +536,7 @@ public class PersistenceTest {
         pk.getPrimaryKeyColumns().add(id);
         persistence.initModel();
         session = persistence.getSession("hibernatetest");
-        List list = session.createQuery("from test_view_1").list();
+        List<?> list = session.createQuery("from test_view_1").list();
         assertEquals(2, list.size());
     }
 
