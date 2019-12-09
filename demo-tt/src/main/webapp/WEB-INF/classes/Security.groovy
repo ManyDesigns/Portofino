@@ -14,12 +14,14 @@ import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
 import org.apache.shiro.authc.*
 import org.apache.shiro.crypto.hash.Sha1Hash
-import org.hibernate.Criteria
 import org.hibernate.Session
-import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+
+import javax.persistence.criteria.CriteriaBuilder
+import javax.persistence.criteria.CriteriaQuery
+import javax.persistence.criteria.Root
 
 class Security extends AbstractPortofinoRealm {
 
@@ -83,10 +85,11 @@ class Security extends AbstractPortofinoRealm {
 
         String encryptedPassword = encryptPassword(newPassword);
         Session session = persistence.getSession("tt");
-        Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("token", token));
+        def (CriteriaQuery criteria, CriteriaBuilder builder, Root root) =
+            QueryUtils.createCriteria(session, "users")
+        criteria.where(builder.equal(root.get('token'), token))
 
-        Serializable principal = (Serializable) criteria.uniqueResult();
+        Serializable principal = (Serializable) session.createQuery(criteria).uniqueResult()
 
         if (principal == null) {
             throw new IncorrectCredentialsException();
@@ -112,11 +115,12 @@ class Security extends AbstractPortofinoRealm {
             SignUpToken signUpToken) {
         String token = signUpToken.token;
 
-        Session session = persistence.getSession("tt");
-        Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("token", token));
+        Session session = persistence.getSession("tt")
+        def (CriteriaQuery criteria, CriteriaBuilder builder, Root root) =
+            QueryUtils.createCriteria(session, "users")
+        criteria.where(builder.equal(root.get('token'), token))
 
-        Serializable principal = (Serializable) criteria.uniqueResult()
+        Serializable principal = (Serializable) session.createQuery(criteria).uniqueResult()
 
         if (principal == null) {
             throw new IncorrectCredentialsException();
@@ -190,8 +194,8 @@ class Security extends AbstractPortofinoRealm {
     @Override
     Map<Serializable, String> getUsers() {
         Session session = persistence.getSession("tt");
-        Criteria criteria = session.createCriteria("users");
-        List users = criteria.list();
+        def (criteria, cb, root) = QueryUtils.createCriteria(session, "users")
+        List users = session.createQuery(criteria).list()
 
         Map result = new HashMap();
         for (Serializable user : users) {
@@ -220,9 +224,11 @@ class Security extends AbstractPortofinoRealm {
     @Override
     Serializable getUserByEmail(String email) {
         Session session = persistence.getSession("tt");
-        def criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("email", email).ignoreCase());
-        return (Serializable) criteria.uniqueResult();
+        def (CriteriaQuery criteria, CriteriaBuilder builder, Root root) =
+            QueryUtils.createCriteria(session, "users")
+        criteria.where(builder.equal(builder.upper(root.get('email')), email?.toUpperCase()))
+
+        (Serializable) session.createQuery(criteria).uniqueResult()
     }
 
     @Override
@@ -256,9 +262,7 @@ class Security extends AbstractPortofinoRealm {
     String saveSelfRegisteredUser(Object principal) {
         Session session = persistence.getSession("tt");
         logger.debug("Check if user already registered. Email: {}", principal.email);
-        Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("email", principal.email));
-        Object user2 = criteria.uniqueResult();
+        Object user2 = getUserByEmail(principal.email)
         if (user2 != null) {
             throw new ExistingUserException(principal.email);
         }
