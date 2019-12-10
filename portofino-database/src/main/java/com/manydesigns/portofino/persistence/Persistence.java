@@ -313,7 +313,7 @@ public class Persistence {
         closeSessions();
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
             String databaseName = current.getKey();
-            logger.info("Cleaning up old setup for: {}", databaseName);
+            logger.debug("Cleaning up old setup for: {}", databaseName);
             HibernateDatabaseSetup hibernateDatabaseSetup = current.getValue();
             try {
                 SessionFactory sessionFactory = hibernateDatabaseSetup.getSessionFactory();
@@ -334,6 +334,7 @@ public class Persistence {
     }
 
     protected void initConnectionProvider(Database database) {
+        logger.info("Initializing connection provider for database " + database.getDatabaseName());
         try {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
             connectionProvider.init(databasePlatformsRegistry);

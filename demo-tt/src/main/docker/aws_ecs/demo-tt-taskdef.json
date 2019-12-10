@@ -62,7 +62,7 @@
   "requiresCompatibilities": [
     "EC2"
   ],
-  "networkMode": "host",
+  "networkMode": "awsvpc",
   "volumes": [
     {
       "name": "demo-tt-database-data",

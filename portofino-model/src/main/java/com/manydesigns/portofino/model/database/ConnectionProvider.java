@@ -86,26 +86,11 @@ public abstract class ConnectionProvider {
     protected String hibernateDialect;
     protected Configuration configuration;
 
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(JdbcConnectionProvider.class);
-
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
+    public static final Logger logger = LoggerFactory.getLogger(ConnectionProvider.class);
 
     public ConnectionProvider() {
         types = new ArrayList<Type>();
     }
-
-
-    //**************************************************************************
-    // Initialization
-    //**************************************************************************
 
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
         configuration = databasePlatformsRegistry.getPortofinoConfiguration();
@@ -149,7 +134,7 @@ public abstract class ConnectionProvider {
                     readType(typeRs);
                 }
                 fixMissingTypeAliases(types);
-                Collections.sort(types, new TypeComparator());
+                types.sort(new TypeComparator());
             }
 
             databasePlatform = databasePlatformsRegistry.findApplicableAbstraction(this);

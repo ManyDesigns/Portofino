@@ -4,7 +4,6 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -43,14 +42,14 @@ public class ApiInfo extends Resource {
     public static String getApiRootUri(ServletContext servletContext, URI baseUri) {
         String apiRoot = servletContext.getInitParameter("portofino.api.root");
         if (apiRoot == null) {
-            apiRoot = "http://localhost:8080";
-        } else if (apiRoot.contains("://")) {
-            //Keep as is
-        } else if (!apiRoot.startsWith("/")) {
-            apiRoot = servletContext.getContextPath() + "/" + apiRoot;
+            apiRoot = "";
         }
         if (!apiRoot.contains("://")) {
-            apiRoot = baseUri.getScheme() + "://" + baseUri.getAuthority() + apiRoot;
+            String baseAddress = baseUri.getScheme() + "://" + baseUri.getAuthority();
+            if (!apiRoot.startsWith("/")) {
+                baseAddress += servletContext.getContextPath();
+            }
+            apiRoot = baseAddress + "/" + apiRoot;
         }
         if (!apiRoot.endsWith("/")) {
             apiRoot += "/";
