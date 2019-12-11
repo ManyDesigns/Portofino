@@ -86,6 +86,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         return (PortofinoContextLoaderListener) servletContext.getAttribute(PORTOFINO_CONTEXT_LOADER_LISTENER);
     }
 
+    @NotNull
     @Override
     protected ConfigurableWebApplicationContext createWebApplicationContext(@NotNull ServletContext sc) {
         if(parentContext == null) {
@@ -122,7 +123,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         });
         CodeBase codeBase = (CodeBase) servletContext.getAttribute(PortofinoListener.CODE_BASE_ATTRIBUTE);
         try {
-            Class userConfigurationClass = codeBase.loadClass("SpringConfiguration");
+            Class<?> userConfigurationClass = codeBase.loadClass("SpringConfiguration");
             ((DefaultResourceLoader) userContext).setClassLoader(codeBase.asClassLoader());
             ((AnnotationConfigRegistry) userContext).register(userConfigurationClass);
             configureContextReload(userContext, codeBase);
@@ -209,7 +210,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         }
     }
 
-    protected boolean isReloadable(Class c) {
+    protected boolean isReloadable(Class<?> c) {
         return c.getAnnotation(Component.class) != null ||
                c.getAnnotation(org.springframework.context.annotation.Configuration.class) != null ||
                c.getAnnotation(Repository.class) != null ||

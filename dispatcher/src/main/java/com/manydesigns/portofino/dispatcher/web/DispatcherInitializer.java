@@ -158,7 +158,7 @@ public class DispatcherInitializer implements ServletContextListener {
                 resolver = (ResourceResolver) resClassConstructor.newInstance(codeBase);
             } catch (Exception e) {
                 logger.debug("Constructor from CodeBase not available", e);
-                resolver = (ResourceResolver) resClass.newInstance();
+                resolver = (ResourceResolver) resClass.getConstructor().newInstance();
             }
             if(caching) {
                 resolver = new CachingResourceResolver(resolver);

@@ -29,7 +29,15 @@ docker push $registry/demo-tt/webapp:5.1.1
 We now need a cluster (a) to run a task (b) which is kept alive by a service (c). So let's create what we don't have yet.
 If we already have (a), (b) and (c), then we can proceed to the next section.
 
-Let's start from the cluster (a):
+Let's start from the cluster (a), by following Amazon's own tutorials using
+[the ECS CLI](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-cli-tutorial-ec2.html) and
+[the AWS CLI](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_AWSCLI_EC2.html):
+
+```
+ecs-cli configure --cluster demo-tt --default-launch-type EC2 --config-name demo-tt --region $region
+ecs-cli up --keypair demo-tt --capability-iam --size 1 --instance-type t2.large --cluster-config demo-tt --ecs-profile $profile
+aws ecs register-task-definition --cli-input-json demo-tt-taskdef.json --region $region
+```
 
 TODO
 

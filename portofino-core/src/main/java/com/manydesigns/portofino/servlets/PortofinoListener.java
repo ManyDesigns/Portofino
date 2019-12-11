@@ -75,7 +75,7 @@ import java.util.concurrent.Future;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class PortofinoListener extends DispatcherInitializer
-        implements ServletContextListener, HttpSessionListener, ServletContextAttributeListener {
+        implements ServletContextListener, ServletContextAttributeListener {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
@@ -232,8 +232,7 @@ public class PortofinoListener extends DispatcherInitializer
 
     protected void checkForNewVersion(String portofinoVersion, String versionCheckUrl) {
         Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(versionCheckUrl)
-                .queryParam("version", portofinoVersion);
+        WebTarget target = client.target(versionCheckUrl).queryParam("version", portofinoVersion);
         Future<Response> responseFuture = target.request().async().get();
         Executors.newSingleThreadExecutor().submit(() -> {
             try {
@@ -278,20 +277,6 @@ public class PortofinoListener extends DispatcherInitializer
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         MDC.clear();
-    }
-
-    //**************************************************************************
-    // HttpSessionListener implementation
-    //**************************************************************************
-
-    public void sessionCreated(HttpSessionEvent httpSessionEvent) {
-        HttpSession session = httpSessionEvent.getSession();
-        logger.debug("Session created: id={}", session.getId());
-    }
-
-    public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
-        HttpSession session = httpSessionEvent.getSession();
-        logger.debug("Session destroyed: id={}", session.getId());
     }
 
     //**************************************************************************
