@@ -80,6 +80,7 @@ public class Persistence {
     //**************************************************************************
 
     public static final String APP_MODEL_DIRECTORY = "portofino-model";
+    @Deprecated
     public static final String APP_MODEL_FILE = APP_MODEL_DIRECTORY + ".xml";
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
@@ -121,7 +122,7 @@ public class Persistence {
         this.databasePlatformsRegistry = databasePlatformsRegistry;
 
         if(getModelFile().exists()) {
-            logger.info("Application model file: {}", getModelFile().getName().getPath());
+            logger.info("Legacy application model file: {}", getModelFile().getName().getPath());
         } else {
             logger.info("Application model directory: {}", getModelDirectory().getName().getPath());
         }
@@ -218,6 +219,7 @@ public class Persistence {
         }
     }
 
+    @Deprecated
     public FileObject getModelFile() throws FileSystemException {
         return appDir.resolveFile(APP_MODEL_FILE);
     }
@@ -273,25 +275,23 @@ public class Persistence {
             }
             for(Schema schema : database.getSchemas()) {
                 FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
-                if(schemaDir.getType() == FileType.FOLDER) {
-                    schemaDir.createFolder();
-                    logger.debug("Schema directory {} exists", schemaDir);
-                    FileObject[] tableFiles = schemaDir.getChildren();
-                    for(FileObject tableFile : tableFiles) {
-                        if(tableFile.getName().getBaseName().endsWith(".table.xml")) {
-                            if (!tableFile.delete()) {
-                                logger.warn("Could not delete table file {}", tableFile.getName().getPath());
-                            }
-                        }
-                    }
-                    for(Table table : schema.getTables()) {
-                        FileObject tableFile = schemaDir.resolveFile(table.getTableName() + ".table.xml");
-                        try(OutputStream outputStream = tableFile.getContent().getOutputStream()) {
-                            m.marshal(table, outputStream);
-                        }
-                    }
-                } else {
+                if(!schemaDir.exists()) {
                     logger.debug("Schema directory {} does not exist", schemaDir);
+                    schemaDir.createFolder();
+                }
+                FileObject[] tableFiles = schemaDir.getChildren();
+                for(FileObject tableFile : tableFiles) {
+                    if(tableFile.getName().getBaseName().endsWith(".table.xml")) {
+                        if (!tableFile.delete()) {
+                            logger.warn("Could not delete table file {}", tableFile.getName().getPath());
+                        }
+                    }
+                }
+                for(Table table : schema.getTables()) {
+                    FileObject tableFile = schemaDir.resolveFile(table.getTableName() + ".table.xml");
+                    try(OutputStream outputStream = tableFile.getContent().getOutputStream()) {
+                        m.marshal(table, outputStream);
+                    }
                 }
             }
         }

@@ -1,5 +1,3 @@
-package com.manydesigns.portofino.resourceactions.crud
-
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.resourceactions.crud.CrudAction
@@ -44,27 +42,6 @@ class ProjectsCrudAction extends CrudAction {
     boolean isBulkOperationsEnabled() {
         false //Remember, if you set it to true, you also have to disable the editPostProcess logic or bulk updates won't work.
     }
-//
-//    //**************************************************************************
-//    // Search customizations
-//    //**************************************************************************
-//
-//    protected Resolution doSearch() {
-//        return new RedirectResolution("/home")
-//    }
-//
-//    //**************************************************************************
-//    // Read customizations
-//    //**************************************************************************
-//
-//    @Override
-//    Resolution read() {
-//        def path = getContext().actionPath
-//        while (path.endsWith("/")) {
-//            path = path.substring(0, path.length() -1 );
-//        }
-//        return new RedirectResolution(path + "/summary");
-//    }
 
     //**************************************************************************
     // Extension hooks
@@ -245,8 +222,5 @@ class ProjectsCrudAction extends CrudAction {
                 .executeUpdate()
         super.doDelete(object)
     }
-
-
-
 
 }
