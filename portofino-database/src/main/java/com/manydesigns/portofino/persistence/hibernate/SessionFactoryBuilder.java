@@ -276,8 +276,8 @@ public class SessionFactoryBuilder {
         return fullName;
     }
 
-    public Class getPersistentClass(Table table, CodeBase codeBase) throws IOException, ClassNotFoundException {
-        Class javaClass = table.getActualJavaClass();
+    public Class<?> getPersistentClass(Table table, CodeBase codeBase) throws IOException, ClassNotFoundException {
+        Class<?> javaClass = table.getActualJavaClass();
         if(javaClass != null) {
             return javaClass;
         } else {
@@ -341,9 +341,10 @@ public class SessionFactoryBuilder {
         AnnotationsAttribute classAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
         javassist.bytecode.annotation.Annotation annotation;
 
+        String schemaName = table.getSchema().getActualSchemaName();
         annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Table.class.getName(), constPool);
-        annotation.addMemberValue("name", new StringMemberValue(table.getTableName(), constPool));
-        annotation.addMemberValue("schema", new StringMemberValue(table.getSchema().getActualSchemaName(), constPool));
+        annotation.addMemberValue("name", new StringMemberValue(jpaEscape(table.getTableName()), constPool));
+        annotation.addMemberValue("schema", new StringMemberValue(jpaEscape(schemaName), constPool));
         classAnnotations.addAnnotation(annotation);
 
         annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Entity.class.getName(), constPool);
@@ -429,7 +430,7 @@ public class SessionFactoryBuilder {
             CtField field = new CtField(classPool.get(column.getActualJavaType().getName()), propertyName, cc);
             AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
             annotation = new Annotation(javax.persistence.Column.class.getName(), constPool);
-            annotation.addMemberValue("name", new StringMemberValue(column.getColumnName(), constPool));
+            annotation.addMemberValue("name", new StringMemberValue(jpaEscape(column.getColumnName()), constPool));
             annotation.addMemberValue("nullable", new BooleanMemberValue(column.isNullable(), constPool));
             if(column.getLength() != null) {
                 annotation.addMemberValue("precision", new IntegerMemberValue(constPool, column.getLength()));
@@ -458,7 +459,7 @@ public class SessionFactoryBuilder {
             setupColumnType(column, fieldAnnotations, constPool);
 
             column.getAnnotations().forEach(ann -> {
-                Class annotationClass = ann.getJavaAnnotationClass();
+                Class<?> annotationClass = ann.getJavaAnnotationClass();
                 if(javax.persistence.Column.class.equals(annotationClass) ||
                    Id.class.equals(annotationClass) ||
                    org.hibernate.annotations.Type.class.equals(annotationClass)) {
@@ -478,6 +479,13 @@ public class SessionFactoryBuilder {
             cc.addMethod(CtNewMethod.getter("get" + accessorName, field));
             cc.addMethod(CtNewMethod.setter("set" + accessorName, field));
         }
+    }
+
+    /**
+     * https://vladmihalcea.com/escape-sql-reserved-keywords-jpa-hibernate/
+     */
+    public String jpaEscape(String columnName) {
+        return "\"" + columnName + "\"";
     }
 
     protected void setupIdentityGenerator(AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
@@ -595,7 +603,7 @@ public class SessionFactoryBuilder {
             annotation = new Annotation(JoinColumn.class.getName(), constPool);
             annotation.addMemberValue("insertable", new BooleanMemberValue(false, constPool));
             annotation.addMemberValue("updatable", new BooleanMemberValue(false, constPool));
-            annotation.addMemberValue("name", new StringMemberValue(reference.getFromColumn(), constPool));
+            annotation.addMemberValue("name", new StringMemberValue(jpaEscape(reference.getFromColumn()), constPool));
             annotation.addMemberValue("referencedColumnName", new StringMemberValue(reference.getToColumn(), constPool));
             joinColumnsValue.add(new AnnotationMemberValue(annotation, constPool));
         }

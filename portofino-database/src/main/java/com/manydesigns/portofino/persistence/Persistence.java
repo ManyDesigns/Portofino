@@ -294,6 +294,7 @@ public class Persistence {
                     }
                 }
             }
+            deleteUnusedSchemaDirectories(database, databaseDir);
         }
         logger.info("Saved xml model to directory: {}", modelDir.getName().getPath());
         if(configurationFile != null) {
@@ -306,6 +307,34 @@ public class Persistence {
             appModelFile.delete();
             logger.info("Deleted legacy portofino-model.xml file: {}", appModelFile.getName().getPath());
         }
+    }
+
+    /**
+     * Delete the directories of the schemas that are no longer present in the model
+     *
+     * @param database the parent database containing the schemas
+     * @param databaseDir the database directory
+     * @throws FileSystemException if the schema directories cannot be listed.
+     */
+    protected void deleteUnusedSchemaDirectories(Database database, FileObject databaseDir) throws FileSystemException {
+        Arrays.stream(databaseDir.getChildren()).forEach(schemaDir -> {
+            String schemaDirPath = schemaDir.getName().getPath();
+            try {
+                if(schemaDir.getType() == FileType.FOLDER) {
+                    String dirName = schemaDir.getName().getBaseName();
+                    if (database.getSchemas().stream().noneMatch(schema -> schema.getSchemaName().equals(dirName))) {
+                        logger.info("Deleting unused schema directory {}", schemaDirPath);
+                        try {
+                            schemaDir.deleteAll();
+                        } catch (FileSystemException e) {
+                            logger.warn("Could not delete unused schema dir " + schemaDirPath, e);
+                        }
+                    }
+                }
+            } catch (FileSystemException e) {
+                logger.error("Unexpected filesystem error when trying to delete schema directory " + schemaDirPath, e);
+            }
+        });
     }
 
     public synchronized void initModel() {

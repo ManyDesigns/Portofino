@@ -18,6 +18,7 @@ import com.manydesigns.portofino.upstairs.actions.database.connections.support.C
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderSummary;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -260,7 +261,7 @@ public class ConnectionsAction extends AbstractResourceAction {
             boolean selected = schema.getBoolean("selected");
             String logicalName = schema.getString("schema");
             String physicalName = schema.optString("name");
-            if(physicalName == null) {
+            if(StringUtils.isEmpty(physicalName)) {
                 physicalName = logicalName;
             }
             if(selected) {
