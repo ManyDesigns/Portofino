@@ -1,9 +1,4 @@
-import {
-  Host, HostBinding,
-  Input,
-  OnInit, Optional,
-  SkipSelf
-} from '@angular/core';
+import { Host, HostBinding, Input, OnInit, Optional, SkipSelf, Directive } from '@angular/core';
 import {isRequired, Property} from "../class-accessor";
 import {
   AbstractControl,
@@ -13,6 +8,7 @@ import {
   FormGroup, FormGroupDirective
 } from "@angular/forms";
 
+@Directive()
 export abstract class FieldComponent implements OnInit {
 
   @Input()

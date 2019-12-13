@@ -1,11 +1,4 @@
-import {
-  AfterViewInit, ChangeDetectorRef,
-  Component,
-  ContentChild,
-  EventEmitter, Injectable,
-  InjectionToken,
-  Input, OnDestroy, Optional, TemplateRef, Type, ViewChild
-} from "@angular/core";
+import { AfterViewInit, ChangeDetectorRef, Component, ContentChild, EventEmitter, Injectable, InjectionToken, Input, OnDestroy, Optional, TemplateRef, Type, ViewChild, Directive } from "@angular/core";
 import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
@@ -208,6 +201,7 @@ export class PageSettingsPanel {
   }
 }
 
+@Directive()
 export abstract class Page implements WithButtons, OnDestroy {
 
   @Input()
@@ -626,11 +620,11 @@ export class TemplatesComponent implements AfterViewInit {
 export class PageLayout implements AfterViewInit {
   @Input()
   page: Page;
-  @ContentChild("content", { static: false })
+  @ContentChild("content")
   content: TemplateRef<any>;
   @ViewChild("defaultTemplate", { static: true })
   defaultTemplate: TemplateRef<any>;
-  @ContentChild("extraConfiguration", { static: false })
+  @ContentChild("extraConfiguration")
   extraConfiguration: TemplateRef<any>;
 
   template: TemplateRef<any>;

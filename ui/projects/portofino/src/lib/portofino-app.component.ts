@@ -68,17 +68,17 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   apiRoot: string;
   @Input()
   upstairsLink = this.portofino.upstairsLink;
-  @ViewChild(ToolbarDirective, { static: false })
+  @ViewChild(ToolbarDirective)
   toolbarHost: ToolbarDirective;
-  @ViewChild(FooterDirective, { static: false })
+  @ViewChild(FooterDirective)
   footerHost: FooterDirective;
 
-  @ViewChild(NavigationDirective, { static: false })
+  @ViewChild(NavigationDirective)
   navigationHost: NavigationDirective;
 
   @ViewChild(TemplatesComponent, { static: true })
   builtinTemplates: TemplatesComponent;
-  @ContentChild(TemplatesComponent, { static: false })
+  @ContentChild(TemplatesComponent)
   extraTemplates: TemplatesComponent;
 
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,

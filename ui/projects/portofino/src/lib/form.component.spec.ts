@@ -21,7 +21,7 @@ import {FieldFactory} from "./fields/field.factory";
     <portofino-form [form]="formDefinition" [formGroup]="formGroup"></portofino-form>`
 })
 class Wrapper {
-  @ViewChild(FormComponent, { static: false })
+  @ViewChild(FormComponent)
   formComponent;
   formGroup = new FormGroup({});
   formDefinition = new Form([

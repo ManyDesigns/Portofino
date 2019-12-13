@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
+import { ChangeDetectorRef, EventEmitter, Input, OnDestroy, Output, ViewChild, Directive } from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
 import {
@@ -17,6 +17,7 @@ import {NotificationService} from "../notifications/notification.service";
 import {Button, ButtonInfo, getButtons, WithButtons} from "../buttons";
 import {TranslateService} from "@ngx-translate/core";
 
+@Directive()
 export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
 
   @Input()
@@ -32,7 +33,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
 
   readonly formDefinition = new Form();
   readonly form = new FormGroup({});
-  @ViewChild(FormComponent, { static: false })
+  @ViewChild(FormComponent)
   formComponent: FormComponent;
   properties: Property[] = [];
   object;

@@ -5,7 +5,8 @@ import {
   FormGroupDirective, NgForm,
   Validators
 } from "@angular/forms";
-import {ErrorStateMatcher, MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { ErrorStateMatcher } from "@angular/material/core";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {AuthenticationService} from "../authentication.service";
 import {Component, Inject} from "@angular/core";
 import {NotificationService} from "../../notifications/notification.service";

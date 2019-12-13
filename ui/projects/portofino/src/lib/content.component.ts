@@ -25,7 +25,7 @@ import {TranslateService} from "@ngx-translate/core";
   styleUrls: ['./content.component.css']
 })
 export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
-  @ViewChild(MainPageDirective, { static: false })
+  @ViewChild(MainPageDirective)
   contentHost: MainPageDirective;
   protected pageFactory: PageFactoryComponent;
 
