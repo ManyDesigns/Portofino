@@ -38,6 +38,4 @@ export * from './lib/security/login/forgotten-password.component';
 export * from './lib/security/login/login.component';
 export * from './lib/security/login/signup.component';
 export * from './lib/security/login/reset-password.component';
-export {DatabasePlatform} from "./lib/administration/support";
-export {ConnectionProviderDetails} from "./lib/administration/support";
-export {ConnectionProviderSummary} from "./lib/administration/support";
+export {ConnectionProviderDetails, ConnectionProviderSummary, DatabasePlatform} from "./lib/administration/support";
