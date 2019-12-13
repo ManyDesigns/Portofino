@@ -569,4 +569,8 @@ public class PersistenceTest {
         assertEquals(LocalDate.of(2010, 9, 27), get(domanda,"data"));
     }
 
+    public void testTableWithSpaces() {
+        persistence.getSession("hibernatetest").createQuery("from test_spaces").list();
+    }
+
 }

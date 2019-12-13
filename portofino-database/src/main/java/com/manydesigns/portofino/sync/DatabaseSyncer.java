@@ -493,7 +493,7 @@ public class DatabaseSyncer {
             Integer jdbcType = liquibaseColumn.getType().getDataTypeId();
             String jdbcTypeName = liquibaseColumn.getType().getTypeName();
             if("Oracle".equals(connectionProvider.getDatabaseProductName())) {
-                //Wait for a bugfix in Liquibase
+                //Wait for a bugfix in Liquibase TODO is this still necessary?
                 if(jdbcType == null || jdbcType == Types.OTHER) {
                     if(jdbcTypeName != null && jdbcTypeName.toUpperCase().startsWith("TIMESTAMP")) {
                         jdbcType = Types.TIMESTAMP;
@@ -544,22 +544,23 @@ public class DatabaseSyncer {
         }
 
         logger.debug("Sorting columns to preserve their previous order as much as possible");
-        Collections.sort(targetTable.getColumns(), new Comparator<Column>() {
+        targetTable.getColumns().sort(new Comparator<Column>() {
             private int oldIndex(Column c) {
                 int i = 0;
-                for(Column old : sourceTable.getColumns()) {
-                    if(old.getColumnName().equals(c.getColumnName())) {
+                for (Column old : sourceTable.getColumns()) {
+                    if (old.getColumnName().equals(c.getColumnName())) {
                         return i;
                     }
                     i++;
                 }
                 return -1;
             }
+
             public int compare(Column c1, Column c2) {
                 int index1 = oldIndex(c1);
                 int index2 = oldIndex(c2);
-                if(index1 != -1) {
-                    if(index2 != -1) {
+                if (index1 != -1) {
+                    if (index2 != -1) {
                         return Integer.compare(index1, index2);
                     } else {
                         return -1;

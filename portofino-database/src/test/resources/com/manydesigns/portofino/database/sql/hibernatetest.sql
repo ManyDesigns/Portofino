@@ -199,3 +199,8 @@ CREATE TABLE test_no_pk(id bigint);
 
 DROP VIEW IF EXISTS public.test_view_1;
 CREATE VIEW public.test_view_1 AS SELECT * from public.table3;
+
+DROP TABLE IF EXISTS public.test_spaces; --it looks like Liquibase doesn't find the pk if the table name is escaped
+CREATE TABLE public.test_spaces(
+    "id spaces" bigint not null primary key,
+    "some other column with spaces" character varying (123));

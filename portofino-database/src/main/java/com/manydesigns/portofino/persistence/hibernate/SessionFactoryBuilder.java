@@ -604,7 +604,7 @@ public class SessionFactoryBuilder {
             annotation.addMemberValue("insertable", new BooleanMemberValue(false, constPool));
             annotation.addMemberValue("updatable", new BooleanMemberValue(false, constPool));
             annotation.addMemberValue("name", new StringMemberValue(jpaEscape(reference.getFromColumn()), constPool));
-            annotation.addMemberValue("referencedColumnName", new StringMemberValue(reference.getToColumn(), constPool));
+            annotation.addMemberValue("referencedColumnName", new StringMemberValue(jpaEscape(reference.getToColumn()), constPool));
             joinColumnsValue.add(new AnnotationMemberValue(annotation, constPool));
         }
         annotation = new Annotation(JoinColumns.class.getName(), constPool);
