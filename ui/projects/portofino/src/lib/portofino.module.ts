@@ -275,14 +275,11 @@ export class PortofinoModule {
   }
 
   public static forRoot(): (ModuleWithProviders<RouterModule> | PortofinoModule)[] {
-    return [RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()), PortofinoModule];
+    return PortofinoModule.withRoutes(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig())
   }
 
   public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders<RouterModule>|Type<PortofinoModule>)[] {
-    return [RouterModule.forRoot(
-      [...routes, ...PortofinoModule.defaultRoutes()],
-      { ...PortofinoModule.defaultRouterConfig(), ...config }),
-      PortofinoModule];
+    return [RouterModule.forRoot(routes, config), PortofinoModule];
   }
 
   public static defaultRoutes(): Routes {

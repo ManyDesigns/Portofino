@@ -37,6 +37,7 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
 import localeIt from "@angular/common/locales/it";
+import {RouterModule} from "@angular/router";
 
 registerLocaleData(localeIt);
 
@@ -52,7 +53,7 @@ export class AppComponent {}
     { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation }
   ],
   imports: [
-    PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
+    PortofinoModule.forRoot(), PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
