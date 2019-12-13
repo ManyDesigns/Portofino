@@ -91,8 +91,6 @@ import {SelectFieldComponent} from "./fields/select-field.component";
 import {PageFactoryComponent} from "./page.factory";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
-import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
-import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
 import {LocalStorageService} from "ngx-store";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
 import {

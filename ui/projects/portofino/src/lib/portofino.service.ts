@@ -2,7 +2,6 @@ import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@an
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import { DateAdapter } from "@angular/material/core";
-import {DatetimeAdapter} from "@mat-datetimepicker/core";
 import {WebStorageService} from "ngx-store";
 import {Observable} from "rxjs";
 import {catchError, map} from "rxjs/operators";
@@ -29,7 +28,7 @@ export class PortofinoService {
   constructor(public http: HttpClient, protected translate: TranslateService,
               @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,
               @Inject(LOCALES) locales: Locale[],
-              protected dateAdapter: DateAdapter<any>, protected datetimeAdapter: DatetimeAdapter<any>) {
+              protected dateAdapter: DateAdapter<any>) {
     this.setupTranslateService(locales);
   }
 
@@ -65,7 +64,6 @@ export class PortofinoService {
   protected setLocale(locale) {
     this.translate.use(locale);
     this.dateAdapter.setLocale(locale);
-    this.datetimeAdapter.setLocale(locale);
     this.storage.set('locale', locale);
   }
 
