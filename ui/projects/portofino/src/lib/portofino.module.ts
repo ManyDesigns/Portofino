@@ -120,8 +120,8 @@ import {RichTextComponent} from "./fields/rich-text.component";
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule,
-    FileInputAccessorModule, NgxdModule, QuillModule, TranslateModule.forChild()],
+    MatMomentDateModule, MatRadioModule, MatSelectModule, FileInputAccessorModule, NgxdModule, QuillModule,
+    TranslateModule.forChild()],
   providers: [ FieldFactory ],
   entryComponents: [
     BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent,
@@ -131,7 +131,7 @@ import {RichTextComponent} from "./fields/rich-text.component";
     NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
     FormComponent,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule]
+    MatMomentDateModule, MatRadioModule, MatSelectModule]
 })
 export class PortofinoFormsModule {}
 
