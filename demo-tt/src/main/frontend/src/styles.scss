@@ -11,11 +11,6 @@ $warn: mat-color($app-warn);
 
 $theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 
-@import '~@mat-datetimepicker/core/datetimepicker/datetimepicker-theme';
-
-// Using the $theme variable from the pre-built theme you can call the theming function
-@include mat-datetimepicker-theme($theme);
-
 //TODO find a way to import this
 @mixin portofino-theme($theme) {
   $primary: map-get($theme, primary);

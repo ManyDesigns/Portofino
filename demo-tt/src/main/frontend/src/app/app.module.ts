@@ -1,29 +1,30 @@
-import {Component, Input, NgModule, OnInit} from '@angular/core';
+import { Component, Input, NgModule, OnInit, Directive } from '@angular/core';
 import {
   PortofinoModule, PortofinoUpstairsModule, Page, NAVIGATION_COMPONENT, DefaultNavigationComponent,
   PortofinoComponent, PortofinoService, CrudComponent, SearchComponent, Button, SearchResults} from "portofino";
-import {
-  MatAutocompleteModule,
-  MatButtonModule,
-  MatCardModule,
-  MatCheckboxModule,
-  MatDatepickerModule,
-  MatDialogModule,
-  MatDividerModule,
-  MatExpansionModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatInputModule, MatListModule,
-  MatMenuModule,
-  MatPaginatorModule, MatProgressBarModule,
-  MatRadioModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSnackBarModule,
-  MatSortModule,
-  MatTableModule,
-  MatToolbarModule, MatTreeModule
-} from "@angular/material";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatDividerModule } from "@angular/material/divider";
+import { MatExpansionModule } from "@angular/material/expansion";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatListModule } from "@angular/material/list";
+import { MatMenuModule } from "@angular/material/menu";
+import { MatPaginatorModule } from "@angular/material/paginator";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { MatRadioModule } from "@angular/material/radio";
+import { MatSelectModule } from "@angular/material/select";
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSortModule } from "@angular/material/sort";
+import { MatTableModule } from "@angular/material/table";
+import { MatToolbarModule } from "@angular/material/toolbar";
+import { MatTreeModule } from "@angular/material/tree";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -37,6 +38,7 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
 import localeIt from "@angular/common/locales/it";
+import {RouterModule} from "@angular/router";
 
 registerLocaleData(localeIt);
 
@@ -98,6 +100,7 @@ export class CustomCrud extends CrudComponent {
   }
 }
 
+@Directive({ selector: 'demo-tt-custom-search' })
 export class CustomSearch extends SearchComponent {
   @Input()
   customInput;
@@ -122,7 +125,8 @@ export class DemoTTAppComponent {}
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
   ],
   imports: [
-    PortofinoModule.withRoutes([{ path: "hello", component: HelloPortofino }]), PortofinoUpstairsModule,
+    RouterModule.forRoot([{ path: "hello", component: HelloPortofino }, ...PortofinoModule.defaultRoutes()], PortofinoModule.defaultRouterConfig()),
+    PortofinoModule, PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,

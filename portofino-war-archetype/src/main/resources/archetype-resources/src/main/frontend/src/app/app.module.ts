@@ -56,7 +56,7 @@ export class WelcomeComponent extends Page {}
   declarations: [AppComponent, WelcomeComponent],
   providers: [],
   imports: [
-    PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
+    PortofinoModule.forRoot(), PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
