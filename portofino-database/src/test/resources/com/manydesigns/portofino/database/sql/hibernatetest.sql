@@ -48,6 +48,7 @@ CREATE TABLE public.table2 (
 --
 -- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
+DROP VIEW IF EXISTS public.test_view_1; --view depends on this table
 DROP TABLE IF EXISTS public.table3;
 CREATE TABLE public.table3 (
     id IDENTITY NOT NULL,

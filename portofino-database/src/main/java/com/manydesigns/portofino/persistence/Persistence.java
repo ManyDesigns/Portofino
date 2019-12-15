@@ -23,6 +23,7 @@ package com.manydesigns.portofino.persistence;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
+import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
@@ -230,7 +231,7 @@ public class Persistence {
 
     public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
-        ResourceAccessor resourceAccessor = new FileSystemResourceAccessor(appDir.getName().getPath());
+        ResourceAccessor resourceAccessor = new VFSResourceAccessor(appDir);
         ConnectionProvider connectionProvider =
                 database.getConnectionProvider();
         for(Schema schema : database.getSchemas()) {
@@ -296,6 +297,7 @@ public class Persistence {
             }
             deleteUnusedSchemaDirectories(database, databaseDir);
         }
+        deleteUnusedDatabaseDirectories();
         logger.info("Saved xml model to directory: {}", modelDir.getName().getPath());
         if(configurationFile != null) {
             configurationFile.save();
@@ -307,6 +309,32 @@ public class Persistence {
             appModelFile.delete();
             logger.info("Deleted legacy portofino-model.xml file: {}", appModelFile.getName().getPath());
         }
+    }
+
+    /**
+     * Delete the directories of the databases that are no longer present in the model
+     *
+     * @throws FileSystemException if the schema directories cannot be listed.
+     */
+    protected void deleteUnusedDatabaseDirectories() throws FileSystemException {
+        Arrays.stream(getModelDirectory().getChildren()).forEach(dbDir -> {
+            String dbDirPath = dbDir.getName().getPath();
+            try {
+                if(dbDir.getType() == FileType.FOLDER) {
+                    String dirName = dbDir.getName().getBaseName();
+                    if (model.getDatabases().stream().noneMatch(db -> db.getDatabaseName().equals(dirName))) {
+                        logger.info("Deleting unused database directory {}", dbDirPath);
+                        try {
+                            dbDir.deleteAll();
+                        } catch (FileSystemException e) {
+                            logger.warn("Could not delete unused database dir " + dbDirPath, e);
+                        }
+                    }
+                }
+            } catch (FileSystemException e) {
+                logger.error("Unexpected filesystem error when trying to delete schema directory " + dbDirPath, e);
+            }
+        });
     }
 
     /**

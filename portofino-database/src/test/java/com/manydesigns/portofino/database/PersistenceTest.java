@@ -17,7 +17,8 @@ import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.vfs2.VFS;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.vfs2.*;
 import org.h2.tools.RunScript;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -29,6 +30,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.persistence.criteria.CriteriaQuery;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -53,11 +56,15 @@ public class PersistenceTest {
 
     @BeforeMethod
     public void setup() throws Exception {
+        FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model");
+        setup(appDir);
+    }
+
+    protected void setup(FileObject appDir) throws Exception {
         Configuration configuration = new PropertiesConfiguration();
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
-        persistence = new Persistence(
-                VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model"), configuration, null, databasePlatformsRegistry);
+        persistence = new Persistence(appDir, configuration, null, databasePlatformsRegistry);
         persistence.start();
         setupJPetStore();
         setupHibernateTest();
@@ -571,6 +578,29 @@ public class PersistenceTest {
 
     public void testTableWithSpaces() {
         persistence.getSession("hibernatetest").createQuery("from test_spaces").list();
+    }
+
+    public void testSaveModel() throws Exception {
+        persistence.stop();
+        FileObject modelSource = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model");
+        FileObject appDir = VFS.getManager().resolveFile("ram:/portofino");
+        appDir.createFolder();
+        try {
+            appDir.copyFrom(modelSource, new AllFileSelector());
+            setup(appDir);
+            Database hibernatetest = DatabaseLogic.findDatabaseByName(persistence.getModel(), "hibernatetest");
+            hibernatetest.setDatabaseName("test");
+            FileObject file;
+            file = appDir.resolveFile("portofino-model").resolveFile("test");
+            assertFalse(file.exists());
+            persistence.saveXmlModel();
+            assertTrue(file.exists());
+            //Old directory is deleted
+            assertFalse(appDir.resolveFile("portofino-model").resolveFile("hibernatetest").exists());
+            assertTrue(file.resolveFile("PUBLIC").exists());
+        } finally {
+            appDir.deleteAll();
+        }
     }
 
 }
