@@ -1,6 +1,6 @@
 {
   "name": "portofino-upstairs",
-  "version": "5.1.0",
+  "version": "5.1.1",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
@@ -13,9 +13,9 @@
     "build-lib": "ng build --prod portofino",
     "package-lib": "npm run build-lib && npm run npm-pack",
     "publish-lib": "npm run build-lib && npm publish dist/portofino",
-    "build-all": "ng build --prod portofino && ng build --prod",
+    "build-all": "npm run build-lib && ng build --prod",
     "npm-pack": "cd dist/portofino && npm pack",
-    "maven-build": "npm run build-lib && ng build --prod"
+    "maven-build": "npm run build-lib && ng build --prod --delete-output-path"
   },
   "private": true,
   "dependencies": {

@@ -1,7 +1,8 @@
-import { Component, Input, NgModule, OnInit, Directive } from '@angular/core';
+import { Component, NgModule, OnInit} from '@angular/core';
 import {
   PortofinoModule, PortofinoUpstairsModule, Page, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, CrudComponent, SearchComponent, Button, SearchResults} from "portofino";
+  PortofinoComponent, PortofinoService, SearchResults, CrudComponent, AuthenticationService, NotificationService
+} from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -33,12 +34,12 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
-import {TranslateModule} from "@ngx-translate/core";
+import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
 import localeIt from "@angular/common/locales/it";
-import {RouterModule} from "@angular/router";
+import {Router, RouterModule} from "@angular/router";
 
 registerLocaleData(localeIt);
 
@@ -77,40 +78,6 @@ export class WelcomeComponent extends Page implements OnInit {
   }
 }
 
-@PortofinoComponent({ name: 'customcrud' })
-export class CustomCrud extends CrudComponent {
-
-  initialize(): void {
-    console.log("Custom crud");
-    super.initialize();
-    this.configuration.title = 'Custom CRUD';
-    this.searchComponent = CustomSearch;
-    this.searchComponentContext = { customInput: "works!" };
-  }
-
-  @Button({
-    list: 'search-results', text: 'Custom button', icon: 'save', color: "warn", enabledIf: CustomCrud.buttonEnabled
-  })
-  hello() {
-    console.log("Custom button", this.configuration);
-  }
-
-  static buttonEnabled() {
-    return true;
-  }
-}
-
-@Directive({ selector: 'demo-tt-custom-search' })
-export class CustomSearch extends SearchComponent {
-  @Input()
-  customInput;
-  ngOnInit(): void {
-    console.log("Custom search with input", this.customInput);
-    super.ngOnInit();
-  }
-}
-
-
 @Component({
   selector: 'app-root',
   template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
@@ -120,7 +87,7 @@ export class CustomSearch extends SearchComponent {
 export class DemoTTAppComponent {}
 
 @NgModule({
-  declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch],
+  declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
   ],
@@ -134,7 +101,7 @@ export class DemoTTAppComponent {}
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule.forRoot(),
     TranslateModule.forRoot()],
-  entryComponents: [ CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch ],
+  entryComponents: [ CustomNavigation, WelcomeComponent ],
   bootstrap: [DemoTTAppComponent]
 })
 export class DemoTTAppModule {

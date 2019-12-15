@@ -47,7 +47,7 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": true,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
@@ -89,10 +89,20 @@
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [],
             "styles": [
-              "src/styles.css"
+              {
+                "input": "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+              },
+              {
+                "input": "node_modules/material-design-icons/iconfont/material-icons.css"
+              },
+              {
+                "input": "node_modules/roboto-fontface/css/roboto/roboto-fontface.css"
+              },
+              "src/styles.scss"
             ],
             "assets": [
               "src/assets",
+              "src/pages",
               "src/favicon.ico"
             ]
           }
@@ -146,5 +156,8 @@
     "@schematics/angular:directive": {
       "prefix": "app"
     }
+  },
+  "cli": {
+    "analytics": "4ea9ce3e-374b-4223-8a43-efc02c8a0162"
   }
 }

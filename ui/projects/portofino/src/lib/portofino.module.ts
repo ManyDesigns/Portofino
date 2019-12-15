@@ -91,7 +91,7 @@ import {SelectFieldComponent} from "./fields/select-field.component";
 import {PageFactoryComponent} from "./page.factory";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
-import {LocalStorageService} from "ngx-store";
+import {CookiesStorageService, LocalStorageService, SessionStorageService, SharedStorageService} from "ngx-store";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
 import {
   MailSettingsComponent,
@@ -210,6 +210,17 @@ export class PortofinoCrudModule {}
 })
 export class PortofinoUpstairsModule {}
 
+//Until https://github.com/zoomsphere/ngx-store/issues/81 is fixed
+@NgModule({
+  providers: [
+    LocalStorageService,
+    SessionStorageService,
+    CookiesStorageService,
+    SharedStorageService,
+  ]
+})
+export class WebStorageModule {}
+
 @NgModule({
   declarations: [
     PortofinoAppComponent,
@@ -217,7 +228,7 @@ export class PortofinoUpstairsModule {}
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
-    NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
+    NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule, WebStorageModule
   ],
   providers: [
     //These are factories to avoid circular dependencies
