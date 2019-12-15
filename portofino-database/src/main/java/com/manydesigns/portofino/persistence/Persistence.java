@@ -232,8 +232,7 @@ public class Persistence {
     public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
         ResourceAccessor resourceAccessor = new VFSResourceAccessor(appDir);
-        ConnectionProvider connectionProvider =
-                database.getConnectionProvider();
+        ConnectionProvider connectionProvider = database.getConnectionProvider();
         for(Schema schema : database.getSchemas()) {
             String schemaName = schema.getSchemaName();
             try(Connection connection = connectionProvider.acquireConnection()) {
