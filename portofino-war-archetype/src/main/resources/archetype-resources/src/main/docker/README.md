@@ -2,9 +2,9 @@
 
 In this directory we find a common structure of Docker files and other resources that, combined with support from
 Portofino 5.1.0 onwards, make it possible to:
- - run and debug the application locally in Docker containers without installing Tomcat and the database system(s)
+ - **run and debug the application locally in Docker containers** without installing Tomcat and the database system(s)
    required by the application;
- - deploy the application with Docker containers in production or in other environments.
+ - **deploy the application with Docker containers** in production or in other environments.
  
 ### Structure of the Docker Images 
 
@@ -52,11 +52,13 @@ container running the application. Therefore, you'll want to remove database con
 `database.xml` files and store them in `portofino.properties`, so you'll be able to either override them with
 `portofino-local.properties` in the image, or use environment variables placeholders (e.g., `${env:MY_DATABASE_HOST}`).
 
-### Initializing the Databases
+### About the Databases
 
 Each Docker image of a database system has its own method of initializing the database (i.e., creating users and schemas,
 inserting initial data, and so on). Typically, scripts in the directory `docker-entrypoint-initdb.d` will be executed in
 order, but please refer to the documentation of your image(s).
+
+For information about persisting database data, please refer to the [Maven Integration](#maven-integration) section.
 
 ### Development and Debugging
 
