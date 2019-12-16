@@ -44,8 +44,8 @@ public class ActionRegistry implements Iterable<ActionInfo> {
         Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(actionClass);
         String scriptTemplate = ResourceActionLogic.getScriptTemplate(actionClass);
         boolean supportsDetail = ResourceActionLogic.supportsDetail(actionClass);
-        ActionInfo info = new ActionInfo(actionClass, configurationClass, scriptTemplate,
-                                                 supportsDetail, descriptionKey);
+        ActionInfo info = new ActionInfo(
+                actionClass, configurationClass, scriptTemplate, supportsDetail, descriptionKey);
         registry.add(info);
         return info;
     }
