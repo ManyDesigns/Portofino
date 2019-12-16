@@ -334,6 +334,8 @@
             <id>docker</id>
             <properties>
                 <portofino.application.directory>${dollar}{env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
+                <debug.port>8000</debug.port>
+                <tomcat.port>8080</tomcat.port>
             </properties>
             <build>
                 <plugins>
@@ -365,9 +367,9 @@
                                     <run>
                                         <ports>
                                             <!-- Tomcat HTTP port -->
-                                            <port>8080:8080</port>
+                                            <port>tomcat.port:8080</port>
                                             <!-- JPDA port for remote debugging -->
-                                            <port>8000:8000</port>
+                                            <port>debug.port:8000</port>
                                         </ports>
                                         <links>
                                             <!-- Choose one or more of these. You're free to remove unused images. -->
