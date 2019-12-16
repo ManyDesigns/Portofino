@@ -16,7 +16,7 @@ Then, when we have a new image that we want to deploy, we push it to the registr
 ```
 aws configure
 #The following command prints the `docker login` command that we'll use in the next step
-aws ecr get-login --region $region --no-include-email #for example, region = us-east-2
+aws ecr get-login --region $region --no-include-email #for example, region = eu-central-1
 docker login ...
 docker images #to see the images
 
@@ -35,19 +35,44 @@ Let's start from the cluster (a), by following Amazon's own tutorials using
 
 ```
 ecs-cli configure --cluster demo-tt --default-launch-type EC2 --config-name demo-tt --region $region
-ecs-cli up --keypair demo-tt --capability-iam --size 1 --instance-type t2.large --cluster-config demo-tt --ecs-profile $profile
-aws ecs register-task-definition --cli-input-json demo-tt-taskdef.json --region $region
+ecs-cli configure profile --access-key AWS_ACCESS_KEY_ID --secret-key AWS_SECRET_ACCESS_KEY --profile-name demo-tt
+ecs-cli up --keypair demo-tt --capability-iam --size 1 --instance-type t2.large --cluster-config demo-tt --ecs-profile demo-tt
 ```
 
-TODO
+This will create also:
+ - one VPC
+ - one security group
+ - two subnets.
+ 
+Let's take note of their id's and move on.
 
 Now we can create a task (b) using the demo-tt-taskdef.json as a template:
 
-TODO
+```
+aws ecs register-task-definition --cli-input-json demo-tt-taskdef.json
+#take note of the task definition ARN
+#you can see it again with
+aws ecs list-task-definitions
+```
 
-Then, we'll want to create a service (c) to keep that task running:
+Then, we'll want to create a service (c) to keep that task running. But first, let's make sure we have the necessary
+network resources. We'll only have to create these once.
 
-TODO
+```
+aws elbv2 create-load-balancer \
+     --name demo-tt-app-lb \
+     --subnets SubnetId1 SubnetId2
+aws elbv2 create-target-group --name demo-tt-webapp --protocol HTTP --port 80 --target-type ip --vpc-id <VpcId>
+```
+
+For the next part, we resort to using the GUI: create a service with the given task definition and load balancer. The
+following is work in progress and doesn't work yet:
+
+```
+aws ecs create-service \
+  --service-name demo-tt --task-definition <arn> --desired-count 1 --launch-type EC2 --cluster demo-tt-lb \
+  --network-configuration "awsvpcConfiguration={subnets=[SubnetId1,SubnetId2]}" --load-balancer demo-tt-app-lb
+```
 
 ### Deployment using the CLI: updating a service
 

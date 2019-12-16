@@ -3,7 +3,6 @@
     {
       "portMappings": [
         {
-          "hostPort": 5432,
           "protocol": "tcp",
           "containerPort": 5432
         }
@@ -29,7 +28,6 @@
     {
       "portMappings": [
         {
-          "hostPort": 80,
           "protocol": "tcp",
           "containerPort": 8080
         }
