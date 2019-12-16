@@ -63,7 +63,7 @@
                             </execution>
 
                             <execution>
-                                <id>npm install</id>
+                                <id>npm ci</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
