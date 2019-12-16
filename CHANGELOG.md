@@ -6,11 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Barebones support for mapping tables as POJO's (objects) rather than maps.
+- Support deployment behind a proxy.
 - Sample AWS ECS task definition in demo-tt.
+- Documentation of Docker development, debugging and deployment in the archetype.
 
 ### Changed
 - Improve performance of selection providers by asking for data lazily in certain cases.
 - Properly support Docker deployments using the image built by the standard pom of archetype-generated projects.
+
+### Fixed
+- Model not properly saved [[#294]](https://github.com/ManyDesigns/Portofino/issues/294).
+- Names of mapped database objects not escaped [[#297]](https://github.com/ManyDesigns/Portofino/issues/297).
+- New actions added with bad class names [[#301]](https://github.com/ManyDesigns/Portofino/issues/301).
 
 ## [5.1.0] - 2019-10-31
 
