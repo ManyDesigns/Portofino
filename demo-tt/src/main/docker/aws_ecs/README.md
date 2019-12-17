@@ -2,19 +2,33 @@
 
 This directory contains an example task definition for the Elastic Container Service (ECS) provided by Amazon Web Services (AWS).
 
-### Deployment using the CLI: first time
+### Deployment using the CLI
 
-First, we create a repository for each Docker image that we want to deploy (this is a one-time operation):
-```
-#for example, registry = 400225363032.dkr.ecr.us-east-2.amazonaws.com
-aws ecr create-repository --repository-name demo-tt/database --region $region
-aws ecr create-repository --repository-name demo-tt/webapp --region $region
-```
+#### Setup
 
-Then, when we have a new image that we want to deploy, we push it to the registry:
+We'll perform these operations only the first time.
+
+First, let's install the AWS CLI and the ECS CLI. Refer to Amazon's tutorials.
+
+Then, we can configure the AWS CLI to store our credentials and the default region (e.g., eu-central-1):
 
 ```
 aws configure
+```
+
+Finally, let's create a repository for each Docker image that we'll want to deploy:
+
+```
+#for example, registry = 400225363032.dkr.ecr.us-east-2.amazonaws.com
+aws ecr create-repository --repository-name demo-tt/database
+aws ecr create-repository --repository-name demo-tt/webapp
+```
+
+#### Uploading the Software
+
+Then, whenever we have a new image that we want to deploy, we push it to the registry:
+
+```
 #The following command prints the `docker login` command that we'll use in the next step
 aws ecr get-login --region $region --no-include-email #for example, region = eu-central-1
 docker login ...
@@ -26,8 +40,10 @@ docker push $registry/demo-tt/database:5.1.0
 docker push $registry/demo-tt/webapp:5.1.1
 ```
 
-We now need a cluster (a) to run a task (b) which is kept alive by a service (c). So let's create what we don't have yet.
-If we already have (a), (b) and (c), then we can proceed to the next section.
+#### Running the Application
+
+To run the application, we need a cluster (a) to run a task (b) which is kept alive by a service (c). So let's create
+what we don't have yet. If we already have (a), (b) and (c), then we can proceed to the next section.
 
 Let's start from the cluster (a), by following Amazon's own tutorials using
 [the ECS CLI](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-cli-tutorial-ec2.html) and
@@ -51,12 +67,12 @@ Now we can create a task (b) using the demo-tt-taskdef.json as a template:
 ```
 aws ecs register-task-definition --cli-input-json demo-tt-taskdef.json
 #take note of the task definition ARN
-#you can see it again with
+#we can see it again with:
 aws ecs list-task-definitions
 ```
 
 Then, we'll want to create a service (c) to keep that task running. But first, let's make sure we have the necessary
-network resources. We'll only have to create these once.
+network resources:
 
 ```
 aws elbv2 create-load-balancer \
@@ -64,6 +80,8 @@ aws elbv2 create-load-balancer \
      --subnets SubnetId1 SubnetId2
 aws elbv2 create-target-group --name demo-tt-webapp --protocol HTTP --port 80 --target-type ip --vpc-id <VpcId>
 ```
+
+This creates a load balancer to expose our webapp to the outside world.
 
 For the next part, we resort to using the GUI: create a service with the given task definition and load balancer. The
 following is work in progress and doesn't work yet:
@@ -96,3 +114,7 @@ Then, run a command like the following:
 ```
 ssh -i keypair.pem ec2-user@x.y.z.k
 ```
+
+### Split API and Webapp Over Different Containers
+
+TODO
