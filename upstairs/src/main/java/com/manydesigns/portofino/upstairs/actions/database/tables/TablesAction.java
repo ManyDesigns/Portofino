@@ -334,7 +334,7 @@ public class TablesAction extends AbstractResourceAction {
                             break;
                         case "typeOfContent":
                             a = new Annotation(((Map)e.getValue()).get("v").toString());
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new Property("value", "true"));
                             existing.getAnnotations().add(a);
                             break;
                         default:
