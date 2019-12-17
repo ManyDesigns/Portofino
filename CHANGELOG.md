@@ -15,9 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Properly support Docker deployments using the image built by the standard pom of archetype-generated projects.
 
 ### Fixed
-- Model not properly saved [[#294]](https://github.com/ManyDesigns/Portofino/issues/294).
-- Names of mapped database objects not escaped [[#297]](https://github.com/ManyDesigns/Portofino/issues/297).
-- New actions added with bad class names [[#301]](https://github.com/ManyDesigns/Portofino/issues/301).
+- Model not properly saved ([#294](https://github.com/ManyDesigns/Portofino/issues/294), [#303](https://github.com/ManyDesigns/Portofino/issues/303)).
+- Names of mapped database objects not escaped ([#297](https://github.com/ManyDesigns/Portofino/issues/297)).
+- New actions added with bad class names ([#301](https://github.com/ManyDesigns/Portofino/issues/301)).
+- Database synchronization issues with MariaDB and PostgreSQL ([#283](https://github.com/ManyDesigns/Portofino/issues/283), [#298](https://github.com/ManyDesigns/Portofino/issues/298)).
 
 ## [5.1.0] - 2019-10-31
 
