@@ -1,3 +1,4 @@
+import com.manydesigns.portofino.pageactions.log.LogAccesses
 import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.Mode
@@ -12,6 +13,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 @RequiresAuthentication
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
+@LogAccesses
 class AdminTicketResolutionsCrudAction extends CrudAction {
     Object old;
 

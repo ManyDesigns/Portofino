@@ -21,7 +21,10 @@ public class AccessLoggerInterceptor implements Interceptor {
         Object bean = context.getActionBean();
         Method handler = context.getHandler();
         if(isToBeLogged(bean, handler)) {
-            logger.info("ActionBean, method " + handler + ", event " + context.getActionBeanContext().getEventName());
+            logger.info(
+                    "ActionBean, method " + handler.getName() +
+                    ", event " + context.getActionBeanContext().getEventName() +
+                    ", query string " + context.getActionBeanContext().getRequest().getQueryString());
         }
         return context.proceed();
     }

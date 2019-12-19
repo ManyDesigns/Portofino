@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.pageactions.activitystream
 
+import com.manydesigns.portofino.pageactions.log.LogAccesses
 import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.blobs.Blob
@@ -22,6 +23,7 @@ import com.manydesigns.elements.blobs.BlobManager
 
 @RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)
+@LogAccesses
 class MyActivityStreamAction extends ActivityStreamAction {
 
     public static String SYSTEM_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +

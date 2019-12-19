@@ -82,6 +82,9 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     protected ResourceInfo resourceInfo;
 
     @Context
+    protected HttpServletRequest request;
+
+    @Context
     protected HttpServletResponse response;
 
     @Override
@@ -136,7 +139,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             executionContext.setLifecycleStage(LifecycleStage.EventHandling);
             try {
                 if(!before && AccessLoggerInterceptor.isToBeLogged(resource, resourceInfo.getResourceMethod())) {
-                    AccessLoggerInterceptor.logger.debug("REST resource, method " + resourceInfo.getResourceMethod());
+                    AccessLoggerInterceptor.logger.info(
+                            requestContext.getMethod() +  " REST resource" +
+                            ", method " + resourceInfo.getResourceMethod().getName() +
+                            ", query string " + request.getQueryString());
                 }
 
                 Resolution resolution = beforeAfterMethodInterceptor.intercept(executionContext);
