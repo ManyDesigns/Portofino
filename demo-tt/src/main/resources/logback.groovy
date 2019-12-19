@@ -1,5 +1,10 @@
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.core.ConsoleAppender
+import com.manydesigns.portofino.i18n.ResourceBundleManager
+import com.manydesigns.portofino.interceptors.AccessLoggerInterceptor
+import com.manydesigns.portofino.servlets.PortofinoListener
+import org.hibernate.c3p0.internal.C3P0ConnectionProvider
+
 import static ch.qos.logback.classic.Level.INFO
 import static ch.qos.logback.classic.Level.WARN
 import ch.qos.logback.classic.jul.LevelChangePropagator
@@ -25,12 +30,13 @@ appenders.add("PORTOFINO-CONSOLE");
 
 root(INFO, appenders)
 logger("org.hibernate", WARN)
-logger("org.hibernate.connection.C3P0ConnectionProvider", INFO)
+logger(C3P0ConnectionProvider.name, INFO)
 
-logger("com.manydesigns.portofino.i18n.ResourceBundleManager", WARN)
-logger("com.manydesigns.portofino.servlets.PortofinoListener", INFO)
+logger(ResourceBundleManager.name, WARN)
+logger(PortofinoListener.name, INFO)
 logger("com.manydesigns.portofino.tt.TtUtils", INFO)
 logger("buttons.tag", INFO)
+logger(AccessLoggerInterceptor.name, DEBUG)
 
 //Periodically reload this file when it changes
 scan("30 seconds")

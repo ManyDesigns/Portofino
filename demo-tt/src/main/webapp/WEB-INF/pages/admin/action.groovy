@@ -1,3 +1,4 @@
+import com.manydesigns.portofino.pageactions.LogAccesses
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
@@ -8,6 +9,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication
 
 @RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)
+@LogAccesses
 class MyCustomAction extends CustomAction {
 
     //Automatically generated on Mon Oct 28 13:16:47 CET 2013 by ManyDesigns Portofino

@@ -26,6 +26,7 @@ import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.interceptors.AccessLoggerInterceptor;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.ActionBean;
@@ -84,7 +85,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     protected HttpServletResponse response;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         UriInfo uriInfo = requestContext.getUriInfo();
         if(uriInfo.getMatchedResources().isEmpty()) {
             return;
@@ -104,7 +105,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         UriInfo uriInfo = requestContext.getUriInfo();
         if(uriInfo.getMatchedResources().isEmpty()) {
             return;
@@ -134,6 +135,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             executionContext.setHandler(resourceInfo.getResourceMethod());
             executionContext.setLifecycleStage(LifecycleStage.EventHandling);
             try {
+                if(!before && AccessLoggerInterceptor.isToBeLogged(resource, resourceInfo.getResourceMethod())) {
+                    AccessLoggerInterceptor.logger.debug("REST resource, method " + resourceInfo.getResourceMethod());
+                }
+
                 Resolution resolution = beforeAfterMethodInterceptor.intercept(executionContext);
                 if(resolution != null) {
                     requestContext.abortWith(Response.ok(resolution).build());
@@ -223,13 +228,13 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
 
     protected boolean checkActionBeanInvocation(ContainerRequestContext requestContext, PageAction pageAction) {
         Method handler = resourceInfo.getResourceMethod();
-        List<PageInstance> pageInstancePath = new ArrayList<PageInstance>();
+        List<PageInstance> pageInstancePath = new ArrayList<>();
         PageInstance last = pageAction.getPageInstance();
         while(last != null) {
             pageInstancePath.add(0, last);
             last = last.getParent();
         }
-        Dispatch dispatch = new Dispatch(pageInstancePath.toArray(new PageInstance[pageInstancePath.size()]));
+        Dispatch dispatch = new Dispatch(pageInstancePath.toArray(new PageInstance[0]));
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         if(!SecurityLogic.isAllowed(request, dispatch, pageAction, handler)) {
             Response.Status status =
@@ -249,7 +254,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         public void assertAuthorized(final Object resource, final Method handler) throws AuthorizationException {
             super.assertAuthorized(new MethodInvocation() {
                 @Override
-                public Object proceed() throws Throwable {
+                public Object proceed() {
                     return null;
                 }
 
