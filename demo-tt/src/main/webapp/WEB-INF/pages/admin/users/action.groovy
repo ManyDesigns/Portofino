@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.pageactions.LogAccesses
+import com.manydesigns.portofino.pageactions.log.LogAccesses
 import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.Mode

@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.pageactions;
+package com.manydesigns.portofino.pageactions.log;
 
 import java.lang.annotation.*;
 

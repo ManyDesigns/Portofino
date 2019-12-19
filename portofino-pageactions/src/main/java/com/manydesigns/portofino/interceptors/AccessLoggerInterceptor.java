@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.pageactions.LogAccesses;
+import com.manydesigns.portofino.pageactions.log.LogAccesses;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -21,14 +21,14 @@ public class AccessLoggerInterceptor implements Interceptor {
         Object bean = context.getActionBean();
         Method handler = context.getHandler();
         if(isToBeLogged(bean, handler)) {
-            logger.debug("ActionBean, method " + handler + ", event " + context.getActionBeanContext().getEventName());
+            logger.info("ActionBean, method " + handler + ", event " + context.getActionBeanContext().getEventName());
         }
         return context.proceed();
     }
 
     public static boolean isToBeLogged(Object resource, Method handler) {
-        Boolean log = null;
         if (resource != null) {
+            Boolean log = null;
             Class<?> resourceClass = resource.getClass();
 
             LogAccesses annotation;
@@ -42,9 +42,8 @@ public class AccessLoggerInterceptor implements Interceptor {
                 annotation = resourceClass.getAnnotation(LogAccesses.class);
                 log = (annotation != null && annotation.value());
             }
-        } else {
-            log = false;
+            return log;
         }
-        return log;
+        return false;
     }
 }
