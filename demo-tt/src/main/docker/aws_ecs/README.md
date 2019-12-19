@@ -79,23 +79,45 @@ aws elbv2 create-load-balancer \
      --name demo-tt-app-lb \
      --subnets SubnetId1 SubnetId2
 aws elbv2 create-target-group --name demo-tt-webapp --protocol HTTP --port 80 --target-type ip --vpc-id <VpcId>
+#take note of the load balancer and target group ARN's
 ```
 
-This creates a load balancer to expose our webapp to the outside world.
-
-For the next part, we resort to using the GUI: create a service with the given task definition and load balancer. The
-following is work in progress and doesn't work yet:
+This creates a load balancer to expose our webapp to the outside world. However, the load balancer does not listen to
+any connection yet; we have to create a listener. First, we'll get a listener JSON template to fill:
 
 ```
-aws ecs create-service \
-  --service-name demo-tt --task-definition <arn> --desired-count 1 --launch-type EC2 --cluster demo-tt-lb \
-  --network-configuration "awsvpcConfiguration={subnets=[SubnetId1,SubnetId2]}" --load-balancer demo-tt-app-lb
+aws elbv2  create-listener --generate-cli-skeleton > listener.json
 ```
 
-### Deployment using the CLI: updating a service
+Then, let's edit `listener.json` with the appropriate data. In this directory we can find an example. We'll then feed
+our JSON file to the AWS CLI:
+
+```
+aws elbv2 create-listener --cli-input-json file:///home/alessio/projects/portofino5/demo-tt/src/main/docker/aws_ecs/listener.json
+```
+
+We now need another component before we can create the service: a security group allowing inbound traffic to port 8080
+and to the database port (5432 for PostgreSQL, 3306 for MySQL/MariaDB). We'll use the GUI for that as it's simpler that
+way: https://$region.console.aws.amazon.com/ec2/v2/home#SecurityGroups
+
+Finally, we can create the service with the given task definition and load balancer:
+
+```
+aws ecs create-service --service-name demo-tt --task-definition  "<task-definition-arn>" --desired-count 1 \
+  --launch-type EC2 --cluster demo-tt \
+  --network-configuration "awsvpcConfiguration={subnets=[SubnetId1,SubnetId2]},securityGroups=[sg-...]" \
+  --load-balancers targetGroupArn=<target-group-arg>,containerName=demo-tt-webapp,containerPort=8080
+```
+
+We'll also need a security group for the load balancer, that allows traffic on port 80. We can use the GUI for that as
+well.
+
+### Updating the Service
+
+At some point after we've got the application up and running, we'll want to update it. Let's see how we can do that. 
 
 We'll start by creating, tagging and pushing the Docker image(s) again. We'll reuse the same repositories, unless we've
-added new images; in that case, refer to the previous section.
+added new images; in that case, refer to the appropriate section.
 
 We can give each image a new version number; in that case, we'll need to update our task to reference the new versions,
 and then update our service to deploy the new task.
@@ -108,7 +130,11 @@ Of course, we can also mix the two, and update some version numbers while leavin
 
 ### Connecting to our instance via SSH
 
-Note the instance public IP on https://us-east-2.console.aws.amazon.com/ec2/home#Instances
+Prerequisites:
+ - we've created the cluster with a keypair
+ - we've allowed SSH access to the EC2 instance through its security group.  
+
+Note the instance public IP on https://$region.console.aws.amazon.com/ec2/home#Instances
 
 Then, run a command like the following:
 ```
@@ -117,4 +143,8 @@ ssh -i keypair.pem ec2-user@x.y.z.k
 
 ### Split API and Webapp Over Different Containers
 
-TODO
+This can be done in several ways, here we propose one: a single task with all the containers and a single load balancer.
+
+We'll want to create 2 targets groups, one for the frontend and one for the backend. The frontend will be the default
+one, as in the previous guide. We'll then add another rule to the same listener with the path `/api/*` forwarding to
+the target group for the backend. We can do that with the CLI or with the GUI.
