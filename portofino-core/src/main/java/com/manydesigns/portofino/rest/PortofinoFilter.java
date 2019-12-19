@@ -68,9 +68,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
-    public final static Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
-    public final static Logger accessLogger = LoggerFactory.getLogger("com.manydesigns.portofino.access");
+    public static final String ACCESS_LOGGER_NAME = "com.manydesigns.portofino.access";
     public static final String MESSAGE_HEADER = "X-Portofino-Message";
+    private static final Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
+    private static final Logger accessLogger = LoggerFactory.getLogger(ACCESS_LOGGER_NAME);
 
     @Context
     protected ResourceInfo resourceInfo;
