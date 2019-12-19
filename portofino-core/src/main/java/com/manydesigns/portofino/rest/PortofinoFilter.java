@@ -104,8 +104,11 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             resourceAction.prepareForExecution();
         }
         checkAuthorizations(requestContext, resource);
-        if(isAccessToBeLogged(resource, resourceInfo.getResourceMethod())) {
-            accessLogger.info(requestContext.getMethod());
+        Method resourceMethod = resourceInfo.getResourceMethod();
+        if(isAccessToBeLogged(resource, resourceMethod)) {
+            accessLogger.info(
+                    requestContext.getMethod() + " " + resourceMethod.getName() +
+                    ", queryString " + request.getQueryString());
         }
     }
 

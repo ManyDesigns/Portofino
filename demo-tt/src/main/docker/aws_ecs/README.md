@@ -148,3 +148,6 @@ This can be done in several ways, here we propose one: a single task with all th
 We'll want to create 2 targets groups, one for the frontend and one for the backend. The frontend will be the default
 one, as in the previous guide. We'll then add another rule to the same listener with the path `/api/*` forwarding to
 the target group for the backend. We can do that with the CLI or with the GUI.
+
+Make sure that the API target group has an appropriate health check set, or the task will be eventually restarted again
+and again. By default the health check targets `/`, it might be necessary to change it to, for example, `/api`. 
