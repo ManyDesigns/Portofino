@@ -27,6 +27,7 @@ import com.manydesigns.portofino.operations.Guarded;
 import com.manydesigns.portofino.cache.ControlsCache;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
+import com.manydesigns.portofino.resourceactions.log.LogAccesses;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -96,7 +97,6 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
         fillMDC();
-        logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
         if(resource instanceof ResourceAction) {
@@ -104,7 +104,30 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             resourceAction.prepareForExecution();
         }
         checkAuthorizations(requestContext, resource);
-        accessLogger.info(requestContext.getMethod());
+        if(isAccessToBeLogged(resource, resourceInfo.getResourceMethod())) {
+            accessLogger.info(requestContext.getMethod());
+        }
+    }
+
+    public static boolean isAccessToBeLogged(Object resource, Method handler) {
+        if (resource != null) {
+            Boolean log = null;
+            Class<?> resourceClass = resource.getClass();
+
+            LogAccesses annotation;
+            if(handler != null) {
+                annotation = handler.getAnnotation(LogAccesses.class);
+                if(annotation != null) {
+                    log = annotation.value();
+                }
+            }
+            if(log == null) {
+                annotation = resourceClass.getAnnotation(LogAccesses.class);
+                log = (annotation != null && annotation.value());
+            }
+            return log;
+        }
+        return false;
     }
 
     protected void addCacheHeaders(ContainerResponseContext responseContext) {
