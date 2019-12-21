@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.persistence;
 
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
@@ -40,6 +41,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
@@ -269,6 +271,11 @@ public class Persistence {
                     logger.debug("Schema directory {} does not exist", schemaDir);
                 }
             }
+        }
+        try {
+            CommonsConfigurationUtils.save(configuration);
+        } catch (ConfigurationException e) {
+            throw new IOException(e);
         }
         logger.info("Saved xml model to file: {}", appModelFile);
     }

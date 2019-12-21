@@ -204,12 +204,14 @@ public class PortofinoListener
             defaultBlobManager = new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         }
 
-        try {
-            logger.info("Initializing KeyManager ");
-            KeyManager.init(configuration);
-        } catch (Exception e) {
-            logger.error("Could not initialize KeyManager", e);
-            throw new RuntimeException("Could not initialize KeyManager");
+        if(!KeyManager.isActive()) {
+            try {
+                logger.info("Initializing KeyManager ");
+                KeyManager.init(configuration);
+            } catch (Exception e) {
+                logger.error("Could not initialize KeyManager", e);
+                throw new RuntimeException("Could not initialize KeyManager");
+            }
         }
 
         servletContext.setAttribute(BaseModule.TEMPORARY_BLOB_MANAGER, tempBlobManager);

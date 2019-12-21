@@ -499,11 +499,7 @@ public class ApplicationWizard extends AbstractPageAction {
         children = ArrayListMultimap.create();
         allTables = new ArrayList<>();
         roots = determineRoots(children, allTables);
-        Collections.sort(allTables, new Comparator<Table>() {
-            public int compare(Table o1, Table o2) {
-                return o1.getQualifiedName().compareToIgnoreCase(o2.getQualifiedName());
-            }
-        });
+        allTables.sort((o1, o2) -> o1.getQualifiedName().compareToIgnoreCase(o2.getQualifiedName()));
         rootsForm = new TableFormBuilder(SelectableRoot.class)
                 .configFields(
                         "selected", "tableName"
@@ -605,31 +601,31 @@ public class ApplicationWizard extends AbstractPageAction {
         }
 
         DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
-        algoSelectionProvider.appendRow(
+        algoSelectionProvider.appendOption(
                 "plaintext:plaintext",
                 ElementsThreadLocals.getText("plain.text"),
                 true);
-        algoSelectionProvider.appendRow(
+        algoSelectionProvider.appendOption(
                 "MD5:base64",
                 ElementsThreadLocals.getText("md5.base64.encoded"),
                 true);
-        algoSelectionProvider.appendRow(
+        algoSelectionProvider.appendOption(
                 "MD5:hex",
                 ElementsThreadLocals.getText("md5.hex.encoded"),
                 true);
-        algoSelectionProvider.appendRow(
+        algoSelectionProvider.appendOption(
                 "SHA-1:base64",
                 ElementsThreadLocals.getText("sha1.base64.encoded.portofino3"),
                 true);
-        algoSelectionProvider.appendRow(
+        algoSelectionProvider.appendOption(
                 "SHA-1:hex",
                 ElementsThreadLocals.getText("sha1.hex.encoded"),
                 true);
-        algoSelectionProvider.appendRow(
+        algoSelectionProvider.appendOption(
                 "SHA-256:base64",
                 ElementsThreadLocals.getText("sha256.base64.encoded"),
                 true);
-        algoSelectionProvider.appendRow(
+        algoSelectionProvider.appendOption(
                 "SHA-256:hex",
                 ElementsThreadLocals.getText("sha256.hex.encoded"),
                 true);
@@ -685,7 +681,7 @@ public class ApplicationWizard extends AbstractPageAction {
 
                 DefaultSelectionProvider userGroupSelectionProvider = new DefaultSelectionProvider("");
                 for(Column column : userGroupTable.getColumns()) {
-                    userGroupSelectionProvider.appendRow(
+                    userGroupSelectionProvider.appendOption(
                             column.getActualPropertyName(),
                             column.getActualPropertyName(),
                             true);
@@ -848,11 +844,7 @@ public class ApplicationWizard extends AbstractPageAction {
                 selectableRoots.add(root);
             }
         }
-        Collections.sort(selectableRoots, new Comparator<SelectableRoot>() {
-            public int compare(SelectableRoot o1, SelectableRoot o2) {
-                return o1.tableName.compareTo(o2.tableName);
-            }
-        });
+        selectableRoots.sort((o1, o2) -> o1.tableName.compareTo(o2.tableName));
         return roots;
     }
 
@@ -934,11 +926,7 @@ public class ApplicationWizard extends AbstractPageAction {
                     setupCalendar(childPages);
                 }
                 Page rootPage = DispatcherLogic.getPage(pagesDir);
-                Collections.sort(childPages, new Comparator<ChildPage>() {
-                    public int compare(ChildPage o1, ChildPage o2) {
-                        return o1.getName().compareToIgnoreCase(o2.getName());
-                    }
-                });
+                childPages.sort((o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
                 rootPage.getLayout().getChildPages().addAll(childPages);
                 DispatcherLogic.savePage(pagesDir, rootPage);
             } catch (Exception e) {
@@ -951,7 +939,7 @@ public class ApplicationWizard extends AbstractPageAction {
             setupUsers();
         }
         try {
-            if(connectionProvider instanceof JdbcConnectionProvider) {
+            if(isNewConnectionProvider() && connectionProvider instanceof JdbcConnectionProvider) {
                 JdbcConnectionProvider jdbcConnectionProvider = (JdbcConnectionProvider) connectionProvider;
                 //By default, store connection properties in portofino.properties
                 String s;
