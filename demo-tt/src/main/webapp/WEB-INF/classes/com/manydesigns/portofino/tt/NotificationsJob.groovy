@@ -40,6 +40,7 @@ import com.manydesigns.mail.queue.model.Recipient.Type
 import com.manydesigns.mail.setup.MailProperties
 import com.manydesigns.portofino.i18n.I18nUtils
 import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
 import org.apache.commons.configuration2.Configuration
 import org.hibernate.Criteria
@@ -53,6 +54,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+import javax.persistence.criteria.CriteriaBuilder
+import javax.persistence.criteria.CriteriaQuery
+import javax.persistence.criteria.Root
 import javax.servlet.RequestDispatcher
 import javax.servlet.ServletContext
 
@@ -156,11 +160,11 @@ public class NotificationsJob implements Job {
 
     void notifyActivity(Session session, Object activity, String subject, String htmlBody) {
 
-        Criteria criteria = session.createCriteria("members");
-        criteria.add(Restrictions.eq("project", activity[TtUtils.ACTIVITY_SQL_PROJECT_ID]));
-        criteria.add(Restrictions.eq("notifications", true));
-        criteria.add(Restrictions.ne("user_", (Long)activity[TtUtils.ACTIVITY_SQL_USER_ID]));
-        List membersToBeNotified = criteria.list();
+        def (criteria, cb, root) = QueryUtils.createCriteria(session, 'members')
+        criteria.where(cb.equal(root.get("notifications"), true))
+        criteria.where(cb.equal(root.get("project"), activity[TtUtils.ACTIVITY_SQL_PROJECT_ID]))
+        criteria.where(cb.equal(root.get("user_"), activity[TtUtils.ACTIVITY_SQL_USER_ID]))
+        List membersToBeNotified = session.createQuery(criteria).list()
         for (Object current : membersToBeNotified) {
             Object user = current.fk_member_user;
             logger.debug("Notifying user {}", user.email);

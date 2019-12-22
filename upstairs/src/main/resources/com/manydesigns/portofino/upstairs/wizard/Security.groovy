@@ -176,10 +176,10 @@ public class Security extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(databaseName);
-        Criteria criteria = session.createCriteria(userTableEntityName);
-        criteria.add(Restrictions.eq(userTokenProperty, token.principal));
+        def (criteria, cb, from) = QueryUtils.createCriteria(session, userTableEntityName)
+        criteria.where(cb.equal(from.get(userTokenProperty), token.principal))
 
-        List result = criteria.list();
+        List result = session.createQuery(criteria).list()
 
         if (result.size() == 1) {
             def hashedPassword = encryptPassword(token.newPassword)
@@ -203,10 +203,10 @@ public class Security extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(databaseName);
-        Criteria criteria = session.createCriteria(userTableEntityName);
-        criteria.add(Restrictions.eq(userTokenProperty, token.principal));
+        def (criteria, cb, from) = QueryUtils.createCriteria(session, userTableEntityName)
+        criteria.where(cb.equal(from.get(userTokenProperty), token.principal))
 
-        List result = criteria.list();
+        List result = session.createQuery(criteria).list()
 
         if (result.size() == 1) {
             def user = result.get(0);
@@ -293,9 +293,9 @@ public class Security extends AbstractPortofinoRealm {
             throw new UnsupportedOperationException("Email property not configured.");
         }
         Session session = persistence.getSession(databaseName);
-        def criteria = session.createCriteria(userTableEntityName);
-        criteria.add(Restrictions.eq(userEmailProperty, email));
-        return (Serializable) criteria.uniqueResult();
+        def (criteria, cb, from) = QueryUtils.createCriteria(session, userTableEntityName)
+        criteria.where(cb.equal(from.get(userEmailProperty), token.email))
+        return (Serializable) session.createQuery(criteria).uniqueResult();
     }
 
     @Override
@@ -361,29 +361,25 @@ public class Security extends AbstractPortofinoRealm {
         persistentUser[userTokenProperty] = token;
 
         try {
-            session.save(userTableEntityName, (Object) persistentUser);
-            session.flush();
+            session.save(userTableEntityName, (Object) persistentUser)
+            session.flush()
         } catch (ConstraintViolationException e) {
-            throw new ExistingUserException(e);
+            throw new ExistingUserException(e)
         }
-        session.transaction.commit();
-        return token;
+        session.transaction.commit()
+        token
     }
 
     Set<String> getGroups() {
         def groups = super.getGroups()
-
         if(!StringUtils.isEmpty(groupTableEntityName)) {
             Session session = persistence.getSession(databaseName)
             def (criteria, cb, from) = QueryUtils.createCriteria(session, groupTableEntityName)
             def groupNameExpression = from.get(groupNameProperty)
             criteria.select(groupNameExpression).orderBy(cb.asc(groupNameExpression))
-
-            for(x in criteria.list()) {
-                groups.add(String.valueOf(x))
-            }
+            groups.addAll(criteria.list().collect { String.valueOf(it) })
         }
-        return groups;
+        groups
     }
 
 }
