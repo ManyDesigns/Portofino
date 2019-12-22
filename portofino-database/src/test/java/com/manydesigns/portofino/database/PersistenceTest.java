@@ -17,21 +17,16 @@ import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.AllFileSelector;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.UnknownEntityTypeException;
 import org.hibernate.jdbc.Work;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import javax.persistence.criteria.CriteriaQuery;
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -52,6 +47,11 @@ public class PersistenceTest {
     @BeforeClass
     public void setupElements() {
         ElementsThreadLocals.setupDefaultElementsContext();
+    }
+
+    @AfterClass
+    public void teardownElements() {
+        ElementsThreadLocals.destroy();
     }
 
     @BeforeMethod

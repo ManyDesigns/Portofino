@@ -49,10 +49,10 @@
         </mailingList>
     </mailingLists>
     <scm>
-        <connection>scm:hg:http://hg.code.sf.net/p/portofino/mercurial</connection>
-        <developerConnection>scm:hg:https://hg.code.sf.net/p/portofino/mercurial</developerConnection>
-        <url>http://sourceforge.net/p/portofino/mercurial/</url>
-        <tag>tip</tag>
+        <connection>scm:git:https://github.com/ManyDesigns/Portofino.git</connection>
+        <developerConnection>scm:hg:https://github.com/ManyDesigns/Portofino.git</developerConnection>
+        <url>https://github.com/ManyDesigns/Portofino</url>
+        <tag>master</tag>
     </scm>
     <developers>
         <developer>

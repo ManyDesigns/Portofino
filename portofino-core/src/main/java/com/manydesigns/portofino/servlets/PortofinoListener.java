@@ -207,11 +207,13 @@ public class PortofinoListener extends DispatcherInitializer
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, configurationFile);
 
-        try {
-            logger.info("Initializing KeyManager ");
-            KeyManager.init(configuration);
-        } catch (Exception e) {
-            logger.error("Could not initialize KeyManager", e);
+        if(!KeyManager.isActive()) {
+            try {
+                logger.info("Initializing KeyManager ");
+                KeyManager.init(configuration);
+            } catch (Exception e) {
+                logger.error("Could not initialize KeyManager", e);
+            }
         }
 
         I18nUtils.setupResourceBundleManager(applicationRoot, servletContext);

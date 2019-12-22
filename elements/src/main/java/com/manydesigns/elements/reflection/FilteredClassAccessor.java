@@ -42,8 +42,8 @@ public class FilteredClassAccessor extends AbstractAnnotatedAccessor implements 
 
     protected FilteredClassAccessor(ClassAccessor delegate, boolean whitelist, String... properties) {
         this.delegate = delegate;
-        List<PropertyAccessor> propertiesList = new ArrayList<PropertyAccessor>();
-        List<PropertyAccessor> keyPropertiesList = new ArrayList<PropertyAccessor>();
+        List<PropertyAccessor> propertiesList = new ArrayList<>();
+        List<PropertyAccessor> keyPropertiesList = new ArrayList<>();
         for(PropertyAccessor p : delegate.getProperties()) {
             if(whitelist == ArrayUtils.contains(properties, p.getName())) {
                 propertiesList.add(p);

@@ -413,7 +413,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             return configuration;
         }
         ClassAccessor classAccessor = getConfigurationClassAccessor();
-        FilteredClassAccessor filteredClassAccessor = filterAccordingToPermissions(classAccessor);
+        ClassAccessor filteredClassAccessor = filterAccordingToPermissions(classAccessor);
         ResourceActionConfiguration filtered = (ResourceActionConfiguration) classAccessor.newInstance();
         for(PropertyAccessor propertyAccessor : filteredClassAccessor.getProperties()) {
             if(propertyAccessor.isWritable()) {
@@ -425,28 +425,31 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     @NotNull
-    protected FilteredClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
+    protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
         Permissions permissions = SecurityLogic.calculateActualPermissions(actionInstance);
         Subject subject = SecurityUtils.getSubject();
         return filterAccordingToPermissions(classAccessor, permissions, subject);
     }
 
     @NotNull
-    protected FilteredClassAccessor filterAccordingToPermissions(
+    protected ClassAccessor filterAccordingToPermissions(
             ClassAccessor classAccessor, Permissions permissions, Subject subject) {
-        List<String> fields = new ArrayList<>();
+        List<String> excluded = new ArrayList<>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             RequiresPermissions requiresPermissions = property.getAnnotation(RequiresPermissions.class);
             boolean permitted =
                     requiresPermissions == null ||
                     SecurityLogic.hasPermissions(getPortofinoConfiguration(), permissions, subject, requiresPermissions);
-            if(permitted) {
-                fields.add(property.getName());
-            } else {
+            if(!permitted) {
                 logger.debug("Property not permitted, filtering: {}", property.getName());
+                excluded.add(property.getName());
             }
         }
-        return FilteredClassAccessor.include(classAccessor, fields.toArray(new String[0]));
+        if(!excluded.isEmpty()) {
+            return FilteredClassAccessor.exclude(classAccessor, excluded.toArray(new String[0]));
+        } else {
+            return classAccessor;
+        }
     }
 
     @io.swagger.v3.oas.annotations.Operation(

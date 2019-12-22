@@ -22,15 +22,10 @@ package com.manydesigns.elements;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
-import com.manydesigns.elements.servlet.MutableHttpServletRequest;
-import com.manydesigns.elements.servlet.MutableServletContext;
-import com.manydesigns.elements.xml.XmlBuffer;
-import org.apache.commons.configuration2.Configuration;
+import com.manydesigns.elements.test.ElementsTestSupport;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,14 +33,9 @@ import java.util.Locale;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public abstract class AbstractElementsTest {
+public abstract class AbstractElementsTest extends ElementsTestSupport {
     public static final String copyright =
             "Copyright (c) 2005-2019, ManyDesigns srl";
-
-    public Configuration elementsConfiguration;
-
-    public MutableServletContext servletContext;
-    public MutableHttpServletRequest req;
 
     public final static boolean PRINT_LOGBACK_STATUS = false;
 
@@ -53,49 +43,17 @@ public abstract class AbstractElementsTest {
     public void setUp() throws Exception {
         if (PRINT_LOGBACK_STATUS) {
             // assume SLF4J is bound to logback in the current environment
-            LoggerContext lc =
-                    (LoggerContext) LoggerFactory.getILoggerFactory();
+            LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
             // print logback's internal status
             StatusPrinter.print(lc);
         }
-        
-        XmlBuffer.checkWellFormed = true;
 
-        setUpProperties();
-        setUpSingletons();
-        setUpRequest();
-        setUpElementsThreadLocals();
-    }
-
-    public void setUpProperties() {
-        elementsConfiguration = ElementsProperties.getConfiguration();
-    }
-
-    public void setUpSingletons() {
-        servletContext = new MutableServletContext();
-    }
-
-    public void setUpRequest() {
-        req = new MutableHttpServletRequest(servletContext);
-        req.setContextPath("");
-        req.setRequestURI("");
-        //Uniform locales
-        req.locales.clear();
-        req.locales.add(Locale.forLanguageTag("en"));
-        req.locales.add(Locale.forLanguageTag("it"));
-    }
-
-    public void setUpElementsThreadLocals() {
-        //Force English so tests don't depend on the environment
-        Locale.setDefault(Locale.ENGLISH);
-        ElementsThreadLocals.setupDefaultElementsContext();
-        ElementsThreadLocals.setHttpServletRequest(req);
-        ElementsThreadLocals.setServletContext(servletContext);
+        super.setUp();
     }
 
     @AfterMethod
     public void tearDown() throws Exception {
-        ElementsThreadLocals.removeElementsContext();
+        super.tearDown();
     }
 
 }

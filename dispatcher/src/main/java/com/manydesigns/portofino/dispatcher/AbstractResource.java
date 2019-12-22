@@ -270,13 +270,13 @@ public abstract class AbstractResource implements SecureResource {
             return null;
         }
         Map<String, List<Permission>> permissionMap = new HashMap<>();
-        for(Map.Entry<String, List<String>> entry : stringMap.entrySet()) {
-            List<Permission> permissionList = new ArrayList<>(entry.getValue().size());
-            for(String perm : entry.getValue()) {
+        stringMap.forEach((key, value) -> {
+            List<Permission> permissionList = new ArrayList<>(value.size());
+            for (String perm : value) {
                 permissionList.add(new WildcardPermission(perm));
             }
-            permissionMap.put(entry.getKey(), permissionList);
-        }
+            permissionMap.put(key, permissionList);
+        });
         return permissionMap;
     }
 

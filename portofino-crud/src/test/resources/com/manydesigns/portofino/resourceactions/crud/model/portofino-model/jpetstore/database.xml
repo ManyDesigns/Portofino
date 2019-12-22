@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database databaseName="jpetstore">
+    <jdbcConnection driver="org.h2.Driver" password="manydesigns" url="jdbc:h2:mem:jpetstore;DB_CLOSE_DELAY=-1" username="manydesigns"/>
+    <schemas>
+        <schema schemaName="PUBLIC" />
+    </schemas>
+</database>
