@@ -49,7 +49,7 @@ public class PersistenceTest {
         ElementsThreadLocals.setupDefaultElementsContext();
     }
 
-    @AfterClass
+    //@AfterClass this seems to break CI
     public void teardownElements() {
         ElementsThreadLocals.destroy();
     }
