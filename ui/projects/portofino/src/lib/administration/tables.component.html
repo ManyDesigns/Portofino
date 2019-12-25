@@ -219,4 +219,10 @@
       <div><portofino-buttons [component]="this" list="column"></portofino-buttons></div>
     </mat-card-content>
   </mat-card>
+  <ng-container *ngIf="!column && !tableInfo">
+    <hr />
+    <mat-card>
+      <portofino-buttons [component]="this" list="misc"></portofino-buttons> {{"if you've modified it externally, on the file system" | translate}}
+    </mat-card>
+  </ng-container>
 </div>

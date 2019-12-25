@@ -203,7 +203,10 @@ export class TablesComponent extends Page implements OnInit {
   @Button({ list: "misc", text: "Reload model", color: "primary", icon: "refresh" })
   reloadModel() {
     this.http.post(this.portofino.apiRoot + "portofino-upstairs/model/:reload", null).subscribe(
-      () => this.notificationService.info(this.translate.get("Model reloaded."))
+      () => {
+        this.loadConnectionProviders();
+        this.notificationService.info(this.translate.get("Model reloaded."));
+      }
     );
   }
 
