@@ -63,10 +63,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Default AbstractCrudAction implementation. Implements a crud resource over a database table, based on a HQL query.
@@ -238,20 +236,22 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 crudConfiguration.getSelectionProviders().add(sp);
             }
         });
-        List<CrudProperty> crudProperties = this.crudConfiguration.getProperties();
-        crudConfiguration.getProperties().forEach(p1 -> {
-            crudProperties.forEach(p2 -> {
-                if(p1.getName().equals(p2.getName())) {
-                    p2.setEnabled(p1.isEnabled());
-                    p2.setInsertable(p1.isInsertable());
-                    p2.setInSummary(p1.isInSummary());
-                    p2.setLabel(p1.getLabel());
-                    p2.setSearchable(p1.isSearchable());
-                    p2.setUpdatable(p1.isUpdatable());
-                }
-            });
-        });
-        crudConfiguration.setProperties(crudProperties);
+        List<CrudProperty> existingProperties = this.crudConfiguration.getProperties();
+        List<CrudProperty> configuredProperties = crudConfiguration.getProperties();
+        List<CrudProperty> newProperties = configuredProperties.stream().map(p1 -> {
+            Optional<CrudProperty> maybeP2 =
+                    existingProperties.stream().filter(p2 -> p1.getName().equals(p2.getName())).findFirst();
+            CrudProperty p2 = maybeP2.orElse(new CrudProperty());
+            p2.setName(p1.getName());
+            p2.setEnabled(p1.isEnabled());
+            p2.setInsertable(p1.isInsertable());
+            p2.setInSummary(p1.isInSummary());
+            p2.setLabel(p1.getLabel());
+            p2.setSearchable(p1.isSearchable());
+            p2.setUpdatable(p1.isUpdatable());
+            return p2;
+        }).collect(Collectors.toList());
+        crudConfiguration.setProperties(newProperties);
         return super.saveConfiguration(crudConfiguration);
     }
 
