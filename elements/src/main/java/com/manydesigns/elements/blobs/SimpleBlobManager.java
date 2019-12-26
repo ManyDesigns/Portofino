@@ -122,7 +122,7 @@ public class SimpleBlobManager implements BlobManager {
             if(blob.isEncrypted()){
                  encryptInputStream = BlobUtils.encrypt(inputStream,blob.getEncryptionType());
                 IOUtils.copyLarge(encryptInputStream, out);
-            }else{
+            } else {
                 blob.setSize(IOUtils.copyLarge(inputStream, out));
             }
         }

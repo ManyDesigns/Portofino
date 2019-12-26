@@ -20,14 +20,16 @@
 
 package com.manydesigns.elements.servlet;
 
+import com.manydesigns.elements.blobs.FileBean;
+import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
+import com.manydesigns.elements.blobs.MultipartWrapper;
+import com.manydesigns.elements.blobs.StreamingCommonsMultipartWrapper;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.security.Principal;
 import java.util.*;
 
@@ -37,7 +39,7 @@ import java.util.*;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MutableHttpServletRequest implements HttpServletRequest {
+public class MutableHttpServletRequest implements HttpServletRequest, MultipartWrapper {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
@@ -48,7 +50,7 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     public final Map<String, Object> attributeMap;
     public final Map<String, String[]> parameterMap;
     public final Map<String, String[]> headerMap;
-    public final Map<String, FileItem[]> fileItemMap;
+    public final Map<String, FileItem> fileItemMap;
     public final List<Locale> locales;
 
     private String method;
@@ -71,17 +73,17 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     //**************************************************************************
 
     public MutableHttpServletRequest() {
-        attributeMap= new HashMap<String, Object>();
-        headerMap = new HashMap<String, String[]>();
-        parameterMap = new HashMap<String, String[]>();
-        fileItemMap = new HashMap<String, FileItem[]>();
-        locales = new ArrayList<Locale>();
-        locales.add(Locale.getDefault());
+        this(new MutableServletContext());
     }
 
     public MutableHttpServletRequest(MutableServletContext servletContext) {
-        this();
         this.servletContext = servletContext;
+        attributeMap = new HashMap<>();
+        headerMap = new HashMap<>();
+        parameterMap = new HashMap<>();
+        fileItemMap = new HashMap<>();
+        locales = new ArrayList<>();
+        locales.add(Locale.getDefault());
     }
 
     //**************************************************************************
@@ -98,24 +100,17 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         parameterMap.put(key, values);
     }
 
-    public void addFileItem(String name, FileItem item) {
-        FileItem[] oldValues = fileItemMap.get(name);
-        FileItem[] newValues = (FileItem[]) ArrayUtils.add(oldValues, item);
-        fileItemMap.put(name, newValues);
+    public boolean addFileItem(String name, FileItem item) {
+        FileItem inMap = fileItemMap.putIfAbsent(name, item);
+        return inMap == item;
     }
 
     public FileItem getFileItem(String name) {
-        FileItem[] values = fileItemMap.get(name);
-        if (values == null) {
-            return null;
-        } else {
-            return values[0];
-        }
+        return fileItemMap.get(name);
     }
 
     public void setFileItem(String key, FileItem value) {
-        FileItem[] values = {value};
-        fileItemMap.put(key, values);
+        fileItemMap.put(key, value);
     }
 
     public void setMethod(String method) {
@@ -160,12 +155,54 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         }
     }
 
+    @Override
+    public void build(HttpServletRequest request, File tempDir, long maxPostSize) {}
+
     public Enumeration getParameterNames() {
         return Collections.enumeration(parameterMap.keySet());
     }
 
     public String[] getParameterValues(String name) {
         return parameterMap.get(name);
+    }
+
+    @Override
+    public Enumeration<String> getFileParameterNames() {
+        return Collections.enumeration(fileItemMap.keySet());
+    }
+
+    @Override
+    public FileBean getFileParameterValue(String name) {
+        final FileItem item = this.fileItemMap.get(name);
+
+        if (item == null
+                || ((item.getName() == null || item.getName().length() == 0) && item.getSize() == 0)) {
+            return null;
+        }
+        else {
+            String filename = item.getName();
+            return new FileBean(null, item.getContentType(), filename, getCharacterEncoding()) {
+                @Override
+                public long getSize() {
+                    return item.getSize();
+                }
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return item.getInputStream();
+                }
+
+                @Override
+                public void delete() {
+                    item.delete();
+                }
+            };
+        }
+    }
+
+    @Override
+    public HttpServletRequestWrapper wrapRequest(HttpServletRequest request) {
+        return null;
     }
 
     public Map getParameterMap() {
@@ -325,7 +362,7 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     public int getContentLength() {
-        throw new UnsupportedOperationException();
+        return -1; //Not known
     }
 
     public long getContentLengthLong() {
@@ -436,7 +473,7 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public ServletContext getServletContext() {
+    public MutableServletContext getServletContext() {
         return servletContext;
     }
 

@@ -25,11 +25,13 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.blobs.HierarchicalBlobManager;
+import com.manydesigns.elements.fields.AbstractBlobField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
@@ -42,20 +44,23 @@ import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegis
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.ActionContext;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
-import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
+import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.*;
 
+import javax.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -64,12 +69,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 @SuppressWarnings({"JpaQlInspection"})
 @Test
-public class CrudActionTest {
+public class CrudActionTest extends JerseyTest {
 
     Persistence persistence;
 
@@ -104,6 +108,11 @@ public class CrudActionTest {
         persistence.stop();
     }
 
+    @Override
+    protected Application configure() {
+        return new ResourceConfig();
+    }
+
     protected void setupJPetStore() throws Exception {
         Session session = persistence.getSession("jpetstore");
         session.doWork(new Work() {
@@ -130,7 +139,10 @@ public class CrudActionTest {
     }
 
     public void testBlobs() throws Exception {
-        MutableHttpServletRequest request = new MutableHttpServletRequest();
+        MutableHttpServletRequest req = new MutableHttpServletRequest();
+        ElementsThreadLocals.setMultipart(req);
+        req.getServletContext().setInitParameter("portofino.api.root", "http://fake");
+        req.makeMultipart();
 
         Column column = DatabaseLogic.findColumnByName(persistence.getModel(), "jpetstore", "PUBLIC", "PRODUCT", "DESCN");
         Annotation ann = new Annotation(column, FileBlob.class.getName());
@@ -148,10 +160,18 @@ public class CrudActionTest {
             protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
                 return classAccessor; //Let's ignore Shiro
             }
+
+            @Override
+            protected String getUrlEncoding() {
+                return PortofinoProperties.URL_ENCODING_DEFAULT;
+            }
         };
         CrudConfiguration configuration = new CrudConfiguration();
         configuration.setDatabase("jpetstore");
         configuration.setQuery("from product");
+        String metaFilenamePattern = "blob-{0}.properties";
+        String dataFilenamePattern = "blob-{0}.data";
+        crudAction.blobManager = new HierarchicalBlobManager(new File(System.getProperty("java.io.tmpdir")), metaFilenamePattern, dataFilenamePattern);
 
         CrudProperty property = new CrudProperty();
         property.setName("productid");
@@ -191,11 +211,13 @@ public class CrudActionTest {
         actionInstance.setConfiguration(configuration);
         actionInstance.getParameters().add("1");
         ActionContext actionContext = new ActionContext();
-        actionContext.setRequest(request);
+        actionContext.setRequest(req);
+        actionContext.setActionPath("");
+        actionContext.setServletContext(req.getServletContext());
 
-        request.setParameter("productid", "1");
+        req.setParameter("productid", "1");
         Map category = (Map) persistence.getSession("jpetstore").createQuery("from category").list().get(0);
-        request.setParameter("category", (String) category.get("catid"));
+        req.setParameter("category", (String) category.get("catid"));
         crudAction.persistence = persistence;
         crudAction.setContext(actionContext);
         crudAction.setActionInstance(actionInstance);
@@ -206,51 +228,58 @@ public class CrudActionTest {
         assertNotNull(descnField);
         assertTrue(descnField instanceof FileBlobField);
 
-        /* TODO
         File tmpFile = File.createTempFile("blob", "blob");
         DiskFileItem fileItem =
                 new DiskFileItem(
                         "descn", "application/octet-stream", false,
-                        tmpFile.getName(), 0, tmpFile.getParentFile());
+                        tmpFile.getName(), 0, tmpFile.getParentFile()) {
+                    @Override
+                    public void delete() {
+                        //Do nothing as we want to reuse this
+                    }
+                };
         OutputStream os = fileItem.getOutputStream();
-        IOUtils.write("some test data", os);
+        IOUtils.write("some test data", os, req.getCharacterEncoding());
         req.addFileItem("descn", fileItem);
-        req.setParameter("descn_operation", FileBlobField.UPLOAD_MODIFY);
+        req.setParameter("descn_operation", AbstractBlobField.UPLOAD_MODIFY);
+        crudAction.httpPostMultipart();
 
-        crudAction.preparePage();
-        crudAction.prepare();
-        crudAction.save();
         assertFalse(crudAction.form.validate());
-        FileBlobField blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
+        AbstractBlobField blobField = (AbstractBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
         assertEquals(tmpFile.getName(), blobField.getValue().getFilename());
         assertEquals(fileItem.getSize(), blobField.getValue().getSize());
         try {
-            tmpBlobManager.loadMetadata(new Blob(blobField.getValue().getCode()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail("The blob was not saved as a temporary blob");
-        }
+            crudAction.getBlobManager().loadMetadata(new Blob(blobField.getValue().getCode()));
+            fail("The blob was saved despite validation failing");
+        } catch (Exception e) {}
+        crudAction.object = null;
 
         req.setParameter(blobField.getCodeInputName(), blobField.getValue().getCode());
-        req.setParameter("descn_operation", FileBlobField.UPLOAD_KEEP);
-        req.setFileItem("descn", null);
         req.setParameter("name", "name");
-        crudAction.preparePage();
-        crudAction.prepare();
-        crudAction.save();
+        req.setParameter("productid", "1");
+        req.setParameter("category", "BIRDS");
+        crudAction.httpPostMultipart();
         assertTrue(crudAction.form.validate());
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
+        crudAction.blobManager.loadMetadata(blobField.getValue()); //This is necessary because the crud might reload the form
         assertEquals(tmpFile.getName(), blobField.getValue().getFilename());
         assertEquals(fileItem.getSize(), blobField.getValue().getSize());
         try {
-            tmpBlobManager.loadMetadata(new Blob(blobField.getValue().getCode()));
-            blobManager.loadMetadata(new Blob(blobField.getValue().getCode()));
+            crudAction.blobManager.loadMetadata(new Blob(blobField.getValue().getCode()));
         } catch (IOException e) {
             e.printStackTrace();
             fail("The blob was not saved");
         }
+
+        crudAction.httpPutMultipart();
+        /* TODO
+
+
+        crudAction.preparePage();
+        crudAction.prepare();
+        crudAction.save();
 
         crudAction.preparePage();
         crudAction.prepare();

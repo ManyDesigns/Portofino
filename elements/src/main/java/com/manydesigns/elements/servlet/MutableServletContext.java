@@ -5,15 +5,15 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.EventListener;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by alessio on 10/31/17.
  */
 public class MutableServletContext implements ServletContext {
+
+    public final Map<String, String> initParameters = new HashMap<>();
+
     @Override
     public String getContextPath() {
         return null;
@@ -115,18 +115,19 @@ public class MutableServletContext implements ServletContext {
     }
 
     @Override
-    public String getInitParameter(String s) {
-        return null;
+    public String getInitParameter(String name) {
+        return initParameters.get(name);
     }
 
     @Override
     public Enumeration<String> getInitParameterNames() {
-        return null;
+        return Collections.enumeration(initParameters.keySet());
     }
 
     @Override
-    public boolean setInitParameter(String s, String s1) {
-        return false;
+    public boolean setInitParameter(String name, String value) {
+        String existing = initParameters.putIfAbsent(name, value);
+        return existing == value;
     }
 
     @Override
