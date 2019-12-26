@@ -3,6 +3,7 @@
     <a mat-list-item [routerLink]="pageService.page.parent.url" routerLinkActive="active">
       <mat-icon *ngIf="pageService.page.parent.icon">{{pageService.page.parent.icon}}</mat-icon>
       {{pageService.page.parent.title | translate}}
+      <mat-icon>chevron_left</mat-icon>
     </a>
     <div *ngFor="let child of pageService.page.parent.children">
       <a mat-list-item
@@ -12,12 +13,14 @@
         {{child.title | translate}}
       </a>
       <div *ngIf="child.path == pageService.page.segment">
-        <a mat-list-item style="font-weight: bold">
-          <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
-          {{pageService.page.title | translate}}
+        <a mat-list-item>
+          <strong>
+            <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
+            {{pageService.page.title | translate}}
+          </strong>
         </a>
         <ng-container *ngFor="let child of pageService.page.children">
-          <a mat-list-item
+          <a mat-list-item class="submenu"
              *ngIf="child.accessible && child.showInNavigation"
              [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
             <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
@@ -32,9 +35,11 @@
       <a mat-list-item>
         <strong>
           <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
-          {{pageService.page.title | translate}}</strong></a>
+          {{pageService.page.title | translate}}
+        </strong>
+      </a>
       <ng-container *ngFor="let child of pageService.page.children">
-        <a mat-list-item
+        <a mat-list-item class="submenu"
            *ngIf="child.accessible && child.showInNavigation"
            [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
           <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
