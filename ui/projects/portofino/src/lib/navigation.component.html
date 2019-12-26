@@ -14,8 +14,8 @@
       </a>
       <div *ngIf="child.path == pageService.page.segment">
         <a mat-list-item>
+          <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
           <strong>
-            <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
             {{pageService.page.title | translate}}
           </strong>
         </a>
@@ -33,8 +33,8 @@
   <div *ngIf="!pageService.page.parent">
     <mat-nav-list>
       <a mat-list-item>
+        <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
         <strong>
-          <mat-icon *ngIf="pageService.page.icon">{{pageService.page.icon}}</mat-icon>
           {{pageService.page.title | translate}}
         </strong>
       </a>
