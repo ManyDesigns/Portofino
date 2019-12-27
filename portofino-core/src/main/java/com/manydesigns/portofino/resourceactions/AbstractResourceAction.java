@@ -463,6 +463,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             @RequestBody(description = "The configuration object in JSON format.")
             String configurationString) throws IOException {
         Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(getClass());
+        if(configurationClass == null) {
+            throw new WebApplicationException("This resource does not support configuration");
+        }
         Object configuration = new ObjectMapper().readValue(configurationString, configurationClass);
         saveConfiguration(configuration);
     }

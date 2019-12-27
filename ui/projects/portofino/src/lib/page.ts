@@ -190,7 +190,7 @@ export class PageSettingsPanel {
 
   getActionConfigurationToSave() {
     const configuration = this.form.get('configuration');
-    return Object.assign({}, configuration ? configuration.value : {});
+    return configuration ? Object.assign({}, configuration.value) : null;
   }
 
   getPageConfigurationToSave(formValue = this.form.value) {
@@ -445,7 +445,9 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.configuration = pageConfiguration;
       let data = new FormData();
       data.append("pageConfiguration", JSON.stringify(pageConfiguration));
-      data.append("actionConfiguration", JSON.stringify(actionConfiguration));
+      if(actionConfiguration) {
+        data.append("actionConfiguration", JSON.stringify(actionConfiguration));
+      }
       saveConfObservable = this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
         params: {
           actionConfigurationPath: this.configurationUrl,
