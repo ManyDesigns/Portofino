@@ -1,17 +1,17 @@
 import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
-import {ClassAccessor, loadClassAccessor, SelectionProvider as Selection} from "../class-accessor";
-import {PortofinoComponent} from "../page.factory";
-import {Operation, Page, PageConfiguration, PageSettingsPanel} from "../page";
+import {ClassAccessor, loadClassAccessor, SelectionProvider as Selection} from "../../class-accessor";
+import {PortofinoComponent} from "../../page.factory";
+import {Operation, Page, PageConfiguration, PageSettingsPanel} from "../../page";
 import {Configuration, SelectionProvider} from "./crud.common";
-import {Button} from "../buttons";
+import {Button} from "../../buttons";
 import {SelectionModel} from "@angular/cdk/collections";
 import {SearchComponent} from "./search/search.component";
 import {DetailComponent} from "./detail/detail.component";
 import {CreateComponent} from "./detail/create.component";
 import {BulkEditComponent} from "./bulk/bulk-edit.component";
 import {mergeMap} from "rxjs/operators";
-import {Field, FieldSet} from "../form";
+import {Field, FieldSet} from "../../form";
 import {BehaviorSubject} from "rxjs";
 
 @Component({

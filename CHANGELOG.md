@@ -5,18 +5,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Text pages (client only, no I18n).
 - Support deployment behind a proxy.
 - Documentation of Docker development, debugging and deployment in the archetype.
 - Example deployment of demo-tt as Docker containers on Amazon ECS.
 - Bare-bones support for mapping tables as POJO's (objects) rather than maps.
 
 ### Changed
+- Give pages more control on security checks, allowing for client-only pages.
 - Improve performance of selection providers by asking for data lazily in certain cases.
 - Properly support Docker deployments using the image built by the standard pom of archetype-generated projects.
 
 ### Fixed
 - Model not properly saved ([#294](https://github.com/ManyDesigns/Portofino/issues/294), [#303](https://github.com/ManyDesigns/Portofino/issues/303)).
-- CRUD properties not properly saved ([#310](https://github.com/ManyDesigns/Portofino/issues/310)).
+- Page configuration not properly saved ([#310](https://github.com/ManyDesigns/Portofino/issues/310), [#311](https://github.com/ManyDesigns/Portofino/issues/311)).
 - Names of mapped database objects not escaped ([#297](https://github.com/ManyDesigns/Portofino/issues/297)).
 - New actions added with bad class names ([#301](https://github.com/ManyDesigns/Portofino/issues/301)).
 - Database synchronization issues with MariaDB and PostgreSQL ([#283](https://github.com/ManyDesigns/Portofino/issues/283), [#298](https://github.com/ManyDesigns/Portofino/issues/298)).

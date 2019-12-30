@@ -193,18 +193,9 @@ public abstract class AbstractResource implements SecureResource {
         description.put("class", getClass().getName());
         description.put("path", getPath());
         description.put("children", getSubResources());
-        describe(description);
         return description;
     }
 
-    /**
-     * Customize the description of this node. The default implementation does nothing.
-     * @param description the default description.
-     */
-    protected void describe(Map<String, Object> description) {
-        //The default implementation does nothing
-    }
-    
     @Path(":description")
     @Produces(MediaType.APPLICATION_JSON)
     @GET

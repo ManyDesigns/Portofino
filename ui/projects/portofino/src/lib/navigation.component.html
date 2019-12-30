@@ -20,11 +20,13 @@
           </strong>
         </a>
         <ng-container *ngFor="let child of pageService.page.children">
-          <a mat-list-item class="submenu"
+          <a mat-list-item
              *ngIf="child.accessible && child.showInNavigation"
              [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
-            <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
-            {{child.title | translate}}
+            <div class="submenu">
+              <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+              {{child.title | translate}}
+            </div>
           </a>
         </ng-container>
       </div>
@@ -39,11 +41,13 @@
         </strong>
       </a>
       <ng-container *ngFor="let child of pageService.page.children">
-        <a mat-list-item class="submenu"
+        <a mat-list-item
            *ngIf="child.accessible && child.showInNavigation"
            [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
-          <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
-          {{child.title | translate}}
+          <div class="submenu">
+            <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+            {{child.title | translate}}
+          </div>
         </a>
       </ng-container>
     </mat-nav-list>

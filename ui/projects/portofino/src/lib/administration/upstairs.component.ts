@@ -22,7 +22,7 @@ import {map} from "rxjs/operators";
   selector: 'portofino-upstairs',
   templateUrl: './upstairs.component.html'
 })
-@PortofinoComponent({ name: "portofino-upstairs" })
+@PortofinoComponent({ name: "portofino-upstairs", hideFromCreateNewPage: true })
 export class UpstairsComponent extends Page implements OnInit {
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
@@ -33,19 +33,19 @@ export class UpstairsComponent extends Page implements OnInit {
 
   loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
     if(child.path == 'actions') {
-      return of({ actualType: ActionsComponent, title: "Actions", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: ActionsComponent, title: "Actions", source: null, children: [] });
     } else if(child.path == 'connections') {
-      return of({ actualType: ConnectionsComponent, title: "Connections", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: ConnectionsComponent, title: "Connections", source: null, children: [] });
     } else if(child.path == 'mail') {
-      return of({ actualType: MailSettingsComponent, title: "Mail", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: MailSettingsComponent, title: "Mail", source: null, children: [] });
     } else if(child.path == 'permissions') {
-      return of({ actualType: PermissionsComponent, title: "Permissions", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: PermissionsComponent, title: "Permissions", source: null, children: [] });
     } else if(child.path == 'settings') {
-      return of({ actualType: SettingsComponent, title: "Settings", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: SettingsComponent, title: "Settings", source: null, children: [] });
     } else if(child.path == 'tables') {
-      return of({ actualType: TablesComponent, title: "Tables", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: TablesComponent, title: "Tables", source: null, children: [] });
     } else if(child.path == 'wizard') {
-      return of({ actualType: WizardComponent, title: "Wizard", source: null, securityCheckPath: null, children: [] });
+      return of({ actualType: WizardComponent, title: "Wizard", source: null, children: [] });
     } else {
       return throwError(404);
     }
@@ -66,9 +66,7 @@ export class UpstairsComponent extends Page implements OnInit {
         }
         this.portofino.loginPath = loginPath;
         this.storage.set("portofino.upstairs.apiRoot", this.portofino.apiRoot);
-        this.children.forEach(c => {
-          this.checkAccessibility(c);
-        });
+        this.checkAccess(true);
       }
     }, error => {
       console.error(error);

@@ -367,14 +367,15 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     @Override
-    protected void describe(Map<String, Object> description) {
-        super.describe(description);
+    public Map<String, Object> describe() {
+        Map<String, Object> description = super.describe();
         description.put("page", actionInstance.getActionDescriptor());
         if(ResourceActionLogic.supportsDetail(getClass())) {
             parameters.add("");
             description.put("detailChildren", getSubResources());
             parameters.remove(parameters.size() - 1);
         }
+        return description;
     }
 
     ////////////////

@@ -63,7 +63,6 @@ export class PageConfiguration {
   actualType?: Type<any>;
   title: string;
   source: string;
-  securityCheckPath: string = ':description';
   children: PageChild[] = [];
   icon?: string;
   template?: string;
@@ -199,7 +198,6 @@ export class PageSettingsPanel {
     //Reflection would be nice
     pageConfiguration.children = config.children;
     pageConfiguration.icon = config.icon;
-    pageConfiguration.securityCheckPath = config.securityCheckPath;
     pageConfiguration.source = config.source;
     pageConfiguration.template = config.template ? config.template.v : null;
     pageConfiguration.title = config.title;
@@ -348,7 +346,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   get template(): TemplateRef<any> {
     const template = this.configuration.template;
-    const templateName = template && template.v ? template.v : template;
+    const templateName = (template && template.v) ? template.v : template;
     if(templateName) {
       const template = this.portofino.templates[templateName];
       if(!template) {
@@ -372,37 +370,35 @@ export abstract class Page implements WithButtons, OnDestroy {
     if(!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
-    let sourceUrl = this.computeSourceUrl();
-    const securityCheckPath = (this.configuration.securityCheckPath || ':description');
-    if(!sourceUrl.endsWith('/') && !securityCheckPath.startsWith('/')) {
-      sourceUrl += '/';
-    } else if(sourceUrl.endsWith('/') && securityCheckPath.startsWith('/')) {
-      sourceUrl = sourceUrl.substring(0, sourceUrl.length - 1);
-    }
-    return this.http.get<any>(
-      sourceUrl + securityCheckPath,
-      { headers: headers });
+    let sourceUrl = this.computeSecurityCheckUrl();
+    return this.http.options(sourceUrl,{ headers: headers, observe: "body", responseType: "text" });
   }
 
-  get accessPermitted(): Observable<boolean> {
-    return this.checkAccess(false).pipe(map(() => true), catchError(() => of(false)));
+  protected computeSecurityCheckUrl() {
+    return this.computeSourceUrl();
   }
 
   computeSourceUrl() {
-    let source = this.configuration.source || '';
-    if(source.startsWith('http://') || source.startsWith('https://')) {
+    return Page.defaultComputeSourceUrl(this.portofino.apiRoot, this.parent, this.configuration.source);
+  }
+
+  public static defaultComputeSourceUrl(apiRoot: string, parent: Page, source: string) {
+    source = source ? source : '';
+    if (source.startsWith('http://') || source.startsWith('https://')) {
       //Absolute, leave as is
-    } else if(!source.startsWith('/')) {
-      if(this.parent) {
-        source = this.parent.computeSourceUrl() + '/' + source;
-      } else {
-        source = this.portofino.apiRoot + '/' + source;
-      }
     } else {
-      source = this.portofino.apiRoot + source;
+      if (!source.startsWith('/')) {
+        if (parent) {
+          source = parent.computeSourceUrl() + '/' + source;
+        } else {
+          source = apiRoot + '/' + source;
+        }
+      } else {
+        source = apiRoot + source;
+      }
     }
     source = Page.removeDoubleSlashesFromUrl(source);
-    while (source.endsWith("/"))  {
+    while (source.endsWith("/")) {
       source = source.substring(0, source.length - 1);
     }
     return source;
@@ -537,16 +533,6 @@ export abstract class Page implements WithButtons, OnDestroy {
     this.settingsPanel.hide(false);
   }
 
-  checkAccessibility(child: PageChild) {
-    this.loadChildConfiguration(child).pipe(mergeMap(config => {
-      const dummy = new DummyPage(
-        this.portofino, this.http, this.router, this.route, this.authenticationService, this.notificationService, this.translate);
-      dummy.parent = this;
-      dummy.configuration = config;
-      return dummy.accessPermitted;
-    })).subscribe(flag => child.accessible = flag);
-  }
-
   goBack() {
     if(this.returnUrl) {
       this.router.navigateByUrl(this.returnUrl);
@@ -667,5 +653,3 @@ export class Group {
   permissions: string[];
   permissionMap: {[name: string]: boolean};
 }
-
-class DummyPage extends Page {}

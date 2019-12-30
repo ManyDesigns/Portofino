@@ -152,11 +152,15 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
   }
 }
 
-export type PortofinoComponentDefinition = { name: string, defaultActionClass?: string };
+export type PortofinoComponentDefinition = {
+  name: string, defaultActionClass?: string, hideFromCreateNewPage?: boolean,
+  computeSecurityCheckUrl?: (apiRoot: string, parent: Page, source: string) => string
+};
 export type PortofinoComponent = { type: Type<any> } & PortofinoComponentDefinition
 
 export function PortofinoComponent(info: PortofinoComponentDefinition) {
   return function(target) {
+    console.debug("Registering Portofino component " + info.name, info, target);
     PageFactoryComponent.components[info.name] = Object.assign({ type: target }, info);
   };
 }

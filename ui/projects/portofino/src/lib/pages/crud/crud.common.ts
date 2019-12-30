@@ -1,4 +1,4 @@
-import {SelectionOption} from "../class-accessor";
+import {SelectionOption} from "../../class-accessor";
 
 export class Configuration {
   rowsPerPage: number;

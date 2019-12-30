@@ -1,11 +1,11 @@
 import {ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {PortofinoService} from "../../portofino.service";
-import {isUpdatable, Property} from "../../class-accessor";
+import {PortofinoService} from "../../../portofino.service";
+import {isUpdatable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
-import {Operation} from "../../page";
-import {NotificationService} from "../../notifications/notification.service";
-import {Button} from "../../buttons";
+import {Operation} from "../../../page";
+import {NotificationService} from "../../../notifications/notification.service";
+import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 import {Subject} from "rxjs";
 

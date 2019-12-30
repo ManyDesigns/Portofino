@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {isDateProperty, isNumericProperty, isRequired, isStringProperty, Property} from "../../class-accessor";
-import {PortofinoService} from "../../portofino.service";
+import {isDateProperty, isNumericProperty, isRequired, isStringProperty, Property} from "../../../class-accessor";
+import {PortofinoService} from "../../../portofino.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {debounceTime} from "rxjs/operators";
 

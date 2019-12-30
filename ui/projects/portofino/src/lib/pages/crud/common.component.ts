@@ -1,20 +1,20 @@
 import {ChangeDetectorRef, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {PortofinoService} from "../portofino.service";
+import {PortofinoService} from "../../portofino.service";
 import {
   ClassAccessor,
   isBlob, isBooleanProperty,
   isDateProperty,
   isEnabled,
   Property, SelectionOption
-} from "../class-accessor";
+} from "../../class-accessor";
 import moment from 'moment-with-locales-es6';
 import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
 import {BlobFile, Configuration, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
-import {Field, Form, FormComponent} from "../form";
-import {NotificationService} from "../notifications/notification.service";
-import {Button, ButtonInfo, getButtons, WithButtons} from "../buttons";
+import {Field, Form, FormComponent} from "../../form";
+import {NotificationService} from "../../notifications/notification.service";
+import {Button, ButtonInfo, getButtons, WithButtons} from "../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 
 export abstract class BaseDetailComponent implements WithButtons, OnDestroy {

@@ -1,11 +1,11 @@
 import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {PortofinoService} from "../../portofino.service";
-import {isBlob, isDateProperty, isUpdatable, Property} from "../../class-accessor";
+import {PortofinoService} from "../../../portofino.service";
+import {isBlob, isDateProperty, isUpdatable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
-import {FormComponent} from "../../form";
-import {NotificationService} from "../../notifications/notification.service";
-import {Button} from "../../buttons";
+import {FormComponent} from "../../../form";
+import {NotificationService} from "../../../notifications/notification.service";
+import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({

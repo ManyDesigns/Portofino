@@ -114,9 +114,11 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
     }
 
     @Override
-    protected void describe(Map<String, Object> description) {
+    public Map<String, Object> describe() {
+        Map<String, Object> description = super.describe();
         description.put("minParameters", minParameters);
         description.put("maxParameters", maxParameters);
         description.put("parameters", parameters);
+        return description;
     }
 }
