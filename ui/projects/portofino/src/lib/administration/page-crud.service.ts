@@ -55,7 +55,6 @@ export class PageCrudService {
     }
     delete page.position;
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
-    const reloadPageConfiguration = () => parentPage.loadConfiguration(); //Update the navigation in case we're adding as a child (default) TODO could navigate to the destination instead, but needs to handle detail
     const parameters: any = {
       actionPath: Page.removeDoubleSlashesFromUrl(`${parentPage.computeSourceUrl()}/${page.source}`),
       childrenProperty: parentPage.childrenProperty,
@@ -65,7 +64,8 @@ export class PageCrudService {
     if(actionClass) {
       parameters.actionClass = actionClass;
     }
-    return this.http.post(`${this.portofino.localApiPath}/${path}`, page, { params: parameters}).pipe(mergeMap(reloadPageConfiguration));
+    return this.http.post(`${this.portofino.localApiPath}/${path}`, page, { params: parameters})
+      .pipe(mergeMap(() => parentPage.reloadBaseUrl()));
   }
 
   deletePage() {
@@ -76,11 +76,14 @@ export class PageCrudService {
     }
     const path = page.getConfigurationLocation();
     const goUpOnePage = () => this.router.navigateByUrl(parentPage.url);
-    return this.http.delete(`${this.portofino.localApiPath}/${path}`, { params: {
-        actionPath: page.computeSourceUrl(),
-        childrenProperty: parentPage.childrenProperty,
-        loginPath: this.portofino.loginPath
-      }}).pipe(tap(goUpOnePage));
+    const params: any = {
+      childrenProperty: parentPage.childrenProperty,
+      loginPath: this.portofino.loginPath
+    };
+    if(page.hasSource()) {
+      params.actionPath = page.computeSourceUrl();
+    }
+    return this.http.delete(`${this.portofino.localApiPath}/${path}`, { params: params}).pipe(tap(goUpOnePage));
   }
 
   movePage(moveInstruction: { destination: string, detail: boolean }) {

@@ -40,6 +40,10 @@ export class TextPageComponent extends Page {
     }
     return source;
   }
+
+  hasSource(): boolean {
+    return false;
+  }
 }
 
 export class TextPageSettingsPanel extends PageSettingsPanel {

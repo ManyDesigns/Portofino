@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 @Path("pages")
@@ -40,8 +42,8 @@ public class Pages extends Resource {
         @QueryParam("actionClass") String actionClass, @QueryParam("actionPath") String actionPath,
         @QueryParam("childrenProperty") String childrenProperty, String pageConfigurationString) {
         checkPathAndAuth(path, auth, loginPath);
+        actionPath = getActionPath(actionPath);
         if(actionPath != null && actionClass != null) {
-            actionPath = getActionPath(actionPath);
             Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
             Response response = request.post(Entity.text(actionClass));
             if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
@@ -120,37 +122,47 @@ public class Pages extends Resource {
         @QueryParam("childrenProperty") String childrenProperty) throws IOException {
         checkPathAndAuth(path, auth, loginPath);
         actionPath = getActionPath(actionPath);
-        Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
-        Response response = request.delete();
-        if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-            String configPath = servletContext.getRealPath("pages/" + path);
-            File file = new File(configPath);
-            FileUtils.deleteDirectory(file.getParentFile());
-            ObjectMapper mapper = new ObjectMapper();
-            File pageDirectory = new File(configPath).getParentFile();
-            File parentDirectory = pageDirectory.getParentFile();
-            Map<String, Object> parentConfig;
-            File parentConfigFile = new File(parentDirectory, "config.json");
-            try (FileReader fr = new FileReader(parentConfigFile)) {
-                String parentConfigString = IOUtils.toString(fr);
-                parentConfig = mapper.readValue(parentConfigString, Map.class);
-                List<Map> children = (List<Map>) parentConfig.get(childrenProperty);
-                if(children != null) {
-                    Iterator<Map> iterator = children.iterator();
-                    while (iterator.hasNext()) {
-                        if(iterator.next().get("path").equals(pageDirectory.getName())) {
-                            iterator.remove();
-                            break;
-                        }
+        Response response;
+        if(actionPath != null) {
+            Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
+            response = request.delete();
+            if(response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+                return response;
+            }
+        } else {
+            response = Response.ok().build();
+        }
+        deletePage(path, childrenProperty);
+        return response;
+    }
+
+    protected void deletePage(String path, String childrenProperty) throws IOException {
+        String configPath = servletContext.getRealPath("pages/" + path);
+        File file = new File(configPath);
+        FileUtils.deleteDirectory(file.getParentFile());
+        ObjectMapper mapper = new ObjectMapper();
+        File pageDirectory = new File(configPath).getParentFile();
+        File parentDirectory = pageDirectory.getParentFile();
+        Map<String, Object> parentConfig;
+        File parentConfigFile = new File(parentDirectory, "config.json");
+        try (FileReader fr = new FileReader(parentConfigFile)) {
+            String parentConfigString = IOUtils.toString(fr);
+            parentConfig = mapper.readValue(parentConfigString, Map.class);
+            List<Map> children = (List<Map>) parentConfig.get(childrenProperty);
+            if(children != null) {
+                Iterator<Map> iterator = children.iterator();
+                while (iterator.hasNext()) {
+                    if(iterator.next().get("path").equals(pageDirectory.getName())) {
+                        iterator.remove();
+                        break;
                     }
                 }
-            } catch (IOException e) {
-                logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
-                throw new WebApplicationException(e.getMessage(), e);
             }
-            writeConfig(mapper, parentConfig, parentConfigFile);
+        } catch (IOException e) {
+            logger.error("Could not save config to " + parentDirectory.getAbsolutePath(), e);
+            throw new WebApplicationException(e.getMessage(), e);
         }
-        return response;
+        writeConfig(mapper, parentConfig, parentConfigFile);
     }
 
     @POST
@@ -176,7 +188,11 @@ public class Pages extends Resource {
             movePage(sourcePath, destParentConfigFile, segment, detail);
             return Response.ok().build();
         }
-        String destinationActionPath = getActionPath(destinationActionParent + (detail ? "/_detail/" : "/") + segment);
+        String actionPath = destinationActionParent + (detail ? "/_detail/" : "/") + segment;
+        String destinationActionPath = getActionPath(actionPath);
+        if(destinationActionPath == null) {
+            throw new WebApplicationException("Invalid destination action path: " + actionPath);
+        }
         Invocation.Builder request = path(destinationActionPath).request().header(AUTHORIZATION_HEADER, auth);
         Response response = request.post(Entity.entity(sourceActionPath, PORTOFINO_ACTION_MOVE_TYPE));
         if(response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
@@ -264,11 +280,20 @@ public class Pages extends Resource {
         return null;
     }
 
-    @NotNull
     public String getActionPath(String actionPath) {
+        if(actionPath == null) {
+            return null;
+        }
         String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
         if (actionPath.startsWith(baseUri)) {
             actionPath = actionPath.substring(baseUri.length());
+        } else {
+            try {
+                new URL(actionPath);
+                return null; //Action is external
+            } catch (MalformedURLException e) {
+                logger.debug(actionPath, e);
+            }
         }
         actionPath = "portofino-upstairs/actions/" + actionPath;
         return actionPath;

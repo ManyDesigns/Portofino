@@ -382,6 +382,10 @@ export abstract class Page implements WithButtons, OnDestroy {
     return Page.defaultComputeSourceUrl(this.portofino.apiRoot, this.parent, this.configuration.source);
   }
 
+  hasSource() {
+    return true;
+  }
+
   public static defaultComputeSourceUrl(apiRoot: string, parent: Page, source: string) {
     source = source ? source : '';
     if (source.startsWith('http://') || source.startsWith('https://')) {
@@ -460,7 +464,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     });
   }
 
-  protected reloadBaseUrl() {
+  reloadBaseUrl() {
     if (this.router.url && this.router.url != "/") {
       this.router.navigateByUrl(this.baseUrl);
     } else {
