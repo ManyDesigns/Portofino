@@ -465,7 +465,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   reloadBaseUrl() {
-    if (this.router.url && this.router.url != "/") {
+    if (this.router.url && this.router.url != "/" && this.router.url != this.baseUrl) {
       this.router.navigateByUrl(this.baseUrl);
     } else {
       //this.router.navigate(['.'], {relativeTo: this.route});
@@ -539,7 +539,11 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   goBack() {
     if(this.returnUrl) {
-      this.router.navigateByUrl(this.returnUrl);
+      if(this.url == this.returnUrl) {
+        window.location.reload(); //TODO
+      } else {
+        this.router.navigateByUrl(this.returnUrl);
+      }
     } else {
       this.goToParent();
     }

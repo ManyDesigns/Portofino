@@ -116,7 +116,7 @@ export class CrudComponent extends Page {
         } else if(this.id) {
           this.showDetail();
           if(params.hasOwnProperty('edit') && !this.embedded) {
-            this.editMode.next(true);
+            this.enableDetailEditMode();
           }
         } else {
           this.showSearch();
@@ -128,6 +128,10 @@ export class CrudComponent extends Page {
         this.refreshSearch.emit();
       } //else TODO
     });
+  }
+
+  protected enableDetailEditMode() {
+    this.editMode.next(true);
   }
 
   static createEnabled(self: CrudComponent) {
@@ -164,6 +168,7 @@ export class CrudComponent extends Page {
 
   showSearch() {
     this.allowEmbeddedComponents = true;
+    this.id = null;
     this.returnUrl = null;
     this.view = CrudView.SEARCH;
   }
@@ -187,8 +192,13 @@ export class CrudComponent extends Page {
     enabledIf: CrudComponent.bulkButtonsEnabled
   })
   showBulkEdit() {
-    this.allowEmbeddedComponents = false;
-    this.view = CrudView.BULK_EDIT;
+    if(this.getSelectedIds().length == 1) {
+      this.openDetail(this.getSelectedIds()[0]);
+      this.enableDetailEditMode();
+    } else {
+      this.allowEmbeddedComponents = false;
+      this.view = CrudView.BULK_EDIT;
+    }
   }
 
   static bulkDeletePresent(self: CrudComponent) {
