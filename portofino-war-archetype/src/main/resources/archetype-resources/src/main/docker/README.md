@@ -10,8 +10,11 @@ Portofino 5.1.0 onwards, make it possible to:
 
 The scheme we've identified comprises these Docker images:
  - One for each database
- - One for the application
- - One that extends the application's image with additional support for development and debugging.
+ - Three for the application:
+   - One including the backend and the frontend as a single Tomcat web application
+   - One including only the backend (Tomcat)
+   - One including only the frontend (served by nginx)
+ - One that extends the application's all-in-one image with additional support for development and debugging.
  
 Unsurprisingly, the `database` directory contains files to build the database image(s), while the `application`
 directory contains the resources to build the application image and the `application/debug` directory the development
@@ -38,10 +41,15 @@ Running `mvn -Pdocker package`, i.e., building the application with the `docker`
 Docker images. Note that, if we plan on running the application locally via Maven for development, **the `docker`
 profile is incompatible with the `portofino-development` profile and actually supersedes it.**.
 
+Also note that the frontend is only built if the profile `build-frontend` is active. Normally it is active by default,
+but if we activate the `docker` profile, then the default profiles are not activated unless explicitly requested with
+`-P`.
+
 The `pom.xml` file also defines the Docker volumes used for persistence. Everything that is not saved in a volume is
 lost when the container is deleted. By default, database images don't mount any volume; if we want to persist data
 across runs of our application, we have to bind additional volumes (refer to the documentation of each database Docker
-image).
+image). Please note that the database image is only meant to be used for development, where the accidental loss of
+persistent data is only a minor inconvenience. Do not use it in production.
 
 For more information about databases, development and debugging, please refer to the appropriate sections.
 
@@ -63,7 +71,7 @@ For information about persisting database data, please refer to the [Maven Integ
 ### Development and Debugging
 
 To launch the application locally for development and debugging, provided you've built the Docker images, we can use the
-command
+following command:
 
 ```
 mvn -Pdocker docker:run
@@ -75,5 +83,5 @@ our IDE is possible on the debug port (8000 by default, again specified in `pom.
 The application will read and write on the source directory of our project, so that modifications made in the IDE and
 modifications made in the running application will be immediately reflected both in the application and in the sources.
 
-Note that Tomcat runs as root in the container, as such it might create new resources with owner root in our source
-directory. In that case, we'll have to manually change their permissions.
+Note that Tomcat runs as root in the container; as such, it might create new resources with owner root in our source
+directory on *NIX systems. In that case, we'll have to manually change their permissions.

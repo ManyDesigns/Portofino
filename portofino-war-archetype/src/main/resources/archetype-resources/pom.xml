@@ -300,6 +300,7 @@
                 <portofino.application.directory>${dollar}{env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
                 <debug.port>8000</debug.port>
                 <tomcat.port>8080</tomcat.port>
+                <frontend.port>3000</frontend.port>
             </properties>
             <build>
                 <plugins>
@@ -382,6 +383,35 @@
                                             <log>mysqld: ready for connections</log>
                                             <time>20000</time>
                                         </wait>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>${project.artifactId}-frontend</alias>
+                                    <name>${project.artifactId}-frontend:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/frontend</contextDir>
+                                        <assembly>
+                                            <descriptor>${project.basedir}/src/main/docker/frontend/assembly.xml</descriptor>
+                                        </assembly>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                        <ports>
+                                            <port>frontend.port:80</port>
+                                        </ports>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>${project.artifactId}-backend</alias>
+                                    <name>${project.artifactId}-backend:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/application/backend-only</contextDir>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                        <ports>
+                                            <port>tomcat.port:8080</port>
+                                        </ports>
                                     </run>
                                 </image>
                             </images>
