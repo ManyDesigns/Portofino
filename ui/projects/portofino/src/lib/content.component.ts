@@ -129,7 +129,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   checkAccessibility(page: Page, child: PageChild) {
     page.loadChildConfiguration(child).pipe(mergeMap(config => {
       const componentType = PageFactoryComponent.components[config.type];
-      let computeSecurityCheckUrl = Page.defaultComputeSourceUrl;
+      let computeSecurityCheckUrl = Page.defaultComputeSecurityCheckUrl;
       if(componentType && componentType.computeSecurityCheckUrl) {
         computeSecurityCheckUrl = componentType.computeSecurityCheckUrl;
       }

@@ -16,7 +16,7 @@ import {Annotation, RICH_TEXT_ANNOTATION} from "../../class-accessor";
 export class TextPageComponent extends Page {
 
   static computeSecurityCheckUrl(apiRoot, parent) {
-    return Page.defaultComputeSourceUrl(apiRoot, parent, '');
+    return Page.defaultComputeSecurityCheckUrl(apiRoot, parent, '');
   }
 
   get text(): string {

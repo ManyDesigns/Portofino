@@ -9,12 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Support deployment behind a proxy.
 - Documentation of Docker development, debugging and deployment in the archetype.
 - Example deployment of demo-tt as Docker containers on Amazon ECS.
+- Sample Docker deployment with the backend and frontend separated into different containers. 
 - Bare-bones support for mapping tables as POJO's (objects) rather than maps.
 
 ### Changed
 - Give pages more control on security checks, allowing for client-only pages.
 - Improve performance of selection providers by asking for data lazily in certain cases.
 - Properly support Docker deployments using the image built by the standard pom of archetype-generated projects.
+- Several wizard improvements and fixes.
 
 ### Fixed
 - Model not properly saved ([#294](https://github.com/ManyDesigns/Portofino/issues/294), [#303](https://github.com/ManyDesigns/Portofino/issues/303)).

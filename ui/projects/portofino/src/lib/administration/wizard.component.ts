@@ -75,35 +75,47 @@ export class WizardComponent extends Page implements OnInit {
     const url = `${this.portofino.apiRoot}portofino-upstairs/application`;
     this.http.post(url, wizard).subscribe((actions: { path: string, type: string, title: string, detail: boolean }[]) => {
       if(this.portofino.localApiPath) {
-        from(actions).pipe(mergeMap(a => {
-          const segments = a.path.split("/").filter(s => s && (s != "_detail"));
-          let confPath = "/" + segments.join("/");
-          confPath = this.getConfigurationLocation(confPath);
-          const page = new PageConfiguration();
-          page.source = segments[segments.length - 1];
-          page.type = a.type;
-          page.title = a.title;
-          return this.http.post(`${this.portofino.localApiPath}/${confPath}`, page, {
-            params: {
-              childrenProperty: a.detail ? "detailChildren" : "children",
-              loginPath: this.portofino.loginPath
-            }
-          });
-        }, 1)).subscribe( //Note concurrent: 1. It is necessary for calls to be executed sequentially.
+        this.createPages(actions).subscribe(
           () => {},
           error => this.notificationService.error("Error " + error), //TODO describe, I18n
           () => {
-            this.notificationService.info(this.translate.instant("Pages created."));
-            this.http.post(`${url}/security`, wizard).subscribe(
-              () => this.notificationService.info(this.translate.instant("Application created.")),
-              ()  => this.notificationService.error(this.translate.get("Error creating Security.groovy"))
-            );
+            this.notificationService.info(this.translate.instant("Pages created. Setting up authc/authz."));
+            setTimeout(() => this.configSecurity(url, wizard), 1000);
           });
       } else {
         this.notificationService.info(this.translate.instant("Local API not available. Only the application backend has been created."));
+        setTimeout(() => { this.router.navigateByUrl("/"); }, 5000);
       }
-      setTimeout(() => { this.router.navigateByUrl("/"); }, 5000);
     });
+  }
+
+  protected configSecurity(url: string, wizard) {
+    return this.http.post(`${url}/security`, wizard).subscribe(() => {
+        this.notificationService.info(this.translate.instant("Application created. You'll be logged out shortly."));
+        setTimeout(() => {
+          this.authenticationService.logout();
+          this.router.navigateByUrl("/");
+        }, 5000);
+      },
+      () => this.notificationService.error(this.translate.get("Error creating Security.groovy")));
+  }
+
+  protected createPages(actions: { path: string; type: string; title: string; detail: boolean }[]) {
+    return from(actions).pipe(mergeMap(a => {
+      const segments = a.path.split("/").filter(s => s && (s != "_detail"));
+      let confPath = "/" + segments.join("/");
+      confPath = this.getConfigurationLocation(confPath);
+      const page = new PageConfiguration();
+      page.source = segments[segments.length - 1];
+      page.type = a.type;
+      page.title = a.title;
+      return this.http.post(`${this.portofino.localApiPath}/${confPath}`, page, {
+        params: {
+          childrenProperty: a.detail ? "detailChildren" : "children",
+          loginPath: this.portofino.loginPath
+        }
+      });
+    }, 1)); //Note concurrent: 1. It is necessary for calls to be executed sequentially.
   }
 
   trackByColumnName(index, column) {
@@ -118,7 +130,7 @@ export class WizardComponent extends Page implements OnInit {
     let prefix = "";
     //TODO multiple configured databases. Portofino 4 did not display this information.
     if(this.wizard.schemas && this.wizard.schemas.filter(s => s.selected).length > 1) {
-      prefix += `${table.schemaName}.`;
+      prefix += `${table.schema}.`;
     }
     return prefix + table.table.tableName;
   }

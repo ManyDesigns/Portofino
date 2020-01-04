@@ -20,11 +20,10 @@
 
 package com.manydesigns.portofino.model.database;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +40,8 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"catalog", "schemaName", "immediateTables"})
-public class Schema implements ModelObject {
+@XmlType(propOrder = {"catalog", "schemaName", "immediateTables", "annotations"})
+public class Schema implements ModelObject, Annotated {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
 
@@ -61,6 +60,7 @@ public class Schema implements ModelObject {
 
     protected Configuration configuration;
     protected String key;
+    protected final List<Annotation> annotations = new ArrayList<>();
     
     //**************************************************************************
     // Logging
@@ -241,6 +241,14 @@ public class Schema implements ModelObject {
     @Override
     public String toString() {
         return MessageFormat.format("schema {0}", getQualifiedName());
+    }
+
+    @Override
+    @XmlElementWrapper(name = "annotations")
+    @XmlElement(name = "annotation", type = Annotation.class)
+    @NotNull
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 
 }

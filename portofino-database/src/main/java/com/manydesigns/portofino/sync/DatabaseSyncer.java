@@ -137,6 +137,7 @@ public class DatabaseSyncer {
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing schema: {}", sourceSchema.getActualSchemaName());
+        copyAnnotations(sourceSchema, targetSchema);
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
         syncViews(databaseSnapshot, sourceSchema, targetSchema);
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);

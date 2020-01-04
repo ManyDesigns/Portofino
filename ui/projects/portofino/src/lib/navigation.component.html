@@ -24,7 +24,7 @@
              *ngIf="child.accessible && child.showInNavigation"
              [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
             <div class="submenu">
-              <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+              <mat-icon *ngIf="child.icon" [inline]="true">{{child.icon}}</mat-icon>
               {{child.title | translate}}
             </div>
           </a>
@@ -45,7 +45,7 @@
            *ngIf="child.accessible && child.showInNavigation"
            [routerLink]="pageService.page.url + '/' + child.path" routerLinkActive="active">
           <div class="submenu">
-            <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
+            <mat-icon *ngIf="child.icon" [inline]="true">{{child.icon}}</mat-icon>
             {{child.title | translate}}
           </div>
         </a>

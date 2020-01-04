@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.resourceactions.crud.configuration;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.model.Annotated;
@@ -158,7 +157,7 @@ public class CrudProperty implements Annotated {
     }
 
     @JsonProperty("annotations")
-    @XmlElementWrapper(name="annotations")
+    @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation", type = Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;

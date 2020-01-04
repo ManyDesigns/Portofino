@@ -61,5 +61,12 @@ public interface ResourceAction extends SecureResource {
      */
     void prepareForExecution();
 
-
+    /**
+     * Security check method. It is invoked as part of the security check logic and it can also be invoked by
+     * the client to check if the action is accessible. If it returns false, the request is terminated with a 401 or 403
+     * status (according to Portofino's security logic).
+     * By default it always returns true, but implementations can implement custom logic.
+     * @return true if the action is accessible. Note that a client will either receive true or a 401/403 status.
+     */
+    boolean isAccessible();
 }

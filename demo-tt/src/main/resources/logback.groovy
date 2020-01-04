@@ -1,13 +1,8 @@
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.core.ConsoleAppender
-import com.manydesigns.portofino.i18n.ResourceBundleManager
-import com.manydesigns.portofino.rest.PortofinoFilter
-import com.manydesigns.portofino.servlets.PortofinoListener
-import org.hibernate.c3p0.internal.C3P0ConnectionProvider
-
-import static ch.qos.logback.classic.Level.INFO
-import static ch.qos.logback.classic.Level.WARN
 import ch.qos.logback.classic.jul.LevelChangePropagator
+
+import static ch.qos.logback.classic.Level.*
 
 def defaultPattern = "%d %-5level %-40logger{40} %X{userId} %X{req.requestURI} %msg%n";
 def appenders = [];

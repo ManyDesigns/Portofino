@@ -378,9 +378,9 @@ public class ManyToManyAction extends AbstractResourceAction {
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
         String label = ElementsThreadLocals.getText("check.boxes.horizontal");
-        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
+        viewTypeSelectionProvider.appendOption(ViewType.CHECKBOXES.name(), label, true);
         label = ElementsThreadLocals.getText("check.boxes.vertical");
-        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES_VERTICAL.name(), label, true);
+        viewTypeSelectionProvider.appendOption(ViewType.CHECKBOXES_VERTICAL.name(), label, true);
         //label = getMessage("lists");
         //viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
         formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");

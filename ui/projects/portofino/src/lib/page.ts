@@ -371,11 +371,11 @@ export abstract class Page implements WithButtons, OnDestroy {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
     let sourceUrl = this.computeSecurityCheckUrl();
-    return this.http.options(sourceUrl,{ headers: headers, observe: "body", responseType: "text" });
+    return this.http.get(sourceUrl,{ headers: headers, observe: "response" });
   }
 
   protected computeSecurityCheckUrl() {
-    return this.computeSourceUrl();
+    return this.computeSourceUrl() + "/:accessible";
   }
 
   computeSourceUrl() {
@@ -406,6 +406,10 @@ export abstract class Page implements WithButtons, OnDestroy {
       source = source.substring(0, source.length - 1);
     }
     return source;
+  }
+
+  public static defaultComputeSecurityCheckUrl(apiRoot: string, parent: Page, source: string) {
+    return Page.defaultComputeSourceUrl(apiRoot, parent, source) + "/:accessible";
   }
 
   static removeDoubleSlashesFromUrl(url) {

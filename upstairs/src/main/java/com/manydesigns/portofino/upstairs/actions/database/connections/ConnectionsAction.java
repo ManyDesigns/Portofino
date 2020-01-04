@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.upstairs.actions.database.connections;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -8,14 +28,13 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.util.FormUtil;
-import com.manydesigns.portofino.model.InitVisitor;
-import com.manydesigns.portofino.model.LinkVisitor;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderDetail;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ConnectionProviderSummary;
+import com.manydesigns.portofino.upstairs.actions.database.connections.support.ExcludeFromWizard;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +55,7 @@ import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 /**
@@ -162,7 +182,8 @@ public class ConnectionsAction extends AbstractResourceAction {
         if(form.validate()) {
             if(jsonObject.has("schemas")) {
                 JSONArray schemasJson = jsonObject.getJSONArray("schemas");
-                updateSchemas(connectionProvider, schemasJson);
+                updateSchemas(connectionProvider, schemasJson,
+                        (database, schema) -> database.getSchemas().remove(schema));
             }
             form.writeToObject(cp);
             return handler.apply(connectionProvider, form);
@@ -192,7 +213,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         if(connectionProvider == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        updateSchemas(connectionProvider, new JSONArray(jsonInput));
+        updateSchemas(connectionProvider, new JSONArray(jsonInput), (database, schema) -> schema.ensureAnnotation(ExcludeFromWizard.class));
         persistence.syncDataModel(databaseName);
         persistence.initModel();
         persistence.saveXmlModel();
@@ -206,8 +227,10 @@ public class ConnectionsAction extends AbstractResourceAction {
         List<TableInfo> roots = new ArrayList<>();
         Multimap<Table, Reference> children = ArrayListMultimap.create();
         for(Schema schema : schemas) {
-            for(Table table : schema.getTables()) {
-                roots.add(new TableInfo(table));
+            if(!schema.getAnnotation(ExcludeFromWizard.class).isPresent()) {
+                for(Table table : schema.getTables()) {
+                    roots.add(new TableInfo(table));
+                }
             }
         }
         for(Iterator<TableInfo> it = roots.iterator(); it.hasNext();) {
@@ -249,12 +272,13 @@ public class ConnectionsAction extends AbstractResourceAction {
         return roots;
     }
 
-    public void updateSchemas(ConnectionProvider connectionProvider, JSONArray schemasJson) {
+    public void updateSchemas(
+            ConnectionProvider connectionProvider, JSONArray schemasJson, BiConsumer<Database, Schema> actionOnNonSelected) {
         Database database = connectionProvider.getDatabase();
-        List<Schema> selectedSchemas = database.getSchemas();
-        List<String> selectedSchemaNames = new ArrayList<>(selectedSchemas.size());
-        for(Schema schema : selectedSchemas) {
-            selectedSchemaNames.add(schema.getActualSchemaName());
+        List<Schema> schemas = database.getSchemas();
+        List<String> schemaNames = new ArrayList<>(schemas.size());
+        for(Schema schema : schemas) {
+            schemaNames.add(schema.getActualSchemaName());
         }
         for(Object schemaObject : schemasJson) {
             JSONObject schema = (JSONObject) schemaObject;
@@ -265,7 +289,7 @@ public class ConnectionsAction extends AbstractResourceAction {
                 physicalName = logicalName;
             }
             if(selected) {
-                if(!selectedSchemaNames.contains(physicalName)) {
+                if(!schemaNames.contains(physicalName)) {
                     Schema modelSchema = new Schema();
                     modelSchema.setConfiguration(portofinoConfiguration);
                     modelSchema.setDatabase(database);
@@ -275,17 +299,21 @@ public class ConnectionsAction extends AbstractResourceAction {
                     }
                     modelSchema.setActualSchemaName(physicalName);
                     database.getSchemas().add(modelSchema);
-                }
-            } else if(selectedSchemaNames.contains(physicalName)) {
-                Schema toBeRemoved = null;
-                for(Schema aSchema : database.getSchemas()) {
-                    if(aSchema.getActualSchemaName().equals(physicalName)) {
-                        toBeRemoved = aSchema;
-                        break;
+                } else {
+                    for(Schema aSchema : database.getSchemas()) {
+                        if(aSchema.getActualSchemaName().equals(physicalName)) {
+                            aSchema.getAnnotations().removeIf(
+                                    a -> a.getType().equals(ExcludeFromWizard.class.getName()));
+                            break;
+                        }
                     }
                 }
-                if(toBeRemoved != null) {
-                    database.getSchemas().remove(toBeRemoved);
+            } else if(schemaNames.contains(physicalName)) {
+                for(Schema aSchema : database.getSchemas()) {
+                    if(aSchema.getActualSchemaName().equals(physicalName)) {
+                        actionOnNonSelected.accept(database, aSchema);
+                        break;
+                    }
                 }
             }
         }
@@ -302,6 +330,7 @@ public class ConnectionsAction extends AbstractResourceAction {
 
             List<SelectableSchema> selectableSchemas = new ArrayList<>(schemaNamesFromDb.size());
             for(String[] schemaName : schemaNamesFromDb) {
+                boolean selected = schemaNamesFromDb.size() == 1;
                 String logicalName = schemaName[1].toLowerCase();
                 String physicalName = schemaName[1];
                 if(physicalName.equals(logicalName)) {
@@ -309,6 +338,7 @@ public class ConnectionsAction extends AbstractResourceAction {
                 }
                 for(Schema schema : selectedSchemas) {
                     if(schemaName[1].equals(schema.getActualSchemaName())) {
+                        selected = true;
                         logicalName = schema.getSchemaName();
                         if(!schemaName[1].equals(logicalName)) {
                             physicalName = schemaName[1];
@@ -316,7 +346,6 @@ public class ConnectionsAction extends AbstractResourceAction {
                         break;
                     }
                 }
-                boolean selected = schemaNamesFromDb.size() == 1;
                 SelectableSchema schema = new SelectableSchema(schemaName[0], physicalName, logicalName, selected);
                 selectableSchemas.add(schema);
             }

@@ -22,9 +22,6 @@ package com.manydesigns.portofino.resourceactions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.FilteredClassAccessor;
@@ -32,17 +29,17 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.ActionLogic;
-import com.manydesigns.portofino.operations.GuardType;
+import com.manydesigns.portofino.actions.Group;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
+import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.security.*;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -308,10 +305,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return context;
     }
 
-    //--------------------------------------------------------------------------
-    // Utitilities
-    //--------------------------------------------------------------------------
-
     /**
      * Returns an error response with message saying that the resourceaction is not properly
      * configured.
@@ -376,6 +369,13 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             parameters.remove(parameters.size() - 1);
         }
         return description;
+    }
+
+    @Override
+    @Path(":accessible")
+    @GET
+    public boolean isAccessible() {
+        return true;
     }
 
     ////////////////

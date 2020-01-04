@@ -87,17 +87,14 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <scope>compile</scope>
         </dependency>
         <!-- mail -->
         <dependency>
@@ -221,12 +218,14 @@
         </profile>
         <!-- See web.xml for an explanation -->
         <profile>
+            <!-- Used for development, see web.xml for an explanation. -->
             <id>portofino-development</id>
             <properties>
                 <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
             </properties>
         </profile>
         <profile>
+            <!-- Build Docker images and launch the application. -->
             <id>docker</id>
             <properties>
                 <portofino.application.directory>${env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
