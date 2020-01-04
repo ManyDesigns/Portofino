@@ -232,6 +232,7 @@
                 <portofino.application.directory>${env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
                 <debug.port>8000</debug.port>
                 <tomcat.port>8080</tomcat.port>
+                <frontend.port>3000</frontend.port>
             </properties>
             <build>
                 <plugins>
@@ -294,6 +295,35 @@
                                             <log>database system is ready to accept connections</log>
                                             <time>20000</time>
                                         </wait>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>demo-tt-frontend</alias>
+                                    <name>demo-tt-frontend:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/frontend</contextDir>
+                                        <assembly>
+                                            <descriptor>${project.basedir}/src/main/docker/frontend/assembly.xml</descriptor>
+                                        </assembly>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                        <ports>
+                                            <port>frontend.port:80</port>
+                                        </ports>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>demo-tt-backend</alias>
+                                    <name>demo-tt-backend:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/application/backend-only</contextDir>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                        <ports>
+                                            <port>tomcat.port:8080</port>
+                                        </ports>
                                     </run>
                                 </image>
                             </images>
