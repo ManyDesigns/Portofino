@@ -265,7 +265,7 @@ public class Table implements ModelObject, Annotated {
         return oneToManyRelationships;
     }
 
-    @XmlElementWrapper(name="annotations")
+    @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation", type = Annotation.class)
     @NotNull
     public List<Annotation> getAnnotations() {
