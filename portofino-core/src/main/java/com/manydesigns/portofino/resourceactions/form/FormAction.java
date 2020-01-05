@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -48,7 +48,7 @@ import javax.ws.rs.core.Response;
 @SupportsPermissions(FormAction.POST_FORM_PERMISSION)
 public abstract class FormAction extends AbstractResourceAction {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(FormAction.class);
     public static final String POST_FORM_PERMISSION = "post-form";

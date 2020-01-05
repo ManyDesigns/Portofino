@@ -26,7 +26,7 @@ import java.lang.reflect.Type;
 public class FormMessageBodyWriter implements MessageBodyWriter<Form> {
 
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

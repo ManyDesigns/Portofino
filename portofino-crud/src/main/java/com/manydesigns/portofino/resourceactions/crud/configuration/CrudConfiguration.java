@@ -21,7 +21,7 @@ import java.util.List;
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration implements ResourceActionConfiguration, ConfigurationWithDefaults {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //**************************************************************************
     // Fields

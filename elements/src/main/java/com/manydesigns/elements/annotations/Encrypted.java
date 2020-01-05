@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Encrypted {
-    String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     String value() default "com.manydesigns.elements.DefaultFieldEncrypter";
 

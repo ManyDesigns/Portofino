@@ -62,7 +62,7 @@ import static com.manydesigns.portofino.modules.ResourceActionsModule.ACTIONS_DI
 @RequiresAuthentication
 @RequiresAdministrator
 public class UpstairsAction extends AbstractResourceAction {
-    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(UpstairsAction.class);
 

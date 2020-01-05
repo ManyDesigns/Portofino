@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -51,7 +51,7 @@ import java.util.ResourceBundle;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class I18nUtils {
-    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public final static String RESOURCE_BUNDLE_MANAGER = "com.manydesigns.portofino.resourceBundleManager";
     public static final String PORTOFINO_MESSAGES_FILE_NAME = "portofino-messages.properties";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class ResourceActionLogic {
-    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(ResourceActionLogic.class);
 

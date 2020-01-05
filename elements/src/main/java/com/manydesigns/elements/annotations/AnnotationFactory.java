@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class AnnotationFactory {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     private final ClassLoader classLoader;
 

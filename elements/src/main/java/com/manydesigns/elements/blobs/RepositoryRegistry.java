@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class RepositoryRegistry {
 
-  public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+  public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
   public static final Logger logger = LoggerFactory.getLogger(RepositoryRegistry.class);
 
   private static RepositoryRegistry instance = new RepositoryRegistry();
