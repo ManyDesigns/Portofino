@@ -30,6 +30,7 @@ import org.apache.commons.lang.ArrayUtils;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.*;
 
@@ -54,7 +55,7 @@ public class MutableHttpServletRequest implements HttpServletRequest, MultipartW
     public final List<Locale> locales;
 
     private String method;
-    private String contextPath;
+    private String contextPath = "";
     private String servletPath;
     private String requestURI;
     private String queryString;
@@ -63,7 +64,7 @@ public class MutableHttpServletRequest implements HttpServletRequest, MultipartW
     private int serverPort;
 
     private String contentType;
-    private String characterEncoding;
+    private String characterEncoding = Charset.defaultCharset().name();
 
     private MutableServletContext servletContext;
     private MutableHttpSession session;
@@ -357,7 +358,7 @@ public class MutableHttpServletRequest implements HttpServletRequest, MultipartW
         return characterEncoding;
     }
 
-    public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
+    public void setCharacterEncoding(String s) {
         characterEncoding = s;
     }
 

@@ -1048,7 +1048,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
         UrlBuilder urlBuilder = new UrlBuilder(
                 charset,
-                Util.getAbsoluteUrl(baseUrl + "/:blob/" + field.getPropertyAccessor().getName()),
+                Util.getAbsoluteUrl(context.getRequest(), baseUrl + "/:blob/" + field.getPropertyAccessor().getName()),
                 false);
         return urlBuilder.toString();
     }
@@ -1835,6 +1835,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @QueryParam("id")
             List<String> ids) throws Exception {
         if(object == null) {
+            if(ids == null || ids.isEmpty()) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+                        "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+            }
             return bulkDelete(ids);
         }
         if(ids != null && !ids.isEmpty()) {

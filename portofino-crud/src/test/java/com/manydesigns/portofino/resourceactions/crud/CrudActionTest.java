@@ -67,6 +67,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.testng.Assert.*;
@@ -274,45 +275,29 @@ public class CrudActionTest extends JerseyTest {
         }
 
         crudAction.httpPutMultipart();
-        /* TODO
-
-
-        crudAction.preparePage();
-        crudAction.prepare();
-        crudAction.save();
-
-        crudAction.preparePage();
-        crudAction.prepare();
-        crudAction.update();
         assertTrue(crudAction.form.validate());
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
+        crudAction.blobManager.loadMetadata(blobField.getValue()); //This is necessary because the crud might reload the form
         assertEquals(tmpFile.getName(), blobField.getValue().getFilename());
         String oldBlobCode = blobField.getValue().getCode();
         assertEquals(fileItem.getSize(), blobField.getValue().getSize());
 
         req.setParameter("descn_operation", FileBlobField.UPLOAD_MODIFY);
         req.setFileItem("descn", fileItem);
-        crudAction.update();
+        crudAction.httpPutMultipart();
         assertTrue(crudAction.form.validate());
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
+        crudAction.blobManager.loadMetadata(blobField.getValue()); //This is necessary because the crud might reload the form
         assertEquals(tmpFile.getName(), blobField.getValue().getFilename());
         String newBlobCode = blobField.getValue().getCode();
 
-        assertFalse(newBlobCode.equals(oldBlobCode));
-
-        blobManager.loadMetadata(new Blob(newBlobCode));
+        assertNotEquals(oldBlobCode, newBlobCode);
+        crudAction.blobManager.loadMetadata(new Blob(newBlobCode));
         try {
-            blobManager.loadMetadata(new Blob(oldBlobCode));
-            tmpBlobManager.loadMetadata(new Blob(oldBlobCode));
+            crudAction.blobManager.loadMetadata(new Blob(oldBlobCode));
             fail("The blob " + oldBlobCode + " should have been deleted");
-        } catch (IOException e) {
-            //Ok
-        }
-        try {
-            tmpBlobManager.loadMetadata(new Blob(newBlobCode));
-            fail("The blob " + newBlobCode + " should have been deleted");
         } catch (IOException e) {
             //Ok
         }
@@ -327,12 +312,12 @@ public class CrudActionTest extends JerseyTest {
         assertEquals(1, qres);
         session.flush();
         session.getTransaction().commit();
-
         session.clear();
         session.beginTransaction();
-        crudAction.preparePage();
-        crudAction.prepare();
-        crudAction.read();
+        //Force loading the object from the DB
+        crudAction.getParameters().add(id.toString());
+        crudAction.parametersAcquired();
+        crudAction.jsonReadData();
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
         assertNotNull(blobField.getBlobError());
@@ -346,18 +331,16 @@ public class CrudActionTest extends JerseyTest {
         assertEquals(1, qres);
         session.flush();
         session.getTransaction().commit();
-
         session.clear();
         session.beginTransaction();
-        crudAction.preparePage();
-        crudAction.prepare();
-        crudAction.delete();
+        crudAction.parametersAcquired(); //Force reload
+        crudAction.httpDelete(Collections.emptyList());
         try {
-            blobManager.loadMetadata(new Blob(newBlobCode));
+            crudAction.blobManager.loadMetadata(new Blob(newBlobCode));
             fail("The blob " + newBlobCode + " should have been deleted");
         } catch (IOException e) {
             //Ok
-        }*/
+        }
     }
 
 }

@@ -65,6 +65,10 @@ public class Util {
 
     public static final Logger logger = LoggerFactory.getLogger(Util.class);
 
+    public static String getAbsoluteUrl(HttpServletRequest req, String url) {
+        return getAbsoluteUrl(req, url, false);
+    }
+
     public static String getAbsoluteUrl(HttpServletRequest req, String url, boolean full) {
         StringBuilder sb = new StringBuilder();
 
