@@ -71,7 +71,7 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
 
     /**
      * Lifecycle method invoked when there are no more path parameters to process.
-     * @since 5.0.0-SNAPSHOT
+     * @since 5.0.0
      */
     protected void parametersAcquired() throws WebApplicationException {
         if(parameters.size() < minParameters) {

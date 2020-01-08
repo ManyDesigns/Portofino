@@ -1732,7 +1732,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * {@link #uploadBlob(String, String, InputStream)}.
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
-     * @since 4.5-SNAPSHOT
+     * @since 5.0
      * @return the updated object as JSON (in a JAX-RS Response).
      */
     protected Response bulkUpdate(String jsonObject, List<String> ids) {

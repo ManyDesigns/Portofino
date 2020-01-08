@@ -205,7 +205,7 @@ public abstract class AbstractResource implements SecureResource {
 
     /**
      * Returns the directory where this resource's children resources are defined.
-     * @since 5.0.0-SNAPSHOT
+     * @since 5.0.0
      */
     public FileObject getChildrenLocation() throws FileSystemException {
         return location;

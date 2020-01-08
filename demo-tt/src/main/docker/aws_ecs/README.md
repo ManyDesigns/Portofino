@@ -34,9 +34,9 @@ aws ecr get-login --region $region --no-include-email #for example, region = eu-
 docker login ...
 docker images #to see the images
 
-docker tag demo-tt-database:5.1.1 $registry/demo-tt/database:5.1.0
+docker tag demo-tt-database:5.1.1 $registry/demo-tt/database:5.1.1
 docker tag demo-tt:5.1.1 $registry/demo-tt/webapp:5.1.1
-docker push $registry/demo-tt/database:5.1.0 
+docker push $registry/demo-tt/database:5.1.1
 docker push $registry/demo-tt/webapp:5.1.1
 ```
 

@@ -39,7 +39,7 @@ public interface ResourceAction extends SecureResource {
 
     /**
      * Returns the action that comes before this action in the matched request path.
-     * @since 5.0.0
+     * @since 5.0
      * @return the parent {@link ResourceAction}.
      */
     ResourceAction getParent();
@@ -57,7 +57,7 @@ public interface ResourceAction extends SecureResource {
 
     /**
      * Lifecycle method invoked just before the resource method is invoked via REST.
-     * @since 5.0.0
+     * @since 5.0
      */
     void prepareForExecution();
 

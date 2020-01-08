@@ -39,7 +39,7 @@ The aforementioned Docker resources are meant to be used in conjunction with Mav
 
 Running `mvn -Pdocker package`, i.e., building the application with the `docker` profile, will automatically build the
 Docker images. Note that, if we plan on running the application locally via Maven for development, **the `docker`
-profile is incompatible with the `portofino-development` profile and actually supersedes it.**.
+profile is incompatible with the `portofino-development` profile and actually supersedes it.**
 
 Also note that the frontend is only built if the profile `build-frontend` is active. Normally it is active by default,
 but if we activate the `docker` profile, then the default profiles are not activated unless explicitly requested with
@@ -70,8 +70,8 @@ For information about persisting database data, please refer to the [Maven Integ
 
 ### Development and Debugging
 
-To launch the application locally for development and debugging, provided you've built the Docker images, we can use the
-following command:
+To launch the application locally for development and debugging, provided that we've built the Docker images, we can use
+the following command:
 
 ```
 mvn -Pdocker docker:run
@@ -80,7 +80,7 @@ mvn -Pdocker docker:run
 This will launch the application listening on the port specified in `pom.xml` (8080 by default). Remote debugging with
 our IDE is possible on the debug port (8000 by default, again specified in `pom.xml`).
 
-The application will read and write on the source directory of our project, so that modifications made in the IDE and
+The application will read and write the source directory of our project, so that modifications made in the IDE and
 modifications made in the running application will be immediately reflected both in the application and in the sources.
 
 Note that Tomcat runs as root in the container; as such, it might create new resources with owner root in our source
