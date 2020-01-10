@@ -131,6 +131,9 @@ export class PageSettingsPanel {
   }
 
   loadPermissions() {
+    if(!this.page.hasSource()) {
+      return;
+    }
     const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
     this.page.http.get<Permissions>(permissionsUrl).subscribe(p => {
       this.permissions = p;

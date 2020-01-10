@@ -65,7 +65,7 @@ export class PageCrudService {
       parameters.actionClass = actionClass;
     }
     return this.http.post(`${this.portofino.localApiPath}/${path}`, page, { params: parameters})
-      .pipe(mergeMap(() => parentPage.reloadBaseUrl()));
+      .pipe(tap(() => parentPage.reloadBaseUrl()));
   }
 
   deletePage() {
