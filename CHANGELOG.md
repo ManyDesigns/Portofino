@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [5.1.1] - 2020-01-10
+
 ### Added
 - Text pages (client only, no I18n).
 - Support deployment behind a proxy.
