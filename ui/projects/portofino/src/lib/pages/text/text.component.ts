@@ -64,5 +64,4 @@ export class TextPageSettingsPanel extends PageSettingsPanel {
     pageConf.text = config.text;
     return pageConf;
   }
-
 }

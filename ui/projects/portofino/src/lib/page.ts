@@ -175,9 +175,7 @@ export class PageSettingsPanel {
 
   reloadConfiguration() {
     this.page.loadConfiguration().subscribe(conf => {
-      this.page.http.get<ClassAccessor>(this.page.configurationUrl + '/classAccessor')
-        .pipe(loadClassAccessor)
-        .subscribe(ca => {
+      this.loadActionConfiguration().subscribe(ca => {
         this.setupConfigurationForm(ca, conf);
       }, error => {
         this.setupConfigurationForm(null, null);
@@ -187,7 +185,18 @@ export class PageSettingsPanel {
     });
   }
 
+  protected loadActionConfiguration() {
+    if(!this.page.hasSource()) {
+      return of(null);
+    }
+    return this.page.http.get<ClassAccessor>(
+      this.page.configurationUrl + '/classAccessor').pipe(loadClassAccessor);
+  }
+
   getActionConfigurationToSave() {
+    if(!this.page.hasSource()) {
+      return null;
+    }
     const configuration = this.form.get('configuration');
     return configuration ? Object.assign({}, configuration.value) : null;
   }
@@ -488,6 +497,13 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   public loadConfiguration() {
+    if(!this.hasSource()) {
+      return of({...this.configuration});
+    }
+    return this.doLoadConfiguration();
+  }
+
+  protected doLoadConfiguration() {
     return this.http.get(this.configurationUrl).pipe(map(c => {
       this.configuration = {...c, ...this.configuration};
       return c;
