@@ -46,8 +46,6 @@ import java.util.*;
  */
 public class JavaCodeBase extends AbstractCodeBase {
     
-    //TODO reset()
-
     protected JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     protected DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
     protected InMemoryFileManager fileManager;

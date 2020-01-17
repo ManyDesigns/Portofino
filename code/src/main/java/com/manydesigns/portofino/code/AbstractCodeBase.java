@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.code;
 
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import org.apache.commons.vfs2.FileObject;
@@ -19,6 +20,7 @@ public abstract class AbstractCodeBase implements CodeBase {
     protected final Subject<Class> reloads = PublishSubject.create();
     protected FileObject root;
     protected ClassLoader classLoader;
+    private Disposable parentSubscription;
 
     public AbstractCodeBase(FileObject root) {
         this.root = root;
@@ -26,11 +28,22 @@ public abstract class AbstractCodeBase implements CodeBase {
 
     public AbstractCodeBase(FileObject root, CodeBase parent, ClassLoader classLoader) {
         this(root);
-        this.parent = parent;
         this.classLoader = classLoader;
+        installParent(parent);
+    }
+
+    public void setParent(CodeBase parent) throws Exception {
+        this.clear(false);
+        if(parentSubscription != null) {
+            parentSubscription.dispose();
+        }
+        installParent(parent);
+    }
+
+    protected void installParent(CodeBase parent) {
+        this.parent = parent;
         if(parent != null) {
-            //noinspection ResultOfMethodCallIgnored - subscriptions are disposed on close
-            parent.getReloads().subscribe(c -> {
+            parentSubscription = parent.getReloads().subscribe(c -> {
                 parentClassReloaded(c);
                 reloads.onNext(c);
             });
