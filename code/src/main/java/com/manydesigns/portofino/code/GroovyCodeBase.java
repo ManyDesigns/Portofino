@@ -46,7 +46,7 @@ public class GroovyCodeBase extends AbstractCodeBase {
             logger.debug("Could not set classpath", e);
         }
         cc.setRecompileGroovySource(true);
-        groovyScriptEngine = new GroovyScriptEngine(new URL[] { this.root.getURL() }, getClassLoader());
+        groovyScriptEngine = new GroovyScriptEngine(new URL[] { this.root.getURL() }, parent != null ? parent.asClassLoader() : getClassLoader());
         groovyScriptEngine.setConfig(cc);
         groovyScriptEngine.getGroovyClassLoader().setShouldRecompile(Boolean.TRUE);
     }

@@ -22,6 +22,7 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.security.SecurityLogic;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtException;
@@ -70,6 +71,9 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     @Autowired
     protected Configuration portofinoConfiguration;
 
+    @Autowired
+    protected CodeBase codeBase;
+
     protected PasswordService passwordService;
 
     protected boolean legacyHashing = false;
@@ -103,7 +107,13 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         byte[] serializedPrincipal = Base64.decode(base64Principal);
         Object principal;
         try {
-            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedPrincipal));
+            Thread.currentThread().setContextClassLoader(codeBase.asClassLoader());
+            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedPrincipal)) {
+                @Override
+                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+                    return codeBase.loadClass(desc.getName());
+                }
+            };
             principal = objectInputStream.readObject();
             objectInputStream.close();
         } catch (Exception e) {

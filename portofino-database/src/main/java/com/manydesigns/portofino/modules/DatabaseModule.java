@@ -22,6 +22,8 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
+import com.manydesigns.portofino.code.AggregateCodeBase;
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -53,7 +55,7 @@ import javax.servlet.ServletContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DatabaseModule implements Module, ApplicationContextAware, ApplicationListener {
+public class DatabaseModule implements Module, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -79,6 +81,8 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     protected ApplicationContext applicationContext;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
+
+    protected final AggregateCodeBase persistenceCodeBase = new AggregateCodeBase(null, getClass().getClassLoader());
 
     //**************************************************************************
     // Constants
@@ -109,6 +113,11 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
         status = ModuleStatus.ACTIVE;
     }
 
+    @Autowired
+    public void setCodeBase(CodeBase codeBase) throws Exception {
+        codeBase.setParent(persistenceCodeBase);
+    }
+
     @Bean
     public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
         return new DatabasePlatformsRegistry(configuration);
@@ -120,6 +129,20 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
         Persistence persistence = new Persistence(applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
+        //Make generated classes visible to shared classes and actions
+        persistence.databaseSetupEvents.subscribe(e -> {
+            switch (e.type) {
+                case Persistence.DatabaseSetupEvent.ADDED:
+                    persistenceCodeBase.add(e.setup.getCodeBase());
+                    break;
+                case Persistence.DatabaseSetupEvent.REMOVED:
+                    persistenceCodeBase.remove(e.setup.getCodeBase());
+                    break;
+                case Persistence.DatabaseSetupEvent.REPLACED:
+                    persistenceCodeBase.replace(e.oldSetup.getCodeBase(), e.setup.getCodeBase());
+                    break;
+            }
+        });
         return persistence;
     }
 
@@ -142,16 +165,14 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     }
 
     @Override
-    public void onApplicationEvent(@NotNull ApplicationEvent event) {
-        if(event instanceof ContextRefreshedEvent) {
-            Persistence persistence = applicationContext.getBean(Persistence.class);
-            Persistence.Status status = persistence.status.getValue();
-            if(status == null || status == Persistence.Status.STOPPED) {
-                logger.info("Starting persistence...");
-                persistence.start();
-                this.status = ModuleStatus.STARTED;
-                logger.info("Persistence started.");
-            }
+    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
+        Persistence persistence = applicationContext.getBean(Persistence.class);
+        Persistence.Status status = persistence.status.getValue();
+        if(status == null || status == Persistence.Status.STOPPED) {
+            logger.info("Starting persistence...");
+            persistence.start();
+            this.status = ModuleStatus.STARTED;
+            logger.info("Persistence started.");
         }
     }
 }

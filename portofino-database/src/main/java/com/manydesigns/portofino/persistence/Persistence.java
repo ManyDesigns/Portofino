@@ -35,6 +35,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
@@ -98,6 +99,7 @@ public class Persistence {
     protected final Configuration configuration;
     protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
+    public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
 
     public enum Status {
         STARTING, STARTED, STOPPING, STOPPED
@@ -379,6 +381,9 @@ public class Persistence {
             }
         }
 
+        for(HibernateDatabaseSetup setup : setups.values()) {
+            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, setup));
+        }
         setups.clear();
         model.init(configuration);
         for (Database database : model.getDatabases()) {
@@ -402,7 +407,14 @@ public class Persistence {
                                 database, sessionFactoryAndCodeBase.sessionFactory,
                                 sessionFactoryAndCodeBase.codeBase, builder.getEntityMode());
                 String databaseName = database.getDatabaseName();
+                HibernateDatabaseSetup oldSetup = setups.get(databaseName);
                 setups.put(databaseName, setup);
+                if(oldSetup != null) {
+                    oldSetup.dispose();
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(oldSetup, setup));
+                } else {
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.ADDED, setup));
+                }
             }
         } catch (Exception e) {
             logger.error("Could not create connection provider for " + database, e);
@@ -542,12 +554,12 @@ public class Persistence {
     }
 
     public void stop() {
+        //TODO complete subscriptions?
         status.onNext(Status.STOPPING);
         closeSessions();
         for(HibernateDatabaseSetup setup : setups.values()) {
-            //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
-            //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
-            setup.getSessionFactory().close();
+            setup.dispose();
+            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, setup));
         }
         for (Database database : model.getDatabases()) {
             ConnectionProvider connectionProvider =
@@ -581,6 +593,28 @@ public class Persistence {
         } catch (FileSystemException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static class DatabaseSetupEvent {
+        public static final int ADDED = +1, REMOVED = -1, REPLACED = 0;
+
+        public DatabaseSetupEvent(int type, HibernateDatabaseSetup setup) {
+            if(type == 0) {
+                throw new IllegalArgumentException();
+            }
+            this.type = type;
+            this.setup = setup;
+        }
+
+        public DatabaseSetupEvent(HibernateDatabaseSetup setup, HibernateDatabaseSetup oldSetup) {
+            this.setup = setup;
+            this.oldSetup = oldSetup;
+            type = REPLACED;
+        }
+
+        public int type;
+        public HibernateDatabaseSetup setup;
+        public HibernateDatabaseSetup oldSetup;
     }
 
 }

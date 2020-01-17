@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import javax.persistence.criteria.CriteriaBuilder
 import javax.persistence.criteria.CriteriaQuery
 import javax.persistence.criteria.Root
+import java.sql.Timestamp
 
 class Security extends AbstractPortofinoRealm {
 
@@ -141,14 +142,15 @@ class Security extends AbstractPortofinoRealm {
     }
 
     private void updateAccess(Object principal, Date now) {
-        def request = ElementsThreadLocals.getHttpServletRequest();
-        principal.last_access = now;
-        principal.last_access_ip = request.getRemoteAddr();
+        def request = ElementsThreadLocals.getHttpServletRequest()
+        principal.last_access = new Timestamp(now.time)
+        principal.last_access_ip = request.getRemoteAddr()
     }
 
     @Override
     protected Object cleanUserPrincipal(user) {
         Map cleanUser = new HashMap()
+        //user.properties.each { k, v -> //use this for POJO persistence
         user.each { k, v ->
             if (v instanceof List || v instanceof Map) {
                 logger.debug("Skipping {}", k)

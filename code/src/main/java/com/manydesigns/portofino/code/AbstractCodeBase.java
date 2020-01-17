@@ -4,11 +4,13 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,6 +34,7 @@ public abstract class AbstractCodeBase implements CodeBase {
         installParent(parent);
     }
 
+    @Override
     public void setParent(CodeBase parent) throws Exception {
         this.clear(false);
         if(parentSubscription != null) {
@@ -80,6 +83,18 @@ public abstract class AbstractCodeBase implements CodeBase {
     }
 
     protected abstract Class loadLocalClass(String className) throws IOException, ClassNotFoundException;
+
+    @Override
+    public URL findResource(String name) throws IOException {
+        FileObject fileObject = getRoot().resolveFile(name);
+        if(fileObject.exists()) {
+            return fileObject.getURL();
+        } else if(parent != null) {
+            return parent.findResource(name);
+        } else {
+            return null;
+        }
+    }
 
     @Override
     public CodeBase getParent() {

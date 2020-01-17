@@ -29,13 +29,8 @@ public class CodeBaseClassLoader extends ClassLoader {
     @Override
     protected URL findResource(String name) {
         try {
-            FileObject fileObject = codeBase.getRoot().resolveFile(name);
-            if(fileObject.exists()) {
-                return fileObject.getURL();
-            } else {
-                return null;
-            }
-        } catch (FileSystemException e) {
+            return codeBase.findResource(name);
+        } catch (IOException e) {
             return null;
         }
     }

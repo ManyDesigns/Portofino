@@ -89,7 +89,6 @@ public class SessionFactoryBuilder {
     }
 
     public SessionFactoryAndCodeBase buildSessionFactory(FileObject root) throws Exception {
-        CodeBase codeBase = new JavaCodeBase(root);
         List<Table> mappableTables = database.getAllTables();
         mappableTables.removeIf(this::checkInvalidPrimaryKey);
         List<Table> externallyMappedTables = mappableTables.stream().filter(t -> {
@@ -131,7 +130,7 @@ public class SessionFactoryBuilder {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        return buildSessionFactory(codeBase, mappableTables, externallyMappedTables);
+        return buildSessionFactory(new JavaCodeBase(root), mappableTables, externallyMappedTables);
     }
 
     protected boolean checkInvalidPrimaryKey(Table table) {

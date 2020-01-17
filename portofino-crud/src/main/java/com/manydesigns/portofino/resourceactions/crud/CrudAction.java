@@ -79,7 +79,7 @@ import java.util.stream.Collectors;
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(CrudConfiguration.class)
 @ResourceActionName("Crud")
-public class CrudAction extends AbstractCrudAction<Object> {
+public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -179,7 +179,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected void doSave(Object object) {
+    protected void doSave(T object) {
         try {
             session.save(baseTable.getActualEntityName(), object);
         } catch(ConstraintViolationException e) {
@@ -196,7 +196,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected void doUpdate(Object object) {
+    protected void doUpdate(T object) {
         try {
             session.update(baseTable.getActualEntityName(), object);
         } catch(ConstraintViolationException e) {
@@ -206,7 +206,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected void doDelete(Object object) {
+    protected void doDelete(T object) {
         session.delete(baseTable.getActualEntityName(), object);
     }
 
@@ -295,7 +295,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     // Object loading
     //**************************************************************************
 
-    public List<Object> loadObjects() {
+    public List<T> loadObjects() {
         try {
             TableCriteria criteria = new TableCriteria(baseTable);
             if(searchForm != null) {
@@ -309,7 +309,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
                     logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
                 }
             }
-            objects = QueryUtils.getObjects(session, getBaseQuery(), criteria, this, firstResult, maxResults);
+            objects = (List) QueryUtils.getObjects(session, getBaseQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects = new ArrayList<>();
             logger.warn("Incorrect Field Type", e);
@@ -329,8 +329,8 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected Object loadObjectByPrimaryKey(Serializable pkObject) {
-        return QueryUtils.getObjectByPk(
+    protected T loadObjectByPrimaryKey(Serializable pkObject) {
+        return (T) QueryUtils.getObjectByPk(
                 persistence,
                 baseTable, pkObject,
                 getBaseQuery(), this);

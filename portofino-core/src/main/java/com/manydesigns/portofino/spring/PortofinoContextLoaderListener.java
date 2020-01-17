@@ -139,7 +139,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         //TODO periodically check SpringConfiguration for changes if reload == true?
         if(reload) {
             Disposable subscription = codeBase.getReloads().subscribe(c -> {
-                if (isReloadable(c)) {
+                if (isConfigurationClass(c)) {
                     if (refreshing.compareAndSet(false, true)) {
                         logger.info("Detected reload of " + c + ", refreshing the application context");
                         try {
@@ -210,7 +210,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         }
     }
 
-    protected boolean isReloadable(Class<?> c) {
+    protected boolean isConfigurationClass(Class<?> c) {
         return c.getAnnotation(Component.class) != null ||
                c.getAnnotation(org.springframework.context.annotation.Configuration.class) != null ||
                c.getAnnotation(Repository.class) != null ||
