@@ -27,11 +27,14 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
+import io.reactivex.disposables.Disposable;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.hibernate.EntityMode;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +86,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     protected final AggregateCodeBase persistenceCodeBase = new AggregateCodeBase(null, getClass().getClassLoader());
+    protected Disposable subscription;
 
     //**************************************************************************
     // Constants
@@ -129,17 +133,30 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
         Persistence persistence = new Persistence(applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
-        //Make generated classes visible to shared classes and actions
-        persistence.databaseSetupEvents.subscribe(e -> {
+
+        FileObject generatedClassesRoot = applicationDirectory.resolveFile("classes-generated");
+        generatedClassesRoot.createFolder();
+        AllFileSelector allFileSelector = new AllFileSelector();
+        //When the entity mode is POJO:
+        // - make generated classes visible to shared classes and actions;
+        // - write them in the application directory so the user's IDE and tools can know about them.
+        subscription = persistence.databaseSetupEvents.subscribe(e -> {
+            if(e.setup.getEntityMode() == EntityMode.MAP) {
+                return;
+            }
+            FileObject databaseDir = e.setup.getCodeBase().getRoot();
+            generatedClassesRoot.resolveFile(e.setup.getDatabase().getDatabaseName()).deleteAll();
             switch (e.type) {
                 case Persistence.DatabaseSetupEvent.ADDED:
                     persistenceCodeBase.add(e.setup.getCodeBase());
+                    generatedClassesRoot.copyFrom(databaseDir, allFileSelector);
                     break;
                 case Persistence.DatabaseSetupEvent.REMOVED:
                     persistenceCodeBase.remove(e.setup.getCodeBase());
                     break;
                 case Persistence.DatabaseSetupEvent.REPLACED:
                     persistenceCodeBase.replace(e.oldSetup.getCodeBase(), e.setup.getCodeBase());
+                    generatedClassesRoot.copyFrom(databaseDir, allFileSelector);
                     break;
             }
         });
@@ -150,6 +167,10 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public void destroy() {
         logger.info("ManyDesigns Portofino database module stopping...");
         applicationContext.getBean(Persistence.class).stop();
+        if(subscription != null) {
+            subscription.dispose();
+            subscription = null;
+        }
         logger.info("ManyDesigns Portofino database module stopped.");
         status = ModuleStatus.DESTROYED;
     }

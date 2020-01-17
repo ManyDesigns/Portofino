@@ -559,7 +559,6 @@ public class Persistence {
         closeSessions();
         for(HibernateDatabaseSetup setup : setups.values()) {
             setup.dispose();
-            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, setup));
         }
         for (Database database : model.getDatabases()) {
             ConnectionProvider connectionProvider =
