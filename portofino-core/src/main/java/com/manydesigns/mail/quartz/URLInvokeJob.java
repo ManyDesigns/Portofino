@@ -51,7 +51,7 @@ public class URLInvokeJob implements Job {
             urlConnection.setReadTimeout(30000);
             urlConnection.connect();
             int responseCode = urlConnection.getResponseCode();
-            if(responseCode != 200) {
+            if(responseCode >= 400) {
                 logger.warn("Invocation of URL " + urlToInvoke + " returned response code " + responseCode);
             }
         } catch (Exception e) {
