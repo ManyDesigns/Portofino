@@ -85,6 +85,7 @@ public class DatabaseSyncer {
                 logger.debug("Source database was already configured. Copying true string and false string.");
                 targetDatabase.setTrueString(sourceDatabase.getTrueString());
                 targetDatabase.setFalseString(sourceDatabase.getFalseString());
+                targetDatabase.setEntityMode(sourceDatabase.getEntityMode());
             }
 
             logger.debug("Reading schema names from metadata");

@@ -281,7 +281,7 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
     }
 
     @Override
-    public Object init() {
+    public CrudAction<T> init() {
         super.init();
         if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
             session = persistence.getSession(getCrudConfiguration().getDatabase());
@@ -295,6 +295,7 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
     // Object loading
     //**************************************************************************
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public List<T> loadObjects() {
         try {
             TableCriteria criteria = new TableCriteria(baseTable);
@@ -329,6 +330,7 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected T loadObjectByPrimaryKey(Serializable pkObject) {
         return (T) QueryUtils.getObjectByPk(
                 persistence,

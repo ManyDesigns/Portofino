@@ -191,4 +191,9 @@ public class ConnectionProviderDetail {
         }
     }
 
+    @Updatable(false)
+    public String getEntityMode() {
+        return database.getEntityMode();
+    }
+
 }

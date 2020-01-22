@@ -11,8 +11,8 @@ export class WizardComponent extends Page implements OnInit {
 
   connectionProviders: ConnectionProviderSummary[];
   databasePlatforms: DatabasePlatform[];
-  wizard: { connectionProvider: ConnectionProviderSummary } | any =
-    { newConnectionType: 'jdbc', strategy: "automatic" };
+  wizard: { connectionProvider: ConnectionProviderSummary, newConnectionType?: string, entityMode: string } | any =
+    { newConnectionType: 'jdbc', strategy: "automatic", entityMode: 'MAP' };
 
   ngOnInit(): void {
     this.loadConnectionProviders();
@@ -39,28 +39,9 @@ export class WizardComponent extends Page implements OnInit {
   wizardStep(event) {
     if(event.selectedIndex == 1) {
       if(this.wizard.connectionProvider) {
-        const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}`;
-        this.http.get<ConnectionProviderDetails>(url).subscribe(c => {
-          this.wizard.schemas = c.schemas;
-        });
+        this.wizardFirstStepExistingConnectionProvider();
       } else {
-        const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
-        const conn = new ConnectionProviderDetails();
-        conn.databaseName = { value: this.wizard.databaseName };
-        conn.jndiResource = { value: this.wizard.jndiResource };
-        conn.driver = { value: this.wizard.driver.standardDriverClassName };
-        conn.url = { value: this.wizard.connectionUrl };
-        conn.username = { value: this.wizard.username };
-        conn.password = { value: this.wizard.password };
-        this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
-          const summary = new ConnectionProviderSummary();
-          summary.name = c.databaseName.value;
-          summary.status = c.status.value;
-          this.connectionProviders.push(summary);
-          this.wizard.connectionProvider = summary;
-          this.wizard.schemas = c.schemas;
-          this.notificationService.info(this.translate.instant("Database created."));
-        });
+        this.wizardFirstStepNewConnectionProvider();
       }
     } else if(event.selectedIndex == 2) {
       const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}/schemas`;
@@ -69,6 +50,34 @@ export class WizardComponent extends Page implements OnInit {
         this.wizard.tables = tables;
       });
     }
+  }
+
+  private wizardFirstStepNewConnectionProvider() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
+    const conn = new ConnectionProviderDetails();
+    conn.databaseName = {value: this.wizard.databaseName};
+    conn.jndiResource = {value: this.wizard.jndiResource};
+    conn.driver = {value: this.wizard.driver.standardDriverClassName};
+    conn.url = {value: this.wizard.connectionUrl};
+    conn.username = {value: this.wizard.username};
+    conn.password = {value: this.wizard.password};
+    conn.entityMode = {value: this.wizard.entityMode};
+    this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
+      const summary = new ConnectionProviderSummary();
+      summary.name = c.databaseName.value;
+      summary.status = c.status.value;
+      this.connectionProviders.push(summary);
+      this.wizard.connectionProvider = summary;
+      this.wizard.schemas = c.schemas;
+      this.notificationService.info(this.translate.instant("Database created."));
+    });
+  }
+
+  private wizardFirstStepExistingConnectionProvider() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}`;
+    this.http.get<ConnectionProviderDetails>(url).subscribe(c => {
+      this.wizard.schemas = c.schemas;
+    });
   }
 
   generateApplication(wizard) {
