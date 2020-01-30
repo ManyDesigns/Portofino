@@ -61,6 +61,7 @@ import javax.servlet.ServletContext;
 public class DatabaseModule implements Module, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
+    public static final String GENERATED_CLASSES_DIRECTORY_NAME = "classes-generated";
 
     //**************************************************************************
     // Fields
@@ -134,29 +135,35 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
         Persistence persistence = new Persistence(applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
 
-        FileObject generatedClassesRoot = applicationDirectory.resolveFile("classes-generated");
+        FileObject generatedClassesRoot = applicationDirectory.resolveFile(GENERATED_CLASSES_DIRECTORY_NAME);
         generatedClassesRoot.createFolder();
         AllFileSelector allFileSelector = new AllFileSelector();
         //When the entity mode is POJO:
         // - make generated classes visible to shared classes and actions;
         // - write them in the application directory so the user's IDE and tools can know about them.
         subscription = persistence.databaseSetupEvents.subscribe(e -> {
-            if(e.setup.getEntityMode() == EntityMode.MAP) {
-                return;
-            }
-            FileObject databaseDir = e.setup.getCodeBase().getRoot();
-            generatedClassesRoot.resolveFile(e.setup.getDatabase().getDatabaseName()).deleteAll();
+            String databaseName = e.setup.getDatabase().getDatabaseName();
+            FileObject inMemoryDatabaseDir = e.setup.getCodeBase().getRoot().resolveFile(databaseName);
+            FileObject externalDatabaseDir = generatedClassesRoot.resolveFile(databaseName);
+            externalDatabaseDir.deleteAll();
             switch (e.type) {
                 case Persistence.DatabaseSetupEvent.ADDED:
                     persistenceCodeBase.add(e.setup.getCodeBase());
-                    generatedClassesRoot.copyFrom(databaseDir, allFileSelector);
+                    if(e.setup.getEntityMode() == EntityMode.POJO) {
+                        externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
+                    }
                     break;
                 case Persistence.DatabaseSetupEvent.REMOVED:
                     persistenceCodeBase.remove(e.setup.getCodeBase());
+                    externalDatabaseDir.deleteAll();
+                    inMemoryDatabaseDir.deleteAll();
                     break;
                 case Persistence.DatabaseSetupEvent.REPLACED:
                     persistenceCodeBase.replace(e.oldSetup.getCodeBase(), e.setup.getCodeBase());
-                    generatedClassesRoot.copyFrom(databaseDir, allFileSelector);
+                    externalDatabaseDir.deleteAll();
+                    if(e.setup.getEntityMode() == EntityMode.POJO) {
+                        externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
+                    }
                     break;
             }
         });

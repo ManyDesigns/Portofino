@@ -6,11 +6,13 @@ import com.manydesigns.elements.fields.DateField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
+import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Property;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.TableCriteria;
@@ -42,6 +44,7 @@ import static org.testng.AssertJUnit.assertEquals;
 @Test
 public class PersistenceTest {
 
+    DatabaseModule databaseModule;
     Persistence persistence;
 
     @BeforeClass
@@ -62,9 +65,21 @@ public class PersistenceTest {
 
     protected void setup(FileObject appDir) throws Exception {
         Configuration configuration = new PropertiesConfiguration();
-        DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
+        final DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
-        persistence = new Persistence(appDir, configuration, null, databasePlatformsRegistry);
+        databaseModule = new DatabaseModule() {
+            @Override
+            public void destroy() {
+                if(subscription != null) {
+                    subscription.dispose();
+                    subscription = null;
+                }
+            }
+        };
+        databaseModule.applicationDirectory = appDir;
+        databaseModule.configuration = configuration;
+        persistence = databaseModule.getPersistence(databasePlatformsRegistry, new CacheResetListenerRegistry());
+        databaseModule.init();
         persistence.start();
         setupJPetStore();
         setupHibernateTest();
@@ -74,6 +89,7 @@ public class PersistenceTest {
     @AfterMethod
     public void teardown() {
         persistence.stop();
+        databaseModule.destroy();
     }
 
     protected void setupJPetStore() throws Exception {
