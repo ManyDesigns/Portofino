@@ -25,7 +25,7 @@
         <property updatable="true" searchable="false" name="last_updated" label="" insertable="false" inSummary="false" enabled="true">
             <annotations>
                 <annotation type="com.manydesigns.elements.annotations.DateFormat">
-                    <value>dd/MM/yyyy HH:mm</value>
+                    <property name="value" value="dd/MM/yyyy HH:mm" />
                 </annotation>
             </annotations>
         </property>
