@@ -24,6 +24,7 @@ export class ManyToManyComponent extends Page {
   readonly associationsPath = "/:availableAssociations";
 
   initialize() {
+    super.initialize();
     this.keySelector.valueChanges.subscribe(value => {
       this.key = value;
       const onePk = value.key;

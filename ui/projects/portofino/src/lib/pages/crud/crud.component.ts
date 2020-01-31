@@ -71,6 +71,7 @@ export class CrudComponent extends Page {
   }
 
   initialize() {
+    super.initialize();
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().pipe(
       mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).pipe(loadClassAccessor)),

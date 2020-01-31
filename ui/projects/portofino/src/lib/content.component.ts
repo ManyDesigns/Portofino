@@ -139,7 +139,12 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
       dummy.parent = page;
       dummy.configuration = config;
       return dummy.checkAccess(false).pipe(map(() => true), catchError(() => of(false)));
-    })).subscribe(flag => child.accessible = flag);
+    })).subscribe(flag => {
+      child.accessible = flag;
+      if(flag) {
+        page.computeNavigationMenu(); //TODO optimization: only compute it when all children have been checked
+      }
+    });
   }
 
 }

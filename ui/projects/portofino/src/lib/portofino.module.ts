@@ -114,6 +114,7 @@ import {ResetPasswordComponent} from "./security/login/reset-password.component"
 import {SidenavService} from "./sidenav.service";
 import {RichTextComponent} from "./fields/rich-text.component";
 import {TextPageComponent} from "./pages/text/text.component";
+import {VarDirective} from "./var.directive";
 
 @NgModule({
   declarations: [
@@ -143,7 +144,7 @@ export class PortofinoFormsModule {}
     PageLayout, ButtonComponent, ButtonsComponent,
     ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
     LanguageSelectorComponent,
-    NavigationDirective, DefaultNavigationComponent,
+    NavigationDirective, DefaultNavigationComponent, VarDirective,
     ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
     CreatePageComponent, DeletePageComponent, MovePageComponent
   ],
