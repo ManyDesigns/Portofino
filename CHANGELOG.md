@@ -4,6 +4,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- API for pages to compute their navigation menu
+
+### Fixed
+- Arrays in XML annotations ([#325](https://github.com/ManyDesigns/Portofino/issues/325))
+- `SendMailAction` not working ([#323](https://github.com/ManyDesigns/Portofino/issues/323))
+
 ## [5.1.1] - 2020-01-10
 
 ### Added
