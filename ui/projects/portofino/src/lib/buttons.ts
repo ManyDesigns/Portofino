@@ -11,8 +11,8 @@ export class ButtonInfo {
   action: (self, event: any | undefined) => void;
   presentIf: (self) => boolean = () => true;
   enabledIf: (self) => boolean = () => true;
-  icon: string;
-  text: string;
+  icon?: string;
+  text?: string;
 }
 
 export function declareButton(info: ButtonInfo | any, target, methodName: string, descriptor: PropertyDescriptor) {
