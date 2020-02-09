@@ -85,15 +85,18 @@ export class TablesComponent extends Page implements OnInit {
         c.javaType = null;
       }
     });
-    this.tableInfo.table.query.forEach(q => this.cancelSelectionProvider(q));
+    this.tableInfo.table.query.forEach(q => {
+      this.cancelSelectionProvider(q);
+      delete q.isHql;
+    });
     const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${table.tableName}`;
     this.http.put(url, this.tableInfo.table).subscribe(
       () => {
         this.prepareTableInfo();
         this.notificationService.info(this.translate.instant("Table saved"));
       }, () => {
-        this.notificationService.error(this.translate.instant("Table not saved"));
         this.prepareTableInfo();
+        this.notificationService.error(this.translate.instant("Table not saved"));
       });
   }
 
@@ -186,9 +189,7 @@ export class TablesComponent extends Page implements OnInit {
   cancelSelectionProvider(sp) {
     if(sp.new) {
       this.deleteSelectionProvider(sp);
-      return;
-    }
-    if(sp.beingEdited) {
+    } else if(sp.beingEdited) {
       const old = sp.beingEdited;
       delete sp.beingEdited;
       Object.assign(sp, old);

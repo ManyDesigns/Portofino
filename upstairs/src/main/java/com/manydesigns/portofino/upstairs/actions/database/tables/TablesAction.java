@@ -223,6 +223,14 @@ public class TablesAction extends AbstractResourceAction {
             BeanUtils.copyProperties(column, c2);
             c2.setTable(existing);
         }
+        existing.getSelectionProviders().clear();
+        existing.getSelectionProviders().addAll(table.getSelectionProviders());
+        existing.getSelectionProviders().forEach(sp -> {
+            sp.setFromTable(existing);
+            sp.getReferences().forEach(r -> {
+                r.setOwner(sp);
+            });
+        });
         persistence.initModel();
         persistence.saveXmlModel();
     }
