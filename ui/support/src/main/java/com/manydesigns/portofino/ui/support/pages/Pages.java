@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.ui.support.pages;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.portofino.ui.support.ApiInfo;
@@ -8,17 +9,15 @@ import com.manydesigns.portofino.ui.support.Resource;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -259,7 +258,8 @@ public class Pages extends Resource {
 
     public void writeConfig(ObjectMapper mapper, Map<String, Object> config, File configFile) {
         try (FileWriter fw = new FileWriter(configFile)) {
-            mapper.writerFor(Map.class).writeValue(fw, config);
+            ObjectWriter objectWriter = mapper.writerFor(Map.class);
+            objectWriter.withDefaultPrettyPrinter().writeValue(fw, config);
         } catch (IOException e) {
             logger.error("Could not save config to " + configFile.getAbsolutePath(), e);
             throw new WebApplicationException(e.getMessage(), e);
@@ -338,7 +338,8 @@ public class Pages extends Resource {
         File file = new File(configPath);
         file.getParentFile().mkdirs();
         try (FileWriter fw = new FileWriter(file)) {
-            fw.write(pageConfiguration);
+            //Note this is different from the format used by Jackson, it would make sense to use Jackson here too
+            new JSONObject(pageConfiguration).write(fw, 2, 0);
             logger.info("Saved page configuration to " + file.getAbsolutePath());
         } catch (IOException e) {
             logger.error("Could not save config to " + file.getAbsolutePath(), e);
