@@ -43,7 +43,7 @@ public class MultipleTextProvider implements TextProvider {
     protected final List<ResourceBundle> resourceBundles;
 
     public MultipleTextProvider(ResourceBundle... resourceBundles) {
-        this.resourceBundles = new ArrayList<ResourceBundle>(Arrays.asList(resourceBundles));
+        this.resourceBundles = new ArrayList<>(Arrays.asList(resourceBundles));
     }
     //--------------------------------------------------------------------------
     // TextProvider implementation
