@@ -5,12 +5,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Barebones support for mapping tables as POJO's (objects) rather than maps.
-- Sample AWS ECS task definition in demo-tt.
+- API for pages to compute their navigation menu
+- Support for buttons with only an icon and no text
+- Button to refresh the CRUD search
 
 ### Changed
+- Wizard is a bit more user-friendly
+- Pretty-print saved `config.json`
+
+### Fixed
+- `SendMailAction` not working ([#323](https://github.com/ManyDesigns/Portofino/issues/323))
+- Arrays in XML annotations ([#325](https://github.com/ManyDesigns/Portofino/issues/325))
+- Local API with IPv6 addresses ([#327](https://github.com/ManyDesigns/Portofino/issues/327))
+- Can't save selection providers ([#328](https://github.com/ManyDesigns/Portofino/issues/328))
+- Generated `Security.groovy` errors when loading groups ([#329](https://github.com/ManyDesigns/Portofino/issues/329))
+- OPTIONS with expired JWT fails triggering bad CORS ([#333](https://github.com/ManyDesigns/Portofino/issues/333))
+- Server-side localized info/warning/error messages ([#334](https://github.com/ManyDesigns/Portofino/issues/334))
+
+## [5.1.1] - 2020-01-10
+
+### Added
+- Text pages (client only, no I18n).
+- Support deployment behind a proxy.
+- Documentation of Docker development, debugging and deployment in the archetype.
+- Example deployment of demo-tt as Docker containers on Amazon ECS.
+- Sample Docker deployment with the backend and frontend separated into different containers. 
+- Bare-bones support for mapping tables as POJO's (objects) rather than maps.
+
+### Changed
+- Give pages more control on security checks, allowing for client-only pages.
 - Improve performance of selection providers by asking for data lazily in certain cases.
 - Properly support Docker deployments using the image built by the standard pom of archetype-generated projects.
+- Several wizard improvements and fixes.
+
+### Fixed
+- Model not properly saved ([#294](https://github.com/ManyDesigns/Portofino/issues/294), [#303](https://github.com/ManyDesigns/Portofino/issues/303)).
+- Page configuration not properly saved ([#310](https://github.com/ManyDesigns/Portofino/issues/310), [#311](https://github.com/ManyDesigns/Portofino/issues/311)).
+- Names of mapped database objects not escaped ([#297](https://github.com/ManyDesigns/Portofino/issues/297)).
+- New actions added with bad class names ([#301](https://github.com/ManyDesigns/Portofino/issues/301)).
+- Database synchronization issues with MariaDB and PostgreSQL ([#283](https://github.com/ManyDesigns/Portofino/issues/283), [#298](https://github.com/ManyDesigns/Portofino/issues/298)).
+- KeyManager with no password (ported from Portofino 4).
 
 ## [5.1.0] - 2019-10-31
 

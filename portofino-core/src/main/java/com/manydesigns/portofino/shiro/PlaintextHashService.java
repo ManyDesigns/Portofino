@@ -13,7 +13,7 @@ import org.apache.shiro.crypto.hash.SimpleHash;
  */
 public class PlaintextHashService implements HashService {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     @Override
     public Hash computeHash(HashRequest request) {

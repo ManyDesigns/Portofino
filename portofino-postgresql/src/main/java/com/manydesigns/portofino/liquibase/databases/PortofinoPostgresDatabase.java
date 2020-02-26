@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.liquibase.databases;
 
+import liquibase.CatalogAndSchema;
 import liquibase.database.core.PostgresDatabase;
 
 /**
@@ -20,4 +21,8 @@ public class PortofinoPostgresDatabase extends PostgresDatabase {
         return PRIORITY_DATABASE;
     }
 
+    @Override
+    public CatalogAndSchema.CatalogAndSchemaCase getSchemaAndCatalogCase() {
+        return CatalogAndSchema.CatalogAndSchemaCase.ORIGINAL_CASE; //Until Liquibase fixes https://liquibase.jira.com/browse/CORE-3504
+    }
 }

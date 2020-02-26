@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 */
 public class Util {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     protected final static String STRING_PATTERN = "\"(([^\"\\\\]|\\\\.)*)\"";
 
@@ -64,6 +64,10 @@ public class Util {
             Pattern.CASE_INSENSITIVE);
 
     public static final Logger logger = LoggerFactory.getLogger(Util.class);
+
+    public static String getAbsoluteUrl(HttpServletRequest req, String url) {
+        return getAbsoluteUrl(req, url, false);
+    }
 
     public static String getAbsoluteUrl(HttpServletRequest req, String url, boolean full) {
         StringBuilder sb = new StringBuilder();

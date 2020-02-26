@@ -229,7 +229,7 @@ export class CreateActionComponent {
   readonly form = new Form([
     new Field(Property.create({ name: "segment", type: "string", label: "Segment" }).required()),
     new Field(Property.create({ name: "type", type: "string", label: "Type" }).required().withSelectionProvider({
-      options: this.getPageTypes()
+      options: this.getActionTypes()
     }))]);
   readonly controls = new FormGroup({});
   error: any;
@@ -239,7 +239,7 @@ export class CreateActionComponent {
               protected portofino: PortofinoService, protected http: HttpClient,
               protected translate: TranslateService) {}
 
-  protected getPageTypes() {
+  protected getActionTypes() {
     const types = [];
     for (let k in PageFactoryComponent.components) {
       if(PageFactoryComponent.components[k].defaultActionClass) {

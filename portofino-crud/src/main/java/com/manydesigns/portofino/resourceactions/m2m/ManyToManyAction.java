@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -87,7 +87,7 @@ import java.util.*;
 @SupportsPermissions(ManyToManyAction.PERMISSION_UPDATE)
 public class ManyToManyAction extends AbstractResourceAction {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final String PERMISSION_UPDATE = "m2m-update";
 
@@ -378,9 +378,9 @@ public class ManyToManyAction extends AbstractResourceAction {
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
         String label = ElementsThreadLocals.getText("check.boxes.horizontal");
-        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
+        viewTypeSelectionProvider.appendOption(ViewType.CHECKBOXES.name(), label, true);
         label = ElementsThreadLocals.getText("check.boxes.vertical");
-        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES_VERTICAL.name(), label, true);
+        viewTypeSelectionProvider.appendOption(ViewType.CHECKBOXES_VERTICAL.name(), label, true);
         //label = getMessage("lists");
         //viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
         formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");

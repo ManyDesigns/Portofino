@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -21,9 +21,12 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.liquibase.databases.PortofinoMariaDBDatabase;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.MariaDBDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.MySql5DatabasePlatform;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.core.MariaDBDatabase;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +43,7 @@ import javax.annotation.PreDestroy;
 */
 public class MysqlModule implements Module {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -75,6 +78,7 @@ public class MysqlModule implements Module {
     public void init() {
         databasePlatformsRegistry.addDatabasePlatform(new MySql5DatabasePlatform());
         databasePlatformsRegistry.addDatabasePlatform(new MariaDBDatabasePlatform());
+        DatabaseFactory.getInstance().register(new PortofinoMariaDBDatabase());
         status = ModuleStatus.STARTED;
     }
 

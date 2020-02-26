@@ -33,9 +33,11 @@ import groovy.text.TemplateEngine;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,7 @@ import static com.manydesigns.portofino.modules.ResourceActionsModule.ACTIONS_DI
 @RequiresAuthentication
 @RequiresAdministrator
 public class UpstairsAction extends AbstractResourceAction {
-    public static final String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(UpstairsAction.class);
 
@@ -629,7 +631,22 @@ public class UpstairsAction extends AbstractResourceAction {
         TemplateEngine engine = new SimpleTemplateEngine();
         Template template = engine.createTemplate(
                 UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/Security.groovy"));
-        Map<String, String> bindings = new HashMap<String, String>();
+        Map<String, String> bindings = getSecurityGroovyBindings(connectionProvider, userTable, wizard);
+        FileObject codeBaseRoot = actionsDirectory.getParent().resolveFile("classes");
+        FileObject securityGroovyFile = codeBaseRoot.resolveFile("Security.groovy");
+        if(securityGroovyFile.exists()) {
+            FileObject backupFile = securityGroovyFile.getParent().resolveFile("Security.groovy.backup");
+            backupFile.copyFrom(securityGroovyFile, new AllFileSelector());
+        }
+        try(Writer fw = new OutputStreamWriter(securityGroovyFile.getContent().getOutputStream())) {
+            template.make(bindings).writeTo(fw);
+            logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
+        }
+    }
+
+    @NotNull
+    protected Map<String, String> getSecurityGroovyBindings(ConnectionProvider connectionProvider, Table userTable, WizardInfo wizard) {
+        Map<String, String> bindings = new HashMap<>();
         bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
         bindings.put("userTableEntityName", userTable.getActualEntityName());
         bindings.put("userIdProperty", getPropertyName(userTable, wizard.userIdProperty));
@@ -666,12 +683,7 @@ public class UpstairsAction extends AbstractResourceAction {
             default:
                 throw new IllegalArgumentException("Unsupported encoding: " + algoAndEncoding[1]);
         }
-        FileObject codeBaseRoot = actionsDirectory.getParent().resolveFile("classes");
-        FileObject securityGroovyFile = codeBaseRoot.resolveFile("Security.groovy");
-        try(Writer fw = new OutputStreamWriter(securityGroovyFile.getContent().getOutputStream())) {
-            template.make(bindings).writeTo(fw);
-            logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
-        }
+        return bindings;
     }
 
     protected String getPropertyName(Table table, Column column) {

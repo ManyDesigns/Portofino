@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -35,7 +35,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ActionRegistry implements Iterable<ActionInfo> {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     protected final List<ActionInfo> registry = new CopyOnWriteArrayList<ActionInfo>();
 
@@ -44,8 +44,8 @@ public class ActionRegistry implements Iterable<ActionInfo> {
         Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(actionClass);
         String scriptTemplate = ResourceActionLogic.getScriptTemplate(actionClass);
         boolean supportsDetail = ResourceActionLogic.supportsDetail(actionClass);
-        ActionInfo info = new ActionInfo(actionClass, configurationClass, scriptTemplate,
-                                                 supportsDetail, descriptionKey);
+        ActionInfo info = new ActionInfo(
+                actionClass, configurationClass, scriptTemplate, supportsDetail, descriptionKey);
         registry.add(info);
         return info;
     }

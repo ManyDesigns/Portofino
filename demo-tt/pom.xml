@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>5.1.1-SNAPSHOT</version>
+        <version>5.1.2-SNAPSHOT</version>
     </parent>
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
@@ -87,17 +87,14 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <scope>compile</scope>
         </dependency>
         <!-- mail -->
         <dependency>
@@ -221,15 +218,20 @@
         </profile>
         <!-- See web.xml for an explanation -->
         <profile>
+            <!-- Used for development, see web.xml for an explanation. -->
             <id>portofino-development</id>
             <properties>
                 <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
             </properties>
         </profile>
         <profile>
+            <!-- Build Docker images and launch the application. -->
             <id>docker</id>
             <properties>
                 <portofino.application.directory>${env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
+                <debug.port>8000</debug.port>
+                <tomcat.port>8080</tomcat.port>
+                <frontend.port>3000</frontend.port>
             </properties>
             <build>
                 <plugins>
@@ -261,9 +263,9 @@
                                     <run>
                                         <ports>
                                             <!-- Tomcat HTTP port -->
-                                            <port>8080:8080</port>
+                                            <port>tomcat.port:8080</port>
                                             <!-- JPDA port for remote debugging -->
-                                            <port>8000:8000</port>
+                                            <port>debug.port:8000</port>
                                         </ports>
                                         <links>
                                             <link>demo-tt-database:db</link>
@@ -271,6 +273,8 @@
                                         <volumes>
                                             <bind>
                                                 <volume>${project.basedir}/src/main/webapp/WEB-INF:/application</volume>
+                                                <volume>${project.basedir}/src/main/frontend/src/assets:/usr/local/tomcat/webapps/ROOT/assets</volume>
+                                                <volume>${project.basedir}/src/main/frontend/src/pages:/usr/local/tomcat/webapps/ROOT/pages</volume>
                                             </bind>
                                         </volumes>
                                     </run>
@@ -290,6 +294,35 @@
                                             <log>database system is ready to accept connections</log>
                                             <time>20000</time>
                                         </wait>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>demo-tt-frontend</alias>
+                                    <name>demo-tt-frontend:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/frontend</contextDir>
+                                        <assembly>
+                                            <descriptor>${project.basedir}/src/main/docker/frontend/assembly.xml</descriptor>
+                                        </assembly>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                        <ports>
+                                            <port>frontend.port:80</port>
+                                        </ports>
+                                    </run>
+                                </image>
+                                <image>
+                                    <alias>demo-tt-backend</alias>
+                                    <name>demo-tt-backend:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/src/main/docker/application/backend-only</contextDir>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                        <ports>
+                                            <port>tomcat.port:8080</port>
+                                        </ports>
                                     </run>
                                 </image>
                             </images>

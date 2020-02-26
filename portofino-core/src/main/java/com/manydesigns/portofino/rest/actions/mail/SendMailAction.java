@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -30,10 +30,9 @@
 package com.manydesigns.portofino.rest.actions.mail;
 
 import com.manydesigns.mail.sender.MailSender;
-import com.manydesigns.portofino.modules.MailModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +55,7 @@ import java.util.HashSet;
 @Path("/actions/mail-sender-run")
 public class SendMailAction {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(SendMailAction.class);
 
@@ -65,9 +64,6 @@ public class SendMailAction {
 
     @Context
     protected HttpServletRequest request;
-
-    @Autowired(required = false)
-    protected MailSender mailSender;
 
     @GET
     public Response execute() {
@@ -83,7 +79,11 @@ public class SendMailAction {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        if(mailSender == null) {
+        MailSender mailSender;
+        try {
+            mailSender = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext).getBean(MailSender.class);
+        } catch (Exception e) {
+            logger.debug("Mail sender not found", e);
             return Response.serverError().entity("Mail Sender not active").build();
         }
         logger.debug("Sending pending email messages");
@@ -98,7 +98,7 @@ public class SendMailAction {
             logger.warn("The following email(s) were sent but could not be marked as sent; they will be sent twice! {}", idsToMarkAsSent);
         }
 
-        return null;
+        return Response.noContent().build();
     }
 
     public static boolean isLocalIPAddress(InetAddress addr) {

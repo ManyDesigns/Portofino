@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -137,7 +137,7 @@ import java.util.regex.Pattern;
 @SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public final static String SEARCH_STRING_PARAM = "searchString";
     public final static String prefix = "";
@@ -1048,7 +1048,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
         UrlBuilder urlBuilder = new UrlBuilder(
                 charset,
-                Util.getAbsoluteUrl(baseUrl + "/:blob/" + field.getPropertyAccessor().getName()),
+                Util.getAbsoluteUrl(context.getRequest(), baseUrl + "/:blob/" + field.getPropertyAccessor().getName()),
                 false);
         return urlBuilder.toString();
     }
@@ -1732,7 +1732,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * {@link #uploadBlob(String, String, InputStream)}.
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
-     * @since 4.5-SNAPSHOT
+     * @since 5.0
      * @return the updated object as JSON (in a JAX-RS Response).
      */
     protected Response bulkUpdate(String jsonObject, List<String> ids) {
@@ -1835,6 +1835,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @QueryParam("id")
             List<String> ids) throws Exception {
         if(object == null) {
+            if(ids == null || ids.isEmpty()) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+                        "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+            }
             return bulkDelete(ids);
         }
         if(ids != null && !ids.isEmpty()) {

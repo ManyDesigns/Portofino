@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 */
 public class RangeSearchField extends AbstractSearchField {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public final static String MIN_SUFFIX = "_min";
     public final static String MAX_SUFFIX = "_max";
@@ -128,11 +128,12 @@ public class RangeSearchField extends AbstractSearchField {
             }
         } else if(minValue == null && maxValue == null) {
             //Fall back to read the non-ranged value, if present
-            minStringValue = StringUtils.trimToNull(req.getParameter(inputName));
-            minValue = readValue(minStringValue, type);
-
-            maxStringValue = StringUtils.trimToNull(req.getParameter(inputName));
-            maxValue = readValue(maxStringValue, type);
+            String stringValue = StringUtils.trimToNull(req.getParameter(inputName));
+            if(stringValue != null) {
+                minStringValue = maxStringValue = stringValue;
+                minValue = readValue(minStringValue, type);
+                maxValue = readValue(maxStringValue, type);
+            }
         }
 
         searchNullValue = (NULL_VALUE.equals(minStringValue)

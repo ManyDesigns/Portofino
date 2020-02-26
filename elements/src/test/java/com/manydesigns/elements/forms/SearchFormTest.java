@@ -262,9 +262,9 @@ public class SearchFormTest extends AbstractElementsTest {
     //testo il form builder aggiungendo un selection provider a cascata su field2
     public void testForm10(){
         DefaultSelectionProvider provider = new DefaultSelectionProvider("provider");
-        provider.appendRow("v1", "ll", true);
-        provider.appendRow("v2", "l2", true);
-        provider.appendRow("v3", "l3", true);
+        provider.appendOption("v1", "ll", true);
+        provider.appendOption("v2", "l2", true);
+        provider.appendOption("v3", "l3", true);
 
         SearchFormBuilder builder =
             new SearchFormBuilder(AnnotatedBean3.class);

@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {Page, PageChild, PageConfiguration} from "../page";
+import {NavigationMenu, NavigationMenuItem, Page, PageChild, PageConfiguration} from "../page";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
 import {Button} from "../buttons";
@@ -22,7 +22,7 @@ import {map} from "rxjs/operators";
   selector: 'portofino-upstairs',
   templateUrl: './upstairs.component.html'
 })
-@PortofinoComponent({ name: "portofino-upstairs" })
+@PortofinoComponent({ name: "portofino-upstairs", hideFromCreateNewPage: true })
 export class UpstairsComponent extends Page implements OnInit {
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
@@ -31,24 +31,24 @@ export class UpstairsComponent extends Page implements OnInit {
     super(portofino, http, router, route, authenticationService, notificationService, translate);
   }
 
+  get children() {
+    return [
+      { path: 'settings', title: 'Settings', icon: 'settings', accessible: true, showInNavigation: true },
+      { path: 'permissions', title: 'Permissions', icon: 'lock', accessible: true, showInNavigation: true },
+      { path: 'connections', title: 'Connections', icon: 'network_wifi', accessible: true, showInNavigation: true },
+      { path: 'wizard', title: 'Wizard', icon: 'web', accessible: true, showInNavigation: true },
+      { path: 'tables', title: 'Tables', icon: 'storage', accessible: true, showInNavigation: true },
+      { path: 'actions', title: 'Actions', icon: 'build', accessible: true, showInNavigation: true },
+      { path: 'mail', title: 'Mail', icon: 'email', accessible: true, showInNavigation: true }];
+  }
+
   loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
-    if(child.path == 'actions') {
-      return of({ actualType: ActionsComponent, title: "Actions", source: null, securityCheckPath: null, children: [] });
-    } else if(child.path == 'connections') {
-      return of({ actualType: ConnectionsComponent, title: "Connections", source: null, securityCheckPath: null, children: [] });
-    } else if(child.path == 'mail') {
-      return of({ actualType: MailSettingsComponent, title: "Mail", source: null, securityCheckPath: null, children: [] });
-    } else if(child.path == 'permissions') {
-      return of({ actualType: PermissionsComponent, title: "Permissions", source: null, securityCheckPath: null, children: [] });
-    } else if(child.path == 'settings') {
-      return of({ actualType: SettingsComponent, title: "Settings", source: null, securityCheckPath: null, children: [] });
-    } else if(child.path == 'tables') {
-      return of({ actualType: TablesComponent, title: "Tables", source: null, securityCheckPath: null, children: [] });
-    } else if(child.path == 'wizard') {
-      return of({ actualType: WizardComponent, title: "Wizard", source: null, securityCheckPath: null, children: [] });
-    } else {
-      return throwError(404);
-    }
+    const types = {
+      actions: ActionsComponent, connections: ConnectionsComponent, mail: MailSettingsComponent,
+      permissions: PermissionsComponent, settings: SettingsComponent, tables: TablesComponent,
+      wizard: WizardComponent
+    };
+    return of({ title: child.title, source: null, children: [], actualType: types[child.path] });
   }
 
   changeApiRoot() {
@@ -66,9 +66,7 @@ export class UpstairsComponent extends Page implements OnInit {
         }
         this.portofino.loginPath = loginPath;
         this.storage.set("portofino.upstairs.apiRoot", this.portofino.apiRoot);
-        this.children.forEach(c => {
-          this.checkAccessibility(c);
-        });
+        this.checkAccess(true);
       }
     }, error => {
       console.error(error);

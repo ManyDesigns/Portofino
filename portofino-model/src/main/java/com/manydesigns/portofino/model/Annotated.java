@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -30,12 +30,12 @@ import java.util.Optional;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface Annotated {
-    String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     List<Annotation> getAnnotations();
 
     @SuppressWarnings("unchecked")
-    default <T extends java.lang.annotation.Annotation> Optional<T> getAnnotation(Class<T> annotationClass) {
+    default <T extends java.lang.annotation.Annotation> Optional<T> getJavaAnnotation(Class<T> annotationClass) {
         return (Optional<T>) getAnnotations().stream()
                 .filter(a -> annotationClass.isAssignableFrom(a.getJavaAnnotationClass()))
                 .map(Annotation::getJavaAnnotation)
@@ -47,6 +47,18 @@ public interface Annotated {
     }
 
     default Annotation ensureAnnotation(final String type) {
+        return getAnnotation(type).orElseGet(() -> {
+            Annotation annotation = new Annotation(this, type);
+            getAnnotations().add(annotation);
+            return annotation;
+        });
+    }
+
+    default Optional<Annotation> getAnnotation(Class<? extends java.lang.annotation.Annotation> type) {
+        return getAnnotations().stream().filter(a -> type == a.getJavaAnnotationClass() || a.getType().equals(type.getName())).findFirst();
+    }
+
+    default Annotation ensureAnnotation(final Class<? extends java.lang.annotation.Annotation> type) {
         return getAnnotation(type).orElseGet(() -> {
             Annotation annotation = new Annotation(this, type);
             getAnnotations().add(annotation);

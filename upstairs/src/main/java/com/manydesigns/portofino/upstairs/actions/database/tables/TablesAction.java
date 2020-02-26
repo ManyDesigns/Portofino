@@ -223,6 +223,14 @@ public class TablesAction extends AbstractResourceAction {
             BeanUtils.copyProperties(column, c2);
             c2.setTable(existing);
         }
+        existing.getSelectionProviders().clear();
+        existing.getSelectionProviders().addAll(table.getSelectionProviders());
+        existing.getSelectionProviders().forEach(sp -> {
+            sp.setFromTable(existing);
+            sp.getReferences().forEach(r -> {
+                r.setOwner(sp);
+            });
+        });
         persistence.initModel();
         persistence.saveXmlModel();
     }
@@ -334,7 +342,7 @@ public class TablesAction extends AbstractResourceAction {
                             break;
                         case "typeOfContent":
                             a = new Annotation(((Map)e.getValue()).get("v").toString());
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new Property("value", "true"));
                             existing.getAnnotations().add(a);
                             break;
                         default:

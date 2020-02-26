@@ -39,7 +39,7 @@ import java.util.List;
 */
 public class MariaDBDatabasePlatform extends MySql5DatabasePlatform {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public final static String DESCRIPTION = "MariaDB";
     public final static String STANDARD_DRIVER_CLASS_NAME = "org.mariadb.jdbc.Driver";

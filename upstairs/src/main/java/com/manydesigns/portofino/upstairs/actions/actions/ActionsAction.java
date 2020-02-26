@@ -85,7 +85,7 @@ public class ActionsAction extends AbstractResourceAction {
         Class<?> configurationClass = info.configurationClass;
         boolean supportsDetail = info.supportsDetail;
 
-        String className = actionClassName + "_" + RandomUtil.createRandomId();
+        String className = actionClass.getSimpleName() + "_" + RandomUtil.createRandomId();
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("generatedClassName", className);
         ognlContext.put("actionClassName", actionClassName);

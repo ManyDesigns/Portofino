@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -39,7 +39,7 @@ import java.util.EventListener;
  */
 public interface CacheResetListener extends EventListener {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     void handleReset(CacheResetEvent e);
 }

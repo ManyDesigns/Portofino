@@ -31,11 +31,11 @@
           </mat-card-content>
         </mat-card>
       </mat-tab>
-      <mat-tab>
+      <mat-tab *ngIf="page.settingsPanel.permissions">
         <ng-template mat-tab-label>
           {{'Permissions'|translate}}
         </ng-template>
-        <table *ngIf="page.settingsPanel.permissions" class="mat-table">
+        <table class="mat-table">
           <tr class="mat-header-row">
             <th class="mat-header-cell">{{'Group'|translate}}</th>
             <th class="mat-header-cell">{{'Access level'|translate}}</th>

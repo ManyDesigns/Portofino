@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.tt
 
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
  */
 class ActivityItem implements XhtmlFragment {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     FastDateFormat dateFormat;
 

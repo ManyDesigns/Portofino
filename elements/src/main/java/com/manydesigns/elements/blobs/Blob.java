@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -42,7 +42,7 @@ import java.util.Properties;
  */
 public class Blob {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(Blob.class);
 
@@ -181,7 +181,8 @@ public class Blob {
 
     public void dispose() {
         try {
-            inputStream.close();
+            if(inputStream!=null)
+                inputStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

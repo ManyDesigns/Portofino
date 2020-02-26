@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -54,7 +54,7 @@ import java.util.List;
  */
 public class DatabaseSyncer {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseSyncer.class);
@@ -137,6 +137,7 @@ public class DatabaseSyncer {
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing schema: {}", sourceSchema.getActualSchemaName());
+        copyAnnotations(sourceSchema, targetSchema);
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
         syncViews(databaseSnapshot, sourceSchema, targetSchema);
         syncPrimaryKeys(databaseSnapshot, sourceSchema, targetSchema);

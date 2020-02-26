@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import com.manydesigns.portofino.dispatcher.security.SecureResource;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface ResourceAction extends SecureResource {
-    String copyright = "Copyright (C) 2005-2019 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     ActionContext getContext();
 
@@ -39,7 +39,7 @@ public interface ResourceAction extends SecureResource {
 
     /**
      * Returns the action that comes before this action in the matched request path.
-     * @since 5.0.0
+     * @since 5.0
      * @return the parent {@link ResourceAction}.
      */
     ResourceAction getParent();
@@ -57,9 +57,16 @@ public interface ResourceAction extends SecureResource {
 
     /**
      * Lifecycle method invoked just before the resource method is invoked via REST.
-     * @since 5.0.0
+     * @since 5.0
      */
     void prepareForExecution();
 
-
+    /**
+     * Security check method. It is invoked as part of the security check logic and it can also be invoked by
+     * the client to check if the action is accessible. If it returns false, the request is terminated with a 401 or 403
+     * status (according to Portofino's security logic).
+     * By default it always returns true, but implementations can implement custom logic.
+     * @return true if the action is accessible. Note that a client will either receive true or a 401/403 status.
+     */
+    boolean isAccessible();
 }

@@ -1,4 +1,11 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ContentChild, EventEmitter, Injectable, InjectionToken, Input, OnDestroy, Optional, TemplateRef, Type, ViewChild, Directive } from "@angular/core";
+import { AfterViewInit,
+  ChangeDetectorRef, Component, ContentChild, EventEmitter,
+  Injectable, InjectionToken, Input,
+  OnDestroy,
+  Optional,
+  TemplateRef,
+  Type,
+  ViewChild, Directive } from "@angular/core";
 import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
@@ -8,7 +15,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {declareButton, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
-import {catchError, map, mergeMap} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
 
@@ -56,7 +63,6 @@ export class PageConfiguration {
   actualType?: Type<any>;
   title: string;
   source: string;
-  securityCheckPath: string = ':description';
   children: PageChild[] = [];
   icon?: string;
   template?: string;
@@ -65,10 +71,10 @@ export class PageConfiguration {
 export class PageChild {
   path: string;
   title: string;
-  icon: string;
-  embedded: boolean;
-  showInNavigation: boolean;
-  accessible: boolean;
+  icon?: string;
+  embedded?: boolean;
+  showInNavigation?: boolean;
+  accessible?: boolean;
 }
 
 export class PageSettingsPanel {
@@ -125,6 +131,9 @@ export class PageSettingsPanel {
   }
 
   loadPermissions() {
+    if(!this.page.hasSource()) {
+      return;
+    }
     const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
     this.page.http.get<Permissions>(permissionsUrl).subscribe(p => {
       this.permissions = p;
@@ -146,7 +155,9 @@ export class PageSettingsPanel {
 
   hide(saved: boolean) {
     this.active = false;
-    this.callback(saved);
+    if(this.callback) {
+      this.callback(saved);
+    }
   }
 
   get groups() {
@@ -169,9 +180,7 @@ export class PageSettingsPanel {
 
   reloadConfiguration() {
     this.page.loadConfiguration().subscribe(conf => {
-      this.page.http.get<ClassAccessor>(this.page.configurationUrl + '/classAccessor')
-        .pipe(loadClassAccessor)
-        .subscribe(ca => {
+      this.loadActionConfiguration().subscribe(ca => {
         this.setupConfigurationForm(ca, conf);
       }, error => {
         this.setupConfigurationForm(null, null);
@@ -181,9 +190,20 @@ export class PageSettingsPanel {
     });
   }
 
+  protected loadActionConfiguration() {
+    if(!this.page.hasSource()) {
+      return of(null);
+    }
+    return this.page.http.get<ClassAccessor>(
+      this.page.configurationUrl + '/classAccessor').pipe(loadClassAccessor);
+  }
+
   getActionConfigurationToSave() {
+    if(!this.page.hasSource()) {
+      return null;
+    }
     const configuration = this.form.get('configuration');
-    return Object.assign({}, configuration ? configuration.value : {});
+    return configuration ? Object.assign({}, configuration.value) : null;
   }
 
   getPageConfigurationToSave(formValue = this.form.value) {
@@ -192,7 +212,6 @@ export class PageSettingsPanel {
     //Reflection would be nice
     pageConfiguration.children = config.children;
     pageConfiguration.icon = config.icon;
-    pageConfiguration.securityCheckPath = config.securityCheckPath;
     pageConfiguration.source = config.source;
     pageConfiguration.template = config.template ? config.template.v : null;
     pageConfiguration.title = config.title;
@@ -215,6 +234,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   allowEmbeddedComponents: boolean = true;
   embedded = false;
   returnUrl;
+  navigationMenu: NavigationMenu;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
@@ -263,7 +283,9 @@ export abstract class Page implements WithButtons, OnDestroy {
     }, this, 'goBack', null);
   }
 
-  initialize() {}
+  initialize() {
+    this.computeNavigationMenu();
+  }
 
   protected getPageSettingsPanel() {
     return new PageSettingsPanel(this);
@@ -322,7 +344,9 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   get icon() {
-    if(this.parent) {
+    if(this.configuration && this.configuration.icon) {
+      return this.configuration.icon;
+    } else if(this.parent) {
       let pageChild = this.parent.children.find(c => c.path == this.segment);
       return pageChild ? pageChild.icon : null;
     } else {
@@ -340,7 +364,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   get template(): TemplateRef<any> {
     const template = this.configuration.template;
-    const templateName = template && template.v ? template.v : template;
+    const templateName = (template && template.v) ? template.v : template;
     if(templateName) {
       const template = this.portofino.templates[templateName];
       if(!template) {
@@ -364,40 +388,46 @@ export abstract class Page implements WithButtons, OnDestroy {
     if(!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
-    let sourceUrl = this.computeSourceUrl();
-    const securityCheckPath = (this.configuration.securityCheckPath || ':description');
-    if(!sourceUrl.endsWith('/') && !securityCheckPath.startsWith('/')) {
-      sourceUrl += '/';
-    } else if(sourceUrl.endsWith('/') && securityCheckPath.startsWith('/')) {
-      sourceUrl = sourceUrl.substring(0, sourceUrl.length - 1);
-    }
-    return this.http.get<any>(
-      sourceUrl + securityCheckPath,
-      { headers: headers });
+    let sourceUrl = this.computeSecurityCheckUrl();
+    return this.http.get(sourceUrl,{ headers: headers, observe: "response" });
   }
 
-  get accessPermitted(): Observable<boolean> {
-    return this.checkAccess(false).pipe(map(() => true), catchError(() => of(false)));
+  protected computeSecurityCheckUrl() {
+    return this.computeSourceUrl() + "/:accessible";
   }
 
   computeSourceUrl() {
-    let source = this.configuration.source || '';
-    if(source.startsWith('http://') || source.startsWith('https://')) {
+    return Page.defaultComputeSourceUrl(this.portofino.apiRoot, this.parent, this.configuration.source);
+  }
+
+  hasSource() {
+    return true;
+  }
+
+  public static defaultComputeSourceUrl(apiRoot: string, parent: Page, source: string) {
+    source = source ? source : '';
+    if (source.startsWith('http://') || source.startsWith('https://')) {
       //Absolute, leave as is
-    } else if(!source.startsWith('/')) {
-      if(this.parent) {
-        source = this.parent.computeSourceUrl() + '/' + source;
-      } else {
-        source = this.portofino.apiRoot + '/' + source;
-      }
     } else {
-      source = this.portofino.apiRoot + source;
+      if (!source.startsWith('/')) {
+        if (parent) {
+          source = parent.computeSourceUrl() + '/' + source;
+        } else {
+          source = apiRoot + '/' + source;
+        }
+      } else {
+        source = apiRoot + source;
+      }
     }
     source = Page.removeDoubleSlashesFromUrl(source);
-    while (source.endsWith("/"))  {
+    while (source.endsWith("/")) {
       source = source.substring(0, source.length - 1);
     }
     return source;
+  }
+
+  public static defaultComputeSecurityCheckUrl(apiRoot: string, parent: Page, source: string) {
+    return Page.defaultComputeSourceUrl(apiRoot, parent, source) + "/:accessible";
   }
 
   static removeDoubleSlashesFromUrl(url) {
@@ -437,7 +467,9 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.configuration = pageConfiguration;
       let data = new FormData();
       data.append("pageConfiguration", JSON.stringify(pageConfiguration));
-      data.append("actionConfiguration", JSON.stringify(actionConfiguration));
+      if(actionConfiguration) {
+        data.append("actionConfiguration", JSON.stringify(actionConfiguration));
+      }
       saveConfObservable = this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
         params: {
           actionConfigurationPath: this.configurationUrl,
@@ -454,8 +486,8 @@ export abstract class Page implements WithButtons, OnDestroy {
     });
   }
 
-  protected reloadBaseUrl() {
-    if (this.router.url && this.router.url != "/") {
+  reloadBaseUrl() {
+    if (this.router.url && this.router.url != "/" && this.router.url != this.baseUrl) {
       this.router.navigateByUrl(this.baseUrl);
     } else {
       //this.router.navigate(['.'], {relativeTo: this.route});
@@ -474,6 +506,13 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   public loadConfiguration() {
+    if(!this.hasSource()) {
+      return of({...this.configuration});
+    }
+    return this.doLoadConfiguration();
+  }
+
+  protected doLoadConfiguration() {
     return this.http.get(this.configurationUrl).pipe(map(c => {
       this.configuration = {...c, ...this.configuration};
       return c;
@@ -527,19 +566,13 @@ export abstract class Page implements WithButtons, OnDestroy {
     this.settingsPanel.hide(false);
   }
 
-  checkAccessibility(child: PageChild) {
-    this.loadChildConfiguration(child).pipe(mergeMap(config => {
-      const dummy = new DummyPage(
-        this.portofino, this.http, this.router, this.route, this.authenticationService, this.notificationService, this.translate);
-      dummy.parent = this;
-      dummy.configuration = config;
-      return dummy.accessPermitted;
-    })).subscribe(flag => child.accessible = flag);
-  }
-
   goBack() {
     if(this.returnUrl) {
-      this.router.navigateByUrl(this.returnUrl);
+      if(this.url == this.returnUrl) {
+        window.location.reload(); //TODO
+      } else {
+        this.router.navigateByUrl(this.returnUrl);
+      }
     } else {
       this.goToParent();
     }
@@ -562,6 +595,27 @@ export abstract class Page implements WithButtons, OnDestroy {
    */
   handleDeclinedLogin() {
     return true;
+  }
+
+  computeNavigationMenu() {
+    const menu = new NavigationMenu();
+    menu.current = NavigationMenuItem.from(this);
+    if(this.parent) {
+      menu.parent = NavigationMenuItem.from(this.parent);
+      this.parent.children.forEach(child => {
+        if(child.path == this.segment) {
+          menu.siblings.push(menu.current);
+        } else if(child.accessible && child.showInNavigation) {
+          menu.siblings.push(new NavigationMenuItem(this.parent.url + '/' + child.path, child.title, child.icon));
+        }
+      });
+    }
+    this.children.forEach(child => {
+      if(child.accessible && child.showInNavigation) {
+        menu.children.push(new NavigationMenuItem(this.url + '/' + child.path, child.title, child.icon));
+      }
+    });
+    return this.navigationMenu = menu;
   }
 }
 
@@ -658,4 +712,25 @@ export class Group {
   permissionMap: {[name: string]: boolean};
 }
 
-class DummyPage extends Page {}
+export class NavigationMenu {
+  parent?: NavigationMenuItem;
+  current: NavigationMenuItem;
+  readonly siblings: NavigationMenuItem[] = [];
+  readonly children: NavigationMenuItem[] = [];
+}
+
+export class NavigationMenuItem {
+  title: string;
+  url: string;
+  icon?: string;
+
+  static from(page: Page) {
+    return new NavigationMenuItem(page.url, page.title, page.icon);
+  }
+
+  constructor(url: string, title: string, icon?: string) {
+    this.url = url;
+    this.title = title;
+    this.icon = icon;
+  }
+}

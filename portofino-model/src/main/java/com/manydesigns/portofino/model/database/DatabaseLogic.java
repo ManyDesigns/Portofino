@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -40,7 +40,7 @@ import java.util.List;
  */
 public class DatabaseLogic {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseLogic.class);
@@ -333,17 +333,6 @@ public class DatabaseLogic {
             if(!changed) {
                 for(ForeignKey fk : table.getOneToManyRelationships()) {
                     if(StringUtils.equals(initialName, fk.getActualManyPropertyName())) {
-                        initialName = prefix + "_" + prog;
-                        logger.warn("Duplicate property found, renaming to {}", initialName);
-                        prog++;
-                        changed = true;
-                        break;
-                    }
-                }
-            }
-            if(!changed) {
-                for(String sp : table.getSyntheticPropertyNames()) {
-                    if(StringUtils.equals(initialName, sp)) {
                         initialName = prefix + "_" + prog;
                         logger.warn("Duplicate property found, renaming to {}", initialName);
                         prog++;

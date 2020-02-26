@@ -168,8 +168,10 @@ export function isPassword(property: Property) {
   return !!annotation;
 }
 
+export const RICH_TEXT_ANNOTATION = "com.manydesigns.elements.annotations.RichText";
+
 export function isRichText(property: Property) {
-  const annotation = getAnnotation(property, "com.manydesigns.elements.annotations.RichText");
+  const annotation = getAnnotation(property, RICH_TEXT_ANNOTATION);
   return annotation && annotation.properties.value;
 }
 

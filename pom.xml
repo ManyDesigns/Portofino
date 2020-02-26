@@ -9,7 +9,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>5.1.2-SNAPSHOT</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
@@ -49,10 +49,10 @@
         </mailingList>
     </mailingLists>
     <scm>
-        <connection>scm:hg:http://hg.code.sf.net/p/portofino/mercurial</connection>
-        <developerConnection>scm:hg:https://hg.code.sf.net/p/portofino/mercurial</developerConnection>
-        <url>http://sourceforge.net/p/portofino/mercurial/</url>
-        <tag>tip</tag>
+        <connection>scm:git:https://github.com/ManyDesigns/Portofino.git</connection>
+        <developerConnection>scm:hg:https://github.com/ManyDesigns/Portofino.git</developerConnection>
+        <url>https://github.com/ManyDesigns/Portofino</url>
+        <tag>master</tag>
     </scm>
     <developers>
         <developer>

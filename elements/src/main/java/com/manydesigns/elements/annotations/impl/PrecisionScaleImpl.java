@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,7 +33,7 @@ import java.lang.annotation.Annotation;
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
 public class PrecisionScaleImpl implements PrecisionScale {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     private final int precision;
     private final int scale;

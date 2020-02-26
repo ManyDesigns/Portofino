@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -51,7 +51,7 @@ import java.util.Map;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Annotation implements ModelObject {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -84,15 +84,24 @@ public class Annotation implements ModelObject {
     public Annotation() {}
 
     public Annotation(String type) {
-        this();
-        this.type = type;
+        this(null, type);
     }
 
     public Annotation(Object parent, String type) {
-        this();
         this.parent = parent;
         this.type = type;
     }
+
+    public Annotation(Class<? extends java.lang.annotation.Annotation> type) {
+        this(null, type);
+    }
+
+    public Annotation(Object parent, Class<? extends java.lang.annotation.Annotation> type) {
+        this.parent = parent;
+        this.type = type.getName();
+        this.javaAnnotationClass = type;
+    }
+
 
     //**************************************************************************
     // ModelObject implementation

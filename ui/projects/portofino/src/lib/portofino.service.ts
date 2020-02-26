@@ -100,6 +100,9 @@ export class PortofinoService {
       } else {
         this.initLoginPath();
       }
+      if(response.disableAdministration) {
+        this.localApiPath = null; //Disable local API
+      }
     }, error => {
       this.fallbackInit();
     });
@@ -110,7 +113,9 @@ export class PortofinoService {
       if (response.loginPath) {
         this.loginPath = this.sanitizeLoginPath(response.loginPath);
       }
-    }); //TODO warn about failed init in case of error because only reloading the page will potentially fix it.
+    },
+      () => alert(this.translate.instant(
+        'Cannot connect to login. The application may not work properly. Please reload the page at a later time or contact the administrator.')));
   }
 
   private sanitizeLoginPath(loginPath) {
@@ -141,6 +146,7 @@ export class PortofinoService {
 class ApiInfo {
   apiRoot: string;
   loginPath: string;
+  disableAdministration?: boolean = false;
 }
 
 export declare type Locale = { key: string, name: string, translations?: Object };

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -43,7 +43,7 @@ public class MultipleTextProvider implements TextProvider {
     protected final List<ResourceBundle> resourceBundles;
 
     public MultipleTextProvider(ResourceBundle... resourceBundles) {
-        this.resourceBundles = new ArrayList<ResourceBundle>(Arrays.asList(resourceBundles));
+        this.resourceBundles = new ArrayList<>(Arrays.asList(resourceBundles));
     }
     //--------------------------------------------------------------------------
     // TextProvider implementation

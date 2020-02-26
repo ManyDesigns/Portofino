@@ -82,7 +82,7 @@ public class PortofinoSpringConfiguration {
             logger.info("Using hierarchical blob manager");
             return new HierarchicalBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         } else {
-            logger.warn("Blobs found directly under the blobs directory; using old style (pre-4.1.1) flat file blob manager");
+            logger.warn("Blobs found directly under the blobs directory: using old style (pre-4.1.1) flat file blob manager");
             return new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         }
     }

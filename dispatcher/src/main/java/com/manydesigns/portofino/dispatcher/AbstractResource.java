@@ -193,18 +193,9 @@ public abstract class AbstractResource implements SecureResource {
         description.put("class", getClass().getName());
         description.put("path", getPath());
         description.put("children", getSubResources());
-        describe(description);
         return description;
     }
 
-    /**
-     * Customize the description of this node. The default implementation does nothing.
-     * @param description the default description.
-     */
-    protected void describe(Map<String, Object> description) {
-        //The default implementation does nothing
-    }
-    
     @Path(":description")
     @Produces(MediaType.APPLICATION_JSON)
     @GET
@@ -214,7 +205,7 @@ public abstract class AbstractResource implements SecureResource {
 
     /**
      * Returns the directory where this resource's children resources are defined.
-     * @since 5.0.0-SNAPSHOT
+     * @since 5.0.0
      */
     public FileObject getChildrenLocation() throws FileSystemException {
         return location;
@@ -270,13 +261,13 @@ public abstract class AbstractResource implements SecureResource {
             return null;
         }
         Map<String, List<Permission>> permissionMap = new HashMap<>();
-        for(Map.Entry<String, List<String>> entry : stringMap.entrySet()) {
-            List<Permission> permissionList = new ArrayList<>(entry.getValue().size());
-            for(String perm : entry.getValue()) {
+        stringMap.forEach((key, value) -> {
+            List<Permission> permissionList = new ArrayList<>(value.size());
+            for (String perm : value) {
                 permissionList.add(new WildcardPermission(perm));
             }
-            permissionMap.put(entry.getKey(), permissionList);
-        }
+            permissionMap.put(key, permissionList);
+        });
         return permissionMap;
     }
 

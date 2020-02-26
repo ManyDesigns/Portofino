@@ -15,7 +15,7 @@ import {
   CrudComponent,
   DetailComponentHolder,
   SearchComponentHolder
-} from './crud/crud.component';
+} from './pages/crud/crud.component';
 import {LOCALE_STORAGE_SERVICE, LOCALES, PortofinoService, ProgressInterceptor} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
@@ -25,7 +25,7 @@ import {
   TOKEN_STORAGE_SERVICE
 } from "./security/authentication.service";
 import {LoginComponent} from './security/login/login.component';
-import {SearchFieldComponent} from './crud/search/search-field.component';
+import {SearchFieldComponent} from './pages/crud/search/search-field.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -56,10 +56,10 @@ import { MatTreeModule } from '@angular/material/tree';
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {ExtraOptions, RouterModule, Routes} from '@angular/router';
-import {SearchComponent} from './crud/search/search.component';
+import {SearchComponent} from './pages/crud/search/search.component';
 import {BreadcrumbsComponent} from "./breadcrumbs/breadcrumbs.component";
-import {DetailComponent} from './crud/detail/detail.component';
-import {CreateComponent} from './crud/detail/create.component';
+import {DetailComponent} from './pages/crud/detail/detail.component';
+import {CreateComponent} from './pages/crud/detail/create.component';
 import {MainPageDirective, NavigationDirective} from './content.directive';
 import {
   DefaultNavigationComponent,
@@ -67,10 +67,10 @@ import {
   NAVIGATION_COMPONENT,
   PageHeader, PageService, TemplatesComponent
 } from './page';
-import {BulkEditComponent} from "./crud/bulk/bulk-edit.component";
+import {BulkEditComponent} from "./pages/crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
 import {FileInputAccessorModule} from "file-input-accessor";
-import {ManyToManyComponent} from './many-to-many/many-to-many.component';
+import {ManyToManyComponent} from './pages/many-to-many/many-to-many.component';
 import {ButtonComponent, ButtonsComponent} from "./button.component";
 import {QuillModule} from "ngx-quill";
 import {DynamicFormComponentDirective, FormComponent} from "./form";
@@ -111,6 +111,9 @@ import {ForgottenPasswordComponent} from "./security/login/forgotten-password.co
 import {ResetPasswordComponent} from "./security/login/reset-password.component";
 import {SidenavService} from "./sidenav.service";
 import {RichTextComponent} from "./fields/rich-text.component";
+import {TextPageComponent} from "./pages/text/text.component";
+import {VarDirective} from "./var.directive";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [
@@ -140,7 +143,7 @@ export class PortofinoFormsModule {}
     PageLayout, ButtonComponent, ButtonsComponent,
     ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
     LanguageSelectorComponent,
-    NavigationDirective, DefaultNavigationComponent,
+    NavigationDirective, DefaultNavigationComponent, VarDirective,
     ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
     CreatePageComponent, DeletePageComponent, MovePageComponent
   ],
@@ -195,17 +198,19 @@ export class PortofinoCrudModule {}
   declarations: [
     UpstairsComponent,
     ActionsComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
+    WizardComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
-    MatGridListModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
+    MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
   entryComponents: [
     UpstairsComponent,
     ActionsComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
+    WizardComponent],
   exports: [UpstairsComponent]
 })
 export class PortofinoUpstairsModule {}
@@ -224,7 +229,8 @@ export class WebStorageModule {}
 @NgModule({
   declarations: [
     PortofinoAppComponent,
-    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent],
+    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
+    TextPageComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
@@ -250,7 +256,8 @@ export class WebStorageModule {}
     { provide: NotificationService, useClass: MatSnackBarNotificationService },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [
-    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent],
+    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
+    TextPageComponent],
   exports: [
     PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent,
     LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
@@ -258,7 +265,7 @@ export class WebStorageModule {}
     DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    ManyToManyComponent]
+    ManyToManyComponent, TextPageComponent]
 })
 export class PortofinoModule {
   static changePasswordComponent() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -22,9 +22,6 @@ package com.manydesigns.portofino.resourceactions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.FilteredClassAccessor;
@@ -32,17 +29,17 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.ActionLogic;
-import com.manydesigns.portofino.operations.GuardType;
+import com.manydesigns.portofino.actions.Group;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
+import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.security.*;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -87,7 +84,7 @@ import java.util.*;
 @RequiresPermissions(level = AccessLevel.VIEW)
 public abstract class AbstractResourceAction extends AbstractResourceWithParameters implements ResourceAction {
     public static final String copyright =
-        "Copyright (C) 2005-2019 ManyDesigns srl";
+        "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -308,10 +305,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return context;
     }
 
-    //--------------------------------------------------------------------------
-    // Utitilities
-    //--------------------------------------------------------------------------
-
     /**
      * Returns an error response with message saying that the resourceaction is not properly
      * configured.
@@ -367,14 +360,22 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     @Override
-    protected void describe(Map<String, Object> description) {
-        super.describe(description);
+    public Map<String, Object> describe() {
+        Map<String, Object> description = super.describe();
         description.put("page", actionInstance.getActionDescriptor());
         if(ResourceActionLogic.supportsDetail(getClass())) {
             parameters.add("");
             description.put("detailChildren", getSubResources());
             parameters.remove(parameters.size() - 1);
         }
+        return description;
+    }
+
+    @Override
+    @Path(":accessible")
+    @GET
+    public boolean isAccessible() {
+        return true;
     }
 
     ////////////////
@@ -413,7 +414,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             return configuration;
         }
         ClassAccessor classAccessor = getConfigurationClassAccessor();
-        FilteredClassAccessor filteredClassAccessor = filterAccordingToPermissions(classAccessor);
+        ClassAccessor filteredClassAccessor = filterAccordingToPermissions(classAccessor);
         ResourceActionConfiguration filtered = (ResourceActionConfiguration) classAccessor.newInstance();
         for(PropertyAccessor propertyAccessor : filteredClassAccessor.getProperties()) {
             if(propertyAccessor.isWritable()) {
@@ -425,28 +426,31 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     @NotNull
-    protected FilteredClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
+    protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
         Permissions permissions = SecurityLogic.calculateActualPermissions(actionInstance);
         Subject subject = SecurityUtils.getSubject();
         return filterAccordingToPermissions(classAccessor, permissions, subject);
     }
 
     @NotNull
-    protected FilteredClassAccessor filterAccordingToPermissions(
+    protected ClassAccessor filterAccordingToPermissions(
             ClassAccessor classAccessor, Permissions permissions, Subject subject) {
-        List<String> fields = new ArrayList<>();
+        List<String> excluded = new ArrayList<>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             RequiresPermissions requiresPermissions = property.getAnnotation(RequiresPermissions.class);
             boolean permitted =
                     requiresPermissions == null ||
                     SecurityLogic.hasPermissions(getPortofinoConfiguration(), permissions, subject, requiresPermissions);
-            if(permitted) {
-                fields.add(property.getName());
-            } else {
+            if(!permitted) {
                 logger.debug("Property not permitted, filtering: {}", property.getName());
+                excluded.add(property.getName());
             }
         }
-        return FilteredClassAccessor.include(classAccessor, fields.toArray(new String[0]));
+        if(!excluded.isEmpty()) {
+            return FilteredClassAccessor.exclude(classAccessor, excluded.toArray(new String[0]));
+        } else {
+            return classAccessor;
+        }
     }
 
     @io.swagger.v3.oas.annotations.Operation(
@@ -460,6 +464,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             @RequestBody(description = "The configuration object in JSON format.")
             String configurationString) throws IOException {
         Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(getClass());
+        if(configurationClass == null) {
+            throw new WebApplicationException("This resource does not support configuration");
+        }
         Object configuration = new ObjectMapper().readValue(configurationString, configurationClass);
         saveConfiguration(configuration);
     }

@@ -1,6 +1,6 @@
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
-import ch.qos.logback.core.ConsoleAppender
 import ch.qos.logback.classic.jul.LevelChangePropagator
+import org.hibernate.c3p0.internal.C3P0ConnectionProvider
 
 import static ch.qos.logback.classic.Level.*
 
@@ -25,7 +25,7 @@ appenders.add("PORTOFINO-CONSOLE");
 
 root(INFO, appenders)
 logger("org.hibernate", WARN)
-logger("org.hibernate.connection.C3P0ConnectionProvider", INFO)
+logger(C3P0ConnectionProvider.name, INFO)
 
 //Periodically reload this file when it changes
 scan("30 seconds")

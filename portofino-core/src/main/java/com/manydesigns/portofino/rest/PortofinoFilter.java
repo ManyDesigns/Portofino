@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -27,6 +27,7 @@ import com.manydesigns.portofino.operations.Guarded;
 import com.manydesigns.portofino.cache.ControlsCache;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
+import com.manydesigns.portofino.resourceactions.log.LogAccesses;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -66,11 +67,12 @@ import static javax.ws.rs.core.Response.Status.CONFLICT;
 public class PortofinoFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public final static Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
-    public final static Logger accessLogger = LoggerFactory.getLogger("com.manydesigns.portofino.access");
+    public static final String ACCESS_LOGGER_NAME = "com.manydesigns.portofino.access";
     public static final String MESSAGE_HEADER = "X-Portofino-Message";
+    private static final Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
+    private static final Logger accessLogger = LoggerFactory.getLogger(ACCESS_LOGGER_NAME);
 
     @Context
     protected ResourceInfo resourceInfo;
@@ -95,7 +97,6 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
         fillMDC();
-        logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         ognlContext.put("securityUtils", new SecurityUtilsBean());
         if(resource instanceof ResourceAction) {
@@ -103,7 +104,33 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             resourceAction.prepareForExecution();
         }
         checkAuthorizations(requestContext, resource);
-        accessLogger.info(requestContext.getMethod());
+        Method resourceMethod = resourceInfo.getResourceMethod();
+        if(isAccessToBeLogged(resource, resourceMethod)) {
+            accessLogger.info(
+                    requestContext.getMethod() + " " + resourceMethod.getName() +
+                    ", queryString " + request.getQueryString());
+        }
+    }
+
+    public static boolean isAccessToBeLogged(Object resource, Method handler) {
+        if (resource != null) {
+            Boolean log = null;
+            Class<?> resourceClass = resource.getClass();
+
+            LogAccesses annotation;
+            if(handler != null) {
+                annotation = handler.getAnnotation(LogAccesses.class);
+                if(annotation != null) {
+                    log = annotation.value();
+                }
+            }
+            if(log == null) {
+                annotation = resourceClass.getAnnotation(LogAccesses.class);
+                log = (annotation != null && annotation.value());
+            }
+            return log;
+        }
+        return false;
     }
 
     protected void addCacheHeaders(ContainerResponseContext responseContext) {
@@ -179,7 +206,8 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     protected void checkResourceActionInvocation(ContainerRequestContext requestContext, ResourceAction resourceAction) {
         Method handler = resourceInfo.getResourceMethod();
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        if(!SecurityLogic.isAllowed(request, resourceAction.getActionInstance(), resourceAction, handler)) {
+        if(!SecurityLogic.isAllowed(request, resourceAction.getActionInstance(), resourceAction, handler) ||
+           !resourceAction.isAccessible()) {
             logger.warn("Request not allowed: " + request.getMethod() + " " + request.getRequestURI());
             Response.Status status =
                     SecurityUtils.getSubject().isAuthenticated() ?

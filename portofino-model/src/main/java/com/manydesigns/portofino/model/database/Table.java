@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -46,7 +46,7 @@ import java.util.List;
 @XmlType(propOrder = {"tableName", "entityName", "shortName", "javaClass","annotations","columns","foreignKeys","primaryKey","selectionProviders"})
 public class Table implements ModelObject, Annotated {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -74,7 +74,6 @@ public class Table implements ModelObject, Annotated {
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class actualJavaClass;
     protected String actualEntityName;
-    protected final List<String> syntheticPropertyNames = new ArrayList<>();
 
     //**************************************************************************
     // Logging
@@ -265,7 +264,7 @@ public class Table implements ModelObject, Annotated {
         return oneToManyRelationships;
     }
 
-    @XmlElementWrapper(name="annotations")
+    @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation", type = Annotation.class)
     @NotNull
     public List<Annotation> getAnnotations() {
@@ -285,10 +284,6 @@ public class Table implements ModelObject, Annotated {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
-    }
-
-    public List<String> getSyntheticPropertyNames() {
-        return syntheticPropertyNames;
     }
 
     //**************************************************************************

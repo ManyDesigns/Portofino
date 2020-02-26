@@ -71,7 +71,7 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
 
     /**
      * Lifecycle method invoked when there are no more path parameters to process.
-     * @since 5.0.0-SNAPSHOT
+     * @since 5.0.0
      */
     protected void parametersAcquired() throws WebApplicationException {
         if(parameters.size() < minParameters) {
@@ -114,9 +114,11 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
     }
 
     @Override
-    protected void describe(Map<String, Object> description) {
+    public Map<String, Object> describe() {
+        Map<String, Object> description = super.describe();
         description.put("minParameters", minParameters);
         description.put("maxParameters", maxParameters);
         description.put("parameters", parameters);
+        return description;
     }
 }

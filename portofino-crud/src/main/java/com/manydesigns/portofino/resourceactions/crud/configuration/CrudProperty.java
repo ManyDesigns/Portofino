@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2019 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.resourceactions.crud.configuration;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.model.Annotated;
@@ -46,7 +45,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true) //Deserialize VirtualProperties as normal properties as we're only interested in common fields for now
 public class CrudProperty implements Annotated {
     public static final String copyright =
-            "Copyright (C) 2005-2019 ManyDesigns srl";
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
 
     //**************************************************************************
@@ -158,7 +157,7 @@ public class CrudProperty implements Annotated {
     }
 
     @JsonProperty("annotations")
-    @XmlElementWrapper(name="annotations")
+    @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation", type = Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
