@@ -12,12 +12,13 @@ import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
-import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
+import {AuthenticationService} from "./security/authentication.service";
 import {declareButton, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
+import {NO_AUTH_HEADER} from "./security/authentication.headers";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 

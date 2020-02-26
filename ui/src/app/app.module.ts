@@ -49,9 +49,7 @@ export class AppComponent {}
 
 @NgModule({
   declarations: [AppComponent],
-  providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation }
-  ],
+  providers: [],
   imports: [
     RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()),
     PortofinoModule, PortofinoUpstairsModule,
@@ -65,9 +63,4 @@ export class AppComponent {}
   entryComponents: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-  static navigation() {
-    return DefaultNavigationComponent;
-    //return CustomNavigation
-  }
-}
+export class AppModule {}

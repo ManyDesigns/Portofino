@@ -41,3 +41,5 @@ export * from './lib/security/login/signup.component';
 export * from './lib/security/login/reset-password.component';
 export {ConnectionProviderDetails, ConnectionProviderSummary, DatabasePlatform} from "./lib/administration/support";
 export {VarDirective} from "./lib/var.directive";
+export {NO_RENEW_HEADER} from "./lib/security/authentication.headers";
+export {NO_AUTH_HEADER} from "./lib/security/authentication.headers";

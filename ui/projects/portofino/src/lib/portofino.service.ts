@@ -2,9 +2,10 @@ import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@an
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import { DateAdapter } from "@angular/material/core";
-import {WebStorageService} from "ngx-store";
 import {Observable} from "rxjs";
 import {catchError, map} from "rxjs/operators";
+import {WebStorageService} from "./storage/storage.services";
+import {NO_RENEW_HEADER} from "./security/authentication.headers";
 
 export const LOCALE_STORAGE_SERVICE = new InjectionToken('Locale Storage');
 export const LOCALES = new InjectionToken('Locales');
@@ -93,7 +94,9 @@ export class PortofinoService {
       this.fallbackInit();
       return;
     }
-    this.http.get<ApiInfo>(this.localApiPath).subscribe(response => {
+    const headers = {};
+    headers[NO_RENEW_HEADER] = true; //Avoid renewing the token on startup as this might hit the wrong login action
+    this.http.get<ApiInfo>(this.localApiPath, { headers: headers }).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
       if(response.loginPath) {
         this.loginPath = this.sanitizeLoginPath(response.loginPath);
@@ -109,7 +112,9 @@ export class PortofinoService {
   }
 
   private initLoginPath() {
-    this.http.get<any>(this.apiRoot + ':description').subscribe(response => {
+    const headers = {};
+    headers[NO_RENEW_HEADER] = true; //Avoid renewing the token on startup as this might hit the wrong login action
+    this.http.get<any>(this.apiRoot + ':description', { headers: headers }).subscribe(response => {
       if (response.loginPath) {
         this.loginPath = this.sanitizeLoginPath(response.loginPath);
       }
