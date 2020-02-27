@@ -1,6 +1,6 @@
 import {Component, NgModule} from '@angular/core';
 import {
-  PortofinoModule, NAVIGATION_COMPONENT, DefaultNavigationComponent, PortofinoUpstairsModule} from "portofino";
+  PortofinoModule, PortofinoUpstairsModule} from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";

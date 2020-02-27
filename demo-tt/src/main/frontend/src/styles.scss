@@ -11,6 +11,8 @@ $warn: mat-color($app-warn);
 
 $theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 
+@include angular-material-theme($theme);
+
 //TODO find a way to import this
 @mixin portofino-theme($theme) {
   $primary: map-get($theme, primary);
