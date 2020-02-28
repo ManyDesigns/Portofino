@@ -1,0 +1,12 @@
+div.portofino-wizard {
+  padding: 20px;
+
+  form > mat-form-field {
+    margin: 0 5px;
+  }
+
+  mat-form-field.connection-url {
+    width: 400px;
+  }
+}
+

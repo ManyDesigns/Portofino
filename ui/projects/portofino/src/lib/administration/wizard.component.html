@@ -1,4 +1,4 @@
-<div style="padding: 20px;">
+<div class="portofino-wizard">
   <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
     <mat-step [stepControl]="step0Form.control">
       <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
@@ -30,11 +30,11 @@
             <mat-form-field>
               <mat-label>{{'Driver' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.driver" required name="driver"
-                          [disabled]="wizard.connectionProvider">
+                          [disabled]="wizard.connectionProvider" (selectionChange)="updateConnectionUrl($event)">
                 <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
               </mat-select>
             </mat-form-field>
-            <mat-form-field>
+            <mat-form-field class="connection-url">
               <mat-label>{{'Connection URL' | translate}}</mat-label>
               <input matInput [(ngModel)]="wizard.connectionUrl" required name="connectionUrl"
                      [disabled]="wizard.connectionProvider">

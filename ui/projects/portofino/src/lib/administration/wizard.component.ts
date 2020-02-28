@@ -5,7 +5,8 @@ import {from} from "rxjs";
 import {mergeMap} from "rxjs/operators";
 
 @Component({
-  templateUrl: 'wizard.component.html'
+  templateUrl: 'wizard.component.html',
+  styleUrls: ['wizard.component.scss']
 })
 export class WizardComponent extends Page implements OnInit {
 
@@ -34,6 +35,10 @@ export class WizardComponent extends Page implements OnInit {
         this.databasePlatforms.push(d[k]);
       }
     });
+  }
+
+  updateConnectionUrl(event) {
+    this.wizard.connectionUrl = this.wizard.driver.connectionStringTemplate;
   }
 
   wizardStep(event) {
