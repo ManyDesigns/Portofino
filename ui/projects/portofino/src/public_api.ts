@@ -22,6 +22,7 @@ export * from './lib/fields/field.factory';
 export * from './lib/i18n/en';
 export * from './lib/i18n/it';
 export * from './lib/i18n/language.interceptor';
+export * from './lib/i18n/language.selector.component';
 export * from './lib/notifications/notification.service';
 export * from './lib/page';
 export * from './lib/page.factory';
