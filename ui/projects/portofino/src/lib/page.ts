@@ -1,10 +1,17 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
+  AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ContentChild,
-  EventEmitter, Injectable,
+  EventEmitter,
+  Injectable,
   InjectionToken,
-  Input, OnDestroy, Optional, TemplateRef, Type, ViewChild
+  Input,
+  OnDestroy,
+  Optional,
+  TemplateRef,
+  Type,
+  ViewChild
 } from "@angular/core";
 import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
@@ -15,7 +22,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
 import {declareButton, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
-import {catchError, map, mergeMap} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {NotificationService} from "./notifications/notification.service";
 import {TranslateService} from "@ngx-translate/core";
 
@@ -71,10 +78,10 @@ export class PageConfiguration {
 export class PageChild {
   path: string;
   title: string;
-  icon: string;
-  embedded: boolean;
-  showInNavigation: boolean;
-  accessible: boolean;
+  icon?: string;
+  embedded?: boolean;
+  showInNavigation?: boolean;
+  accessible?: boolean;
 }
 
 export class PageSettingsPanel {
@@ -155,7 +162,9 @@ export class PageSettingsPanel {
 
   hide(saved: boolean) {
     this.active = false;
-    this.callback(saved);
+    if(this.callback) {
+      this.callback(saved);
+    }
   }
 
   get groups() {
@@ -231,6 +240,7 @@ export abstract class Page implements WithButtons, OnDestroy {
   allowEmbeddedComponents: boolean = true;
   embedded = false;
   returnUrl;
+  navigationMenu: NavigationMenu;
 
   readonly operationsPath = '/:operations';
   readonly configurationPath = '/:configuration';
@@ -279,7 +289,9 @@ export abstract class Page implements WithButtons, OnDestroy {
     }, this, 'goBack', null);
   }
 
-  initialize() {}
+  initialize() {
+    this.computeNavigationMenu();
+  }
 
   protected getPageSettingsPanel() {
     return new PageSettingsPanel(this);
@@ -590,6 +602,27 @@ export abstract class Page implements WithButtons, OnDestroy {
   handleDeclinedLogin() {
     return true;
   }
+
+  computeNavigationMenu() {
+    const menu = new NavigationMenu();
+    menu.current = NavigationMenuItem.from(this);
+    if(this.parent) {
+      menu.parent = NavigationMenuItem.from(this.parent);
+      this.parent.children.forEach(child => {
+        if(child.path == this.segment) {
+          menu.siblings.push(menu.current);
+        } else if(child.accessible && child.showInNavigation) {
+          menu.siblings.push(new NavigationMenuItem(this.parent.url + '/' + child.path, child.title, child.icon));
+        }
+      });
+    }
+    this.children.forEach(child => {
+      if(child.accessible && child.showInNavigation) {
+        menu.children.push(new NavigationMenuItem(this.url + '/' + child.path, child.title, child.icon));
+      }
+    });
+    return this.navigationMenu = menu;
+  }
 }
 
 @Component({
@@ -683,4 +716,27 @@ export class Group {
   actualAccessLevel: string;
   permissions: string[];
   permissionMap: {[name: string]: boolean};
+}
+
+export class NavigationMenu {
+  parent?: NavigationMenuItem;
+  current: NavigationMenuItem;
+  readonly siblings: NavigationMenuItem[] = [];
+  readonly children: NavigationMenuItem[] = [];
+}
+
+export class NavigationMenuItem {
+  title: string;
+  url: string;
+  icon?: string;
+
+  static from(page: Page) {
+    return new NavigationMenuItem(page.url, page.title, page.icon);
+  }
+
+  constructor(url: string, title: string, icon?: string) {
+    this.url = url;
+    this.title = title;
+    this.icon = icon;
+  }
 }

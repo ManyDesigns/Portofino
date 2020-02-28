@@ -1,5 +1,5 @@
 <div style="padding: 20px;">
-  <mat-form-field>
+  <mat-form-field *ngIf="!tableInfo">
     <mat-label>{{'Table name'|translate}}</mat-label>
     <input matInput [(ngModel)]="tableTreeDataSource.filter" />
     <mat-icon matSuffix>search</mat-icon>
@@ -134,13 +134,13 @@
                       </mat-select>
                     </mat-form-field>
                   </td>
-                  <td *ngIf="q.isHql" class="mat-cell">
+                  <td *ngIf="!q.new && q.isHql" class="mat-cell">
                     <mat-form-field>
                       <mat-label>HQL</mat-label>
                       <input matInput [(ngModel)]="q.hql" />
                     </mat-form-field>
                   </td>
-                  <td *ngIf="!q.isHql" class="mat-cell">
+                  <td *ngIf="!q.new && !q.isHql" class="mat-cell">
                     <mat-form-field>
                       <mat-label>SQL</mat-label>
                       <input matInput [(ngModel)]="q.sql" />

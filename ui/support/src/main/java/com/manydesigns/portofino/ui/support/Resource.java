@@ -34,7 +34,11 @@ public class Resource {
     }
 
     protected WebTarget path(Client c, String path) {
-        String localUri = request.getScheme() + "://" + request.getLocalAddr() + ":" + request.getLocalPort() + request.getContextPath();
+        String localAddr = request.getLocalAddr();
+        if(localAddr.contains(":")) { //Assume this is an IPv6 address
+            localAddr = "[" + localAddr + "]"; //https://www.ietf.org/rfc/rfc2732.txt
+        }
+        String localUri = request.getScheme() + "://" + localAddr + ":" + request.getLocalPort() + request.getContextPath();
         String baseUri;
         try {
             URI uri = new URI(localUri);

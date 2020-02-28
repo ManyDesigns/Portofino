@@ -45,8 +45,12 @@ public class JWTFilter extends PathMatchingFilter {
     private static final Logger logger = LoggerFactory.getLogger(JWTFilter.class);
 
     @Override
-    protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
+    protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) {
         HttpServletRequest httpRequest = WebUtils.toHttp(request);
+        if("OPTIONS".equals(httpRequest.getMethod())) {
+            //These are used for CORS among other things, and anyway don't have any side-effects.
+            return true;
+        }
         String jwt = getJSONWebToken(httpRequest);
         if(jwt == null) {
             logger.debug("JWT not found, proceeding with the request");

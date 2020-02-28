@@ -377,7 +377,7 @@ public class Security extends AbstractPortofinoRealm {
             def (criteria, cb, from) = QueryUtils.createCriteria(session, groupTableEntityName)
             def groupNameExpression = from.get(groupNameProperty)
             criteria.select(groupNameExpression).orderBy(cb.asc(groupNameExpression))
-            groups.addAll(criteria.list().collect { String.valueOf(it) })
+            groups.addAll(session.createQuery(criteria).list().collect { String.valueOf(it) })
         }
         groups
     }

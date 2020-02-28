@@ -74,7 +74,6 @@ public class Table implements ModelObject, Annotated {
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class actualJavaClass;
     protected String actualEntityName;
-    protected final List<String> syntheticPropertyNames = new ArrayList<>();
 
     //**************************************************************************
     // Logging
@@ -285,10 +284,6 @@ public class Table implements ModelObject, Annotated {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
-    }
-
-    public List<String> getSyntheticPropertyNames() {
-        return syntheticPropertyNames;
     }
 
     //**************************************************************************

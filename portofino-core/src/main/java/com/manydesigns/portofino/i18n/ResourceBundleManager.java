@@ -21,21 +21,22 @@
 package com.manydesigns.portofino.i18n;
 
 import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.DefaultReloadingDetectorFactory;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.builder.ReloadingFileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.apache.commons.configuration2.builder.fluent.PropertiesBuilderParameters;
-import org.apache.commons.configuration2.convert.DisabledListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -49,7 +50,7 @@ public class ResourceBundleManager {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    protected LinkedList<String> searchPaths = new LinkedList<String>();
+    protected LinkedList<String> searchPaths = new LinkedList<>();
     protected final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
             new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
 
@@ -79,12 +80,11 @@ public class ResourceBundleManager {
         return name;
     }
 
-    public ResourceBundle getBundle(Locale locale) {
+    public ConfigurationResourceBundle getBundle(Locale locale) {
         ConfigurationResourceBundle bundle = resourceBundles.get(locale);
         if(bundle == null) {
             CompositeConfiguration configuration = new CompositeConfiguration();
             Iterator<String> iterator = searchPaths.descendingIterator();
-            Configurations configurations = new Configurations();
             while(iterator.hasNext()) {
                 String path = iterator.next();
                 int index = path.lastIndexOf('/') + 1;
@@ -92,30 +92,30 @@ public class ResourceBundleManager {
                 int suffixIndex = path.length() - ".properties".length();
                 String resourceBundleBaseName = path.substring(index, suffixIndex);
                 String bundleName = getBundleFileName(resourceBundleBaseName, locale);
-                PropertiesBuilderParameters builderParams =
-                        new Parameters()
-                                .properties()
-                                .setReloadingDetectorFactory(new DefaultReloadingDetectorFactory());
-                PropertiesConfiguration conf;
+                String bundleLocation = basePath + bundleName;
+                URL bundleUrl = getBundleUrl(bundleLocation);
                 try {
-                    conf = configurations.propertiesBuilder(basePath + bundleName)
-                            .configure(builderParams)
-                            .getConfiguration();
-                } catch (ConfigurationException e) {
-                    logger.debug("Couldn't load resource bundle for locale " + locale + " from " + basePath, e);
-                    //Fall back to default .properties without _locale
-                    try {
+                    bundleUrl.openStream().close();
+                } catch (IOException e) {
+                    if(!StringUtils.isEmpty(locale.getCountry())) {
+                        logger.debug("Couldn't load resource bundle for locale " + locale + " from " + basePath + ", trying with language-only locale", e);
+                        bundle = getBundle(new Locale(locale.getLanguage()));
+                        //TODO setParent?
+                        resourceBundles.put(locale, bundle);
+                        return bundle;
+                    } else {
+                        logger.debug("Couldn't load resource bundle for locale " + locale + " from " + basePath + ", trying with default", e);
                         String defaultBundleName = basePath + resourceBundleBaseName + ".properties";
-                        conf = configurations.propertiesBuilder(defaultBundleName)
-                                .configure(builderParams)
-                                .getConfiguration();
-                    } catch (ConfigurationException e1) {
-                        logger.debug("Couldn't load default resource bundle from " + basePath, e1);
-                        conf = null;
+                        bundleUrl = getBundleUrl(defaultBundleName);
                     }
                 }
-                if(conf != null) {
+                try {
+                    Configuration conf = new ReloadingFileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
+                            .configure(new Parameters().fileBased().setURL(bundleUrl))
+                            .getConfiguration();
                     configuration.addConfiguration(conf);
+                } catch (ConfigurationException e) {
+                    logger.debug("Couldn't load resource bundle from " + bundleUrl, e);
                 }
             }
             bundle = new ConfigurationResourceBundle(configuration, locale);
@@ -123,6 +123,21 @@ public class ResourceBundleManager {
             resourceBundles.put(locale, bundle);
         }
         return bundle;
+    }
+
+    @NotNull
+    protected URL getBundleUrl(String bundleLocation) {
+        URL url;
+        try {
+            url = new URL(bundleLocation);
+        } catch (MalformedURLException e) {
+            try {
+                url = new URL("file:" + bundleLocation);
+            } catch (MalformedURLException ex) {
+                throw new IllegalArgumentException("Invalid bundle location: " + bundleLocation);
+            }
+        }
+        return url;
     }
 
     public void addSearchPath(String searchPath) {

@@ -39,3 +39,4 @@ export * from './lib/security/login/reset-password.component';
 export {DatabasePlatform} from "./lib/administration/support";
 export {ConnectionProviderDetails} from "./lib/administration/support";
 export {ConnectionProviderSummary} from "./lib/administration/support";
+export {VarDirective} from "./lib/var.directive";

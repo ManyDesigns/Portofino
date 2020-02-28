@@ -107,9 +107,12 @@
                             [component]="parent"></portofino-button>
           <portofino-buttons [component]="this"></portofino-buttons>
         </div>
-        <mat-paginator *ngIf="isDataTable()"
-                       [length]="results ? results.totalRecords : 0" [pageSize]="pageSize" (page)="loadPage($event)">
-        </mat-paginator>
+        <div>
+          <portofino-buttons [component]="this" list="pagination"></portofino-buttons>
+          <mat-paginator *ngIf="isDataTable()" style="display: inline-block;"
+                         [length]="results ? results.totalRecords : 0" [pageSize]="pageSize" (page)="loadPage($event)">
+          </mat-paginator>
+        </div>
       </div>
     </div>
   </mat-card-content>

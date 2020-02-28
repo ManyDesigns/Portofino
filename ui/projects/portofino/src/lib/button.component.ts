@@ -5,9 +5,13 @@ import {ButtonInfo, WithButtons} from "./buttons";
   selector: 'portofino-button',
   template: `
     <button mat-flat-button [color]="button.color" type="button" (click)="button.action(component, $event)"
-            *ngIf="button.presentIf(component)" [disabled]="!button.enabledIf(component)">
+            *ngIf="(!button.icon || button.text) && button.presentIf(component)" [disabled]="!button.enabledIf(component)">
       <mat-icon *ngIf="button.icon">{{button.icon}}</mat-icon>
       {{button.text | translate }}
+    </button>
+    <button mat-icon-button [color]="button.color" type="button" (click)="button.action(component, $event)"
+            *ngIf="button.icon && !button.text && button.presentIf(component)" [disabled]="!button.enabledIf(component)">
+      <mat-icon>{{button.icon}}</mat-icon>
     </button>`
 })
 export class ButtonComponent {

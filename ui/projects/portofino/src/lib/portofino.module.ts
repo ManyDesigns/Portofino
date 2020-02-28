@@ -114,6 +114,8 @@ import {ResetPasswordComponent} from "./security/login/reset-password.component"
 import {SidenavService} from "./sidenav.service";
 import {RichTextComponent} from "./fields/rich-text.component";
 import {TextPageComponent} from "./pages/text/text.component";
+import {VarDirective} from "./var.directive";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @NgModule({
   declarations: [
@@ -143,7 +145,7 @@ export class PortofinoFormsModule {}
     PageLayout, ButtonComponent, ButtonsComponent,
     ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
     LanguageSelectorComponent,
-    NavigationDirective, DefaultNavigationComponent,
+    NavigationDirective, DefaultNavigationComponent, VarDirective,
     ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
     CreatePageComponent, DeletePageComponent, MovePageComponent
   ],
@@ -198,17 +200,19 @@ export class PortofinoCrudModule {}
   declarations: [
     UpstairsComponent,
     ActionsComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
+    WizardComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
-    MatGridListModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
+    MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
   entryComponents: [
     UpstairsComponent,
     ActionsComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent, WizardComponent],
+    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
+    WizardComponent],
   exports: [UpstairsComponent]
 })
 export class PortofinoUpstairsModule {}

@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements.ognl;
 
+import com.manydesigns.elements.util.Util;
 import ognl.TypeConverter;
 import org.joda.time.DateTime;
 
@@ -30,11 +31,11 @@ import java.util.Date;
 import java.util.Map;
 
 /*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class CustomTypeConverter implements TypeConverter {
 
     private TypeConverter conv;
@@ -44,25 +45,25 @@ public class CustomTypeConverter implements TypeConverter {
         this.conv = conv;
     }
 
-    public Object convertValue(Map context, Object target, Member member,
-            String propertyName, Object value, Class toType) {
+    public Object convertValue(
+            Map context, Object target, Member member, String propertyName, Object value, Class toType) {
         if ((toType == Boolean.class || toType == Boolean.TYPE) && (value instanceof String)) {
             String thisValue = (String) value;
             return Boolean.valueOf(thisValue);
         } else if (toType == Date.class) {
-            if(value instanceof DateTime) {
+            if (value instanceof DateTime) {
                 return new Date(((DateTime) value).getMillis());
             }
         } else if (toType == Timestamp.class) {
-            if(value instanceof String) {
+            if (value instanceof String) {
                 try {
                     return Timestamp.valueOf((String) value);
                 } catch (Exception e) {
                     return throwFailedConversion(value, toType, e);
                 }
-            } else if(value instanceof Date) {
+            } else if (value instanceof Date) {
                 return new Timestamp(((Date) value).getTime());
-            } else if(value instanceof DateTime) {
+            } else if (value instanceof DateTime) {
                 return new Timestamp(((DateTime) value).getMillis());
             }
         } else if (toType == java.sql.Date.class) {
@@ -72,19 +73,19 @@ public class CustomTypeConverter implements TypeConverter {
                 } catch (Exception e) {
                     return throwFailedConversion(value, toType, e);
                 }
-            } else if(value instanceof Date) {
+            } else if (value instanceof Date) {
                 return new java.sql.Date(((Date) value).getTime());
-            } else if(value instanceof DateTime) {
+            } else if (value instanceof DateTime) {
                 return new java.sql.Date(((DateTime) value).getMillis());
             }
         } else if ((toType == Time.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
             return new Time(thisValue.getTime());
         } else if (toType == DateTime.class) {
-             if(value instanceof Date) {
+            if (value instanceof Date) {
                 return new DateTime(((Date) value).getTime());
             }
-        } else if (toType.isEnum() && value instanceof String){
+        } else if (toType.isEnum() && value instanceof String) {
             return Enum.valueOf(toType, (String) value);
         } else if (toType == Class.class && value instanceof String) {
             try {
@@ -92,6 +93,8 @@ public class CustomTypeConverter implements TypeConverter {
             } catch (Exception e) {
                 return throwFailedConversion(value, toType, e);
             }
+        } else if (toType.isArray() && value instanceof String) {
+            return convertValue(context, target, member, propertyName, Util.matchStringArray((String) value), toType);
         }
         return conv.convertValue(context, target, member, propertyName, value, toType);
     }

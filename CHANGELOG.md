@@ -4,6 +4,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- API for pages to compute their navigation menu
+- Support for buttons with only an icon and no text
+- Button to refresh the CRUD search
+
+### Changed
+- Wizard is a bit more user-friendly
+- Pretty-print saved `config.json`
+
+### Fixed
+- `SendMailAction` not working ([#323](https://github.com/ManyDesigns/Portofino/issues/323))
+- Arrays in XML annotations ([#325](https://github.com/ManyDesigns/Portofino/issues/325))
+- Local API with IPv6 addresses ([#327](https://github.com/ManyDesigns/Portofino/issues/327))
+- Can't save selection providers ([#328](https://github.com/ManyDesigns/Portofino/issues/328))
+- Generated `Security.groovy` errors when loading groups ([#329](https://github.com/ManyDesigns/Portofino/issues/329))
+- OPTIONS with expired JWT fails triggering bad CORS ([#333](https://github.com/ManyDesigns/Portofino/issues/333))
+- Server-side localized info/warning/error messages ([#334](https://github.com/ManyDesigns/Portofino/issues/334))
+
 ## [5.1.1] - 2020-01-10
 
 ### Added

@@ -27,7 +27,7 @@ import {SelectionProvider} from "../crud.common";
 import {AuthenticationService} from "../../../security/authentication.service";
 import {MediaObserver} from "@angular/flex-layout";
 import {Observable, of, Subject, Subscription} from "rxjs";
-import {ButtonInfo, getButtons} from "../../../buttons";
+import {Button, ButtonInfo, getButtons} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 import {SearchFieldComponent} from "./search-field.component";
 
@@ -391,8 +391,9 @@ export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  @Button({ icon: 'refresh', list: 'pagination' })
   refreshSearch() {
-    //Infinite scrolling appends to the list rather then replace it, so we need to empty it
+    //Infinite scrolling appends to the list rather then replacing it, so we need to empty it
     this.resultsDataSource.data = [];
     this.loadSearchResultsPage(this.page);
   }
