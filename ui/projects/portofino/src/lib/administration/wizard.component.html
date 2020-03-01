@@ -1,5 +1,5 @@
 <div class="portofino-wizard">
-  <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
+  <mat-horizontal-stepper #stepper linear="true">
     <mat-step [stepControl]="step0Form.control">
       <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
       {{'Use an existing'|translate}}
@@ -30,7 +30,7 @@
             <mat-form-field>
               <mat-label>{{'Driver' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.driver" required name="driver"
-                          [disabled]="wizard.connectionProvider" (selectionChange)="updateConnectionUrl($event)">
+                          [disabled]="wizard.connectionProvider" (selectionChange)="updateConnectionUrl()">
                 <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
               </mat-select>
             </mat-form-field>
@@ -59,7 +59,7 @@
           </ng-container>
         </form>
       </fieldset>
-      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+      <button mat-button (click)="configureConnection()" color="primary">{{'Next' | translate}}</button>
     </mat-step>
     <mat-step [editable]="wizard.connectionProvider">
       <ng-template matStepLabel>{{'Select the database schema(s) to import' | translate}}</ng-template>
@@ -78,7 +78,7 @@
         </tr>
       </table>
       <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+      <button mat-button (click)="selectSchemas()" color="primary">{{'Next' | translate}}</button>
     </mat-step>
     <mat-step [stepControl]="userGroupForm.control">
       <ng-template matStepLabel>{{'Configure user management' | translate}}</ng-template>
@@ -224,7 +224,7 @@
         </tr>
       </table>
       <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-      <button mat-button color="accent" (click)="generateApplication(wizard)">{{'Finish' | translate}}</button>
+      <button mat-button color="accent" (click)="generateApplication()">{{'Finish' | translate}}</button>
     </mat-step>
   </mat-horizontal-stepper>
 </div>
