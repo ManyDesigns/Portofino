@@ -2,9 +2,9 @@
   <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
     <mat-step [stepControl]="step0Form.control">
       <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
-      {{'Use an existing'|translate}}
+      {{'Use existing database connection'|translate}}
       <mat-form-field>
-        <mat-label>{{'database connection' | translate}}</mat-label>
+        <mat-label>{{'choose' | translate}}</mat-label>
         <mat-select [(ngModel)]="wizard.connectionProvider">
           <mat-option></mat-option>
           <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
@@ -12,7 +12,7 @@
       </mat-form-field>
       <div>
         <label>{{'or create a new one (choose its type)'}}</label>
-        <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider">
+        <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="wizard.connectionProvider" style="margin: 0 5px;">
           <mat-radio-button value="jdbc">JDBC</mat-radio-button>
           <mat-radio-button value="jndi">JNDI</mat-radio-button>
         </mat-radio-group>
