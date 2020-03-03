@@ -107,7 +107,6 @@ public class SessionFactoryBuilder {
         Thread.currentThread().setContextClassLoader(scratchClassLoader);
 
         try {
-
             CtClass baseClass = generateBaseClass();
             FileObject baseClassFile = root.resolveFile(
                     database.getDatabaseName() + FileName.SEPARATOR_CHAR + "BaseEntity.class");
@@ -339,15 +338,53 @@ public class SessionFactoryBuilder {
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
         AnnotationsAttribute classAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-        javassist.bytecode.annotation.Annotation annotation;
+        configureAnnotations(table, constPool, classAnnotations);
+        ccFile.addAttribute(classAnnotations);
+        setupColumns(table, cc, constPool);
+
+        List<Column> columnPKList = table.getPrimaryKey().getColumns();
+        String equalsMethod =
+                "public boolean equals(Object other) {" +
+                "    if(!(other instanceof " + cc.getName() + ")) {" +
+                "        return false;" +
+                "    }" +
+                cc.getName() + " castOther = (" + cc.getName() + ") other;";
+        String hashCodeMethod =
+                "public int hashCode() {" +
+                        "    return java.util.Objects.hash(new java.lang.Object[] {";
+
+        boolean first = true;
+        for(Column c : columnPKList) {
+            equalsMethod +=
+                    "    if(!java.util.Objects.equals(this." + c.getActualPropertyName() + ", castOther." + c.getActualPropertyName() + ")) {" +
+                    "        return false;" +
+                    "    }";
+            if(first) {
+                first = false;
+            } else {
+                hashCodeMethod += ", ";
+            }
+            hashCodeMethod += c.getActualPropertyName();
+        }
+
+        equalsMethod += "return true; }";
+        hashCodeMethod += "});}";
+
+        cc.addMethod(CtNewMethod.make(equalsMethod, cc));
+        cc.addMethod(CtNewMethod.make(hashCodeMethod, cc));
+        return cc;
+    }
+
+    protected void configureAnnotations(Table table, ConstPool constPool, AnnotationsAttribute classAnnotations) {
+        Annotation annotation;
 
         String schemaName = table.getSchema().getActualSchemaName();
-        annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Table.class.getName(), constPool);
+        annotation = new Annotation(javax.persistence.Table.class.getName(), constPool);
         annotation.addMemberValue("name", new StringMemberValue(jpaEscape(table.getTableName()), constPool));
         annotation.addMemberValue("schema", new StringMemberValue(jpaEscape(schemaName), constPool));
         classAnnotations.addAnnotation(annotation);
 
-        annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Entity.class.getName(), constPool);
+        annotation = new Annotation(Entity.class.getName(), constPool);
         annotation.addMemberValue("name", new StringMemberValue(table.getActualEntityName(), constPool));
         classAnnotations.addAnnotation(annotation);
 
@@ -365,9 +402,6 @@ public class SessionFactoryBuilder {
                 classAnnotations.addAnnotation(new Annotation(Immutable.class.getName(), constPool));
             }
         });
-        ccFile.addAttribute(classAnnotations);
-        setupColumns(table, cc, constPool);
-        return cc;
     }
 
     @Nullable
@@ -474,6 +508,7 @@ public class SessionFactoryBuilder {
 
 
             field.getFieldInfo().addAttribute(fieldAnnotations);
+            field.setModifiers(javassist.Modifier.PROTECTED);
             cc.addField(field);
             String accessorName = propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
             cc.addMethod(CtNewMethod.getter("get" + accessorName, field));
