@@ -1,11 +1,13 @@
 import {Page, PageConfiguration} from "../page";
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewChild} from "@angular/core";
 import {ConnectionProviderDetails, ConnectionProviderSummary, DatabasePlatform} from "./support";
 import {from} from "rxjs";
 import {mergeMap} from "rxjs/operators";
+import {MatStepper} from "@angular/material/stepper";
 
 @Component({
-  templateUrl: 'wizard.component.html'
+  templateUrl: 'wizard.component.html',
+  styleUrls: ['wizard.component.scss']
 })
 export class WizardComponent extends Page implements OnInit {
 
@@ -13,6 +15,8 @@ export class WizardComponent extends Page implements OnInit {
   databasePlatforms: DatabasePlatform[];
   wizard: { connectionProvider: ConnectionProviderSummary, newConnectionType?: string, entityMode: string } | any =
     { newConnectionType: 'jdbc', strategy: "automatic", entityMode: 'MAP' };
+  @ViewChild("stepper", { static: true })
+  stepper: MatStepper;
 
   ngOnInit(): void {
     this.loadConnectionProviders();
@@ -36,60 +40,59 @@ export class WizardComponent extends Page implements OnInit {
     });
   }
 
-  wizardStep(event) {
-    if(event.selectedIndex == 1) {
-      if(this.wizard.connectionProvider) {
-        this.wizardFirstStepExistingConnectionProvider();
-      } else {
-        this.wizardFirstStepNewConnectionProvider();
-      }
-    } else if(event.selectedIndex == 2) {
-      const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}/schemas`;
-      this.http.put<any[]>(url, this.wizard.schemas).subscribe(tables => {
-        tables.forEach(t => { t.selected = t.root; });
-        this.wizard.tables = tables;
+  updateConnectionUrl() {
+    this.wizard.connectionUrl = this.wizard.driver.connectionStringTemplate;
+  }
+
+  configureConnection() {
+    if (this.wizard.connectionProvider) {
+      const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}`;
+      this.http.get<ConnectionProviderDetails>(url).subscribe(c => {
+        this.wizard.schemas = c.schemas;
+        this.stepper.next();
+      });
+    } else {
+      const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
+      const conn = new ConnectionProviderDetails();
+      conn.databaseName = {value: this.wizard.databaseName};
+      conn.jndiResource = {value: this.wizard.jndiResource};
+      conn.driver = {value: this.wizard.driver.standardDriverClassName};
+      conn.url = {value: this.wizard.connectionUrl};
+      conn.username = {value: this.wizard.username};
+      conn.password = {value: this.wizard.password};
+      conn.entityMode = {value: this.wizard.entityMode};
+      this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
+        this.notificationService.info(this.translate.instant("Database created."));
+        const summary = new ConnectionProviderSummary();
+        summary.name = c.databaseName.value;
+        summary.status = c.status.value;
+        this.connectionProviders.push(summary);
+        this.wizard.connectionProvider = summary;
+        this.wizard.schemas = c.schemas;
+        this.stepper.next();
       });
     }
   }
 
-  private wizardFirstStepNewConnectionProvider() {
-    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
-    const conn = new ConnectionProviderDetails();
-    conn.databaseName = {value: this.wizard.databaseName};
-    conn.jndiResource = {value: this.wizard.jndiResource};
-    conn.driver = {value: this.wizard.driver.standardDriverClassName};
-    conn.url = {value: this.wizard.connectionUrl};
-    conn.username = {value: this.wizard.username};
-    conn.password = {value: this.wizard.password};
-    conn.entityMode = {value: this.wizard.entityMode};
-    this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
-      const summary = new ConnectionProviderSummary();
-      summary.name = c.databaseName.value;
-      summary.status = c.status.value;
-      this.connectionProviders.push(summary);
-      this.wizard.connectionProvider = summary;
-      this.wizard.schemas = c.schemas;
-      this.notificationService.info(this.translate.instant("Database created."));
+  selectSchemas() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}/schemas`;
+    this.http.put<any[]>(url, this.wizard.schemas).subscribe(tables => {
+      tables.forEach(t => { t.selected = t.root; });
+      this.wizard.tables = tables;
+      this.stepper.next();
     });
   }
 
-  private wizardFirstStepExistingConnectionProvider() {
-    const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}`;
-    this.http.get<ConnectionProviderDetails>(url).subscribe(c => {
-      this.wizard.schemas = c.schemas;
-    });
-  }
-
-  generateApplication(wizard) {
+  generateApplication() {
     const url = `${this.portofino.apiRoot}portofino-upstairs/application`;
-    this.http.post(url, wizard).subscribe((actions: { path: string, type: string, title: string, detail: boolean }[]) => {
+    this.http.post(url, this.wizard).subscribe((actions: { path: string, type: string, title: string, detail: boolean }[]) => {
       if(this.portofino.localApiPath) {
         this.createPages(actions).subscribe(
           () => {},
           error => this.notificationService.error("Error " + error), //TODO describe, I18n
           () => {
             this.notificationService.info(this.translate.instant("Pages created. Setting up authc/authz."));
-            setTimeout(() => this.configSecurity(url, wizard), 1000);
+            setTimeout(() => this.configSecurity(url, this.wizard), 1000);
           });
       } else {
         this.notificationService.info(this.translate.instant("Local API not available. Only the application backend has been created."));

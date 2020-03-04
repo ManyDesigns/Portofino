@@ -64,6 +64,14 @@ public class SessionFactoryBuilder {
     protected final ClassPool classPool = new ClassPool(ClassPool.getDefault());
     protected EntityMode entityMode = EntityMode.MAP;
 
+    protected static final Set<String> JAVA_KEYWORDS = new HashSet<>();
+
+    static {
+        JAVA_KEYWORDS.add("private");
+        JAVA_KEYWORDS.add("protected");
+        JAVA_KEYWORDS.add("public");
+    }
+
     public SessionFactoryBuilder(Database database) {
         this.database = database;
         String trueString = database.getTrueString();
@@ -106,7 +114,6 @@ public class SessionFactoryBuilder {
         Thread.currentThread().setContextClassLoader(scratchClassLoader);
 
         try {
-
             CtClass baseClass = generateBaseClass();
             FileObject databaseDir = root.resolveFile(database.getDatabaseName());
             databaseDir.deleteAll();
@@ -259,9 +266,7 @@ public class SessionFactoryBuilder {
         String packageName = table.getSchema().getQualifiedName().toLowerCase();
         String className = table.getActualEntityName();
         if(entityMode == EntityMode.POJO) {
-            className = Arrays.stream(StringUtils.split(className, "_- "))
-                    .map(StringUtils::capitalize)
-                    .collect(Collectors.joining());
+            className = toJavaLikeName(className);
         } else {
             className = className.replaceAll("-|\\h", "");
         }
@@ -269,12 +274,32 @@ public class SessionFactoryBuilder {
             className = "_" + className;
         }
         String fullName = packageName + "." + className;
+        if(entityMode == EntityMode.POJO) {
+            fullName = ensureValidJavaName(fullName);
+        }
         for(Table other : table.getSchema().getDatabase().getAllTables()) {
             if(other != table && other.getActualJavaClass() != null && other.getActualJavaClass().getName().equals(fullName)) {
                 fullName += "_1";
             }
         }
         return fullName;
+    }
+
+    public static String ensureValidJavaName(String fullName) {
+        String[] tokens = fullName.split("\\.");
+        for(int i = 0; i < tokens.length; i++) {
+            if(JAVA_KEYWORDS.contains(tokens[i])) {
+                tokens[i] = tokens[i] + "_";
+            }
+        }
+        return StringUtils.join(tokens, ".");
+    }
+
+    @NotNull
+    protected static String toJavaLikeName(String name) {
+        return Arrays.stream(StringUtils.split(name.toLowerCase(), "_- "))
+                .map(StringUtils::capitalize)
+                .collect(Collectors.joining());
     }
 
     public Class<?> getPersistentClass(Table table, CodeBase codeBase) throws IOException, ClassNotFoundException {
@@ -340,15 +365,59 @@ public class SessionFactoryBuilder {
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
         AnnotationsAttribute classAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-        javassist.bytecode.annotation.Annotation annotation;
+        configureAnnotations(table, constPool, classAnnotations);
+        ccFile.addAttribute(classAnnotations);
+        setupColumns(table, cc, constPool);
+
+        if(entityMode == EntityMode.POJO) {
+            defineEqualsAndHashCode(table, cc);
+        }
+        return cc;
+    }
+
+    protected void defineEqualsAndHashCode(Table table, CtClass cc) throws CannotCompileException {
+        List<Column> columnPKList = table.getPrimaryKey().getColumns();
+        String equalsMethod =
+                "public boolean equals(Object other) {" +
+                        "    if(!(other instanceof " + cc.getName() + ")) {" +
+                        "        return false;" +
+                        "    }" +
+                        cc.getName() + " castOther = (" + cc.getName() + ") other;";
+        String hashCodeMethod =
+                "public int hashCode() {" +
+                        "    return java.util.Objects.hash(new java.lang.Object[] {";
+
+        boolean first = true;
+        for (Column c : columnPKList) {
+            equalsMethod +=
+                    "    if(!java.util.Objects.equals(this." + c.getActualPropertyName() + ", castOther." + c.getActualPropertyName() + ")) {" +
+                            "        return false;" +
+                            "    }";
+            if (first) {
+                first = false;
+            } else {
+                hashCodeMethod += ", ";
+            }
+            hashCodeMethod += c.getActualPropertyName();
+        }
+
+        equalsMethod += "return true; }";
+        hashCodeMethod += "});}";
+
+        cc.addMethod(CtNewMethod.make(equalsMethod, cc));
+        cc.addMethod(CtNewMethod.make(hashCodeMethod, cc));
+    }
+
+    protected void configureAnnotations(Table table, ConstPool constPool, AnnotationsAttribute classAnnotations) {
+        Annotation annotation;
 
         String schemaName = table.getSchema().getActualSchemaName();
-        annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Table.class.getName(), constPool);
+        annotation = new Annotation(javax.persistence.Table.class.getName(), constPool);
         annotation.addMemberValue("name", new StringMemberValue(jpaEscape(table.getTableName()), constPool));
         annotation.addMemberValue("schema", new StringMemberValue(jpaEscape(schemaName), constPool));
         classAnnotations.addAnnotation(annotation);
 
-        annotation = new javassist.bytecode.annotation.Annotation(javax.persistence.Entity.class.getName(), constPool);
+        annotation = new Annotation(Entity.class.getName(), constPool);
         annotation.addMemberValue("name", new StringMemberValue(table.getActualEntityName(), constPool));
         classAnnotations.addAnnotation(annotation);
 
@@ -366,9 +435,6 @@ public class SessionFactoryBuilder {
                 classAnnotations.addAnnotation(new Annotation(Immutable.class.getName(), constPool));
             }
         });
-        ccFile.addAttribute(classAnnotations);
-        setupColumns(table, cc, constPool);
-        return cc;
     }
 
     @Nullable
@@ -475,6 +541,7 @@ public class SessionFactoryBuilder {
 
 
             field.getFieldInfo().addAttribute(fieldAnnotations);
+            field.setModifiers(javassist.Modifier.PROTECTED);
             cc.addField(field);
             String accessorName = propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
             cc.addMethod(CtNewMethod.getter("get" + accessorName, field));
@@ -676,7 +743,7 @@ public class SessionFactoryBuilder {
         fieldAnnotations.addAnnotation(annotation);
         field.getFieldInfo().addAttribute(fieldAnnotations);
 
-        String accessorName = field.getName().toUpperCase() + field.getName().substring(1);
+        String accessorName = toJavaLikeName(field.getName());
         cc.addMethod(CtNewMethod.getter("get" + accessorName, field));
         cc.addMethod(CtNewMethod.setter("set" + accessorName, field));
     }

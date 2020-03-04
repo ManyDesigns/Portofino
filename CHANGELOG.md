@@ -2,7 +2,7 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [5.1.2] - 2020-03-02
 
 ### Added
 - API for pages to compute their navigation menu

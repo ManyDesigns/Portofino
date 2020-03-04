@@ -4,6 +4,7 @@ import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import org.hibernate.EntityMode;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -47,7 +48,8 @@ public class POJOPersistenceTest extends PersistenceTest {
         Object entity;
         try {
             String databaseName = className.substring(0, className.indexOf('.'));
-            Class entityClass = persistence.getDatabaseSetup(databaseName).getCodeBase().loadClass(className);
+            String actualClassName = SessionFactoryBuilder.ensureValidJavaName(className);
+            Class entityClass = persistence.getDatabaseSetup(databaseName).getCodeBase().loadClass(actualClassName);
             entity = entityClass.getConstructor().newInstance();
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 Field field = entityClass.getDeclaredField(entry.getKey());
@@ -80,10 +82,5 @@ public class POJOPersistenceTest extends PersistenceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    protected Object getEntityName(Object entity) {
-        return entity.getClass().getName().toLowerCase();
     }
 }

@@ -211,7 +211,6 @@ public class PersistenceTest {
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
         Object categoria0 = findCategory(tableAccessor, tableCriteria);
-        assertEquals("jpetstore.public.category", getEntityName(categoria0));
         assertEquals("Fish", get(categoria0, "name"));
         set(categoria0, "name", "Pesciu");
         session.update("category", categoria0);
@@ -221,17 +220,12 @@ public class PersistenceTest {
         //Controllo l'aggiornamento e riporto le cose come stavano
         tableCriteria = new TableCriteria(table);
         categoria0 =  findCategory(tableAccessor, tableCriteria);
-        assertEquals("jpetstore.public.category", getEntityName(categoria0));
         assertEquals("Pesciu", get(categoria0, "name"));
         set(categoria0, "name", "Fish");
         session = persistence.getSession("jpetstore");
         session.update("category", categoria0);
         session.getTransaction().commit();
         persistence.closeSessions();
-    }
-
-    protected Object getEntityName(Object entity) {
-        return get(entity, "$type$");
     }
 
     public void testSaveCategoria() {

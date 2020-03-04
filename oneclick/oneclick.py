@@ -41,7 +41,7 @@ os.makedirs(base_path)
 print "Downloading Tomcat..."
 class MyURLopener(urllib.FancyURLopener):
     def http_error_default(self, url, fp, errcode, errmsg, headers):
-        raise IOError("Could not download Tomcat, error is " + errmsg + " (" + str(errcode) + ")")
+        raise IOError("Could not download " + url + ", error is " + errmsg + " (" + str(errcode) + ")")
 
 urllib._urlopener = MyURLopener()
 
@@ -60,7 +60,7 @@ shutil.copy(portofino_path + "/THIRDPARTIES.txt", base_path + "/THIRDPARTIES.txt
 
 print "Downloading JDBC drivers..."
 for driver in local.drivers:
-    urllib.urlretrieve("http://repo1.maven.org/maven2/" + driver[0] + driver[1], tomcat_path + "/lib/" + driver[1])
+    urllib.urlretrieve("https://repo1.maven.org/maven2/" + driver[0] + driver[1], tomcat_path + "/lib/" + driver[1])
 
 command = "cd " + portofino_path + "; mvn clean install"
 print "Building Portofino with command: " + command

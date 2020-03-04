@@ -23,6 +23,7 @@ export class ConnectionProviderDetails {
 }
 
 export class DatabasePlatform {
+  connectionStringTemplate: string;
   description: string;
   standardDriverClassName: string;
   status: string;

@@ -1,10 +1,10 @@
-<div style="padding: 20px;">
-  <mat-horizontal-stepper linear="true" (selectionChange)="wizardStep($event)">
+<div class="portofino-wizard">
+  <mat-horizontal-stepper #stepper linear="true">
     <mat-step [stepControl]="step0Form.control">
       <ng-template matStepLabel>{{'Connect to your database' | translate}}</ng-template>
-      {{'Use an existing'|translate}}
+      {{'Use existing database connection'|translate}}
       <mat-form-field>
-        <mat-label>{{'database connection' | translate}}</mat-label>
+        <mat-label>{{'choose' | translate}}</mat-label>
         <mat-select [(ngModel)]="wizard.connectionProvider">
           <mat-option></mat-option>
           <mat-option *ngFor="let cp of connectionProviders" [value]="cp">{{cp.name}}</mat-option>
@@ -12,7 +12,7 @@
       </mat-form-field>
       <div>
         <label>{{'or create a new one (choose its type)'}}</label>
-        <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="!!wizard.connectionProvider">
+        <mat-radio-group [(ngModel)]="wizard.newConnectionType" [disabled]="!!wizard.connectionProvider" style="margin: 0 5px;">
           <mat-radio-button value="jdbc">JDBC</mat-radio-button>
           <mat-radio-button value="jndi">JNDI</mat-radio-button>
         </mat-radio-group>
@@ -30,11 +30,11 @@
             <mat-form-field>
               <mat-label>{{'Driver' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.driver" required name="driver"
-                          [disabled]="!!wizard.connectionProvider">
+                          [disabled]="!!wizard.connectionProvider" (selectionChange)="updateConnectionUrl()">
                 <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
               </mat-select>
             </mat-form-field>
-            <mat-form-field>
+            <mat-form-field class="connection-url">
               <mat-label>{{'Connection URL' | translate}}</mat-label>
               <input matInput [(ngModel)]="wizard.connectionUrl" required name="connectionUrl"
                      [disabled]="!!wizard.connectionProvider">
@@ -66,7 +66,7 @@
           </mat-form-field>
         </form>
       </fieldset>
-      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+      <button mat-button (click)="configureConnection()" color="primary">{{'Next' | translate}}</button>
     </mat-step>
     <mat-step [editable]="!!wizard.connectionProvider">
       <ng-template matStepLabel>{{'Select the database schema(s) to import' | translate}}</ng-template>
@@ -85,7 +85,7 @@
         </tr>
       </table>
       <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+      <button mat-button (click)="selectSchemas()" color="primary">{{'Next' | translate}}</button>
     </mat-step>
     <mat-step [stepControl]="userGroupForm.control">
       <ng-template matStepLabel>{{'Configure user management' | translate}}</ng-template>
@@ -231,7 +231,7 @@
         </tr>
       </table>
       <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-      <button mat-button color="accent" (click)="generateApplication(wizard)">{{'Finish' | translate}}</button>
+      <button mat-button color="accent" (click)="generateApplication()">{{'Finish' | translate}}</button>
     </mat-step>
   </mat-horizontal-stepper>
 </div>
