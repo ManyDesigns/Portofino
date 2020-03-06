@@ -2,6 +2,14 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+- Possibility for buttons to prevent double submit by returning an Observable
+
+### Fixed
+- Database views are now usable properly
+
 ## [5.1.2] - 2020-03-02
 
 ### Added
