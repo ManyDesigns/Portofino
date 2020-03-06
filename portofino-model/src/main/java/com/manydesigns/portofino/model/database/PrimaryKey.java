@@ -103,9 +103,7 @@ public class PrimaryKey implements ModelObject {
 //        assert primaryKeyName != null;
 
         if (primaryKeyColumns.isEmpty()) {
-            throw new Error(MessageFormat.format(
-                    "Primary key {0} has no columns",
-                    getQualifiedName()));
+            throw new Error(MessageFormat.format("Primary key {0} has no columns", getQualifiedName()));
         }
 
     }
@@ -131,6 +129,13 @@ public class PrimaryKey implements ModelObject {
         for (PrimaryKeyColumn pkc : primaryKeyColumns) {
             visitor.visit(pkc);
         }
+    }
+
+    public void add(Column column) {
+        PrimaryKeyColumn pkColumn = new PrimaryKeyColumn(this);
+        pkColumn.setActualColumn(column);
+        primaryKeyColumns.add(pkColumn); //This also checks that the column belongs to the right table
+        columns.add(column);
     }
 
     //**************************************************************************

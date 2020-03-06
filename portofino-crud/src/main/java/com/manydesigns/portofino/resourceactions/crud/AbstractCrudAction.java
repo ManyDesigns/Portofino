@@ -48,7 +48,6 @@ import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.annotations.Guard;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
-import com.manydesigns.portofino.resourceactions.ResourceActionLogic;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
@@ -1591,6 +1590,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "Create a new object (without blob data)")
@@ -1631,6 +1631,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Operation(summary = "Create a new object (including blob data)")

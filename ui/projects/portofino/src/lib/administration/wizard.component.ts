@@ -76,7 +76,14 @@ export class WizardComponent extends Page implements OnInit {
   selectSchemas() {
     const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections/${this.wizard.connectionProvider.name}/schemas`;
     this.http.put<any[]>(url, this.wizard.schemas).subscribe(tables => {
-      tables.forEach(t => { t.selected = t.root; });
+      tables.forEach(t => {
+        t.selected = t.root;
+        if(t.table) {
+          //These are view-specific fields which we don't want to modify here and which the backend doesn't know how to handle anyway
+          delete t.table.insertable;
+          delete t.table.updatable;
+        }
+      });
       this.wizard.tables = tables;
       this.stepper.next();
     });

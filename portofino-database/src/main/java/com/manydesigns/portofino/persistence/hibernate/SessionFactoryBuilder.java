@@ -147,10 +147,12 @@ public class SessionFactoryBuilder {
 
     protected boolean checkInvalidPrimaryKey(Table table, boolean warn) {
         if(table.getPrimaryKey() == null || table.getPrimaryKey().getPrimaryKeyColumns().isEmpty()) {
-            if(warn) {
-                logger.warn("Skipping table without primary key: {}", table.getQualifiedName());
+            if(!ensurePrimaryKey(table)) {
+                if (warn) {
+                    logger.warn("Skipping table without primary key: {}", table.getQualifiedName());
+                }
+                return true;
             }
-            return true;
         }
         List<Column> columnPKList = table.getPrimaryKey().getColumns();
         if(!table.getColumns().containsAll(columnPKList)) {
@@ -160,6 +162,30 @@ public class SessionFactoryBuilder {
             return true;
         }
         return false;
+    }
+
+    protected boolean ensurePrimaryKey(Table table) {
+        List<Column> idColumns = new ArrayList<>();
+        for(Column column : table.getColumns()) {
+            column.getAnnotations().forEach(ann -> {
+                Class<?> annotationClass = ann.getJavaAnnotationClass();
+                if(Id.class.equals(annotationClass)) {
+                    idColumns.add(column);
+                }
+            });
+        }
+        if(idColumns.isEmpty()) {
+            return false;
+        } else {
+            logger.info("Creating primary key on table {} according to @Id annotations", table.getQualifiedName());
+            PrimaryKey pk = new PrimaryKey(table);
+            pk.setPrimaryKeyName("synthetic_pk_" + table.getQualifiedName().replace('.', '_'));
+            for(Column column : idColumns) {
+                pk.add(column);
+            }
+            table.setPrimaryKey(pk);
+            return true;
+        }
     }
 
     public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase, List<Table> tablesToMap, List<Table> externallyMappedTables) {
@@ -529,7 +555,7 @@ public class SessionFactoryBuilder {
                 if(javax.persistence.Column.class.equals(annotationClass) ||
                    Id.class.equals(annotationClass) ||
                    org.hibernate.annotations.Type.class.equals(annotationClass)) {
-                    logger.warn("@Column or @Id or @Type specified on column {}, skipping annotation {}", column.getQualifiedName(), annotationClass);
+                    logger.debug("@Column or @Id or @Type specified on column {}, ignoring annotation {}", column.getQualifiedName(), annotationClass);
                     return;
                 }
                 Annotation fieldAnn = convertAnnotation(constPool, ann);
@@ -537,7 +563,6 @@ public class SessionFactoryBuilder {
                     fieldAnnotations.addAnnotation(fieldAnn);
                 }
             });
-
 
             field.getFieldInfo().addAttribute(fieldAnnotations);
             field.setModifiers(javassist.Modifier.PROTECTED);

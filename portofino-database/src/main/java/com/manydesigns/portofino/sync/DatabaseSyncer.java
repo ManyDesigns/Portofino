@@ -35,10 +35,19 @@ import liquibase.snapshot.SnapshotControl;
 import liquibase.snapshot.SnapshotGeneratorFactory;
 import liquibase.structure.core.ForeignKeyConstraintType;
 import liquibase.structure.core.Relation;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.parser.JSqlParser;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Types;
@@ -436,6 +445,12 @@ public class DatabaseSyncer {
             if(sourceTable == null) {
                 logger.debug("Added new table: {}", viewName);
                 sourceTable = new Table();
+                //Attempt to deduce the primary key from the referenced table
+            }
+            if(sourceTable.getPrimaryKey() == null ||
+               sourceTable.getPrimaryKey().getPrimaryKeyColumns() == null ||
+               sourceTable.getPrimaryKey().getPrimaryKeyColumns().isEmpty()) {
+                //tryToDeterminePrimaryKey(liquibaseView);
             }
             View targetView = new View(targetSchema);
             if(sourceTable instanceof View) {
@@ -456,8 +471,59 @@ public class DatabaseSyncer {
             syncColumns(liquibaseView, sourceTable, targetView);
 
             copySelectionProviders(sourceTable, targetView);
+
+            PrimaryKey sourcePk = sourceTable.getPrimaryKey();
+            if(sourcePk != null) {
+                PrimaryKey targetPk = new PrimaryKey(targetView);
+                for (PrimaryKeyColumn sourcePkColumn : sourcePk.getPrimaryKeyColumns()) {
+                    targetPk.add(DatabaseLogic.findColumnByName(targetView, sourcePkColumn.getColumnName()));
+                }
+                targetView.setPrimaryKey(targetPk);
+            }
         }
     }
+
+    /* TODO too sophisticated for now
+    protected PrimaryKey tryToDeterminePrimaryKey(liquibase.structure.core.View view) {
+        PrimaryKey candidate = null;
+        liquibase.structure.core.Column idColumn = null;
+        for (liquibase.structure.core.Column column : view.getColumns()) {
+            if (column.getName().equalsIgnoreCase("id")) {
+                if(idColumn != null) {
+                    logger.debug();
+                    break;
+                }
+                idColumn = column;
+            }
+        }
+        String viewDef = view.getDefinition();
+        if(viewDef != null) {
+            CCJSqlParserManager parserManager = new CCJSqlParserManager();
+            try {
+                Statement statement = parserManager.parse(new StringReader(viewDef));
+                if(!(statement instanceof Select)) {
+                    logger.warn("The definition of the view " + view.getName() + "is not a select query: " + viewDef);
+                    return candidate;
+                }
+                SelectBody selectBody = ((Select) statement).getSelectBody();
+                if(!(selectBody instanceof PlainSelect)) {
+                    logger.warn("The definition of the view " + view.getName() + "is not a plain select query: " + viewDef);
+                    return candidate;
+                }
+                PlainSelect select = (PlainSelect) selectBody;
+                FromItem fromItem = select.getFromItem();
+                if(!(fromItem instanceof net.sf.jsqlparser.schema.Table)) {
+                    logger.info("Cannot determine the primary key for the view " + view.getName() + " as it's not a select from a single table");
+                    return candidate;
+                }
+                net.sf.jsqlparser.schema.Table table = (net.sf.jsqlparser.schema.Table) fromItem;
+                //TODO
+            } catch (JSQLParserException e) {
+                logger.warn("Could not parse the definition of the view " + view.getName() + " to determine the primary key", e);
+            }
+        }
+        return candidate;
+    }*/
 
     protected void copySelectionProviders(Table sourceTable, Table targetTable) {
         for(ModelSelectionProvider sourceSP : sourceTable.getSelectionProviders()) {

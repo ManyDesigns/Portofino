@@ -23,28 +23,24 @@ package com.manydesigns.portofino.resourceactions.crud;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.Insertable;
 import com.manydesigns.elements.annotations.Updatable;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.persistence.TableCriteria;
-import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.resourceactions.ResourceActionName;
+import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.persistence.QueryUtils;
+import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
-import com.manydesigns.portofino.persistence.Persistence;
-import com.manydesigns.portofino.persistence.QueryUtils;
-import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
@@ -61,9 +57,13 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -116,7 +116,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     protected long calculateTotalSearchRecords() {
-        // calculate totalRecords
         TableCriteria criteria = new TableCriteria(baseTable);
         if(searchForm != null) {
             searchForm.configureCriteria(criteria);
@@ -132,9 +131,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             throw new Error(e);
         }
         //TODO gestire count non disponibile (totalRecordsQueryString == null)
-        List<Object> result = QueryUtils.runHqlQuery
-                (session, totalRecordsQueryString,
-                        query.getParameters());
+        List<Object> result = QueryUtils.runHqlQuery(session, totalRecordsQueryString, query.getParameters());
         return totalSearchRecords = ((Number) result.get(0)).longValue();
     }
 
@@ -157,7 +154,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             plainSelect.setOrderByElements(null);
             return plainSelect.toString();
         } catch(Exception e) {
-            logger.debug("Query string {} does not contain select", e);
+            logger.debug("Query string " + queryString + " does not contain select", e);
             queryString = "SELECT count(*) " + queryString;
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
@@ -203,6 +200,13 @@ public class CrudAction extends AbstractCrudAction<Object> {
             logger.warn("Constraint violation in update", e);
             throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
         }
+    }
+
+    @Override
+    public boolean isDeleteEnabled() {
+        return classAccessor != null &&
+                (classAccessor.getAnnotation(Updatable.class) == null ||
+                 classAccessor.getAnnotation(Updatable.class).value());
     }
 
     @Override
@@ -277,7 +281,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             return null;
         }
 
-        return new TableAccessor(baseTable);
+        return persistence.getTableAccessor(baseTable);
     }
 
     @Override

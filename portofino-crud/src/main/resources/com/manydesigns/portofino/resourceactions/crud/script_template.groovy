@@ -32,9 +32,9 @@ class %{#generatedClassName} extends CrudAction {
     //**************************************************************************
 
     public boolean isCreateEnabled() {
-        true
+        super.createEnabled
     }
-    
+
     protected void createSetup(Object object) {}
 
     protected boolean createValidate(Object object) {
@@ -45,7 +45,7 @@ class %{#generatedClassName} extends CrudAction {
 
 
     public boolean isEditEnabled() {
-        true
+        super.editEnabled
     }
 
     protected void editSetup(Object object) {}
@@ -58,7 +58,7 @@ class %{#generatedClassName} extends CrudAction {
 
 
     public boolean isDeleteEnabled() {
-        true
+        super.deleteEnabled
     }
 
     protected boolean deleteValidate(Object object) {
