@@ -1,16 +1,17 @@
 import {Component, Input} from '@angular/core';
 import {ButtonInfo, WithButtons} from "./buttons";
+import {isObservable, Observable} from "rxjs";
 
 @Component({
   selector: 'portofino-button',
   template: `
-    <button mat-flat-button [color]="button.color" type="button" (click)="button.action(component, $event)"
-            *ngIf="(!button.icon || button.text) && button.presentIf(component)" [disabled]="!button.enabledIf(component)">
+    <button mat-flat-button [color]="button.color" type="button" (click)="executeAction($event)"
+            *ngIf="!isIconOnly() && isPresent()" [disabled]="isDisabled()">
       <mat-icon *ngIf="button.icon">{{button.icon}}</mat-icon>
       {{button.text | translate }}
     </button>
-    <button mat-icon-button [color]="button.color" type="button" (click)="button.action(component, $event)"
-            *ngIf="button.icon && !button.text && button.presentIf(component)" [disabled]="!button.enabledIf(component)">
+    <button mat-icon-button [color]="button.color" type="button" (click)="executeAction($event)"
+            *ngIf="isIconOnly() && isPresent()" [disabled]="isDisabled()">
       <mat-icon>{{button.icon}}</mat-icon>
     </button>`
 })
@@ -19,6 +20,28 @@ export class ButtonComponent {
   button: ButtonInfo;
   @Input()
   component: any;
+  disabled: boolean;
+
+  isIconOnly() {
+    return this.button.icon && !this.button.text;
+  }
+
+  isPresent() {
+    return this.button.presentIf(this.component);
+  }
+
+  isDisabled() {
+    return this.disabled || !this.button.enabledIf(this.component);
+  }
+
+  executeAction($event) {
+    const result = this.button.action(this.component, $event);
+    if(isObservable(result)) {
+      this.disabled = true;
+      const enable = () => { this.disabled = false };
+      result.subscribe(enable, enable, enable);
+    }
+  }
 }
 
 @Component({

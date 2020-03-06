@@ -8,7 +8,7 @@ export class ButtonInfo {
   methodName: string;
   propertyDescriptor: PropertyDescriptor;
   color: ThemePalette;
-  action: (self, event: any | undefined) => void;
+  action: (self, event: any | undefined) => any;
   presentIf: (self) => boolean = () => true;
   enabledIf: (self) => boolean = () => true;
   icon?: string;
@@ -21,7 +21,7 @@ export function declareButton(info: ButtonInfo | any, target, methodName: string
   info.methodName = methodName;
   info.propertyDescriptor = descriptor;
   info.action = (self, event) => {
-    self[methodName].call(self, event);
+    return self[methodName].call(self, event);
   };
   if(!target.hasOwnProperty(BUTTONS)) {
     const parentButtons = target[BUTTONS];

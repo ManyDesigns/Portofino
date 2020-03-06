@@ -288,7 +288,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
   }
 
   static isSaveButtonEnabled(self: BaseDetailComponent) {
-    return self.isFormValid();
+    return self.isFormValid() && !self.saving;
   }
 
   getButtons(list = 'default') {
