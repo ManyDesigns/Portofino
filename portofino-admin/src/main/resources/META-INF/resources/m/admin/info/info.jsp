@@ -26,12 +26,12 @@
                         <span class="glyphicon glyphicon-book" aria-hidden="true"></span> Documentation
                     </a>
 
-                    <a class="btn btn-info btn-lg" target="_blank"  href="https://tt.manydesigns.com/wiki" role="button">
+                    <a class="btn btn-info btn-lg" target="_blank"  href="https://github.com/ManyDesigns/Portofino/wiki" role="button">
                         <span class="glyphicon glyphicon-globe" aria-hidden="true"></span> Wiki
                     </a>
 
-                    <a class="btn btn-danger btn-lg" target="_blank"  href="https://tt.manydesigns.com/" role="button">
-                        <span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Ticket Tracker
+                    <a class="btn btn-danger btn-lg" target="_blank"  href="https://github.com/ManyDesigns/Portofino/issues" role="button">
+                        <span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Issues
                     </a>
                 </div>
             </div>
