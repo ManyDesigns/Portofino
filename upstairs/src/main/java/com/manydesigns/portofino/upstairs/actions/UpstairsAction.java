@@ -512,50 +512,41 @@ public class UpstairsAction extends AbstractResourceAction {
             return;
         }
 
-        Connection connection = null;
-        try {
+        try(Connection connection = connectionProvider.acquireConnection()) {
             logger.info("Trying to detect whether table {} has many records...", table.getQualifiedName());
-            connection = connectionProvider.acquireConnection();
             liquibase.database.Database implementation =
                     DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             String sql =
                     "select count(*) from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-            PreparedStatement statement = connection.prepareStatement(sql);
-            setQueryTimeout(statement, 1);
-            statement.setMaxRows(1);
-            ResultSet rs = statement.executeQuery();
-            if(rs.next()) {
-                Long count = safeGetLong(rs, 1);
-                if(count != null) {
-                    if(count > LARGE_RESULT_SET_THRESHOLD) {
-                        logger.info(
-                                "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is bigger than " +
-                                        "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
-                                        "marked as largeResultSet = true and no autodetection based on table data will be " +
-                                        "attempted, in order to keep the processing time reasonable.");
-                        configuration.setLargeResultSet(true);
-                    } else {
-                        logger.info(
-                                "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is smaller than " +
-                                        "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
-                                        "analyzed normally.");
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                setQueryTimeout(statement, 1);
+                statement.setMaxRows(1);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        Long count = safeGetLong(rs, 1);
+                        if (count != null) {
+                            if (count > LARGE_RESULT_SET_THRESHOLD) {
+                                logger.info(
+                                        "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is bigger than " +
+                                                "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
+                                                "marked as largeResultSet = true and no autodetection based on table data will be " +
+                                                "attempted, in order to keep the processing time reasonable.");
+                                configuration.setLargeResultSet(true);
+                            } else {
+                                logger.info(
+                                        "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is smaller than " +
+                                                "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
+                                                "analyzed normally.");
+                            }
+                        } else {
+                            logger.warn("Could not determine number of records, assuming large result set");
+                            configuration.setLargeResultSet(true);
+                        }
                     }
-                } else {
-                    logger.warn("Could not determine number of records, assuming large result set");
-                    configuration.setLargeResultSet(true);
                 }
             }
-            statement.close();
         } catch (Exception e) {
             logger.error("Could not determine count", e);
-        } finally {
-            try {
-                if(connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Could not close connection", e);
-            }
         }
         largeResultSet.put(table, configuration.isLargeResultSet());
     }
