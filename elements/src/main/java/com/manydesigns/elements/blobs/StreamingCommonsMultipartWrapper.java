@@ -50,7 +50,7 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
 
     private static final Pattern WINDOWS_PATH_PREFIX_PATTERN = Pattern.compile("(?i:^[A-Z]:\\\\)");
 
-    /** Ensure this class will not load unless Commons FileUpload is on the classpath. */
+    /* Ensure this class will not load unless Commons FileUpload is on the classpath. */
     static {
         FileUploadException.class.getName();
     }
@@ -101,39 +101,32 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
 
             while (iterator.hasNext()) {
                 FileItemStream item = iterator.next();
-                InputStream stream = item.openStream();
-
-                // If it's a form field, add the string value to the list
-                if (item.isFormField()) {
-                    List<String> values = params.get(item.getFieldName());
-                    if (values == null) {
-                        values = new ArrayList<String>();
-                        params.put(item.getFieldName(), values);
+                try(InputStream stream = item.openStream()) {
+                    // If it's a form field, add the string value to the list
+                    if (item.isFormField()) {
+                        List<String> values = params.computeIfAbsent(item.getFieldName(), k -> new ArrayList<>());
+                        values.add(charset == null ? IOUtils.toString(stream) : IOUtils.toString(stream, charset));
+                    } else {
+                        // Else store the file param
+                        File tempFile = File.createTempFile("portofino-temp-" + item.getName(), ".temp");
+                        int size = copyInputStreamToFile(stream, tempFile);
+                        FileItem fileItem = new FileItem(item.getName(), item.getContentType(), tempFile, size);
+                        files.put(item.getFieldName(), fileItem);
                     }
-                    values.add(charset == null ? IOUtils.toString(stream) : IOUtils.toString(stream, charset));
-                }
-                // Else store the file param
-                else {
-                    File tempFile = File.createTempFile("portofino-temp-" + item.getName(), ".temp");
-                    int size = copyInputStreamToFile(stream, tempFile);
-                    FileItem fileItem = new FileItem(item.getName(), item.getContentType(), tempFile, size);
-                    files.put(item.getFieldName(), fileItem);
                 }
             }
 
             // Now convert them down into the usual map of String->String[]
             for (Map.Entry<String,List<String>> entry : params.entrySet()) {
                 List<String> values = entry.getValue();
-                this.parameters.put(entry.getKey(), values.toArray(new String[values.size()]));
+                this.parameters.put(entry.getKey(), values.toArray(new String[0]));
             }
         }
         catch (FileUploadBase.SizeLimitExceededException slee) {
             throw new FileUploadLimitExceededException(maxPostSize, slee.getActualSize());
         }
         catch (FileUploadException fue) {
-            IOException ioe = new IOException("Could not parse and cache file upload data.");
-            ioe.initCause(fue);
-            throw ioe;
+            throw new IOException("Could not parse and cache file upload data.", fue);
         }
 
     }
@@ -189,17 +182,20 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
         if (item == null
                 || ((item.fileName == null || item.fileName.length() == 0) && item.size == 0)) {
             return null;
-        }
-        else {
+        } else {
             // Attempt to ensure the file name is just the basename with no path included
             String filename = item.fileName;
-            int index;
-            if (WINDOWS_PATH_PREFIX_PATTERN.matcher(filename).find())
-                index = filename.lastIndexOf('\\');
-            else
-                index = filename.lastIndexOf('/');
-            if (index >= 0 && index + 1 < filename.length() - 1)
-                filename = filename.substring(index + 1);
+            if(filename != null) {
+                int index;
+                if (WINDOWS_PATH_PREFIX_PATTERN.matcher(filename).find()) {
+                    index = filename.lastIndexOf('\\');
+                } else {
+                    index = filename.lastIndexOf('/');
+                }
+                if (index >= 0 && index + 1 < filename.length() - 1) {
+                    filename = filename.substring(index + 1);
+                }
+            }
 
             // Use an anonymous inner subclass of FileBean that overrides all the
             // methods that rely on having a File present, to use the FileItem

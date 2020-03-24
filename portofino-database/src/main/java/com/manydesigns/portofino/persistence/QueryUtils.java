@@ -112,23 +112,21 @@ public class QueryUtils {
         try {
             session.doWork(new Work() {
                 public void execute(Connection connection) throws SQLException {
-                    PreparedStatement stmt = connection.prepareStatement(queryString);
-                    try {
+                    try (PreparedStatement stmt = connection.prepareStatement(queryString)) {
                         for (int i = 0; i < parameters.length; i++) {
                             stmt.setObject(i + 1, parameters[i]);
                         }
-                        ResultSet rs = stmt.executeQuery();
-                        ResultSetMetaData md = rs.getMetaData();
-                        int cc = md.getColumnCount();
-                        while(rs.next()) {
-                            Object[] current = new Object[cc];
-                            for(int i = 0; i < cc; i++) {
-                                current[i] = rs.getObject(i + 1);
+                        try(ResultSet rs = stmt.executeQuery()) {
+                            ResultSetMetaData md = rs.getMetaData();
+                            int cc = md.getColumnCount();
+                            while (rs.next()) {
+                                Object[] current = new Object[cc];
+                                for (int i = 0; i < cc; i++) {
+                                    current[i] = rs.getObject(i + 1);
+                                }
+                                result.add(current);
                             }
-                            result.add(current);
                         }
-                    } finally {
-                        stmt.close(); //Chiude anche il result set
                     }
                 }
             });

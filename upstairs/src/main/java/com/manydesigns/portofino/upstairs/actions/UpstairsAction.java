@@ -436,26 +436,13 @@ public class UpstairsAction extends AbstractResourceAction {
         if(column.getJdbcType() == Types.INTEGER || column.getJdbcType() == Types.DECIMAL || column.getJdbcType() == Types.NUMERIC) {
             logger.info(
                     "Detecting whether numeric column " + column.getQualifiedName() + " is boolean by examining " +
-                            "its values...");
+                    "its values...");
 
             //Detect booleans
-            Connection connection = null;
-
-            try {
-                connection = connectionProvider.acquireConnection();
+            try(Connection connection = connectionProvider.acquireConnection()) {
                 liquibase.database.Database implementation =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-                String sql =
-                        "select count(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
-                                "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-                PreparedStatement statement = connection.prepareStatement(sql);
-                setQueryTimeout(statement, 1);
-                statement.setMaxRows(1);
-                ResultSet rs = statement.executeQuery();
-                Long count = null;
-                if(rs.next()) {
-                    count = safeGetLong(rs, 1);
-                }
+                Long count = count(table, column, connection, implementation);
 
                 if(count == null || count < 10) {
                     logger.info("Cannot determine if numeric column {} is boolean, count is {}",
@@ -463,45 +450,57 @@ public class UpstairsAction extends AbstractResourceAction {
                     return;
                 }
 
-                sql =
+                String sql =
                         "select distinct(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
-                                "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-                statement = connection.prepareStatement(sql);
-                setQueryTimeout(statement, 1);
-                statement.setMaxRows(3);
-                rs = statement.executeQuery();
-                int valueCount = 0;
-                boolean only0and1 = true;
-                while(rs.next()) {
-                    valueCount++;
-                    if(valueCount > 2) {
-                        only0and1 = false;
-                        break;
+                        "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    setQueryTimeout(statement, 1);
+                    statement.setMaxRows(3);
+                    int valueCount;
+                    boolean only0and1;
+                    try (ResultSet rs = statement.executeQuery()) {
+                        valueCount = 0;
+                        only0and1 = true;
+                        while (rs.next()) {
+                            valueCount++;
+                            if (valueCount > 2) {
+                                only0and1 = false;
+                                break;
+                            }
+                            Long value = safeGetLong(rs, 1);
+                            only0and1 &= value != null && (value == 0 || value == 1);
+                        }
                     }
-                    Long value = safeGetLong(rs, 1);
-                    only0and1 &= value != null && (value == 0 || value == 1);
+                    if (only0and1 && valueCount == 2) {
+                        logger.info("Column appears to be of boolean type.");
+                        column.setJavaType(Boolean.class.getName());
+                    } else {
+                        logger.info("Column appears not to be of boolean type.");
+                    }
                 }
-                if(only0and1 && valueCount == 2) {
-                    logger.info("Column appears to be of boolean type.");
-                    column.setJavaType(Boolean.class.getName());
-                } else {
-                    logger.info("Column appears not to be of boolean type.");
-                }
-                statement.close();
             } catch (Exception e) {
                 logger.debug("Could not determine whether column " + column.getQualifiedName() + " is boolean", e);
                 logger.info("Could not determine whether column " + column.getQualifiedName() + " is boolean");
-            } finally {
-                try {
-                    if(connection != null) {
-                        connection.close();
-                    }
-                } catch (SQLException e) {
-                    logger.error("Could not close connection", e);
-                }
             }
             detectedBooleanColumns.add(column);
         }
+    }
+
+    @Nullable
+    private Long count(Table table, Column column, Connection connection, liquibase.database.Database implementation) throws SQLException {
+        String sql =
+                "select count(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
+                "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            setQueryTimeout(statement, 1);
+            statement.setMaxRows(1);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return safeGetLong(rs, 1);
+                }
+            }
+        }
+        return null;
     }
 
     protected final Map<Table, Boolean> largeResultSet = new HashMap<Table, Boolean>();
