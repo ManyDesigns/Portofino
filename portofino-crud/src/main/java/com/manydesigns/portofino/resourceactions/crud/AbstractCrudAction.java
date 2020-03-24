@@ -130,15 +130,15 @@ import java.util.regex.Pattern;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
+@SupportsPermissions({ AbstractCrudAction.PERMISSION_CREATE, AbstractCrudAction.PERMISSION_EDIT, AbstractCrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
-    public static final String copyright =
+    public static final String COPYRIGHT =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public final static String SEARCH_STRING_PARAM = "searchString";
+    public static final String SEARCH_STRING_PARAM = "searchString";
     public final static String prefix = "";
     public final static String searchPrefix = prefix + "search_";
 
