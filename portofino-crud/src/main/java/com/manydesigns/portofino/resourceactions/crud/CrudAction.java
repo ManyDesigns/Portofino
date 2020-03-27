@@ -262,10 +262,11 @@ public class CrudAction extends AbstractCrudAction<Object> {
     @Override
     protected ClassAccessor prepare(ActionInstance actionInstance) {
         Database actualDatabase = getCrudConfiguration().getActualDatabase();
+        //TODO I18n
         if (actualDatabase == null) {
             String message =
                     "Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
-                    "refers to an nonexistent database: " + getCrudConfiguration().getDatabase();
+                    "refers to a nonexistent database: " + getCrudConfiguration().getDatabase();
             logger.warn(message);
             RequestMessages.addErrorMessage(message);
             return null;
