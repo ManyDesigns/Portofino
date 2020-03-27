@@ -43,12 +43,7 @@ public class FileBlobField extends AbstractBlobField {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public final Callable<String> DEFAULT_CODE_GENERATOR = new Callable<String>() {
-        @Override
-        public String call() {
-            return RandomUtil.createRandomId(size);
-        }
-    };
+    public final Callable<String> DEFAULT_CODE_GENERATOR = () -> RandomUtil.createRandomId(size);
     protected Callable<String> blobCodeGenerator = DEFAULT_CODE_GENERATOR;
 
     public FileBlobField(@NotNull PropertyAccessor accessor,

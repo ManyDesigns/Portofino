@@ -116,6 +116,11 @@
         <spring.version>5.2.0.RELEASE</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <sonar.projectKey>ManyDesigns_Portofino</sonar.projectKey>
+        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
+        <sonar.organization>manydesigns</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <modules>
         <!-- Core stuff -->
