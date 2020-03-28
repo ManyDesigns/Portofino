@@ -83,8 +83,7 @@ import java.util.*;
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
 public abstract class AbstractResourceAction extends AbstractResourceWithParameters implements ResourceAction {
-    public static final String copyright =
-        "Copyright (C) 2005-2020 ManyDesigns srl";
+    public static final String COPYRIGHT = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Properties

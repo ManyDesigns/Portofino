@@ -38,6 +38,7 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
@@ -69,8 +70,11 @@ public class TableFormPdfExporter {
         Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, outputStream);
 
         // Setup XSLT
-        TransformerFactory Factory = TransformerFactory.newInstance();
-        Transformer transformer = Factory.newTransformer(xsltSource);
+        TransformerFactory factory = TransformerFactory.newInstance();
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        Transformer transformer = factory.newTransformer(xsltSource);
 
         // Set the value of a <param> in the stylesheet
         transformer.setParameter("versionParam", "2.0");
@@ -92,10 +96,8 @@ public class TableFormPdfExporter {
 
     /**
      * Composes an XML document representing the current search results.
-     * @return
-     * @throws IOException
      */
-    protected Reader composeXml() throws IOException {
+    protected Reader composeXml() {
         XmlBuffer xb = new XmlBuffer();
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");

@@ -34,6 +34,7 @@ import java.util.Map;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public abstract class AbstractResourceWithParameters extends AbstractResource implements WithParameters {
+    public static final String COPYRIGHT = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     protected int minParameters = 0;
     protected int maxParameters = 1;
