@@ -31,6 +31,8 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
+import com.manydesigns.portofino.persistence.model.ModelIO;
+import com.manydesigns.portofino.persistence.model.XMLModel;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -39,6 +41,7 @@ import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.pro.packaged.D;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration2.Configuration;
@@ -81,8 +84,6 @@ public class Persistence {
     //**************************************************************************
 
     public static final String APP_MODEL_DIRECTORY = "portofino-model";
-    @Deprecated
-    public static final String APP_MODEL_FILE = APP_MODEL_DIRECTORY + ".xml";
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
 
@@ -121,13 +122,6 @@ public class Persistence {
         this.configuration = configuration;
         this.configurationFile = configurationFile;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
-
-        if(getModelFile().exists()) {
-            logger.info("Legacy application model file: {}", getModelFile().getName().getPath());
-        } else {
-            logger.info("Application model directory: {}", getModelDirectory().getName().getPath());
-        }
-
         setups = new HashMap<>();
     }
 
@@ -135,100 +129,21 @@ public class Persistence {
     // Model loading
     //**************************************************************************
 
+    public synchronized void loadModel(ModelIO modelIO) throws IOException {
+        model = modelIO.load();
+        initModel();
+    }
+
+    @Deprecated
     public synchronized void loadXmlModel() {
         try {
-            JAXBContext jc = createModelJAXBContext();
-            Unmarshaller um = jc.createUnmarshaller();
-            FileObject appModelFile = getModelFile();
-            if(appModelFile.exists()) {
-                logger.info("Loading legacy xml model from file: {}", appModelFile.getName().getPath());
-                try (InputStream inputStream = appModelFile.getContent().getInputStream()) {
-                    model = (Model) um.unmarshal(inputStream);
-                } catch (Exception e) {
-                    String msg = "Cannot load/parse model: " + appModelFile;
-                    logger.error(msg, e);
-                }
-            } else {
-                logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
-                model = new Model();
-            }
-            FileObject modelDir = getModelDirectory();
-            if(modelDir.exists()) {
-                for (FileObject databaseDir : modelDir.getChildren()) {
-                    loadXmlDatabase(um, model, databaseDir);
-                }
-            }
-            initModel();
+            loadModel(new XMLModel(appDir));
         } catch (Exception e) {
             logger.error("Cannot load/parse model", e);
         }
     }
 
-    public JAXBContext createModelJAXBContext() throws JAXBException {
-        return JAXBContext.newInstance(Model.class, View.class);
-    }
-
-    protected void loadXmlDatabase(Unmarshaller um, Model model, FileObject databaseDir) throws IOException, JAXBException {
-        if(!databaseDir.getType().equals(FileType.FOLDER)) {
-            logger.error("Not a directory: " + databaseDir.getName().getPath());
-            return;
-        }
-        String databaseName = databaseDir.getName().getBaseName();
-        FileObject databaseFile = databaseDir.resolveFile("database.xml");
-
-        Database database;
-        if(databaseFile.exists()) {
-            logger.info("Loading database connection from " + databaseFile.getName().getPath());
-            try(InputStream inputStream = databaseFile.getContent().getInputStream()) {
-                database = (Database) um.unmarshal(inputStream);
-                database.afterUnmarshal(um, model);
-                if(!databaseName.equals(database.getDatabaseName())) {
-                    logger.error("Database named {} defined in directory named {}, skipping", database.getDatabaseName(), databaseName);
-                    return;
-                }
-                model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
-                model.getDatabases().add(database);
-            }
-        } else {
-            database = DatabaseLogic.findDatabaseByName(model, databaseName);
-            if(database != null) {
-                logger.info("Using legacy database defined in portofino-model.xml: " + databaseName + "; it will be automatically migrated to database.xml upon save.");
-            } else {
-                logger.warn("No database defined in " + databaseDir.getName().getPath());
-                return;
-            }
-        }
-
-        for(Schema schema : database.getSchemas()) {
-            FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
-            if(schemaDir.getType() == FileType.FOLDER) {
-                logger.debug("Schema directory {} exists", schemaDir);
-                FileObject[] tableFiles = schemaDir.getChildren();
-                for(FileObject tableFile : tableFiles) {
-                    if(!tableFile.getName().getBaseName().endsWith(".table.xml")) {
-                        continue;
-                    }
-                    try(InputStream tableInputStream = tableFile.getContent().getInputStream()) {
-                        Table table = (Table) um.unmarshal(tableInputStream);
-                        if (!tableFile.getName().getBaseName().equalsIgnoreCase(table.getTableName() + ".table.xml")) {
-                            logger.error("Skipping table " + table.getTableName() + " defined in file " + tableFile);
-                            continue;
-                        }
-                        table.afterUnmarshal(um, schema);
-                        schema.getTables().add(table);
-                    }
-                }
-            } else {
-                logger.debug("Schema directory {} does not exist", schemaDir);
-            }
-        }
-    }
-
     @Deprecated
-    public FileObject getModelFile() throws FileSystemException {
-        return appDir.resolveFile(APP_MODEL_FILE);
-    }
-
     public FileObject getModelDirectory() throws FileSystemException {
         return appDir.resolveFile(APP_MODEL_DIRECTORY);
     }
@@ -262,110 +177,9 @@ public class Persistence {
         }
     }
 
+    @Deprecated
     public synchronized void saveXmlModel() throws IOException, JAXBException, ConfigurationException {
-        //TODO gestire conflitti con modifiche esterne?
-        JAXBContext jc = createModelJAXBContext();
-        Marshaller m = jc.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-        FileObject modelDir = getModelDirectory();
-        modelDir.createFolder();
-        for(Database database : model.getDatabases()) {
-            FileObject databaseDir = modelDir.resolveFile(database.getDatabaseName());
-            FileObject databaseFile = databaseDir.resolveFile("database.xml");
-            databaseFile.createFile();
-            try(OutputStream outputStream = databaseFile.getContent().getOutputStream()) {
-                m.marshal(database, outputStream);
-            }
-            for(Schema schema : database.getSchemas()) {
-                FileObject schemaDir = databaseDir.resolveFile(schema.getSchemaName());
-                if(!schemaDir.exists()) {
-                    logger.debug("Schema directory {} does not exist", schemaDir);
-                    schemaDir.createFolder();
-                }
-                FileObject[] tableFiles = schemaDir.getChildren();
-                for(FileObject tableFile : tableFiles) {
-                    if(tableFile.getName().getBaseName().endsWith(".table.xml")) {
-                        if (!tableFile.delete()) {
-                            logger.warn("Could not delete table file {}", tableFile.getName().getPath());
-                        }
-                    }
-                }
-                for(Table table : schema.getTables()) {
-                    FileObject tableFile = schemaDir.resolveFile(table.getTableName() + ".table.xml");
-                    try(OutputStream outputStream = tableFile.getContent().getOutputStream()) {
-                        m.marshal(table, outputStream);
-                    }
-                }
-            }
-            deleteUnusedSchemaDirectories(database, databaseDir);
-        }
-        deleteUnusedDatabaseDirectories();
-        logger.info("Saved xml model to directory: {}", modelDir.getName().getPath());
-        if(configurationFile != null) {
-            configurationFile.save();
-            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
-        }
-
-        FileObject appModelFile = getModelFile();
-        if(appModelFile.exists()) {
-            appModelFile.delete();
-            logger.info("Deleted legacy portofino-model.xml file: {}", appModelFile.getName().getPath());
-        }
-    }
-
-    /**
-     * Delete the directories of the databases that are no longer present in the model
-     *
-     * @throws FileSystemException if the schema directories cannot be listed.
-     */
-    protected void deleteUnusedDatabaseDirectories() throws FileSystemException {
-        Arrays.stream(getModelDirectory().getChildren()).forEach(dbDir -> {
-            String dbDirPath = dbDir.getName().getPath();
-            try {
-                if(dbDir.getType() == FileType.FOLDER) {
-                    String dirName = dbDir.getName().getBaseName();
-                    if (model.getDatabases().stream().noneMatch(db -> db.getDatabaseName().equals(dirName))) {
-                        logger.info("Deleting unused database directory {}", dbDirPath);
-                        try {
-                            dbDir.deleteAll();
-                        } catch (FileSystemException e) {
-                            logger.warn("Could not delete unused database dir " + dbDirPath, e);
-                        }
-                    }
-                }
-            } catch (FileSystemException e) {
-                logger.error("Unexpected filesystem error when trying to delete schema directory " + dbDirPath, e);
-            }
-        });
-    }
-
-    /**
-     * Delete the directories of the schemas that are no longer present in the model
-     *
-     * @param database the parent database containing the schemas
-     * @param databaseDir the database directory
-     * @throws FileSystemException if the schema directories cannot be listed.
-     */
-    protected void deleteUnusedSchemaDirectories(Database database, FileObject databaseDir) throws FileSystemException {
-        Arrays.stream(databaseDir.getChildren()).forEach(schemaDir -> {
-            String schemaDirPath = schemaDir.getName().getPath();
-            try {
-                if(schemaDir.getType() == FileType.FOLDER) {
-                    String dirName = schemaDir.getName().getBaseName();
-                    if (database.getSchemas().stream().noneMatch(schema -> schema.getSchemaName().equals(dirName))) {
-                        logger.info("Deleting unused schema directory {}", schemaDirPath);
-                        try {
-                            schemaDir.deleteAll();
-                        } catch (FileSystemException e) {
-                            logger.warn("Could not delete unused schema dir " + schemaDirPath, e);
-                        }
-                    }
-                }
-            } catch (FileSystemException e) {
-                logger.error("Unexpected filesystem error when trying to delete schema directory " + schemaDirPath, e);
-            }
-        });
+        new XMLModel(appDir).save(model, configurationFile);
     }
 
     public synchronized void initModel() {
@@ -581,15 +395,6 @@ public class Persistence {
         FileObject dbDir = getModelDirectory().resolveFile(schema.getDatabaseName());
         FileObject schemaDir = dbDir.resolveFile(schema.getSchemaName());
         return schemaDir.resolveFile(changelogFileNameTemplate);
-    }
-
-    @Deprecated
-    public FileObject getAppModelFile() {
-        try {
-            return getModelFile();
-        } catch (FileSystemException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }
