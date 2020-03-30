@@ -44,8 +44,6 @@ public class JsonBuffer {
     // Static fields
     //**************************************************************************
 
-    public static boolean checkWellFormed = false;
-
     public Logger logger = LoggerFactory.getLogger(JsonBuffer.class);
 
     //**************************************************************************
@@ -69,7 +67,7 @@ public class JsonBuffer {
 
     /**
      * Creates a new instance of JsonBuffer
-     * @param writer
+     * @param writer where to write to.
      */
     public JsonBuffer(Writer writer) {
         this.writer = writer;

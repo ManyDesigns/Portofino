@@ -54,7 +54,7 @@ public class MemoryUtil {
         }
         int log = (int) Math.log10(bytes);
         int pos = log / 3;
-        double scaled = ((double) bytes) / Math.pow(10, pos * 3);
+        double scaled = bytes / Math.pow(10, pos * 3.0);
         long rounded = Math.round(scaled);
         double rounded2 = Math.round(scaled * 10) / 10d;
 

@@ -386,7 +386,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return ResourceActionLogic.getConfigurationClass(getClass());
     }
 
-    @NotNull
     protected ClassAccessor getConfigurationClassAccessor() {
         Class<?> configurationClass = getConfigurationClass();
         if(configurationClass == null) {
@@ -494,11 +493,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":configuration/classAccessor")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public String getConfigurationAccessor() {
-        Class<?> configurationClass = getConfigurationClass();
-        if (configurationClass == null) {
+        ClassAccessor classAccessor = getConfigurationClassAccessor();
+        if(classAccessor == null) {
             return null;
         }
-        ClassAccessor classAccessor = getConfigurationClassAccessor();
         JSONStringer jsonStringer = new JSONStringer();
         ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
         return jsonStringer.toString();
