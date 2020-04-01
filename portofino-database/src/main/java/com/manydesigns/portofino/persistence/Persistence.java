@@ -31,8 +31,8 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
-import com.manydesigns.portofino.persistence.model.ModelIO;
-import com.manydesigns.portofino.persistence.model.XMLModel;
+import com.manydesigns.portofino.model.io.ModelIO;
+import com.manydesigns.portofino.model.io.xml.XMLModel;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -41,8 +41,6 @@ import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import liquibase.pro.packaged.D;
-import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -59,10 +57,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.sql.Connection;
 import java.util.Arrays;
@@ -137,13 +132,12 @@ public class Persistence {
     @Deprecated
     public synchronized void loadXmlModel() {
         try {
-            loadModel(new XMLModel(appDir));
+            loadModel(new XMLModel(getModelDirectory()));
         } catch (Exception e) {
             logger.error("Cannot load/parse model", e);
         }
     }
 
-    @Deprecated
     public FileObject getModelDirectory() throws FileSystemException {
         return appDir.resolveFile(APP_MODEL_DIRECTORY);
     }
@@ -179,7 +173,7 @@ public class Persistence {
 
     @Deprecated
     public synchronized void saveXmlModel() throws IOException, JAXBException, ConfigurationException {
-        new XMLModel(appDir).save(model, configurationFile);
+        new XMLModel(getModelDirectory()).save(model, configurationFile);
     }
 
     public synchronized void initModel() {

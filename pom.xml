@@ -88,6 +88,7 @@
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
         <commons.io.version>2.6</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
+        <commons.vfs.version>2.6.0</commons.vfs.version>
         <fop.version>2.1</fop.version>
         <groovy.version>2.5.8</groovy.version>
         <guava.version>27.0.1-jre</guava.version>
@@ -253,6 +254,11 @@
                 <artifactId>commons-io</artifactId>
                 <version>${commons.io.version}</version>
                 <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-vfs2</artifactId>
+                <version>${commons.vfs.version}</version>
             </dependency>
             <!-- Logging -->
             <dependency>

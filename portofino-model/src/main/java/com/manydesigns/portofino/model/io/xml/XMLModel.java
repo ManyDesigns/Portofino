@@ -1,7 +1,9 @@
-package com.manydesigns.portofino.persistence.model;
+package com.manydesigns.portofino.model.io.xml;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.io.ModelIO;
+import com.manydesigns.portofino.model.io.ModelParseException;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -20,19 +22,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import static com.manydesigns.portofino.persistence.Persistence.APP_MODEL_DIRECTORY;
-
 public class XMLModel implements ModelIO {
 
-    public static final String LEGACY_APP_MODEL_FILE = APP_MODEL_DIRECTORY + ".xml";
+    public static final String LEGACY_APP_MODEL_FILE = "portofino-model.xml";
     private static final Logger logger = LoggerFactory.getLogger(XMLModel.class);
 
-    private final FileObject applicationDirectory;
+    private final FileObject modelDirectory;
 
-    public XMLModel(FileObject applicationDirectory) {
-        this.applicationDirectory = applicationDirectory;
+    public XMLModel(FileObject modelDirectory) {
+        this.modelDirectory = modelDirectory;
     }
-
 
     @Override
     public Model load() throws IOException {
@@ -125,12 +124,12 @@ public class XMLModel implements ModelIO {
     }
 
     public FileObject getLegacyModelFile() throws FileSystemException {
-        return applicationDirectory.resolveFile(LEGACY_APP_MODEL_FILE);
+        return modelDirectory.getParent().resolveFile(LEGACY_APP_MODEL_FILE);
     }
 
     @Override
-    public FileObject getModelDirectory() throws FileSystemException {
-        return applicationDirectory.resolveFile(APP_MODEL_DIRECTORY);
+    public FileObject getModelDirectory() {
+        return modelDirectory;
     }
 
     @Override

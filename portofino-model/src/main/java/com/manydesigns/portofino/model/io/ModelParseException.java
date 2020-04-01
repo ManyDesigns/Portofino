@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.persistence.model;
+package com.manydesigns.portofino.model.io;
 
 public class ModelParseException extends RuntimeException {
 

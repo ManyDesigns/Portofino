@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.persistence.model;
+package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.configuration2.PropertiesConfiguration;
