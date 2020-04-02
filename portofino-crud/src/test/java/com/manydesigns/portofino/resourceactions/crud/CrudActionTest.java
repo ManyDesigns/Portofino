@@ -35,7 +35,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.Property;
+import com.manydesigns.portofino.model.AnnotationProperty;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.IncrementGenerator;
@@ -201,7 +201,7 @@ public class CrudActionTest extends JerseyTest {
         property.setInsertable(true);
         property.setUpdatable(true);
         ann = new Annotation(column, Required.class.getName());
-        ann.getProperties().add(new Property("value", "true"));
+        ann.getProperties().add(new AnnotationProperty("value", "true"));
         property.getAnnotations().add(ann);
         configuration.getProperties().add(property);
 

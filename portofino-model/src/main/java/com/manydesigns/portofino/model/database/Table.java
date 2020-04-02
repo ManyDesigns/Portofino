@@ -54,18 +54,18 @@ public class Table implements ModelObject, Annotated {
 
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
-    protected final List<Annotation> annotations;
     protected final List<ModelSelectionProvider> selectionProviders;
 
     protected Schema schema;
     protected String tableName;
-    protected String entityName;
 
     protected String javaClass;
 
     protected String shortName;
 
     protected PrimaryKey primaryKey;
+
+    protected Entity entity;
 
     //**************************************************************************
     // Fields for wire-up
@@ -84,12 +84,18 @@ public class Table implements ModelObject, Annotated {
     //**************************************************************************
     // Constructors and init
     //**************************************************************************
-    public Table() {
+
+
+    public Table(Entity entity) {
+        this.entity = entity;
         columns = new ArrayList<>();
         foreignKeys = new ArrayList<>();
         oneToManyRelationships = new ArrayList<>();
-        annotations = new ArrayList<>();
         selectionProviders = new ArrayList<>();
+    }
+
+    public Table() {
+        this(new Entity());
     }
 
     public Table(Schema schema) {
@@ -127,10 +133,10 @@ public class Table implements ModelObject, Annotated {
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
         String baseEntityName;
-        if (entityName == null) {
+        if (entity.getName() == null) {
             baseEntityName = DatabaseLogic.normalizeName(getTableName());
         } else {
-            baseEntityName = DatabaseLogic.normalizeName(entityName);
+            baseEntityName = DatabaseLogic.normalizeName(entity.getName());
         }
 
         String calculatedEntityName = baseEntityName;
@@ -148,6 +154,8 @@ public class Table implements ModelObject, Annotated {
     public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
+        visitor.visit(entity);
+
         for (Column column : columns) {
             visitor.visit(column);
         }
@@ -160,10 +168,6 @@ public class Table implements ModelObject, Annotated {
 
         for (ForeignKey foreignKey : foreignKeys) {
             visitor.visit(foreignKey);
-        }
-
-        for (Annotation annotation : annotations) {
-            visitor.visit(annotation);
         }
 
         for(ModelSelectionProvider selectionProvider : selectionProviders) {
@@ -249,11 +253,11 @@ public class Table implements ModelObject, Annotated {
 
     @XmlAttribute(required = false)
     public String getEntityName() {
-        return entityName;
+        return entity.getName();
     }
 
     public void setEntityName(String entityName) {
-        this.entityName = entityName;
+        entity.setName(entityName);
     }
 
     public String getActualEntityName() {
@@ -268,7 +272,7 @@ public class Table implements ModelObject, Annotated {
     @XmlElement(name = "annotation", type = Annotation.class)
     @NotNull
     public List<Annotation> getAnnotations() {
-        return annotations;
+        return entity.getAnnotations();
     }
 
     @XmlElementWrapper(name="selectionProviders")
@@ -306,4 +310,7 @@ public class Table implements ModelObject, Annotated {
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 
+    public Entity getEntity() {
+        return entity;
+    }
 }

@@ -12,7 +12,7 @@ import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.Property;
+import com.manydesigns.portofino.model.AnnotationProperty;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -33,9 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -269,7 +266,7 @@ public class TablesAction extends AbstractResourceAction {
                                 break;
                             }
                             a = new Annotation(DATE_FORMAT);
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new AnnotationProperty("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "decimalFormat":
@@ -281,12 +278,12 @@ public class TablesAction extends AbstractResourceAction {
                                 break;
                             }
                             a = new Annotation(DECIMAL_FORMAT);
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new AnnotationProperty("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "fieldSize":
                             a = new Annotation(FIELD_SIZE);
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new AnnotationProperty("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "fileBlob":
@@ -309,7 +306,7 @@ public class TablesAction extends AbstractResourceAction {
                             break;
                         case "highlightLinks":
                             a = new Annotation(HIGHLIGHT_LINKS);
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new AnnotationProperty("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "minValue":
@@ -318,7 +315,7 @@ public class TablesAction extends AbstractResourceAction {
                             } else {
                                 a = new Annotation(MIN_DECIMAL_VALUE);
                             }
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new AnnotationProperty("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "maxValue":
@@ -327,13 +324,13 @@ public class TablesAction extends AbstractResourceAction {
                             } else {
                                 a = new Annotation(MAX_DECIMAL_VALUE);
                             }
-                            a.getProperties().add(new Property("value", value));
+                            a.getProperties().add(new AnnotationProperty("value", value));
                             existing.getAnnotations().add(a);
                             break;
                         case "regexp":
                             a = new Annotation(REGEXP);
-                            a.getProperties().add(new Property("value", value));
-                            a.getProperties().add(new Property("errorMessage", "elements.error.field.regexp.format")); //Default error message
+                            a.getProperties().add(new AnnotationProperty("value", value));
+                            a.getProperties().add(new AnnotationProperty("errorMessage", "elements.error.field.regexp.format")); //Default error message
                             existing.getAnnotations().add(a);
                             break;
                         case "stringFormat":
@@ -342,7 +339,7 @@ public class TablesAction extends AbstractResourceAction {
                             break;
                         case "typeOfContent":
                             a = new Annotation(((Map)e.getValue()).get("v").toString());
-                            a.getProperties().add(new Property("value", "true"));
+                            a.getProperties().add(new AnnotationProperty("value", "true"));
                             existing.getAnnotations().add(a);
                             break;
                         default:
@@ -444,7 +441,7 @@ public class TablesAction extends AbstractResourceAction {
             }
             if(a.getProperties().size() > 1) {
                 jsonStringer.object();
-                for (Property p : a.getProperties()) {
+                for (AnnotationProperty p : a.getProperties()) {
                     jsonStringer.key(p.getName()).value(p.getValue());
                 }
                 jsonStringer.endObject();

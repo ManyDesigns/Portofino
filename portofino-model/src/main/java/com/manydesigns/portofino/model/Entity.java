@@ -6,10 +6,10 @@ import javax.xml.bind.Unmarshaller;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Property implements ModelObject, Annotated {
+public class Entity implements ModelObject, Annotated {
 
-    protected Entity owner;
     protected String name;
+    protected final List<Property> properties = new ArrayList<>();
     protected final List<Annotation> annotations = new ArrayList<>();
 
     public String getName() {
@@ -22,7 +22,7 @@ public class Property implements ModelObject, Annotated {
 
     @Override
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.owner = (Entity) parent;
+
     }
 
     @Override
@@ -42,17 +42,12 @@ public class Property implements ModelObject, Annotated {
 
     @Override
     public void visitChildren(ModelObjectVisitor visitor) {
+        for(Property property : properties) {
+            visitor.visit(property);
+        }
         for (Annotation annotation : annotations) {
             visitor.visit(annotation);
         }
-    }
-
-    public Entity getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Entity owner) {
-        this.owner = owner;
     }
 
     @Override

@@ -63,9 +63,7 @@ public class Column implements ModelObject, Annotated {
     //**************************************************************************
 
     protected String javaType;
-    protected String propertyName;
-    protected final List<Annotation> annotations;
-
+    protected Property property;
 
     //**************************************************************************
     // Fields for wire-up
@@ -80,7 +78,11 @@ public class Column implements ModelObject, Annotated {
     // Constructors and init
     //**************************************************************************
     public Column() {
-        annotations = new ArrayList<>();
+        this(new Property());
+    }
+
+    public Column(Property property) {
+        this.property = property;
     }
 
     public Column(Table table) {
@@ -98,7 +100,7 @@ public class Column implements ModelObject, Annotated {
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        table = (Table) parent;
+        setTable((Table) parent);
     }
 
     public void reset() {
@@ -112,10 +114,10 @@ public class Column implements ModelObject, Annotated {
         assert columnName != null;
         assert columnType != null;
 
-        if (propertyName == null) {
+        if (property.getName() == null) {
             actualPropertyName = DatabaseLogic.getUniquePropertyName(table, DatabaseLogic.normalizeName(columnName));
         } else {
-            actualPropertyName = propertyName; //AS do not normalize (can be mixed-case Java properties)
+            actualPropertyName = property.getName(); //AS do not normalize (can be mixed-case Java properties)
         }
 
         if(javaType != null) {
@@ -139,9 +141,7 @@ public class Column implements ModelObject, Annotated {
     public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
-        for (Annotation annotation : annotations) {
-            visitor.visit(annotation);
-        }
+        visitor.visit(property);
     }
 
     //**************************************************************************
@@ -154,6 +154,7 @@ public class Column implements ModelObject, Annotated {
 
     public void setTable(Table table) {
         this.table = table;
+        this.property.setOwner(table.getEntity());
     }
 
     public String getDatabaseName() {
@@ -257,17 +258,17 @@ public class Column implements ModelObject, Annotated {
 
     @XmlAttribute(required = false)
     public String getPropertyName() {
-        return propertyName;
+        return property.getName();
     }
 
     public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
+        property.setName(propertyName);
     }
 
     @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation", type = Annotation.class)
     public List<Annotation> getAnnotations() {
-        return annotations;
+        return property.getAnnotations();
     }
 
         
@@ -285,6 +286,7 @@ public class Column implements ModelObject, Annotated {
     // Utility methods
     //**************************************************************************
 
+    @Deprecated
     public static String composeQualifiedName(String databaseName,
                                               String schemaName,
                                               String tableName,
@@ -296,8 +298,9 @@ public class Column implements ModelObject, Annotated {
                 columnName);
     }
 
+    @Deprecated
     public Annotation findModelAnnotationByType(String annotationType) {
-        for (Annotation annotation : annotations) {
+        for (Annotation annotation : getAnnotations()) {
             if (annotation.getType().equals(annotationType)) {
                 return annotation;
             }

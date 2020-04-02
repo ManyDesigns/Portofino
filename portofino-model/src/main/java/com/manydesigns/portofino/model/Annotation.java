@@ -61,7 +61,7 @@ public class Annotation implements ModelObject {
     protected String type;
     @Deprecated
     protected List<String> values = new ArrayList<>();
-    protected List<Property> properties = new ArrayList<>();
+    protected List<AnnotationProperty> properties = new ArrayList<>();
 
     //**************************************************************************
     // Fields for wire up
@@ -134,9 +134,9 @@ public class Annotation implements ModelObject {
                 javaAnnotation = legacyAnnotation;
                 try {
                     logger.info("Migrating annotation " + javaAnnotation + " to new format");
-                    List<Property> properties = new ArrayList<>();
+                    List<AnnotationProperty> properties = new ArrayList<>();
                     for (Method method : AnnotationFactory.getAnnotationMethods(javaAnnotationClass)) {
-                        Property property = new Property();
+                        AnnotationProperty property = new AnnotationProperty();
                         property.setName(method.getName());
                         Object value = method.invoke(javaAnnotation);
                         property.setValue(OgnlUtils.convertValueToString(value));
@@ -265,13 +265,13 @@ public class Annotation implements ModelObject {
     }
 
     @JsonProperty("properties")
-    @XmlElement(name = "property", type = Property.class)
-    public List<Property> getProperties() {
+    @XmlElement(name = "property", type = AnnotationProperty.class)
+    public List<AnnotationProperty> getProperties() {
         return properties;
     }
 
     //Needed for Jackson
-    public void setProperties(List<Property> properties) {
+    public void setProperties(List<AnnotationProperty> properties) {
         this.properties.clear();
         this.properties.addAll(properties);
     }
@@ -284,8 +284,8 @@ public class Annotation implements ModelObject {
         return javaAnnotation;
     }
 
-    public Property getProperty(String name) {
-        for(Property property : properties) {
+    public AnnotationProperty getProperty(String name) {
+        for(AnnotationProperty property : properties) {
             if(name.equals(property.getName())) {
                 return property;
             }
@@ -294,9 +294,9 @@ public class Annotation implements ModelObject {
     }
 
     public void setProperty(String name, String value) {
-        Property property = getProperty(name);
+        AnnotationProperty property = getProperty(name);
         if(property == null) {
-            property = new Property(name, value);
+            property = new AnnotationProperty(name, value);
             properties.add(property);
         } else {
             property.setValue(value);

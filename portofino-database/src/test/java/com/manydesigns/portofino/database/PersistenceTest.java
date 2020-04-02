@@ -8,7 +8,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.Property;
+import com.manydesigns.portofino.model.AnnotationProperty;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -550,7 +550,7 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
         assertNotNull(table);
         Annotation nq = new Annotation(table, "javax.persistence.NamedQuery");
-        nq.setProperties(Arrays.asList(new Property("name", "all_questions"), new Property("query", "from domanda")));
+        nq.setProperties(Arrays.asList(new AnnotationProperty("name", "all_questions"), new AnnotationProperty("query", "from domanda")));
         table.getAnnotations().add(nq);
         persistence.initModel();
         session = persistence.getSession("hibernatetest");
