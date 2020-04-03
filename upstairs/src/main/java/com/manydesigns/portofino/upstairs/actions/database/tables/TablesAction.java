@@ -217,7 +217,7 @@ public class TablesAction extends AbstractResourceAction {
         existing.setShortName(table.getShortName());
         for(Column column : table.getColumns()) {
             Column c2 = DatabaseLogic.findColumnByName(existing, column.getColumnName());
-            BeanUtils.copyProperties(column, c2);
+            BeanUtils.copyProperties(column, c2, "table");
             c2.setTable(existing);
         }
         existing.getSelectionProviders().clear();

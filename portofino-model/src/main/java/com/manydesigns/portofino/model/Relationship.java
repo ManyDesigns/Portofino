@@ -8,16 +8,16 @@ import java.util.List;
 
 public class Relationship implements ModelObject, Annotated, Named {
 
-    public Relationship() {}
+    protected Pair<Entity> entities;
+    protected String name;
 
-    public Relationship(Entity a, Entity b) {
-        this.a = a;
-        this.b = b;
+    public Relationship() {
+        entities = new Pair<>();
     }
 
-    protected String name;
-    protected Entity a;
-    protected Entity b;
+    public Relationship(Entity a, Entity b) {
+        entities = new Pair<>(a, b);
+    }
 
     protected final List<Annotation> annotations = new ArrayList<>();
 
@@ -61,19 +61,19 @@ public class Relationship implements ModelObject, Annotated, Named {
     }
 
     public Entity getA() {
-        return a;
+        return entities.left;
     }
 
     public void setA(Entity a) {
-        this.a = a;
+        entities.left = a;
     }
 
     public Entity getB() {
-        return b;
+        return entities.right;
     }
 
     public void setB(Entity b) {
-        this.b = b;
+        entities.right = b;
     }
 
 }

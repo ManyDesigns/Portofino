@@ -153,7 +153,7 @@ public class Column implements ModelObject, Annotated {
 
     public void setTable(Table table) {
         this.table = table;
-        this.property.setOwner(table.getEntity());
+        this.property.setOwner(table != null ? table.getEntity() : null);
     }
 
     public String getDatabaseName() {

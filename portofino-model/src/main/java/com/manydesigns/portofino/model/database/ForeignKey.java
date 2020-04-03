@@ -22,11 +22,13 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Pair;
+import com.manydesigns.portofino.model.Relationship;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 
@@ -72,6 +74,7 @@ public class ForeignKey extends DatabaseSelectionProvider
     protected String actualManyPropertyName;
     protected String actualOnePropertyName;
     protected Table toTable;
+    Relationship relationship;
 
     //**************************************************************************
     // Logging
@@ -140,6 +143,11 @@ public class ForeignKey extends DatabaseSelectionProvider
                 ? DatabaseLogic.getUniquePropertyName(toTable, DatabaseLogic.normalizeName(name))
                 : manyPropertyName;
 
+            if(relationship == null) {
+                relationship = new Relationship(fromTable.getEntity(), toTable.getEntity());
+                relationship.setName(name);
+                fromTable.getEntity().getDomain().addRelationship(relationship);
+            }
         } else {
             logger.warn("Cannot find destination table '{}'",
                     Table.composeQualifiedName(toDatabase, toSchema, toTableName));

@@ -100,7 +100,7 @@ public class Table implements ModelObject, Annotated {
 
     public Table(Schema schema) {
         this();
-        this.schema = schema;
+        setSchema(schema);
     }
 
     //**************************************************************************
@@ -116,7 +116,7 @@ public class Table implements ModelObject, Annotated {
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        schema = (Schema) parent;
+        setSchema((Schema) parent);
     }
 
     public void reset() {
@@ -149,6 +149,9 @@ public class Table implements ModelObject, Annotated {
         }
 
         actualEntityName = calculatedEntityName;
+        if(entity.getName() == null) {
+            entity.setName(actualEntityName);
+        }
     }
 
     public void link(Model model, Configuration configuration) {}
@@ -185,6 +188,7 @@ public class Table implements ModelObject, Annotated {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
+        this.entity.setDomain(schema != null ? schema.getDomain() : null);
     }
 
     @Required

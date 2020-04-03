@@ -54,7 +54,7 @@ public class Schema implements ModelObject, Annotated {
     @Deprecated
     protected final List<Table> immediateTables;
 
-    protected String schemaName;
+    protected Domain domain;
     protected String actualSchemaName;
     protected String catalog;
 
@@ -73,6 +73,11 @@ public class Schema implements ModelObject, Annotated {
     // Constructors and init
     //**************************************************************************
     public Schema() {
+        this(new Domain());
+    }
+
+    public Schema(Domain domain) {
+        this.domain = domain;
         immediateTables = new ArrayList<>();
     }
 
@@ -92,7 +97,7 @@ public class Schema implements ModelObject, Annotated {
     }
 
     public String getQualifiedName() {
-        String name = actualSchemaName != null ? actualSchemaName : schemaName;
+        String name = actualSchemaName != null ? actualSchemaName : getSchemaName();
         if(getDatabaseName() == null) {
             return name;
         }
@@ -104,14 +109,13 @@ public class Schema implements ModelObject, Annotated {
 
     public void init(Model model, Configuration configuration) {
         assert database != null;
-        assert schemaName != null;
         this.configuration = configuration;
-        key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + schemaName;
+        key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + getSchemaName();
         if(actualSchemaName == null) {
             actualSchemaName = configuration.getString(key);
         }
         if(actualSchemaName == null) {
-            actualSchemaName = schemaName;
+            actualSchemaName = getSchemaName();
         }
     }
 
@@ -141,11 +145,11 @@ public class Schema implements ModelObject, Annotated {
 
     @XmlAttribute(required = true)
     public String getSchemaName() {
-        return schemaName;
+        return domain.getName();
     }
 
     public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+        domain.setName(schemaName);
     }
 
     public String getActualSchemaName() {
@@ -156,7 +160,7 @@ public class Schema implements ModelObject, Annotated {
         if(key != null) { //key is null when creating/synchronizing a new schema
             if (StringUtils.isEmpty(actualSchemaName)) {
                 configuration.clearProperty(key);
-            } else if (configuration.containsKey(key) || !schemaName.equals(actualSchemaName)) {
+            } else if (configuration.containsKey(key) || !getSchemaName().equals(actualSchemaName)) {
                 configuration.setProperty(key, actualSchemaName);
             }
         }
@@ -252,4 +256,11 @@ public class Schema implements ModelObject, Annotated {
         return annotations;
     }
 
+    public Domain getDomain() {
+        return domain;
+    }
+
+    public void setDomain(Domain domain) {
+        this.domain = domain;
+    }
 }

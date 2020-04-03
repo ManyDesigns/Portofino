@@ -95,11 +95,13 @@ public class TableTest {
         assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
+        table.setEntityName(null);
         table.setTableName("XYZéèçò°àùì");
         table.init(model, null);
         assertEquals("xyzéèçò_àùì", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
+        table.setEntityName(null);
         table.setTableName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
         table.init(model, null);
         assertEquals("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", table.getActualEntityName());
