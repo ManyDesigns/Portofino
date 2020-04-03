@@ -129,11 +129,10 @@ public class Column implements ModelObject, Annotated {
             actualJavaType = Type.getDefaultJavaType(jdbcType, columnType, length, scale);
             if (actualJavaType == null) {
                 logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
-                        new Object[]{table.getTableName(),
-                                getColumnName(),
-                                jdbcType,
-                                javaType
-                        });
+                        table.getTableName(),
+                        getColumnName(),
+                        jdbcType,
+                        javaType);
             }
         }
     }
@@ -243,7 +242,7 @@ public class Column implements ModelObject, Annotated {
         return actualJavaType;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute()
     public String getJavaType() {
         return javaType;
     }
@@ -256,7 +255,7 @@ public class Column implements ModelObject, Annotated {
         return actualPropertyName;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute()
     public String getPropertyName() {
         return property.getName();
     }
@@ -306,5 +305,9 @@ public class Column implements ModelObject, Annotated {
             }
         }
         return null;
+    }
+
+    public Property getProperty() {
+        return property;
     }
 }

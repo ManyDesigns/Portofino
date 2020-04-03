@@ -24,6 +24,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.Property;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,8 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -75,7 +78,7 @@ public class PrimaryKey implements ModelObject {
 
     public PrimaryKey(Table table) {
         this();
-        this.table = table;
+        setTable(table);
     }
 
     //**************************************************************************
@@ -88,7 +91,10 @@ public class PrimaryKey implements ModelObject {
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        table = (Table) parent;
+        setTable((Table) parent);
+        List<Property> idProps = columns.stream().map(Column::getProperty).collect(Collectors.toList());
+        table.getEntity().getId().clear();
+        table.getEntity().getId().addAll(idProps);
     }
 
     public void reset() {

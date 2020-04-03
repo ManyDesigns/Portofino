@@ -6,13 +6,22 @@ import javax.xml.bind.Unmarshaller;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Property implements ModelObject, Annotated {
+public class Relationship implements ModelObject, Annotated, Named {
 
-    protected Entity owner;
+    public Relationship() {}
+
+    public Relationship(Entity a, Entity b) {
+        this.a = a;
+        this.b = b;
+    }
+
     protected String name;
-    protected Type type;
+    protected Entity a;
+    protected Entity b;
+
     protected final List<Annotation> annotations = new ArrayList<>();
 
+    @Override
     public String getName() {
         return name;
     }
@@ -21,18 +30,8 @@ public class Property implements ModelObject, Annotated {
         this.name = name;
     }
 
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
     @Override
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.owner = (Entity) parent;
-    }
+    public void afterUnmarshal(Unmarshaller u, Object parent) {}
 
     @Override
     public void reset() {
@@ -56,22 +55,25 @@ public class Property implements ModelObject, Annotated {
         }
     }
 
-    public Entity getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Entity owner) {
-        if(this.owner == owner) {
-            return;
-        } else if(this.owner != null) {
-            throw new IllegalArgumentException("Cannot change owner");
-        }
-        owner.getProperties().add(this);
-        this.owner = owner;
-    }
-
     @Override
     public List<Annotation> getAnnotations() {
         return annotations;
     }
+
+    public Entity getA() {
+        return a;
+    }
+
+    public void setA(Entity a) {
+        this.a = a;
+    }
+
+    public Entity getB() {
+        return b;
+    }
+
+    public void setB(Entity b) {
+        this.b = b;
+    }
+
 }
