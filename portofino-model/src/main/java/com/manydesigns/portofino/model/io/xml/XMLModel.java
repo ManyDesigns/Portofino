@@ -80,7 +80,7 @@ public class XMLModel implements ModelIO {
             logger.info("Loading database connection from " + databaseFile.getName().getPath());
             try(InputStream inputStream = databaseFile.getContent().getInputStream()) {
                 database = (Database) um.unmarshal(inputStream);
-                database.afterUnmarshal(um, model);
+                database.setParent(model);
                 if(!databaseName.equals(database.getDatabaseName())) {
                     logger.error("Database named {} defined in directory named {}, skipping", database.getDatabaseName(), databaseName);
                     return;
@@ -113,7 +113,7 @@ public class XMLModel implements ModelIO {
                             logger.error("Skipping table " + table.getTableName() + " defined in file " + tableFile);
                             continue;
                         }
-                        table.afterUnmarshal(um, schema);
+                        table.setParent(schema);
                         schema.getTables().add(table);
                     }
                 }

@@ -23,7 +23,6 @@ public class QueryUtilsTest {
 
         Schema schema = new Schema(database);
         schema.setSchemaName("schema");
-        database.getSchemas().add(schema);
 
         Table table = new Table(schema);
         table.setTableName("test_table");

@@ -21,10 +21,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
-import com.manydesigns.portofino.model.Property;
+import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +42,7 @@ import java.util.stream.Stream;
 */
 
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class PrimaryKey implements ModelObject {
+public class PrimaryKey implements ModelObject, Named, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -85,19 +82,28 @@ public class PrimaryKey implements ModelObject {
     // ModelObject implementation
     //**************************************************************************
 
+    @Override
+    public String getName() {
+        return primaryKeyName;
+    }
+
     public String getQualifiedName() {
         return MessageFormat.format("{0}#{1}",
                 table.getQualifiedName(), primaryKeyName);
     }
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
+    public void setParent(Object parent) {
         setTable((Table) parent);
         List<Property> idProps = columns.stream().map(Column::getProperty).collect(Collectors.toList());
         table.getEntity().getId().clear();
         table.getEntity().getId().addAll(idProps);
     }
 
-    public void reset() {
+    public void afterUnmarshal(Unmarshaller u, Object parent) {
+        setParent(parent);
+    }
+
+        public void reset() {
         columns.clear();
         valid = true;
     }

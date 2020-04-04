@@ -47,7 +47,7 @@ import java.util.Date;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public abstract class ConnectionProvider {
+public abstract class ConnectionProvider implements Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 

@@ -41,7 +41,7 @@ import java.util.List;
 */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"catalog", "schemaName", "immediateTables", "annotations"})
-public class Schema implements ModelObject, Annotated {
+public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -84,6 +84,7 @@ public class Schema implements ModelObject, Annotated {
     public Schema(Database database) {
         this();
         this.database = database;
+        database.getSchemas().add(this);
         Domain parent = database.getDomain();
         if(!this.domain.getParents().contains(parent)) {
             this.domain.getParents().add(parent);
@@ -91,10 +92,18 @@ public class Schema implements ModelObject, Annotated {
     }
 
     //**************************************************************************
-    // DatamodelObject implementation
+    // ModelObject implementation
     //**************************************************************************
+    @Override
+    public String getName() {
+        return getSchemaName();
+    }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
+        setParent(parent);
+    }
+
+    public void setParent(Object parent) {
         database = (Database) parent;
         tables.addAll(immediateTables);
         immediateTables.clear();

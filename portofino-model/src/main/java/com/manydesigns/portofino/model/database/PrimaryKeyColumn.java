@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class PrimaryKeyColumn implements ModelObject {
+public class PrimaryKeyColumn implements ModelObject, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -78,6 +78,10 @@ public class PrimaryKeyColumn implements ModelObject {
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
+        primaryKey = (PrimaryKey) parent;
+    }
+
+    public void setParent(Object parent) {
         primaryKey = (PrimaryKey) parent;
     }
 

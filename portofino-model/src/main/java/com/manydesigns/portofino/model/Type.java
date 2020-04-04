@@ -2,7 +2,6 @@ package com.manydesigns.portofino.model;
 
 import org.apache.commons.configuration2.Configuration;
 
-import javax.xml.bind.Unmarshaller;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class Type implements ModelObject, Annotated {
     }
 
     @Override
-    public void afterUnmarshal(Unmarshaller u, Object parent) {}
+    public void setParent(Object parent) {}
 
     @Override
     public void reset() {

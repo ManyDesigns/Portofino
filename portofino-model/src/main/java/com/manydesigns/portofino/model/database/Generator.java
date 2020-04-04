@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public abstract class Generator implements ModelObject {
+public abstract class Generator implements ModelObject, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
     //**************************************************************************
@@ -72,6 +72,10 @@ public abstract class Generator implements ModelObject {
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
+        primaryKeyColumn = (PrimaryKeyColumn) parent;
+    }
+
+    public void setParent(Object parent) {
         primaryKeyColumn = (PrimaryKeyColumn) parent;
     }
 

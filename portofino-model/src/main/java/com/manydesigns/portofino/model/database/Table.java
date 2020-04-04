@@ -44,7 +44,7 @@ import java.util.List;
 @XmlRootElement(name = "table")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"tableName", "entityName", "shortName", "javaClass","annotations","columns","foreignKeys","primaryKey","selectionProviders"})
-public class Table implements ModelObject, Annotated {
+public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -104,7 +104,7 @@ public class Table implements ModelObject, Annotated {
     }
 
     //**************************************************************************
-    // DatamodelObject implementation
+    // ModelObject implementation
     //**************************************************************************
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -113,6 +113,15 @@ public class Table implements ModelObject, Annotated {
             return tableName;
         }
         return MessageFormat.format("{0}.{1}", schema.getQualifiedName(), tableName);
+    }
+
+    @Override
+    public String getName() {
+        return getTableName();
+    }
+
+    public void setParent(Object parent) {
+        setSchema((Schema) parent);
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {

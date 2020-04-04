@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
 @XmlType(propOrder = {"fromColumn","toColumn"})
-public class Reference implements ModelObject {
+public class Reference implements ModelObject, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -73,6 +73,9 @@ public class Reference implements ModelObject {
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+    public void setParent(Object parent) {
+        this.owner = (HasReferences) parent;
+    }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
         this.owner = (HasReferences) parent;

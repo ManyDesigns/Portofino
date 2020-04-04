@@ -22,8 +22,6 @@ package com.manydesigns.portofino.model;
 
 import org.apache.commons.configuration2.Configuration;
 
-import javax.xml.bind.Unmarshaller;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -31,10 +29,9 @@ import javax.xml.bind.Unmarshaller;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public interface ModelObject {
-    public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+    String COPYRIGHT = "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    void afterUnmarshal(Unmarshaller u, Object parent);
+    void setParent(Object parent);
 
     void reset();
     void init(Model model, Configuration configuration);

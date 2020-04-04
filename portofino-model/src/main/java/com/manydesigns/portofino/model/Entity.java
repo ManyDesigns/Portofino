@@ -25,7 +25,7 @@ public class Entity implements ModelObject, Annotated {
     }
 
     @Override
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
+    public void setParent(Object parent) {
         setDomain((Domain) parent);
     }
 

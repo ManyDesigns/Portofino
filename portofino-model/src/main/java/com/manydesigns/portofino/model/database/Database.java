@@ -20,10 +20,7 @@
 
 package com.manydesigns.portofino.model.database;
 
-import com.manydesigns.portofino.model.Domain;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +40,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas"})
 @XmlRootElement
-public class Database implements ModelObject {
+public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -81,10 +78,17 @@ public class Database implements ModelObject {
     }
 
     //**************************************************************************
-    // DatamodelObject implementation
+    // ModelObject implementation
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {}
+
+    public void setParent(Object parent) {}
+
+    @Override
+    public String getName() {
+        return getDatabaseName();
+    }
 
     public String getQualifiedName() {
         return domain.getName();
@@ -214,5 +218,10 @@ public class Database implements ModelObject {
 
     public void setDomain(Domain domain) {
         this.domain = domain;
+    }
+
+    @Override
+    public List<Annotation> getAnnotations() {
+        return domain.getAnnotations();
     }
 }

@@ -22,6 +22,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.Named;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ import java.util.List;
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
 @XmlType(propOrder = {"name","toDatabase","references","hql", "sql"})
-public class DatabaseSelectionProvider implements ModelSelectionProvider {
+public class DatabaseSelectionProvider implements ModelSelectionProvider, Named, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -75,6 +76,10 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
+
+    public void setParent(Object parent) {
+        fromTable = (Table) parent;
+    }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
         fromTable = (Table) parent;

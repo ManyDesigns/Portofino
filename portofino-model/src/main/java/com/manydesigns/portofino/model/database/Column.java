@@ -41,7 +41,7 @@ import java.util.List;
 */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"columnName", "columnType", "length", "scale", "jdbcType" ,"autoincrement","nullable","javaType","propertyName","annotations"})
-public class Column implements ModelObject, Annotated {
+public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -94,12 +94,21 @@ public class Column implements ModelObject, Annotated {
     // ModelObject implementation
     //**************************************************************************
 
+    @Override
+    public String getName() {
+        return getColumnName();
+    }
+
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}",
                 table.getQualifiedName(), columnName);
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
+        setTable((Table) parent);
+    }
+
+    public void setParent(Object parent) {
         setTable((Table) parent);
     }
 

@@ -30,7 +30,6 @@ import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -107,7 +106,7 @@ public class Annotation implements ModelObject {
     // ModelObject implementation
     //**************************************************************************
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
+    public void setParent(Object parent) {
         this.parent = parent;
     }
 
@@ -235,10 +234,6 @@ public class Annotation implements ModelObject {
 
     public Object getParent() {
         return parent;
-    }
-
-    public void setParent(Object parent) {
-        this.parent = parent;
     }
 
     @XmlAttribute(required = true)
