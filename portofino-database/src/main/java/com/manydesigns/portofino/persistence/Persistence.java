@@ -172,7 +172,7 @@ public class Persistence {
     }
 
     @Deprecated
-    public synchronized void saveXmlModel() throws IOException, JAXBException, ConfigurationException {
+    public synchronized void saveXmlModel() throws IOException, ConfigurationException {
         new XMLModel(getModelDirectory()).save(model, configurationFile);
     }
 

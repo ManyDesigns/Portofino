@@ -92,4 +92,24 @@ public class Domain implements ModelObject, Annotated {
         r.getA().getRelationships().add(r);
         r.getB().getRelationships().add(r);
     }
+
+    public List<Domain> getParents() {
+        return parents;
+    }
+
+    public List<Domain> getSubdomains() {
+        return subdomains;
+    }
+
+    public List<Type> getTypes() {
+        return types;
+    }
+
+    public List<Entity> getEntities() {
+        return entities;
+    }
+
+    public List<Relationship> getRelationships() {
+        return relationships;
+    }
 }

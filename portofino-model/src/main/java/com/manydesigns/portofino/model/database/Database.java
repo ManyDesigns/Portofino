@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model.database;
 
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
@@ -52,7 +53,7 @@ public class Database implements ModelObject {
 
     protected final List<Schema> schemas;
 
-    protected String databaseName;
+    protected Domain domain;
 
     protected String trueString = null;
     protected String falseString = null;
@@ -70,8 +71,13 @@ public class Database implements ModelObject {
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public Database() {
+    public Database(Domain domain) {
+        this.domain = domain;
         this.schemas = new ArrayList<>();
+    }
+
+    public Database() {
+        this(new Domain());
     }
 
     //**************************************************************************
@@ -81,17 +87,17 @@ public class Database implements ModelObject {
     public void afterUnmarshal(Unmarshaller u, Object parent) {}
 
     public String getQualifiedName() {
-        return databaseName;
+        return domain.getName();
     }
 
     public void reset() {}
 
     public void init(Model model, Configuration configuration) {
-        if(databaseName == null) {
+        if(domain.getName() == null) {
             throw new IllegalStateException("Database name is null");
         }
-        if(databaseName.contains("/") || databaseName.contains("\\")) {
-            throw new IllegalStateException("Database name contains slashes or backslashes: " + databaseName);
+        if(domain.getName().contains("/") || domain.getName().contains("\\")) {
+            throw new IllegalStateException("Database name contains slashes or backslashes: " + domain.getName());
         }
     }
 
@@ -109,11 +115,11 @@ public class Database implements ModelObject {
 
     @XmlAttribute(required = true)
     public String getDatabaseName() {
-        return databaseName;
+        return domain.getName();
     }
 
     public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
+        domain.setName(databaseName);
     }
 
     @XmlElementWrapper(name="schemas")
@@ -127,34 +133,28 @@ public class Database implements ModelObject {
     //**************************************************************************
 
     public List<Table> getAllTables() {
-        List<Table> result = new ArrayList<Table>();
+        List<Table> result = new ArrayList<>();
         for (Schema schema : schemas) {
-            for (Table table : schema.getTables()) {
-                result.add(table);
-            }
+            result.addAll(schema.getTables());
         }
         return result;
     }
 
     public List<Column> getAllColumns() {
-        List<Column> result = new ArrayList<Column>();
+        List<Column> result = new ArrayList<>();
         for (Schema schema : schemas) {
             for (Table table : schema.getTables()) {
-                for (Column column : table.getColumns()) {
-                    result.add(column);
-                }
+                result.addAll(table.getColumns());
             }
         }
         return result;
     }
 
     public List<ForeignKey> getAllForeignKeys() {
-        List<ForeignKey> result = new ArrayList<ForeignKey>();
+        List<ForeignKey> result = new ArrayList<>();
         for (Schema schema : schemas) {
             for (Table table : schema.getTables()) {
-                for (ForeignKey foreignKey : table.getForeignKeys()) {
-                    result.add(foreignKey);
-                }
+                result.addAll(table.getForeignKeys());
             }
         }
         return result;
@@ -206,5 +206,13 @@ public class Database implements ModelObject {
 
     public void setEntityMode(String entityMode) {
         this.entityMode = entityMode;
+    }
+
+    public Domain getDomain() {
+        return domain;
+    }
+
+    public void setDomain(Domain domain) {
+        this.domain = domain;
     }
 }

@@ -84,6 +84,10 @@ public class Schema implements ModelObject, Annotated {
     public Schema(Database database) {
         this();
         this.database = database;
+        Domain parent = database.getDomain();
+        if(!this.domain.getParents().contains(parent)) {
+            this.domain.getParents().add(parent);
+        }
     }
 
     //**************************************************************************
