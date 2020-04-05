@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model.io.dsl;
 
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
@@ -23,8 +24,7 @@ public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
 
     @Override
     public Void visitDatabase(ModelParser.DatabaseContext ctx) {
-        currentDatabase = new Database();
-        currentDatabase.setDatabaseName(ctx.name.getText());
+        String name = ctx.name.getText();
         boolean jdbc = true;
         Optional<String> connectionType = getConnectionProperty(ctx, "type");
         if(connectionType.isPresent()) {
@@ -33,9 +33,18 @@ public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
             } else if(connectionType.get().equalsIgnoreCase("JNDI")) {
                 jdbc = false;
             } else {
-                throw new RuntimeException("Unrecognized connection type: " + connectionType);
+                throw new RuntimeException("Unrecognized connection type: " + connectionType); //TODO
             }
         }
+        Optional<Domain> domain = model.getDomains().stream().filter(d -> d.getName().equals(name)).findFirst();
+        if(domain.isPresent()) {
+            currentDatabase = new Database(domain.get());
+        } else {
+            currentDatabase = new Database();
+            currentDatabase.setDatabaseName(name);
+            model.getDomains().add(currentDatabase.getDomain());
+        }
+        model.getDatabases().add(currentDatabase);
         if(jdbc) {
             JdbcConnectionProvider cp = new JdbcConnectionProvider();
             Optional<String> property = getConnectionProperty(ctx, "url");
@@ -54,7 +63,6 @@ public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
             currentDatabase.setConnectionProvider(cp);
         }
         super.visitDatabase(ctx);
-        model.getDatabases().add(currentDatabase);
         return null;
     }
 
@@ -66,14 +74,6 @@ public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
             schema.setActualSchemaName(getText(ctx.physicalName));
         }
         return null;
-    }
-
-    private String getText(Token token) {
-        if(token.getType() == ModelParser.STRING) {
-            return token.getText().substring(1, token.getText().length() - 2);
-        } else {
-            return token.getText();
-        }
     }
 
     @NotNull
@@ -90,5 +90,13 @@ public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
             text = text.substring(1, text.length() - 2);
         }
         return text;
+    }
+
+    private String getText(Token token) {
+        if(token.getType() == ModelParser.STRING) {
+            return token.getText().substring(1, token.getText().length() - 2);
+        } else {
+            return token.getText();
+        }
     }
 }

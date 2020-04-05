@@ -9,15 +9,13 @@ database: ('database') name=IDENTIFIER '(' connectionProperty* ')' ('{'
 connectionProperty: name=IDENTIFIER '=' value=literal;
 schema: 'schema' name=IDENTIFIER ('(' physicalName=STRING ')')?;
 
-standaloneDomain: domainDeclaration? importDeclaration* domain;
+standaloneDomain: domain;
 
 domain: 'domain' name=IDENTIFIER '{'
     (domain | entity)*
 '}';
 
-domainDeclaration: 'domain' name=IDENTIFIER;
-
-standaloneEntity: domainDeclaration? importDeclaration* entity;
+standaloneEntity: entity;
 
 entity: annotation* 'entity' name=IDENTIFIER '{'
   property*
@@ -32,9 +30,9 @@ relationship: annotation* name=IDENTIFIER '-->' type;
 
 type: IDENTIFIER nullable='?'?;
 
-annotation: '@' name=IDENTIFIER annotation_params?;
+annotation: '@' name=IDENTIFIER annotationParams?;
 
-annotation_params: '(' (literal | (IDENTIFIER '=' literal (',' IDENTIFIER '=' literal)*)) ')';
+annotationParams: '(' (literal | (IDENTIFIER '=' literal (',' IDENTIFIER '=' literal)*)) ')';
 
 literal: BOOLEAN | NUMBER | STRING;
 

@@ -27,6 +27,7 @@ public class Domain implements ModelObject, Annotated {
     @Override
     public void setParent(Object parent) {
         parents.add((Domain) parent);
+        ((Domain) parent).getSubdomains().add(this);
     }
 
     @Override
@@ -63,6 +64,7 @@ public class Domain implements ModelObject, Annotated {
         } else if(domain != this) {
             throw new IllegalArgumentException("Entity " + entity + " already belongs to domain " + domain);
         }
+        //TODO check for duplicate name?
         entities.add(entity);
     }
 
