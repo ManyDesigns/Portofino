@@ -83,6 +83,21 @@ public class Domain implements ModelObject, Annotated {
         return null;
     }
 
+    public Type findType(String name) {
+        for (Type t : types) {
+            if(t.getName().equals(name)) {
+                return t;
+            }
+        }
+        for(Domain dom : parents) {
+            Type type = dom.findType(name);
+            if(type != null) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     public void addRelationship(Relationship r) {
         if(!r.getA().equals(findEntity(r.getA().getName()))) {
             throw new IllegalArgumentException("Entity " + r.getA() + " does not belong to " + this);

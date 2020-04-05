@@ -11,6 +11,10 @@ public class Type implements ModelObject, Annotated {
 
     protected final List<Annotation> annotations = new ArrayList<>();
 
+    public Type(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

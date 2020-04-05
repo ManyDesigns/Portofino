@@ -11,22 +11,22 @@ schema: 'schema' name=IDENTIFIER ('(' physicalName=STRING ')')?;
 
 standaloneDomain: domain;
 
-domain: 'domain' name=IDENTIFIER '{'
-    (domain | entity)*
+domain: annotation* 'domain' name=IDENTIFIER '{'
+    (domain | entity | relationship)*
 '}';
 
 standaloneEntity: entity;
 
 entity: annotation* 'entity' name=IDENTIFIER '{'
   property*
-  relationship*
+  relationshipProperty*
 '}';
-
-importDeclaration: 'import' IMPORT;
 
 property: annotation* name=IDENTIFIER (':' type)?;
 
-relationship: annotation* name=IDENTIFIER '-->' type;
+relationship: annotation* name=IDENTIFIER ':' a=type '-->' b=type;
+
+relationshipProperty: annotation* name=IDENTIFIER '-->' type;
 
 type: IDENTIFIER nullable='?'?;
 
@@ -39,8 +39,7 @@ literal: BOOLEAN | NUMBER | STRING;
 BOOLEAN: 'true' | 'false';
 NUMBER: ('+' | '-')?[0-9]+('.'[0-9]+);
 STRING: '"' ('\\"'|.)*? '"';
-IMPORT: IDENTIFIER '.*'?;
 IDENTIFIER: IDENTIFIER_COMPONENT ('.' IDENTIFIER_COMPONENT)*;
 WS: (' ' | '\t' | '\n' | '\r') -> skip;
 
-fragment IDENTIFIER_COMPONENT: [a-zA-Z_][a-zA-Z_0-9]*;
+fragment IDENTIFIER_COMPONENT: [a-zA-Z_][a-zA-Z0-9_]*;

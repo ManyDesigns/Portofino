@@ -5,11 +5,16 @@ import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.Token;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
 
     protected Domain baseDomain;
     protected Entity entity;
     protected Annotated annotated;
+
+    public List<Domain> domains = new ArrayList<>();
 
     public EntityModelVisitor() {}
 
@@ -26,8 +31,11 @@ public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
         }
         domain.setName(ctx.name.getText());
         baseDomain = domain;
+        annotated = domain;
         visitChildren(ctx);
         baseDomain = previous;
+        annotated = previous;
+        domains.add(domain);
         return domain;
     }
 
@@ -66,6 +74,28 @@ public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
             }
         }
         annotated.getAnnotations().add(annotation);
+        return baseDomain;
+    }
+
+    @Override
+    public Domain visitProperty(ModelParser.PropertyContext ctx) {
+        String name = ctx.name.getText();
+        Annotated previous = annotated;
+        if(entity == null) {
+            throw new IllegalStateException("Property without an entity: " + name);
+        }
+        String typeName = ctx.type().IDENTIFIER().getText();
+        Type type = entity.getDomain().findType(typeName);
+        if(type == null) {
+            throw new RuntimeException("Unknown type: " + typeName); //TODO
+        }
+        Property property = new Property();
+        property.setName(name);
+        property.setOwner(entity);
+        property.setType(type);
+        annotated = property;
+        visitChildren(ctx);
+        annotated = previous;
         return baseDomain;
     }
 

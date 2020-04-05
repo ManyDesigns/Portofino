@@ -1,0 +1,5 @@
+domain testDomain1 {
+    entity Foo {
+        name: java.lang.String
+    }
+}

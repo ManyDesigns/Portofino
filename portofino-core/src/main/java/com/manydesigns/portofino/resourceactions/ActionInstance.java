@@ -68,7 +68,7 @@ public class ActionInstance {
         this.directory = directory;
         this.actionDescriptor = actionDescriptor;
         this.actionClass = actionClass;
-        parameters = new ArrayList<String>();
+        parameters = new ArrayList<>();
     }
 
     public ActionInstance copy() {
