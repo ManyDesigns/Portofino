@@ -12,7 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Polished the Maven archetype
 
 ### Fixed
-- Database views are now usable properly
+- Database views aren't usable in practice
+- Move page broken for text pages ([#349](https://github.com/ManyDesigns/Portofino/issues/349))
 
 ## [5.1.2] - 2020-03-02
 

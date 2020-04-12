@@ -99,16 +99,23 @@ export class PageCrudService {
       sanitizedDestination = sanitizedDestination.substring(1);
     }
     return this.pageFactory.loadPath(sanitizedDestination).pipe(mergeMap(newParent => {
+      let params: any = {
+        detail: !!moveInstruction.detail + "",
+        loginPath: this.portofino.loginPath,
+        segment: page.segment
+      };
+
+      if(page.hasSource()) {
+        params.sourceActionPath = `${page.computeSourceUrl()}`;
+        params.destinationActionParent =
+          !page.configuration.source.startsWith("/") ? newParent.instance.computeSourceUrl() : null;
+      }
+
       return this.http.post(`${this.portofino.localApiPath}/pages/${sanitizedDestination}/config.json`, path, {
         headers: {
           "Content-Type": "application/vnd.com.manydesigns.portofino.page-move"
         },
-        params: {
-          sourceActionPath: `${page.computeSourceUrl()}`,
-          detail: !!moveInstruction.detail + "",
-          loginPath: this.portofino.loginPath,
-          destinationActionParent: !page.configuration.source.startsWith("/") ? newParent.instance.computeSourceUrl() : null
-        }}).pipe(mergeMap(goUpOnePage));
+        params: params}).pipe(mergeMap(goUpOnePage));
     }));
   }
 
