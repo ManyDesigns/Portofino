@@ -27,6 +27,7 @@ import {registerLocaleData} from "@angular/common";
 
 //Customize for your app's locales, if any. Portofino is translated in Italian, currently. Additional translations are welcome!
 import localeIt from "@angular/common/locales/it";
+import {MatSnackBarNotificationService, NOTIFICATION_HANDLERS} from "../../../../../../../../../../ui/dist/portofino";
 
 registerLocaleData(localeIt);
 
@@ -75,7 +76,9 @@ export class WelcomeComponent extends Page {
 
 @NgModule({
   declarations: [AppComponent, WelcomeComponent],
-  providers: [],
+  providers: [
+    { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true }
+  ],
   imports: [
     PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,

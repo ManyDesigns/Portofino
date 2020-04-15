@@ -1,7 +1,19 @@
 import {Component, Input, NgModule, OnInit} from '@angular/core';
 import {
-  PortofinoModule, PortofinoUpstairsModule, Page, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, CrudComponent, SearchComponent, Button, SearchResults} from "portofino";
+  PortofinoModule,
+  PortofinoUpstairsModule,
+  Page,
+  NAVIGATION_COMPONENT,
+  DefaultNavigationComponent,
+  PortofinoComponent,
+  PortofinoService,
+  CrudComponent,
+  SearchComponent,
+  Button,
+  SearchResults,
+  NOTIFICATION_HANDLERS,
+  MatSnackBarNotificationService
+} from "portofino";
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -120,6 +132,7 @@ export class DemoTTAppComponent {}
   declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
+    { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
     PortofinoModule.withRoutes([{ path: "hello", component: HelloPortofino }]), PortofinoUpstairsModule,

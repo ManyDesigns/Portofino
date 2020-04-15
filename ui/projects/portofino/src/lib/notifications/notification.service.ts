@@ -1,5 +1,5 @@
-import {ErrorHandler, Injectable} from "@angular/core";
-import {Observable, of} from "rxjs";
+import {ErrorHandler, Inject, Injectable, InjectionToken} from "@angular/core";
+import {concat, Observable, of} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material/snack-bar";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
@@ -58,6 +58,34 @@ export class MatSnackBarNotificationService extends NotificationService {
 
   show(message: string, level: NotificationLevel) {
     return this.snackBar.open(message, this.translate.instant('Ok'), this.configuration).afterOpened();
+  }
+}
+
+@Injectable()
+export class NotificationsHolder extends NotificationService {
+
+  notifications: { message: string, level: NotificationLevel }[] = [];
+
+  show(message: string, level: NotificationLevel) {
+    const len = this.notifications.unshift({ message: message, level: level })
+    if(len > 100) {
+      this.notifications.pop();
+    }
+    return of(null);
+  }
+}
+
+export const NOTIFICATION_HANDLERS = new InjectionToken('NOTIFICATION_HANDLERS');
+
+@Injectable()
+export class NotificationDispatcher extends NotificationService {
+
+  constructor(@Inject(NOTIFICATION_HANDLERS) protected handlers: NotificationService[]) {
+    super();
+  }
+
+  show(message: string, level: NotificationLevel): Observable<void> {
+    return this.handlers.reduce((acc, current) => concat(acc, current.show(message, level)), of(null));
   }
 }
 

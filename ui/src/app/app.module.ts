@@ -1,6 +1,12 @@
 import {Component, NgModule} from '@angular/core';
 import {
-  PortofinoModule, NAVIGATION_COMPONENT, DefaultNavigationComponent, PortofinoUpstairsModule} from "portofino";
+  PortofinoModule,
+  NAVIGATION_COMPONENT,
+  DefaultNavigationComponent,
+  PortofinoUpstairsModule,
+  NOTIFICATION_HANDLERS,
+  MatSnackBarNotificationService
+} from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -49,7 +55,8 @@ export class AppComponent {}
 @NgModule({
   declarations: [AppComponent],
   providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation }
+    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
+    { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
     PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
@@ -66,6 +73,5 @@ export class AppComponent {}
 export class AppModule {
   static navigation() {
     return DefaultNavigationComponent;
-    //return CustomNavigation
   }
 }

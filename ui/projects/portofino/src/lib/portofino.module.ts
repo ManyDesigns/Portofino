@@ -77,8 +77,12 @@ import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {ContentComponent} from "./content.component";
 import {
-  MatSnackBarNotificationService, NotificationErrorHandler, NotificationInterceptor,
-  NotificationService
+  MatSnackBarNotificationService,
+  NOTIFICATION_HANDLERS,
+  NotificationDispatcher,
+  NotificationErrorHandler,
+  NotificationInterceptor,
+  NotificationService, NotificationsHolder
 } from "./notifications/notification.service";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { NgxdModule } from '@ngxd/core';
@@ -244,7 +248,8 @@ export class PortofinoUpstairsModule {}
     { provide: LOCALES, useValue: [
       { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
       { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
-    { provide: NotificationService, useClass: MatSnackBarNotificationService },
+    { provide: NOTIFICATION_HANDLERS, useClass: NotificationsHolder, multi: true },
+    { provide: NotificationService, useClass: NotificationDispatcher },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [
     LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
