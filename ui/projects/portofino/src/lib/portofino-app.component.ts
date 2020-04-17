@@ -13,6 +13,7 @@ import {NAVIGATION_COMPONENT, TemplatesComponent} from "./page";
 import {NavigationDirective} from "./content.directive";
 import {PageCrudService} from "./administration/page-crud.service";
 import {SidenavService} from "./sidenav.service";
+import {NotificationsHolder} from "./notifications/notification.service";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 export const FOOTER_COMPONENT = new InjectionToken('Footer Component');
@@ -46,7 +47,10 @@ export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
   constructor(
     public authenticationService: AuthenticationService, public portofino: PortofinoService,
-    public pageCrudService: PageCrudService, public sidenav: SidenavService) {}
+    public pageCrudService: PageCrudService, public sidenav: SidenavService,
+    public notifications: NotificationsHolder) {
+    console.log("notifications:", notifications)
+  }
 }
 
 @Component({

@@ -248,7 +248,8 @@ export class PortofinoUpstairsModule {}
     { provide: LOCALES, useValue: [
       { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
       { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
-    { provide: NOTIFICATION_HANDLERS, useClass: NotificationsHolder, multi: true },
+    NotificationsHolder,
+    { provide: NOTIFICATION_HANDLERS, useExisting: NotificationsHolder, multi: true },
     { provide: NotificationService, useClass: NotificationDispatcher },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [

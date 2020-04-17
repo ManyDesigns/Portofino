@@ -67,11 +67,17 @@ export class NotificationsHolder extends NotificationService {
   notifications: { message: string, level: NotificationLevel }[] = [];
 
   show(message: string, level: NotificationLevel) {
-    const len = this.notifications.unshift({ message: message, level: level })
+    let notifications = this.notifications;
+    const len = notifications.unshift({ message: message, level: level })
     if(len > 100) {
-      this.notifications.pop();
+      notifications.pop();
     }
+    this.notifications = notifications;
     return of(null);
+  }
+
+  remove(notification: { message: string; level: NotificationLevel }) {
+    this.notifications = this.notifications.filter(x => x != notification);
   }
 }
 
