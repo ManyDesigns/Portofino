@@ -83,7 +83,7 @@ import {
   NotificationErrorHandler,
   NotificationInterceptor,
   NotificationService, NotificationsHolder
-} from "./notifications/notification.service";
+} from "./notifications/notification.services";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { NgxdModule } from '@ngxd/core';
 import {FieldFactory, FieldFactoryComponent} from "./fields/field.factory";
@@ -120,6 +120,7 @@ import {RichTextComponent} from "./fields/rich-text.component";
 import {TextPageComponent} from "./pages/text/text.component";
 import {VarDirective} from "./var.directive";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatBadgeModule} from "@angular/material/badge";
 
 @NgModule({
   declarations: [
@@ -156,9 +157,9 @@ export class PortofinoFormsModule {}
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule,
-    MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule, MatMenuModule,
-    MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
+    MatBadgeModule, MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule,
+    MatMenuModule, MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule,
+    MatStepperModule, MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule.forChild()
   ],
   providers: [PortofinoService, AuthenticationService, PageService, PageCrudService, SidenavService],

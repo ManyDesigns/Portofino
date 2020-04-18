@@ -8,7 +8,7 @@ import {
 import {ErrorStateMatcher, MatDialogRef} from "@angular/material";
 import {AuthenticationService} from "../authentication.service";
 import {Component} from "@angular/core";
-import {NotificationService} from "../../notifications/notification.service";
+import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {samePasswordChecker} from "../../form";
 

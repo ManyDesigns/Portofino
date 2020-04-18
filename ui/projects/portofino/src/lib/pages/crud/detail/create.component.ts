@@ -3,7 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../../portofino.service";
 import {isInsertable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
-import {NotificationService} from "../../../notifications/notification.service";
+import {NotificationService} from "../../../notifications/notification.services";
 import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 

@@ -23,7 +23,7 @@ import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.s
 import {declareButton, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, map} from "rxjs/operators";
-import {NotificationService} from "./notifications/notification.service";
+import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');

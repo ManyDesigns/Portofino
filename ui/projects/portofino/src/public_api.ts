@@ -15,7 +15,7 @@ export * from './lib/fields/text-field.component';
 export * from './lib/fields/field.factory';
 export * from './lib/i18n/en';
 export * from './lib/i18n/it';
-export * from './lib/notifications/notification.service';
+export * from './lib/notifications/notification.services';
 export * from './lib/portofino-app.component';
 export * from './lib/page.factory';
 export * from './lib/sidenav.service';

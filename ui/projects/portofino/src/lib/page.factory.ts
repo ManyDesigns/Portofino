@@ -13,7 +13,7 @@ import {ActivatedRoute, Router, UrlSegment} from "@angular/router";
 import {AuthenticationService} from "./security/authentication.service";
 import {Observable, of, throwError} from "rxjs";
 import {map, mergeMap} from "rxjs/operators";
-import {NotificationService} from "./notifications/notification.service";
+import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({

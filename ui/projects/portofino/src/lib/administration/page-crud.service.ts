@@ -12,7 +12,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {mergeMap, tap} from "rxjs/operators";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
-import {NotificationService} from "../notifications/notification.service";
+import {NotificationService} from "../notifications/notification.services";
 
 @Injectable()
 export class PageCrudService {

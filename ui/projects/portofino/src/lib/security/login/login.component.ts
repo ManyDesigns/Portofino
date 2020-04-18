@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {AuthenticationService} from "../authentication.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {NotificationService} from "../../notifications/notification.service";
+import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {SignupComponent} from "./signup.component";
 import {ForgottenPasswordComponent} from "./forgotten-password.component";

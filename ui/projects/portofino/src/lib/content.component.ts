@@ -16,7 +16,7 @@ import {PortofinoService} from "./portofino.service";
 import {AuthenticationService} from "./security/authentication.service";
 import {Page, PageChild, PageService} from "./page";
 import {PageFactoryComponent} from "./page.factory";
-import {NotificationService} from "./notifications/notification.service";
+import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {catchError, map, mergeMap} from "rxjs/operators";
 

@@ -13,7 +13,7 @@ import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms
 import {BlobFile, Configuration, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
 import {Field, Form, FormComponent} from "../../form";
-import {NotificationService} from "../../notifications/notification.service";
+import {NotificationService} from "../../notifications/notification.services";
 import {Button, ButtonInfo, getButtons, WithButtons} from "../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 

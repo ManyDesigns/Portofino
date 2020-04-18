@@ -65,18 +65,30 @@ export class MatSnackBarNotificationService extends NotificationService {
 export class NotificationsHolder extends NotificationService {
 
   notifications: { message: string, level: NotificationLevel }[] = [];
+  maximumNotifications = 20;
+  timeToLiveMs = 600000;
 
   show(message: string, level: NotificationLevel) {
     let notifications = this.notifications;
-    const len = notifications.unshift({ message: message, level: level })
-    if(len > 100) {
+    let notification = { message: message, level: level, timeout: null };
+    const len = notifications.unshift(notification);
+    if(len > this.maximumNotifications) {
       notifications.pop();
     }
     this.notifications = notifications;
+    if(this.timeToLiveMs > 0) {
+      notification.timeout = setTimeout(() => {
+        notification.timeout = null;
+        this.remove(notification);
+      }, this.timeToLiveMs);
+    }
     return of(null);
   }
 
-  remove(notification: { message: string; level: NotificationLevel }) {
+  remove(notification) {
+    if(notification.timeout) {
+      clearTimeout(notification.timeout);
+    }
     this.notifications = this.notifications.filter(x => x != notification);
   }
 }
