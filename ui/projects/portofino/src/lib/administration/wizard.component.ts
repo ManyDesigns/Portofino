@@ -89,6 +89,15 @@ export class WizardComponent extends Page implements OnInit {
     });
   }
 
+  checkAuthczConfiguration() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/users/check-wizard`;
+    this.http.post<string>(url, this.wizard).subscribe((result) => {
+      if("true" == result) {
+        this.stepper.next();
+      }
+    });
+  }
+
   generateApplication() {
     const url = `${this.portofino.apiRoot}portofino-upstairs/application`;
     this.http.post(url, this.wizard).subscribe((actions: { path: string, type: string, title: string, detail: boolean }[]) => {

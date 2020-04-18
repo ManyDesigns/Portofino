@@ -202,7 +202,7 @@
         </fieldset>
       </form>
       <button mat-button matStepperPrevious>{{'Previous' | translate}}</button>
-      <button mat-button matStepperNext color="primary">{{'Next' | translate}}</button>
+      <button mat-button (click)="checkAuthczConfiguration()" color="primary">{{'Next' | translate}}</button>
     </mat-step>
     <mat-step>
       <ng-template matStepLabel>{{'Create the application' | translate}}</ng-template>
