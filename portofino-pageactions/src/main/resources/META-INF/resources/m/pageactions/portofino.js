@@ -48,7 +48,7 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
     var selectField = $(selectFieldId);
     autocompleteObj.typeahead(
         {
-            minLength: 1,
+            minLength: 3,
             highlight: true,
             hint: false
         },
