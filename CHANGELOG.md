@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Notifications bell showing up to 20 messages
 - Possibility for buttons to prevent double submit by returning an Observable
 - RestEasy support on Tomcat (alternative to Jersey JAX-RS)
+- More error reporting in the wizard
 
 ### Changed
 - Polished the Maven archetype

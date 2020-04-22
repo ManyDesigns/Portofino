@@ -48,9 +48,7 @@ export class DefaultToolbarComponent implements ToolbarComponent {
   constructor(
     public authenticationService: AuthenticationService, public portofino: PortofinoService,
     public pageCrudService: PageCrudService, public sidenav: SidenavService,
-    public notifications: NotificationsHolder) {
-    console.log("notifications:", notifications)
-  }
+    public notifications: NotificationsHolder) {}
 }
 
 @Component({
