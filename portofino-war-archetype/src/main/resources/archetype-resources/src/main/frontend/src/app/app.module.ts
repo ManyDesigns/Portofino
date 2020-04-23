@@ -42,7 +42,7 @@ export class AppComponent {}
   template: `
     <portofino-page-layout [page]="this">
       <ng-template #content>
-        <p>Welcome to Portofino 5. This is your new empty application.</p>
+        <p>Welcome to Portofino 5. This is your new, empty application.</p>
         <p>
           Use the navigation button
           <button title="{{ 'Navigation' | translate }}" type="button" mat-icon-button
@@ -51,15 +51,29 @@ export class AppComponent {}
           </button>
           to explore the pages.
         </p>
-        <p>Initially, the application has the user admin/admin built in.
+        <p>
+          Your application has a REST API which depends on the resource-actions that it's made of.
+          You can download <a [href]="portofino.apiRoot">the documentation of the REST API</a> in OpenAPI (aka Swagger) format.
+        </p>
+        <p>
+          Initially, the application has the user admin/admin built in.
           You can use that to <a [routerLink]="portofino.upstairsLink + '/wizard'">run the wizard</a>,
           connect to your database, and build a complete application from it in a few clicks. Please refer to the
-          <a href="https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5">getting started page</a> if you feel lost.</p>
-        <p>The wizard is one of the tools that can be found in the administration section
+          <a href="https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5">getting started page</a>
+          if you feel lost.
+        </p>
+        <p>
+          The wizard is one of the tools that can be found in the administration section
           <a [routerLink]="portofino.upstairsLink">"upstairs"</a> (link in the toolbar).
-          The "upstairs" section is optional and can be disabled in production, leaving only the "downstairs" floor, i.e., the application.</p>
-        <p>"Upstairs" and "downstairs" are historical references to Portofino 3, which used the same model-driven interface
-        both for the application and for the application's model (the metamodel).</p>
+          The "upstairs" section is optional and can be disabled in production, leaving only the "downstairs" floor, i.e., the application.
+          "Upstairs" and "downstairs" are historical references to Portofino 3, which used the same model-driven interface
+          both for the application and for the application's model (the metamodel).
+        </p>
+        <p>
+          You can find additional documentation in the <a href="https://github.com/ManyDesigns/Portofino/wiki">wiki</a>
+          and in the <a href="https://portofino.manydesigns.com/en/docs">documentation center</a>, which was written for
+          Portofino 4.x, but is in many cases still applicable.
+        </p>
       </ng-template>
     </portofino-page-layout>`
 })
