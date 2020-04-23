@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Possibility for buttons to prevent double submit by returning an Observable
 - RestEasy support on Tomcat (alternative to Jersey JAX-RS)
 - More error reporting in the wizard
+- Tested on WildFly 19.0.0.Final
 
 ### Changed
 - Polished the Maven archetype
