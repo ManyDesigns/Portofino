@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>upstairs</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <baseDirectory>portofino-${project.version}-upstairs</baseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}/ui/dist/ui</directory>
+      <includes>
+        <include>**</include>
+      </includes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+  </fileSets>
+</assembly>

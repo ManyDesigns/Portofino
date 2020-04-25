@@ -118,7 +118,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <sonar.projectKey>ManyDesigns_Portofino</sonar.projectKey>
-        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.organization>manydesigns</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -372,8 +372,10 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
+                    <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                     <descriptors>
                         <descriptor>assembly-src.xml</descriptor>
+                        <descriptor>assembly-upstairs-standalone.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
