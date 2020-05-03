@@ -32,6 +32,37 @@
                     </filesets>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.33.0</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <alias>portofino-upstairs</alias>
+                            <name>portofino-upstairs:${project.version}</name>
+                            <build>
+                                <contextDir>${project.basedir}/docker</contextDir>
+                                <assembly>
+                                    <descriptor>${project.basedir}/docker/assembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                            <run>
+                                <skip>true</skip>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>docker:build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
