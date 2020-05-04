@@ -1,11 +1,13 @@
-import {Component, NgModule} from '@angular/core';
+import {Component, Inject, NgModule, OnInit} from '@angular/core';
 import {
   PortofinoModule,
   NAVIGATION_COMPONENT,
   DefaultNavigationComponent,
   PortofinoUpstairsModule,
   NOTIFICATION_HANDLERS,
-  MatSnackBarNotificationService
+  MatSnackBarNotificationService,
+  PortofinoService,
+  LOCALE_STORAGE_SERVICE, PortofinoAppComponent
 } from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
@@ -43,14 +45,29 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
 import localeIt from "@angular/common/locales/it";
+import {LocalStorageService} from "ngx-store";
 
 registerLocaleData(localeIt);
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Portofino Upstairs" apiRoot="http://localhost:8080/" [upstairsLink]="null"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Upstairs" [preInit]="initApiRoot"></portofino-app>`
 })
-export class AppComponent {}
+export class AppComponent {
+
+  constructor(@Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {}
+
+  initApiRoot = (app: PortofinoAppComponent) => {
+    const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
+    console.log("API root:", apiRoot);
+    if(apiRoot) {
+      app.apiRoot = apiRoot;
+    } else {
+      app.apiRoot = "http://localhost:8080/api";
+    }
+    app.upstairsLink = null;
+  };
+}
 
 @NgModule({
   declarations: [AppComponent],

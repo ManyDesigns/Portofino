@@ -70,6 +70,10 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   apiRoot: string;
   @Input()
   upstairsLink = this.portofino.upstairsLink;
+  @Input()
+  preInit: (self: PortofinoAppComponent) => void;
+  @Input()
+  postInit: (self: PortofinoAppComponent) => void;
   @ViewChild(ToolbarDirective, { static: false })
   toolbarHost: ToolbarDirective;
   @ViewChild(FooterDirective, { static: false })
@@ -91,12 +95,18 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
               @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {}
 
   ngOnInit(): void {
+    if(this.preInit) {
+      this.preInit(this);
+    }
     if(this.apiRoot) {
       this.portofino.defaultApiRoot = this.apiRoot;
     }
     this.portofino.upstairsLink = this.upstairsLink;
     this.portofino.applicationName = this.title;
     this.portofino.init();
+    if(this.postInit) {
+      this.postInit(this);
+    }
   }
 
   ngAfterViewInit(): void {

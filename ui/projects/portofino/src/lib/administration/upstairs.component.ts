@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {NavigationMenu, NavigationMenuItem, Page, PageChild, PageConfiguration} from "../page";
+import {Page, PageChild, PageConfiguration} from "../page";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
 import {Button} from "../buttons";
@@ -72,17 +72,6 @@ export class UpstairsComponent extends Page implements OnInit {
       console.error(error);
       this.notificationService.error(this.translate.get("Invalid API root (see console for details)"));
     });
-  }
-
-  prepare() {
-    return super.prepare().pipe(map(() => {
-      const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
-      if(apiRoot && !this.portofino.localApiAvailable) {
-        this.portofino.apiRoot = apiRoot;
-        this.changeApiRoot();
-      }
-      return this;
-    }));
   }
 
   ngOnInit(): void {
