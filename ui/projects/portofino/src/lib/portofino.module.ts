@@ -110,6 +110,7 @@ import {WizardComponent} from "./administration/wizard.component";
 import {TablesComponent} from "./administration/tables.component";
 import {ActionsComponent, CreateActionComponent, GenericPage} from "./administration/actions.component";
 import {TRANSLATIONS_EN} from "./i18n/en";
+import {TRANSLATIONS_ES} from "./i18n/es";
 import {TRANSLATIONS_IT} from "./i18n/it";
 import {ChangePasswordComponent} from "./security/login/change-password.component";
 import {SignupComponent} from "./security/login/signup.component";
@@ -248,7 +249,8 @@ export class PortofinoUpstairsModule {}
     { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: LOCALES, useValue: [
       { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
-      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
+      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT },
+      { key: 'es', name: 'Español', translations: TRANSLATIONS_ES }]},
     NotificationsHolder,
     { provide: NOTIFICATION_HANDLERS, useExisting: NotificationsHolder, multi: true },
     { provide: NotificationService, useClass: NotificationDispatcher },

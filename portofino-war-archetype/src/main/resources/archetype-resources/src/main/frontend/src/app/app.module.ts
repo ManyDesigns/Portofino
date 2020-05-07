@@ -1,6 +1,7 @@
 import {Component, NgModule, Optional} from '@angular/core';
 import {
-  PortofinoModule, PortofinoUpstairsModule, AuthenticationService, NotificationService,
+  PortofinoModule, PortofinoUpstairsModule, AuthenticationService,
+  NotificationService, MatSnackBarNotificationService, NOTIFICATION_HANDLERS,
   Page, PortofinoComponent, PortofinoService, SidenavService
 } from "portofino";
 import {
@@ -25,10 +26,12 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {registerLocaleData} from "@angular/common";
 
-//Customize for your app's locales, if any. Portofino is translated in Italian, currently. Additional translations are welcome!
+//Customize for your app's locales, if any. As of version 5.1.3, Portofino is translated to Spanish and Italian.
+//Additional translations are welcome!
+import localeEs from "@angular/common/locales/es";
 import localeIt from "@angular/common/locales/it";
-import {MatSnackBarNotificationService, NOTIFICATION_HANDLERS} from "../../../../../../../../../../ui/dist/portofino";
 
+registerLocaleData(localeEs);
 registerLocaleData(localeIt);
 
 @Component({

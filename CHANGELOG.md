@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Notifications bell showing up to 20 messages
-- Possibility for buttons to prevent double submit by returning an Observable
-- RestEasy support on Tomcat (alternative to Jersey JAX-RS)
 - More error reporting in the wizard
+- Spanish translation of the UI, thanks to Gabriel Mautino
+- Possibility for buttons to prevent double submit by returning an Observable
+- RestEasy support (alternative to Jersey JAX-RS)
 - Tested on WildFly 19.0.0.Final
+- Docker image for the upstairs application
 
 ### Changed
 - Polished the Maven archetype
