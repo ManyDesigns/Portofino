@@ -9,7 +9,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.3-SNAPSHOT</version>
+    <version>5.1.3</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
