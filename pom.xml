@@ -536,6 +536,9 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <keyname>info@manydesigns.com</keyname>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
