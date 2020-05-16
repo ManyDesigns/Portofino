@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Database views aren't usable in practice
 - Move page broken for text pages ([#349](https://github.com/ManyDesigns/Portofino/issues/349))
+- JWT filter eats the Authorization header even if it's not a JWT ([#367](https://github.com/ManyDesigns/Portofino/issues/367))
 
 ## [5.1.2] - 2020-03-02
 
