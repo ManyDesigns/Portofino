@@ -126,6 +126,14 @@ public class PrimaryKeyColumn implements ModelObject {
         return actualColumn;
     }
 
+    public void setActualColumn(Column actualColumn) {
+        Table table = primaryKey.getTable();
+        if(actualColumn.getTable() != table) {
+            throw new IllegalArgumentException("Column " + actualColumn.getQualifiedName() + " does not belong to the primary key table " + table.getQualifiedName());
+        }
+        this.actualColumn = actualColumn;
+        this.columnName = actualColumn.columnName;
+    }
 
     @XmlElements({
           @XmlElement(name="sequenceGenerator",type=SequenceGenerator.class),

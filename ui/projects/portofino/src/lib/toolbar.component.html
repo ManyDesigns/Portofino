@@ -8,6 +8,22 @@
   </div>
   <div fxLayout="row">
     <mat-spinner *ngIf="portofino.callsInProgress > 0" color="accent" diameter="35"></mat-spinner>
+    <mat-menu #notificationsMenu="matMenu" [overlapTrigger]="false" class="notifications-menu">
+      <button mat-menu-item *ngFor="let notification of notifications.notifications"
+              (click)="notifications.remove(notification)" style="white-space: normal; margin-bottom: 5px; margin-top: 5px;">
+        {{ notification.message }}
+      </button>
+    </mat-menu>
+    <button mat-icon-button *ngIf="!notifications.notifications || notifications.notifications.length == 0">
+      <mat-icon>notifications_none</mat-icon>
+      <span class="cdk-visually-hidden">{{ 'No notifications' | translate }}</span>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" *ngIf="notifications.notifications && notifications.notifications.length > 0">
+      <mat-icon [matBadge]="notifications.notifications.length" matBadgeColor="accent" matBadgeSize="small">
+        notifications
+      </mat-icon>
+      <span class="cdk-visually-hidden">{{ 'Notifications' | translate }}</span>
+    </button>
     <ng-container *ngIf="authenticationService.isAdmin && (portofino.upstairsLink || pageCrudService.available)">
       <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
         <a mat-menu-item *ngIf="portofino.upstairsLink" [routerLink]="portofino.upstairsLink">

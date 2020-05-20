@@ -1,6 +1,12 @@
-import {Component, NgModule} from '@angular/core';
+import {Component, Inject, NgModule, OnInit} from '@angular/core';
 import {
-  PortofinoModule, PortofinoUpstairsModule} from "portofino";
+  LocalStorageService,
+  PortofinoModule,
+  PortofinoUpstairsModule,
+  NOTIFICATION_HANDLERS,
+  MatSnackBarNotificationService,
+  LOCALE_STORAGE_SERVICE, PortofinoAppComponent
+} from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -36,20 +42,39 @@ import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
+import localeEs from "@angular/common/locales/es";
 import localeIt from "@angular/common/locales/it";
 import {RouterModule} from "@angular/router";
 
 registerLocaleData(localeIt);
+registerLocaleData(localeEs);
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Portofino Upstairs" apiRoot="http://localhost:8080/" [upstairsLink]="null"></portofino-app>`
+  template: `<portofino-app appTitle="Portofino Upstairs" [preInit]="initApiRoot"></portofino-app>`
 })
-export class AppComponent {}
+export class AppComponent {
+
+  constructor(@Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {}
+
+  initApiRoot = (app: PortofinoAppComponent) => {
+    const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
+    console.log("API root:", apiRoot);
+    if(apiRoot) {
+      app.apiRoot = apiRoot;
+    } else {
+      app.apiRoot = "http://localhost:8080/api";
+    }
+    app.upstairsLink = null;
+  };
+}
 
 @NgModule({
   declarations: [AppComponent],
-  providers: [],
+  providers: [
+    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
+    { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
+  ],
   imports: [
     RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()),
     PortofinoModule, PortofinoUpstairsModule,
@@ -63,4 +88,8 @@ export class AppComponent {}
   entryComponents: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+  static navigation() {
+    return DefaultNavigationComponent;
+  }
+}

@@ -4,7 +4,7 @@ import {PortofinoService} from "../../../portofino.service";
 import {isBlob, isDateProperty, isUpdatable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {FormComponent} from "../../../form";
-import {NotificationService} from "../../../notifications/notification.service";
+import {NotificationService} from "../../../notifications/notification.services";
 import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 

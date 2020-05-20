@@ -137,7 +137,7 @@ public class Persistence {
 
     public synchronized void loadXmlModel() {
         try {
-            JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
+            JAXBContext jc = createModelJAXBContext();
             Unmarshaller um = jc.createUnmarshaller();
             FileObject appModelFile = getModelFile();
             if(appModelFile.exists()) {
@@ -162,6 +162,10 @@ public class Persistence {
         } catch (Exception e) {
             logger.error("Cannot load/parse model", e);
         }
+    }
+
+    public JAXBContext createModelJAXBContext() throws JAXBException {
+        return JAXBContext.newInstance(Model.class, View.class);
     }
 
     protected void loadXmlDatabase(Unmarshaller um, Model model, FileObject databaseDir) throws IOException, JAXBException {
@@ -260,7 +264,7 @@ public class Persistence {
 
     public synchronized void saveXmlModel() throws IOException, JAXBException, ConfigurationException {
         //TODO gestire conflitti con modifiche esterne?
-        JAXBContext jc = JAXBContext.newInstance(Model.class.getPackage().getName());
+        JAXBContext jc = createModelJAXBContext();
         Marshaller m = jc.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
@@ -523,6 +527,11 @@ public class Persistence {
         if(table == null) {
             throw new IllegalArgumentException("Table " + entityName + " not found in database " + databaseName);
         }
+        return getTableAccessor(table);
+    }
+
+    @NotNull
+    public TableAccessor getTableAccessor(Table table) {
         return table instanceof View ? new ViewAccessor((View) table) : new TableAccessor(table);
     }
 

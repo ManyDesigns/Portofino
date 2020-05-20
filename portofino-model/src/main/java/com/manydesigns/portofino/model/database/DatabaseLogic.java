@@ -225,8 +225,13 @@ public class DatabaseLogic {
                                                 String databaseName, String entityName,
                                                 String relationshipName) {
         Database database = findDatabaseByName(model, databaseName);
+        if(database == null) {
+            return null;
+        }
         Table table = findTableByEntityName(database, entityName);
-        assert table != null;
+        if(table == null) {
+            return null;
+        }
         return findOneToManyRelationshipByName(table, relationshipName);
     }
 

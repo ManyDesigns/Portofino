@@ -4,7 +4,7 @@ import {PortofinoService} from "../../../portofino.service";
 import {isUpdatable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../../page";
-import {NotificationService} from "../../../notifications/notification.service";
+import {NotificationService} from "../../../notifications/notification.services";
 import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 import {Subject} from "rxjs";

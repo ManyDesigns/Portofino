@@ -45,7 +45,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
             //hitting the DB or services, etc.
             Resource root = rootFactory.createRoot();
             root.setResourceContext(getResourceContext());
-            new DepthFirstVisitor((ResourceVisitor) node -> {
+            initRoot(root);
+            new DepthFirstVisitor(node -> {
                 try {
                     OpenAPI subApi = subResourceReader.readSubResource(node);
                     openAPI.getPaths().putAll(subApi.getPaths());
@@ -57,6 +58,10 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    protected void initRoot(Resource root) {
+        root.init();
     }
 
     protected SubResourceReader getSubResourceReader(Reader reader) {

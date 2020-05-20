@@ -53,6 +53,7 @@ public class MailSenderRunnable implements Runnable {
             mainLoop();
         } catch (InterruptedException e) {
             stop();
+            Thread.currentThread().interrupt();
         }
     }
 

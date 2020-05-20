@@ -13,6 +13,7 @@ import {NAVIGATION_COMPONENT, TemplatesComponent} from "./page";
 import {NavigationDirective} from "./content.directive";
 import {PageCrudService} from "./administration/page-crud.service";
 import {SidenavService} from "./sidenav.service";
+import {NotificationsHolder} from "./notifications/notification.services";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 export const FOOTER_COMPONENT = new InjectionToken('Footer Component');
@@ -46,7 +47,8 @@ export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
   constructor(
     public authenticationService: AuthenticationService, public portofino: PortofinoService,
-    public pageCrudService: PageCrudService, public sidenav: SidenavService) {}
+    public pageCrudService: PageCrudService, public sidenav: SidenavService,
+    public notifications: NotificationsHolder) {}
 }
 
 @Component({
@@ -68,6 +70,10 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   apiRoot: string;
   @Input()
   upstairsLink = this.portofino.upstairsLink;
+  @Input()
+  preInit: (self: PortofinoAppComponent) => void;
+  @Input()
+  postInit: (self: PortofinoAppComponent) => void;
   @ViewChild(ToolbarDirective)
   toolbarHost: ToolbarDirective;
   @ViewChild(FooterDirective)
@@ -89,12 +95,18 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
               @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {}
 
   ngOnInit(): void {
+    if(this.preInit) {
+      this.preInit(this);
+    }
     if(this.apiRoot) {
       this.portofino.defaultApiRoot = this.apiRoot;
     }
     this.portofino.upstairsLink = this.upstairsLink;
     this.portofino.applicationName = this.title;
     this.portofino.init();
+    if(this.postInit) {
+      this.postInit(this);
+    }
   }
 
   ngAfterViewInit(): void {

@@ -77,9 +77,13 @@ import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {ContentComponent} from "./content.component";
 import {
-  MatSnackBarNotificationService, NotificationErrorHandler, NotificationInterceptor,
-  NotificationService
-} from "./notifications/notification.service";
+  MatSnackBarNotificationService,
+  NOTIFICATION_HANDLERS,
+  NotificationDispatcher,
+  NotificationErrorHandler,
+  NotificationInterceptor,
+  NotificationService, NotificationsHolder
+} from "./notifications/notification.services";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { NgxdModule } from '@ngxd/core';
 import {FieldFactory, FieldFactoryComponent} from "./fields/field.factory";
@@ -103,6 +107,7 @@ import {WizardComponent} from "./administration/wizard.component";
 import {TablesComponent} from "./administration/tables.component";
 import {ActionsComponent, CreateActionComponent, GenericPage} from "./administration/actions.component";
 import {TRANSLATIONS_EN} from "./i18n/en";
+import {TRANSLATIONS_ES} from "./i18n/es";
 import {TRANSLATIONS_IT} from "./i18n/it";
 import {ChangePasswordComponent} from "./security/login/change-password.component";
 import {SignupComponent} from "./security/login/signup.component";
@@ -113,6 +118,7 @@ import {RichTextComponent} from "./fields/rich-text.component";
 import {TextPageComponent} from "./pages/text/text.component";
 import {VarDirective} from "./var.directive";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatBadgeModule} from "@angular/material/badge";
 import {LocalStorageService} from "./storage/storage.services";
 
 @NgModule({
@@ -150,9 +156,9 @@ export class PortofinoFormsModule {}
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule,
-    MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule, MatMenuModule,
-    MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
+    MatBadgeModule, MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule,
+    MatMenuModule, MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule,
+    MatStepperModule, MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule.forChild()
   ],
   providers: [PortofinoService, AuthenticationService, PageService, PageCrudService, SidenavService],
@@ -241,8 +247,11 @@ export class PortofinoUpstairsModule {}
     { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: LOCALES, useValue: [
       { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
-      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
-    { provide: NotificationService, useClass: MatSnackBarNotificationService },
+      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT },
+      { key: 'es', name: 'Español', translations: TRANSLATIONS_ES }]},
+    NotificationsHolder,
+    { provide: NOTIFICATION_HANDLERS, useExisting: NotificationsHolder, multi: true },
+    { provide: NotificationService, useClass: NotificationDispatcher },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [
     LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,

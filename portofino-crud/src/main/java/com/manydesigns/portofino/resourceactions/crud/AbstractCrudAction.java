@@ -48,7 +48,6 @@ import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.annotations.Guard;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
-import com.manydesigns.portofino.resourceactions.ResourceActionLogic;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
@@ -131,15 +130,15 @@ import java.util.regex.Pattern;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
+@SupportsPermissions({ AbstractCrudAction.PERMISSION_CREATE, AbstractCrudAction.PERMISSION_EDIT, AbstractCrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
-    public static final String copyright =
+    public static final String COPYRIGHT =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public final static String SEARCH_STRING_PARAM = "searchString";
+    public static final String SEARCH_STRING_PARAM = "searchString";
     public final static String prefix = "";
     public final static String searchPrefix = prefix + "search_";
 
@@ -1591,6 +1590,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "Create a new object (without blob data)")
@@ -1631,6 +1631,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Guard(test = "isCreateEnabled()", type = GuardType.VISIBLE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Operation(summary = "Create a new object (including blob data)")

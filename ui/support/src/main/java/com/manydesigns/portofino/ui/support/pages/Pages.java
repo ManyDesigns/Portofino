@@ -170,6 +170,7 @@ public class Pages extends Resource {
     public Response movePageAndAction(
         @HeaderParam(AUTHORIZATION_HEADER) String auth,
         @PathParam("destinationPath") String destinationPath, @QueryParam("loginPath") String loginPath,
+        @QueryParam("segment") String segment,
         @QueryParam("sourceActionPath") String sourceActionPath,
         @QueryParam("destinationActionParent") String destinationActionParent,
         @QueryParam("detail") boolean detail,
@@ -177,15 +178,13 @@ public class Pages extends Resource {
         checkPathAndAuth(destinationPath, auth, loginPath);
         checkPath(sourcePath);
         String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
-        if (sourceActionPath.startsWith(baseUri)) {
-            sourceActionPath = sourceActionPath.substring(baseUri.length());
-        }
         File destParentConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
-        String[] segments = sourceActionPath.split("/");
-        String segment = segments[segments.length - 1];
         if(destinationActionParent == null) {
             movePage(sourcePath, destParentConfigFile, segment, detail);
             return Response.ok().build();
+        }
+        if (sourceActionPath.startsWith(baseUri)) {
+            sourceActionPath = sourceActionPath.substring(baseUri.length());
         }
         String actionPath = destinationActionParent + (detail ? "/_detail/" : "/") + segment;
         String destinationActionPath = getActionPath(actionPath);

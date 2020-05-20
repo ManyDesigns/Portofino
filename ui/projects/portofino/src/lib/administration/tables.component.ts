@@ -2,7 +2,7 @@ import {Page} from "../page";
 import {Component, OnInit} from "@angular/core";
 import {ConnectionProviderDetails, ConnectionProviderSummary} from "./support";
 import {Button} from "../buttons";
-import {NotificationService} from "../notifications/notification.service";
+import {NotificationService} from "../notifications/notification.services";
 import {ActivatedRoute, Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";

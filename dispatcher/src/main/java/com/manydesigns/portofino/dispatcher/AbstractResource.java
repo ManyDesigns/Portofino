@@ -44,7 +44,7 @@ import java.util.*;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public abstract class AbstractResource implements SecureResource {
-    
+    public static final String COPYRIGHT = "Copyright (C) 2005-2020 ManyDesigns srl";
     protected static final Logger logger = LoggerFactory.getLogger(AbstractResource.class);
     
     protected FileObject location;

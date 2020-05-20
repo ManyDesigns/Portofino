@@ -2,7 +2,27 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [5.1.3] - 2020-05-17
+
+### Added
+- Notifications bell showing up to 20 messages
+- More error reporting in the wizard
+- Spanish translation of the UI, thanks to Gabriel Mautino
+- Possibility for buttons to prevent double submit by returning an Observable
+- RestEasy support (alternative to Jersey JAX-RS)
+- Tested on WildFly 19.0.0.Final
+- Docker image for the upstairs application
+
+### Changed
+- Polished the Maven archetype
+
+### Fixed
+- Database views aren't usable in practice
+- Move page broken for text pages ([#349](https://github.com/ManyDesigns/Portofino/issues/349))
+- JWT filter eats the Authorization header even if it's not a JWT ([#367](https://github.com/ManyDesigns/Portofino/issues/367))
+- OpenAPI manifest only shows root resource ([#369](https://github.com/ManyDesigns/Portofino/issues/369)) 
+
+## [5.1.2] - 2020-03-02
 
 ### Added
 - API for pages to compute their navigation menu

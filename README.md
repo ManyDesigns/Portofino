@@ -26,12 +26,13 @@ resources (forums, wiki, issue tracker), commercial support.
 
 Portofino is translated in several languages, thanks to Manydesigns and various contributors. Languages include English, Italian, French, German, Spanish and Arabic.
 
-## Installation ##
+## Getting Started ##
 
-The official compiled distribution is hosted on SourceForge: http://sourceforge.net/projects/portofino
+To get started, it's useful to begin from the wiki on GitHub: https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5.
+
+The official compiled distribution is hosted on SourceForge: http://sourceforge.net/projects/portofino.
 It requires no installation, just unzip it. It is a bundle of Apache Tomcat, Portofino and JDBC drivers for popular
 open source databases.
 
-This is the source code of the framework. If you want to build it, see
-https://github.com/ManyDesigns/Portofino/wiki/Building-from-source
-
+This repository contains the source code of the framework. If you want to build it, see
+https://github.com/ManyDesigns/Portofino/wiki/Building-from-source. It's not necessary to build Portofino in order to use it.

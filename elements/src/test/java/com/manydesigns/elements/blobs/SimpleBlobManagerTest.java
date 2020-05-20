@@ -70,7 +70,15 @@ public class SimpleBlobManagerTest extends AbstractElementsTest {
     public void testManager1() {
         assertNotNull(manager);
         assertNotNull(blobsDir);
-        assertEquals(System.getProperty("java.io.tmpdir"), blobsDir.getAbsolutePath());
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        String path = blobsDir.getAbsolutePath();
+        if(!path.endsWith("/")) {
+            path += "/";
+        }
+        if(!tmpDir.endsWith("/")) {
+            tmpDir += "/";
+        }
+        assertEquals(tmpDir, path);
         assertEquals(META_FILE_NAME_PATTERN, manager.getMetaFileNamePattern());
         assertEquals(DATA_FILE_NAME_PATTERN, manager.getDataFileNamePattern());
     }

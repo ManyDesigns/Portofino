@@ -83,8 +83,7 @@ import java.util.*;
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
 public abstract class AbstractResourceAction extends AbstractResourceWithParameters implements ResourceAction {
-    public static final String copyright =
-        "Copyright (C) 2005-2020 ManyDesigns srl";
+    public static final String COPYRIGHT = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -372,6 +371,18 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     @Override
+    @io.swagger.v3.oas.annotations.Operation(
+            operationId =
+                    "com.manydesigns.portofino.resourceactions.AbstractResourceAction#isAccessible",
+            description =
+                    "Returns true if this action is accessible, and an HTTP 40x error if it's not." +
+                    "Clients can use this method to check if the action is accessible without invoking any" +
+                    "other operations.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "The string true, if the action is accessible."),
+            @ApiResponse(responseCode = "401", description = "If the action is not accessible and the request is not authenticated."),
+            @ApiResponse(responseCode = "403", description = "If the action is not accessible for the authenticated user.")
+    })
     @Path(":accessible")
     @GET
     public boolean isAccessible() {
@@ -387,7 +398,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return ResourceActionLogic.getConfigurationClass(getClass());
     }
 
-    @NotNull
     protected ClassAccessor getConfigurationClassAccessor() {
         Class<?> configurationClass = getConfigurationClass();
         if(configurationClass == null) {
@@ -495,11 +505,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":configuration/classAccessor")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public String getConfigurationAccessor() {
-        Class<?> configurationClass = getConfigurationClass();
-        if (configurationClass == null) {
+        ClassAccessor classAccessor = getConfigurationClassAccessor();
+        if(classAccessor == null) {
             return null;
         }
-        ClassAccessor classAccessor = getConfigurationClassAccessor();
         JSONStringer jsonStringer = new JSONStringer();
         ReflectionUtil.classAccessorToJson(classAccessor, jsonStringer);
         return jsonStringer.toString();

@@ -54,7 +54,7 @@ class TicketAttachementsCrudAction extends CrudAction {
 
     @Override
     boolean isCreateEnabled() {
-        return canEditTicket()
+        return super.isCreateEnabled() && canEditTicket()
     }
 
     protected void createSetup(Object object) {
@@ -91,7 +91,7 @@ class TicketAttachementsCrudAction extends CrudAction {
 
     @Override
     boolean isEditEnabled() {
-        canEditTicket()
+        super.editEnabled && canEditTicket()
     }
 
     protected void editPostProcess(Object object) {

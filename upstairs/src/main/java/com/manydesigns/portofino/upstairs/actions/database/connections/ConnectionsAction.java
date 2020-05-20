@@ -37,6 +37,7 @@ import com.manydesigns.portofino.upstairs.actions.database.connections.support.C
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ExcludeFromWizard;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
@@ -51,6 +52,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -153,6 +156,12 @@ public class ConnectionsAction extends AbstractResourceAction {
         } catch (Exception e) {
             persistence.getModel().getDatabases().remove(connectionProvider.getDatabase());
             persistence.initModel();
+            try {
+                persistence.saveXmlModel();
+            } catch (Exception ex) {
+                logger.error("Cannot save restored model", ex);
+            }
+            RequestMessages.addErrorMessage(e.getLocalizedMessage());
             throw new WebApplicationException(e);
         }
     }

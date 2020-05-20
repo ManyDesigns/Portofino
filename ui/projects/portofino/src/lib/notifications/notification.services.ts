@@ -1,5 +1,5 @@
-import {ErrorHandler, Injectable} from "@angular/core";
-import {Observable, of} from "rxjs";
+import {ErrorHandler, Inject, Injectable, InjectionToken} from "@angular/core";
+import {concat, Observable, of} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import { MatSnackBar, MatSnackBarConfig } from "@angular/material/snack-bar";
 import {HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
@@ -58,6 +58,52 @@ export class MatSnackBarNotificationService extends NotificationService {
 
   show(message: string, level: NotificationLevel) {
     return this.snackBar.open(message, this.translate.instant('Ok'), this.configuration).afterOpened();
+  }
+}
+
+@Injectable()
+export class NotificationsHolder extends NotificationService {
+
+  notifications: { message: string, level: NotificationLevel }[] = [];
+  maximumNotifications = 20;
+  timeToLiveMs = 600000;
+
+  show(message: string, level: NotificationLevel) {
+    let notifications = this.notifications;
+    let notification = { message: message, level: level, timeout: null };
+    const len = notifications.unshift(notification);
+    if(len > this.maximumNotifications) {
+      notifications.pop();
+    }
+    this.notifications = notifications;
+    if(this.timeToLiveMs > 0) {
+      notification.timeout = setTimeout(() => {
+        notification.timeout = null;
+        this.remove(notification);
+      }, this.timeToLiveMs);
+    }
+    return of(null);
+  }
+
+  remove(notification) {
+    if(notification.timeout) {
+      clearTimeout(notification.timeout);
+    }
+    this.notifications = this.notifications.filter(x => x != notification);
+  }
+}
+
+export const NOTIFICATION_HANDLERS = new InjectionToken('NOTIFICATION_HANDLERS');
+
+@Injectable()
+export class NotificationDispatcher extends NotificationService {
+
+  constructor(@Inject(NOTIFICATION_HANDLERS) protected handlers: NotificationService[]) {
+    super();
+  }
+
+  show(message: string, level: NotificationLevel): Observable<void> {
+    return this.handlers.reduce((acc, current) => concat(acc, current.show(message, level)), of(null));
   }
 }
 

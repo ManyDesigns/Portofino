@@ -73,6 +73,14 @@ public class PortofinoApplicationRoot extends ApplicationRoot {
     }
 
     @Override
+    protected void initRoot(Resource root) {
+        ((PortofinoRoot) root).servletContext = ElementsThreadLocals.getServletContext();
+        ((PortofinoRoot) root).request = ElementsThreadLocals.getHttpServletRequest();
+        ((PortofinoRoot) root).response = ElementsThreadLocals.getHttpServletResponse();
+        root.init();
+    }
+
+    @Override
     public void beforeScan(Reader reader, OpenAPI openAPI) {
         super.beforeScan(reader, openAPI);
         ModelConverters.getInstance().addConverter(new PortofinoModelResolver(Json.mapper()));

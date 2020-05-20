@@ -5,6 +5,7 @@
     <format>zip</format>
   </formats>
   <includeBaseDirectory>true</includeBaseDirectory>
+  <baseDirectory>portofino-${project.version}-src</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${basedir}</directory>

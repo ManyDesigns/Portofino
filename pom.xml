@@ -9,7 +9,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.2-SNAPSHOT</version>
+    <version>5.2.0-SNAPSHOT</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
@@ -89,7 +89,7 @@
         <commons.io.version>2.6</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>2.5.8</groovy.version>
+        <groovy.version>3.0.3</groovy.version>
         <guava.version>27.0.1-jre</guava.version>
         <hibernate.version>5.4.7.Final</hibernate.version>
         <jackson.version>2.10.0</jackson.version>
@@ -101,7 +101,7 @@
         <jjwt.version>0.10.7</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
-        <jsqlparser.version>0.9.6</jsqlparser.version>
+        <jsqlparser.version>0.9.7</jsqlparser.version>
         <json.version>20180813</json.version>
         <jsoup.version>1.9.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
@@ -109,13 +109,18 @@
         <logback.version>1.2.3</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
-        <resteasy.version>3.6.3.Final</resteasy.version>
+        <resteasy.version>4.5.2.Final</resteasy.version>
         <servlet.api.version>3.1.0</servlet.api.version>
-        <shiro.version>1.4.2</shiro.version>
+        <shiro.version>1.5.1</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.version>5.2.0.RELEASE</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <sonar.projectKey>ManyDesigns_Portofino</sonar.projectKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+        <sonar.organization>manydesigns</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
     <modules>
         <!-- Core stuff -->
@@ -320,7 +325,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -330,7 +335,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <index>true</index>
@@ -350,7 +355,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
+                <version>3.1.0</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -358,24 +363,26 @@
                     <dependency>
                         <groupId>org.apache.maven.shared</groupId>
                         <artifactId>maven-filtering</artifactId>
-                        <version>1.3</version>
+                        <version>3.1.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>3.2.0</version>
                 <configuration>
+                    <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                     <descriptors>
                         <descriptor>assembly-src.xml</descriptor>
+                        <descriptor>assembly-upstairs-standalone.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.3</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -386,10 +393,21 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Tests and coverage -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.7</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -398,7 +416,7 @@
             <plugin>
               <groupId>com.github.spotbugs</groupId>
               <artifactId>spotbugs-maven-plugin</artifactId>
-              <version>3.1.11</version>
+              <version>4.0.0</version>
               <configuration>
                 <plugins>
                   <plugin>
@@ -421,13 +439,33 @@
                 </dependency>
               </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>2.5.3</version>
                     <configuration>
                         <mavenExecutorId>forked-path</mavenExecutorId>
                         <useReleaseProfile>false</useReleaseProfile>
@@ -474,7 +512,7 @@
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link http://shiro.apache.org/static/1.4.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/2.5.8/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link http://shiro.apache.org/static/1.5.2/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/3.0.1/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
@@ -498,6 +536,9 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <keyname>info@manydesigns.com</keyname>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

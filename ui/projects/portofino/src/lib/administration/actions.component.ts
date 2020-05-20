@@ -9,7 +9,7 @@ import {Page, PageConfiguration} from "../page";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {PageFactoryComponent} from "../page.factory";
-import {NotificationService} from "../notifications/notification.service";
+import {NotificationService} from "../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {Field, Form} from "../form";
 import {Property} from "../class-accessor";

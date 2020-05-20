@@ -13,6 +13,7 @@ import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.actions.Group;
 import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.Annotation;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -129,7 +130,7 @@ public class UpstairsAction extends AbstractResourceAction {
                 TemplateEngine engine = new SimpleTemplateEngine();
                 Template template = engine.createTemplate(
                         UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudAction.groovy"));
-                Table userTable = getTable(wizard.usersTable);
+                Table userTable = getTable(persistence.getModel(), wizard.usersTable);
                 Column userPasswordColumn = getColumn(userTable, wizard.userPasswordProperty);
                 boolean userCrudCreated = false;
                 for(TableInfo tableInfo : tables) {
@@ -173,7 +174,7 @@ public class UpstairsAction extends AbstractResourceAction {
         if(database == null) {
             throw new WebApplicationException("The database does not exist: " + databaseName);
         }
-        Table userTable = getTable(wizard.usersTable);
+        Table userTable = getTable(persistence.getModel(), wizard.usersTable);
         if(userTable != null) {
             try {
                 setupSecurityGroovy(database.getConnectionProvider(), userTable, wizard);
@@ -185,7 +186,7 @@ public class UpstairsAction extends AbstractResourceAction {
     }
 
     @Nullable
-    public Column getColumn(Table table, Column column) {
+    public static Column getColumn(Table table, Column column) {
         if (table != null && column != null) {
             return DatabaseLogic.findColumnByName(table, column.getColumnName());
         } else {
@@ -193,11 +194,12 @@ public class UpstairsAction extends AbstractResourceAction {
         }
     }
 
-    protected Table getTable(TableInfo tableInfo) {
-        if(tableInfo == null) {
+    @Nullable
+    public static Table getTable(Model model, TableInfo tableInfo) {
+        if(tableInfo == null || tableInfo.table == null) {
             return null;
         }
-        return DatabaseLogic.findTableByName(persistence.getModel(), tableInfo.database, tableInfo.schema, tableInfo.table.getTableName());
+        return DatabaseLogic.findTableByName(model, tableInfo.database, tableInfo.schema, tableInfo.table.getTableName());
     }
 
     protected ActionDescriptor createCrudAction(
@@ -436,26 +438,13 @@ public class UpstairsAction extends AbstractResourceAction {
         if(column.getJdbcType() == Types.INTEGER || column.getJdbcType() == Types.DECIMAL || column.getJdbcType() == Types.NUMERIC) {
             logger.info(
                     "Detecting whether numeric column " + column.getQualifiedName() + " is boolean by examining " +
-                            "its values...");
+                    "its values...");
 
             //Detect booleans
-            Connection connection = null;
-
-            try {
-                connection = connectionProvider.acquireConnection();
+            try(Connection connection = connectionProvider.acquireConnection()) {
                 liquibase.database.Database implementation =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-                String sql =
-                        "select count(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
-                                "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-                PreparedStatement statement = connection.prepareStatement(sql);
-                setQueryTimeout(statement, 1);
-                statement.setMaxRows(1);
-                ResultSet rs = statement.executeQuery();
-                Long count = null;
-                if(rs.next()) {
-                    count = safeGetLong(rs, 1);
-                }
+                Long count = count(table, column, connection, implementation);
 
                 if(count == null || count < 10) {
                     logger.info("Cannot determine if numeric column {} is boolean, count is {}",
@@ -463,45 +452,57 @@ public class UpstairsAction extends AbstractResourceAction {
                     return;
                 }
 
-                sql =
+                String sql =
                         "select distinct(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
-                                "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-                statement = connection.prepareStatement(sql);
-                setQueryTimeout(statement, 1);
-                statement.setMaxRows(3);
-                rs = statement.executeQuery();
-                int valueCount = 0;
-                boolean only0and1 = true;
-                while(rs.next()) {
-                    valueCount++;
-                    if(valueCount > 2) {
-                        only0and1 = false;
-                        break;
+                        "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
+                try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                    setQueryTimeout(statement, 1);
+                    statement.setMaxRows(3);
+                    int valueCount;
+                    boolean only0and1;
+                    try (ResultSet rs = statement.executeQuery()) {
+                        valueCount = 0;
+                        only0and1 = true;
+                        while (rs.next()) {
+                            valueCount++;
+                            if (valueCount > 2) {
+                                only0and1 = false;
+                                break;
+                            }
+                            Long value = safeGetLong(rs, 1);
+                            only0and1 &= value != null && (value == 0 || value == 1);
+                        }
                     }
-                    Long value = safeGetLong(rs, 1);
-                    only0and1 &= value != null && (value == 0 || value == 1);
+                    if (only0and1 && valueCount == 2) {
+                        logger.info("Column appears to be of boolean type.");
+                        column.setJavaType(Boolean.class.getName());
+                    } else {
+                        logger.info("Column appears not to be of boolean type.");
+                    }
                 }
-                if(only0and1 && valueCount == 2) {
-                    logger.info("Column appears to be of boolean type.");
-                    column.setJavaType(Boolean.class.getName());
-                } else {
-                    logger.info("Column appears not to be of boolean type.");
-                }
-                statement.close();
             } catch (Exception e) {
                 logger.debug("Could not determine whether column " + column.getQualifiedName() + " is boolean", e);
                 logger.info("Could not determine whether column " + column.getQualifiedName() + " is boolean");
-            } finally {
-                try {
-                    if(connection != null) {
-                        connection.close();
-                    }
-                } catch (SQLException e) {
-                    logger.error("Could not close connection", e);
-                }
             }
             detectedBooleanColumns.add(column);
         }
+    }
+
+    @Nullable
+    private Long count(Table table, Column column, Connection connection, liquibase.database.Database implementation) throws SQLException {
+        String sql =
+                "select count(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
+                "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            setQueryTimeout(statement, 1);
+            statement.setMaxRows(1);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return safeGetLong(rs, 1);
+                }
+            }
+        }
+        return null;
     }
 
     protected final Map<Table, Boolean> largeResultSet = new HashMap<Table, Boolean>();
@@ -513,50 +514,41 @@ public class UpstairsAction extends AbstractResourceAction {
             return;
         }
 
-        Connection connection = null;
-        try {
+        try(Connection connection = connectionProvider.acquireConnection()) {
             logger.info("Trying to detect whether table {} has many records...", table.getQualifiedName());
-            connection = connectionProvider.acquireConnection();
             liquibase.database.Database implementation =
                     DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             String sql =
                     "select count(*) from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
-            PreparedStatement statement = connection.prepareStatement(sql);
-            setQueryTimeout(statement, 1);
-            statement.setMaxRows(1);
-            ResultSet rs = statement.executeQuery();
-            if(rs.next()) {
-                Long count = safeGetLong(rs, 1);
-                if(count != null) {
-                    if(count > LARGE_RESULT_SET_THRESHOLD) {
-                        logger.info(
-                                "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is bigger than " +
-                                        "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
-                                        "marked as largeResultSet = true and no autodetection based on table data will be " +
-                                        "attempted, in order to keep the processing time reasonable.");
-                        configuration.setLargeResultSet(true);
-                    } else {
-                        logger.info(
-                                "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is smaller than " +
-                                        "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
-                                        "analyzed normally.");
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                setQueryTimeout(statement, 1);
+                statement.setMaxRows(1);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        Long count = safeGetLong(rs, 1);
+                        if (count != null) {
+                            if (count > LARGE_RESULT_SET_THRESHOLD) {
+                                logger.info(
+                                        "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is bigger than " +
+                                                "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
+                                                "marked as largeResultSet = true and no autodetection based on table data will be " +
+                                                "attempted, in order to keep the processing time reasonable.");
+                                configuration.setLargeResultSet(true);
+                            } else {
+                                logger.info(
+                                        "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is smaller than " +
+                                                "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
+                                                "analyzed normally.");
+                            }
+                        } else {
+                            logger.warn("Could not determine number of records, assuming large result set");
+                            configuration.setLargeResultSet(true);
+                        }
                     }
-                } else {
-                    logger.warn("Could not determine number of records, assuming large result set");
-                    configuration.setLargeResultSet(true);
                 }
             }
-            statement.close();
         } catch (Exception e) {
             logger.error("Could not determine count", e);
-        } finally {
-            try {
-                if(connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Could not close connection", e);
-            }
         }
         largeResultSet.put(table, configuration.isLargeResultSet());
     }
@@ -655,12 +647,12 @@ public class UpstairsAction extends AbstractResourceAction {
         bindings.put("userEmailProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userEmailProperty)));
         bindings.put("userTokenProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userTokenProperty)));
 
-        Table groupsTable = getTable(wizard.groupsTable);
+        Table groupsTable = getTable(persistence.getModel(), wizard.groupsTable);
         bindings.put("groupTableEntityName", groupsTable != null ? groupsTable.getActualEntityName() : "");
         bindings.put("groupIdProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupIdProperty)));
         bindings.put("groupNameProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupNameProperty)));
 
-        Table userGroupTable = getTable(wizard.userGroupTable);
+        Table userGroupTable = getTable(persistence.getModel(), wizard.userGroupTable);
         bindings.put("userGroupTableEntityName",
                 userGroupTable != null ? userGroupTable.getActualEntityName() : "");
         bindings.put("groupLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.groupLinkProperty)));

@@ -50,7 +50,7 @@ public class Schema implements ModelObject, Annotated {
     //**************************************************************************
 
     protected Database database;
-    protected final List<Table> tables = new ArrayList<Table>();
+    protected final List<Table> tables = new ArrayList<>();
     @Deprecated
     protected final List<Table> immediateTables;
 
@@ -92,11 +92,12 @@ public class Schema implements ModelObject, Annotated {
     }
 
     public String getQualifiedName() {
+        String name = actualSchemaName != null ? actualSchemaName : schemaName;
         if(getDatabaseName() == null) {
-            return actualSchemaName != null ? actualSchemaName : schemaName;
+            return name;
         }
         return MessageFormat.format("{0}.{1}", getDatabaseName(),
-                actualSchemaName != null ? actualSchemaName : schemaName);
+                name);
     }
 
     public void reset() {}

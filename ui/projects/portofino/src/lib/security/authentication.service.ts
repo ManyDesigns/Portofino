@@ -13,7 +13,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {Observable, throwError} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
-import {NotificationService} from "../notifications/notification.service";
+import {NotificationService} from "../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import moment from 'moment-with-locales-es6';
 import {WebStorageService} from "../storage/storage.services";

@@ -1,8 +1,4 @@
 import { Component, NgModule, OnInit} from '@angular/core';
-import {
-  PortofinoModule, PortofinoUpstairsModule, Page, NAVIGATION_COMPONENT, DefaultNavigationComponent,
-  PortofinoComponent, PortofinoService, SearchResults, CrudComponent, AuthenticationService, NotificationService
-} from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -26,6 +22,20 @@ import { MatSortModule } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatTreeModule } from "@angular/material/tree";
+  PortofinoModule,
+  PortofinoUpstairsModule,
+  Page,
+  NAVIGATION_COMPONENT,
+  DefaultNavigationComponent,
+  PortofinoComponent,
+  PortofinoService,
+  CrudComponent,
+  SearchComponent,
+  Button,
+  SearchResults,
+  NOTIFICATION_HANDLERS,
+  MatSnackBarNotificationService
+} from "portofino";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -90,6 +100,7 @@ export class DemoTTAppComponent {}
   declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
+    { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
     RouterModule.forRoot([{ path: "hello", component: HelloPortofino }, ...PortofinoModule.defaultRoutes()], PortofinoModule.defaultRouterConfig()),

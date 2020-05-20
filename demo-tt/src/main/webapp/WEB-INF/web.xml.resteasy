@@ -102,14 +102,4 @@
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
-
-    <filter>
-        <filter-name>ResteasyCleanupFilter</filter-name>
-        <filter-class>com.manydesigns.portofino.resteasy.ResteasyCleanupFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>ResteasyCleanupFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
 </web-app>
