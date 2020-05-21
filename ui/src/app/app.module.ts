@@ -5,7 +5,7 @@ import {
   PortofinoUpstairsModule,
   NOTIFICATION_HANDLERS,
   MatSnackBarNotificationService,
-  LOCALE_STORAGE_SERVICE, PortofinoAppComponent
+  LOCALE_STORAGE_SERVICE, PortofinoAppComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent
 } from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
@@ -41,10 +41,10 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
+import {RouterModule} from "@angular/router";
 import {registerLocaleData} from "@angular/common";
 import localeEs from "@angular/common/locales/es";
 import localeIt from "@angular/common/locales/it";
-import {RouterModule} from "@angular/router";
 
 registerLocaleData(localeIt);
 registerLocaleData(localeEs);

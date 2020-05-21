@@ -22,6 +22,7 @@ import { MatSortModule } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatTreeModule } from "@angular/material/tree";
+import {
   PortofinoModule,
   PortofinoUpstairsModule,
   Page,
@@ -29,9 +30,6 @@ import { MatTreeModule } from "@angular/material/tree";
   DefaultNavigationComponent,
   PortofinoComponent,
   PortofinoService,
-  CrudComponent,
-  SearchComponent,
-  Button,
   SearchResults,
   NOTIFICATION_HANDLERS,
   MatSnackBarNotificationService
@@ -44,13 +42,16 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {MatMomentDateModule} from "@angular/material-moment-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
-import {TranslateModule, TranslateService} from "@ngx-translate/core";
+import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
-import {registerLocaleData} from "@angular/common";
-import localeIt from "@angular/common/locales/it";
-import {Router, RouterModule} from "@angular/router";
+import {RouterModule} from "@angular/router";
 
+import {registerLocaleData} from "@angular/common";
+import localeEs from "@angular/common/locales/es";
+import localeIt from "@angular/common/locales/it";
+
+registerLocaleData(localeEs);
 registerLocaleData(localeIt);
 
 @Component({
