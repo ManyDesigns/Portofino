@@ -77,7 +77,6 @@ import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {ContentComponent} from "./content.component";
 import {
-  MatSnackBarNotificationService,
   NOTIFICATION_HANDLERS,
   NotificationDispatcher,
   NotificationErrorHandler,
