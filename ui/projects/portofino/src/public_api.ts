@@ -38,6 +38,7 @@ export * from './lib/pages/crud/search/search-field.component';
 export * from './lib/pages/crud/bulk/bulk-edit.component';
 export * from './lib/pages/many-to-many/many-to-many.component';
 export * from './lib/pages/text/text.component';
+export * from './lib/portofino.module';
 export * from './lib/administration/upstairs.component';
 export * from './lib/security/authentication.service';
 export * from './lib/security/login/change-password.component';
