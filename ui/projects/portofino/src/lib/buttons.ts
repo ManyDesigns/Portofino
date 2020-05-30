@@ -51,6 +51,15 @@ export function getButtons(component, list: string = 'default'): ButtonInfo[] | 
   return allButtons ? allButtons[list] : null;
 }
 
+export function getAvailableButtonLists(component) {
+  const allButtons = component[BUTTONS];
+  let lists = [];
+  for(let l in allButtons) {
+    lists.push(l);
+  }
+  return lists;
+}
+
 export interface WithButtons {
   getButtons(list: string): ButtonInfo[] | null;
 }

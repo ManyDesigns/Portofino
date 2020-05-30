@@ -13,12 +13,13 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "./security/authentication.service";
-import {declareButton, getButtons, WithButtons} from "./buttons";
+import {ButtonInfo, declareButton, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {NO_AUTH_HEADER} from "./security/authentication.headers";
+import {ThemePalette} from "@angular/material/core";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -67,6 +68,14 @@ export class PageConfiguration {
   children: PageChild[] = [];
   icon?: string;
   template?: string;
+  buttons?: { [list: string]: ButtonConfiguration[] };
+}
+
+export class ButtonConfiguration {
+  icon?: string;
+  text?: string;
+  color: ThemePalette;
+  method: string;
 }
 
 export class PageChild {
@@ -211,6 +220,7 @@ export class PageSettingsPanel {
     const config = Object.assign({}, this.page.configuration, formValue);
     const pageConfiguration = new PageConfiguration();
     //Reflection would be nice
+    pageConfiguration.buttons = config.buttons;
     pageConfiguration.children = config.children;
     pageConfiguration.icon = config.icon;
     pageConfiguration.source = config.source;
@@ -284,8 +294,32 @@ export abstract class Page implements WithButtons, OnDestroy {
     }, this, 'goBack', null);
   }
 
+  noActionForButton(event) {
+    if(console) {
+      console.log("Not implemented", event);
+    }
+  }
+
   initialize() {
     this.computeNavigationMenu();
+    const config = this.configuration;
+    if(config && config.buttons) {
+      for(let list in config.buttons) {
+        let buttons = config.buttons[list];
+        buttons.forEach(b => {
+          let info = new ButtonInfo();
+          info.list = list;
+          info.color = b.color;
+          info.icon = b.icon;
+          info.text = b.text;
+          let methodName = 'noActionForButton';
+          if(this[b.method] instanceof Function) {
+            methodName = b.method;
+          }
+          declareButton(info, this, methodName, null);
+        });
+      }
+    }
   }
 
   protected getPageSettingsPanel() {
