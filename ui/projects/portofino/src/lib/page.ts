@@ -96,6 +96,8 @@ export class PageSettingsPanel {
   error;
   readonly accessLevels = ["NONE", "VIEW", "EDIT", "DEVELOP", "DENY"];
   callback: (saved: boolean) => void;
+  children = true;
+  buttons = true;
 
   constructor(public page: Page) {}
 

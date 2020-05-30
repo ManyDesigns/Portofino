@@ -62,7 +62,7 @@
         </table>
         <portofino-buttons [component]="page" list="permissions"></portofino-buttons>
       </mat-tab>
-      <mat-tab>
+      <mat-tab *ngIf="page.settingsPanel.children">
         <ng-template mat-tab-label>
           {{'Children'|translate}}
         </ng-template>
@@ -89,6 +89,14 @@
           </tr>
         </table>
         <portofino-buttons [component]="page" list="children"></portofino-buttons>
+      </mat-tab>
+      <mat-tab *ngIf="page.settingsPanel.buttons">
+        <ng-template mat-tab-label>
+          {{'Buttons'|translate}}
+        </ng-template>
+        <mat-error *ngIf="!page.portofino.localApiAvailable">{{'Local API not available.' | translate}}</mat-error>
+        TODO
+        <portofino-buttons [component]="page" list="buttonsConfiguration"></portofino-buttons>
       </mat-tab>
     </mat-tab-group>
   </div>

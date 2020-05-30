@@ -75,6 +75,8 @@ export class ActionsComponent extends Page implements OnInit {
       if(saved) {
         this.notificationService.info(this.translate.get("Configuration saved"));
       }
+      page.settingsPanel.buttons = false;
+      page.settingsPanel.children = false;
       page.settingsPanel.active = true;
     };
     page.configure(callback);
