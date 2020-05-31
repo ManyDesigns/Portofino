@@ -7,4 +7,4 @@ jdk:
   - openjdk12
   - openjdk13
   - openjdk14
-script: mvn test -B -Pno-frontend-build #Angular 9 does not build cleanly on Travis CI
+script: mvn test -B -Pno-frontend-build #Demo-tt with Angular 9 does not build cleanly on Travis CI, even though it builds fine locally on two different machines (OSX and Linux).

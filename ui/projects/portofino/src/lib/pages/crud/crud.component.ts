@@ -71,7 +71,6 @@ export class CrudComponent extends Page {
   }
 
   initialize() {
-    super.initialize();
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().pipe(
       mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).pipe(loadClassAccessor)),
@@ -129,6 +128,7 @@ export class CrudComponent extends Page {
         this.refreshSearch.emit();
       } //else TODO
     });
+    super.initialize();
   }
 
   protected enableDetailEditMode() {

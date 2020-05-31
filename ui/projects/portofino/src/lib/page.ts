@@ -69,6 +69,7 @@ export class PageConfiguration {
   icon?: string;
   template?: string;
   buttons?: { [list: string]: ButtonConfiguration[] };
+  script?: string;
 }
 
 export class ButtonConfiguration {
@@ -272,28 +273,32 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   private setupBasicPageButtons() {
-    declareButton({
+    this.declareButton({
       color: 'primary', icon: 'save', text: 'Save', list: 'configuration',
       enabledIf: () => this.settingsPanel.isValid()
-    }, this, 'saveConfiguration', null);
-    declareButton({
+    }, 'saveConfiguration');
+    this.declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'configuration'
-    }, this, 'cancelConfiguration', null);
-    declareButton({
+    }, 'cancelConfiguration',);
+    this.declareButton({
       color: 'primary', icon: 'save', text: 'Save', list: 'permissions'
-    }, this, 'savePermissions', null);
-    declareButton({
+    }, 'savePermissions');
+    this.declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'permissions'
-    }, this, 'cancelPermissions', null);
-    declareButton({
+    }, 'cancelPermissions');
+    this.declareButton({
       color: 'primary', icon: 'save', text: 'Save', list: 'children', enabledIf: () => this.portofino.localApiAvailable
-    }, this, 'saveChildren', null);
-    declareButton({
+    }, 'saveChildren');
+    this.declareButton({
       icon: 'arrow_back', text: 'Cancel', list: 'children'
-    }, this, 'cancelChildren', null);
-    declareButton({
+    }, 'cancelChildren');
+    this.declareButton({
       icon: 'arrow_back', text: 'Back', list: 'breadcrumbs', presentIf: () => this.canGoBack()
-    }, this, 'goBack', null);
+    }, 'goBack');
+  }
+
+  declareButton(info: ButtonInfo | any, methodName: string) {
+    declareButton(info, this, methodName, null);
   }
 
   noActionForButton(event) {
@@ -321,6 +326,15 @@ export abstract class Page implements WithButtons, OnDestroy {
           declareButton(info, this, methodName, null);
         });
       }
+    }
+    if(config && config.script) {
+      this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.script}`), {
+        responseType: "text"
+      }).subscribe(s => {
+        let factory = new Function(`return function(page) { ${s} }`);
+        let userFunction = factory();
+        userFunction(this);
+      });
     }
   }
 
