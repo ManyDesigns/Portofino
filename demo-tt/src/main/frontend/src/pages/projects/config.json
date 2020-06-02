@@ -5,5 +5,8 @@
   "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": true, "showInNavigation": true }],
   "source": "projects",
   "template": "mainWithTabs",
-  "script": "custom.js"
+  "script": "custom.js",
+  "buttons": {
+    "search-results": [{ "text": "Custom button", "method": "customButtonAction" }]
+  }
 }

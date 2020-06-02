@@ -310,23 +310,6 @@ export abstract class Page implements WithButtons, OnDestroy {
   initialize() {
     this.computeNavigationMenu();
     const config = this.configuration;
-    if(config && config.buttons) {
-      for(let list in config.buttons) {
-        let buttons = config.buttons[list];
-        buttons.forEach(b => {
-          let info = new ButtonInfo();
-          info.list = list;
-          info.color = b.color;
-          info.icon = b.icon;
-          info.text = b.text;
-          let methodName = 'noActionForButton';
-          if(this[b.method] instanceof Function) {
-            methodName = b.method;
-          }
-          declareButton(info, this, methodName, null);
-        });
-      }
-    }
     if(config && config.script) {
       this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.script}`), {
         responseType: "text"
@@ -334,7 +317,27 @@ export abstract class Page implements WithButtons, OnDestroy {
         let factory = new Function(`return function(page) { ${s} }`);
         let userFunction = factory();
         userFunction(this);
+      }, e => {
+        this.notificationService.error(this.translate.get("Could not load page script"));
       });
+    }
+    this.setupCustomButtons(config);
+  }
+
+  protected setupCustomButtons(config) {
+    if (config && config.buttons) {
+      for (let list in config.buttons) {
+        let buttons = config.buttons[list];
+        buttons.forEach(b => {
+          let info = new ButtonInfo();
+          info.list = list;
+          info.color = b.color;
+          info.icon = b.icon;
+          info.text = b.text;
+          let methodName = b.method || 'noActionForButton';
+          declareButton(info, this, methodName, null);
+        });
+      }
     }
   }
 
