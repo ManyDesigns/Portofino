@@ -13,7 +13,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "./security/authentication.service";
-import {ButtonInfo, declareButton, getButtons, WithButtons} from "./buttons";
+import {ButtonInfo, declareButton, getAvailableButtonLists, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {NotificationService} from "./notifications/notification.services";
@@ -272,41 +272,6 @@ export abstract class Page implements WithButtons, OnDestroy {
     }
   }
 
-  private setupBasicPageButtons() {
-    this.declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'configuration',
-      enabledIf: () => this.settingsPanel.isValid()
-    }, 'saveConfiguration');
-    this.declareButton({
-      icon: 'arrow_back', text: 'Cancel', list: 'configuration'
-    }, 'cancelConfiguration',);
-    this.declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'permissions'
-    }, 'savePermissions');
-    this.declareButton({
-      icon: 'arrow_back', text: 'Cancel', list: 'permissions'
-    }, 'cancelPermissions');
-    this.declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'children', enabledIf: () => this.portofino.localApiAvailable
-    }, 'saveChildren');
-    this.declareButton({
-      icon: 'arrow_back', text: 'Cancel', list: 'children'
-    }, 'cancelChildren');
-    this.declareButton({
-      icon: 'arrow_back', text: 'Back', list: 'breadcrumbs', presentIf: () => this.canGoBack()
-    }, 'goBack');
-  }
-
-  declareButton(info: ButtonInfo | any, methodName: string) {
-    declareButton(info, this, methodName, null);
-  }
-
-  noActionForButton(event) {
-    if(console) {
-      console.log("Not implemented", event);
-    }
-  }
-
   initialize() {
     this.computeNavigationMenu();
     const config = this.configuration;
@@ -409,9 +374,50 @@ export abstract class Page implements WithButtons, OnDestroy {
     return this.children.find(c => c.path == segment);
   }
 
+  //Buttons
   getButtons(list = 'default') {
     return getButtons(this, list);
   }
+
+  protected setupBasicPageButtons() {
+    this.declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'configuration',
+      enabledIf: () => this.settingsPanel.isValid()
+    }, 'saveConfiguration');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'configuration'
+    }, 'cancelConfiguration',);
+    this.declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'permissions'
+    }, 'savePermissions');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'permissions'
+    }, 'cancelPermissions');
+    this.declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'children', enabledIf: () => this.portofino.localApiAvailable
+    }, 'saveChildren');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'children'
+    }, 'cancelChildren');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Back', list: 'breadcrumbs', presentIf: () => this.canGoBack()
+    }, 'goBack');
+  }
+
+  declareButton(info: ButtonInfo | any, methodName: string) {
+    declareButton(info, this, methodName, null);
+  }
+
+  getAvailableButtonLists() {
+    return getAvailableButtonLists(this);
+  }
+
+  noActionForButton(event) {
+    if(console) {
+      console.log("Not implemented", event);
+    }
+  }
+  //End buttons
 
   get template(): TemplateRef<any> {
     const template = this.configuration.template;

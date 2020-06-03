@@ -119,6 +119,7 @@ import {VarDirective} from "./var.directive";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatBadgeModule} from "@angular/material/badge";
 import {LocalStorageService} from "./storage/storage.services";
+import {PageSettingsPanelComponent} from "./page-settings-panel.component";
 
 @NgModule({
   declarations: [
@@ -144,14 +145,14 @@ import {LocalStorageService} from "./storage/storage.services";
 export class PortofinoFormsModule {}
 
 @NgModule({
-  declarations: [
-    PageLayout, ButtonComponent, ButtonsComponent,
-    ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
-    LanguageSelectorComponent,
-    NavigationDirective, DefaultNavigationComponent, VarDirective,
-    ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
-    CreatePageComponent, DeletePageComponent, MovePageComponent
-  ],
+    declarations: [
+        PageLayout, ButtonComponent, ButtonsComponent,
+        ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
+        LanguageSelectorComponent,
+        NavigationDirective, DefaultNavigationComponent, VarDirective,
+        ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
+        CreatePageComponent, DeletePageComponent, MovePageComponent, PageSettingsPanelComponent
+    ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule,
