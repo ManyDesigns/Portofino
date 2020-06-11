@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
 import org.apache.commons.configuration2.Configuration;
 import org.quartz.*;
@@ -76,7 +75,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

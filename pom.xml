@@ -127,6 +127,8 @@
         <module>code</module>
         <module>dispatcher</module>
         <module>elements</module>
+        <module>modules</module>
+        <module>mail</module>
         <module>portofino-core</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>

@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.upstairs;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.rest.PortofinoRoot;
@@ -64,7 +63,7 @@ public class UpstairsModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

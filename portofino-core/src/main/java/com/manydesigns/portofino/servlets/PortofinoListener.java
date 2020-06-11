@@ -31,6 +31,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import com.manydesigns.portofino.i18n.I18nUtils;
+import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -53,9 +54,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -125,7 +123,7 @@ public class PortofinoListener extends DispatcherInitializer
             String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
             initApplicationRoot(servletContext, actionsDirectory);
 
-            String portofinoVersion = PortofinoProperties.getPortofinoVersion();
+            String portofinoVersion = Module.getPortofinoVersion();
             String lineSeparator = System.getProperty("line.separator", "\n");
             logger.info(lineSeparator + SEPARATOR +
                             lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +

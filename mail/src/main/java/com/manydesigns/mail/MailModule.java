@@ -18,13 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.modules;
+package com.manydesigns.mail;
 
 import com.manydesigns.mail.quartz.MailScheduler;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.mail.setup.MailQueueSetup;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.modules.ModuleStatus;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ public class MailModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

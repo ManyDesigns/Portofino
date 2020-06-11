@@ -7,7 +7,6 @@ import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.actions.Group;
@@ -54,7 +53,7 @@ import java.io.Writer;
 import java.sql.*;
 import java.util.*;
 
-import static com.manydesigns.portofino.modules.ResourceActionsModule.ACTIONS_DIRECTORY;
+import static com.manydesigns.portofino.ResourceActionsModule.ACTIONS_DIRECTORY;
 
 /**
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
@@ -90,7 +89,7 @@ public class UpstairsAction extends AbstractResourceAction {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> getInfo() {
         Map<String, Object> info = new HashMap<>();
-        info.put("version", PortofinoProperties.getPortofinoVersion());
+        info.put("version", Module.getPortofinoVersion());
         List<ModuleInfo> modules = new ArrayList<>();
         for(Module module : applicationContext.getBeansOfType(Module.class).values()) {
             ModuleInfo view = new ModuleInfo();

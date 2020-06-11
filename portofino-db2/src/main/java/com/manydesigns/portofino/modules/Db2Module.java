@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.IbmDb2DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.IbmDb2ZosDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.IbmDb2iDatabasePlatform;
@@ -64,7 +63,7 @@ public class Db2Module implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override
