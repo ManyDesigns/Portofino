@@ -18,6 +18,12 @@
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-microservice-launcher</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -146,6 +152,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
+                <configuration>
+                    <mainClass>com.manydesigns.portofino.microservices.launcher.WarFileLauncher</mainClass>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
