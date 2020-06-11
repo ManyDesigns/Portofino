@@ -43,8 +43,9 @@
     <ng-container *ngIf="!connectionProvider.jndiResource.value">
       <mat-form-field>
         <mat-label>{{'Driver'|translate}}</mat-label>
-        <input name="driver" matInput required [(ngModel)]="connectionProvider.driver.value"
+        <input name="driver" matInput [(ngModel)]="connectionProvider.driver.value"
                [disabled]="!isEditConnectionProvider" />
+        <mat-hint>{{'leave empty to autodetect'|translate}}</mat-hint>
       </mat-form-field>
       <mat-form-field>
         <mat-label>{{'Connection URL'|translate}}</mat-label>
@@ -71,11 +72,13 @@
         <mat-label>{{'True string'|translate}}</mat-label>
         <input name="true-string" matInput [(ngModel)]="connectionProvider.trueString.value"
                [disabled]="!isEditConnectionProvider" />
+        <mat-hint>{{'how boolean true is encoded'|translate}}</mat-hint>
       </mat-form-field>
       <mat-form-field>
         <mat-label>{{'False string'|translate}}</mat-label>
         <input name="false-string" matInput [(ngModel)]="connectionProvider.falseString.value"
                [disabled]="!isEditConnectionProvider" />
+        <mat-hint>{{'how boolean false is encoded'|translate}}</mat-hint>
       </mat-form-field>
     </ng-container>
     <mat-divider></mat-divider>

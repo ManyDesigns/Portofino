@@ -31,8 +31,12 @@
               <mat-label>{{'Driver' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.driver" required name="driver"
                           [disabled]="wizard.connectionProvider" (selectionChange)="updateConnectionUrl()">
-                <mat-option *ngFor="let d of databasePlatforms" [value]="d">{{d.description}}</mat-option>
+                <ng-container *ngFor="let d of databasePlatforms">
+                  <mat-option *ngIf="d.status == 'ok'" [value]="d">{{d.description}}</mat-option>
+                </ng-container>
+                <mat-option [value]="{}">{{ 'Generic' | translate}}</mat-option>
               </mat-select>
+              <mat-hint>{{ "More platforms may be available" | translate}}</mat-hint>
             </mat-form-field>
             <mat-form-field class="connection-url">
               <mat-label>{{'Connection URL' | translate}}</mat-label>

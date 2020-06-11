@@ -1,0 +1,25 @@
+<h4 mat-dialog-title>{{ 'Sign in' | translate }}</h4>
+<mat-dialog-content>
+  <form (submit)="login()" [formGroup]="loginForm">
+    <mat-form-field>
+      <input matInput placeholder="{{ 'Username' | translate }}" name="username" formControlName="username">
+      <mat-error *ngIf="loginForm.get('username').hasError('required')" class="alert alert-danger">
+        {{ 'Username is required.' | translate }}
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput placeholder="{{ 'Password' | translate }}" type="password" name="password" formControlName="password">
+      <mat-error *ngIf="loginForm.get('password').hasError('required')" class="alert alert-danger">
+        {{ 'Password is required.' | translate }}
+      </mat-error>
+    </mat-form-field>
+    <button type="submit" style="display:none">{{ 'Sign in' | translate }}</button>
+  </form>
+  <mat-divider></mat-divider>
+  <a href="#" (click)="openForgotPasswordDialog(); $event.preventDefault();">{{ 'Forgot password?' | translate }}</a><br />
+  <a href="#" (click)="openSignUpDialog(); $event.preventDefault();">{{ 'Sign up' | translate }}</a> {{ "if you don't have an account" | translate }}
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="login()" color="accent">{{ 'Sign in' | translate }}</button>
+  <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
+</mat-dialog-actions>

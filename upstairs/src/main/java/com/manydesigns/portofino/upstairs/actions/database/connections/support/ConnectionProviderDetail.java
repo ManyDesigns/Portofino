@@ -65,7 +65,6 @@ public class ConnectionProviderDetail {
     }
 
     @FieldSize(50)
-    @Required
     public String getDriver() {
         if(jdbcConnectionProvider == null) {
             return null;

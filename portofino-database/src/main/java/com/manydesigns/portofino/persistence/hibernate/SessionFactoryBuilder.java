@@ -244,7 +244,10 @@ public class SessionFactoryBuilder {
             JdbcConnectionProvider jdbcConnectionProvider =
                     (JdbcConnectionProvider) connectionProvider;
             settings.put("hibernate.connection.url", jdbcConnectionProvider.getActualUrl());
-            settings.put("hibernate.connection.driver_class", jdbcConnectionProvider.getDriver());
+            String driver = jdbcConnectionProvider.getDriver();
+            if(driver != null) {
+                settings.put("hibernate.connection.driver_class", driver);
+            }
             if(jdbcConnectionProvider.getActualUsername() != null) {
                 settings.put("hibernate.connection.username", jdbcConnectionProvider.getActualUsername());
             }
