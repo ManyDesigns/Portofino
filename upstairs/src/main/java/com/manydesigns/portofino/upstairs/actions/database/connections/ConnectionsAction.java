@@ -245,8 +245,13 @@ public class ConnectionsAction extends AbstractResourceAction {
         for(Iterator<TableInfo> it = roots.iterator(); it.hasNext();) {
             TableInfo tableInfo = it.next();
             Table table = tableInfo.table;
-
+            //Exclude tables with no primary key
             if(table.getPrimaryKey() == null) {
+                it.remove();
+                continue;
+            }
+            //Exclude Liquibase tables
+            if("databasechangeloglock".equalsIgnoreCase(table.getTableName())) {
                 it.remove();
                 continue;
             }
