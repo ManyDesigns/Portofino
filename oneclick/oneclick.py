@@ -5,11 +5,11 @@ You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "5.1.1"
-tomcat_dir = "apache-tomcat-9.0.26"
+portofino_version = "5.1.4"
+tomcat_dir = "apache-tomcat-9.0.31"
 portofino_path = "~/projects/portofino5"
-tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.26/bin/apache-tomcat-9.0.26.zip"
-drivers = [["org/postgresql/postgresql/42.2.8/", "postgresql-42.2.8.jar"],
+tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.31/bin/apache-tomcat-9.0.31.zip"
+drivers = [["org/postgresql/postgresql/42.2.14/", "postgresql-42.2.14.jar"],
            ["mysql/mysql-connector-java/8.0.17/", "mysql-connector-java-8.0.17.jar"],
            ["net/sourceforge/jtds/jtds/1.3.1/", "jtds-1.3.1.jar"]]
 """
