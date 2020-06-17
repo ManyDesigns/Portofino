@@ -237,7 +237,12 @@ public class UpstairsAction extends AbstractResourceAction {
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
-                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, column.equals(userPasswordColumn));
+                String name = column.getColumnName();
+                boolean isPassword =
+                        column.equals(userPasswordColumn) ||
+                        (column.getActualJavaType() == String.class &&
+                                ("password".equalsIgnoreCase(name) || "pwd".equalsIgnoreCase(name)));
+                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, isPassword);
             }
 
             ActionLogic.saveConfiguration(dir, configuration);
