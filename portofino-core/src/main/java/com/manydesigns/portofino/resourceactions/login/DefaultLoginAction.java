@@ -55,7 +55,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
@@ -109,7 +108,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         } else {
-            return checkJWT();
+            return getUserInfo();
         }
     }
 
@@ -133,7 +132,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresAuthentication
-    public String checkJWT() {
+    public String getUserInfo() {
         Subject subject = SecurityUtils.getSubject();
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         String jwt = JWTFilter.getJSONWebToken(context.getRequest());

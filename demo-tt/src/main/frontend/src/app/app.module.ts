@@ -49,6 +49,7 @@ import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
 import {registerLocaleData} from "@angular/common";
 import localeIt from "@angular/common/locales/it";
+import { ProfileComponent } from './profile.component';
 
 registerLocaleData(localeIt);
 
@@ -129,7 +130,9 @@ export class CustomSearch extends SearchComponent {
 export class DemoTTAppComponent {}
 
 @NgModule({
-  declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch],
+  declarations: [
+    DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch,
+    ProfileComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
@@ -143,7 +146,7 @@ export class DemoTTAppComponent {}
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule.forRoot(),
     TranslateModule.forRoot()],
-  entryComponents: [ CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch ],
+  entryComponents: [ CustomNavigation, WelcomeComponent, CustomCrud, CustomSearch, ProfileComponent ],
   bootstrap: [DemoTTAppComponent]
 })
 export class DemoTTAppModule {

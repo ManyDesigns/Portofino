@@ -38,7 +38,7 @@ export class AuthenticationService {
               @Inject(RESET_PASSWORD_COMPONENT) protected resetPasswordComponent) {
     const userInfo = this.storage.get('user');
     if(userInfo) {
-      this.currentUser = new UserInfo(userInfo.displayName, userInfo.administrator, userInfo.groups);
+      this.currentUser = new UserInfo(userInfo.userId, userInfo.displayName, userInfo.administrator, userInfo.groups);
     }
   }
 
@@ -144,11 +144,12 @@ export class AuthenticationService {
   protected setAuthenticationInfo(result) {
     this.setJsonWebToken(result.jwt);
     this.storage.set('user', {
+      userId: result.userId,
       displayName: result.displayName,
       administrator: result.administrator,
       groups: result.groups
     });
-    this.currentUser = new UserInfo(result.displayName, result.administrator, result.groups);
+    this.currentUser = new UserInfo(result.userId, result.displayName, result.administrator, result.groups);
     this.logins.emit(this.currentUser);
   }
 
@@ -254,7 +255,7 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 }
 
 export class UserInfo {
-  constructor(public displayName: string, public administrator: boolean, public groups: string[]) {}
+  constructor(public userId: string, public displayName: string, public administrator: boolean, public groups: string[]) {}
 }
 
 export const NO_AUTH_HEADER = "X-Portofino-no-auth";

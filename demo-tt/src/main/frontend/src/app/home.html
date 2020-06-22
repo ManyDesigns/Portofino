@@ -2,22 +2,38 @@
   <ng-template #content>
     <div fxFlex fxLayout="column" class="demo-tt-home">
       <p>Welcome to the Portofino 5 demo application "demo-tt"! Here is a list of projects:</p>
-      <p fxLayout="row wrap" fxLayout.lt-md="column" fxFlex fxLayoutGap="20px">
-        <mat-card [ngClass]="$any(project).public_.value ? 'success' : 'warn'" *ngFor="let project of projects">
-          <mat-card-header>
-            <div mat-card-avatar>
-              <mat-icon class="icon-lg">dashboard</mat-icon>
-            </div>
-            <mat-card-title>{{project.id.value}}</mat-card-title>
-            <mat-card-subtitle>{{project.title.value}}</mat-card-subtitle>
-          </mat-card-header>
-          <mat-card-actions>
-            <a [routerLink]="'/projects/' + project.id.value">
-              {{'Open'|translate}}
-            </a>
-          </mat-card-actions>
-        </mat-card>
-      </p>
+      <div gdAreas="content sidebar" gdColumns="auto 200px">
+        <div class="projects" fxLayout="row wrap" fxLayout.lt-md="column" fxFlex fxLayoutGap="20px" gdArea="content">
+          <mat-card [ngClass]="$any(project).public_.value ? 'success' : 'warn'" *ngFor="let project of projects">
+            <mat-card-header>
+              <div mat-card-avatar>
+                <mat-icon class="icon-lg">dashboard</mat-icon>
+              </div>
+              <mat-card-title>{{project.id.value}}</mat-card-title>
+              <mat-card-subtitle>{{project.title.value}}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-actions>
+              <a [routerLink]="'/projects/' + project.id.value">
+                {{'Open'|translate}}
+              </a>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+        <div gdArea="sidebar">
+          <mat-card *ngIf="authenticationService.currentUser">
+            <mat-card-title>{{'Welcome' | translate}}, {{authenticationService.currentUser.displayName}}</mat-card-title>
+            <mat-card-content>
+              <a mat-raised-button routerLink="/profile">Edit your profile</a>
+            </mat-card-content>
+          </mat-card>
+          <mat-card>
+            <mat-card-title>Support (Documentation)</mat-card-title>
+            <mat-card-content>
+              New to Portofino? Ask a question on the support <a href="https://groups.google.com/forum/#!forum/manydesigns-portofino">mailing list</a>.
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
     </div>
   </ng-template>
 </portofino-page-layout>
