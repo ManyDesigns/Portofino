@@ -23,7 +23,15 @@
           <mat-card *ngIf="authenticationService.currentUser">
             <mat-card-title>{{'Welcome' | translate}}, {{authenticationService.currentUser.displayName}}</mat-card-title>
             <mat-card-content>
-              <a mat-raised-button routerLink="/profile">Edit your profile</a>
+              <div fxLayout="column" fxLayoutGap="10px">
+                <span><!-- Divider --></span>
+                <a mat-raised-button routerLink="/profile">Edit your profile</a>
+                <a mat-raised-button routerLink="/projects" [queryParams]="{ create: '' }">Create a new project</a>
+                <mat-divider></mat-divider>
+                <div>
+                  To finish your session: <a href="#" (click)="authenticationService.logout()">Log out</a>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
           <mat-card>
