@@ -83,7 +83,6 @@ public class Profile extends CustomAction {
 
     @GET
     @Path("photo")
-    @RequiresPermissions(level = AccessLevel.NONE)
     public Response photo() {
         def user = SecurityUtils.subject.principal
         if(StringUtils.isEmpty(user.avatar)) {

@@ -1,9 +1,18 @@
-import {AuthenticationService, NotificationService, Page, PortofinoComponent, PortofinoService} from "portofino";
+import {
+  AuthenticationService,
+  Field,
+  Form,
+  NotificationService,
+  Page,
+  PortofinoComponent,
+  PortofinoService, Property
+} from "portofino";
 import {Component, OnInit} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
+import {FormGroup} from "@angular/forms";
 
 @PortofinoComponent({ name: 'user-profile' })
 @Component({
@@ -16,12 +25,18 @@ import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
             <img mat-card-avatar [src]="photo" alt="User avatar">
             <mat-card-title>{{authenticationService.currentUser.displayName}}</mat-card-title>
           </mat-card-header>
+          <mat-card-content>
+            <portofino-form [controls]="form" [form]="formDefinition"
+                            fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="default center"></portofino-form>
+          </mat-card-content>
         </mat-card>
       </ng-template>
     </portofino-page-layout>`
 })
 export class ProfileComponent extends Page implements OnInit {
   photo: SafeResourceUrl;
+  formDefinition = new Form();
+  readonly form = new FormGroup({});
 
   constructor(
     portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
@@ -36,9 +51,12 @@ export class ProfileComponent extends Page implements OnInit {
   ngOnInit(): void {
     this.http.get<any>(this.portofino.apiRoot + "profile/view").subscribe(u => {
       console.log(u);
+      let form = new Form();
+      form.editable = false;
+      form.contents.push(new Field(Property.create({ name: "email", label: "Email" }), { value: u.email.value }));
+      this.formDefinition = form;
     });
     this.http.get(this.portofino.apiRoot + 'profile/photo', { responseType: "blob" }).subscribe(data => {
-      console.log(data);
       let reader = new FileReader();
       reader.onload = (e: any) => {
         this.photo = this.sanitizer.bypassSecurityTrustResourceUrl(e.target.result);

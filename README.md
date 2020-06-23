@@ -5,6 +5,7 @@
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/ManyDesigns/Portofino.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ManyDesigns/Portofino/context:javascript)
 [![Build Status](https://travis-ci.com/ManyDesigns/Portofino.svg?branch=master)](https://travis-ci.com/ManyDesigns/Portofino)
 [![Join the chat at https://gitter.im/ManyDesigns-Portofino/Lobby](https://badges.gitter.im/ManyDesigns-Portofino/Lobby.svg)](https://gitter.im/ManyDesigns-Portofino/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Download the latest version of Portofino from SourceForge](https://img.shields.io/sourceforge/dm/portofino.svg)](https://sourceforge.net/projects/portofino/files/latest/download)
 
 Portofino is a web application framework written in Java and extensible using Groovy, distributed under the LGPL open
 source license. It is developed by ManyDesigns, based in Genoa, Italy (http://www.manydesigns.com).

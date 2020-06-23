@@ -12,7 +12,7 @@ import {
   Button,
   SearchResults,
   NOTIFICATION_HANDLERS,
-  MatSnackBarNotificationService
+  MatSnackBarNotificationService, PortofinoFormsModule
 } from "portofino";
 import {
   MatAutocompleteModule,
@@ -139,6 +139,7 @@ export class DemoTTAppComponent {}
   ],
   imports: [
     PortofinoModule.withRoutes([{ path: "hello", component: HelloPortofino }]), PortofinoUpstairsModule,
+    PortofinoFormsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,

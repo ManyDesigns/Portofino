@@ -1,4 +1,5 @@
 {
   "title": "Profile",
-  "type": "user-profile"
+  "type": "user-profile",
+  "source": "profile"
 }
