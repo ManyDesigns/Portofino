@@ -70,30 +70,8 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
     this.object = object;
     this.formDefinition.contents = [];
     this.properties.forEach(p => {
-      let value;
       const disabled = !this.isEditEnabled() || !this.isEditable(p);
-      if(!object[p.name]) {
-        //value is undefined
-      } else if (isDateProperty(p)) {
-        value = object[p.name].value ? moment(object[p.name].value) : null;
-      } else if (isBlob(p) && object[p.name].value) {
-        const portofinoBlob = object[p.name].value;
-        value = new BlobFile();
-        value.code = portofinoBlob.code;
-        value.size = portofinoBlob.size;
-        value.name = portofinoBlob.filename;
-        value.type = portofinoBlob.contentType;
-        value = [value];
-      } else if(disabled && !isBooleanProperty(p) && object[p.name].displayValue) {
-        value = object[p.name].displayValue;
-      } else {
-        value = object[p.name].value;
-      }
-      const field = new Field();
-      field.property = p;
-      field.initialState = { value: value, disabled: disabled };
-      field.editable = !disabled;
-      this.formDefinition.contents.push(field);
+      this.formDefinition.contents.push(Field.fromProperty(p, object, disabled));
     });
     this.formDefinition.editable = this.isEditEnabled();
     if(this.formComponent) {

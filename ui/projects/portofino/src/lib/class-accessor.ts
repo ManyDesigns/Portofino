@@ -13,10 +13,42 @@ export const loadClassAccessor = map((c: ClassAccessor) => {
   }
 });
 
+export const BOOLEAN_TYPE = "boolean";
+export const DATE_TYPE = "date";
+export const NUMBER_TYPE = "number";
+export const STRING_TYPE = "string";
+
+export function forObject(object: any, options: {
+    name?: string, ownProperties?: boolean, types: { [property: string]: string } } = { types: {}
+  }): ClassAccessor {
+  let accessor = new ClassAccessor();
+  accessor.name = options.name;
+  for(let p in object) {
+    if(options.ownProperties && !object.hasOwnProperty(p)) {
+      continue;
+    }
+    let value = object[p];
+    if(value && value.value) {
+      value = value.value; //Handle objects returned by Elements that have value and displayValue
+    }
+    let property = Property.create({ name: p, label: p.charAt(0).toUpperCase() + p.slice(1) });
+    let userType = options.types[p];
+    if(userType) {
+      property.type = userType;
+    } else if(typeof(value) === NUMBER_TYPE) {
+      property.type = NUMBER_TYPE;
+    } else if(typeof(value) !== STRING_TYPE) {
+      continue; //We don't handle arrays and objects for now
+    }
+    accessor.properties.push(property);
+  }
+  return accessor;
+}
+
 export class ClassAccessor {
   name: string;
-  properties: Property[];
-  keyProperties: string[];
+  properties: Property[] = [];
+  keyProperties: string[] = [];
 
   initSelectionProviders() {
     this.properties.forEach(p => {
@@ -39,7 +71,7 @@ export class ClassAccessor {
 
 export class Property {
   name: string;
-  type = 'string';
+  type = STRING_TYPE;
   annotations: Annotation[] = [];
   modifiers: string[] = [];
   label: string;
@@ -109,22 +141,24 @@ export function getAnnotation(property: Property, type: string): Annotation {
 }
 
 export function isBooleanProperty(property: Property) {
-  return property.type == 'java.lang.Boolean' || property.type == 'boolean'
+  return property.type == 'java.lang.Boolean' || property.type == BOOLEAN_TYPE
 }
 
 export function isStringProperty(property: Property) {
-  return property.type == 'java.lang.String' || property.type == 'string'
+  return property.type == 'java.lang.String' || property.type == STRING_TYPE
 }
 
 export function isNumericProperty(property: Property) {
   return property.type == 'java.lang.Long' || property.type == 'java.lang.Integer' ||
          property.type == 'java.lang.Float' || property.type == 'java.lang.Double' ||
          property.type == 'java.math.BigInteger' || property.type == 'java.math.BigDecimal' ||
-         property.type == 'number'
+         property.type == NUMBER_TYPE
 }
 
 export function isDateProperty(property: Property) {
-  return property.type == 'java.util.Date' || property.type == 'java.sql.Date' || property.type == 'java.sql.Timestamp';
+  return property.type == 'java.util.Date' ||
+         property.type == 'java.sql.Date' || property.type == 'java.sql.Timestamp' ||
+         property.type == DATE_TYPE;
 }
 
 export function isEnabled(property: Property) {
@@ -185,16 +219,16 @@ export function deriveKind(property: Property) {
     return "blob";
   }
   if(isNumericProperty(property)) {
-    return "number";
+    return NUMBER_TYPE;
   }
   if(isDateProperty(property)) {
-    return "date";
+    return DATE_TYPE;
   }
   if(isStringProperty(property)) {
-    return "string";
+    return STRING_TYPE;
   }
   if(isBooleanProperty(property)) {
-    return "boolean";
+    return BOOLEAN_TYPE;
   }
   throw `${property.name}: unsupported property type ${property.type}`
 }
@@ -202,7 +236,7 @@ export function deriveKind(property: Property) {
 export function getValidators(property: Property): ValidatorFn[] {
   let validators = [];
   //Required on checkboxes means that they must be checked, which is not what we want
-  if (isRequired(property) && property.kind != 'boolean') {
+  if (isRequired(property) && property.kind != BOOLEAN_TYPE) {
     validators.push(Validators.required);
   }
   const maxLength = getAnnotation(property, "com.manydesigns.elements.annotations.MaxLength");

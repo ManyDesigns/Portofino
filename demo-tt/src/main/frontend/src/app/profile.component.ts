@@ -1,11 +1,10 @@
 import {
-  AuthenticationService,
-  Field,
-  Form,
+  AuthenticationService, DATE_TYPE,
+  Form, forObject,
   NotificationService,
   Page,
   PortofinoComponent,
-  PortofinoService, Property
+  PortofinoService
 } from "portofino";
 import {Component, OnInit} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
@@ -51,9 +50,14 @@ export class ProfileComponent extends Page implements OnInit {
   ngOnInit(): void {
     this.http.get<any>(this.portofino.apiRoot + "profile/view").subscribe(u => {
       console.log(u);
-      let form = new Form();
+      let form = Form.fromClassAccessor(forObject(u, {
+        types: {
+          "registration": DATE_TYPE,
+          "last_access": DATE_TYPE,
+          "validated": DATE_TYPE,
+        }
+      }), { object: u });
       form.editable = false;
-      form.contents.push(new Field(Property.create({ name: "email", label: "Email" }), { value: u.email.value }));
       this.formDefinition = form;
     });
     this.http.get(this.portofino.apiRoot + 'profile/photo', { responseType: "blob" }).subscribe(data => {
