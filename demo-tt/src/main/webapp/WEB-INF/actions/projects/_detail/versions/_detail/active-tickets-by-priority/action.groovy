@@ -17,8 +17,8 @@ class ActiveTicketsByPriorityAction extends CustomAction {
 
     public final static String SQL = """
     select p.id, p.priority, count(t.n)
-    from ticket_priorities p
-    left join tickets t on (p.id = t.priority and t.fix_version = :version and t.state <> 4)
+    from tt.ticket_priorities p
+    left join tt.tickets t on (p.id = t.priority and t.fix_version = :version and t.state <> 4)
     group by p.id, p.priority
     order by p.id desc
     """;

@@ -28,7 +28,7 @@ class ProjectActivityAction extends ActivityStreamAction {
     public void populateActivityItems() {
         Locale locale = context.request.locale;
         Session session = persistence.getSession("tt");
-        List items = session.createSQLQuery(PROJECT_ACTIVTY_SQL).setString("project_id", project.id).setMaxResults(30).list();
+        List items = session.createSQLQuery(PROJECT_ACTIVTY_SQL).setParameter("project_id", project.id).setMaxResults(30).list();
 
         String keyPrefix = "project.";
 
