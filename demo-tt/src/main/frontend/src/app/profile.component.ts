@@ -42,14 +42,13 @@ export class ProfileComponent extends Page implements OnInit {
     authenticationService: AuthenticationService, notificationService: NotificationService,
     translate: TranslateService, private sanitizer: DomSanitizer) {
     super(portofino, http, router, route, authenticationService, notificationService, translate);
-    this.photo = sanitizer.bypassSecurityTrustResourceUrl(`data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
+    this.photo = sanitizer.bypassSecurityTrustUrl(`data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
     AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
         9TXL0Y4OHwAAAABJRU5ErkJggg=="`);
   }
 
   ngOnInit(): void {
     this.http.get<any>(this.portofino.apiRoot + "profile/view").subscribe(u => {
-      console.log(u);
       let form = Form.fromClassAccessor(forObject(u, {
         types: {
           "registration": DATE_TYPE,
@@ -63,7 +62,7 @@ export class ProfileComponent extends Page implements OnInit {
     this.http.get(this.portofino.apiRoot + 'profile/photo', { responseType: "blob" }).subscribe(data => {
       let reader = new FileReader();
       reader.onload = (e: any) => {
-        this.photo = this.sanitizer.bypassSecurityTrustResourceUrl(e.target.result);
+        this.photo = this.sanitizer.bypassSecurityTrustUrl(e.target.result);
       }
       reader.readAsDataURL(data);
     });
