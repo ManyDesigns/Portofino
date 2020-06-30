@@ -54,7 +54,7 @@ class TicketActivityAction extends ActivityStreamAction {
     void populateActivityItems() {
         Locale locale = context.request.locale;
         Session session = persistence.getSession("tt");
-        List items = session.createSQLQuery(TICKET_ACTIVTY_SQL).setString("project_id", project.id).setLong("ticket_n", ticket.n).setMaxResults(30).list();
+        List items = session.createSQLQuery(TICKET_ACTIVTY_SQL).setParameter("project_id", project.id).setParameter("ticket_n", ticket.n).setMaxResults(30).list();
 
         String keyPrefix = "ticket.";
 

@@ -17,8 +17,8 @@ class TicketsByStatusAction extends CustomAction {
 
     public final static String SQL = """
     select s.id, s.state, count(t.n)
-    from ticket_states s
-    left join tickets t on (s.id = t.state and t.project = :project)
+    from tt.ticket_states s
+    left join tt.tickets t on (s.id = t.state and t.project = :project)
     group by s.id, s.state
     order by s.id asc
     """;

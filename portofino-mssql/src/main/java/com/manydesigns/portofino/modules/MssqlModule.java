@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.JTDSDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.MSSqlServerDatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
@@ -63,7 +62,7 @@ public class MssqlModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

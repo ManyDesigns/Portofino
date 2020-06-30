@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.rest.actions.mail;
+package com.manydesigns.mail.rest;
 
 import com.manydesigns.mail.sender.MailSender;
 import org.slf4j.Logger;

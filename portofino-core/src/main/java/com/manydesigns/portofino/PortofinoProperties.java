@@ -62,12 +62,4 @@ public final class PortofinoProperties {
 
     private PortofinoProperties() {}
 
-    //Utilities
-    public static String getPortofinoVersion() {
-        try {
-            return IOUtils.toString(PortofinoProperties.class.getResourceAsStream("/portofino.version"), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            return null;
-        }
-    }
 }

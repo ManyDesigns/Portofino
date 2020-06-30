@@ -4,7 +4,8 @@ import {ConnectionProviderDetails, ConnectionProviderSummary, DatabasePlatform} 
 import {Button} from "../buttons";
 
 @Component({
-  templateUrl: 'connections.component.html'
+  templateUrl: 'connections.component.html',
+  styleUrls: ['connections.component.scss']
 })
 export class ConnectionsComponent extends Page implements OnInit {
 

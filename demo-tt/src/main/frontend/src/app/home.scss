@@ -4,34 +4,36 @@
     font-size: 40px;
   }
 
-  .mat-card {
-    color: #fff;
-    min-width: 200px;
+  .projects {
+    .mat-card {
+      color: #fff;
+      min-width: 200px;
 
-    .mat-card-header {
-      width: 100%;
-      .mat-card-header-text {
+      .mat-card-header {
         width: 100%;
+        .mat-card-header-text {
+          width: 100%;
+          text-align: right;
+        }
+      }
+
+      .mat-card-title {
+        font-size: 40px !important;
+        margin-top: 10px;
+        margin-bottom: 15px;
         text-align: right;
       }
-    }
-
-    .mat-card-title {
-      font-size: 40px !important;
-      margin-top: 10px;
-      margin-bottom: 15px;
-      text-align: right;
-    }
-    .mat-card-subtitle {
-      color: #fff;
-      text-align: right;
-    }
-
-    .mat-card-actions {
-      a {
-        text-decoration: none;
-        cursor: pointer;
+      .mat-card-subtitle {
         color: #fff;
+        text-align: right;
+      }
+
+      .mat-card-actions {
+        a {
+          text-decoration: none;
+          cursor: pointer;
+          color: #fff;
+        }
       }
     }
   }

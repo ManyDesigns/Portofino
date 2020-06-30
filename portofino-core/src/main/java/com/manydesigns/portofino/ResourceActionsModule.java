@@ -18,15 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.modules;
+package com.manydesigns.portofino;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
+import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.resourceactions.custom.CustomAction;
 import com.manydesigns.portofino.resourceactions.form.FormAction;
 import com.manydesigns.portofino.resourceactions.form.TableFormAction;
@@ -114,7 +115,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

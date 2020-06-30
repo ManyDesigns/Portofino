@@ -13,8 +13,15 @@
     <url>http://www.manydesigns.com/</url>
     <properties>
         <portofino.application.directory>${serverInfo:realPath}/WEB-INF</portofino.application.directory>
+        <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-microservice-launcher</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
@@ -108,7 +115,20 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.5</version>
+            <version>42.2.14</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- This is for building an executable war. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-microservice-launcher</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>9.0.36</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -126,6 +146,22 @@
                         <resource><directory>src/main/webapp/</directory></resource>
                     </webResources>
                 </configuration>
+            </plugin>
+            <!-- We use this to repackage the war and make it executable, even if we don't use Spring Boot -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <mainClass>com.manydesigns.portofino.microservices.launcher.WarFileLauncher</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <resources>

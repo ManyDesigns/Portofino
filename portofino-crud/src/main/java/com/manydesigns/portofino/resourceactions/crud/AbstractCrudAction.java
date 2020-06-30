@@ -52,6 +52,7 @@ import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
+import com.manydesigns.portofino.rest.Utilities;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
@@ -1069,53 +1070,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(field == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        Blob blob = field.getValue();
-        if(blob == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        if(blob.getInputStream() == null) {
-            try {
-                blobManager.loadMetadata(blob);
-            } catch (IOException e) {
-                logger.error("Could not load blob", e);
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-        }
-        long contentLength = blob.getSize();
-        String contentType = blob.getContentType();
-        String fileName = blob.getFilename();
-        long lastModified = blob.getCreateTimestamp().getMillis();
-        HttpServletRequest request = context.getRequest();
-        if(request.getHeader("If-Modified-Since") != null) {
-            long ifModifiedSince = request.getDateHeader("If-Modified-Since");
-            if(ifModifiedSince >= lastModified) {
-                return Response.status(Response.Status.NOT_MODIFIED).build();
-            }
-        }
-        final InputStream inputStream;
-        if(blob.getInputStream() == null) {
-            try {
-                inputStream = blobManager.openStream(blob);
-            } catch (IOException e) {
-                logger.error("Could not load blob", e);
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-        } else {
-            inputStream = blob.getInputStream();
-        }
-        StreamingOutput streamingOutput = output -> {
-            try(InputStream i = inputStream) {
-                IOUtils.copyLarge(i, output);
-            }
-        };
-        Response.ResponseBuilder responseBuilder = Response.ok(streamingOutput).
-                type(contentType).
-                lastModified(new Date(lastModified)).
-                header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-        if(contentLength > 0) {
-            responseBuilder.header(HttpHeaders.CONTENT_LENGTH, contentLength);
-        }
-        return responseBuilder.build();
+        return Utilities.downloadBlob(field.getValue(), blobManager, context.getRequest(), logger);
     }
 
     @PUT

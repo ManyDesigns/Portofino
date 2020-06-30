@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.PostgreSQLDatabasePlatform;
 import com.manydesigns.portofino.liquibase.databases.PortofinoPostgresDatabase;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
@@ -64,7 +63,7 @@ public class PostgresqlModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

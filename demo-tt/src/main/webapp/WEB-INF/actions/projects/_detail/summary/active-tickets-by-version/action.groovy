@@ -18,8 +18,8 @@ class ActiveTicketsByVersionAction extends CustomAction {
 
     public final static String SQL = """
     select v.id, v.title, count(t.n)
-    from tickets t
-    left join versions v on v.id = t.fix_version
+    from tt.tickets t
+    left join tt.versions v on v.id = t.fix_version
     where t.project = :project
     and t.state <> 4
     group by v.id, v.title

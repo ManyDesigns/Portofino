@@ -29,6 +29,11 @@
 
 package com.manydesigns.portofino.modules;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -38,6 +43,15 @@ package com.manydesigns.portofino.modules;
 public interface Module {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
+
+    //Utilities
+    static String getPortofinoVersion() {
+        try {
+            return IOUtils.toString(Module.class.getResourceAsStream("/portofino.version"), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
     String getModuleVersion();
 
