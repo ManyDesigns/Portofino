@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - "Fat jar" deployment option (with embedded Tomcat)
 - Restored the profile section of demo-tt with an example custom Angular component
+- Included the MariaDB JDBC driver in the binary distribution
 
 ### Changed
 - Improved wizard
