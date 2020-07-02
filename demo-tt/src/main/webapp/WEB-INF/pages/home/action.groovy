@@ -16,8 +16,8 @@ class HomeProjectsAction extends CustomAction {
 
     public final static String ANONYMOUS_SQL = """
     select p.id, p.title, p.description, count(t.n) as c, true
-    from projects p
-    left join tickets t on (t.project = p.id and t.state <>4)
+    from tt.projects p
+    left join tt.tickets t on (t.project = p.id and t.state <>4)
     where p.public_
     group by p.id, p.title, p.description
     order by p.id
@@ -25,9 +25,9 @@ class HomeProjectsAction extends CustomAction {
 
     public final static String LOGGED_SQL = """
     select p.id, p.title, p.description, count(t.n) as c, p.public_
-    from projects p
-    left join members m on m.project = p.id
-    left join tickets t on (t.project = p.id and t.state <>4)
+    from tt.projects p
+    left join tt.members m on m.project = p.id
+    left join tt.tickets t on (t.project = p.id and t.state <>4)
     where p.public_ = true
     or m.user_ = :user
     group by p.id, p.title, p.description, p.public_

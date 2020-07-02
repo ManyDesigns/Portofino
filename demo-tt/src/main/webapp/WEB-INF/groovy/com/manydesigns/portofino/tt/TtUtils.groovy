@@ -190,21 +190,21 @@ select
     ts.state as ticket_state,
     act.version_state as version_state_id,
     vs.state as version_state
-from activity act
-join activity_types at on at.id = act.type
-left join users u on u.id = act.user_
-left join users u2 on u2.id = act.user2
-left join projects p on p.id = act.project
-left join tickets t on t.project = act.project and t.n = act.n
-left join attachments a on a.id = act.attachment
-left join versions v on v.id = act.version
-left join components c on c.id = act.component
-left join roles r on r.id = act.role
-left join ticket_resolutions tr on tr.id = act.ticket_resolution
-left join ticket_priorities tp on tp.id = act.ticket_priority
-left join ticket_types tt on tt.id = act.ticket_type
-left join ticket_states ts on ts.id = act.ticket_state
-left join version_states vs on vs.id = act.version_state
+from tt.activity act
+join tt.activity_types at on at.id = act.type
+left join tt.users u on u.id = act.user_
+left join tt.users u2 on u2.id = act.user2
+left join tt.projects p on p.id = act.project
+left join tt.tickets t on t.project = act.project and t.n = act.n
+left join tt.attachments a on a.id = act.attachment
+left join tt.versions v on v.id = act.version
+left join tt.components c on c.id = act.component
+left join tt.roles r on r.id = act.role
+left join tt.ticket_resolutions tr on tr.id = act.ticket_resolution
+left join tt.ticket_priorities tp on tp.id = act.ticket_priority
+left join tt.ticket_types tt on tt.id = act.ticket_type
+left join tt.ticket_states ts on ts.id = act.ticket_state
+left join tt.version_states vs on vs.id = act.version_state
     """
 
     public final static int ACTIVITY_SQL_ACTIVITY_ID = 0;
