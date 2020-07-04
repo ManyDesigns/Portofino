@@ -51,7 +51,7 @@
     "roboto-fontface": "^0.10.0",
     "rxjs": "^6.5.4",
     "zone.js": "~0.9.1",
-    "snyk": "^1.316.1"
+    "snyk": "^1.360.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.803.28",
