@@ -43,6 +43,10 @@
             <id>build-frontend</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
             </activation>
             <build>
                 <plugins>
@@ -90,6 +94,12 @@
         <profile>
             <!-- Build Docker images and launch the application. -->
             <id>docker</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

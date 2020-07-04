@@ -9,6 +9,7 @@
       </mat-expansion-panel-header>
 
       <form (submit)="search()" [formGroup]="form">
+        <button type="submit" hidden>Hidden search button</button>
         <div fxLayout="row wrap" fxLayoutGap="10px" fxLayoutAlign="default center">
           <portofino-crud-search-field *ngFor="let field of searchProperties" [form]="form" [property]="field">
           </portofino-crud-search-field>

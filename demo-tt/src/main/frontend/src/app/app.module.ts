@@ -138,7 +138,7 @@ export class DemoTTAppComponent {}
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
-    PortofinoModule.withRoutes([{ path: "hello", component: HelloPortofino }]), PortofinoUpstairsModule,
+    PortofinoModule.withRoutes([{path: "hello", component: HelloPortofino}]), PortofinoUpstairsModule,
     PortofinoFormsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,

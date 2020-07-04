@@ -48,7 +48,11 @@ import {samePasswordChecker} from "../../form";
       <button mat-button [disabled]="form.invalid" (click)="change()" color="accent">{{ 'Change password' | translate }}</button>
       <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
     </mat-dialog-actions>
-  `
+  `,
+  styles: [`
+    form > mat-form-field {
+      margin: 0 5px;
+    }`]
 })
 export class ChangePasswordComponent {
 

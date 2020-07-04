@@ -76,7 +76,7 @@ public abstract class AbstractField<T> implements Field<T> {
     protected int colSpan = 1;
     protected String help;
 
-    protected List<String> errors = new ArrayList<String>();
+    protected List<String> errors = new ArrayList<>();
 
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractField.class);
@@ -330,7 +330,7 @@ public abstract class AbstractField<T> implements Field<T> {
         if(value instanceof String) {
             setStringValue((String) value);
         } else {
-                setValue(maybeConvertValue(value));
+            setValue(maybeConvertValue(value));
         }
     }
 
