@@ -9,6 +9,7 @@
     <version>${version}</version>
     <properties>
         <portofino.version>${portofinoVersion}</portofino.version>
+        <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
         <portofino.application.directory>${dollar}{serverInfo:realPath}/WEB-INF</portofino.application.directory>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
