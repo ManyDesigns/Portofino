@@ -9,6 +9,8 @@ import com.manydesigns.portofino.tt.TtUtils
 import org.apache.shiro.SecurityUtils
 import org.springframework.beans.factory.annotation.Autowired
 
+import java.sql.Timestamp
+
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectsCrudAction extends CrudAction {
@@ -54,10 +56,10 @@ class ProjectsCrudAction extends CrudAction {
 
     @Override
     protected boolean createValidate(Object object) {
-        Date now = new Date();
-        object.created = now;
-        object.last_updated = now;
-        return true;
+        Timestamp now = new Timestamp(new Date().time)
+        object.created = now
+        object.last_updated = now
+        true
     }
 
     @Override

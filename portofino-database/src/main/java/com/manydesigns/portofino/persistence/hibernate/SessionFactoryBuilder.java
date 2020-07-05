@@ -97,7 +97,6 @@ public class SessionFactoryBuilder {
     }
 
     public SessionFactoryAndCodeBase buildSessionFactory(FileObject root) throws Exception {
-        CodeBase codeBase = new JavaCodeBase(root);
         List<Table> mappableTables = database.getAllTables();
         mappableTables.removeIf(this::checkInvalidPrimaryKey);
         List<Table> externallyMappedTables = mappableTables.stream().filter(t -> {
@@ -116,8 +115,10 @@ public class SessionFactoryBuilder {
 
         try {
             CtClass baseClass = generateBaseClass();
-            FileObject baseClassFile = root.resolveFile(
-                    database.getDatabaseName() + FileName.SEPARATOR_CHAR + "BaseEntity.class");
+            FileObject databaseDir = root.resolveFile(database.getDatabaseName());
+            databaseDir.deleteAll();
+            databaseDir.createFolder();
+            FileObject baseClassFile = databaseDir.resolveFile("BaseEntity.class");
             try(OutputStream outputStream = baseClassFile.getContent().getOutputStream()) {
                 outputStream.write(baseClass.toBytecode());
             }
@@ -138,7 +139,7 @@ public class SessionFactoryBuilder {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        return buildSessionFactory(codeBase, mappableTables, externallyMappedTables);
+        return buildSessionFactory(new JavaCodeBase(root), mappableTables, externallyMappedTables);
     }
 
     protected boolean checkInvalidPrimaryKey(Table table) {

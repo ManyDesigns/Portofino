@@ -95,6 +95,12 @@ public class HibernateDatabaseSetup {
         return hibernateEntityName != null ? hibernateEntityName : entityName;
     }
 
+    public void dispose() {
+        //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
+        //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
+        getSessionFactory().close();
+    }
+
     public void setThreadSession(Session session) {
         threadSessions.set(session);
     }

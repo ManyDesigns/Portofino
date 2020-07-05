@@ -135,7 +135,7 @@ import java.util.regex.Pattern;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
-public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
+public abstract class AbstractCrudAction<T extends Serializable> extends AbstractResourceAction {
     public static final String COPYRIGHT =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 

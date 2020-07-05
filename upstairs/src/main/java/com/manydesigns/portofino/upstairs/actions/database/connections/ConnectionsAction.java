@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.hibernate.EntityMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -138,6 +139,10 @@ public class ConnectionsAction extends AbstractResourceAction {
         }
         connectionProvider.setDatabase(database);
         database.setConnectionProvider(connectionProvider);
+        if(jsonObject.has("entityMode")) {
+            String entityMode = jsonObject.getJSONObject("entityMode").optString("value", EntityMode.MAP.getExternalName());
+            database.setEntityMode(entityMode);
+        }
         return saveConnectionProvider(connectionProvider, jsonObject, this::doCreateConnectionProvider);
     }
 

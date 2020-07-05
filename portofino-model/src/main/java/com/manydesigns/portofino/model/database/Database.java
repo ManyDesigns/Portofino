@@ -40,7 +40,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas"})
+@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode"})
 @XmlRootElement
 public class Database implements ModelObject {
     public static final String copyright =
@@ -137,7 +137,7 @@ public class Database implements ModelObject {
     }
 
     public List<Column> getAllColumns() {
-        List<Column> result = new ArrayList<Column>();
+        List<Column> result = new ArrayList<>();
         for (Schema schema : schemas) {
             for (Table table : schema.getTables()) {
                 for (Column column : table.getColumns()) {
@@ -149,7 +149,7 @@ public class Database implements ModelObject {
     }
 
     public List<ForeignKey> getAllForeignKeys() {
-        List<ForeignKey> result = new ArrayList<ForeignKey>();
+        List<ForeignKey> result = new ArrayList<>();
         for (Schema schema : schemas) {
             for (Table table : schema.getTables()) {
                 for (ForeignKey foreignKey : table.getForeignKeys()) {

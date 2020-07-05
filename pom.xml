@@ -50,7 +50,7 @@
     </mailingLists>
     <scm>
         <connection>scm:git:https://github.com/ManyDesigns/Portofino.git</connection>
-        <developerConnection>scm:hg:https://github.com/ManyDesigns/Portofino.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/ManyDesigns/Portofino.git</developerConnection>
         <url>https://github.com/ManyDesigns/Portofino</url>
         <tag>master</tag>
     </scm>

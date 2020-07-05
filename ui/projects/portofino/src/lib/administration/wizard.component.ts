@@ -13,8 +13,8 @@ export class WizardComponent extends Page implements OnInit {
 
   connectionProviders: ConnectionProviderSummary[];
   databasePlatforms: DatabasePlatform[];
-  wizard: { connectionProvider: ConnectionProviderSummary } | any =
-    { newConnectionType: 'jdbc', strategy: "automatic" };
+  wizard: { connectionProvider: ConnectionProviderSummary, newConnectionType?: string, entityMode: string } | any =
+    { newConnectionType: 'jdbc', strategy: "automatic", entityMode: 'MAP' };
   @ViewChild("stepper", { static: true })
   stepper: MatStepper;
 
@@ -60,6 +60,7 @@ export class WizardComponent extends Page implements OnInit {
       conn.url = {value: this.wizard.connectionUrl};
       conn.username = {value: this.wizard.username};
       conn.password = {value: this.wizard.password};
+      conn.entityMode = {value: this.wizard.entityMode};
       this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
         this.notificationService.info(this.translate.instant("Database created."));
         const summary = new ConnectionProviderSummary();
