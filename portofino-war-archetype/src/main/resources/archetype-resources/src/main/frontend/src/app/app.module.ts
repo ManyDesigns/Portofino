@@ -97,7 +97,7 @@ export class WelcomeComponent extends Page {
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true }
   ],
   imports: [
-    PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
+    PortofinoModule.forRoot(), PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,

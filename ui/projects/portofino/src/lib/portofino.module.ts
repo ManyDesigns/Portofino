@@ -77,7 +77,6 @@ import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {ContentComponent} from "./content.component";
 import {
-  MatSnackBarNotificationService,
   NOTIFICATION_HANDLERS,
   NotificationDispatcher,
   NotificationErrorHandler,
@@ -95,9 +94,6 @@ import {SelectFieldComponent} from "./fields/select-field.component";
 import {PageFactoryComponent} from "./page.factory";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
-import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
-import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
-import {LocalStorageService} from "ngx-store";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
 import {
   MailSettingsComponent,
@@ -122,6 +118,8 @@ import {TextPageComponent} from "./pages/text/text.component";
 import {VarDirective} from "./var.directive";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatBadgeModule} from "@angular/material/badge";
+import {LocalStorageService} from "./storage/storage.services";
+import {PageSettingsPanelComponent} from "./page-settings-panel.component";
 
 @NgModule({
   declarations: [
@@ -131,8 +129,8 @@ import {MatBadgeModule} from "@angular/material/badge";
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule,
-    FileInputAccessorModule, NgxdModule, QuillModule, TranslateModule.forChild()],
+    MatMomentDateModule, MatRadioModule, MatSelectModule, FileInputAccessorModule, NgxdModule, QuillModule,
+    TranslateModule.forChild()],
   providers: [ FieldFactory ],
   entryComponents: [
     BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent,
@@ -142,19 +140,19 @@ import {MatBadgeModule} from "@angular/material/badge";
     NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
     FormComponent,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule]
+    MatMomentDateModule, MatRadioModule, MatSelectModule]
 })
 export class PortofinoFormsModule {}
 
 @NgModule({
-  declarations: [
-    PageLayout, ButtonComponent, ButtonsComponent,
-    ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
-    LanguageSelectorComponent,
-    NavigationDirective, DefaultNavigationComponent, VarDirective,
-    ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
-    CreatePageComponent, DeletePageComponent, MovePageComponent
-  ],
+    declarations: [
+        PageLayout, ButtonComponent, ButtonsComponent,
+        ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
+        LanguageSelectorComponent,
+        NavigationDirective, DefaultNavigationComponent, VarDirective,
+        ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
+        CreatePageComponent, DeletePageComponent, MovePageComponent, PageSettingsPanelComponent
+    ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule,
@@ -293,14 +291,11 @@ export class PortofinoModule {
   }
 
   public static forRoot(): (ModuleWithProviders<RouterModule> | PortofinoModule)[] {
-    return [RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()), PortofinoModule];
+    return PortofinoModule.withRoutes(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig())
   }
 
   public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders<RouterModule>|Type<PortofinoModule>)[] {
-    return [RouterModule.forRoot(
-      [...routes, ...PortofinoModule.defaultRoutes()],
-      { ...PortofinoModule.defaultRouterConfig(), ...config }),
-      PortofinoModule];
+    return [RouterModule.forRoot(routes, config), PortofinoModule];
   }
 
   public static defaultRoutes(): Routes {

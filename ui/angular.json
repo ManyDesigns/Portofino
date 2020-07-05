@@ -12,6 +12,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "aot": true,
             "preserveSymlinks": true,
             "outputPath": "dist/ui",
             "index": "src/index.html",
@@ -39,9 +40,15 @@
           },
           "configurations": {
             "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": true,
               "extractCss": true,
               "namedChunks": false,
               "aot": true,
@@ -154,7 +161,8 @@
           },
           "configurations": {
             "production": {
-              "project": "projects/portofino/ng-package.prod.json"
+              "project": "projects/portofino/ng-package.prod.json",
+              "tsConfig": "projects/portofino/tsconfig.lib.prod.json"
             }
           }
         },
@@ -185,10 +193,13 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
-      "styleext": "scss"
+      "style": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "app"
     }
+  },
+  "cli": {
+    "analytics": "68bc78d1-bda7-40dc-921c-44a876a1fe75"
   }
 }

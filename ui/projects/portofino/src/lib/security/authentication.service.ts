@@ -1,16 +1,23 @@
 import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
 import {
   HttpClient,
-  HttpEvent, HttpHandler, HttpHeaders, HttpInterceptor, HttpParams, HttpRequest, HttpResponse
+  HttpEvent,
+  HttpHandler,
+  HttpHeaders,
+  HttpInterceptor,
+  HttpParams,
+  HttpRequest,
+  HttpResponse
 } from "@angular/common/http";
 import {MatDialog} from "@angular/material/dialog";
 import {Observable, throwError} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {PortofinoService} from "../portofino.service";
 import {NotificationService} from "../notifications/notification.services";
-import {WebStorageService} from "ngx-store";
 import {TranslateService} from "@ngx-translate/core";
 import moment from 'moment-with-locales-es6';
+import {WebStorageService} from "../storage/storage.services";
+import {NO_AUTH_HEADER, NO_RENEW_HEADER} from "./authentication.headers";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 export const CHANGE_PASSWORD_COMPONENT = new InjectionToken('Change Password Component');
@@ -257,9 +264,6 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 export class UserInfo {
   constructor(public userId: string, public displayName: string, public administrator: boolean, public groups: string[]) {}
 }
-
-export const NO_AUTH_HEADER = "X-Portofino-no-auth";
-export const NO_RENEW_HEADER = "X-Portofino-no-renew";
 
 export class LoginDeclinedException extends Error {
   constructor(public message: string) {

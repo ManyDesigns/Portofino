@@ -26,7 +26,7 @@ import {catchError, map, mergeMap} from "rxjs/operators";
   styleUrls: ['./content.component.css']
 })
 export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
-  @ViewChild(MainPageDirective, { static: false })
+  @ViewChild(MainPageDirective)
   contentHost: MainPageDirective;
   protected pageFactory: PageFactoryComponent;
 

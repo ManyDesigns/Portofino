@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {FieldComponent} from "./field.component";
 import {getAnnotation, isMultiline, isPassword, isRichText} from "../class-accessor";
-import {ErrorStateMatcher} from "@angular/material";
+import { ErrorStateMatcher } from "@angular/material/core";
 import {FormControl, FormGroupDirective, NgForm} from "@angular/forms";
 
 @Component({

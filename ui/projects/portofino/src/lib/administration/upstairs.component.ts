@@ -15,8 +15,8 @@ import {AuthenticationService} from "../security/authentication.service";
 import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {NotificationService} from "../notifications/notification.services";
-import {LocalStorageService} from "ngx-store";
 import {map} from "rxjs/operators";
+import {WebStorageService} from "../storage/storage.services";
 
 @Component({
   selector: 'portofino-upstairs',
@@ -27,7 +27,7 @@ export class UpstairsComponent extends Page implements OnInit {
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, notificationService: NotificationService,
-              translate: TranslateService, @Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {
+              translate: TranslateService, @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService) {
     super(portofino, http, router, route, authenticationService, notificationService, translate);
   }
 

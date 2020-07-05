@@ -2,10 +2,10 @@ import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@an
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import { DateAdapter } from "@angular/material/core";
-import {DatetimeAdapter} from "@mat-datetimepicker/core";
-import {WebStorageService} from "ngx-store";
 import {Observable} from "rxjs";
 import {catchError, map} from "rxjs/operators";
+import {WebStorageService} from "./storage/storage.services";
+import {NO_RENEW_HEADER} from "./security/authentication.headers";
 
 export const LOCALE_STORAGE_SERVICE = new InjectionToken('Locale Storage');
 export const LOCALES = new InjectionToken('Locales');
@@ -29,7 +29,7 @@ export class PortofinoService {
   constructor(public http: HttpClient, protected translate: TranslateService,
               @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,
               @Inject(LOCALES) locales: Locale[],
-              protected dateAdapter: DateAdapter<any>, protected datetimeAdapter: DatetimeAdapter<any>) {
+              protected dateAdapter: DateAdapter<any>) {
     this.setupTranslateService(locales);
   }
 
@@ -65,7 +65,6 @@ export class PortofinoService {
   protected setLocale(locale) {
     this.translate.use(locale);
     this.dateAdapter.setLocale(locale);
-    this.datetimeAdapter.setLocale(locale);
     this.storage.set('locale', locale);
   }
 
@@ -95,7 +94,9 @@ export class PortofinoService {
       this.fallbackInit();
       return;
     }
-    this.http.get<ApiInfo>(this.localApiPath).subscribe(response => {
+    const headers = {};
+    headers[NO_RENEW_HEADER] = true; //Avoid renewing the token on startup as this might hit the wrong login action
+    this.http.get<ApiInfo>(this.localApiPath, { headers: headers }).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
       if(response.loginPath) {
         this.loginPath = this.sanitizeLoginPath(response.loginPath);
@@ -111,7 +112,9 @@ export class PortofinoService {
   }
 
   private initLoginPath() {
-    this.http.get<any>(this.apiRoot + ':description').subscribe(response => {
+    const headers = {};
+    headers[NO_RENEW_HEADER] = true; //Avoid renewing the token on startup as this might hit the wrong login action
+    this.http.get<any>(this.apiRoot + ':description', { headers: headers }).subscribe(response => {
       if (response.loginPath) {
         this.loginPath = this.sanitizeLoginPath(response.loginPath);
       }

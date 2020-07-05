@@ -1,12 +1,11 @@
 import {Component, Inject, NgModule, OnInit} from '@angular/core';
 import {
+  LocalStorageService,
   PortofinoModule,
-  NAVIGATION_COMPONENT,
-  DefaultNavigationComponent,
   PortofinoUpstairsModule,
   NOTIFICATION_HANDLERS,
   MatSnackBarNotificationService,
-  LOCALE_STORAGE_SERVICE, PortofinoAppComponent
+  LOCALE_STORAGE_SERVICE, PortofinoAppComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent
 } from "portofino";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
@@ -42,10 +41,10 @@ import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {NgxdModule} from "@ngxd/core";
+import {RouterModule} from "@angular/router";
 import {registerLocaleData} from "@angular/common";
 import localeEs from "@angular/common/locales/es";
 import localeIt from "@angular/common/locales/it";
-import {LocalStorageService} from "ngx-store";
 
 registerLocaleData(localeIt);
 registerLocaleData(localeEs);
@@ -77,7 +76,8 @@ export class AppComponent {
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
-    PortofinoModule.withRoutes([]), PortofinoUpstairsModule,
+    RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()),
+    PortofinoModule, PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
