@@ -99,7 +99,7 @@ export class WelcomeComponent extends Page implements OnInit {
 export class DemoTTAppComponent {}
 
 @NgModule({
-  declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent],
+  declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, ProfileComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },

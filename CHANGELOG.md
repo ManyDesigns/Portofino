@@ -2,7 +2,7 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.1.4] – Not yet released
+## [5.1.4] – 2020-07-04
 
 ### Added
 - "Fat jar" deployment option (with embedded Tomcat)
