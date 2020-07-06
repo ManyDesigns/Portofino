@@ -1,4 +1,4 @@
-import { Component, NgModule, OnInit} from '@angular/core';
+import {Component, Input, NgModule, OnInit} from '@angular/core';
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
@@ -32,7 +32,13 @@ import {
   PortofinoService,
   SearchResults,
   NOTIFICATION_HANDLERS,
-  MatSnackBarNotificationService, PortofinoFormsModule
+  MatSnackBarNotificationService,
+  PortofinoFormsModule,
+  CrudComponent,
+  Button,
+  SearchComponent,
+  DEFAULT_SEARCH_TEMPLATE,
+  DEFAULT_CRUD_TEMPLATE, DEFAULT_SEARCH_STYLE
 } from "portofino";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -90,6 +96,47 @@ export class WelcomeComponent extends Page implements OnInit {
   }
 }
 
+@PortofinoComponent({ name: 'custom-crud' })
+@Component({
+  selector: 'demo-tt-custom-crud',
+  template: DEFAULT_CRUD_TEMPLATE
+})
+export class CustomCrud extends CrudComponent {
+
+  initialize(): void {
+    console.log("Custom crud");
+    super.initialize();
+    this.configuration.title = 'Custom CRUD';
+    this.searchComponent = CustomSearch;
+    this.searchComponentContext = { customInput: "works!" };
+  }
+
+  @Button({
+    list: 'search-results', text: 'Custom button', icon: 'save', color: "warn", enabledIf: CustomCrud.buttonEnabled
+  })
+  hello() {
+    console.log("Custom button", this.configuration);
+  }
+
+  static buttonEnabled() {
+    return true;
+  }
+}
+
+@Component({
+  selector: 'demo-tt-custom-search',
+  template: DEFAULT_SEARCH_TEMPLATE,
+  styles: [DEFAULT_SEARCH_STYLE]
+})
+export class CustomSearch extends SearchComponent {
+  @Input()
+  customInput;
+  ngOnInit(): void {
+    console.log("Custom search with input", this.customInput);
+    super.ngOnInit();
+  }
+}
+
 @Component({
   selector: 'app-root',
   template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
@@ -99,15 +146,16 @@ export class WelcomeComponent extends Page implements OnInit {
 export class DemoTTAppComponent {}
 
 @NgModule({
-  declarations: [DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, ProfileComponent],
+  declarations: [
+    DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, ProfileComponent,
+    CustomCrud, CustomSearch],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
     RouterModule.forRoot([{path: "hello", component: HelloPortofino}, ...PortofinoModule.defaultRoutes()], PortofinoModule.defaultRouterConfig()),
-    PortofinoModule, PortofinoUpstairsModule,
-    PortofinoFormsModule,
+    PortofinoModule, PortofinoFormsModule, PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,

@@ -1,12 +1,12 @@
 {
   "title": "Projects",
-  "type": "crud",
+  "type": "custom-crud",
   "children": [],
   "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": true, "showInNavigation": true }],
   "source": "projects",
   "template": "mainWithTabs",
   "script": "custom.js",
   "buttons": {
-    "search-results": [{ "text": "Custom button", "method": "customButtonAction" }]
+    "search-results": [{ "text": "Another custom button", "method": "customButtonAction" }]
   }
 }
