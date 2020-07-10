@@ -327,16 +327,8 @@
                 </plugins>
             </build>
         </profile>
-        <!-- See web.xml for an explanation -->
         <profile>
-            <!-- Used for development, see web.xml for an explanation. -->
-            <id>portofino-development</id>
-            <properties>
-                <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
-            </properties>
-        </profile>
-        <profile>
-            <!-- Build Docker images and launch the application. -->
+            <!-- Build Docker images and launch the application. See web.xml for additional explanations. -->
             <id>docker</id>
             <properties>
                 <portofino.application.directory>${dollar}{env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>

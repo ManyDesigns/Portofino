@@ -21,11 +21,12 @@
         <param-name>portofino.application.directory</param-name>
         <param-value>${portofino.application.directory}</param-value>
         <!--
-        The param-value above is meant to be interpolated by Maven. If you activate the portofino-development profile
-        (-Pportofino-development from the command line), it will point to the src/main/webapp/WEB-INF directory so
-        that you'll be able to work on it from an IDE and from Portofino's web UI and immediately see the changes in
-        both directions. Note that this hardcodes the path of your source tree in web.xml and thus it is only meant
-        for development on your own machine. The generated war WILL NOT WORK on other machines.
+        The param-value above is meant to be interpolated by Maven. If you activate the docker profile
+        (-Pdocker from the command line), the generated application will point to a Docker volume
+        mapped to the src/main/webapp/WEB-INF directory, so that you'll be able to work on the application both
+        from your IDE and from Portofino's web UI and immediately see the effects of your changes, in
+        both directions. Note that this hard-codes a Docker-specific path in this web.xml file. It's meant
+        for development on your own machine only, the generated war WILL NOT WORK on other machines.
          -->
     </context-param>
 
