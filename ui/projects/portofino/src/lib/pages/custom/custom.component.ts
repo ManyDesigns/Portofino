@@ -1,8 +1,16 @@
 import {Page, PageConfiguration, PageSettingsPanel} from "../../page";
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, Optional} from "@angular/core";
 import {PortofinoComponent} from "../../page.factory";
 import {Field} from "../../form";
 import {Annotation, RICH_TEXT_ANNOTATION} from "../../class-accessor";
+import {PortofinoService} from "../../portofino.service";
+import {HttpClient} from "@angular/common/http";
+import {ActivatedRoute, Router} from "@angular/router";
+import {AuthenticationService} from "../../security/authentication.service";
+import {NotificationService} from "../../notifications/notification.services";
+import {TranslateService} from "@ngx-translate/core";
+import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import {BehaviorSubject} from "rxjs";
 
 export const DEFAULT_CUSTOM_PAGE_TEMPLATE = `
 <portofino-page-layout [page]="this">
@@ -11,6 +19,10 @@ export const DEFAULT_CUSTOM_PAGE_TEMPLATE = `
     <div *ngIf="!html">{{ 'This a custom page. You can either provide an HTML file to display here, or override this template entirely using Angular.' | translate }}</div>
   </ng-template>
 </portofino-page-layout>`
+
+export enum HtmlLoadStatus {
+  NOT_YET_LOADED, LOADED, ERRORED
+}
 
 @Component({
   selector: 'portofino-custom',
@@ -22,7 +34,15 @@ export const DEFAULT_CUSTOM_PAGE_TEMPLATE = `
 })
 export class CustomPageComponent extends Page  {
 
-  html: string;
+  html: SafeHtml;
+  readonly htmlLoadStatus = new BehaviorSubject(HtmlLoadStatus.NOT_YET_LOADED);
+
+  constructor(
+    portofino: PortofinoService, http: HttpClient, router: Router, @Optional() route: ActivatedRoute,
+    authenticationService: AuthenticationService, notificationService: NotificationService,
+    translate: TranslateService, protected domSanitizer: DomSanitizer) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate);
+  }
 
   static computeSecurityCheckUrl(apiRoot, parent) {
     // How do we check if this page is accessible? We can either:
@@ -65,9 +85,11 @@ export class CustomPageComponent extends Page  {
       this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.html}`), {
         responseType: "text"
       }).subscribe(html => {
-        this.html = html;
+        this.html = this.domSanitizer.bypassSecurityTrustHtml(html);
+        this.htmlLoadStatus.next(HtmlLoadStatus.LOADED);
       }, e => {
         this.notificationService.error(this.translate.get("Could not load page HTML"));
+        this.htmlLoadStatus.next(HtmlLoadStatus.ERRORED);
       });
     }
   }

@@ -156,8 +156,10 @@ export class DemoTTAppComponent {}
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
-    RouterModule.forRoot([{path: "hello", component: HelloPortofino}, ...PortofinoModule.defaultRoutes()], PortofinoModule.defaultRouterConfig()),
-    PortofinoModule, PortofinoFormsModule, PortofinoUpstairsModule, PortofinoPagesModule, PortofinoCrudModule,
+    RouterModule.forRoot([
+      {path: "hello", component: HelloPortofino}, ...PortofinoModule.defaultRoutes()],
+      PortofinoModule.defaultRouterConfig()),
+    PortofinoModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
@@ -165,7 +167,6 @@ export class DemoTTAppComponent {}
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule.forRoot(),
     TranslateModule.forRoot()],
-  entryComponents: [ CustomNavigation, WelcomeComponent ],
   bootstrap: [DemoTTAppComponent]
 })
 export class DemoTTAppModule {
@@ -173,4 +174,9 @@ export class DemoTTAppModule {
     return DefaultNavigationComponent
     //return CustomNavigation
   }
+
+  // It's necessary to spell used components here, otherwise Angular (Ivy) tree-shakes them.
+  // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
+  // https://github.com/angular/angular/issues/35314#issuecomment-584821399
+  static entryComponents = [ CrudComponent, CustomPageComponent, TextPageComponent ];
 }

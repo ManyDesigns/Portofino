@@ -2,7 +2,8 @@ import {Component, NgModule, Optional} from '@angular/core';
 import {
   PortofinoModule, PortofinoUpstairsModule, AuthenticationService,
   NotificationService, MatSnackBarNotificationService, NOTIFICATION_HANDLERS,
-  Page, PortofinoComponent, PortofinoService, SidenavService
+  Page, PortofinoComponent, PortofinoService, SidenavService,
+  CrudComponent, CustomPageComponent, TextPageComponent
 } from "portofino";
 import {
   MatAutocompleteModule,
@@ -106,4 +107,9 @@ export class WelcomeComponent extends Page {
   entryComponents: [WelcomeComponent],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+  // It's necessary to spell the components used in the application here, otherwise Angular (Ivy) tree-shakes them.
+  // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
+  // https://github.com/angular/angular/issues/35314#issuecomment-584821399
+  static entryComponents = [ CrudComponent, CustomPageComponent, TextPageComponent ];
+}

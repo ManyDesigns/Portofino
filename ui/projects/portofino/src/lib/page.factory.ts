@@ -145,7 +145,6 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
       }));
   }
 
-
   ngOnDestroy() {
     super.ngOnDestroy();
     this.pageCreated.complete();
@@ -156,7 +155,7 @@ export type PortofinoComponentDefinition = {
   name: string, defaultActionClass?: string, hideFromCreateNewPage?: boolean,
   computeSecurityCheckUrl?: (apiRoot: string, parent: Page, source: string) => string
 };
-export type PortofinoComponent = { type: Type<any> } & PortofinoComponentDefinition
+export type PortofinoComponent = { type: Type<any> } & PortofinoComponentDefinition;
 
 export function PortofinoComponent(info: PortofinoComponentDefinition) {
   return function(target) {
