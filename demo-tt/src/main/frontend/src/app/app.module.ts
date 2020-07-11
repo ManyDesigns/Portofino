@@ -37,8 +37,10 @@ import {
   CrudComponent,
   Button,
   SearchComponent,
+  TextPageComponent,
+  CustomPageComponent,
   DEFAULT_SEARCH_TEMPLATE,
-  DEFAULT_CRUD_TEMPLATE, DEFAULT_SEARCH_STYLE
+  DEFAULT_CRUD_TEMPLATE, DEFAULT_SEARCH_STYLE, PortofinoCrudModule, PortofinoPagesModule
 } from "portofino";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -155,7 +157,7 @@ export class DemoTTAppComponent {}
   ],
   imports: [
     RouterModule.forRoot([{path: "hello", component: HelloPortofino}, ...PortofinoModule.defaultRoutes()], PortofinoModule.defaultRouterConfig()),
-    PortofinoModule, PortofinoFormsModule, PortofinoUpstairsModule,
+    PortofinoModule, PortofinoFormsModule, PortofinoUpstairsModule, PortofinoPagesModule, PortofinoCrudModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,

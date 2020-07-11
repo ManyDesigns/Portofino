@@ -448,8 +448,12 @@ export abstract class Page implements WithButtons, OnDestroy {
     if(!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
-    let sourceUrl = this.computeSecurityCheckUrl();
-    return this.http.get(sourceUrl,{ headers: headers, observe: "response" });
+    let securityCheckUrl = this.computeSecurityCheckUrl();
+    if(securityCheckUrl) {
+      return this.http.get(securityCheckUrl,{ headers: headers, observe: "response" });
+    } else {
+      return of(true);
+    }
   }
 
   protected computeSecurityCheckUrl() {

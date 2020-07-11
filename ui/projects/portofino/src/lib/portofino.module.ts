@@ -120,6 +120,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatBadgeModule} from "@angular/material/badge";
 import {LocalStorageService} from "./storage/storage.services";
 import {PageSettingsPanelComponent} from "./page-settings-panel.component";
+import {CustomPageComponent} from "./pages/custom/custom.component";
 
 @NgModule({
   declarations: [
@@ -224,8 +225,8 @@ export class PortofinoUpstairsModule {}
 @NgModule({
   declarations: [
     PortofinoAppComponent,
-    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
-    TextPageComponent],
+    CustomPageComponent, LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent,
+    ResetPasswordComponent, TextPageComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
@@ -254,8 +255,8 @@ export class PortofinoUpstairsModule {}
     { provide: NotificationService, useClass: NotificationDispatcher },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [
-    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
-    TextPageComponent],
+    CustomPageComponent, LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent,
+    ResetPasswordComponent, TextPageComponent],
   exports: [
     PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent,
     LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
@@ -263,6 +264,7 @@ export class PortofinoUpstairsModule {}
     DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
+    CustomPageComponent,
     ManyToManyComponent, TextPageComponent]
 })
 export class PortofinoModule {
