@@ -1,8 +1,7 @@
 import {Page, PageConfiguration, PageSettingsPanel} from "../../page";
-import {Component, OnInit, Optional} from "@angular/core";
+import {Component, Optional} from "@angular/core";
 import {PortofinoComponent} from "../../page.factory";
 import {Field} from "../../form";
-import {Annotation, RICH_TEXT_ANNOTATION} from "../../class-accessor";
 import {PortofinoService} from "../../portofino.service";
 import {HttpClient} from "@angular/common/http";
 import {ActivatedRoute, Router} from "@angular/router";

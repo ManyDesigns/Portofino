@@ -98,23 +98,23 @@ export class WelcomeComponent extends Page implements OnInit {
   }
 }
 
-@PortofinoComponent({ name: 'custom-crud' })
+@PortofinoComponent({ name: 'projects-crud' })
 @Component({
-  selector: 'demo-tt-custom-crud',
+  selector: 'demo-tt-projects-crud',
   template: DEFAULT_CRUD_TEMPLATE
 })
-export class CustomCrud extends CrudComponent {
+export class ProjectsCrud extends CrudComponent {
 
   initialize(): void {
     console.log("Custom crud");
     super.initialize();
     this.configuration.title = 'Custom CRUD';
-    this.searchComponent = CustomSearch;
+    this.searchComponent = ProjectsSummary;
     this.searchComponentContext = { customInput: "works!" };
   }
 
   @Button({
-    list: 'search-results', text: 'Custom button', icon: 'save', color: "warn", enabledIf: CustomCrud.buttonEnabled
+    list: 'search-results', text: 'Custom button', icon: 'save', color: "warn", enabledIf: ProjectsCrud.buttonEnabled
   })
   hello() {
     console.log("Custom button", this.configuration);
@@ -126,11 +126,11 @@ export class CustomCrud extends CrudComponent {
 }
 
 @Component({
-  selector: 'demo-tt-custom-search',
-  template: DEFAULT_SEARCH_TEMPLATE,
+  selector: 'demo-tt-projects-summary',
+  template: `<div>TODO</div>`,
   styles: [DEFAULT_SEARCH_STYLE]
 })
-export class CustomSearch extends SearchComponent {
+export class ProjectsSummary extends SearchComponent {
   @Input()
   customInput;
   ngOnInit(): void {
@@ -150,7 +150,7 @@ export class DemoTTAppComponent {}
 @NgModule({
   declarations: [
     DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, ProfileComponent,
-    CustomCrud, CustomSearch],
+    ProjectsCrud, ProjectsSummary],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
