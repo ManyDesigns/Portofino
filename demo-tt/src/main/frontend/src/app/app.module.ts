@@ -40,7 +40,7 @@ import {
   TextPageComponent,
   CustomPageComponent,
   DEFAULT_SEARCH_TEMPLATE,
-  DEFAULT_CRUD_TEMPLATE, DEFAULT_SEARCH_STYLE, PortofinoCrudModule, PortofinoPagesModule
+  DEFAULT_CRUD_TEMPLATE, DEFAULT_SEARCH_STYLE, PortofinoCrudModule, PortofinoPagesModule, DetailComponent
 } from "portofino";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -59,6 +59,7 @@ import {registerLocaleData} from "@angular/common";
 import localeEs from "@angular/common/locales/es";
 import localeIt from "@angular/common/locales/it";
 import { ProfileComponent } from './profile.component';
+import {MatChipsModule} from "@angular/material/chips";
 
 registerLocaleData(localeEs);
 registerLocaleData(localeIt);
@@ -106,42 +107,43 @@ export class WelcomeComponent extends Page implements OnInit {
 export class ProjectsCrud extends CrudComponent {
 
   initialize(): void {
-    console.log("Custom crud");
     super.initialize();
-    this.configuration.title = 'Custom CRUD';
-    this.searchComponent = ProjectsSummary;
-    this.searchComponentContext = { customInput: "works!" };
+    this.detailComponent = ProjectsSummary;
+    this.detailComponentContext = { customInput: "works!" };
   }
 
-  @Button({
-    list: 'search-results', text: 'Custom button', icon: 'save', color: "warn", enabledIf: ProjectsCrud.buttonEnabled
-  })
-  hello() {
-    console.log("Custom button", this.configuration);
-  }
-
-  static buttonEnabled() {
-    return true;
+  showSearch() {
+    this.router.navigateByUrl("/");
   }
 }
 
 @Component({
   selector: 'demo-tt-projects-summary',
-  template: `<div>TODO</div>`,
+  template: `<div>
+    <mat-card>
+      <mat-card-title>
+        {{object.id.value}} – {{object.title.value}}
+        <mat-chip-list style="display: inline-block">
+          <mat-chip color="primary" selected *ngIf="object.public_.value">Public project</mat-chip>
+          <mat-chip color="warn" selected *ngIf="!object.public_.value">Private project</mat-chip>
+        </mat-chip-list>
+      </mat-card-title>
+    </mat-card>
+    TODO</div>`,
   styles: [DEFAULT_SEARCH_STYLE]
 })
-export class ProjectsSummary extends SearchComponent {
+export class ProjectsSummary extends DetailComponent {
   @Input()
   customInput;
   ngOnInit(): void {
-    console.log("Custom search with input", this.customInput);
+    console.log("Custom detail with input", this.customInput);
     super.ngOnInit();
   }
 }
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:18080/demo-tt/api/">
     <portofino-templates></portofino-templates>
   </portofino-app>`
 })
@@ -157,7 +159,7 @@ export class DemoTTAppComponent {}
   ],
   imports: [
     RouterModule.forRoot([
-      {path: "hello", component: HelloPortofino}, ...PortofinoModule.defaultRoutes()],
+        {path: "hello", component: HelloPortofino}, ...PortofinoModule.defaultRoutes()],
       PortofinoModule.defaultRouterConfig()),
     PortofinoModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
@@ -166,7 +168,7 @@ export class DemoTTAppComponent {}
     MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule.forRoot(),
-    TranslateModule.forRoot()],
+    TranslateModule.forRoot(), MatChipsModule],
   bootstrap: [DemoTTAppComponent]
 })
 export class DemoTTAppModule {
