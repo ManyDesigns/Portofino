@@ -10,8 +10,8 @@ import {ResetPasswordComponent} from "./reset-password.component";
 
 @Component({
   selector: 'portofino-login',
-  templateUrl: 'login.component.html',
-  styleUrls: ['login.component.scss']
+  templateUrl: '../../../../assets/security/login/login.component.html',
+  styleUrls: ['../../../../assets/security/login/login.component.scss']
 })
 export class LoginComponent implements OnInit {
 

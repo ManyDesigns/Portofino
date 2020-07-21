@@ -1,0 +1,15 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+@mixin portofino-theme($theme) {
+  $primary: map-get($theme, primary);
+
+  .portofino-navigation {
+    .mat-list-item.active {
+      background-color: mat-color($primary, 50);
+    }
+    .mat-list-item:hover {
+      background-color: mat-color($primary, 100) !important;
+    }
+  }
+}

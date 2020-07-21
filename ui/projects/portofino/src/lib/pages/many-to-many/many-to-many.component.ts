@@ -6,8 +6,8 @@ import {Button} from "../../buttons";
 
 @Component({
   selector: 'portofino-many-to-many',
-  templateUrl: './many-to-many.component.html',
-  styleUrls: ['./many-to-many.component.css']
+  templateUrl: '../../../../assets/pages/many-to-many/many-to-many.component.html',
+  styleUrls: ['../../../../assets/pages/many-to-many/many-to-many.component.scss']
 })
 @PortofinoComponent({ name: 'manyToMany' })
 export class ManyToManyComponent extends Page {

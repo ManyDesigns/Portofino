@@ -226,8 +226,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
     }
     this.saving = true;
     if(!this.isFormValid()) {
-      this.triggerValidationForAllFields(this.form);
-      this.notificationService.error('There are validation errors').subscribe();
+      this.handleInvalidForm();
       this.saving = false;
       return;
     }
@@ -235,7 +234,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
     this.doSave(object).subscribe(
       () =>  {
         this.saving = false;
-        this.close.emit(object);
+        this.afterSaved(object);
       },
       (error) => {
         this.saving = false;
@@ -260,6 +259,15 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
           }
         }
       });
+  }
+
+  protected afterSaved(object) {
+    this.close.emit(object);
+  }
+
+  protected handleInvalidForm() {
+    this.triggerValidationForAllFields(this.form);
+    this.notificationService.error('There are validation errors').subscribe();
   }
 
   static isSaveButtonPresent(self: BaseDetailComponent) {

@@ -1,14 +1,19 @@
+import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.resourceactions.crud.CrudAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import com.manydesigns.portofino.tt.ActivityItem
 import com.manydesigns.portofino.tt.Refresh
 import com.manydesigns.portofino.tt.TtUtils
 import org.apache.shiro.SecurityUtils
+import org.hibernate.Session
 import org.springframework.beans.factory.annotation.Autowired
 
+import javax.ws.rs.GET
+import javax.ws.rs.Path
 import java.sql.Timestamp
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
@@ -19,6 +24,9 @@ class ProjectsCrudAction extends CrudAction {
     Refresh refresh
 
     Object old
+
+    public static String PROJECT_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +
+            "WHERE act.project = :project_id ORDER BY act.id DESC"
 
     static {
         logger.info("Loaded action - ${ProjectsCrudAction.class.hashCode()} - ${Refresh.class.hashCode()}")
@@ -214,7 +222,7 @@ class ProjectsCrudAction extends CrudAction {
                 null,
                 null,
                 null
-        );
+        )
     }
 
     @Override
@@ -223,6 +231,24 @@ class ProjectsCrudAction extends CrudAction {
                 .setParameter('project', object.id)
                 .executeUpdate()
         super.doDelete(object)
+    }
+
+    @GET
+    @Path("activity")
+    List<ActivityItem> getProjectActivity() {
+        Locale locale = context.request.locale
+        List items =
+                session.createSQLQuery(PROJECT_ACTIVTY_SQL)
+                .setParameter("project_id", object.id)
+                .setMaxResults(30).list()
+
+        String keyPrefix = "project.";
+
+        String memberImageFormat = String.format("/projects/%s/members?userImage=&userId=%%s&code=%%s", object.id)
+
+        List<ActivityItem> activityItems = []
+        TtUtils.populateActivityItems(items, activityItems, keyPrefix, locale, memberImageFormat)
+        return activityItems
     }
 
 }

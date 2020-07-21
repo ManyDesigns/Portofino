@@ -24,7 +24,6 @@ import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatTreeModule } from "@angular/material/tree";
 import {
   PortofinoModule,
-  PortofinoUpstairsModule,
   Page,
   NAVIGATION_COMPONENT,
   DefaultNavigationComponent,
@@ -33,14 +32,10 @@ import {
   SearchResults,
   NOTIFICATION_HANDLERS,
   MatSnackBarNotificationService,
-  PortofinoFormsModule,
   CrudComponent,
-  Button,
-  SearchComponent,
   TextPageComponent,
   CustomPageComponent,
-  DEFAULT_SEARCH_TEMPLATE,
-  DEFAULT_CRUD_TEMPLATE, DEFAULT_SEARCH_STYLE, PortofinoCrudModule, PortofinoPagesModule, DetailComponent
+  DetailComponent, PortofinoFormsModule
 } from "portofino";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -60,6 +55,7 @@ import localeEs from "@angular/common/locales/es";
 import localeIt from "@angular/common/locales/it";
 import { ProfileComponent } from './profile.component';
 import {MatChipsModule} from "@angular/material/chips";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 registerLocaleData(localeEs);
 registerLocaleData(localeIt);
@@ -102,7 +98,7 @@ export class WelcomeComponent extends Page implements OnInit {
 @PortofinoComponent({ name: 'projects-crud' })
 @Component({
   selector: 'demo-tt-projects-crud',
-  template: DEFAULT_CRUD_TEMPLATE
+  templateUrl: '../../node_modules/portofino/assets/pages/crud/crud.component.html'
 })
 export class ProjectsCrud extends CrudComponent {
 
@@ -128,9 +124,30 @@ export class ProjectsCrud extends CrudComponent {
           <mat-chip color="warn" selected *ngIf="!object.public_.value">Private project</mat-chip>
         </mat-chip-list>
       </mat-card-title>
+      <mat-card-content>
+        <ng-container *ngIf="object && !editMode">
+          <div [innerHTML]="object.description.value"></div>
+          <a *ngIf="object.url" [href]="object.url.value">{{object.url.value}}</a>
+        </ng-container>
+        <form (submit)="save()" *ngIf="object && editMode">
+          <portofino-form [controls]="form" [form]="formDefinition" (formReset)="onFormReset()"
+                          fxLayout="row wrap" fxLayoutGap="20px" fxLayoutAlign="default center"></portofino-form>
+          <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+        </form>
+        <mat-spinner *ngIf="loading"></mat-spinner>
+        <mat-error *ngIf="!object && !loading">
+          {{ '_ not found' | translate:{ what: id } }}
+        </mat-error>
+      </mat-card-content>
+      <mat-card-actions>
+        <button type="submit" style="display:none">{{ 'Save' | translate }}</button>
+        <portofino-button *ngFor="let button of parentButtons"
+                          [button]="button" [component]="parent"></portofino-button>
+        <portofino-buttons [component]="this"></portofino-buttons>
+      </mat-card-actions>
     </mat-card>
-    TODO</div>`,
-  styles: [DEFAULT_SEARCH_STYLE]
+  </div>`,
+  styleUrls: ['../../node_modules/portofino/assets/pages/crud/search/search.component.scss']
 })
 export class ProjectsSummary extends DetailComponent {
   @Input()
@@ -139,11 +156,15 @@ export class ProjectsSummary extends DetailComponent {
     console.log("Custom detail with input", this.customInput);
     super.ngOnInit();
   }
+
+  afterSaved() {
+    this.editMode = false;
+  }
 }
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:18080/demo-tt/api/">
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
     <portofino-templates></portofino-templates>
   </portofino-app>`
 })
@@ -168,7 +189,7 @@ export class DemoTTAppComponent {}
     MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule.forRoot(),
-    TranslateModule.forRoot(), MatChipsModule],
+    TranslateModule.forRoot(), MatChipsModule, MatProgressSpinnerModule, PortofinoFormsModule],
   bootstrap: [DemoTTAppComponent]
 })
 export class DemoTTAppModule {

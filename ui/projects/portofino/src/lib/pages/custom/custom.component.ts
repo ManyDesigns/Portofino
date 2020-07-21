@@ -11,21 +11,13 @@ import {TranslateService} from "@ngx-translate/core";
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {BehaviorSubject} from "rxjs";
 
-export const DEFAULT_CUSTOM_PAGE_TEMPLATE = `
-<portofino-page-layout [page]="this">
-  <ng-template #content>
-    <div [innerHTML]="html" *ngIf="html"></div>
-    <div *ngIf="!html">{{ 'This a custom page. You can either provide an HTML file to display here, or override this template entirely using Angular.' | translate }}</div>
-  </ng-template>
-</portofino-page-layout>`
-
 export enum HtmlLoadStatus {
   NOT_YET_LOADED, LOADED, ERRORED
 }
 
 @Component({
   selector: 'portofino-custom',
-  template: DEFAULT_CUSTOM_PAGE_TEMPLATE
+  templateUrl: '../../../../assets/pages/custom/custom.component.html'
 })
 @PortofinoComponent({
   name: 'custom',

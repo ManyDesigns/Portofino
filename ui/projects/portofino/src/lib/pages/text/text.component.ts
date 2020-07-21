@@ -6,8 +6,8 @@ import {Annotation, RICH_TEXT_ANNOTATION} from "../../class-accessor";
 
 @Component({
   selector: 'portofino-text',
-  templateUrl: './text.component.html',
-  styleUrls: ['./text.component.scss']
+  templateUrl: '../../../../assets/pages/text/text.component.html',
+  styleUrls: ['../../../../assets/pages/text/text.component.scss']
 })
 @PortofinoComponent({
   name: 'text',

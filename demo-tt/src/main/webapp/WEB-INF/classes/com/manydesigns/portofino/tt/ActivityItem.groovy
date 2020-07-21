@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.tt
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 /*
  * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
@@ -20,12 +22,12 @@ package com.manydesigns.portofino.tt
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.util.Util;
-import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.xml.XhtmlFragment;
-import org.apache.commons.lang.time.FastDateFormat;
-import org.jetbrains.annotations.NotNull;
+import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.util.Util
+import com.manydesigns.elements.xml.XhtmlBuffer
+import com.manydesigns.elements.xml.XhtmlFragment
+import org.apache.commons.lang.time.FastDateFormat
+import org.jetbrains.annotations.NotNull
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,10 +39,12 @@ class ActivityItem implements XhtmlFragment {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
+    @JsonIgnore
     FastDateFormat dateFormat;
 
+    @JsonIgnore
     final Locale locale;
-    final Date timestamp;
+    final long timestamp;
     final String imageSrc;
     final String imageHref;
     final String imageAlt;
@@ -51,15 +55,15 @@ class ActivityItem implements XhtmlFragment {
     boolean fullUrls = false;
 
     public ActivityItem(Locale locale, Date timestamp, String imageSrc, String imageHref, String imageAlt, String message, String key) {
-        this.locale = locale;
-        this.timestamp = timestamp;
-        this.imageSrc = imageSrc;
-        this.imageHref = imageHref;
-        this.imageAlt = imageAlt;
-        this.message = message;
-        this.key = key;
+        this.locale = locale
+        this.timestamp = timestamp.time
+        this.imageSrc = imageSrc
+        this.imageHref = imageHref
+        this.imageAlt = imageAlt
+        this.message = message
+        this.key = key
 
-        dateFormat = FastDateFormat.getDateTimeInstance(FastDateFormat.FULL, FastDateFormat.FULL, locale);
+        dateFormat = FastDateFormat.getDateTimeInstance(FastDateFormat.FULL, FastDateFormat.FULL, locale)
     }
 
     @Override
@@ -126,7 +130,7 @@ class ActivityItem implements XhtmlFragment {
         xb.openElement("div");
         xb.openElement("small");
         xb.addAttribute("class", "text-muted");
-        xb.write(dateFormat.format(timestamp));
+        xb.write(dateFormat.format(new Date(timestamp)));
         xb.closeElement("small");
         xb.closeElement("div");
     }

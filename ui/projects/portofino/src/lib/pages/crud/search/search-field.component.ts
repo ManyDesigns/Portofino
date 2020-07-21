@@ -6,8 +6,8 @@ import {debounceTime} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-crud-search-field',
-  templateUrl: './search-field.component.html',
-  styleUrls: ['./search-field.component.css']
+  templateUrl: '../../../../../assets/pages/crud/search/search-field.component.html',
+  styleUrls: ['../../../../../assets/pages/crud/search/search-field.component.scss']
 })
 export class SearchFieldComponent implements OnInit {
 

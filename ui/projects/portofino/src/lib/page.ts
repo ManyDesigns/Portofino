@@ -53,8 +53,8 @@ export class PageService {
 
 @Component({
   selector: 'portofino-default-navigation',
-  templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.scss']
+  templateUrl: '../../assets/navigation.component.html',
+  styleUrls: ['../../assets/navigation.component.scss']
 })
 export class DefaultNavigationComponent {
   constructor(public pageService: PageService) {}

@@ -1,4 +1,6 @@
 @import '~@angular/material/theming';
+@import '~portofino/assets/theming';
+
 @include mat-core();
 $app-primary: mat-palette($mat-indigo);
 $app-accent:  mat-palette($mat-pink);
@@ -11,22 +13,8 @@ $warn: mat-color($app-warn);
 
 $theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 
-//TODO find a way to import this
-@mixin portofino-theme($theme) {
-  $primary: map-get($theme, primary);
-
-  .portofino-navigation {
-    .mat-list-item.active {
-      background-color: mat-color($primary, 50);
-    }
-    &:hover,
-    &:focus {
-      .mat-list-item:not(.expanded) {
-        background-color: mat-color($primary, 100) !important;
-      }
-    }
-  }
-}
+@include angular-material-theme($theme);
+@include portofino-theme($theme);
 
 .container {
   min-height: 100%;
