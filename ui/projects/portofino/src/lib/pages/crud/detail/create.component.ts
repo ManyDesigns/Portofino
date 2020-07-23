@@ -9,8 +9,8 @@ import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-crud-create',
-  templateUrl: './create.component.html',
-  styleUrls: ['./create.component.css']
+  templateUrl: '../../../../../assets/pages/crud/detail/create.component.html',
+  styleUrls: ['../../../../../assets/pages/crud/detail/create.component.scss']
 })
 export class CreateComponent extends BaseDetailComponent implements OnInit {
 

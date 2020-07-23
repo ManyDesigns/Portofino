@@ -3,7 +3,6 @@
   "type": "custom",
   "children": [],
   "detailChildren": [],
-  "source": "active-tickets-assigned-to-me",
   "script": "tickets.js",
   "html": "tickets.html"
 }

@@ -20,6 +20,7 @@ import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {NO_AUTH_HEADER} from "./security/authentication.headers";
 import {ThemePalette} from "@angular/material/core";
+import moment from 'moment-with-locales-es6';
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -279,6 +280,11 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.script}`), {
         responseType: "text"
       }).subscribe(s => {
+        //Expose some utilities
+        (this as any).util = {
+          moment: moment
+        };
+
         let factory = new Function(`return function(page) { ${s} }`);
         let userFunction = factory();
         userFunction(this);

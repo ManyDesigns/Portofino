@@ -27,6 +27,7 @@ export class CrudComponent extends Page {
 
   classAccessor: ClassAccessor;
   selectionProviders: SelectionProvider[];
+  operations: Operation[];
   classAccessorPath = '/:classAccessor';
   selectionProvidersPath = '/:selectionProvider';
 
@@ -81,7 +82,10 @@ export class CrudComponent extends Page {
         this.selectionProviders = sps;
         return this.http.get<Operation[]>(this.sourceUrl + this.operationsPath);
       })).subscribe(
-        ops => this.init(ops),
+        ops => {
+          this.operations = ops;
+          this.init();
+        },
       () => this.error = this.translate.instant("This page is not configured correctly."));
   }
 
@@ -98,11 +102,11 @@ export class CrudComponent extends Page {
     }
   }
 
-  protected init(operations: Operation[]) {
-    const bulkOpsEnabled = operations.some(op => op.name == "Bulk operations" && op.available);
-    this.createEnabled = this.operationAvailable(operations, "POST");
-    this.bulkEditEnabled = this.operationAvailable(operations, "PUT") && bulkOpsEnabled;
-    this.bulkDeleteEnabled = this.operationAvailable(operations, "DELETE") && bulkOpsEnabled;
+  protected init() {
+    const bulkOpsEnabled = this.operations.some(op => op.name == "Bulk operations" && op.available);
+    this.createEnabled = this.operationAvailable(this.operations, "POST");
+    this.bulkEditEnabled = this.operationAvailable(this.operations, "PUT") && bulkOpsEnabled;
+    this.bulkDeleteEnabled = this.operationAvailable(this.operations, "DELETE") && bulkOpsEnabled;
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });

@@ -3,14 +3,12 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {
   ClassAccessor,
-  isBlob, isBooleanProperty,
-  isDateProperty,
+  isBlob, isDateProperty,
   isEnabled,
   Property, SelectionOption
 } from "../../class-accessor";
-import moment from 'moment-with-locales-es6';
 import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
-import {BlobFile, Configuration, SelectionProvider} from "./crud.common";
+import {Configuration, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
 import {Field, Form, FormComponent} from "../../form";
 import {NotificationService} from "../../notifications/notification.services";

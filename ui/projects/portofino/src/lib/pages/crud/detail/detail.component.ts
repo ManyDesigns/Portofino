@@ -11,8 +11,8 @@ import {Subject} from "rxjs";
 
 @Component({
   selector: 'portofino-crud-detail',
-  templateUrl: './detail.component.html',
-  styleUrls: ['./detail.component.css']
+  templateUrl: '../../../../../assets/pages/crud/detail/detail.component.html',
+  styleUrls: ['../../../../../assets/pages/crud/detail/detail.component.scss']
 })
 export class DetailComponent extends BaseDetailComponent implements OnInit, OnDestroy {
 

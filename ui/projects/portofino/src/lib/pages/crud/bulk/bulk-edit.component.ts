@@ -10,8 +10,8 @@ import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
-  templateUrl: './bulk-edit.component.html',
-  styleUrls: ['./bulk-edit.component.css']
+  templateUrl: '../../../../../assets/pages/crud/bulk/bulk-edit.component.html',
+  styleUrls: ['../../../../../assets/pages/crud/bulk/bulk-edit.component.scss']
 })
 export class BulkEditComponent extends BaseDetailComponent implements OnInit {
 

@@ -28,12 +28,15 @@ class ProjectsActiveTicketsAssignedToMeAction extends CustomAction {
         if (principal == null) {
             Collections.EMPTY_LIST;
         } else {
-            session.createCriteria("tickets")
+            def tickets = session.createCriteria("tickets")
                     .add(Restrictions.eq("project", project.id))
                     .add(Restrictions.eq("assignee", principal.id))
                     .add(Restrictions.ne("state", 4L))
                     .addOrder(Order.asc("n"))
-                    .list();
+                    .list()
+            tickets.collect {
+                [ n: it.n, title: it.title, last_updated: it.last_updated?.time ]
+            }
         }
     }
 
