@@ -81,13 +81,7 @@ export class CrudComponent extends Page {
         this.selectionProviders = sps;
         return this.http.get<Operation[]>(this.sourceUrl + this.operationsPath);
       })).subscribe(
-        ops => {
-        const bulkOpsEnabled = ops.some(op => op.name == "Bulk operations" && op.available);
-        this.createEnabled = this.operationAvailable(ops, "POST");
-        this.bulkEditEnabled = this.operationAvailable(ops, "PUT") && bulkOpsEnabled;
-        this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE") && bulkOpsEnabled;
-        this.init();
-      },
+        ops => this.init(ops),
       () => this.error = this.translate.instant("This page is not configured correctly."));
   }
 
@@ -104,7 +98,11 @@ export class CrudComponent extends Page {
     }
   }
 
-  protected init() {
+  protected init(operations: Operation[]) {
+    const bulkOpsEnabled = operations.some(op => op.name == "Bulk operations" && op.available);
+    this.createEnabled = this.operationAvailable(operations, "POST");
+    this.bulkEditEnabled = this.operationAvailable(operations, "PUT") && bulkOpsEnabled;
+    this.bulkDeleteEnabled = this.operationAvailable(operations, "DELETE") && bulkOpsEnabled;
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });

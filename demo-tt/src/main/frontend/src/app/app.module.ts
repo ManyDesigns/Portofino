@@ -117,13 +117,14 @@ export class ProjectsCrud extends CrudComponent {
   selector: 'demo-tt-projects-summary',
   template: `<div>
     <mat-card>
-      <mat-card-title>
+      <mat-card-title *ngIf="object">
         {{object.id.value}} – {{object.title.value}}
         <mat-chip-list style="display: inline-block">
           <mat-chip color="primary" selected *ngIf="object.public_.value">Public project</mat-chip>
           <mat-chip color="warn" selected *ngIf="!object.public_.value">Private project</mat-chip>
         </mat-chip-list>
       </mat-card-title>
+      <mat-card-title *ngIf="!object">{{'Loading...' | translate}}</mat-card-title>
       <mat-card-content>
         <ng-container *ngIf="object && !editMode">
           <div [innerHTML]="object.description.value"></div>
@@ -164,7 +165,7 @@ export class ProjectsSummary extends DetailComponent {
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:18080/demo-tt/api/">
     <portofino-templates></portofino-templates>
   </portofino-app>`
 })

@@ -2,7 +2,9 @@
   "title": "Projects",
   "type": "projects-crud",
   "children": [],
-  "detailChildren": [{"path": "tickets", "title": "Tickets", "embedded": true, "showInNavigation": true }],
+  "detailChildren": [
+    {"path": "active-tickets-assigned-to-me", "title": "Active tickets assigned to me", "embedded": true, "showInNavigation": false },
+    {"path": "tickets", "title": "Tickets", "embedded": false, "showInNavigation": true }],
   "source": "projects",
   "template": "mainWithTabs",
   "script": "custom.js",

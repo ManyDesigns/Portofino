@@ -1,5 +1,5 @@
 import {Page, PageConfiguration, PageSettingsPanel} from "../../page";
-import {Component, Optional} from "@angular/core";
+import {Component, OnDestroy, Optional} from "@angular/core";
 import {PortofinoComponent} from "../../page.factory";
 import {Field} from "../../form";
 import {PortofinoService} from "../../portofino.service";
@@ -23,7 +23,7 @@ export enum HtmlLoadStatus {
   name: 'custom',
   computeSecurityCheckUrl: CustomPageComponent.computeSecurityCheckUrl
 })
-export class CustomPageComponent extends Page  {
+export class CustomPageComponent extends Page implements OnDestroy {
 
   html: SafeHtml;
   readonly htmlLoadStatus = new BehaviorSubject(HtmlLoadStatus.NOT_YET_LOADED);
@@ -77,12 +77,16 @@ export class CustomPageComponent extends Page  {
         responseType: "text"
       }).subscribe(html => {
         this.html = this.domSanitizer.bypassSecurityTrustHtml(html);
-        this.htmlLoadStatus.next(HtmlLoadStatus.LOADED);
+        setTimeout(() => this.htmlLoadStatus.next(HtmlLoadStatus.LOADED), 0);
       }, e => {
         this.notificationService.error(this.translate.get("Could not load page HTML"));
         this.htmlLoadStatus.next(HtmlLoadStatus.ERRORED);
       });
     }
+  }
+
+  ngOnDestroy() {
+    this.htmlLoadStatus.complete();
   }
 }
 

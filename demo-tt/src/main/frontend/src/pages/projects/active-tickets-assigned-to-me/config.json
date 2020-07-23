@@ -1,0 +1,9 @@
+{
+  "title": "Active tickets assigned to me",
+  "type": "custom",
+  "children": [],
+  "detailChildren": [],
+  "source": "active-tickets-assigned-to-me",
+  "script": "tickets.js",
+  "html": "tickets.html"
+}
