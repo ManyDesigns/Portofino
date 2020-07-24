@@ -6,7 +6,7 @@ page.htmlLoadStatus.subscribe(s => {
         tickets.innerText = t;
       });
       page.http.get(page.computeSourceUrl() + "/active-tickets-assigned-to-me").subscribe(ts => {
-        if(ts) {
+        if(ts && ts.length > 0) {
           tickets.innerText = '';
           const list = document.createElement("ul");
           tickets.appendChild(list);
@@ -14,7 +14,6 @@ page.htmlLoadStatus.subscribe(s => {
             let item = document.createElement('li');
 
             let link = document.createElement("a");
-            console.log(page.parent)
             let projectId = page.parent.id;
             link.href = `${page.parent.url}/tickets/${projectId}/${t.n}`;
             link.innerText = `${projectId}-${t.n}`;
