@@ -6,8 +6,8 @@ import {mergeMap} from "rxjs/operators";
 import {MatStepper} from "@angular/material/stepper";
 
 @Component({
-  templateUrl: 'wizard.component.html',
-  styleUrls: ['wizard.component.scss']
+  templateUrl: '../../../assets/administration/wizard.component.html',
+  styleUrls: ['../../../assets/administration/wizard.component.scss']
 })
 export class WizardComponent extends Page implements OnInit {
 

@@ -20,7 +20,7 @@ import {WebStorageService} from "../storage/storage.services";
 
 @Component({
   selector: 'portofino-upstairs',
-  templateUrl: './upstairs.component.html'
+  templateUrl: '../../../assets/administration/upstairs.component.html'
 })
 @PortofinoComponent({ name: "portofino-upstairs", hideFromCreateNewPage: true })
 export class UpstairsComponent extends Page implements OnInit {

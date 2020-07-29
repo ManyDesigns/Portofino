@@ -40,8 +40,8 @@ export interface ToolbarComponent {
 
 @Component({
   selector: 'portofino-default-toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.scss']
+  templateUrl: '../../assets/toolbar.component.html',
+  styleUrls: ['../../assets/toolbar.component.scss']
 })
 export class DefaultToolbarComponent implements ToolbarComponent {
   title: string;
@@ -59,8 +59,8 @@ export class DefaultFooterComponent {}
 
 @Component({
   selector: 'portofino-app',
-  templateUrl: './portofino-app.component.html',
-  styleUrls: ['./portofino-app.component.css']
+  templateUrl: '../../assets/portofino-app.component.html',
+  styleUrls: ['../../assets/portofino-app.component.scss']
 })
 export class PortofinoAppComponent implements OnInit, AfterViewInit {
 

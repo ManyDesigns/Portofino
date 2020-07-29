@@ -16,7 +16,7 @@ import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
 
-@Component({ templateUrl: "actions.component.html" })
+@Component({ templateUrl: "../../../assets/administration/actions.component.html" })
 export class ActionsComponent extends Page implements OnInit {
   treeControl: FlatTreeControl<ActionFlatNode>;
   dataSource: PageTreeDataSource;

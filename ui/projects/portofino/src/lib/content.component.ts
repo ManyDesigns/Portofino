@@ -22,8 +22,8 @@ import {catchError, map, mergeMap} from "rxjs/operators";
 
 @Component({
   selector: 'portofino-content',
-  templateUrl: './content.component.html',
-  styleUrls: ['./content.component.css']
+  templateUrl: '../../assets/content.component.html',
+  styleUrls: ['../../assets/content.component.scss']
 })
 export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(MainPageDirective)

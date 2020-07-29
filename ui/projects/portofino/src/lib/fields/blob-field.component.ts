@@ -7,7 +7,7 @@ import {DomSanitizer} from "@angular/platform-browser";
 
 @Component({
   selector: 'portofino-blob-field',
-  templateUrl: './blob-field.component.html'
+  templateUrl: '../../../assets/fields/blob-field.component.html'
 })
 export class BlobFieldComponent extends FieldComponent {
 

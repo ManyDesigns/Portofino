@@ -17,7 +17,7 @@ import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {map} from "rxjs/operators";
 
 @Component({
-  templateUrl: 'tables.component.html'
+  templateUrl: '../../../assets/administration/tables.component.html'
 })
 export class TablesComponent extends Page implements OnInit {
 

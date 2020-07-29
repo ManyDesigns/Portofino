@@ -3,6 +3,6 @@ import {FieldComponent} from "./field.component";
 
 @Component({
   selector: 'portofino-boolean-field',
-  templateUrl: './boolean-field.component.html'
+  templateUrl: '../../../assets/fields/boolean-field.component.html'
 })
 export class BooleanFieldComponent extends FieldComponent {}

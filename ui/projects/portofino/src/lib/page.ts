@@ -691,8 +691,8 @@ export abstract class Page implements WithButtons, OnDestroy {
 
 @Component({
   selector: 'portofino-page-header',
-  templateUrl: './page-header.component.html',
-  styleUrls: ['./page-header.component.scss']
+  templateUrl: '../../assets/page-header.component.html',
+  styleUrls: ['../../assets/page-header.component.scss']
 })
 export class PageHeader {
   @Input()
@@ -738,8 +738,8 @@ export class TemplatesComponent implements AfterViewInit {
 
 @Component({
   selector: 'portofino-page-layout',
-  templateUrl: './page-layout.component.html',
-  styleUrls: ['./page-layout.component.scss']
+  templateUrl: '../../assets/page-layout.component.html',
+  styleUrls: ['../../assets/page-layout.component.scss']
 })
 export class PageLayout implements AfterViewInit {
   @Input()

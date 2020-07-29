@@ -168,8 +168,8 @@ export class DynamicFormComponentDirective {
 
 @Component({
   selector: 'portofino-form',
-  templateUrl: './form.component.html',
-  styleUrls: ['./form.component.scss']
+  templateUrl: '../../assets/form.component.html',
+  styleUrls: ['../../assets/form.component.scss']
 })
 export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   private _controls: FormGroup;
