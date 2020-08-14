@@ -20,10 +20,9 @@
 
 package com.manydesigns.portofino.model.database;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,7 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode"})
 @XmlRootElement
-public class Database implements ModelObject {
+public class Database implements ModelObject, Annotated {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -59,7 +58,7 @@ public class Database implements ModelObject {
     protected String entityMode = null;
 
     protected ConnectionProvider connectionProvider;
-
+    protected final List<Annotation> annotations = new ArrayList<>();
     
     //**************************************************************************
     // Logging
@@ -206,5 +205,13 @@ public class Database implements ModelObject {
 
     public void setEntityMode(String entityMode) {
         this.entityMode = entityMode;
+    }
+
+    @Override
+    @XmlElementWrapper(name = "annotations")
+    @XmlElement(name = "annotation", type = Annotation.class)
+    @NotNull
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 }

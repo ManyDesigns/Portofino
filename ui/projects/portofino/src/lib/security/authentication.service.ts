@@ -61,7 +61,7 @@ export class AuthenticationService {
 
     if (req.headers.has(NO_RENEW_HEADER)) {
       req = req.clone({headers: req.headers.delete(NO_RENEW_HEADER)});
-    } else if (!!this.jsonWebToken && this.portofino.apiRoot &&
+    } else if (this.renewAfterSeconds > -1 && !!this.jsonWebToken && this.portofino.apiRoot &&
       moment().diff(this.lastRenew, 'seconds') > this.renewAfterSeconds) {
       this.lastRenew = moment();
       //The body here is to work around CORS requests failing with an empty body (TODO investigate)

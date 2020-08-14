@@ -3,6 +3,7 @@ package com.manydesigns.portofino.persistence.hibernate;
 import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
+import com.manydesigns.portofino.database.annotations.MultiTenant;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.SequenceGenerator;
@@ -21,6 +22,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.hibernate.EntityMode;
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.TypeDef;
@@ -32,6 +34,7 @@ import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
@@ -194,10 +197,7 @@ public class SessionFactoryBuilder {
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
-        Map<String, Object> settings = new HashMap<>();
-        setupConnection(settings);
-        ServiceRegistry standardRegistry =
-                new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
+        ServiceRegistry standardRegistry = setupConnection(bootstrapServiceRegistry);
         MetadataSources sources = new MetadataSources(standardRegistry);
         List<String> externallyMappedClasses = new ArrayList<>();
         try {
@@ -234,39 +234,59 @@ public class SessionFactoryBuilder {
         return new SessionFactoryAndCodeBase(sessionFactoryBuilder.build(), codeBase);
     }
 
-    protected void setupConnection(Map<String, Object> settings) {
+    protected ServiceRegistry setupConnection(BootstrapServiceRegistry bootstrapServiceRegistry) {
+        Map<String, Object> settings = new HashMap<>();
         ConnectionProvider connectionProvider = database.getConnectionProvider();
         if(!connectionProvider.isHibernateDialectAutodetected()) {
             settings.put(
-                    "hibernate.dialect",
+                    AvailableSettings.DIALECT,
                     connectionProvider.getActualHibernateDialectName());
         }
-        if(connectionProvider instanceof JdbcConnectionProvider) {
-            JdbcConnectionProvider jdbcConnectionProvider =
-                    (JdbcConnectionProvider) connectionProvider;
-            settings.put("hibernate.connection.url", jdbcConnectionProvider.getActualUrl());
-            String driver = jdbcConnectionProvider.getDriver();
-            if(driver != null) {
-                settings.put("hibernate.connection.driver_class", driver);
+        settings.put(AvailableSettings.STATIC_METAMODEL_POPULATION, "enabled");
+        Optional<MultiTenant> multiTenant = database.getJavaAnnotation(MultiTenant.class);
+        if(multiTenant.isPresent()) {
+            MultiTenancyStrategy strategy = multiTenant.get().value();
+            if(strategy.requiresMultiTenantConnectionProvider()) {
+                setupMultiTenantConnection(connectionProvider, settings);
+            } else {
+                setupSingleTenantConnection(connectionProvider, settings);
             }
-            if(jdbcConnectionProvider.getActualUsername() != null) {
-                settings.put("hibernate.connection.username", jdbcConnectionProvider.getActualUsername());
-            }
-            if(jdbcConnectionProvider.getActualPassword() != null) {
-                settings.put("hibernate.connection.password", jdbcConnectionProvider.getActualPassword());
-            }
-        } else if(connectionProvider instanceof JndiConnectionProvider) {
-            JndiConnectionProvider jndiConnectionProvider =
-                    (JndiConnectionProvider) connectionProvider;
-            settings.put("hibernate.connection.datasource", jndiConnectionProvider.getJndiResource());
         } else {
-            throw new Error("Unsupported connection provider: " + connectionProvider);
+            setupSingleTenantConnection(connectionProvider, settings);
         }
-        settings.put("hibernate.ejb.metamodel.population", "enabled");
         //TODO evaluate if they're still applicable:
         //  .setProperty("hibernate.current_session_context_class", "org.hibernate.context.internal.ThreadLocalSessionContext")
         //  .setProperty("org.hibernate.hql.ast.AST", "true")
         //  .setProperty("hibernate.globally_quoted_identifiers", "false");
+        return new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
+    }
+
+    protected void setupMultiTenantConnection(ConnectionProvider connectionProvider, Map<String, Object> settings) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    protected void setupSingleTenantConnection(ConnectionProvider connectionProvider, Map<String, Object> settings) {
+        if(connectionProvider instanceof JdbcConnectionProvider) {
+            JdbcConnectionProvider jdbcConnectionProvider =
+                    (JdbcConnectionProvider) connectionProvider;
+            settings.put(AvailableSettings.URL, jdbcConnectionProvider.getActualUrl());
+            String driver = jdbcConnectionProvider.getDriver();
+            if(driver != null) {
+                settings.put(AvailableSettings.DRIVER, driver);
+            }
+            if(jdbcConnectionProvider.getActualUsername() != null) {
+                settings.put(AvailableSettings.USER, jdbcConnectionProvider.getActualUsername());
+            }
+            if(jdbcConnectionProvider.getActualPassword() != null) {
+                settings.put(AvailableSettings.PASS, jdbcConnectionProvider.getActualPassword());
+            }
+        } else if(connectionProvider instanceof JndiConnectionProvider) {
+            JndiConnectionProvider jndiConnectionProvider =
+                    (JndiConnectionProvider) connectionProvider;
+            settings.put(AvailableSettings.DATASOURCE, jndiConnectionProvider.getJndiResource());
+        } else {
+            throw new Error("Unsupported connection provider: " + connectionProvider);
+        }
     }
 
     protected FileObject getEntityLocation(FileObject root, Table table) throws FileSystemException {
