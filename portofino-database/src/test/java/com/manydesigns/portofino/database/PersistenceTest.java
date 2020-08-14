@@ -416,7 +416,7 @@ public class PersistenceTest {
 
     public void testFkComposite() throws Exception {
         Session session = persistence.getSession("hibernatetest");
-        List<Object> list2 = session.createQuery(QueryUtils.createCriteria(session, "table2").getFirst()).list();
+        List<Object> list2 = session.createQuery(QueryUtils.createCriteria(session, "table2").getV1()).list();
         Object map = list2.get(0);
         List<?> obj = get(map, "table3_t2_id1_fkey");
         assertNotNull(obj);

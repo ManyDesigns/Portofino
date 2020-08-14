@@ -202,5 +202,5 @@ export class DemoTTAppModule {
   // It's necessary to spell used components here, otherwise Angular (Ivy) tree-shakes them.
   // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
   // https://github.com/angular/angular/issues/35314#issuecomment-584821399
-  static entryComponents = [ CrudComponent, CustomPageComponent, TextPageComponent ];
+  static entryComponents = [ CrudComponent, CustomPageComponent, TextPageComponent, ProfileComponent ];
 }

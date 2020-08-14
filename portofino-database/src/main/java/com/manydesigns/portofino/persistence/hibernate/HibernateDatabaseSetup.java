@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.persistence.hibernate;
 
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.database.annotations.MultiTenant;
 import com.manydesigns.portofino.model.database.Database;
 import org.hibernate.*;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,6 +47,7 @@ public class HibernateDatabaseSetup {
     protected final ThreadLocal<Session> threadSessions;
     protected final EntityMode entityMode;
     protected final Map<String, String> jpaEntityNameToClassNameMap = new HashMap<>();
+    protected final boolean multitenant;
 
         public static final Logger logger =
             LoggerFactory.getLogger(HibernateDatabaseSetup.class);
@@ -58,6 +61,13 @@ public class HibernateDatabaseSetup {
         database.getAllTables().forEach(t -> {
             jpaEntityNameToClassNameMap.put(t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode));
         });
+        Optional<MultiTenant> multiTenant = database.getJavaAnnotation(MultiTenant.class);
+        if(multiTenant.isPresent()) {
+            MultiTenancyStrategy strategy = multiTenant.get().value();
+            this.multitenant = strategy != MultiTenancyStrategy.NONE;
+        } else {
+            this.multitenant = false;
+        }
     }
 
     public SessionFactory getSessionFactory() {
@@ -86,7 +96,12 @@ public class HibernateDatabaseSetup {
     }
 
     public Session createSession() {
-        Session session = sessionFactory.openSession();
+        Session session;
+        if(multitenant) {
+            session = sessionFactory.withOptions().tenantIdentifier("TODO").openSession();
+        } else {
+            session = sessionFactory.openSession();
+        }
         return new SessionDelegator(this, session);
     }
 

@@ -11,6 +11,7 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.model.database.TableGenerator;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenantConnectionProvider;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
@@ -23,6 +24,7 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.hibernate.EntityMode;
 import org.hibernate.MultiTenancyStrategy;
+import org.hibernate.SessionFactory;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.TypeDef;
@@ -32,6 +34,7 @@ import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.cfg.AvailableSettings;
@@ -197,7 +200,9 @@ public class SessionFactoryBuilder {
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
-        ServiceRegistry standardRegistry = setupConnection(bootstrapServiceRegistry);
+        Map<String, Object> settings = setupConnection();
+        StandardServiceRegistry standardRegistry =
+                new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
         MetadataSources sources = new MetadataSources(standardRegistry);
         List<String> externallyMappedClasses = new ArrayList<>();
         try {
@@ -234,7 +239,7 @@ public class SessionFactoryBuilder {
         return new SessionFactoryAndCodeBase(sessionFactoryBuilder.build(), codeBase);
     }
 
-    protected ServiceRegistry setupConnection(BootstrapServiceRegistry bootstrapServiceRegistry) {
+    protected Map<String, Object> setupConnection() {
         Map<String, Object> settings = new HashMap<>();
         ConnectionProvider connectionProvider = database.getConnectionProvider();
         if(!connectionProvider.isHibernateDialectAutodetected()) {
@@ -242,12 +247,13 @@ public class SessionFactoryBuilder {
                     AvailableSettings.DIALECT,
                     connectionProvider.getActualHibernateDialectName());
         }
-        settings.put(AvailableSettings.STATIC_METAMODEL_POPULATION, "enabled");
+        settings.put(AvailableSettings.JPA_METAMODEL_POPULATION, "enabled");
         Optional<MultiTenant> multiTenant = database.getJavaAnnotation(MultiTenant.class);
         if(multiTenant.isPresent()) {
             MultiTenancyStrategy strategy = multiTenant.get().value();
             if(strategy.requiresMultiTenantConnectionProvider()) {
                 setupMultiTenantConnection(connectionProvider, settings);
+                settings.put(AvailableSettings.MULTI_TENANT, strategy);
             } else {
                 setupSingleTenantConnection(connectionProvider, settings);
             }
@@ -258,11 +264,27 @@ public class SessionFactoryBuilder {
         //  .setProperty("hibernate.current_session_context_class", "org.hibernate.context.internal.ThreadLocalSessionContext")
         //  .setProperty("org.hibernate.hql.ast.AST", "true")
         //  .setProperty("hibernate.globally_quoted_identifiers", "false");
-        return new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
+        return settings;
     }
 
     protected void setupMultiTenantConnection(ConnectionProvider connectionProvider, Map<String, Object> settings) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        if(connectionProvider instanceof JndiConnectionProvider) {
+            logger.debug("JNDI connection provider configured. Using default Hibernate strategy based on JNDI.");
+            return;
+        }
+
+        setupSingleTenantConnection(connectionProvider, settings);
+
+        BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
+        BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
+        StandardServiceRegistry standardRegistry =
+                new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
+        Object service = standardRegistry.getService(org.hibernate.engine.jdbc.connections.spi.ConnectionProvider.class);
+        standardRegistry.close();
+        Class connectionProviderClass = service.getClass();
+
+        settings.put(MultiTenantConnectionProvider.CONNECTION_PROVIDER_CLASS, connectionProviderClass);
+        settings.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, MultiTenantConnectionProvider.class);
     }
 
     protected void setupSingleTenantConnection(ConnectionProvider connectionProvider, Map<String, Object> settings) {

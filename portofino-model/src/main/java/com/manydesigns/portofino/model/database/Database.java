@@ -39,7 +39,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode"})
+@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode","annotations"})
 @XmlRootElement
 public class Database implements ModelObject, Annotated {
     public static final String copyright =
@@ -83,7 +83,11 @@ public class Database implements ModelObject, Annotated {
         return databaseName;
     }
 
-    public void reset() {}
+    public void reset() {
+        for(Annotation a : annotations) {
+            a.reset();
+        }
+    }
 
     public void init(Model model, Configuration configuration) {
         if(databaseName == null) {
@@ -92,9 +96,16 @@ public class Database implements ModelObject, Annotated {
         if(databaseName.contains("/") || databaseName.contains("\\")) {
             throw new IllegalStateException("Database name contains slashes or backslashes: " + databaseName);
         }
+        for(Annotation a : annotations) {
+            a.init(model, configuration);
+        }
     }
 
-    public void link(Model model, Configuration configuration) {}
+    public void link(Model model, Configuration configuration) {
+        for(Annotation a : annotations) {
+            a.link(model, configuration);
+        }
+    }
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Schema schema : schemas) {
