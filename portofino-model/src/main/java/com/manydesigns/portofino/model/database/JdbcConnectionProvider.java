@@ -116,7 +116,9 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     public Connection acquireConnection() throws Exception {
-        Class.forName(driver);
+        if(driver != null) {
+            Class.forName(driver);
+        }
         return DriverManager.getConnection(actualUrl, actualUsername, actualPassword);
     }
 
@@ -124,7 +126,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     // Getters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
+    @XmlAttribute
     public String getDriver() {
         return driver;
     }

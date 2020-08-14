@@ -19,6 +19,7 @@ export class ConnectionProviderDetails {
   url: { value: string };
   user: { value: string };
   username: { value: string };
+  entityMode: { value: string };
 }
 
 export class DatabasePlatform {

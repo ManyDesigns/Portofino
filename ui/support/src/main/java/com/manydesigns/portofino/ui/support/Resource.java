@@ -39,16 +39,20 @@ public class Resource {
             localAddr = "[" + localAddr + "]"; //https://www.ietf.org/rfc/rfc2732.txt
         }
         String localUri = request.getScheme() + "://" + localAddr + ":" + request.getLocalPort() + request.getContextPath();
-        String baseUri;
+
+        String baseUri = null;
+        String apiRootUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
         try {
             URI uri = new URI(localUri);
             baseUri = ApiInfo.getApiRootUri(servletContext, uri);
         } catch (URISyntaxException e) {
             logger.debug("Invalid local URI: " + localUri, e);
-            baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
         }
-        if (path.startsWith(baseUri)) {
+
+        if (baseUri != null && path.startsWith(baseUri)) {
             path = path.substring(baseUri.length());
+        } else if(path.startsWith(apiRootUri)) {
+            path = path.substring(apiRootUri.length());
         }
         WebTarget target = c.target(baseUri);
         return target.path(path);

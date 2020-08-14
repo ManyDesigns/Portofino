@@ -12,8 +12,8 @@ export class Breadcrumb {
 
 @Component({
   selector: 'breadcrumbs',
-  templateUrl: 'breadcrumbs.component.html',
-  styleUrls: ['./breadcrumbs.component.css']
+  templateUrl: '../../../assets/breadcrumbs/breadcrumbs.component.html',
+  styleUrls: ['../../../assets/breadcrumbs/breadcrumbs.component.scss']
 })
 export class BreadcrumbsComponent implements OnInit, OnDestroy {
 

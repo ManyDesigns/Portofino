@@ -1,30 +1,26 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ContentChild,
-  EventEmitter,
-  Injectable,
-  InjectionToken,
-  Input,
+import { AfterViewInit,
+  ChangeDetectorRef, Component, ContentChild, EventEmitter,
+  Injectable, InjectionToken, Input,
   OnDestroy,
   Optional,
   TemplateRef,
   Type,
-  ViewChild
-} from "@angular/core";
+  ViewChild, Directive } from "@angular/core";
 import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
-import {AuthenticationService, NO_AUTH_HEADER} from "./security/authentication.service";
-import {declareButton, getButtons, WithButtons} from "./buttons";
+import {AuthenticationService} from "./security/authentication.service";
+import {ButtonInfo, declareButton, getAvailableButtonLists, getButtons, WithButtons} from "./buttons";
 import {Observable, of, PartialObserver, Subscription} from "rxjs";
 import {catchError, map} from "rxjs/operators";
-import {NotificationService} from "./notifications/notification.service";
+import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
+import {NO_AUTH_HEADER} from "./security/authentication.headers";
+import {ThemePalette} from "@angular/material/core";
+import moment from 'moment-with-locales-es6';
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -58,8 +54,8 @@ export class PageService {
 
 @Component({
   selector: 'portofino-default-navigation',
-  templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.scss']
+  templateUrl: '../../assets/navigation.component.html',
+  styleUrls: ['../../assets/navigation.component.scss']
 })
 export class DefaultNavigationComponent {
   constructor(public pageService: PageService) {}
@@ -73,6 +69,15 @@ export class PageConfiguration {
   children: PageChild[] = [];
   icon?: string;
   template?: string;
+  buttons?: { [list: string]: ButtonConfiguration[] };
+  script?: string;
+}
+
+export class ButtonConfiguration {
+  icon?: string;
+  text?: string;
+  color: ThemePalette;
+  method: string;
 }
 
 export class PageChild {
@@ -93,6 +98,8 @@ export class PageSettingsPanel {
   error;
   readonly accessLevels = ["NONE", "VIEW", "EDIT", "DEVELOP", "DENY"];
   callback: (saved: boolean) => void;
+  children = true;
+  buttons = true;
 
   constructor(public page: Page) {}
 
@@ -217,6 +224,7 @@ export class PageSettingsPanel {
     const config = Object.assign({}, this.page.configuration, formValue);
     const pageConfiguration = new PageConfiguration();
     //Reflection would be nice
+    pageConfiguration.buttons = config.buttons;
     pageConfiguration.children = config.children;
     pageConfiguration.icon = config.icon;
     pageConfiguration.source = config.source;
@@ -227,6 +235,7 @@ export class PageSettingsPanel {
   }
 }
 
+@Directive()
 export abstract class Page implements WithButtons, OnDestroy {
 
   @Input()
@@ -264,33 +273,43 @@ export abstract class Page implements WithButtons, OnDestroy {
     }
   }
 
-  private setupBasicPageButtons() {
-    declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'configuration',
-      enabledIf: () => this.settingsPanel.isValid()
-    }, this, 'saveConfiguration', null);
-    declareButton({
-      icon: 'arrow_back', text: 'Cancel', list: 'configuration'
-    }, this, 'cancelConfiguration', null);
-    declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'permissions'
-    }, this, 'savePermissions', null);
-    declareButton({
-      icon: 'arrow_back', text: 'Cancel', list: 'permissions'
-    }, this, 'cancelPermissions', null);
-    declareButton({
-      color: 'primary', icon: 'save', text: 'Save', list: 'children', enabledIf: () => this.portofino.localApiAvailable
-    }, this, 'saveChildren', null);
-    declareButton({
-      icon: 'arrow_back', text: 'Cancel', list: 'children'
-    }, this, 'cancelChildren', null);
-    declareButton({
-      icon: 'arrow_back', text: 'Back', list: 'breadcrumbs', presentIf: () => this.canGoBack()
-    }, this, 'goBack', null);
-  }
-
   initialize() {
     this.computeNavigationMenu();
+    const config = this.configuration;
+    if(config && config.script) {
+      this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.script}`), {
+        responseType: "text"
+      }).subscribe(s => {
+        //Expose some utilities
+        (this as any).util = {
+          moment: moment
+        };
+
+        let factory = new Function(`return function(page) { ${s} }`);
+        let userFunction = factory();
+        userFunction(this);
+      }, e => {
+        this.notificationService.error(this.translate.get("Could not load page script"));
+      });
+    }
+    this.setupCustomButtons(config);
+  }
+
+  protected setupCustomButtons(config) {
+    if (config && config.buttons) {
+      for (let list in config.buttons) {
+        let buttons = config.buttons[list];
+        buttons.forEach(b => {
+          let info = new ButtonInfo();
+          info.list = list;
+          info.color = b.color;
+          info.icon = b.icon;
+          info.text = b.text;
+          let methodName = b.method || 'noActionForButton';
+          declareButton(info, this, methodName, null);
+        });
+      }
+    }
   }
 
   protected getPageSettingsPanel() {
@@ -364,9 +383,50 @@ export abstract class Page implements WithButtons, OnDestroy {
     return this.children.find(c => c.path == segment);
   }
 
+  //Buttons
   getButtons(list = 'default') {
     return getButtons(this, list);
   }
+
+  protected setupBasicPageButtons() {
+    this.declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'configuration',
+      enabledIf: () => this.settingsPanel.isValid()
+    }, 'saveConfiguration');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'configuration'
+    }, 'cancelConfiguration',);
+    this.declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'permissions'
+    }, 'savePermissions');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'permissions'
+    }, 'cancelPermissions');
+    this.declareButton({
+      color: 'primary', icon: 'save', text: 'Save', list: 'children', enabledIf: () => this.portofino.localApiAvailable
+    }, 'saveChildren');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Cancel', list: 'children'
+    }, 'cancelChildren');
+    this.declareButton({
+      icon: 'arrow_back', text: 'Back', list: 'breadcrumbs', presentIf: () => this.canGoBack()
+    }, 'goBack');
+  }
+
+  declareButton(info: ButtonInfo | any, methodName: string) {
+    declareButton(info, this, methodName, null);
+  }
+
+  getAvailableButtonLists() {
+    return getAvailableButtonLists(this);
+  }
+
+  noActionForButton(event) {
+    if(console) {
+      console.log("Not implemented", event);
+    }
+  }
+  //End buttons
 
   get template(): TemplateRef<any> {
     const template = this.configuration.template;
@@ -394,8 +454,12 @@ export abstract class Page implements WithButtons, OnDestroy {
     if(!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
-    let sourceUrl = this.computeSecurityCheckUrl();
-    return this.http.get(sourceUrl,{ headers: headers, observe: "response" });
+    let securityCheckUrl = this.computeSecurityCheckUrl();
+    if(securityCheckUrl) {
+      return this.http.get(securityCheckUrl,{ headers: headers, observe: "response" });
+    } else {
+      return of(true);
+    }
   }
 
   protected computeSecurityCheckUrl() {
@@ -627,8 +691,8 @@ export abstract class Page implements WithButtons, OnDestroy {
 
 @Component({
   selector: 'portofino-page-header',
-  templateUrl: './page-header.component.html',
-  styleUrls: ['./page-header.component.scss']
+  templateUrl: '../../assets/page-header.component.html',
+  styleUrls: ['../../assets/page-header.component.scss']
 })
 export class PageHeader {
   @Input()
@@ -674,17 +738,17 @@ export class TemplatesComponent implements AfterViewInit {
 
 @Component({
   selector: 'portofino-page-layout',
-  templateUrl: './page-layout.component.html',
-  styleUrls: ['./page-layout.component.scss']
+  templateUrl: '../../assets/page-layout.component.html',
+  styleUrls: ['../../assets/page-layout.component.scss']
 })
 export class PageLayout implements AfterViewInit {
   @Input()
   page: Page;
-  @ContentChild("content", { static: false })
+  @ContentChild("content")
   content: TemplateRef<any>;
   @ViewChild("defaultTemplate", { static: true })
   defaultTemplate: TemplateRef<any>;
-  @ContentChild("extraConfiguration", { static: false })
+  @ContentChild("extraConfiguration")
   extraConfiguration: TemplateRef<any>;
 
   template: TemplateRef<any>;

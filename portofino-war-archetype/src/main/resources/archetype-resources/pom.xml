@@ -9,6 +9,7 @@
     <version>${version}</version>
     <properties>
         <portofino.version>${portofinoVersion}</portofino.version>
+        <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
         <portofino.application.directory>${dollar}{serverInfo:realPath}/WEB-INF</portofino.application.directory>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -183,6 +184,19 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
+        <!-- This is for building an executable war. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-microservice-launcher</artifactId>
+            <version>${portofino.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>9.0.36</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -208,6 +222,24 @@
                         <resource><directory>src/main/webapp/</directory></resource>
                     </webResources>
                 </configuration>
+            </plugin>
+            <!-- We use this to repackage the war and make it executable, even if we don't use Spring Boot.
+                 If you don't plan to launch the war file with java -jar and an embedded container, you can
+                 safely remove this plugin. -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <mainClass>com.manydesigns.portofino.microservices.launcher.WarFileLauncher</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <resources>
@@ -295,16 +327,8 @@
                 </plugins>
             </build>
         </profile>
-        <!-- See web.xml for an explanation -->
         <profile>
-            <!-- Used for development, see web.xml for an explanation. -->
-            <id>portofino-development</id>
-            <properties>
-                <portofino.application.directory>${basedir}/src/main/webapp/WEB-INF</portofino.application.directory>
-            </properties>
-        </profile>
-        <profile>
-            <!-- Build Docker images and launch the application. -->
+            <!-- Build Docker images and launch the application. See web.xml for additional explanations. -->
             <id>docker</id>
             <properties>
                 <portofino.application.directory>${dollar}{env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>

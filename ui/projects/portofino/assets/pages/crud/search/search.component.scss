@@ -1,0 +1,19 @@
+.search-results table.mat-table {
+  width: 100%;
+
+  tr.mat-row[mat-row] td.mat-cell {
+    a.mat-button {
+      margin-left: -16px;
+    }
+  }
+}
+
+.mat-column-select {
+  overflow: initial;
+}
+
+.portofino-search-title {
+  line-height: 28px;
+  font-size: large;
+  margin-left: 5px;
+}

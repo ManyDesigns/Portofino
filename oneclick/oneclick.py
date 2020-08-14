@@ -1,17 +1,18 @@
 #! /usr/bin/env python
 
 """
-You must create a "local.py" using the following template:
+In order to run this script, you must first create a "local.py" file using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "5.1.1"
-tomcat_dir = "apache-tomcat-9.0.26"
+portofino_version = "5.1.4"
+tomcat_dir = "apache-tomcat-9.0.36"
 portofino_path = "~/projects/portofino5"
-tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.26/bin/apache-tomcat-9.0.26.zip"
-drivers = [["org/postgresql/postgresql/42.2.8/", "postgresql-42.2.8.jar"],
-           ["mysql/mysql-connector-java/8.0.17/", "mysql-connector-java-8.0.17.jar"],
-           ["net/sourceforge/jtds/jtds/1.3.1/", "jtds-1.3.1.jar"]]
+tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.36/bin/apache-tomcat-9.0.36.zip"
+drivers = [["org/postgresql/postgresql/42.2.14/", "postgresql-42.2.14.jar"],
+           ["mysql/mysql-connector-java/8.0.20/", "mysql-connector-java-8.0.20.jar"],
+           ["net/sourceforge/jtds/jtds/1.3.1/", "jtds-1.3.1.jar"],
+           ["org/mariadb/jdbc/mariadb-java-client/2.6.1/", "mariadb-java-client-2.6.1.jar"]]
 """
 
 import local

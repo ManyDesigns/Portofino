@@ -2,7 +2,7 @@ import {Page} from "../page";
 import {Component, OnInit} from "@angular/core";
 import {ConnectionProviderDetails, ConnectionProviderSummary} from "./support";
 import {Button} from "../buttons";
-import {NotificationService} from "../notifications/notification.service";
+import {NotificationService} from "../notifications/notification.services";
 import {ActivatedRoute, Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../portofino.service";
@@ -17,7 +17,7 @@ import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {map} from "rxjs/operators";
 
 @Component({
-  templateUrl: 'tables.component.html'
+  templateUrl: '../../../assets/administration/tables.component.html'
 })
 export class TablesComponent extends Page implements OnInit {
 

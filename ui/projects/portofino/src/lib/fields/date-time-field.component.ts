@@ -13,7 +13,7 @@ import moment from "moment-with-locales-es6";
 
 @Component({
   selector: 'portofino-date-time-field',
-  templateUrl: './date-time-field.component.html'
+  templateUrl: '../../../assets/fields/date-time-field.component.html'
 })
 export class DateTimeFieldComponent extends FieldComponent {
 

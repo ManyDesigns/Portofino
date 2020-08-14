@@ -5,7 +5,7 @@ import {FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'portofino-select-field',
-  templateUrl: './select-field.component.html'
+  templateUrl: '../../../assets/fields/select-field.component.html'
 })
 export class SelectFieldComponent extends FieldComponent {
 

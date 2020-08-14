@@ -1,0 +1,6 @@
+<portofino-page-layout [page]="this">
+  <ng-template #content>
+    <div [innerHTML]="html" *ngIf="html"></div>
+    <div *ngIf="!html">{{ 'This a custom page. You can either provide an HTML file to display here, or override this template entirely using Angular.' | translate }}</div>
+  </ng-template>
+</portofino-page-layout>

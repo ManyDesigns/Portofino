@@ -2,13 +2,17 @@ package com.manydesigns.portofino.code;
 
 import io.reactivex.subjects.Subject;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by alessio on 28/03/17.
  */
 public interface CodeBase {
+    void setParent(CodeBase parent) throws Exception;
+
     Class loadClass(String className, SearchScope searchScope) throws IOException, ClassNotFoundException;
 
     default Class loadClass(String className) throws IOException, ClassNotFoundException {
@@ -34,6 +38,8 @@ public interface CodeBase {
     CodeBase getParent();
 
     Subject<Class> getReloads();
+
+    URL findResource(String name) throws IOException;
 
     enum SearchScope {
         LOCAL, LOCAL_PARENT, LOCAL_PARENT_CLASSLOADER;

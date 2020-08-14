@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {MatDialogRef} from "@angular/material/dialog";
 import {AuthenticationService} from "../authentication.service";
 import {FormGroup} from "@angular/forms";
-import {NotificationService} from "../../notifications/notification.service";
+import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {Location} from "@angular/common";
 import {HttpClient} from "@angular/common/http";

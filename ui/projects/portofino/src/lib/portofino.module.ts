@@ -77,9 +77,12 @@ import {DynamicFormComponentDirective, FormComponent} from "./form";
 import {TranslateModule} from "@ngx-translate/core";
 import {ContentComponent} from "./content.component";
 import {
-  MatSnackBarNotificationService, NotificationErrorHandler, NotificationInterceptor,
-  NotificationService
-} from "./notifications/notification.service";
+  NOTIFICATION_HANDLERS,
+  NotificationDispatcher,
+  NotificationErrorHandler,
+  NotificationInterceptor,
+  NotificationService, NotificationsHolder
+} from "./notifications/notification.services";
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import { NgxdModule } from '@ngxd/core';
 import {FieldFactory, FieldFactoryComponent} from "./fields/field.factory";
@@ -91,9 +94,6 @@ import {SelectFieldComponent} from "./fields/select-field.component";
 import {PageFactoryComponent} from "./page.factory";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
-import {MatDatetimepickerModule} from "@mat-datetimepicker/core";
-import {MatMomentDatetimeModule} from "@mat-datetimepicker/moment";
-import {LocalStorageService} from "ngx-store";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
 import {
   MailSettingsComponent,
@@ -106,6 +106,7 @@ import {WizardComponent} from "./administration/wizard.component";
 import {TablesComponent} from "./administration/tables.component";
 import {ActionsComponent, CreateActionComponent, GenericPage} from "./administration/actions.component";
 import {TRANSLATIONS_EN} from "./i18n/en";
+import {TRANSLATIONS_ES} from "./i18n/es";
 import {TRANSLATIONS_IT} from "./i18n/it";
 import {ChangePasswordComponent} from "./security/login/change-password.component";
 import {SignupComponent} from "./security/login/signup.component";
@@ -116,6 +117,10 @@ import {RichTextComponent} from "./fields/rich-text.component";
 import {TextPageComponent} from "./pages/text/text.component";
 import {VarDirective} from "./var.directive";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatBadgeModule} from "@angular/material/badge";
+import {LocalStorageService} from "./storage/storage.services";
+import {PageSettingsPanelComponent} from "./page-settings-panel.component";
+import {CustomPageComponent} from "./pages/custom/custom.component";
 
 @NgModule({
   declarations: [
@@ -125,8 +130,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule,
-    FileInputAccessorModule, NgxdModule, QuillModule, TranslateModule.forChild()],
+    MatMomentDateModule, MatRadioModule, MatSelectModule, FileInputAccessorModule, NgxdModule, QuillModule,
+    TranslateModule.forChild()],
   providers: [ FieldFactory ],
   entryComponents: [
     BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent,
@@ -136,25 +141,25 @@ import {MatTooltipModule} from "@angular/material/tooltip";
     NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
     FormComponent,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatMomentDatetimeModule, MatRadioModule, MatSelectModule, MatDatetimepickerModule]
+    MatMomentDateModule, MatRadioModule, MatSelectModule]
 })
 export class PortofinoFormsModule {}
 
 @NgModule({
-  declarations: [
-    PageLayout, ButtonComponent, ButtonsComponent,
-    ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
-    LanguageSelectorComponent,
-    NavigationDirective, DefaultNavigationComponent, VarDirective,
-    ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
-    CreatePageComponent, DeletePageComponent, MovePageComponent
-  ],
+    declarations: [
+        PageLayout, ButtonComponent, ButtonsComponent,
+        ContentComponent, PageFactoryComponent, PageHeader, MainPageDirective, TemplatesComponent,
+        LanguageSelectorComponent,
+        NavigationDirective, DefaultNavigationComponent, VarDirective,
+        ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
+        CreatePageComponent, DeletePageComponent, MovePageComponent, PageSettingsPanelComponent
+    ],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule,
-    MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule, MatMenuModule,
-    MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
+    MatBadgeModule, MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule,
+    MatMenuModule, MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule,
+    MatStepperModule, MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule.forChild()
   ],
   providers: [PortofinoService, AuthenticationService, PageService, PageCrudService, SidenavService],
@@ -220,8 +225,8 @@ export class PortofinoUpstairsModule {}
 @NgModule({
   declarations: [
     PortofinoAppComponent,
-    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
-    TextPageComponent],
+    CustomPageComponent, LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent,
+    ResetPasswordComponent, TextPageComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
@@ -243,12 +248,15 @@ export class PortofinoUpstairsModule {}
     { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
     { provide: LOCALES, useValue: [
       { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
-      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT }]},
-    { provide: NotificationService, useClass: MatSnackBarNotificationService },
+      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT },
+      { key: 'es', name: 'Español', translations: TRANSLATIONS_ES }]},
+    NotificationsHolder,
+    { provide: NOTIFICATION_HANDLERS, useExisting: NotificationsHolder, multi: true },
+    { provide: NotificationService, useClass: NotificationDispatcher },
     { provide: ErrorHandler, useClass: NotificationErrorHandler }],
   entryComponents: [
-    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
-    TextPageComponent],
+    CustomPageComponent, LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent,
+    ResetPasswordComponent, TextPageComponent],
   exports: [
     PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent,
     LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
@@ -256,6 +264,7 @@ export class PortofinoUpstairsModule {}
     DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
     CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
     SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
+    CustomPageComponent,
     ManyToManyComponent, TextPageComponent]
 })
 export class PortofinoModule {
@@ -284,14 +293,11 @@ export class PortofinoModule {
   }
 
   public static forRoot(): (ModuleWithProviders<RouterModule> | PortofinoModule)[] {
-    return [RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()), PortofinoModule];
+    return PortofinoModule.withRoutes(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig())
   }
 
   public static withRoutes(routes: Routes, config: ExtraOptions = {}): (ModuleWithProviders<RouterModule>|Type<PortofinoModule>)[] {
-    return [RouterModule.forRoot(
-      [...routes, ...PortofinoModule.defaultRoutes()],
-      { ...PortofinoModule.defaultRouterConfig(), ...config }),
-      PortofinoModule];
+    return [RouterModule.forRoot(routes, config), PortofinoModule];
   }
 
   public static defaultRoutes(): Routes {

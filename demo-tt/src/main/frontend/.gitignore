@@ -1,4 +1,7 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# Since Portofino is included as a local library file, which is built every time the root project is built,
+# the checksum in the committed package-lock.json won't match with the one built during CI. Therefore, for this project
+# only, we don't commit package-lock.json.
+package-lock.json
 
 # compiled output
 /dist

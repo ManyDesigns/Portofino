@@ -6,6 +6,7 @@ public class GenericDatabasePlatform extends AbstractDatabasePlatform {
 
     public GenericDatabasePlatform() {
         super(null, "jdbc:");
+        status = DatabasePlatform.STATUS_OK;
     }
 
     @Override

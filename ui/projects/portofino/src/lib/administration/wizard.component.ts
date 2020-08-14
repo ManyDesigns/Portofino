@@ -6,15 +6,15 @@ import {mergeMap} from "rxjs/operators";
 import {MatStepper} from "@angular/material/stepper";
 
 @Component({
-  templateUrl: 'wizard.component.html',
-  styleUrls: ['wizard.component.scss']
+  templateUrl: '../../../assets/administration/wizard.component.html',
+  styleUrls: ['../../../assets/administration/wizard.component.scss']
 })
 export class WizardComponent extends Page implements OnInit {
 
   connectionProviders: ConnectionProviderSummary[];
   databasePlatforms: DatabasePlatform[];
-  wizard: { connectionProvider: ConnectionProviderSummary } | any =
-    { newConnectionType: 'jdbc', strategy: "automatic" };
+  wizard: { connectionProvider: ConnectionProviderSummary, newConnectionType?: string, entityMode: string } | any =
+    { newConnectionType: 'jdbc', strategy: "automatic", entityMode: 'MAP' };
   @ViewChild("stepper", { static: true })
   stepper: MatStepper;
 
@@ -60,6 +60,7 @@ export class WizardComponent extends Page implements OnInit {
       conn.url = {value: this.wizard.connectionUrl};
       conn.username = {value: this.wizard.username};
       conn.password = {value: this.wizard.password};
+      conn.entityMode = {value: this.wizard.entityMode};
       this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
         this.notificationService.info(this.translate.instant("Database created."));
         const summary = new ConnectionProviderSummary();
@@ -86,6 +87,15 @@ export class WizardComponent extends Page implements OnInit {
       });
       this.wizard.tables = tables;
       this.stepper.next();
+    });
+  }
+
+  checkAuthczConfiguration() {
+    const url = `${this.portofino.apiRoot}portofino-upstairs/users/check-wizard`;
+    this.http.post(url, this.wizard).subscribe((result) => {
+      if(result) {
+        this.stepper.next();
+      }
     });
   }
 

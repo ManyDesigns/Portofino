@@ -32,7 +32,7 @@ export class FieldFactory {
 
 @Component({
   selector: 'portofino-field',
-  templateUrl: './field.component.html'
+  templateUrl: '../../../assets/fields/field.component.html'
 })
 export class FieldFactoryComponent extends FieldComponent {
 

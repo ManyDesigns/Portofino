@@ -5,10 +5,11 @@ import {
   FormGroupDirective, NgForm,
   Validators
 } from "@angular/forms";
-import {ErrorStateMatcher, MatDialogRef} from "@angular/material";
+import { ErrorStateMatcher } from "@angular/material/core";
+import { MatDialogRef } from "@angular/material/dialog";
 import {AuthenticationService} from "../authentication.service";
 import {Component} from "@angular/core";
-import {NotificationService} from "../../notifications/notification.service";
+import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {samePasswordChecker} from "../../form";
 
@@ -48,7 +49,11 @@ import {samePasswordChecker} from "../../form";
       <button mat-button [disabled]="form.invalid" (click)="change()" color="accent">{{ 'Change password' | translate }}</button>
       <button mat-button mat-dialog-close>{{ 'Cancel' | translate }}</button>
     </mat-dialog-actions>
-  `
+  `,
+  styles: [`
+    form > mat-form-field {
+      margin: 0 5px;
+    }`]
 })
 export class ChangePasswordComponent {
 

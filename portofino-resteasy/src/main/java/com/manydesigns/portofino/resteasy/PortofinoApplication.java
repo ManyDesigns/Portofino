@@ -1,8 +1,8 @@
 package com.manydesigns.portofino.resteasy;
 
+import com.manydesigns.mail.rest.SendMailAction;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoFilter;
-import com.manydesigns.portofino.rest.actions.mail.SendMailAction;
 import com.manydesigns.portofino.rest.messagebodywriters.FormMessageBodyWriter;
 import com.manydesigns.portofino.rest.messagebodywriters.XhtmlFragmentMessageBodyWriter;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;

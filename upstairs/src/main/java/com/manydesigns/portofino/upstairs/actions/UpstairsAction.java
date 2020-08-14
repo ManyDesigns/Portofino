@@ -7,12 +7,12 @@ import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.actions.Group;
 import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.Annotation;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -53,7 +53,7 @@ import java.io.Writer;
 import java.sql.*;
 import java.util.*;
 
-import static com.manydesigns.portofino.modules.ResourceActionsModule.ACTIONS_DIRECTORY;
+import static com.manydesigns.portofino.ResourceActionsModule.ACTIONS_DIRECTORY;
 
 /**
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
@@ -89,7 +89,7 @@ public class UpstairsAction extends AbstractResourceAction {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> getInfo() {
         Map<String, Object> info = new HashMap<>();
-        info.put("version", PortofinoProperties.getPortofinoVersion());
+        info.put("version", Module.getPortofinoVersion());
         List<ModuleInfo> modules = new ArrayList<>();
         for(Module module : applicationContext.getBeansOfType(Module.class).values()) {
             ModuleInfo view = new ModuleInfo();
@@ -129,7 +129,7 @@ public class UpstairsAction extends AbstractResourceAction {
                 TemplateEngine engine = new SimpleTemplateEngine();
                 Template template = engine.createTemplate(
                         UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudAction.groovy"));
-                Table userTable = getTable(wizard.usersTable);
+                Table userTable = getTable(persistence.getModel(), wizard.usersTable);
                 Column userPasswordColumn = getColumn(userTable, wizard.userPasswordProperty);
                 boolean userCrudCreated = false;
                 for(TableInfo tableInfo : tables) {
@@ -173,7 +173,7 @@ public class UpstairsAction extends AbstractResourceAction {
         if(database == null) {
             throw new WebApplicationException("The database does not exist: " + databaseName);
         }
-        Table userTable = getTable(wizard.usersTable);
+        Table userTable = getTable(persistence.getModel(), wizard.usersTable);
         if(userTable != null) {
             try {
                 setupSecurityGroovy(database.getConnectionProvider(), userTable, wizard);
@@ -185,7 +185,7 @@ public class UpstairsAction extends AbstractResourceAction {
     }
 
     @Nullable
-    public Column getColumn(Table table, Column column) {
+    public static Column getColumn(Table table, Column column) {
         if (table != null && column != null) {
             return DatabaseLogic.findColumnByName(table, column.getColumnName());
         } else {
@@ -193,11 +193,12 @@ public class UpstairsAction extends AbstractResourceAction {
         }
     }
 
-    protected Table getTable(TableInfo tableInfo) {
-        if(tableInfo == null) {
+    @Nullable
+    public static Table getTable(Model model, TableInfo tableInfo) {
+        if(tableInfo == null || tableInfo.table == null) {
             return null;
         }
-        return DatabaseLogic.findTableByName(persistence.getModel(), tableInfo.database, tableInfo.schema, tableInfo.table.getTableName());
+        return DatabaseLogic.findTableByName(model, tableInfo.database, tableInfo.schema, tableInfo.table.getTableName());
     }
 
     protected ActionDescriptor createCrudAction(
@@ -236,7 +237,12 @@ public class UpstairsAction extends AbstractResourceAction {
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
-                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, column.equals(userPasswordColumn));
+                String name = column.getColumnName();
+                boolean isPassword =
+                        column.equals(userPasswordColumn) ||
+                        (column.getActualJavaType() == String.class &&
+                                ("password".equalsIgnoreCase(name) || "pwd".equalsIgnoreCase(name)));
+                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, isPassword);
             }
 
             ActionLogic.saveConfiguration(dir, configuration);
@@ -645,12 +651,12 @@ public class UpstairsAction extends AbstractResourceAction {
         bindings.put("userEmailProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userEmailProperty)));
         bindings.put("userTokenProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userTokenProperty)));
 
-        Table groupsTable = getTable(wizard.groupsTable);
+        Table groupsTable = getTable(persistence.getModel(), wizard.groupsTable);
         bindings.put("groupTableEntityName", groupsTable != null ? groupsTable.getActualEntityName() : "");
         bindings.put("groupIdProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupIdProperty)));
         bindings.put("groupNameProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupNameProperty)));
 
-        Table userGroupTable = getTable(wizard.userGroupTable);
+        Table userGroupTable = getTable(persistence.getModel(), wizard.userGroupTable);
         bindings.put("userGroupTableEntityName",
                 userGroupTable != null ? userGroupTable.getActualEntityName() : "");
         bindings.put("groupLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.groupLinkProperty)));

@@ -33,8 +33,8 @@ import {SearchFieldComponent} from "./search-field.component";
 
 @Component({
   selector: 'portofino-crud-search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+  templateUrl: "../../../../../assets/pages/crud/search/search.component.html",
+  styleUrls: ["../../../../../assets/pages/crud/search/search.component.scss"]
 })
 export class SearchComponent implements OnInit, OnDestroy, AfterViewInit {
 

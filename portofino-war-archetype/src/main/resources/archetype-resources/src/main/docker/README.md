@@ -38,8 +38,7 @@ The aforementioned Docker resources are meant to be used in conjunction with Mav
 `docker` enables such integration.
 
 Running `mvn -Pdocker package`, i.e., building the application with the `docker` profile, will automatically build the
-Docker images. Note that, if we plan on running the application locally via Maven for development, **the `docker`
-profile is incompatible with the `portofino-development` profile and actually supersedes it.**
+Docker images.
 
 Also note that the frontend is only built if the profile `build-frontend` is active. Normally it is active by default,
 but if we activate the `docker` profile, then the default profiles are not activated unless explicitly requested with

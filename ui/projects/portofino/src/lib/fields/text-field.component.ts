@@ -1,13 +1,13 @@
 import {Component} from '@angular/core';
 import {FieldComponent} from "./field.component";
 import {getAnnotation, isMultiline, isPassword, isRichText} from "../class-accessor";
-import {ErrorStateMatcher} from "@angular/material";
+import { ErrorStateMatcher } from "@angular/material/core";
 import {FormControl, FormGroupDirective, NgForm} from "@angular/forms";
 
 @Component({
   selector: 'portofino-text-field',
-  templateUrl: './text-field.component.html',
-  styleUrls: ['./text-field.component.scss']
+  templateUrl: '../../../assets/fields/text-field.component.html',
+  styleUrls: ['../../../assets/fields/text-field.component.scss']
 })
 export class TextFieldComponent extends FieldComponent {
 

@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>9</version>
-    </parent>
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.3-SNAPSHOT</version>
+    <version>5.2.0-SNAPSHOT</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
@@ -50,7 +45,7 @@
     </mailingLists>
     <scm>
         <connection>scm:git:https://github.com/ManyDesigns/Portofino.git</connection>
-        <developerConnection>scm:hg:https://github.com/ManyDesigns/Portofino.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/ManyDesigns/Portofino.git</developerConnection>
         <url>https://github.com/ManyDesigns/Portofino</url>
         <tag>master</tag>
     </scm>
@@ -90,7 +85,7 @@
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.2</commons.vfs.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>2.5.8</groovy.version>
+        <groovy.version>3.0.5</groovy.version>
         <guava.version>27.0.1-jre</guava.version>
         <hibernate.version>5.4.7.Final</hibernate.version>
         <jackson.version>2.10.0</jackson.version>
@@ -111,27 +106,37 @@
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.5.2.Final</resteasy.version>
-        <servlet.api.version>3.1.0</servlet.api.version>
-        <shiro.version>1.4.2</shiro.version>
+        <servlet.api.version>4.0.1</servlet.api.version>
+        <shiro.version>1.5.1</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spring.version>5.2.0.RELEASE</spring.version>
+        <spring.version>5.2.7.RELEASE</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <sonar.projectKey>ManyDesigns_Portofino</sonar.projectKey>
-        <sonar.moduleKey>${artifactId}</sonar.moduleKey>
+        <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
         <sonar.organization>manydesigns</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <modules>
         <!-- Core stuff -->
         <module>code</module>
         <module>dispatcher</module>
         <module>elements</module>
+        <module>modules</module>
+        <module>mail</module>
         <module>portofino-core</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>
+        <!-- Microservices -->
+        <module>microservices/launcher</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
         <module>portofino-db2</module>
@@ -378,8 +383,10 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
+                    <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                     <descriptors>
                         <descriptor>assembly-src.xml</descriptor>
+                        <descriptor>assembly-upstairs-standalone.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>
@@ -500,6 +507,17 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>3.1.1</version>
@@ -516,7 +534,7 @@
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link http://shiro.apache.org/static/1.4.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/2.5.8/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link http://shiro.apache.org/static/1.5.2/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/3.0.1/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
@@ -526,6 +544,7 @@
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>jar</goal>
+                                    <goal>aggregate-jar</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -540,6 +559,9 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <keyname>info@manydesigns.com</keyname>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

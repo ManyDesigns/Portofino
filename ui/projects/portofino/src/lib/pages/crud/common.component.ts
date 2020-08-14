@@ -1,22 +1,21 @@
-import {ChangeDetectorRef, EventEmitter, Input, OnDestroy, Output, ViewChild} from '@angular/core';
+import { ChangeDetectorRef, EventEmitter, Input, OnDestroy, Output, ViewChild, Directive } from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {
   ClassAccessor,
-  isBlob, isBooleanProperty,
-  isDateProperty,
+  isBlob, isDateProperty,
   isEnabled,
   Property, SelectionOption
 } from "../../class-accessor";
-import moment from 'moment-with-locales-es6';
 import {AbstractControl, FormArray, FormControl, FormGroup} from "@angular/forms";
-import {BlobFile, Configuration, SelectionProvider} from "./crud.common";
+import {Configuration, SelectionProvider} from "./crud.common";
 import {Observable} from "rxjs";
 import {Field, Form, FormComponent} from "../../form";
-import {NotificationService} from "../../notifications/notification.service";
+import {NotificationService} from "../../notifications/notification.services";
 import {Button, ButtonInfo, getButtons, WithButtons} from "../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 
+@Directive()
 export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
 
   @Input()
@@ -32,7 +31,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
 
   readonly formDefinition = new Form();
   readonly form = new FormGroup({});
-  @ViewChild(FormComponent, { static: false })
+  @ViewChild(FormComponent)
   formComponent: FormComponent;
   properties: Property[] = [];
   object;
@@ -70,30 +69,8 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
     this.object = object;
     this.formDefinition.contents = [];
     this.properties.forEach(p => {
-      let value;
       const disabled = !this.isEditEnabled() || !this.isEditable(p);
-      if(!object[p.name]) {
-        //value is undefined
-      } else if (isDateProperty(p)) {
-        value = object[p.name].value ? moment(object[p.name].value) : null;
-      } else if (isBlob(p) && object[p.name].value) {
-        const portofinoBlob = object[p.name].value;
-        value = new BlobFile();
-        value.code = portofinoBlob.code;
-        value.size = portofinoBlob.size;
-        value.name = portofinoBlob.filename;
-        value.type = portofinoBlob.contentType;
-        value = [value];
-      } else if(disabled && !isBooleanProperty(p) && object[p.name].displayValue) {
-        value = object[p.name].displayValue;
-      } else {
-        value = object[p.name].value;
-      }
-      const field = new Field();
-      field.property = p;
-      field.initialState = { value: value, disabled: disabled };
-      field.editable = !disabled;
-      this.formDefinition.contents.push(field);
+      this.formDefinition.contents.push(Field.fromProperty(p, object, disabled));
     });
     this.formDefinition.editable = this.isEditEnabled();
     if(this.formComponent) {
@@ -247,8 +224,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
     }
     this.saving = true;
     if(!this.isFormValid()) {
-      this.triggerValidationForAllFields(this.form);
-      this.notificationService.error('There are validation errors').subscribe();
+      this.handleInvalidForm();
       this.saving = false;
       return;
     }
@@ -256,7 +232,7 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
     this.doSave(object).subscribe(
       () =>  {
         this.saving = false;
-        this.close.emit(object);
+        this.afterSaved(object);
       },
       (error) => {
         this.saving = false;
@@ -281,6 +257,15 @@ export abstract class BaseDetailComponent implements WithButtons, OnDestroy {
           }
         }
       });
+  }
+
+  protected afterSaved(object) {
+    this.close.emit(object);
+  }
+
+  protected handleInvalidForm() {
+    this.triggerValidationForAllFields(this.form);
+    this.notificationService.error('There are validation errors').subscribe();
   }
 
   static isSaveButtonPresent(self: BaseDetailComponent) {

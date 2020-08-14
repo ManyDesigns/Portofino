@@ -4,20 +4,20 @@ import {PortofinoService} from "../../../portofino.service";
 import {isBlob, isDateProperty, isUpdatable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {FormComponent} from "../../../form";
-import {NotificationService} from "../../../notifications/notification.service";
+import {NotificationService} from "../../../notifications/notification.services";
 import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-crud-bulk-edit',
-  templateUrl: './bulk-edit.component.html',
-  styleUrls: ['./bulk-edit.component.css']
+  templateUrl: '../../../../../assets/pages/crud/bulk/bulk-edit.component.html',
+  styleUrls: ['../../../../../assets/pages/crud/bulk/bulk-edit.component.scss']
 })
 export class BulkEditComponent extends BaseDetailComponent implements OnInit {
 
   @Input()
   ids: string[];
-  @ViewChild(FormComponent, { static: false })
+  @ViewChild(FormComponent)
   formComponent: FormComponent;
 
   constructor(

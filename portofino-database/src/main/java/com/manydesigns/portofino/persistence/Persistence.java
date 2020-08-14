@@ -37,6 +37,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
@@ -51,7 +52,6 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -90,10 +90,11 @@ public class Persistence {
     protected Model model;
     protected final Map<String, HibernateDatabaseSetup> setups;
 
-    protected final FileObject appDir;
+    protected final FileObject applicationDirectory;
     protected final Configuration configuration;
     protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
+    public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
 
     public enum Status {
         STARTING, STARTED, STOPPING, STOPPED
@@ -112,8 +113,8 @@ public class Persistence {
     // Constructors
     //**************************************************************************
 
-    public Persistence(FileObject appDir, Configuration configuration, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile, DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
-        this.appDir = appDir;
+    public Persistence(FileObject applicationDirectory, Configuration configuration, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile, DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
+        this.applicationDirectory = applicationDirectory;
         this.configuration = configuration;
         this.configurationFile = configurationFile;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
@@ -138,13 +139,15 @@ public class Persistence {
         }
     }
 
+
+
     public FileObject getModelDirectory() throws FileSystemException {
-        return appDir.resolveFile(APP_MODEL_DIRECTORY);
+        return applicationDirectory.resolveFile(APP_MODEL_DIRECTORY);
     }
 
     public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
-        ResourceAccessor resourceAccessor = new VFSResourceAccessor(appDir);
+        ResourceAccessor resourceAccessor = new VFSResourceAccessor(applicationDirectory);
         ConnectionProvider connectionProvider = database.getConnectionProvider();
         for(Schema schema : database.getSchemas()) {
             String schemaName = schema.getSchemaName();
@@ -159,7 +162,7 @@ public class Persistence {
                 liquibase.database.Database lqDatabase =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                 lqDatabase.setDefaultSchemaName(schema.getActualSchemaName());
-                String relativeChangelogPath = appDir.getName().getRelativeName(changelogFile.getName());
+                String relativeChangelogPath = applicationDirectory.getName().getRelativeName(changelogFile.getName());
                 Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase);
 
                 String[] contexts = configuration.getStringArray(LIQUIBASE_CONTEXT);
@@ -182,15 +185,15 @@ public class Persistence {
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
             String databaseName = current.getKey();
             logger.debug("Cleaning up old setup for: {}", databaseName);
-            HibernateDatabaseSetup hibernateDatabaseSetup = current.getValue();
+            HibernateDatabaseSetup setup = current.getValue();
             try {
-                SessionFactory sessionFactory = hibernateDatabaseSetup.getSessionFactory();
-                sessionFactory.close();
+                setup.dispose();
             } catch (Throwable t) {
                 logger.warn("Cannot close session factory for: " + databaseName, t);
             }
+            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, setup));
         }
-
+        //TODO it would perhaps be preferable if we generated REPLACED events here rather than REMOVED followed by ADDED
         setups.clear();
         model.init(configuration);
         for (Database database : model.getDatabases()) {
@@ -214,7 +217,14 @@ public class Persistence {
                                 database, sessionFactoryAndCodeBase.sessionFactory,
                                 sessionFactoryAndCodeBase.codeBase, builder.getEntityMode());
                 String databaseName = database.getDatabaseName();
+                HibernateDatabaseSetup oldSetup = setups.get(databaseName);
                 setups.put(databaseName, setup);
+                if(oldSetup != null) {
+                    oldSetup.dispose();
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(oldSetup, setup));
+                } else {
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.ADDED, setup));
+                }
             }
         } catch (Exception e) {
             logger.error("Could not create connection provider for " + database, e);
@@ -359,12 +369,11 @@ public class Persistence {
     }
 
     public void stop() {
+        //TODO complete subscriptions?
         status.onNext(Status.STOPPING);
         closeSessions();
         for(HibernateDatabaseSetup setup : setups.values()) {
-            //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
-            //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
-            setup.getSessionFactory().close();
+            setup.dispose();
         }
         for (Database database : model.getDatabases()) {
             ConnectionProvider connectionProvider =
@@ -389,6 +398,32 @@ public class Persistence {
         FileObject dbDir = getModelDirectory().resolveFile(schema.getDatabaseName());
         FileObject schemaDir = dbDir.resolveFile(schema.getSchemaName());
         return schemaDir.resolveFile(changelogFileNameTemplate);
+    }
+
+    public FileObject getApplicationDirectory() {
+        return applicationDirectory;
+    }
+
+    public static class DatabaseSetupEvent {
+        public static final int ADDED = +1, REMOVED = -1, REPLACED = 0;
+
+        public DatabaseSetupEvent(int type, HibernateDatabaseSetup setup) {
+            if(type == 0) {
+                throw new IllegalArgumentException();
+            }
+            this.type = type;
+            this.setup = setup;
+        }
+
+        public DatabaseSetupEvent(HibernateDatabaseSetup setup, HibernateDatabaseSetup oldSetup) {
+            this.setup = setup;
+            this.oldSetup = oldSetup;
+            type = REPLACED;
+        }
+
+        public int type;
+        public HibernateDatabaseSetup setup;
+        public HibernateDatabaseSetup oldSetup;
     }
 
 }

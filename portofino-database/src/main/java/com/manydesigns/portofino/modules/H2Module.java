@@ -20,12 +20,9 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.configuration2.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -51,7 +48,7 @@ public class H2Module implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

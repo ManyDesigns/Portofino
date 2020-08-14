@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>5.1.3-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>portofino-angular-ui</artifactId>
     <packaging>pom</packaging>
@@ -20,7 +20,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>2.5</version>
+                <version>3.1.0</version>
                 <configuration>
                     <filesets>
                         <fileset>
@@ -28,6 +28,7 @@
                             <includes>
                                 <include>**</include>
                             </includes>
+                            <followSymlinks>false</followSymlinks>
                         </fileset>
                     </filesets>
                 </configuration>
@@ -43,6 +44,10 @@
             <id>build-frontend</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
             </activation>
             <build>
                 <plugins>
@@ -63,7 +68,7 @@
                             </execution>
 
                             <execution>
-                                <id>npm install</id>
+                                <id>npm ci</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
@@ -81,6 +86,51 @@
                                     <arguments>run-script maven-build</arguments>
                                 </configuration>
                                 <phase>generate-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Build Docker images and launch the application. -->
+            <id>docker</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.33.0</version>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <alias>portofino-upstairs</alias>
+                                    <name>portofino-upstairs:${project.version}</name>
+                                    <build>
+                                        <contextDir>${project.basedir}/docker</contextDir>
+                                        <assembly>
+                                            <descriptor>${project.basedir}/docker/assembly.xml</descriptor>
+                                        </assembly>
+                                    </build>
+                                    <run>
+                                        <skip>true</skip>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>docker:build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

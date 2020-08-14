@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {NavigationMenu, NavigationMenuItem, Page, PageChild, PageConfiguration} from "../page";
+import {Page, PageChild, PageConfiguration} from "../page";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
 import {Button} from "../buttons";
@@ -14,20 +14,20 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
-import {NotificationService} from "../notifications/notification.service";
-import {LocalStorageService} from "ngx-store";
+import {NotificationService} from "../notifications/notification.services";
 import {map} from "rxjs/operators";
+import {WebStorageService} from "../storage/storage.services";
 
 @Component({
   selector: 'portofino-upstairs',
-  templateUrl: './upstairs.component.html'
+  templateUrl: '../../../assets/administration/upstairs.component.html'
 })
 @PortofinoComponent({ name: "portofino-upstairs", hideFromCreateNewPage: true })
 export class UpstairsComponent extends Page implements OnInit {
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, notificationService: NotificationService,
-              translate: TranslateService, @Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {
+              translate: TranslateService, @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService) {
     super(portofino, http, router, route, authenticationService, notificationService, translate);
   }
 
@@ -72,17 +72,6 @@ export class UpstairsComponent extends Page implements OnInit {
       console.error(error);
       this.notificationService.error(this.translate.get("Invalid API root (see console for details)"));
     });
-  }
-
-  prepare() {
-    return super.prepare().pipe(map(() => {
-      const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
-      if(apiRoot && !this.portofino.localApiAvailable) {
-        this.portofino.apiRoot = apiRoot;
-        this.changeApiRoot();
-      }
-      return this;
-    }));
   }
 
   ngOnInit(): void {

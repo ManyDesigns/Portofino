@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.jersey;
 
+import com.manydesigns.mail.rest.SendMailAction;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -13,6 +14,7 @@ public class PortofinoApplication extends ResourceConfig {
         packages("com.manydesigns.portofino.rest"); //TODO configure user packages
         register(OpenApiResource.class);
         register(JacksonFeature.class);
+        register(SendMailAction.class);
     }
 
 }

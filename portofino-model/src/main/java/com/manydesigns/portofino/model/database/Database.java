@@ -38,7 +38,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas"})
+@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode"})
 @XmlRootElement
 public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     public static final String copyright =

@@ -1,0 +1,75 @@
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center" class="mat-elevation-z6">
+  <div>
+    <button title="{{ title | translate }}" type="button" mat-icon-button
+            (click)="sidenav.toggle()">
+      <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+    </button>
+    <a mat-button routerLink="/"><span>{{ title | translate}}</span></a>
+  </div>
+  <div fxLayout="row">
+    <mat-spinner *ngIf="portofino.callsInProgress > 0" color="accent" diameter="35"></mat-spinner>
+    <mat-menu #notificationsMenu="matMenu" [overlapTrigger]="false" class="notifications-menu">
+      <button mat-menu-item *ngFor="let notification of notifications.notifications"
+              (click)="notifications.remove(notification)" style="white-space: normal; margin-bottom: 5px; margin-top: 5px;">
+        {{ notification.message }}
+      </button>
+    </mat-menu>
+    <button mat-icon-button *ngIf="!notifications.notifications || notifications.notifications.length == 0">
+      <mat-icon>notifications_none</mat-icon>
+      <span class="cdk-visually-hidden">{{ 'No notifications' | translate }}</span>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="notificationsMenu" *ngIf="notifications.notifications && notifications.notifications.length > 0">
+      <mat-icon [matBadge]="notifications.notifications.length" matBadgeColor="accent" matBadgeSize="small">
+        notifications
+      </mat-icon>
+      <span class="cdk-visually-hidden">{{ 'Notifications' | translate }}</span>
+    </button>
+    <ng-container *ngIf="authenticationService.isAdmin && (portofino.upstairsLink || pageCrudService.available)">
+      <mat-menu #adminMenu="matMenu" [overlapTrigger]="false">
+        <a mat-menu-item *ngIf="portofino.upstairsLink" [routerLink]="portofino.upstairsLink">
+          <mat-icon>build</mat-icon>
+          {{ 'Upstairs' | translate }}
+        </a>
+        <mat-divider *ngIf="portofino.upstairsLink && pageCrudService.available"></mat-divider>
+        <ng-container *ngIf="pageCrudService.available">
+          <button mat-menu-item (click)="pageCrudService.showCreatePageDialog()">
+            <mat-icon>add</mat-icon>
+            {{ 'Add page' | translate }}
+          </button>
+          <button mat-menu-item (click)="pageCrudService.confirmDeletePage()">
+            <mat-icon>delete</mat-icon>
+            {{ 'Delete page' | translate }}
+          </button>
+          <button mat-menu-item (click)="pageCrudService.showMovePageDialog()">
+            <mat-icon>forward</mat-icon>
+            {{ 'Move page' | translate }}
+          </button>
+        </ng-container>
+      </mat-menu>
+      <button mat-button [matMenuTriggerFor]="adminMenu">
+        <mat-icon>settings</mat-icon>
+        <span fxHide.xs="true">{{ 'Administration' | translate }}</span>
+      </button>
+    </ng-container>
+    <portofino-language-selector *ngIf="portofino.locales.length > 1"></portofino-language-selector>
+    <ng-container *ngIf="authenticationService.currentUser">
+      <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
+        <button mat-menu-item (click)="authenticationService.showChangePasswordDialog()">
+          <mat-icon>vpn_key</mat-icon>
+          {{ 'Change password' | translate }}
+        </button>
+        <button mat-menu-item (click)="authenticationService.logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          {{ 'Sign out' | translate }}
+        </button>
+      </mat-menu>
+      <button mat-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>account_circle</mat-icon>
+        <span fxHide.xs="true">{{ authenticationService.currentUser.displayName }}</span>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="!authenticationService.currentUser">
+      <button mat-button (click)="authenticationService.showLoginDialog()">{{ 'Sign in' | translate }}</button>
+    </ng-container>
+  </div>
+</mat-toolbar>

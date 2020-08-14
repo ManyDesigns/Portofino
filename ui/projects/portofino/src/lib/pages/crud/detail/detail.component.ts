@@ -4,15 +4,15 @@ import {PortofinoService} from "../../../portofino.service";
 import {isUpdatable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
 import {Operation} from "../../../page";
-import {NotificationService} from "../../../notifications/notification.service";
+import {NotificationService} from "../../../notifications/notification.services";
 import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 import {Subject} from "rxjs";
 
 @Component({
   selector: 'portofino-crud-detail',
-  templateUrl: './detail.component.html',
-  styleUrls: ['./detail.component.css']
+  templateUrl: '../../../../../assets/pages/crud/detail/detail.component.html',
+  styleUrls: ['../../../../../assets/pages/crud/detail/detail.component.scss']
 })
 export class DetailComponent extends BaseDetailComponent implements OnInit, OnDestroy {
 

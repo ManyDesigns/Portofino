@@ -6,8 +6,8 @@ import {Button} from "../../buttons";
 
 @Component({
   selector: 'portofino-many-to-many',
-  templateUrl: './many-to-many.component.html',
-  styleUrls: ['./many-to-many.component.css']
+  templateUrl: '../../../../assets/pages/many-to-many/many-to-many.component.html',
+  styleUrls: ['../../../../assets/pages/many-to-many/many-to-many.component.scss']
 })
 @PortofinoComponent({ name: 'manyToMany' })
 export class ManyToManyComponent extends Page {
@@ -24,7 +24,6 @@ export class ManyToManyComponent extends Page {
   readonly associationsPath = "/:availableAssociations";
 
   initialize() {
-    super.initialize();
     this.keySelector.valueChanges.subscribe(value => {
       this.key = value;
       const onePk = value.key;
@@ -45,12 +44,13 @@ export class ManyToManyComponent extends Page {
     this.sourceUrl = this.computeSourceUrl();
     this.http.get<Operation[]>(this.sourceUrl + this.operationsPath).subscribe(ops => {
       this.saveEnabled = this.operationAvailable(ops,"POST");
-    });
-    this.http.get<Keys>(this.sourceUrl).subscribe(keys => {
-      this.keys = keys.keys;
-      if(this.keys.length == 1) {
-        this.keySelector.setValue(this.keys[0]);
-      }
+      this.http.get<Keys>(this.sourceUrl).subscribe(keys => {
+        this.keys = keys.keys;
+        if(this.keys.length == 1) {
+          this.keySelector.setValue(this.keys[0]);
+        }
+        super.initialize();
+      });
     });
   }
 

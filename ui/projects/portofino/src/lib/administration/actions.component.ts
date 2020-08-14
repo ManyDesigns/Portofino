@@ -9,14 +9,14 @@ import {Page, PageConfiguration} from "../page";
 import {ActivatedRoute, Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {PageFactoryComponent} from "../page.factory";
-import {NotificationService} from "../notifications/notification.service";
+import {NotificationService} from "../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {Field, Form} from "../form";
 import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
 
-@Component({ templateUrl: "actions.component.html" })
+@Component({ templateUrl: "../../../assets/administration/actions.component.html" })
 export class ActionsComponent extends Page implements OnInit {
   treeControl: FlatTreeControl<ActionFlatNode>;
   dataSource: PageTreeDataSource;
@@ -75,6 +75,8 @@ export class ActionsComponent extends Page implements OnInit {
       if(saved) {
         this.notificationService.info(this.translate.get("Configuration saved"));
       }
+      page.settingsPanel.buttons = false;
+      page.settingsPanel.children = false;
       page.settingsPanel.active = true;
     };
     page.configure(callback);

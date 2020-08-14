@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.OracleDatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.configuration2.Configuration;
@@ -62,7 +61,7 @@ public class OracleModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

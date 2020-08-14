@@ -16,8 +16,7 @@ import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'portofino-crud',
-  templateUrl: './crud.component.html',
-  styleUrls: ['./crud.component.scss']
+  templateUrl: '../../../../assets/pages/crud/crud.component.html'
 })
 @PortofinoComponent({ name: 'crud', defaultActionClass: "com.manydesigns.portofino.resourceactions.crud.CrudAction" })
 export class CrudComponent extends Page {
@@ -28,6 +27,7 @@ export class CrudComponent extends Page {
 
   classAccessor: ClassAccessor;
   selectionProviders: SelectionProvider[];
+  operations: Operation[];
   classAccessorPath = '/:classAccessor';
   selectionProvidersPath = '/:selectionProvider';
 
@@ -71,7 +71,6 @@ export class CrudComponent extends Page {
   }
 
   initialize() {
-    super.initialize();
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().pipe(
       mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).pipe(loadClassAccessor)),
@@ -84,12 +83,9 @@ export class CrudComponent extends Page {
         return this.http.get<Operation[]>(this.sourceUrl + this.operationsPath);
       })).subscribe(
         ops => {
-        const bulkOpsEnabled = ops.some(op => op.name == "Bulk operations" && op.available);
-        this.createEnabled = this.operationAvailable(ops, "POST");
-        this.bulkEditEnabled = this.operationAvailable(ops, "PUT") && bulkOpsEnabled;
-        this.bulkDeleteEnabled = this.operationAvailable(ops, "DELETE") && bulkOpsEnabled;
-        this.init();
-      },
+          this.operations = ops;
+          this.init();
+        },
       () => this.error = this.translate.instant("This page is not configured correctly."));
   }
 
@@ -107,6 +103,10 @@ export class CrudComponent extends Page {
   }
 
   protected init() {
+    const bulkOpsEnabled = this.operations.some(op => op.name == "Bulk operations" && op.available);
+    this.createEnabled = this.operationAvailable(this.operations, "POST");
+    this.bulkEditEnabled = this.operationAvailable(this.operations, "PUT") && bulkOpsEnabled;
+    this.bulkDeleteEnabled = this.operationAvailable(this.operations, "DELETE") && bulkOpsEnabled;
     this.classAccessor.properties.forEach(p => {
       p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
     });
@@ -129,6 +129,7 @@ export class CrudComponent extends Page {
         this.refreshSearch.emit();
       } //else TODO
     });
+    super.initialize();
   }
 
   protected enableDetailEditMode() {

@@ -1,13 +1,23 @@
+import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
+import com.manydesigns.portofino.operations.GuardType
+import com.manydesigns.portofino.operations.Operation
+import com.manydesigns.portofino.operations.annotations.Guard
 import com.manydesigns.portofino.resourceactions.crud.CrudAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import com.manydesigns.portofino.tt.ActivityItem
 import com.manydesigns.portofino.tt.Refresh
 import com.manydesigns.portofino.tt.TtUtils
 import org.apache.shiro.SecurityUtils
+import org.hibernate.Session
 import org.springframework.beans.factory.annotation.Autowired
+
+import javax.ws.rs.GET
+import javax.ws.rs.Path
+import java.sql.Timestamp
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -17,6 +27,9 @@ class ProjectsCrudAction extends CrudAction {
     Refresh refresh
 
     Object old
+
+    public static String PROJECT_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +
+            "WHERE act.project = :project_id ORDER BY act.id DESC"
 
     static {
         logger.info("Loaded action - ${ProjectsCrudAction.class.hashCode()} - ${Refresh.class.hashCode()}")
@@ -54,10 +67,10 @@ class ProjectsCrudAction extends CrudAction {
 
     @Override
     protected boolean createValidate(Object object) {
-        Date now = new Date();
-        object.created = now;
-        object.last_updated = now;
-        return true;
+        Timestamp now = new Timestamp(new Date().time)
+        object.created = now
+        object.last_updated = now
+        true
     }
 
     @Override
@@ -111,32 +124,13 @@ class ProjectsCrudAction extends CrudAction {
 
     }
 
-//    protected Resolution getSuccessfulSaveView() {
-//        return new RedirectResolution(context.getActionPath() + "/" + object.id);
-//    }
-//
-//    //**************************************************************************
-//    // Edit customizations
-//    //**************************************************************************
-//    @Override
-//    @Buttons([
-//        @Button(list = "crud-read", key = "edit", order = 1d, icon = "glyphicon-edit white",
-//                group = "crud", type = Button.TYPE_SUCCESS),
-//        @Button(list = "crud-read-default-button", key = "search")
-//    ])
-//    @Guard(test="isManager()", type=GuardType.VISIBLE)
-//    Resolution edit() {
-//        return super.edit()
-//    }
-//
-//    @Override
-//    @Button(list = "crud-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
-//    @Guard(test="isManager()", type=GuardType.VISIBLE)
-//    Resolution update() {
-//        Date now = new Date();
-//        object.last_updated = now;
-//        return super.update()
-//    }
+    //**************************************************************************
+    // Edit customizations
+    //**************************************************************************
+    @Override
+    boolean isEditEnabled() {
+        return super.isEditEnabled() && isManager()
+    }
 
     @Override
     protected boolean editValidate(Object object) {
@@ -145,18 +139,18 @@ class ProjectsCrudAction extends CrudAction {
         return true;
     }
 
+    @Override
     protected void editSetup(Object object) {
-        old = object.clone();
+        old = object.clone()
     }
-
 
     @Override
     protected void editPostProcess(Object object) {
-        Object principal = SecurityUtils.subject.principal;
-        Form newForm = form;
-        setupForm(Mode.EDIT);
-        form.readFromObject(old);
-        String message = TtUtils.createDiffMessage(form, newForm);
+        Object principal = SecurityUtils.subject.principal
+        Form newForm = form
+        setupForm(Mode.EDIT)
+        form.readFromObject(old)
+        String message = TtUtils.createDiffMessage(form, newForm)
         if (message != null) {
             Date now = new Date();
             TtUtils.addActivity(session,
@@ -184,12 +178,10 @@ class ProjectsCrudAction extends CrudAction {
     // Delete customizations
     //**************************************************************************
 
-
-//    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH)
-//    @Guard(test = "isManager()", type = GuardType.VISIBLE)
-//    public Resolution delete() {
-//        return super.delete();
-//    }
+    @Override
+    boolean isDeleteEnabled() {
+        return super.isDeleteEnabled() && isManager()
+    }
 
     @Override
     protected void deletePostProcess(Object object) {
@@ -212,7 +204,7 @@ class ProjectsCrudAction extends CrudAction {
                 null,
                 null,
                 null
-        );
+        )
     }
 
     @Override
@@ -221,6 +213,31 @@ class ProjectsCrudAction extends CrudAction {
                 .setParameter('project', object.id)
                 .executeUpdate()
         super.doDelete(object)
+    }
+
+    @GET
+    @Path("activity")
+    List<ActivityItem> getProjectActivity() {
+        Locale locale = context.request.locale
+        List items =
+                session.createSQLQuery(PROJECT_ACTIVTY_SQL)
+                .setParameter("project_id", object.id)
+                .setMaxResults(30).list()
+
+        String keyPrefix = "project.";
+
+        String memberImageFormat = String.format("/projects/%s/members?userImage=&userId=%%s&code=%%s", object.id)
+
+        List<ActivityItem> activityItems = []
+        TtUtils.populateActivityItems(items, activityItems, keyPrefix, locale, memberImageFormat)
+        return activityItems
+    }
+
+    @GET
+    @Path("canCreateNewTicket")
+    @Guard(test="isContributor()", type= GuardType.VISIBLE)
+    boolean canCreateNewTicket() {
+        true
     }
 
 }

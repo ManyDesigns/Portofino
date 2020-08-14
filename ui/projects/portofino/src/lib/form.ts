@@ -1,7 +1,7 @@
 import {
   ClassAccessor,
   deriveKind, getAnnotation,
-  getValidators,
+  getValidators, isBlob, isBooleanProperty, isDateProperty,
   isEnabled,
   isMultiline, isRichText,
   Property
@@ -24,6 +24,8 @@ import {
   FormGroupDirective, ValidationErrors, ValidatorFn
 } from "@angular/forms";
 import {FieldFactoryComponent} from "./fields/field.factory";
+import moment from "moment-with-locales-es6";
+import {BlobFile} from "./pages/crud/crud.common";
 
 export type FormElement =
   Field|FieldSet|{name: string, component: Type<any>, dependencies?: object}|{html: string}|FormList;
@@ -57,6 +59,7 @@ export class Form {
     return form;
   }
 
+  //This has to be static, because we want to copy forms with form = {...form}
   static setupProperty(form: Form, property: Property, setup) {
     if(!isEnabled(property)) {
       return;
@@ -65,8 +68,11 @@ export class Form {
       //TODO if list FormList else
       form.contents.push(Field.fromProperty(property, setup.object || {}));
     } catch (e) {
-      //Continue
-      console.error(e);
+      if(setup.error) {
+        setup.error(e);
+      } else {
+        console.error(e);
+      }
     }
   }
 }
@@ -94,12 +100,33 @@ export class Field {
     return {...this.context, ...context};
   }
 
-  static fromProperty(property: Property | any, object = {}) {
+  static fromProperty(property: Property | any, object = {}, disabled?: boolean) {
     if(!(property instanceof Property)) {
       property = Property.create(property);
     }
     deriveKind(property); //Cause an exception to be thrown early if the type is not supported
-    return new Field(property, object[property.name]);
+    let value =
+      (object[property.name] && object[property.name].hasOwnProperty("value")) ?
+        object[property.name].value :
+        object[property.name];
+    if(!value) {
+      //value is undefined
+    } else if (isDateProperty(property)) {
+      value = moment(value);
+    } else if (isBlob(property)) {
+      const portofinoBlob = value;
+      value = new BlobFile();
+      value.code = portofinoBlob.code;
+      value.size = portofinoBlob.size;
+      value.name = portofinoBlob.filename;
+      value.type = portofinoBlob.contentType;
+      value = [value];
+    } else if(disabled && !isBooleanProperty(property) && object[property.name].displayValue) {
+      value = object[property.name].displayValue;
+    }
+    let field = new Field(property, { value: value, disabled: disabled });
+    field.editable = !disabled;
+    return field;
   }
 }
 
@@ -141,8 +168,8 @@ export class DynamicFormComponentDirective {
 
 @Component({
   selector: 'portofino-form',
-  templateUrl: './form.component.html',
-  styleUrls: ['./form.component.scss']
+  templateUrl: '../../assets/form.component.html',
+  styleUrls: ['../../assets/form.component.scss']
 })
 export class FormComponent implements OnInit, AfterViewInit, OnDestroy {
   private _controls: FormGroup;

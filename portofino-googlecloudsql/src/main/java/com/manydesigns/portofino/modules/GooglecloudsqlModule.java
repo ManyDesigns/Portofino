@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.platforms.GoogleCloudSQLDatabasePlatform;
 import com.manydesigns.portofino.liquibase.databases.GoogleCloudSQLDatabase;
 import com.manydesigns.portofino.liquibase.sqlgenerators.GoogleCloudSQLLockDatabaseChangeLogGenerator;
@@ -66,7 +65,7 @@ public class GooglecloudsqlModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return PortofinoProperties.getPortofinoVersion();
+        return Module.getPortofinoVersion();
     }
 
     @Override

@@ -3,14 +3,14 @@ import {HttpClient} from "@angular/common/http";
 import {PortofinoService} from "../../../portofino.service";
 import {isInsertable, Property} from "../../../class-accessor";
 import {BaseDetailComponent} from "../common.component";
-import {NotificationService} from "../../../notifications/notification.service";
+import {NotificationService} from "../../../notifications/notification.services";
 import {Button} from "../../../buttons";
 import {TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'portofino-crud-create',
-  templateUrl: './create.component.html',
-  styleUrls: ['./create.component.css']
+  templateUrl: '../../../../../assets/pages/crud/detail/create.component.html',
+  styleUrls: ['../../../../../assets/pages/crud/detail/create.component.scss']
 })
 export class CreateComponent extends BaseDetailComponent implements OnInit {
 
