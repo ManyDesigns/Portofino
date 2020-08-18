@@ -21,15 +21,15 @@
 package com.manydesigns.portofino.persistence.hibernate;
 
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.database.annotations.MultiTenant;
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
+import org.apache.commons.configuration2.Configuration;
 import org.hibernate.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,28 +46,26 @@ public class HibernateDatabaseSetup {
     protected final CodeBase codeBase;
     protected final ThreadLocal<Session> threadSessions;
     protected final EntityMode entityMode;
+    protected final Configuration configuration;
     protected final Map<String, String> jpaEntityNameToClassNameMap = new HashMap<>();
-    protected final boolean multitenant;
+    protected final MultiTenancyImplementation multiTenancyImplementation;
 
         public static final Logger logger =
             LoggerFactory.getLogger(HibernateDatabaseSetup.class);
 
-    public HibernateDatabaseSetup(Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode) {
+    public HibernateDatabaseSetup(
+            Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode,
+            Configuration configuration, MultiTenancyImplementation multiTenancyImplementation) {
         this.database = database;
         this.sessionFactory = sessionFactory;
         this.codeBase = codeBase;
         this.entityMode = entityMode;
+        this.configuration = configuration;
+        this.multiTenancyImplementation = multiTenancyImplementation;
         threadSessions = new ThreadLocal<>();
         database.getAllTables().forEach(t -> {
             jpaEntityNameToClassNameMap.put(t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode));
         });
-        Optional<MultiTenant> multiTenant = database.getJavaAnnotation(MultiTenant.class);
-        if(multiTenant.isPresent()) {
-            MultiTenancyStrategy strategy = multiTenant.get().value();
-            this.multitenant = strategy != MultiTenancyStrategy.NONE;
-        } else {
-            this.multitenant = false;
-        }
     }
 
     public SessionFactory getSessionFactory() {
@@ -97,8 +95,8 @@ public class HibernateDatabaseSetup {
 
     public Session createSession() {
         Session session;
-        if(multitenant) {
-            session = sessionFactory.withOptions().tenantIdentifier("TODO").openSession();
+        if(multiTenancyImplementation != null) {
+            session = sessionFactory.withOptions().tenantIdentifier(multiTenancyImplementation.getTenant()).openSession();
         } else {
             session = sessionFactory.openSession();
         }
@@ -134,5 +132,9 @@ public class HibernateDatabaseSetup {
 
     public EntityMode getEntityMode() {
         return entityMode;
+    }
+
+    public MultiTenancyImplementation getMultiTenancyImplementation() {
+        return multiTenancyImplementation;
     }
 }

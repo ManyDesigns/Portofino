@@ -42,7 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -131,7 +130,8 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public Persistence getPersistence(
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
-        Persistence persistence = new Persistence(applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
+        Persistence persistence = new Persistence(
+                applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
 
         FileObject generatedClassesRoot = applicationDirectory.resolveFile(GENERATED_CLASSES_DIRECTORY_NAME);

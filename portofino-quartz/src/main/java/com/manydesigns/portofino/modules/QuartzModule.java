@@ -95,7 +95,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
             // Always want to get the scheduler, even if it isn't starting,
             // to make sure it is both initialized and registered.
             scheduler = factory.getScheduler();
-            scheduler.setJobFactory(new PortofinoJobFactory(applicationContext));
+            scheduler.setJobFactory(new PortofinoJobFactory(servletContext, applicationContext));
 
             String factoryKey = configuration.getString("quartz.servlet-context-factory-key");
             if (factoryKey == null) {

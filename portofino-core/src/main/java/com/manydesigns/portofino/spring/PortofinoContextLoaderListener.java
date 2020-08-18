@@ -73,6 +73,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
             servletContext = event.getServletContext();
+            ElementsThreadLocals.setServletContext(servletContext);
             bridgeContext.setId("portofino-bridge");
             super.contextInitialized(event);
             servletContext.setAttribute(PORTOFINO_CONTEXT_LOADER_LISTENER, this);

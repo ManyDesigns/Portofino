@@ -3,7 +3,6 @@ package com.manydesigns.portofino.persistence.hibernate;
 import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
-import com.manydesigns.portofino.database.annotations.MultiTenant;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.SequenceGenerator;
@@ -11,12 +10,13 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.model.database.TableGenerator;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenantConnectionProvider;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.*;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
@@ -24,7 +24,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.hibernate.EntityMode;
 import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.SessionFactory;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.TypeDef;
@@ -40,7 +39,6 @@ import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
-import org.hibernate.service.ServiceRegistry;
 import org.jadira.usertype.dateandtime.joda.PersistentDateTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,6 +66,8 @@ public class SessionFactoryBuilder {
     protected String falseString = "F";
     protected final Database database;
     protected final ClassPool classPool = new ClassPool(ClassPool.getDefault());
+    protected final Configuration configuration;
+    protected final MultiTenancyImplementation multiTenancyImplementation;
     protected EntityMode entityMode = EntityMode.MAP;
 
     protected static final Set<String> JAVA_KEYWORDS = new HashSet<>();
@@ -78,8 +78,11 @@ public class SessionFactoryBuilder {
         JAVA_KEYWORDS.add("public");
     }
 
-    public SessionFactoryBuilder(Database database) {
+    public SessionFactoryBuilder(
+            Database database, Configuration configuration, MultiTenancyImplementation multiTenancyImplementation) {
         this.database = database;
+        this.configuration = configuration;
+        this.multiTenancyImplementation = multiTenancyImplementation;
         String trueString = database.getTrueString();
         if (trueString != null) {
             this.trueString = "null".equalsIgnoreCase(trueString) ? null : trueString;
@@ -248,12 +251,10 @@ public class SessionFactoryBuilder {
                     connectionProvider.getActualHibernateDialectName());
         }
         settings.put(AvailableSettings.JPA_METAMODEL_POPULATION, "enabled");
-        Optional<MultiTenant> multiTenant = database.getJavaAnnotation(MultiTenant.class);
-        if(multiTenant.isPresent()) {
-            MultiTenancyStrategy strategy = multiTenant.get().value();
-            if(strategy.requiresMultiTenantConnectionProvider()) {
+        if(multiTenancyImplementation != null) {
+            MultiTenancyStrategy strategy = multiTenancyImplementation.getStrategy();
+            if (strategy.requiresMultiTenantConnectionProvider()) {
                 setupMultiTenantConnection(connectionProvider, settings);
-                settings.put(AvailableSettings.MULTI_TENANT, strategy);
             } else {
                 setupSingleTenantConnection(connectionProvider, settings);
             }
@@ -269,7 +270,7 @@ public class SessionFactoryBuilder {
 
     protected void setupMultiTenantConnection(ConnectionProvider connectionProvider, Map<String, Object> settings) {
         if(connectionProvider instanceof JndiConnectionProvider) {
-            logger.debug("JNDI connection provider configured. Using default Hibernate strategy based on JNDI.");
+            logger.debug("JNDI connection provider configured. Using default Hibernate strategy based on JNDI (org.hibernate.engine.jdbc.connections.spi.DataSourceBasedMultiTenantConnectionProviderImpl).");
             return;
         }
 
@@ -277,14 +278,16 @@ public class SessionFactoryBuilder {
 
         BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
-        StandardServiceRegistry standardRegistry =
-                new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
-        Object service = standardRegistry.getService(org.hibernate.engine.jdbc.connections.spi.ConnectionProvider.class);
-        standardRegistry.close();
-        Class connectionProviderClass = service.getClass();
+        Class<?> connectionProviderClass;
+        try(StandardServiceRegistry standardRegistry =
+                new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build()) {
+            Object service = standardRegistry.getService(org.hibernate.engine.jdbc.connections.spi.ConnectionProvider.class);
+            connectionProviderClass = service.getClass();
+        }
 
-        settings.put(MultiTenantConnectionProvider.CONNECTION_PROVIDER_CLASS, connectionProviderClass);
-        settings.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, MultiTenantConnectionProvider.class);
+        settings.put(MultiTenancyImplementation.CONNECTION_PROVIDER_CLASS, connectionProviderClass);
+        settings.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenancyImplementation.getClass());
+        settings.put(AvailableSettings.MULTI_TENANT, multiTenancyImplementation.getStrategy());
     }
 
     protected void setupSingleTenantConnection(ConnectionProvider connectionProvider, Map<String, Object> settings) {
@@ -482,10 +485,13 @@ public class SessionFactoryBuilder {
     protected void configureAnnotations(Table table, ConstPool constPool, AnnotationsAttribute classAnnotations) {
         Annotation annotation;
 
-        String schemaName = table.getSchema().getActualSchemaName();
         annotation = new Annotation(javax.persistence.Table.class.getName(), constPool);
         annotation.addMemberValue("name", new StringMemberValue(jpaEscape(table.getTableName()), constPool));
-        annotation.addMemberValue("schema", new StringMemberValue(jpaEscape(schemaName), constPool));
+        if(multiTenancyImplementation == null || multiTenancyImplementation.getStrategy() != MultiTenancyStrategy.SCHEMA) {
+            //Don't configure the schema name if we're using schema-based multitenancy
+            String schemaName = table.getSchema().getActualSchemaName();
+            annotation.addMemberValue("schema", new StringMemberValue(jpaEscape(schemaName), constPool));
+        }
         classAnnotations.addAnnotation(annotation);
 
         annotation = new Annotation(Entity.class.getName(), constPool);
