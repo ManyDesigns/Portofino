@@ -9,9 +9,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Pages can load custom JavaScript (example in demo-tt)
 - demo-tt profile page (example custom component)
 - Full support for POJO-based persistence:
-  - Export generated classes to actions and shared code
-  - Export generated classes to the file system so that an IDE can pick them up
+  - Export generated mapped classes to actions and shared code
+  - Export generated mapped classes to the file system so that an IDE can pick them up
   - Allow to configure the entity mode of each database mapping from the UI
+- Support for multi-tenancy in Hibernate
 
 ### Changed
 - Angular updated to version 9
