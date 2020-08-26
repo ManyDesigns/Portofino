@@ -89,7 +89,7 @@ export class AppComponent {
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  static navigation() {
+  static navigation(): new(...args) => DefaultNavigationComponent {
     return DefaultNavigationComponent;
   }
 }
