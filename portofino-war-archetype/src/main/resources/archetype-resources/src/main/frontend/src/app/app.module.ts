@@ -58,20 +58,22 @@ export class AppComponent {}
         <p>
           Your application has a REST API which depends on the resource-actions that it's made of.
           You can download <a [href]="portofino.apiRoot">the documentation of the REST API</a> in OpenAPI (aka Swagger) format.
+          Note that currently the documentation is cached, and if you change the structure of the application, you'll
+          have to restart it in order to see the updated documentation.
         </p>
         <p>
           Initially, the application has the user admin/admin built in.
           You can use that to <a [routerLink]="portofino.upstairsLink + '/wizard'">run the wizard</a>,
           connect to your database, and build a complete application from it in a few clicks. Please refer to the
-          <a href="https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5">getting started page</a>
-          if you feel lost.
+          <a href="https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5">getting started page</a>.
         </p>
         <p>
           The wizard is one of the tools that can be found in the administration section
           <a [routerLink]="portofino.upstairsLink">"upstairs"</a> (link in the toolbar).
-          The "upstairs" section is optional and can be disabled in production, leaving only the "downstairs" floor, i.e., the application.
-          "Upstairs" and "downstairs" are historical references to Portofino 3, which used the same model-driven interface
-          both for the application and for the application's model (the metamodel).
+          The "upstairs" section is optional and can be disabled in production, leaving only the "downstairs" floor,
+          i.e., the application.
+          <small>"Upstairs" and "downstairs" are historical references to Portofino 3, which used the same model-driven interface
+          both for the application and for the application's model (the metamodel).</small>
         </p>
         <p>
           You can find additional documentation in the <a href="https://github.com/ManyDesigns/Portofino/wiki">wiki</a>
@@ -111,5 +113,5 @@ export class AppModule {
   // It's necessary to spell the components used in the application here, otherwise Angular (Ivy) tree-shakes them.
   // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
   // https://github.com/angular/angular/issues/35314#issuecomment-584821399
-  static entryComponents = [ CrudComponent, CustomPageComponent, TextPageComponent ];
+  static entryComponents = [ CrudComponent, CustomPageComponent, TextPageComponent, WelcomeComponent ];
 }
