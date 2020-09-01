@@ -31,7 +31,7 @@ class HomeProjectsAction extends CustomAction {
     or m.user_ = :user
     group by p.id, p.title, p.description, p.public_
     order by id
-    """;
+    """
 
     public final static String LOGGED_SQL2 = """
     select p.id, p.title, p.description, count(t.n) as c, true
@@ -46,12 +46,12 @@ class HomeProjectsAction extends CustomAction {
     and m.user_ = :user
     group by p.id, p.title, p.description
     order by id
-    """;
+    """
 
     @Autowired
-    private Persistence persistence;
+    private Persistence persistence
 
-    List projects;
+    List projects
 
     @DefaultHandler
     public Resolution execute() {

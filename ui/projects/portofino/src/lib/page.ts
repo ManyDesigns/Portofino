@@ -423,7 +423,7 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   noActionForButton(event) {
     if(console) {
-      console.log("Not implemented", event);
+      console.error("Not implemented", event);
     }
   }
   //End buttons

@@ -61,7 +61,9 @@ import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import ognl.OgnlContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -842,7 +844,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
                 sortDirection = "asc";
             }
 
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put("sortProperty", propName);
             parameters.put("sortDirection", sortDirection);
             parameters.put(SEARCH_STRING_PARAM, searchString);
@@ -1640,7 +1642,17 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     @Guard(test = "isEditEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
-    @Operation(summary = "Update one or more objects (without blob data)")
+    @Operation(summary = "Update one or more objects in JSON form. This doesn't handle blobs. If you need to update blobs, use the single object, multipart/form-data version.", responses = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description =
+                            "For a single object update, the updated object. For bulk updates, the list of the " +
+                            "ids of the object that have NOT been updated"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            "When the request is incorrect, i.e. it supplies neither a /objectKey path parameter " +
+                            "nor a list of id query parameters, or it supplies both at the same time")})
     public Response httpPutJson(
             @Parameter(description = "The (optional) list of object ids to update in bulk")
             @QueryParam("id")
@@ -1689,7 +1701,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
      * @since 5.0
-     * @return the updated object as JSON (in a JAX-RS Response).
+     * @return the IDs of the objects that have NOT been updated (in a JAX-RS Response).
      */
     protected Response bulkUpdate(String jsonObject, List<String> ids) {
         List<String> idsNotUpdated = new ArrayList<>();
@@ -1785,7 +1797,14 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     @DELETE
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     @Guard(test = "isDeleteEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
-    @Operation(summary = "Delete one or more objects")
+    @Operation(summary = "Delete one or more objects", responses = {
+            @ApiResponse(responseCode = "200", description = "The number of objects that have been deleted"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            "When the request is incorrect, i.e. it supplies neither a /objectKey path parameter " +
+                            "nor a list of id query parameters, or it supplies both at the same time"),
+    })
     public int httpDelete(
             @Parameter(description = "The (optional) list of object ids to delete in bulk")
             @QueryParam("id")
