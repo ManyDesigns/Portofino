@@ -19,7 +19,8 @@ public class CorsServletContainerInitializer implements ServletContainerInitiali
     public static final String DEFAULT_ALLOWED_HEADERS =
             "Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, " +
             "Access-Control-Request-Headers, Authorization, Accept-Encoding, Accept-Language, " +
-            "Cache-Control, Connection, Host, Referer, User-Agent";
+            "Cache-Control, Connection, Host, Referer, User-Agent, " +
+            "X-Portofino-API-Version"; //TODO this is used by the CRUD action. Maybe these should be configurable by modules somehow?
     public static final String DEFAULT_EXPOSED_HEADERS =
             "Access-Control-Allow-Origin, Access-Control-Allow-Credentials, " +
             "X-Portofino-Pretty-Name, " +  //TODO this is used by the CRUD action. Maybe these should be configurable by modules somehow?

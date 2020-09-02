@@ -59,13 +59,12 @@ import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import com.vdurmont.semver4j.Semver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import ognl.OgnlContext;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -80,12 +79,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -161,6 +157,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractCrudAction.class);
     public static final String PORTOFINO_PRETTY_NAME_HEADER = "X-Portofino-Pretty-Name";
+    public static final Semver PORTOFINO_API_VERSION_5_2 = new Semver("5.2", Semver.SemverType.LOOSE);
 
     //--------------------------------------------------------------------------
     // Web parameters
@@ -1788,39 +1785,91 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         }
     }
 
+    @Deprecated
+    public Response httpDelete(List<String> ids) throws Exception {
+        return httpDelete(ids, null);
+    }
+
     /**
      * Handles object deletion via REST.
      * @param ids the list of object id's (keys) to delete if this is a bulk deletion.
+     * @param apiVersion the version of the REST API
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      */
     @DELETE
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     @Guard(test = "isDeleteEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
     @Operation(summary = "Delete one or more objects", responses = {
-            @ApiResponse(responseCode = "200", description = "The number of objects that have been deleted"),
+            @ApiResponse(
+                    responseCode = "200",
+                    description =
+                            "The ids of the objects that have been deleted (Portofino 5.2+) " +
+                            "or the number of deleted objects (legacy versions)."),
             @ApiResponse(
                     responseCode = "400",
                     description =
                             "When the request is incorrect, i.e. it supplies neither a /objectKey path parameter " +
                             "nor a list of id query parameters, or it supplies both at the same time"),
+            @ApiResponse(
+                    responseCode = "409",
+                    description =
+                            "When the application does not allow deleting this specific resource because the " +
+                            "deleteValidate method returns false (since Portofino 5.2)"),
     })
-    public int httpDelete(
+    public Response httpDelete(
             @Parameter(description = "The (optional) list of object ids to delete in bulk")
             @QueryParam("id")
-            List<String> ids) throws Exception {
+            List<String> ids,
+            @HeaderParam(PORTOFINO_API_VERSION_HEADER)
+            String apiVersion) throws Exception {
+        boolean returnIds = false;
+        if(apiVersion != null) {
+            returnIds = new Semver(apiVersion, Semver.SemverType.LOOSE).isGreaterThanOrEqualTo(PORTOFINO_API_VERSION_5_2);
+        }
         if(object == null) {
-            if(ids == null || ids.isEmpty()) {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
-                        "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
-            }
-            return bulkDelete(ids);
+            return deleteMany(ids, returnIds);
         }
         if(ids != null && !ids.isEmpty()) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
                     "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
         }
-        return delete(object);
+        return deleteOne(returnIds);
+    }
+
+    protected Response deleteOne(boolean returnIds) {
+        int deleted = delete(object);
+        Response.ResponseBuilder response = Response.ok();
+        if(returnIds) {
+            if(deleted == 1) {
+                response.entity(Collections.singletonList(pkHelper.getPkString(object)));
+            } else {
+                response.status(Response.Status.CONFLICT).entity(getDeleteDeniedMessage());
+            }
+        } else {
+            response.entity(deleted);
+        }
+        return response.build();
+    }
+
+    protected Response deleteMany(List<String> ids, boolean returnIds) throws Exception {
+        if(ids == null || ids.isEmpty()) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+                    "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+        }
+        List<String> deleted = bulkDelete(ids);
+        Response.ResponseBuilder response = Response.ok();
+        if(returnIds) {
+            response.entity(deleted);
+        } else {
+            response.entity(deleted.size());
+        }
+        return response.build();
+    }
+
+    protected String getDeleteDeniedMessage() {
+        return ElementsThreadLocals.getText("the.deleteValidate.method.returned.false");
     }
 
     protected int delete(T object) {
@@ -1841,9 +1890,9 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         }
     }
 
-    protected int bulkDelete(List<String> ids) throws Exception {
-        List<T> objects = new ArrayList<T>(ids.size());
-        int deleted = 0;
+    protected List<String> bulkDelete(List<String> ids) throws Exception {
+        List<T> objects = new ArrayList<>(ids.size());
+        List<String> deleted = new ArrayList<>();
         for (String current : ids) {
             String[] pkArr = current.split("/");
             Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
@@ -1852,7 +1901,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
                 doDelete(obj);
                 deletePostProcess(obj);
                 objects.add(obj);
-                deleted++;
+                deleted.add(current);
             }
         }
         commitTransaction();

@@ -32,6 +32,7 @@ import com.manydesigns.portofino.dispatcher.security.SecureResource;
  */
 public interface ResourceAction extends SecureResource {
     String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
+    String PORTOFINO_API_VERSION_HEADER = "X-Portofino-API-Version";
 
     ActionContext getContext();
 
