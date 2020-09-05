@@ -6,7 +6,7 @@ import { AfterViewInit,
   TemplateRef,
   Type,
   ViewChild, Directive } from "@angular/core";
-import {ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
+import {Annotation, ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
 import {PortofinoService} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
@@ -275,19 +275,26 @@ export abstract class Page implements WithButtons, OnDestroy {
 
   initialize() {
     this.computeNavigationMenu();
+    if(typeof(this.configuration) === 'string') {
+      //Play nice with web components
+      this.configuration = JSON.parse(this.configuration as string);
+    }
     const config = this.configuration;
     if(config && config.script) {
       this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.script}`), {
         responseType: "text"
       }).subscribe(s => {
-        //Expose some utilities
-        (this as any).util = {
-          moment: moment
-        };
-
-        let factory = new Function(`return function(page) { ${s} }`);
+        let factory = new Function(`return function(page, forms, moment) { ${s} }`);
         let userFunction = factory();
-        userFunction(this);
+        const forms = {
+          ClassAccessor: ClassAccessor,
+          Property: Property,
+          Annotation: Annotation,
+          Field: Field,
+          FieldSet: FieldSet,
+          Form: Form,
+        };
+        userFunction(this, forms, moment);
       }, e => {
         this.notificationService.error(this.translate.get("Could not load page script"));
       });

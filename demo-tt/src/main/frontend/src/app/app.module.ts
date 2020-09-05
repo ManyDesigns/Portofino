@@ -165,7 +165,7 @@ export class ProjectsSummary extends DetailComponent {
 
 @Component({
   selector: 'app-root',
-  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
+  template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:18080/demo-tt/api/">
     <portofino-templates></portofino-templates>
   </portofino-app>`
 })

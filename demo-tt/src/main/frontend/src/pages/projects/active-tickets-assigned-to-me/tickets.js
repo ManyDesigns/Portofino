@@ -25,7 +25,7 @@ if(page.authenticationService.currentUser) {
 
         let lastUpdated = document.createElement("small");
         page.translate.get("Last updated on").subscribe(text => {
-          lastUpdated.innerText = text + " " + page.util.moment(t.last_updated, 'yyyy-MM-dd HH:mm:ss z');
+          lastUpdated.innerText = text + " " + moment(t.last_updated, 'yyyy-MM-dd HH:mm:ss z');
         });
 
         list.appendChild(item);

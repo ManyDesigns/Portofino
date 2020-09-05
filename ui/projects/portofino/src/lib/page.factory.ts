@@ -159,7 +159,7 @@ export type PortofinoComponent = { type: Type<any> } & PortofinoComponentDefinit
 
 export function PortofinoComponent(info: PortofinoComponentDefinition) {
   return function(target) {
-    if(console) {
+    if(console && console.debug) {
       console.debug("Registering Portofino component " + info.name, info, target);
     }
     PageFactoryComponent.components[info.name] = Object.assign({ type: target }, info);

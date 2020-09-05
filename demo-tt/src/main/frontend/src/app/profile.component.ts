@@ -1,8 +1,7 @@
 import {
-  AuthenticationService, Button,
+  AuthenticationService, Button, ClassAccessor,
   DATE_TYPE,
   Form,
-  forObject,
   NotificationService,
   Page,
   PortofinoComponent,
@@ -115,11 +114,12 @@ export class ProfileComponent extends Page implements OnInit {
   }
 
   protected setupForm(user, properties?: string[]) {
-    this.formDefinition = Form.fromClassAccessor(forObject(user, {
-      types: {
-        "registration": DATE_TYPE,
-        "last_access": DATE_TYPE,
-        "validated": DATE_TYPE,
+    //@ts-ignore
+    this.formDefinition = Form.fromClassAccessor(ClassAccessor.forObject(user, {
+      properties: {
+        "registration": { type: DATE_TYPE },
+        "last_access": { type: DATE_TYPE },
+        "validated": { type: DATE_TYPE },
       }
     }), { object: user, properties });
   }
