@@ -119,14 +119,14 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   }
 
   protected defineCustomComponents() {
-    this.defineCustomElement('portofino-form', FormComponent);
+    this.defineCustomElement('portofino-form-component', FormComponent);
     //Fields
-    this.defineCustomElement('portofino-blob-field', BlobFieldComponent);
-    this.defineCustomElement('portofino-boolean-field', BooleanFieldComponent);
-    this.defineCustomElement('portofino-date-time-field', DateTimeFieldComponent);
-    this.defineCustomElement('portofino-number-field', NumberFieldComponent);
-    this.defineCustomElement('portofino-select-field', SelectFieldComponent);
-    this.defineCustomElement('portofino-text-field', TextFieldComponent);
+    this.defineCustomElement('portofino-blob-field-component', BlobFieldComponent);
+    this.defineCustomElement('portofino-boolean-field-component', BooleanFieldComponent);
+    this.defineCustomElement('portofino-date-time-field-component', DateTimeFieldComponent);
+    this.defineCustomElement('portofino-number-field-component', NumberFieldComponent);
+    this.defineCustomElement('portofino-select-field-component', SelectFieldComponent);
+    this.defineCustomElement('portofino-text-field-component', TextFieldComponent);
   }
 
   protected defineCustomElement(name, type: Type<any>) {
