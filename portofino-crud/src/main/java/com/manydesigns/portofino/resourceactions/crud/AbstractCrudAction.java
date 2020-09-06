@@ -52,6 +52,7 @@ import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
+import com.manydesigns.portofino.rest.PortofinoFilter;
 import com.manydesigns.portofino.rest.Utilities;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -158,6 +159,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             LoggerFactory.getLogger(AbstractCrudAction.class);
     public static final String PORTOFINO_PRETTY_NAME_HEADER = "X-Portofino-Pretty-Name";
     public static final Semver PORTOFINO_API_VERSION_5_2 = new Semver("5.2", Semver.SemverType.LOOSE);
+    public static final String PK_SEPARATOR = "/";
 
     //--------------------------------------------------------------------------
     // Web parameters
@@ -1632,7 +1634,13 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
      * @param jsonObject the object (in serialized JSON form)
      * @param ids the list of object id's (keys) to save if this is a bulk operation.
      * @since 4.2
-     * @return the updated object as JSON (in a JAX-RS Response).
+     * @return in case of single update, the updated object as JSON (in a JAX-RS Response). For bulk updates, it depends
+     * on the API version:
+     * <ul>
+     *     <li>5.2+ returns the list of updated ids</li>
+     *     <li>legacy versions return the list of ids that have NOT been updated.</li>
+     * </ul>
+     * In any case, if the input JSON does not pass validation, an error response with the invalid form is returned.
      */
     @PUT
     @RequiresPermissions(permissions = PERMISSION_EDIT)
@@ -1649,15 +1657,26 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
                     responseCode = "400",
                     description =
                             "When the request is incorrect, i.e. it supplies neither a /objectKey path parameter " +
-                            "nor a list of id query parameters, or it supplies both at the same time")})
+                            "nor a list of id query parameters, or it supplies both at the same time"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description =
+                            "When the JSON body does not pass validation against the CRUD's configuration " +
+                            "and possibly user-defined validation methods.")})
     public Response httpPutJson(
             @Parameter(description = "The (optional) list of object ids to update in bulk")
             @QueryParam("id")
             List<String> ids,
             @RequestBody(description = "The object in JSON form, as returned by GET")
-            String jsonObject) {
+            String jsonObject,
+            @HeaderParam(PortofinoFilter.PORTOFINO_API_VERSION_HEADER)
+            String apiVersion) {
         if(object == null) {
-            return bulkUpdate(jsonObject, ids);
+            boolean returnUpdated = true;
+            if(apiVersion != null) {
+                returnUpdated = new Semver(apiVersion, Semver.SemverType.LOOSE).isGreaterThanOrEqualTo(PORTOFINO_API_VERSION_5_2);
+            }
+            return bulkUpdate(jsonObject, ids, returnUpdated);
         }
         if(ids != null && !ids.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
@@ -1691,30 +1710,36 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         }
     }
 
+    @Deprecated
+    protected Response bulkUpdate(String jsonObject, List<String> ids) {
+        return bulkUpdate(jsonObject, ids, false);
+    }
+
     /**
      * Handles the update of multiple objects via REST.
      * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
      * {@link #uploadBlob(String, String, InputStream)}.
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
+     * @param returnUpdated (5.2+) whether to return the ids of the objects that have been updated (Portofino 5.2+)
+     *                      or the ids of the objects that have NOT been updated (legacy versions).
      * @since 5.0
      * @return the IDs of the objects that have NOT been updated (in a JAX-RS Response).
      */
-    protected Response bulkUpdate(String jsonObject, List<String> ids) {
-        List<String> idsNotUpdated = new ArrayList<>();
+    protected Response bulkUpdate(String jsonObject, List<String> ids, boolean returnUpdated) {
+        List<String> updated = new ArrayList<>();
         setupForm(Mode.BULK_EDIT);
         disableBlobFields();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
             for (String id : ids) {
-                loadObject(id.split("/"));
+                loadObject(id.split(PK_SEPARATOR));
                 editSetup(object);
                 writeFormToObject();
                 if(editValidate(object)) {
                     doUpdate(object);
                     editPostProcess(object);
-                } else {
-                    idsNotUpdated.add(id);
+                    updated.add(id);
                 }
             }
             try {
@@ -1724,7 +1749,15 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
                 logger.warn(rootCauseMessage, e);
                 return Response.serverError().entity(e).build();
             }
-            return Response.ok(idsNotUpdated).build();
+            if(returnUpdated) {
+                return Response.ok(updated).build();
+            } else {
+                List<String> idsNotUpdated = new ArrayList<>(ids);
+                idsNotUpdated.removeAll(updated);
+                return Response.ok(idsNotUpdated)
+                        .header(PortofinoFilter.PORTOFINO_API_VERSION_HEADER, "5.1")
+                        .build();
+            }
         } else {
             return Response.serverError().entity(form).build();
         }
@@ -1822,23 +1855,29 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             @Parameter(description = "The (optional) list of object ids to delete in bulk")
             @QueryParam("id")
             List<String> ids,
-            @HeaderParam(PORTOFINO_API_VERSION_HEADER)
+            @HeaderParam(PortofinoFilter.PORTOFINO_API_VERSION_HEADER)
             String apiVersion) throws Exception {
         boolean returnIds = false;
         if(apiVersion != null) {
             returnIds = new Semver(apiVersion, Semver.SemverType.LOOSE).isGreaterThanOrEqualTo(PORTOFINO_API_VERSION_5_2);
         }
+        Response.ResponseBuilder responseBuilder;
         if(object == null) {
-            return deleteMany(ids, returnIds);
+            responseBuilder = deleteMany(ids, returnIds);
+        } else {
+            if (ids != null && !ids.isEmpty()) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
+                        "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+            }
+            responseBuilder = deleteOne(returnIds);
         }
-        if(ids != null && !ids.isEmpty()) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
-                    "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
+        if(!returnIds) {
+            responseBuilder.header(PortofinoFilter.PORTOFINO_API_VERSION_HEADER, "5.1");
         }
-        return deleteOne(returnIds);
+        return responseBuilder.build();
     }
 
-    protected Response deleteOne(boolean returnIds) {
+    protected Response.ResponseBuilder deleteOne(boolean returnIds) {
         int deleted = delete(object);
         Response.ResponseBuilder response = Response.ok();
         if(returnIds) {
@@ -1850,10 +1889,10 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         } else {
             response.entity(deleted);
         }
-        return response.build();
+        return response;
     }
 
-    protected Response deleteMany(List<String> ids, boolean returnIds) throws Exception {
+    protected Response.ResponseBuilder deleteMany(List<String> ids, boolean returnIds) throws Exception {
         if(ids == null || ids.isEmpty()) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
                     "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
@@ -1865,7 +1904,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         } else {
             response.entity(deleted.size());
         }
-        return response.build();
+        return response;
     }
 
     protected String getDeleteDeniedMessage() {

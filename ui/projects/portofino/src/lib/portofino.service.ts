@@ -181,3 +181,13 @@ export class ProgressInterceptor implements HttpInterceptor {
     }));
   }
 }
+
+@Injectable()
+export class ApiVersionInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let request = req.clone({
+      headers: req.headers.append("X-Portofino-API-Version", "5.2")
+    });
+    return next.handle(request);
+  }
+}

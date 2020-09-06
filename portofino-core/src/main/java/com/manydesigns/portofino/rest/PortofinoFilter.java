@@ -48,6 +48,7 @@ import javax.ws.rs.ConstrainedTo;
 import javax.ws.rs.RuntimeType;
 import javax.ws.rs.container.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
@@ -71,8 +72,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
 
     public static final String ACCESS_LOGGER_NAME = "com.manydesigns.portofino.access";
     public static final String MESSAGE_HEADER = "X-Portofino-Message";
+    public static final String PORTOFINO_API_VERSION_HEADER = "X-Portofino-API-Version";
     private static final Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
     private static final Logger accessLogger = LoggerFactory.getLogger(ACCESS_LOGGER_NAME);
+    public static final String PORTOFINO_API_VERSION = "5.2";
 
     @Context
     protected ResourceInfo resourceInfo;
@@ -148,14 +151,18 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
 
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         addCacheHeaders(responseContext);
+        MultivaluedMap<String, Object> headers = responseContext.getHeaders();
         for(String message : RequestMessages.consumeErrorMessages()) {
-            responseContext.getHeaders().add(MESSAGE_HEADER, "error: " + message);
+            headers.add(MESSAGE_HEADER, "error: " + message);
         }
         for(String message : RequestMessages.consumeWarningMessages()) {
-            responseContext.getHeaders().add(MESSAGE_HEADER, "warning: " + message);
+            headers.add(MESSAGE_HEADER, "warning: " + message);
         }
         for(String message : RequestMessages.consumeInfoMessages()) {
-            responseContext.getHeaders().add(MESSAGE_HEADER, "info: " + message);
+            headers.add(MESSAGE_HEADER, "info: " + message);
+        }
+        if(!headers.containsKey(PORTOFINO_API_VERSION_HEADER)) { //Give a chance to actions to declare a different version
+            headers.putSingle(PORTOFINO_API_VERSION_HEADER, PORTOFINO_API_VERSION);
         }
     }
 

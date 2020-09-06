@@ -16,7 +16,13 @@ import {
   DetailComponentHolder,
   SearchComponentHolder
 } from './pages/crud/crud.component';
-import {LOCALE_STORAGE_SERVICE, LOCALES, PortofinoService, ProgressInterceptor} from './portofino.service';
+import {
+  ApiVersionInterceptor,
+  LOCALE_STORAGE_SERVICE,
+  LOCALES,
+  PortofinoService,
+  ProgressInterceptor
+} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
   AuthenticationInterceptor,
@@ -240,6 +246,7 @@ export class PortofinoUpstairsModule {}
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: FOOTER_COMPONENT, useFactory: PortofinoModule.footerComponent },
+    { provide: HTTP_INTERCEPTORS, useClass: ApiVersionInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },
