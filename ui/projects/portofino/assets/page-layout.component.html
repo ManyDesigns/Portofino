@@ -1,6 +1,6 @@
 <ng-template #defaultTemplate let-content="content" let-page="page">
   <ng-template [ngTemplateOutlet]="content"></ng-template>
-  <portofino-page *ngFor="let child of page.embeddedChildren"
+  <portofino-page *ngFor="let child of page.getEmbeddedChildren()"
                   [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
 </ng-template>
 <div class="page" [class.embedded]="page.embedded">

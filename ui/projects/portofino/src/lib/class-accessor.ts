@@ -1,7 +1,6 @@
 import {ValidatorFn, Validators} from "@angular/forms";
-import {map} from "rxjs/operators";
 
-export const loadClassAccessor = map((c: ClassAccessor) => {
+export const loadClassAccessor = (c: ClassAccessor) => {
   if(!c) {
     return c;
   }
@@ -11,7 +10,7 @@ export const loadClassAccessor = map((c: ClassAccessor) => {
   } else {
     return ClassAccessor.create(c);
   }
-});
+};
 
 export const BOOLEAN_TYPE = "boolean";
 export const DATE_TYPE = "date";

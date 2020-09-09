@@ -56,12 +56,19 @@
       {{'Children'|translate}}
     </ng-template>
     <mat-error *ngIf="!page.portofino.localApiAvailable">{{'Local API not available.' | translate}}</mat-error>
+    <mat-table hidden [dataSource]="emptyDataSource">
+      <!-- To load the mat-table CSS -->
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row"></td>
+      <tr mat-header-row *matHeaderRowDef="[]"></tr>
+      <tr mat-row *matRowDef="let row; columns: []"></tr>
+    </mat-table>
     <table class="mat-table">
       <tr class="mat-header-row">
         <th class="mat-header-cell">{{'Segment'|translate}}</th>
         <th class="mat-header-cell">{{'Title'|translate}}</th>
         <th class="mat-header-cell">{{'Icon'|translate}}</th>
-        <th class="mat-header-cell">{{'Embedded'|translate}}</th>
+        <th class="mat-header-cell">{{'Embedded in'|translate}}</th>
         <th class="mat-header-cell">{{'Show in navigation'|translate}}</th>
       </tr>
       <tr *ngFor="let child of page.children" class="mat-row">
@@ -73,7 +80,12 @@
             <mat-icon matSuffix *ngIf="child.icon">{{child.icon}}</mat-icon>
           </mat-form-field>
         </td>
-        <td class="mat-cell"><mat-checkbox [(ngModel)]="child.embedded"></mat-checkbox></td>
+        <td class="mat-cell">
+          <mat-select [(ngModel)]="child.embeddedIn">
+            <mat-option [value]="null">{{'Not embedded'|translate}}</mat-option>
+            <mat-option *ngFor="let section of page.template.sections" [value]="section">{{section|translate}}</mat-option>
+          </mat-select>
+        </td>
         <td class="mat-cell"><mat-checkbox [(ngModel)]="child.showInNavigation"></mat-checkbox></td>
       </tr>
     </table>

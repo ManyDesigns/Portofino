@@ -71,11 +71,21 @@ export class CrudComponent extends Page {
   }
 
   initialize() {
+    //Legacy children with no embedded section
+    this.configuration.detailChildren.forEach(c => {
+      if(c.embedded) {
+        if(!c.embeddedIn) {
+          c.embeddedIn = "default";
+        }
+        delete c.embedded;
+      }
+    });
+
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().pipe(
-      mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath).pipe(loadClassAccessor)),
+      mergeMap(() => this.http.get<ClassAccessor>(this.sourceUrl + this.classAccessorPath)),
       mergeMap(classAccessor => {
-        this.classAccessor = classAccessor;
+        this.initClassAccessor(classAccessor);
         return this.http.get<SelectionProvider[]>(this.sourceUrl + this.selectionProvidersPath);
       }),
       mergeMap(sps => {
@@ -83,10 +93,26 @@ export class CrudComponent extends Page {
         return this.http.get<Operation[]>(this.sourceUrl + this.operationsPath);
       })).subscribe(
         ops => {
-          this.operations = ops;
-          this.init();
+          this.initOperations(ops);
+          this.start();
+          super.initialize();
         },
       () => this.error = this.translate.instant("This page is not configured correctly."));
+  }
+
+  protected initOperations(operations: Operation[]) {
+    this.operations = operations;
+    const bulkOpsEnabled = this.operations.some(op => op.name == "Bulk operations" && op.available);
+    this.createEnabled = this.operationAvailable(this.operations, "POST");
+    this.bulkEditEnabled = this.operationAvailable(this.operations, "PUT") && bulkOpsEnabled;
+    this.bulkDeleteEnabled = this.operationAvailable(this.operations, "DELETE") && bulkOpsEnabled;
+  }
+
+  protected initClassAccessor(classAccessor: ClassAccessor) {
+    this.classAccessor = loadClassAccessor(classAccessor);
+    this.classAccessor.properties.forEach(p => {
+      p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
+    });
   }
 
   computeBaseSourceUrl() {
@@ -102,14 +128,7 @@ export class CrudComponent extends Page {
     }
   }
 
-  protected init() {
-    const bulkOpsEnabled = this.operations.some(op => op.name == "Bulk operations" && op.available);
-    this.createEnabled = this.operationAvailable(this.operations, "POST");
-    this.bulkEditEnabled = this.operationAvailable(this.operations, "PUT") && bulkOpsEnabled;
-    this.bulkDeleteEnabled = this.operationAvailable(this.operations, "DELETE") && bulkOpsEnabled;
-    this.classAccessor.properties.forEach(p => {
-      p.key = (this.classAccessor.keyProperties.find(k => k == p.name) != null);
-    });
+  protected start() {
     if(this.route) {
       this.subscribe(this.route.queryParams,params => {
         if(params.hasOwnProperty('create') && this.createEnabled && !this.embedded) {
@@ -129,7 +148,6 @@ export class CrudComponent extends Page {
         this.refreshSearch.emit();
       } //else TODO
     });
-    super.initialize();
   }
 
   protected enableDetailEditMode() {

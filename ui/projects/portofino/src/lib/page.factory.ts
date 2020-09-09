@@ -92,6 +92,17 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
+
+    //Legacy children with no embedded section
+    config.children.forEach(c => {
+      if(c.embedded) {
+        if(!c.embeddedIn) {
+          c.embeddedIn = "default";
+        }
+        delete c.embedded;
+      }
+    });
+
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType.type);
     let componentRef = componentFactory.create(this.injector);
     const component = <Page>componentRef.instance;
