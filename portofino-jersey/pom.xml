@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.4.3.Final</version>
+            <version>6.0.19.Final</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
