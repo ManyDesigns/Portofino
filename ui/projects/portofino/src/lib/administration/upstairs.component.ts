@@ -3,7 +3,7 @@ import {Page, PageChild, PageConfiguration} from "../page";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
 import {Button} from "../buttons";
-import {Observable, of, throwError} from "rxjs";
+import {Observable, of} from "rxjs";
 import {PortofinoComponent} from "../page.factory";
 import {ConnectionsComponent} from "./connections.component";
 import {WizardComponent} from "./wizard.component";
@@ -15,7 +15,6 @@ import {AuthenticationService} from "../security/authentication.service";
 import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {NotificationService} from "../notifications/notification.services";
-import {map} from "rxjs/operators";
 import {WebStorageService} from "../storage/storage.services";
 
 @Component({

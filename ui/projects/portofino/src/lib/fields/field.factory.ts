@@ -1,4 +1,4 @@
-import {Component, Host, Injectable, Injector, Input, Optional, SkipSelf, Type} from "@angular/core";
+import {Component, Host, Injectable, Input, Optional, SkipSelf, Type} from "@angular/core";
 import {BlobFieldComponent} from "./blob-field.component";
 import {FieldComponent} from "./field.component";
 import {DateTimeFieldComponent} from "./date-time-field.component";

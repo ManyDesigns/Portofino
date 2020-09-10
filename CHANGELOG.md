@@ -6,16 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Pages can load custom JavaScript (example in demo-tt)
-- demo-tt profile page (example custom component)
+- User interface extensibility improvements:
+  - Custom pages in HTML and JavaScript with no Angular knowledge required (example in demo-tt)
+  - All pages can load custom JavaScript (example in demo-tt)
+  - Page templates can include several sections where child pages can be embedded (like Portofino 4)
+  - demo-tt profile page (example custom component)
+  - Progressive Web Application (PWA) example in demo-tt
 - Full support for POJO-based persistence:
   - Export generated classes to actions and shared code
   - Export generated classes to the file system so that an IDE can pick them up
-  - Allow to configure the entity mode of each database mapping from the UI
+  - Allow to configure the entity mode of each database mapping from the UI (the default is still map-based)
 
 ### Changed
-- Angular updated to version 9
+- Angular updated to version 10
 - Groovy updated to version 3
+- Various other dependencies updated for security & bug fixes
+- CRUD REST API versioning with X-Portofino-API-Version header
+- CRUD REST API changes (legacy behavior still default):
+  - Bulk update (PUT) returns list of modified IDs
+  - Bulk delete (DELETE) returns list of deleted IDs
 
 ### Removed
 - Maven profile "portofino-development" which has been superseded by Docker

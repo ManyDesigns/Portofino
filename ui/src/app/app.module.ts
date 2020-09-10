@@ -1,4 +1,4 @@
-import {Component, Inject, NgModule, OnInit} from '@angular/core';
+import {Component, Inject, NgModule} from '@angular/core';
 import {
   LocalStorageService,
   PortofinoModule,

@@ -4,10 +4,8 @@ import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.RootFactory;
 import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.dispatcher.visitor.DepthFirstVisitor;
-import com.manydesigns.portofino.dispatcher.visitor.ResourceVisitor;
 import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.jaxrs2.ReaderListener;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
@@ -87,25 +85,25 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         }
 
         public String calculateResourcePath(Resource resource, ArrayList<Parameter> parameters) {
-            String path;
+            StringBuilder path;
             if(resource.getParent() != null) {
-                path = calculateResourcePath(resource.getParent(), parameters);
-                path += "/" + resource.getSegment();
+                path = new StringBuilder(calculateResourcePath(resource.getParent(), parameters));
+                path.append("/").append(resource.getSegment());
             } else {
-                path = "";
+                path = new StringBuilder();
             }
             if(resource instanceof WithParameters) {
                 WithParameters wp = (WithParameters) resource;
                 for(int i = 0; i < wp.getParameters().size(); i++) {
                     String name = wp.getParameterName(i);
-                    path += "/{" + name + "}";
+                    path.append("/{").append(name).append("}");
                     PathParameter parameter = new PathParameter();
                     parameter.setName(name);
                     parameter.setRequired(true);
                     parameters.add(parameter);
                 }
             }
-            return path;
+            return path.toString();
         }
     }
 
