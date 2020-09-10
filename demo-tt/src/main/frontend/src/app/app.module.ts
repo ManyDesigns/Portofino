@@ -56,6 +56,8 @@ import localeIt from "@angular/common/locales/it";
 import { ProfileComponent } from './profile.component';
 import {MatChipsModule} from "@angular/material/chips";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 registerLocaleData(localeEs);
 registerLocaleData(localeIt);
@@ -190,7 +192,8 @@ export class DemoTTAppComponent {}
     MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
     MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule.forRoot(),
-    TranslateModule.forRoot(), MatChipsModule, MatProgressSpinnerModule, PortofinoFormsModule],
+    TranslateModule.forRoot(), MatChipsModule, MatProgressSpinnerModule, PortofinoFormsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })],
   bootstrap: [DemoTTAppComponent]
 })
 export class DemoTTAppModule {
