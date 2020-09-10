@@ -39,9 +39,6 @@
 
     <profiles>
         <profile>
-            <id>no-frontend-build</id>
-        </profile>
-        <profile>
             <id>build-frontend</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
