@@ -5,6 +5,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {Location} from "@angular/common";
+import {PortofinoService} from "../../portofino.service";
+import {HttpClient} from "@angular/common/http";
+import {InAppAuthenticationStrategy} from "./in-app-authentication-strategy";
 
 @Component({
   selector: 'portofino-forgotten-password',
@@ -33,16 +36,21 @@ export class ForgottenPasswordComponent implements OnInit {
   constructor(protected dialog: MatDialog, protected dialogRef: MatDialogRef<ForgottenPasswordComponent>,
               protected authenticationService: AuthenticationService,
               protected formBuilder: FormBuilder, protected notificationService: NotificationService,
-              protected translate: TranslateService, protected location: Location) {
+              protected translate: TranslateService, protected location: Location,
+              protected portofino: PortofinoService, protected http: HttpClient) {
     this.form = this.formBuilder.group({email: ['', [Validators.required, Validators.email]]});
   }
 
   ngOnInit() {}
 
   sendForgotPasswordEmail() {
-    this.authenticationService.sendForgotPasswordEmail(this.form.get('email').value,
-      //TODO alternative to window.location?
-      window.location.origin + this.location.normalize("/") + "?resetPassword=x&token=TOKEN").subscribe(
+    return this.http.post(`${(this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath}/:send-reset-password-email`,{
+      email: this.form.get('email').value,
+      loginPageUrl:
+        //TODO alternative to window.location?
+        window.location.origin + this.location.normalize("/") + "?resetPassword=x&token=TOKEN",
+      siteNameOrAddress: this.portofino.applicationName
+    }).subscribe(
       () => {
         this.notificationService.info(this.translate.get("Check your mailbox and follow the instructions."));
         this.dialogRef.close();

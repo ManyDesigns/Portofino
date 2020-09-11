@@ -206,5 +206,5 @@ export class DemoTTAppModule {
   // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
   // https://github.com/angular/angular/issues/35314#issuecomment-584821399
   static entryComponents = [
-    CustomPageComponent, ProjectsCrud, ProjectsSummary, TextPageComponent, WelcomeComponent ];
+    CustomPageComponent, ProjectsCrud, ProjectsSummary, TextPageComponent, WelcomeComponent, ProfileComponent ];
 }

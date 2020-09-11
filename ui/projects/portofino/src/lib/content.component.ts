@@ -88,7 +88,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
       page.configure();
     } else if (!page.parent) {
       if (params.hasOwnProperty('resetPassword')) {
-        this.authenticationService.showResetPasswordDialog(params.token);
+        this.authenticationService.goToResetPassword(params.token);
       } else if (params.hasOwnProperty('confirmSignup')) {
         this.authenticationService.confirmSignup(params.token).subscribe(
           () => this.notificationService.info(this.translate.get("User successfully created."))
