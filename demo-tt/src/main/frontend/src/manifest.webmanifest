@@ -1,7 +1,7 @@
 {
   "name": "Portofino Demo-tt",
   "short_name": "Demo-tt",
-  "theme_color": "#1976d2",
+  "theme_color": "#0073B3",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "./",
