@@ -25,9 +25,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - CRUD REST API changes (legacy behavior still default):
   - Bulk update (PUT) returns list of modified IDs
   - Bulk delete (DELETE) returns list of deleted IDs
+  
 
 ### Removed
 - Maven profile "portofino-development" which has been superseded by Docker
+- Maven profile "no-frontend-build" (use -P-build-frontend)
+
+### Fixed
+
+- Newly created CRUD pages don't have create/update buttons ([#406](https://github.com/ManyDesigns/Portofino/issues/406))
 
 ## [5.1.4] – 2020-07-04
 
