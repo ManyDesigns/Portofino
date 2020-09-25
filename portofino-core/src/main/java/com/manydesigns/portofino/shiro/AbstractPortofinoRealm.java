@@ -101,8 +101,13 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         } catch (JwtException e) {
             throw new AuthenticationException(e);
         }
-        Map body = (Map) jwt.getBody();
         String credentials = legacyHashing ? token.getCredentials() : encryptPassword(token.getCredentials());
+        Object principal = extractPrincipalFromWebToken(jwt);
+        return new SimpleAuthenticationInfo(principal, credentials, getName());
+    }
+
+    protected Object extractPrincipalFromWebToken(Jwt jwt) {
+        Map body = (Map) jwt.getBody();
         String base64Principal = (String) body.get("serialized-principal");
         byte[] serializedPrincipal = Base64.decode(base64Principal);
         Object principal;
@@ -122,7 +127,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         } finally {
             Thread.currentThread().setContextClassLoader(loader);
         }
-        return new SimpleAuthenticationInfo(principal, credentials, getName());
+        return principal;
     }
 
     public String generateWebToken(Object principal) {
