@@ -39,7 +39,7 @@ import {FormGroup} from "@angular/forms";
             <mat-card-content>
               <div fxLayout="column" fxLayoutGap="10px">
                 <span><!-- Divider --></span>
-                <a mat-raised-button color="accent" (click)="authenticationService.showChangePasswordDialog()">
+                <a mat-raised-button color="accent" (click)="authenticationService.goToChangePassword()">
                   Change your password
                 </a>
                 <a mat-raised-button color="primary" (click)="edit()">Edit your data</a>

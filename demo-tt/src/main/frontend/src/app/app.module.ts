@@ -35,7 +35,7 @@ import {
   CrudComponent,
   TextPageComponent,
   CustomPageComponent,
-  DetailComponent, PortofinoFormsModule
+  DetailComponent, PortofinoFormsModule, UpstairsComponent
 } from "portofino";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -206,5 +206,6 @@ export class DemoTTAppModule {
   // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
   // https://github.com/angular/angular/issues/35314#issuecomment-584821399
   static entryComponents = [
-    CustomPageComponent, ProjectsCrud, ProjectsSummary, TextPageComponent, WelcomeComponent, ProfileComponent ];
+    CustomPageComponent, ProjectsCrud, ProjectsSummary, TextPageComponent, WelcomeComponent, ProfileComponent,
+    UpstairsComponent ];
 }

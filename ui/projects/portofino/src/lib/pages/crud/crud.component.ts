@@ -71,15 +71,17 @@ export class CrudComponent extends Page {
   }
 
   initialize() {
-    //Legacy children with no embedded section
-    this.configuration.detailChildren.forEach(c => {
-      if(c.embedded) {
-        if(!c.embeddedIn) {
-          c.embeddedIn = "default";
+    if(this.configuration.detailChildren) {
+      //Legacy children with no embedded section
+      this.configuration.detailChildren.forEach(c => {
+        if(c.embedded) {
+          if(!c.embeddedIn) {
+            c.embeddedIn = "default";
+          }
+          delete c.embedded;
         }
-        delete c.embedded;
-      }
-    });
+      });
+    }
 
     this.sourceUrl = this.computeBaseSourceUrl();
     this.loadConfiguration().pipe(

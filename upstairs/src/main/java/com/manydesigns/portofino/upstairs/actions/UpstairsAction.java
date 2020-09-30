@@ -23,6 +23,7 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Cru
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.SecurityLogic;
+import com.manydesigns.portofino.shiro.*;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.upstairs.ModuleInfo;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
@@ -173,14 +174,12 @@ public class UpstairsAction extends AbstractResourceAction {
         if(database == null) {
             throw new WebApplicationException("The database does not exist: " + databaseName);
         }
-        Table userTable = getTable(persistence.getModel(), wizard.usersTable);
-        if(userTable != null) {
-            try {
-                setupSecurityGroovy(database.getConnectionProvider(), userTable, wizard);
-            } catch (Exception e) {
-                logger.error("Couldn't configure users", e);
-                throw new WebApplicationException(e);
-            }
+
+        try {
+            setupSecurityGroovy(wizard);
+        } catch (Exception e) {
+            logger.error("Couldn't configure users", e);
+            throw new WebApplicationException(e);
         }
     }
 
@@ -623,11 +622,50 @@ public class UpstairsAction extends AbstractResourceAction {
         }
     }
 
-    protected void setupSecurityGroovy(ConnectionProvider connectionProvider, Table userTable, WizardInfo wizard) throws Exception {
+    protected void setupSecurityGroovy(WizardInfo wizard)
+            throws Exception {
+        Table userTable = getTable(persistence.getModel(), wizard.usersTable);
+        if(userTable == null) {
+            throw new IllegalArgumentException("User table must not be null");
+        }
+
+        PortofinoRealm currentRealm = ShiroUtils.getPortofinoRealm();
+        if(currentRealm instanceof ModelBasedRealm) {
+            removeSecurityAnnotations(((ModelBasedRealm) currentRealm).getUsersTable());
+            removeSecurityAnnotations(((ModelBasedRealm) currentRealm).getGroupsTable());
+            removeSecurityAnnotations(((ModelBasedRealm) currentRealm).getUsersGroupsTable());
+        } else {
+            logger.info("The existing realm ({}) is not model-based. We'll assume that the model does not contain security annotations. If it's the case, you should remove them manually.", currentRealm);
+        }
+
+        DatabaseLogic.findColumnByName(userTable, wizard.userNameProperty.getColumnName())
+                .ensureAnnotation(Username.class);
+        DatabaseLogic.findColumnByName(userTable, wizard.userPasswordProperty.getColumnName())
+                .ensureAnnotation(com.manydesigns.portofino.shiro.Password.class);
+        if(wizard.userEmailProperty != null) {
+            DatabaseLogic.findColumnByName(userTable, wizard.userEmailProperty.getColumnName())
+                    .ensureAnnotation(EmailAddress.class);
+        }
+        if(wizard.userTokenProperty != null) {
+            DatabaseLogic.findColumnByName(userTable, wizard.userTokenProperty.getColumnName())
+                    .ensureAnnotation(EmailToken.class);
+        }
+
+        Table groupsTable = getTable(persistence.getModel(), wizard.groupsTable);
+        Table usersGroupsTable = getTable(persistence.getModel(), wizard.userGroupTable);
+        if(groupsTable != null && usersGroupsTable != null) {
+            DatabaseLogic.findColumnByName(groupsTable, wizard.groupNameProperty.getColumnName())
+                    .ensureAnnotation(GroupName.class);
+            DatabaseLogic.findColumnByName(usersGroupsTable, wizard.groupLinkProperty.getColumnName())
+                    .ensureAnnotation(GroupLink.class);
+            DatabaseLogic.findColumnByName(usersGroupsTable, wizard.userLinkProperty.getColumnName())
+                    .ensureAnnotation(UserLink.class);
+        }
+
         TemplateEngine engine = new SimpleTemplateEngine();
         Template template = engine.createTemplate(
                 UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/Security.groovy"));
-        Map<String, String> bindings = getSecurityGroovyBindings(connectionProvider, userTable, wizard);
+        Map<String, String> bindings = getSecurityGroovyBindings(wizard);
         FileObject codeBaseRoot = actionsDirectory.getParent().resolveFile("classes");
         FileObject securityGroovyFile = codeBaseRoot.resolveFile("Security.groovy");
         if(securityGroovyFile.exists()) {
@@ -638,29 +676,18 @@ public class UpstairsAction extends AbstractResourceAction {
             template.make(bindings).writeTo(fw);
             logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
         }
+        persistence.saveXmlModel();
+    }
+
+    private void removeSecurityAnnotations(Table table) {
+        table.getColumns().forEach(c -> {
+            c.getAnnotations().removeIf(a -> a.getType().startsWith(Username.class.getPackage().getName()));
+        });
     }
 
     @NotNull
-    protected Map<String, String> getSecurityGroovyBindings(ConnectionProvider connectionProvider, Table userTable, WizardInfo wizard) {
+    protected Map<String, String> getSecurityGroovyBindings(WizardInfo wizard) {
         Map<String, String> bindings = new HashMap<>();
-        bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
-        bindings.put("userTableEntityName", userTable.getActualEntityName());
-        bindings.put("userIdProperty", getPropertyName(userTable, wizard.userIdProperty));
-        bindings.put("userNameProperty", getPropertyName(userTable, wizard.userNameProperty));
-        bindings.put("passwordProperty", getPropertyName(userTable, wizard.userPasswordProperty));
-        bindings.put("userEmailProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userEmailProperty)));
-        bindings.put("userTokenProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userTokenProperty)));
-
-        Table groupsTable = getTable(persistence.getModel(), wizard.groupsTable);
-        bindings.put("groupTableEntityName", groupsTable != null ? groupsTable.getActualEntityName() : "");
-        bindings.put("groupIdProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupIdProperty)));
-        bindings.put("groupNameProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupNameProperty)));
-
-        Table userGroupTable = getTable(persistence.getModel(), wizard.userGroupTable);
-        bindings.put("userGroupTableEntityName",
-                userGroupTable != null ? userGroupTable.getActualEntityName() : "");
-        bindings.put("groupLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.groupLinkProperty)));
-        bindings.put("userLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.userLinkProperty)));
         bindings.put("adminGroupName", StringUtils.defaultString(wizard.adminGroupName));
 
         bindings.put("hashIterations", "1");

@@ -148,10 +148,10 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
-    protected Object cleanUserPrincipal(user) {
+    protected Object cleanUserPrincipal(principal) {
         Map cleanUser = new HashMap()
         //user.properties.each { k, v -> //use this for POJO persistence
-        user.each { k, v ->
+        principal.each { k, v ->
             if (v instanceof List || v instanceof Map) {
                 logger.debug("Skipping {}", k)
             } else {
