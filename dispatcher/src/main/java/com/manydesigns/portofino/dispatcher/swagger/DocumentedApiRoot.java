@@ -6,6 +6,7 @@ import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.dispatcher.visitor.DepthFirstVisitor;
 import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.jaxrs2.ReaderListener;
+import io.swagger.v3.oas.integration.api.OpenApiReader;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
@@ -33,11 +34,11 @@ public abstract class DocumentedApiRoot implements ReaderListener {
     }
     
     @Override
-    public void beforeScan(Reader reader, OpenAPI openAPI) {}
+    public void beforeScan(OpenApiReader reader, OpenAPI openAPI) {}
 
     @Override
-    public void afterScan(Reader reader, OpenAPI openAPI) {
-        final SubResourceReader subResourceReader = getSubResourceReader(reader);
+    public void afterScan(OpenApiReader reader, OpenAPI openAPI) {
+        final SubResourceReader subResourceReader = getSubResourceReader(openAPI);
         try {
             //TODO actions should be put in a special "inspection mode" to avoid checks (e.g. not-in-use-case),
             //hitting the DB or services, etc.
@@ -62,8 +63,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         root.init();
     }
 
-    protected SubResourceReader getSubResourceReader(Reader reader) {
-        return new SubResourceReader(reader);
+    protected SubResourceReader getSubResourceReader(OpenAPI openAPI) {
+        return new SubResourceReader(openAPI);
     }
 
     protected ResourceContext getResourceContext() {
@@ -72,8 +73,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
 
     protected static class SubResourceReader extends Reader {
 
-        public SubResourceReader(Reader reader) {
-            super(reader.getOpenAPI());
+        public SubResourceReader(OpenAPI openAPI) {
+            super(openAPI);
         }
 
         public OpenAPI readSubResource(Resource resource) {
