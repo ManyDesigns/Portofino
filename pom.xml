@@ -134,8 +134,6 @@
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>
-        <!-- Microservices -->
-        <module>microservices/launcher</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
         <module>portofino-db2</module>
@@ -147,8 +145,11 @@
         <module>portofino-postgresql</module>
         <!-- Pages -->
         <module>portofino-crud</module>
-        <!-- Optional services -->
+        <!-- Optional services and integrations -->
         <module>portofino-quartz</module>
+        <module>keycloak</module>
+        <!-- Microservices -->
+        <module>microservices/launcher</module>
         <!-- UI -->
         <module>ui</module>
         <!-- upstairs -->

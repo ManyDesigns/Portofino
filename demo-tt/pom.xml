@@ -56,6 +56,13 @@
             <scope>compile</scope>
         </dependency>
         -->
+        <!-- Keycloak support -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-keycloak</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Quartz support. -->
         <dependency>
             <groupId>com.manydesigns</groupId>

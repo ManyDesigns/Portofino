@@ -108,7 +108,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
         return Response.ok(doLogin(data.username, data.password)).build();
     }
 
-    private String doLogin(String username, String password) {
+    protected String doLogin(String username, String password) {
         Subject subject = SecurityUtils.getSubject();
         if(!subject.isAuthenticated()) try {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
