@@ -89,9 +89,26 @@ public class DefaultLoginAction extends AbstractResourceAction {
     public MailQueue mailQueue;
 
     @POST
-    @Produces("application/json")
-    public String login(@FormParam("username") String username, @FormParam("password") String password)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(@FormParam("username") String username, @FormParam("password") String password)
             throws AuthenticationException {
+        return Response.ok(doLogin(username, password)).build();
+    }
+
+    public static class LoginData {
+        public String username;
+        public String password;
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(LoginData data) {
+        return Response.ok(doLogin(data.username, data.password)).build();
+    }
+
+    private String doLogin(String username, String password) {
         Subject subject = SecurityUtils.getSubject();
         if(!subject.isAuthenticated()) try {
             UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
