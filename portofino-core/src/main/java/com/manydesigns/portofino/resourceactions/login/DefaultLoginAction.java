@@ -131,7 +131,17 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     @Path(":renew-token")
     @POST
+    @Deprecated
+    /**
+     * @deprecated use {@link #refreshToken()} instead.
+     */
     public String renewToken() {
+        return refreshToken();
+    }
+
+    @Path(":refresh-token")
+    @POST
+    public String refreshToken() {
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
             Object principal = subject.getPrincipal();

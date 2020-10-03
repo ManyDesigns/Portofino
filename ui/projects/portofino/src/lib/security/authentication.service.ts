@@ -1,11 +1,13 @@
 import {EventEmitter, Inject, Injectable, InjectionToken} from '@angular/core';
 import {HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
-import {Observable, throwError} from "rxjs";
+import {Observable, of, throwError} from "rxjs";
 import {catchError, map, mergeMap, share} from "rxjs/operators";
 import {NotificationService} from "../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {WebStorageService} from "../storage/storage.services";
-import {NO_AUTH_HEADER} from "./authentication.headers";
+import {NO_AUTH_HEADER, NO_REFRESH_TOKEN_HEADER} from "./authentication.headers";
+import jwt_decode from 'jwt-decode';
+import moment from "moment-with-locales-es6";
 
 export const TOKEN_STORAGE_SERVICE = new InjectionToken('JSON Web Token Storage');
 
@@ -15,6 +17,8 @@ export class AuthenticationService {
   credentialsObservable: Observable<any>;
   currentUser: UserInfo;
   retryUnauthenticatedOnSessionExpiration = true;
+  tokenExpirationThresholdMs = 10 * 60 * 1000; //Ten minutes before the token expires, refresh it
+
   readonly logins = new EventEmitter<UserInfo>();
   readonly logouts = new EventEmitter<void>();
   readonly declinedLogins = new EventEmitter<void>();
@@ -31,16 +35,14 @@ export class AuthenticationService {
   }
 
   request(req: HttpRequest<any>, httpHandler: HttpHandler): Observable<HttpEvent<any>> {
-    const requestWithAuth = (original) => httpHandler.handle(original).pipe(catchError((error) => {
+    return httpHandler.handle(req).pipe(catchError((error) => {
       if (error.status === 401) {
-        return this.authenticate(original);
+        return this.authenticate(req);
       } else if (error.status === 403) {
         this.notifications.error(this.translate.get("You do not have the permission to do that!"));
       }
       return throwError(error);
     }), share());
-
-    return requestWithAuth(this.strategy.preprocess(req));
   }
 
   setJsonWebToken(token) {
@@ -64,7 +66,8 @@ export class AuthenticationService {
             throw new LoginDeclinedException("User declined login");
           }
         }),
-        mergeMap(() => this.http.request(this.withAuthenticationHeader(req))));
+        mergeMap(() => this.withAuthenticationHeader(req)),
+        mergeMap(req => this.http.request(req)));
     }
   }
 
@@ -114,16 +117,32 @@ export class AuthenticationService {
     this.logins.emit(this.currentUser);
   }
 
-  withAuthenticationHeader(req: HttpRequest<any>) {
+  withAuthenticationHeader(req: HttpRequest<any>): Observable<HttpRequest<any>> {
     if(!this.jsonWebToken) {
-      return req;
+      return of(req);
     }
-    req = req.clone({
+    const requestWithHeader = r => r.clone({
       setHeaders: {
         Authorization: `Bearer ${this.jsonWebToken}`
       }
     });
-    return req;
+    if (req.headers.has(NO_REFRESH_TOKEN_HEADER)) {
+      req = req.clone({headers: req.headers.delete(NO_REFRESH_TOKEN_HEADER)});
+      return of(requestWithHeader(req));
+    }
+
+    const token = jwt_decode(this.jsonWebToken);
+    if(token.exp && moment().isAfter(moment(token.exp * 1000 - this.tokenExpirationThresholdMs))) {
+      return this.strategy.refreshToken().pipe(map(token => {
+        this.setJsonWebToken(token);
+        return requestWithHeader(req);
+      }), catchError(() => {
+        this.notifications.error(this.translate.get("Failed to refresh access token"));
+        return token;
+      }));
+    } else {
+      return of(requestWithHeader(req));
+    }
   }
 
   public get jsonWebToken() {
@@ -152,13 +171,16 @@ export class AuthenticationInterceptor implements HttpInterceptor {
   constructor(protected authenticationService: AuthenticationService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    req = this.authenticationService.withAuthenticationHeader(req);
-    if(req.headers.has(NO_AUTH_HEADER)) {
-      req = req.clone({ headers: req.headers.delete(NO_AUTH_HEADER) });
-      return next.handle(req);
-    } else {
-      return this.authenticationService.request(req, next);
-    }
+    return this.authenticationService.withAuthenticationHeader(req).pipe(
+      mergeMap(req => {
+        if(req.headers.has(NO_AUTH_HEADER)) {
+          req = req.clone({ headers: req.headers.delete(NO_AUTH_HEADER) });
+          return next.handle(req);
+        } else {
+          return this.authenticationService.request(req, next);
+        }
+      })
+    );
   }
 }
 
@@ -181,7 +203,7 @@ export abstract class AuthenticationStrategy {
 
   abstract goToResetPassword(token: string);
 
-  abstract preprocess<T>(req: HttpRequest<T>): HttpRequest<T>;
+  abstract refreshToken(): Observable<string>;
 
   abstract logout(): Observable<any>;
 

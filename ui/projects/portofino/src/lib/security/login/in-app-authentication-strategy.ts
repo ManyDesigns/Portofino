@@ -1,14 +1,15 @@
-import {AuthenticationStrategy} from "../authentication.service";
+import {AuthenticationStrategy, TOKEN_STORAGE_SERVICE} from "../authentication.service";
 import {Inject, Injectable, InjectionToken} from "@angular/core";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {Observable} from "rxjs";
-import {NO_RENEW_HEADER} from "../authentication.headers";
+import {NO_REFRESH_TOKEN_HEADER} from "../authentication.headers";
 import moment from "moment-with-locales-es6";
 import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {map} from "rxjs/operators";
+import {LocalStorageService, WebStorageService} from "../../storage/storage.services";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 export const CHANGE_PASSWORD_COMPONENT = new InjectionToken('Change Password Component');
@@ -16,9 +17,6 @@ export const RESET_PASSWORD_COMPONENT = new InjectionToken('Reset Password Compo
 
 @Injectable()
 export class InAppAuthenticationStrategy extends AuthenticationStrategy {
-  protected lastRenew = moment(0);
-  renewAfterSeconds = 600;
-
   constructor(
     protected portofino: PortofinoService, protected http: HttpClient,
     protected notifications: NotificationService, protected translate: TranslateService,
@@ -31,12 +29,7 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
 
   askForCredentials(): Observable<any> {
     const dialogRef = this.dialog.open(this.loginComponent);
-    return dialogRef.afterClosed().pipe(map(r => {
-      if(r && r.jwt) {
-        this.lastRenew = moment();
-      }
-      return r;
-    }));
+    return dialogRef.afterClosed();
   }
 
   goToChangePassword(): MatDialogRef<unknown> {
@@ -49,37 +42,27 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
     });
   }
 
-  preprocess<T>(req: HttpRequest<T>): HttpRequest<T> {
-    if (req.headers.has(NO_RENEW_HEADER)) {
-      req = req.clone({headers: req.headers.delete(NO_RENEW_HEADER)});
-    } else if (!!this.authentication.jsonWebToken && this.portofino.apiRoot &&
-      moment().diff(this.lastRenew, 'seconds') > this.renewAfterSeconds) {
-      this.lastRenew = moment();
-      //The body here is to work around CORS requests failing with an empty body (TODO investigate)
-      this.http.request(this.authentication.withAuthenticationHeader(
-        new HttpRequest<any>("POST", `${this.loginPath}/:renew-token`, "renew", {
-          headers: new HttpHeaders().set(NO_RENEW_HEADER, 'true'), responseType: 'text'
-        }))).subscribe(
-        event => {
-          if (event instanceof HttpResponse) {
-            if (event.status == 200) {
-              const token = event.body;
-              this.authentication.setJsonWebToken(token);
-            } else {
-              this.notifications.error(this.translate.get("Failed to renew authentication token"));
-            }
+  refreshToken(): Observable<string> {
+    //The body here is to work around CORS requests failing with an empty body (TODO investigate)
+    return this.authentication.withAuthenticationHeader(
+      new HttpRequest<any>("POST", `${this.loginPath}/:refresh-token`, "renew", {
+        headers: new HttpHeaders().set(NO_REFRESH_TOKEN_HEADER, 'true'), responseType: 'text'
+      })).pipe(map(
+      event => {
+        if (event instanceof HttpResponse) {
+          if (event.status == 200) {
+            return event.body;
+          } else {
+            throw "Failed to refresh access token";
           }
-        },
-        () => this.notifications.error(this.translate.get("Failed to renew authentication token")));
-    }
-    return req;
+        }
+      }));
   }
 
   logout(): Observable<any> {
-    this.lastRenew = moment(0);
     const url = `${this.loginPath}`;
     return this.http.delete(url, {
-      headers: new HttpHeaders().set(NO_RENEW_HEADER, 'true')
+      headers: new HttpHeaders().set(NO_REFRESH_TOKEN_HEADER, 'true')
     });
   }
 

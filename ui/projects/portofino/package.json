@@ -30,6 +30,7 @@
     "@ngxd/core": "^10.0.0",
     "core-js": "^2.5.7",
     "file-input-accessor": "^10.0.0",
+    "jwt-decode": "^3.0.0",
     "lodash": ">=4.17.19",
     "lodash.merge": ">=4.6.2",
     "material-design-icons": "^3.0.1",
