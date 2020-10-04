@@ -16,13 +16,17 @@ import {
   DetailComponentHolder,
   SearchComponentHolder
 } from './pages/crud/crud.component';
-import {LOCALE_STORAGE_SERVICE, LOCALES, PortofinoService, ProgressInterceptor} from './portofino.service';
+import {
+  ApiVersionInterceptor,
+  LOCALE_STORAGE_SERVICE,
+  LOCALES,
+  PortofinoService,
+  ProgressInterceptor
+} from './portofino.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
   AuthenticationInterceptor,
-  AuthenticationService, CHANGE_PASSWORD_COMPONENT,
-  LOGIN_COMPONENT, RESET_PASSWORD_COMPONENT,
-  TOKEN_STORAGE_SERVICE
+  AuthenticationService, AuthenticationStrategy, TOKEN_STORAGE_SERVICE
 } from "./security/authentication.service";
 import {LoginComponent} from './security/login/login.component';
 import {SearchFieldComponent} from './pages/crud/search/search-field.component';
@@ -121,6 +125,12 @@ import {MatBadgeModule} from "@angular/material/badge";
 import {LocalStorageService} from "./storage/storage.services";
 import {PageSettingsPanelComponent} from "./page-settings-panel.component";
 import {CustomPageComponent} from "./pages/custom/custom.component";
+import {
+  CHANGE_PASSWORD_COMPONENT,
+  LOGIN_COMPONENT,
+  RESET_PASSWORD_COMPONENT,
+  InAppAuthenticationStrategy,
+} from "./security/login/in-app-authentication-strategy";
 
 @NgModule({
   declarations: [
@@ -233,6 +243,7 @@ export class PortofinoUpstairsModule {}
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
   ],
   providers: [
+    { provide: AuthenticationStrategy, useClass: InAppAuthenticationStrategy },
     //These are factories to avoid circular dependencies
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: CHANGE_PASSWORD_COMPONENT, useFactory: PortofinoModule.changePasswordComponent },
@@ -240,6 +251,7 @@ export class PortofinoUpstairsModule {}
     { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
     { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
     { provide: FOOTER_COMPONENT, useFactory: PortofinoModule.footerComponent },
+    { provide: HTTP_INTERCEPTORS, useClass: ApiVersionInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },

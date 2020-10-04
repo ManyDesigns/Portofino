@@ -34,6 +34,7 @@ import org.apache.shiro.util.Initializable;
 import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
@@ -131,7 +132,9 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     }
 
     protected void configureDelegate(PortofinoRealm security) {
-        applicationContext.getAutowireCapableBeanFactory().autowireBean(security);
+        AutowireCapableBeanFactory bf = applicationContext.getAutowireCapableBeanFactory();
+        bf.autowireBean(security);
+        bf.initializeBean(security, "Security.groovy");
         security.setCacheManager(cacheManager);
         LifecycleUtils.init(security);
     }

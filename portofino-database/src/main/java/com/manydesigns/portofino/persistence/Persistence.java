@@ -63,6 +63,7 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -138,8 +139,6 @@ public class Persistence {
             logger.error("Cannot load/parse model", e);
         }
     }
-
-
 
     public FileObject getModelDirectory() throws FileSystemException {
         return applicationDirectory.resolveFile(APP_MODEL_DIRECTORY);

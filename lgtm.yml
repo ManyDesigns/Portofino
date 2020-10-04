@@ -1,4 +1,4 @@
 extraction:
   java:
     index:
-      build_command: mvn clean package -Pno-frontend-build -Dmaven.test.skip
+      build_command: mvn clean package -P-build-frontend -Dmaven.test.skip

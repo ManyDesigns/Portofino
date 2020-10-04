@@ -3,7 +3,8 @@ import {
   PortofinoModule, PortofinoUpstairsModule, AuthenticationService,
   NotificationService, MatSnackBarNotificationService, NOTIFICATION_HANDLERS,
   Page, PortofinoComponent, PortofinoService, SidenavService,
-  CrudComponent, CustomPageComponent, TextPageComponent
+  CrudComponent, CustomPageComponent, TextPageComponent,
+  UpstairsComponent
 } from "portofino";
 import {
   MatAutocompleteModule,
@@ -56,23 +57,30 @@ export class AppComponent {}
           to explore the pages.
         </p>
         <p>
-          Your application has a REST API which depends on the resource-actions that it's made of.
-          You can download <a [href]="portofino.apiRoot">the documentation of the REST API</a> in OpenAPI (aka Swagger) format.
-        </p>
-        <p>
           Initially, the application has the user admin/admin built in.
           You can use that to <a [routerLink]="portofino.upstairsLink + '/wizard'">run the wizard</a>,
           connect to your database, and build a complete application from it in a few clicks. Please refer to the
-          <a href="https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5">getting started page</a>
-          if you feel lost.
+          <a href="https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5">getting started page</a>.
         </p>
         <p>
           The wizard is one of the tools that can be found in the administration section
           <a [routerLink]="portofino.upstairsLink">"upstairs"</a> (link in the toolbar).
-          The "upstairs" section is optional and can be disabled in production, leaving only the "downstairs" floor, i.e., the application.
-          "Upstairs" and "downstairs" are historical references to Portofino 3, which used the same model-driven interface
-          both for the application and for the application's model (the metamodel).
+          The "upstairs" section is optional and can be disabled in production, leaving only the "downstairs" floor,
+          i.e., the application.
+          <small>"Upstairs" and "downstairs" are historical references to Portofino 3, which used the same model-driven interface
+            both for the application and for the application's model (the metamodel).</small>
         </p>
+        <h3>API</h3>
+        <p>
+          Your application exposes a REST API which depends on the resource-actions that it's made of (when you create
+          a page, a corresponding resource-action is created for you).
+          You can download <a [href]="portofino.apiRoot">the documentation of the REST API</a> in OpenAPI (aka Swagger)
+          format. This is machine-readable, so you have the option of generating a client automatically in many
+          programming languages.
+          Note that currently the documentation is cached, and if you change the structure of the application, you'll
+          have to restart it in order to see the updated documentation.
+        </p>
+        <h3>I want to know more</h3>
         <p>
           You can find additional documentation in the <a href="https://github.com/ManyDesigns/Portofino/wiki">wiki</a>
           and in the <a href="https://portofino.manydesigns.com/en/docs">documentation center</a>, which was written for
@@ -104,12 +112,12 @@ export class WelcomeComponent extends Page {
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
     MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
     FileInputAccessorModule, QuillModule.forRoot(), TranslateModule.forRoot()],
-  entryComponents: [WelcomeComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   // It's necessary to spell the components used in the application here, otherwise Angular (Ivy) tree-shakes them.
   // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
   // https://github.com/angular/angular/issues/35314#issuecomment-584821399
-  static entryComponents = [ CrudComponent, CustomPageComponent, TextPageComponent ];
+  static entryComponents = [
+    CrudComponent, CustomPageComponent, TextPageComponent, UpstairsComponent, WelcomeComponent ];
 }

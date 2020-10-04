@@ -1,4 +1,4 @@
-import {Component, Inject, NgModule, OnInit} from '@angular/core';
+import {Component, Inject, NgModule} from '@angular/core';
 import {
   LocalStorageService,
   PortofinoModule,
@@ -89,7 +89,7 @@ export class AppComponent {
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  static navigation() {
+  static navigation(): new(...args) => DefaultNavigationComponent {
     return DefaultNavigationComponent;
   }
 }

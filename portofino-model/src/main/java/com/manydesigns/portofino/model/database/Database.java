@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,6 +58,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     protected String entityMode = null;
 
     protected ConnectionProvider connectionProvider;
+    protected Properties settings;
 
     
     //**************************************************************************
@@ -223,5 +225,13 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     @Override
     public List<Annotation> getAnnotations() {
         return domain.getAnnotations();
+    }
+
+    public Properties getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Properties settings) {
+        this.settings = settings;
     }
 }

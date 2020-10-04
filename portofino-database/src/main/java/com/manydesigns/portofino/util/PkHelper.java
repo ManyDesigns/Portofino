@@ -27,6 +27,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,8 +111,7 @@ public class PkHelper {
         for(int i = 0; i < keyProperties.length; i++) {
             PropertyAccessor property = keyProperties[i];
             Object value = property.get(object);
-            String stringValue =
-                    (String) OgnlUtils.convertValue(value, String.class);
+            String stringValue = OgnlUtils.convertValue(value, String.class);
             array[i] = stringValue;
         }
         return array;
@@ -126,7 +126,16 @@ public class PkHelper {
         for(int i = 0; i < pk.length; i++) {
             escapedPk[i] = URLEncoder.encode(pk[i], encoding);
         }
-        return StringUtils.join(escapedPk, "/");
+        return getPkString(escapedPk);
+    }
+
+    @Nullable
+    public String getPkString(String[] pkStringArray) {
+        return StringUtils.join(pkStringArray, "/");
+    }
+
+    public String getPkString(Object object) {
+        return getPkString(generatePkStringArray(object));
     }
 
 }

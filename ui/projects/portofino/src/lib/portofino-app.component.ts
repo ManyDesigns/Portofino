@@ -3,8 +3,7 @@ import {
   Component,
   ComponentFactoryResolver, ContentChild, Directive,
   Inject,
-  InjectionToken,
-  Input, OnInit, ViewChild,
+  InjectionToken, Injector, Input, OnInit, Type, ViewChild,
   ViewContainerRef
 } from '@angular/core';
 import {PortofinoService} from "./portofino.service";
@@ -14,6 +13,14 @@ import {NavigationDirective} from "./content.directive";
 import {PageCrudService} from "./administration/page-crud.service";
 import {SidenavService} from "./sidenav.service";
 import {NotificationsHolder} from "./notifications/notification.services";
+import {BlobFieldComponent} from "./fields/blob-field.component";
+import {BooleanFieldComponent} from "./fields/boolean-field.component";
+import {DateTimeFieldComponent} from "./fields/date-time-field.component";
+import {NumberFieldComponent} from "./fields/number-field.component";
+import {SelectFieldComponent} from "./fields/select-field.component";
+import {TextFieldComponent} from "./fields/text-field.component";
+import {createCustomElement} from "@angular/elements";
+import {FormComponent} from "./form";
 
 export const TOOLBAR_COMPONENT = new InjectionToken('Toolbar Component');
 export const FOOTER_COMPONENT = new InjectionToken('Footer Component');
@@ -90,6 +97,7 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
   constructor(public portofino: PortofinoService, public authenticationService: AuthenticationService,
               protected componentFactoryResolver: ComponentFactoryResolver,
               protected changeDetector: ChangeDetectorRef, public sidenav: SidenavService,
+              protected injector: Injector,
               @Inject(TOOLBAR_COMPONENT) protected toolbarComponent,
               @Inject(FOOTER_COMPONENT) protected footerComponent,
               @Inject(NAVIGATION_COMPONENT) protected navigationComponent) {}
@@ -107,7 +115,25 @@ export class PortofinoAppComponent implements OnInit, AfterViewInit {
     if(this.postInit) {
       this.postInit(this);
     }
+    this.defineCustomComponents();
   }
+
+  protected defineCustomComponents() {
+    this.defineCustomElement('portofino-form-component', FormComponent);
+    //Fields
+    this.defineCustomElement('portofino-blob-field-component', BlobFieldComponent);
+    this.defineCustomElement('portofino-boolean-field-component', BooleanFieldComponent);
+    this.defineCustomElement('portofino-date-time-field-component', DateTimeFieldComponent);
+    this.defineCustomElement('portofino-number-field-component', NumberFieldComponent);
+    this.defineCustomElement('portofino-select-field-component', SelectFieldComponent);
+    this.defineCustomElement('portofino-text-field-component', TextFieldComponent);
+  }
+
+  protected defineCustomElement(name, type: Type<any>) {
+    const element = createCustomElement(type, { injector: this.injector });
+    return customElements.define(name, element);
+  }
+
 
   ngAfterViewInit(): void {
     for (let key in this.builtinTemplates.templates) {

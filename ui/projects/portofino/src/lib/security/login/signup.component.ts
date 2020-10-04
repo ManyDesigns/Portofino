@@ -5,9 +5,12 @@ import {FormGroup} from "@angular/forms";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {Location} from "@angular/common";
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Form} from "../../form";
 import {ClassAccessor} from "../../class-accessor";
+import {NO_AUTH_HEADER} from "../authentication.headers";
+import {PortofinoService} from "../../portofino.service";
+import {InAppAuthenticationStrategy} from "./in-app-authentication-strategy";
 
 @Component({
   selector: 'portofino-signup',
@@ -32,10 +35,10 @@ export class SignupComponent implements OnInit {
   constructor(protected dialogRef: MatDialogRef<SignupComponent>, protected http: HttpClient,
               protected authenticationService: AuthenticationService, protected location: Location,
               protected notificationService: NotificationService,
-              protected translate: TranslateService) {}
+              protected translate: TranslateService, protected portofino: PortofinoService) {}
 
   ngOnInit() {
-    this.http.get<ClassAccessor>(`${this.authenticationService.loginPath}/user/classAccessor`).subscribe(
+    this.http.get<ClassAccessor>(`${(this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath}/user/classAccessor`).subscribe(
       c => this.signupFormDefinition = Form.fromClassAccessor(c),
       () => this.dialogRef.close()
     );
@@ -54,10 +57,22 @@ export class SignupComponent implements OnInit {
         user[k] = value;
       }
     }
-    this.authenticationService.signup(user, confirmationUrl).subscribe(
+    this.signup(user, confirmationUrl).subscribe(
       result => {
         this.dialogRef.close(result);
       });
+  }
+
+  signup(user: any, confirmationUrl) {
+    const headers = new HttpHeaders().set(NO_AUTH_HEADER, 'true');
+    const params = new FormData();
+    params.append('portofino:confirmationUrl', confirmationUrl);
+    params.append('portofino:siteNameOrAddress', this.portofino.applicationName);
+    for(let k in user) {
+      params.append(k, user[k]);
+    }
+    return this.http.post(
+      `${(this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath}/user`, params,{headers: headers});
   }
 
 }

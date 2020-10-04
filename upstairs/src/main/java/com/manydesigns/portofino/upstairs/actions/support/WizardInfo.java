@@ -17,14 +17,12 @@ public class WizardInfo {
     public String strategy;
     public List<TableInfo> tables;
     public TableInfo usersTable;
-    public Column userIdProperty;
     public Column userNameProperty;
     public Column userPasswordProperty;
     public Column userEmailProperty;
     public Column userTokenProperty;
     public String adminGroupName;
     public TableInfo groupsTable;
-    public Column groupIdProperty;
     public Column groupNameProperty;
     public TableInfo userGroupTable;
     public Column groupLinkProperty;

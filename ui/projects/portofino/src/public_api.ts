@@ -50,3 +50,6 @@ export * from './lib/security/login/signup.component';
 export * from './lib/security/login/reset-password.component';
 export * from './lib/sidenav.service';
 export * from "./lib/storage/storage.services";
+export {RESET_PASSWORD_COMPONENT} from "./lib/security/login/in-app-authentication-strategy";
+export {CHANGE_PASSWORD_COMPONENT} from "./lib/security/login/in-app-authentication-strategy";
+export {LOGIN_COMPONENT} from "./lib/security/login/in-app-authentication-strategy";

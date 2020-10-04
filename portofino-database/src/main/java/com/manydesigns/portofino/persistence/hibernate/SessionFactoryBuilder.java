@@ -195,6 +195,9 @@ public class SessionFactoryBuilder {
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
         Map<String, Object> settings = new HashMap<>();
+        if(database.getSettings() != null) {
+            settings.putAll((Map) database.getSettings());
+        }
         setupConnection(settings);
         ServiceRegistry standardRegistry =
                 new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();

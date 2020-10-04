@@ -47,12 +47,15 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.security.Key;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Default implementation of PortofinoRealm. Provides convenient implementations of the interface methods.
@@ -78,6 +81,8 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     protected boolean legacyHashing = false;
 
+    private static final Logger logger = LoggerFactory.getLogger(AbstractPortofinoRealm.class);
+
     protected AbstractPortofinoRealm() {
         //Legacy - let the actual implementation handle hashing
         setup(new PlaintextHashService(), new PlaintextHashFormat());
@@ -101,8 +106,13 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         } catch (JwtException e) {
             throw new AuthenticationException(e);
         }
-        Map body = (Map) jwt.getBody();
         String credentials = legacyHashing ? token.getCredentials() : encryptPassword(token.getCredentials());
+        Object principal = extractPrincipalFromWebToken(jwt);
+        return new SimpleAuthenticationInfo(principal, credentials, getName());
+    }
+
+    protected Object extractPrincipalFromWebToken(Jwt jwt) {
+        Map body = (Map) jwt.getBody();
         String base64Principal = (String) body.get("serialized-principal");
         byte[] serializedPrincipal = Base64.decode(base64Principal);
         Object principal;
@@ -122,7 +132,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         } finally {
             Thread.currentThread().setContextClassLoader(loader);
         }
-        return new SimpleAuthenticationInfo(principal, credentials, getName());
+        return principal;
     }
 
     public String generateWebToken(Object principal) {
@@ -153,11 +163,29 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     /**
      * Clean the user principal making it suitable for JSON serialization. For example, if it is a map, remove
-     * circular references. By default, this returns the principal as-is.
+     * circular references.
      * @param principal the principal.
      * @return
      */
     protected Object cleanUserPrincipal(Object principal) {
+        if(principal instanceof Map) {
+            Map cleanUser = new HashMap();
+            AtomicBoolean skipped = new AtomicBoolean(false);
+            ((Map<?, ?>) principal).forEach((k, v) -> {
+                if (v instanceof List || v instanceof Map) {
+                    logger.debug("Skipping {}", k);
+                    skipped.set(true);
+                } else {
+                    cleanUser.put(k, v);
+                }
+            });
+            if(skipped.get()) {
+                logger.debug("The user entity has potential self-references that make it unusable as a principal, because it must be serializable to JSON. Returning a non-persistent map with no references.");
+                return cleanUser;
+            } else {
+                return principal;
+            }
+        }
         return principal;
     }
 

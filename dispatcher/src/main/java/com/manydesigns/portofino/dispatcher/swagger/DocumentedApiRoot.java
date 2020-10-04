@@ -4,10 +4,9 @@ import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.RootFactory;
 import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.dispatcher.visitor.DepthFirstVisitor;
-import com.manydesigns.portofino.dispatcher.visitor.ResourceVisitor;
 import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.jaxrs2.ReaderListener;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.integration.api.OpenApiReader;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
@@ -35,11 +34,11 @@ public abstract class DocumentedApiRoot implements ReaderListener {
     }
     
     @Override
-    public void beforeScan(Reader reader, OpenAPI openAPI) {}
+    public void beforeScan(OpenApiReader reader, OpenAPI openAPI) {}
 
     @Override
-    public void afterScan(Reader reader, OpenAPI openAPI) {
-        final SubResourceReader subResourceReader = getSubResourceReader(reader);
+    public void afterScan(OpenApiReader reader, OpenAPI openAPI) {
+        final SubResourceReader subResourceReader = getSubResourceReader(openAPI);
         try {
             //TODO actions should be put in a special "inspection mode" to avoid checks (e.g. not-in-use-case),
             //hitting the DB or services, etc.
@@ -64,8 +63,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         root.init();
     }
 
-    protected SubResourceReader getSubResourceReader(Reader reader) {
-        return new SubResourceReader(reader);
+    protected SubResourceReader getSubResourceReader(OpenAPI openAPI) {
+        return new SubResourceReader(openAPI);
     }
 
     protected ResourceContext getResourceContext() {
@@ -74,8 +73,8 @@ public abstract class DocumentedApiRoot implements ReaderListener {
 
     protected static class SubResourceReader extends Reader {
 
-        public SubResourceReader(Reader reader) {
-            super(reader.getOpenAPI());
+        public SubResourceReader(OpenAPI openAPI) {
+            super(openAPI);
         }
 
         public OpenAPI readSubResource(Resource resource) {
@@ -87,25 +86,25 @@ public abstract class DocumentedApiRoot implements ReaderListener {
         }
 
         public String calculateResourcePath(Resource resource, ArrayList<Parameter> parameters) {
-            String path;
+            StringBuilder path;
             if(resource.getParent() != null) {
-                path = calculateResourcePath(resource.getParent(), parameters);
-                path += "/" + resource.getSegment();
+                path = new StringBuilder(calculateResourcePath(resource.getParent(), parameters));
+                path.append("/").append(resource.getSegment());
             } else {
-                path = "";
+                path = new StringBuilder();
             }
             if(resource instanceof WithParameters) {
                 WithParameters wp = (WithParameters) resource;
                 for(int i = 0; i < wp.getParameters().size(); i++) {
                     String name = wp.getParameterName(i);
-                    path += "/{" + name + "}";
+                    path.append("/{").append(name).append("}");
                     PathParameter parameter = new PathParameter();
                     parameter.setName(name);
                     parameter.setRequired(true);
                     parameters.add(parameter);
                 }
             }
-            return path;
+            return path.toString();
         }
     }
 

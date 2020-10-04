@@ -77,7 +77,7 @@
     </developers>
     <properties>
         <commons.collections.version>3.2.2</commons.collections.version>
-        <commons.configuration.version>2.6</commons.configuration.version>
+        <commons.configuration.version>2.7</commons.configuration.version>
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
@@ -85,9 +85,9 @@
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.2</commons.vfs.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>3.0.5</groovy.version>
+        <groovy.version>3.0.6</groovy.version>
         <guava.version>27.0.1-jre</guava.version>
-        <hibernate.version>5.4.7.Final</hibernate.version>
+        <hibernate.version>5.4.21.Final</hibernate.version>
         <jackson.version>2.10.0</jackson.version>
         <jackson.databind.version>2.10.0</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
@@ -101,15 +101,15 @@
         <json.version>20180813</json.version>
         <jsoup.version>1.9.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>3.8.2</liquibase.version>
+        <liquibase.version>3.10.1</liquibase.version>
         <logback.version>1.2.3</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.5.2.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.5.1</shiro.version>
+        <shiro.version>1.6.0</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spring.version>5.2.7.RELEASE</spring.version>
+        <spring.version>5.2.9.RELEASE</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -135,8 +135,6 @@
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>
-        <!-- Microservices -->
-        <module>microservices/launcher</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
         <module>portofino-db2</module>
@@ -148,8 +146,11 @@
         <module>portofino-postgresql</module>
         <!-- Pages -->
         <module>portofino-crud</module>
-        <!-- Optional services -->
+        <!-- Optional services and integrations -->
         <module>portofino-quartz</module>
+        <module>keycloak</module>
+        <!-- Microservices -->
+        <module>microservices/launcher</module>
         <!-- UI -->
         <module>ui</module>
         <!-- upstairs -->

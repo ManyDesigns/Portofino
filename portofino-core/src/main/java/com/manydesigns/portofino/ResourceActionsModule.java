@@ -128,6 +128,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
         logger.debug("Initializing dispatcher");
         ActionLogic.init(configuration);
 
+        //noinspection SpringConfigurationProxyMethods - @PostConstruct init() is a lifecycle method, it cannot have arguments
         FileObject actionsDirectory = getActionsDirectory(configuration, applicationDirectory);
         logger.info("Actions directory: " + actionsDirectory);
         //TODO ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
