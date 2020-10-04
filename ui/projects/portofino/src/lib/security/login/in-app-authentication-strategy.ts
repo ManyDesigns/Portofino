@@ -1,15 +1,13 @@
-import {AuthenticationStrategy, TOKEN_STORAGE_SERVICE} from "../authentication.service";
+import {AuthenticationStrategy} from "../authentication.service";
 import {Inject, Injectable, InjectionToken} from "@angular/core";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {Observable} from "rxjs";
 import {NO_REFRESH_TOKEN_HEADER} from "../authentication.headers";
-import moment from "moment-with-locales-es6";
 import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/common/http";
 import {PortofinoService} from "../../portofino.service";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
-import {map} from "rxjs/operators";
-import {LocalStorageService, WebStorageService} from "../../storage/storage.services";
+import {filter, map, mergeMap} from "rxjs/operators";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 export const CHANGE_PASSWORD_COMPONENT = new InjectionToken('Change Password Component');
@@ -47,14 +45,16 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
     return this.authentication.withAuthenticationHeader(
       new HttpRequest<any>("POST", `${this.loginPath}/:refresh-token`, "renew", {
         headers: new HttpHeaders().set(NO_REFRESH_TOKEN_HEADER, 'true'), responseType: 'text'
-      })).pipe(map(
-      event => {
-        if (event instanceof HttpResponse) {
-          if (event.status == 200) {
-            return event.body;
-          } else {
-            throw "Failed to refresh access token";
-          }
+      })).pipe(
+        mergeMap(req => this.http.request(req)),
+        filter(event => event instanceof HttpResponse),
+        map(
+          (event: HttpResponse<any>) => {
+        console.log("event", event)
+        if (event.status == 200) {
+          return event.body as string;
+        } else {
+          throw "Failed to refresh access token";
         }
       }));
   }

@@ -35,6 +35,9 @@ export class AuthenticationService {
   }
 
   request(req: HttpRequest<any>, httpHandler: HttpHandler): Observable<HttpEvent<any>> {
+    if (req.headers.has(NO_REFRESH_TOKEN_HEADER)) {
+      req = req.clone({headers: req.headers.delete(NO_REFRESH_TOKEN_HEADER)});
+    }
     return httpHandler.handle(req).pipe(catchError((error) => {
       if (error.status === 401) {
         return this.authenticate(req);
@@ -127,7 +130,6 @@ export class AuthenticationService {
       }
     });
     if (req.headers.has(NO_REFRESH_TOKEN_HEADER)) {
-      req = req.clone({headers: req.headers.delete(NO_REFRESH_TOKEN_HEADER)});
       return of(requestWithHeader(req));
     }
 
