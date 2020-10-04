@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Properties;
 
 public class XMLModel implements ModelIO {
 
@@ -87,6 +88,15 @@ public class XMLModel implements ModelIO {
                 }
                 model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
                 model.getDatabases().add(database);
+            }
+
+            FileObject settingsFile = databaseDir.resolveFile("hibernate.properties");
+            if(settingsFile.exists()) {
+                try(InputStream inputStream = settingsFile.getContent().getInputStream()) {
+                    Properties settings = new Properties();
+                    settings.load(inputStream);
+                    database.setSettings(settings);
+                }
             }
         } else {
             database = DatabaseLogic.findDatabaseByName(model, databaseName);
