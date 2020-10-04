@@ -1,5 +1,8 @@
 domain testDomain1 {
     entity Foo {
-        name: java.lang.String
+        name
+        @Email
+        email
+        age: java.lang.Integer
     }
 }

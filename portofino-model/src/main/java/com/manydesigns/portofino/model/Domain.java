@@ -128,4 +128,14 @@ public class Domain implements ModelObject, Annotated {
     public List<Relationship> getRelationships() {
         return relationships;
     }
+
+    public Type getDefaultType() {
+        for(Domain parent : parents) {
+            Type defaultType = parent.getDefaultType();
+            if(defaultType != null) {
+                return defaultType;
+            }
+        }
+        return null;
+    }
 }

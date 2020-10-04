@@ -1,23 +1,22 @@
 grammar Model;
 
+importDeclaration: IMPORT IDENTIFIER ('.' wildcard='*')?;
+
 databasePersistence: database*;
 
-database: ('database') name=IDENTIFIER '(' connectionProperty* ')' ('{'
-  schema*
-'}')?;
+database: DATABASE name=IDENTIFIER '(' connectionProperty* ')'
+    (';' | '{' schema* '}');
 
 connectionProperty: name=IDENTIFIER '=' value=literal;
-schema: 'schema' name=IDENTIFIER ('(' physicalName=STRING ')')?;
+schema: SCHEMA name=IDENTIFIER ('(' physicalName=STRING ')')?;
 
 standaloneDomain: domain;
 
-domain: annotation* 'domain' name=IDENTIFIER '{'
-    (domain | entity | relationship)*
-'}';
+domain: annotation* DOMAIN name=IDENTIFIER (';' | '{' (domain | entity | relationship)* '}');
 
 standaloneEntity: entity;
 
-entity: annotation* 'entity' name=IDENTIFIER '{'
+entity: annotation* ENTITY name=IDENTIFIER '{'
   property*
   relationshipProperty*
 '}';
@@ -38,8 +37,15 @@ literal: BOOLEAN | NUMBER | STRING;
 
 BOOLEAN: 'true' | 'false';
 NUMBER: ('+' | '-')?[0-9]+('.'[0-9]+);
-STRING: '"' ('\\"'|.)*? '"';
+STRING: '"' ('\\'('"'|'\\')|.)*? '"';
+
+SCHEMA: 'schema';
+IMPORT: 'import';
+ENTITY: 'entity';
+DOMAIN: 'domain';
+DATABASE: 'database';
+
 IDENTIFIER: IDENTIFIER_COMPONENT ('.' IDENTIFIER_COMPONENT)*;
-WS: (' ' | '\t' | '\n' | '\r') -> skip;
+WS: (' ' | '\t' | '\n' | '\r') -> channel(HIDDEN);
 
 fragment IDENTIFIER_COMPONENT: [a-zA-Z_][a-zA-Z0-9_]*;

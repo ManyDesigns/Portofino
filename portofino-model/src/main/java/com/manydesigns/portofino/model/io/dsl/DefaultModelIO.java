@@ -86,7 +86,23 @@ public class DefaultModelIO implements ModelIO {
 
     @Override
     public void save(Model model, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile) throws IOException, ConfigurationException {
+        logger.info("Saving model into directory: {}", getModelDirectory().getName().getPath());
+        FileObject modelDir = getModelDirectory();
+        if(!modelDirectory.getType().equals(FileType.FOLDER)) {
+            throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
+        }
+        if (modelDir.exists()) {
+            saveEntities(modelDir, model.getDomains());
+            saveDatabasePersistence(modelDir, model);
+        }
+    }
 
+    protected void saveDatabasePersistence(FileObject modelDir, Model model) {
+        //TODO
+    }
+
+    protected void saveEntities(FileObject modelDir, List<Domain> domains) {
+        //TODO
     }
 
     @Override

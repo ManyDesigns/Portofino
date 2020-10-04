@@ -64,17 +64,23 @@ public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
         }
         Annotation annotation = new Annotation(annotated, resolveAnnotationType(annotationType));
         ModelParser.AnnotationParamsContext params = ctx.annotationParams();
-        if(params.IDENTIFIER().isEmpty()) {
+        if(params != null) {
+            visitAnnotationParams(annotation, params);
+        }
+        annotated.getAnnotations().add(annotation);
+        return baseDomain;
+    }
+
+    public void visitAnnotationParams(Annotation annotation, ModelParser.AnnotationParamsContext params) {
+        if (params.IDENTIFIER().isEmpty()) {
             annotation.getProperties().add(new AnnotationProperty("value", getText(params.literal(0))));
         } else {
-            for(int i = 0; i < params.IDENTIFIER().size(); i++) {
+            for (int i = 0; i < params.IDENTIFIER().size(); i++) {
                 AnnotationProperty prop =
                         new AnnotationProperty(params.IDENTIFIER(i).getText(), getText(params.literal(i)));
                 annotation.getProperties().add(prop);
             }
         }
-        annotated.getAnnotations().add(annotation);
-        return baseDomain;
     }
 
     @Override
@@ -84,11 +90,20 @@ public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
         if(entity == null) {
             throw new IllegalStateException("Property without an entity: " + name);
         }
-        String typeName = ctx.type().IDENTIFIER().getText();
-        Type type = entity.getDomain().findType(typeName);
-        if(type == null) {
-            throw new RuntimeException("Unknown type: " + typeName); //TODO
+        Type type;
+        if(ctx.type() != null) {
+            String typeName = ctx.type().IDENTIFIER().getText();
+            type = entity.getDomain().findType(typeName);
+            if(type == null) {
+                throw new RuntimeException("Unknown type: " + typeName); //TODO
+            }
+        } else {
+            type = entity.getDomain().getDefaultType();
+            if(type == null) {
+                throw new RuntimeException("Domain " + entity.getDomain() + " does not have a default type"); //TODO
+            }
         }
+
         Property property = new Property();
         property.setName(name);
         property.setOwner(entity);
@@ -97,6 +112,10 @@ public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
         visitChildren(ctx);
         annotated = previous;
         return baseDomain;
+    }
+
+    protected String decodeType(String typeName) {
+        return typeName;
     }
 
     protected String resolveAnnotationType(String annotationType) {
