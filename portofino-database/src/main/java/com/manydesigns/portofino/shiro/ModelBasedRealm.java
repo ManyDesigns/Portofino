@@ -14,6 +14,7 @@ import org.apache.shiro.authc.*;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,17 +124,11 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
     @Override
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         List<String> groups = new ArrayList<>();
-        if(groupsTable == null || usersGroupsTable == null) {
+        if(groupsTable == null) {
             return groups;
         }
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        String queryString =
-                "select distinct g." + groupNameProperty + "\n" +
-                "from " + groupsTable.getActualEntityName() + " g, " +
-                usersGroupsTable.getActualEntityName() + " ug, " + usersTable.getActualEntityName() + " u\n" +
-                "where g." + groupIdProperty + " = ug." + groupLinkProperty + "\n" +
-                "and ug." + userLinkProperty + " = u." + userIdProperty + "\n" +
-                "and u." + userIdProperty + " = :userId";
+        String queryString = getUserGroupsQuery();
         Query<String> query = session.createQuery(queryString);
         Object userId = getUserProperty(principal, userIdProperty);
         if(userId != null) {
@@ -142,6 +137,18 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
             groups.addAll(query.list());
         }
         return groups;
+    }
+
+    @NotNull
+    protected String getUserGroupsQuery() {
+        String queryString =
+                "select distinct g." + groupNameProperty + "\n" +
+                "from " + groupsTable.getActualEntityName() + " g, " +
+                usersGroupsTable.getActualEntityName() + " ug, " + usersTable.getActualEntityName() + " u\n" +
+                "where g." + groupIdProperty + " = ug." + groupLinkProperty + "\n" +
+                "and ug." + userLinkProperty + " = u." + userIdProperty + "\n" +
+                "and u." + userIdProperty + " = :userId";
+        return queryString;
     }
 
     protected Object getUserProperty(Object principal, String property) {

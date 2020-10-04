@@ -50,7 +50,6 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
         filter(event => event instanceof HttpResponse),
         map(
           (event: HttpResponse<any>) => {
-        console.log("event", event)
         if (event.status == 200) {
           return event.body as string;
         } else {
