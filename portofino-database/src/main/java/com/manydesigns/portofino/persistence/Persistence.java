@@ -64,6 +64,7 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -188,6 +189,15 @@ public class Persistence {
                 }
                 model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
                 model.getDatabases().add(database);
+            }
+
+            FileObject settingsFile = databaseDir.resolveFile("hibernate.properties");
+            if(settingsFile.exists()) {
+                try(InputStream inputStream = settingsFile.getContent().getInputStream()) {
+                    Properties settings = new Properties();
+                    settings.load(inputStream);
+                    database.setSettings(settings);
+                }
             }
         } else {
             database = DatabaseLogic.findDatabaseByName(model, databaseName);
