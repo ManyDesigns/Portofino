@@ -86,6 +86,7 @@ public class HibernateConfig {
 
             setupConnection(configuration);
             setupConfigurationProperties(configuration);
+            setupDatabaseProperties(configuration,database);
 
             Mappings mappings = configuration.createMappings();
 
@@ -114,6 +115,16 @@ public class HibernateConfig {
                 .setProperty("hibernate.globally_quoted_identifiers", "false");
         // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
         // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
+    }
+
+    protected void setupDatabaseProperties(Configuration configuration,Database database) {
+        Properties properties=database.getSettings();
+
+        if(properties!=null){
+            for(Object propertyKey : properties.keySet() ){
+                configuration.setProperty((String) propertyKey,properties.getProperty((String) propertyKey));
+            }
+        }
     }
 
     protected void setupConnection(Configuration configuration) {

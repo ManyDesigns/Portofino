@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,7 +58,7 @@ public class Database implements ModelObject {
     protected String falseString = null;
 
     protected ConnectionProvider connectionProvider;
-
+    protected Properties settings;
     
     //**************************************************************************
     // Logging
@@ -191,5 +192,13 @@ public class Database implements ModelObject {
 
     public void setConnectionProvider(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
+    }
+
+    public Properties getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Properties settings) {
+        this.settings = settings;
     }
 }

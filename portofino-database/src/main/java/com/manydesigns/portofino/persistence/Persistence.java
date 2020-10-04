@@ -43,6 +43,7 @@ import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -52,19 +53,17 @@ import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -171,6 +170,21 @@ public class Persistence {
                         logger.debug("Schema directory {} does not exist", schemaDir);
                     }
                 }
+
+                File settingsFile = new File(databaseDir, "hibernate.properties");
+                if(settingsFile.exists()) {
+                    Properties settings = new Properties();
+                    InputStream propertiesStream = null;
+                    try {
+                        propertiesStream = new FileInputStream(settingsFile);
+                        settings.load(propertiesStream);
+                        database.setSettings(settings);
+                    } finally {
+                        IOUtils.closeQuietly(propertiesStream);
+                    }
+
+                }
+
             }
             this.model = model;
             initModel();
