@@ -85,7 +85,7 @@
         <commons.lang.version>2.5</commons.lang.version>
         <fop.version>2.1</fop.version>
         <groovy.version>3.0.6</groovy.version>
-        <guava.version>27.0.1-jre</guava.version>
+        <guava.version>30.0-android</guava.version>
         <hibernate.version>5.4.21.Final</hibernate.version>
         <jackson.version>2.10.0</jackson.version>
         <jackson.databind.version>2.10.0</jackson.databind.version>
