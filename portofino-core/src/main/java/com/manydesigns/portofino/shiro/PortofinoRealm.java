@@ -101,10 +101,10 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      * Saves a self-registered user on the system. The user should be in a invalid state (cannot log in) until he or she
      * confirms registration providing a token (typically by clicking a link in an email message).
      * @param user the user object to save. It is the same kind of object known by getSelfRegisteredUserClassAccessor().
-     * @return the unique token necessary to confirm the registration.
+     * @return the unique token necessary to confirm the registration and the user's email address.
      * @throws RegistrationException if the user could not be saved for whatever reason.
      */
-    String saveSelfRegisteredUser(Object user) throws RegistrationException;
+    String[] saveSelfRegisteredUser(Object user) throws RegistrationException;
 
     //--------------------------------------------------------------------------
     // Users CRUD

@@ -361,7 +361,7 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
         return token;
     }
 
-    public String saveSelfRegisteredUser(Object user) throws RegistrationException {
+    public String[] saveSelfRegisteredUser(Object user) throws RegistrationException {
         if(StringUtils.isEmpty(userTokenProperty)) {
             throw new UnsupportedOperationException("Token property not configured.");
         }
@@ -385,7 +385,7 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
             throw new ExistingUserException(e);
         }
         session.getTransaction().commit();
-        return token;
+        return new String[] { token, theUser.email };
     }
 
     public Set<String> getGroups() {

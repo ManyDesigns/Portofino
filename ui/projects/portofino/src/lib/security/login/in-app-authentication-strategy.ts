@@ -66,7 +66,7 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
   }
 
   confirmSignup(token: string) {
-    this.http.post(`${this.loginPath}/user/:confirm`,{ token: token });
+    return this.http.post(`${this.loginPath}/user/:confirm`,{ token: token });
   }
 
   get loginPath() {

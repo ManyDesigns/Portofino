@@ -34,6 +34,15 @@ export class ClassAccessor {
     });
   }
 
+  static getProperty(self: ClassAccessor, name: string) {
+    for(const p in self.properties) {
+      let property = self.properties[p];
+      if(property.name == name) {
+        return property
+      }
+    }
+  }
+
   static create(values: ClassAccessor | any): ClassAccessor {
     const ca = Object.assign(new ClassAccessor(), values);
     ca.initSelectionProviders();
@@ -93,6 +102,10 @@ export class Property {
 
   static create(values: Property | any): Property {
     return Object.assign(new Property(), values)
+  }
+
+  static get(owner: ClassAccessor, name: string) {
+    return ClassAccessor.getProperty(owner, name);
   }
 
   required(value: boolean = true): Property {

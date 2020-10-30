@@ -386,7 +386,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        List<String> errorMessages = new ArrayList<String>();
+        List<String> errorMessages = new ArrayList<>();
         if (!validateSignUpPassword(signUpForm, errorMessages)) {
             for (String current : errorMessages) {
                 RequestMessages.addErrorMessage(current);
@@ -397,13 +397,15 @@ public class DefaultLoginAction extends AbstractResourceAction {
         try {
             Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
             signUpForm.writeToObject(user);
-            String token = portofinoRealm.saveSelfRegisteredUser(user);
-            String body = getConfirmSignUpEmailBody(siteNameOrAddress, confirmationUrl.replace("TOKEN", token));
+            String[] tokenAndEmail = portofinoRealm.saveSelfRegisteredUser(user);
+            String body = getConfirmSignUpEmailBody(
+                    siteNameOrAddress, confirmationUrl.replace("TOKEN", tokenAndEmail[0]));
             String from = portofinoConfiguration.getString(
                     PortofinoProperties.MAIL_FROM, "example@example.com");
-            sendMail(from, portofinoRealm.getEmail((Serializable) user), ElementsThreadLocals.getText("confirm.signup"), body);
+            sendMail(from, tokenAndEmail[1], ElementsThreadLocals.getText("confirm.signup"), body);
         } catch (ExistingUserException e) {
-            RequestMessages.addErrorMessage(ElementsThreadLocals.getText("a.user.with.the.same.username.already.exists"));
+            RequestMessages.addErrorMessage(ElementsThreadLocals.getText(
+                    "a.user.with.the.same.username.already.exists"));
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         } catch (Exception e) {
             logger.error("Error during sign-up", e);

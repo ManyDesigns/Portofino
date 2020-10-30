@@ -312,7 +312,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     }
 
     @Override
-    public String saveSelfRegisteredUser(Object user) {
+    public String[] saveSelfRegisteredUser(Object user) {
         throw new UnsupportedOperationException();
     }
 

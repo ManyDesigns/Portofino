@@ -261,7 +261,7 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
-    String saveSelfRegisteredUser(Object principal) {
+    String[] saveSelfRegisteredUser(Object principal) {
         Session session = persistence.getSession("tt");
         logger.debug("Check if user already registered. Email: {}", principal.email);
         Object user2 = getUserByEmail(principal.email)
@@ -283,8 +283,7 @@ class Security extends AbstractPortofinoRealm {
         session.save("users", (Object)principal);
         session.getTransaction().commit();
 
-        return token;
-
+        [token, principal.email]
     }
 
     @Override

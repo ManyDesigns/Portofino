@@ -209,7 +209,7 @@ export abstract class AuthenticationStrategy {
 
   abstract logout(): Observable<any>;
 
-  abstract confirmSignup(token: string);
+  abstract confirmSignup(token: string): Observable<any>;
 
   set authenticationService(auth) {
     this.authentication = auth;
