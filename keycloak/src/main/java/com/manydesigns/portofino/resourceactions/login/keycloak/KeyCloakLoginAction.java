@@ -37,6 +37,15 @@ public class KeyCloakLoginAction extends DefaultLoginAction {
         return userInfo(subject, portofinoRealm, jwt);
     }
 
+    @Override
+    public void logout() {
+        Subject subject = SecurityUtils.getSubject();
+        if(subject.isAuthenticated()) {
+            forgetRefreshToken((Serializable) subject.getPrincipal());
+        }
+        super.logout();
+    }
+
     protected String authenticate(Invocation.Builder request, Form form, Subject subject) {
         Response response = request.post(Entity.form(form));
         String jwt;
@@ -64,11 +73,18 @@ public class KeyCloakLoginAction extends DefaultLoginAction {
     }
 
     protected void saveRefreshToken(Serializable principal, String refreshToken) {
-        refreshTokens.put(principal, refreshToken);
+        Serializable userId = ShiroUtils.getPortofinoRealm().getUserId(principal);
+        refreshTokens.put(userId, refreshToken);
     }
 
     protected String getRefreshToken(Serializable principal) {
-        return refreshTokens.get(principal);
+        Serializable userId = ShiroUtils.getPortofinoRealm().getUserId(principal);
+        return refreshTokens.get(userId);
+    }
+
+    protected void forgetRefreshToken(Serializable principal) {
+        Serializable userId = ShiroUtils.getPortofinoRealm().getUserId(principal);
+        refreshTokens.remove(userId);
     }
 
     @Override
