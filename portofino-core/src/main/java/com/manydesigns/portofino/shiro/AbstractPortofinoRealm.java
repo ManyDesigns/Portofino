@@ -279,6 +279,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     }
 
     @Override
+    public boolean supportsSelfRegistration() {
+        return false;
+    }
+
+    @Override
     public ClassAccessor getSelfRegisteredUserClassAccessor() {
         return JavaClassAccessor.getClassAccessor(User.class);
     }

@@ -228,7 +228,7 @@ class Security extends AbstractPortofinoRealm {
         Session session = persistence.getSession("tt");
         def (CriteriaQuery criteria, CriteriaBuilder builder, Root root) =
             QueryUtils.createCriteria(session, "users")
-        criteria.where(builder.equal(builder.upper(root.get('email')), email?.toUpperCase()))
+        criteria.where(builder.equal(builder.upper(root.<String>get('email')), email?.toUpperCase()))
 
         (Serializable) session.createQuery(criteria).uniqueResult()
     }
@@ -254,22 +254,25 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
+    boolean supportsSelfRegistration() {
+        true
+    }
+
+    @Override
     ClassAccessor getSelfRegisteredUserClassAccessor() {
-        Database database = DatabaseLogic.findDatabaseByName(persistence.model, "tt");
-        Table table = DatabaseLogic.findTableByEntityName(database, "users");
-        return new TableAccessor(table);
+        persistence.getTableAccessor("tt", "users")
     }
 
     @Override
     String[] saveSelfRegisteredUser(Object principal) {
-        Session session = persistence.getSession("tt");
-        logger.debug("Check if user already registered. Email: {}", principal.email);
+        Session session = persistence.getSession("tt")
+        logger.debug("Check if user already registered. Email: {}", principal.email)
         Object user2 = getUserByEmail(principal.email)
         if (user2 != null) {
-            throw new ExistingUserException(principal.email);
+            throw new ExistingUserException(principal.email)
         }
 
-        logger.debug("Marking registration ip and date");
+        logger.debug("Marking registration ip and date")
         String token = RandomUtil.createRandomId();
         def now = new Date()
         principal.password = encryptPassword(principal.password);

@@ -69,7 +69,9 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -87,6 +89,15 @@ public class DefaultLoginAction extends AbstractResourceAction {
 
     @Autowired(required = false)
     public MailQueue mailQueue;
+
+    @Path("capabilities")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map getCapabilities() {
+        HashMap map = new HashMap();
+        map.put("supportsSelfRegistration", ShiroUtils.getPortofinoRealm().supportsSelfRegistration());
+        return map;
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)

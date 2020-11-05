@@ -8,6 +8,7 @@ import {WebStorageService} from "../storage/storage.services";
 import {NO_AUTH_HEADER, NO_REFRESH_TOKEN_HEADER} from "./authentication.headers";
 import jwt_decode from 'jwt-decode';
 import moment from "moment-with-locales-es6";
+import {ApiInfo} from "../portofino.service";
 
 export const TOKEN_STORAGE_SERVICE = new InjectionToken('JSON Web Token Storage');
 
@@ -210,6 +211,10 @@ export abstract class AuthenticationStrategy {
   abstract logout(): Observable<any>;
 
   abstract confirmSignup(token: string): Observable<any>;
+
+  abstract get supportsSelfRegistration(): boolean;
+
+  init(response: ApiInfo) {}
 
   set authenticationService(auth) {
     this.authentication = auth;

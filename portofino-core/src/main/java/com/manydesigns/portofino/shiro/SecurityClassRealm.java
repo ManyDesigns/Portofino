@@ -179,6 +179,11 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     }
 
     @Override
+    public boolean supportsSelfRegistration() {
+        return ensureDelegate().supportsSelfRegistration();
+    }
+
+    @Override
     public ClassAccessor getSelfRegisteredUserClassAccessor() {
         return ensureDelegate().getSelfRegisteredUserClassAccessor();
     }

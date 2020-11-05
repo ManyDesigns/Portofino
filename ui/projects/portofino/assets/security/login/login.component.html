@@ -17,7 +17,10 @@
   </form>
   <mat-divider></mat-divider>
   <a href="#" (click)="openForgotPasswordDialog(); $event.preventDefault();">{{ 'Forgot password?' | translate }}</a><br />
-  <a href="#" (click)="openSignUpDialog(); $event.preventDefault();">{{ 'Sign up' | translate }}</a> {{ "if you don't have an account" | translate }}
+  <ng-container *ngIf="authenticationService.strategy.supportsSelfRegistration">
+    <a href="#" (click)="openSignUpDialog(); $event.preventDefault();">{{ 'Sign up' | translate }}</a>
+    {{ "if you don't have an account" | translate }}
+  </ng-container>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button (click)="login()" color="accent">{{ 'Sign in' | translate }}</button>

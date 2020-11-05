@@ -361,6 +361,11 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
         return token;
     }
 
+    @Override
+    public boolean supportsSelfRegistration() {
+        return true;
+    }
+
     public String[] saveSelfRegisteredUser(Object user) throws RegistrationException {
         if(StringUtils.isEmpty(userTokenProperty)) {
             throw new UnsupportedOperationException("Token property not configured.");

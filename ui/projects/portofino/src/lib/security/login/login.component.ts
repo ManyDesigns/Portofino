@@ -23,8 +23,8 @@ export class LoginComponent implements OnInit {
   resetPasswordComponent = ResetPasswordComponent;
   signupComponent = SignupComponent;
 
-  constructor(protected dialog: MatDialog, protected dialogRef: MatDialogRef<LoginComponent>,
-              protected authenticationService: AuthenticationService,
+  constructor(public authenticationService: AuthenticationService,
+              protected dialog: MatDialog, protected dialogRef: MatDialogRef<LoginComponent>,
               protected formBuilder: FormBuilder, protected notificationService: NotificationService,
               protected translate: TranslateService, protected http: HttpClient) {
     this.loginForm = this.formBuilder.group({

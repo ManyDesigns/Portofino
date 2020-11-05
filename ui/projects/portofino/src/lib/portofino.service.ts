@@ -1,4 +1,4 @@
-import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@angular/core';
+import {EventEmitter, Inject, Injectable, InjectionToken, Injector, TemplateRef} from '@angular/core';
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {DateAdapter} from "@angular/material/core";
@@ -6,6 +6,7 @@ import {Observable} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {WebStorageService} from "./storage/storage.services";
 import {NO_REFRESH_TOKEN_HEADER} from "./security/authentication.headers";
+import {AuthenticationStrategy} from "./security/authentication.service";
 
 export const LOCALE_STORAGE_SERVICE = new InjectionToken('Locale Storage');
 export const LOCALES = new InjectionToken('Locales');
@@ -31,7 +32,8 @@ export class PortofinoService {
   constructor(public http: HttpClient, protected translate: TranslateService,
               @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,
               @Inject(LOCALES) locales: Locale[],
-              protected dateAdapter: DateAdapter<any>) {
+              protected dateAdapter: DateAdapter<any>,
+              protected injector: Injector) {
     this.setupTranslateService(locales);
   }
 
@@ -101,10 +103,11 @@ export class PortofinoService {
     this.http.get<ApiInfo>(this.localApiPath, { headers: headers }).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
       if(response.loginPath) {
-        this.loginPath = this.sanitizeLoginPath(response.loginPath);
+        this.setLoginPath(response);
       } else {
         this.initLoginPath();
       }
+      this.injector.get(AuthenticationStrategy).init(response);
       if(response.disableAdministration) {
         this.localApiPath = null; //Disable local API
       }
@@ -113,12 +116,19 @@ export class PortofinoService {
     });
   }
 
+  private setLoginPath(response: ApiInfo) {
+    this.loginPath = this.sanitizeLoginPath(response.loginPath);
+    this.injector.get(AuthenticationStrategy).init({
+      apiRoot: this.apiRoot, loginPath: this.loginPath
+    });
+  }
+
   private initLoginPath() {
     const headers = {};
     headers[NO_REFRESH_TOKEN_HEADER] = true; //Avoid refreshing the token on startup as this might hit the wrong login action
     this.http.get<any>(this.apiRoot + ':description', { headers: headers }).subscribe(response => {
       if (response.loginPath) {
-        this.loginPath = this.sanitizeLoginPath(response.loginPath);
+        this.setLoginPath(response);
       }
     },
       () => alert(this.translate.instant(
@@ -150,7 +160,7 @@ export class PortofinoService {
   }
 }
 
-class ApiInfo {
+export class ApiInfo {
   apiRoot: string;
   loginPath: string;
   disableAdministration?: boolean = false;
