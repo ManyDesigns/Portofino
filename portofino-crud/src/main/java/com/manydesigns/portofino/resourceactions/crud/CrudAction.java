@@ -309,8 +309,9 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             }
             if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
                 try {
-                    PropertyAccessor orderByProperty = classAccessor.getProperty(sortProperty);
-                    criteria.orderBy(orderByProperty, sortDirection);
+                    PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
+                    if(orderByProperty != null)
+                        criteria.orderBy(orderByProperty, sortDirection);
                 } catch (NoSuchFieldException e) {
                     logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
                 }
@@ -322,6 +323,13 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             RequestMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
         }
         return objects;
+    }
+
+    /**
+     * @return an PropertyAccessor object
+     */
+    protected PropertyAccessor getOrderByProperty(String sortProperty) throws NoSuchFieldException {
+        return this.classAccessor.getProperty(sortProperty);
     }
 
     /**
