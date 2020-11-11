@@ -88,7 +88,7 @@ public class KeyCloakLoginAction extends DefaultLoginAction {
     }
 
     @Override
-    public String renewToken() {
+    public String refreshToken() {
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
             Object principal = subject.getPrincipal();
@@ -104,7 +104,7 @@ public class KeyCloakLoginAction extends DefaultLoginAction {
             form.param("refresh_token", refreshToken);
             return authenticate(request, form, subject);
         } else {
-            logger.warn("Token renew request for unauthenticated user");
+            logger.warn("Token refresh request for unauthenticated user");
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         }
     }
