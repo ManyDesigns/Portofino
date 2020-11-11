@@ -20,10 +20,9 @@
 
 package com.manydesigns.portofino.model.database;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +40,9 @@ import java.util.Properties;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode"})
+@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode","annotations"})
 @XmlRootElement
-public class Database implements ModelObject {
+public class Database implements ModelObject, Annotated {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -61,7 +60,7 @@ public class Database implements ModelObject {
 
     protected ConnectionProvider connectionProvider;
     protected Properties settings;
-
+    protected final List<Annotation> annotations = new ArrayList<>();
     
     //**************************************************************************
     // Logging
@@ -86,7 +85,11 @@ public class Database implements ModelObject {
         return databaseName;
     }
 
-    public void reset() {}
+    public void reset() {
+        for(Annotation a : annotations) {
+            a.reset();
+        }
+    }
 
     public void init(Model model, Configuration configuration) {
         if(databaseName == null) {
@@ -95,9 +98,16 @@ public class Database implements ModelObject {
         if(databaseName.contains("/") || databaseName.contains("\\")) {
             throw new IllegalStateException("Database name contains slashes or backslashes: " + databaseName);
         }
+        for(Annotation a : annotations) {
+            a.init(model, configuration);
+        }
     }
 
-    public void link(Model model, Configuration configuration) {}
+    public void link(Model model, Configuration configuration) {
+        for(Annotation a : annotations) {
+            a.link(model, configuration);
+        }
+    }
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Schema schema : schemas) {
@@ -216,5 +226,13 @@ public class Database implements ModelObject {
 
     public void setSettings(Properties settings) {
         this.settings = settings;
+    }
+
+    @Override
+    @XmlElementWrapper(name = "annotations")
+    @XmlElement(name = "annotation", type = Annotation.class)
+    @NotNull
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 }

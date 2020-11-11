@@ -22,6 +22,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - application/json login endpoint (in addition to the existing form-based endpoint).
   - Better handling of token expiration in the client.
 - Per-database Hibernate properties.
+- Support annotations on databases.
+- Quartz jobs now run with a working Shiro environment.
 
 ### Changed
 - Angular updated to version 10
