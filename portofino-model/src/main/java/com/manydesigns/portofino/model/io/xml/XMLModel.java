@@ -10,6 +10,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.PatternFileSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,5 +252,14 @@ public class XMLModel implements ModelIO {
                 logger.error("Unexpected filesystem error when trying to delete schema directory " + schemaDirPath, e);
             }
         });
+    }
+
+    @Override
+    public void delete() throws IOException {
+        FileObject appModelFile = getLegacyModelFile();
+        if (appModelFile.exists()) {
+            appModelFile.delete();
+        }
+        getModelDirectory().delete(new PatternFileSelector("(database|.*[.]table)[.]xml"));
     }
 }

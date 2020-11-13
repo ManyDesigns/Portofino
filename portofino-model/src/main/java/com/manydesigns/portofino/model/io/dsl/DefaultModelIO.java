@@ -2,6 +2,7 @@ package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
@@ -18,6 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class DefaultModelIO implements ModelIO {
@@ -57,9 +62,7 @@ public class DefaultModelIO implements ModelIO {
                     ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
                     if(parser.getNumberOfSyntaxErrors() > 0) {
                         logger.error("Could not parse domain definition file " + domainDefFile.getName().getPath()); //TODO properly report errors
-                        continue;
                     }
-
                 }
             }
         }
@@ -97,8 +100,31 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void saveDatabasePersistence(FileObject modelDir, Model model) {
-        //TODO
+    protected void saveDatabasePersistence(FileObject modelDir, Model model) throws IOException {
+        FileObject persistenceFile = modelDir.resolveFile("persistence.database");
+        persistenceFile.createFile();
+        try(OutputStreamWriter os = new OutputStreamWriter(persistenceFile.getContent().getOutputStream(), StandardCharsets.UTF_8)) {
+            for(Database db : model.getDatabases()) {
+                os.write("database " + db.getName() + " (");
+                ConnectionProvider cp = db.getConnectionProvider();
+                if(cp instanceof JdbcConnectionProvider) {
+                    os.write("type = \"jdbc\"");
+                } else if(cp instanceof JndiConnectionProvider) {
+                    os.write("type = \"jndi\"");
+                } else {
+                    throw new IllegalStateException("Unknown connection provider type: " + cp.getClass()); //TODO should check earlier to avoid leaving a broken file
+                }
+                os.write(") {" + System.lineSeparator());
+                for(Schema schema : db.getSchemas()) {
+                    os.write("\tschema " + schema.getSchemaName());
+                    if(!schema.getActualSchemaName().equals(schema.getSchemaName())) {
+                        os.write(" (" + schema.getActualSchemaName() + ")");
+                    }
+                    os.write(System.lineSeparator());
+                }
+                os.write("}");
+            }
+        }
     }
 
     protected void saveEntities(FileObject modelDir, List<Domain> domains) {
@@ -108,5 +134,10 @@ public class DefaultModelIO implements ModelIO {
     @Override
     public FileObject getModelDirectory() throws FileSystemException {
         return modelDirectory;
+    }
+
+    @Override
+    public void delete() throws IOException {
+        //TODO
     }
 }

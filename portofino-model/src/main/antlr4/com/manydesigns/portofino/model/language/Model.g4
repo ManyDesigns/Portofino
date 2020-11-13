@@ -4,8 +4,7 @@ importDeclaration: IMPORT IDENTIFIER ('.' wildcard='*')?;
 
 databasePersistence: database*;
 
-database: DATABASE name=IDENTIFIER '(' connectionProperty* ')'
-    (';' | '{' schema* '}');
+database: DATABASE name=IDENTIFIER '(' (connectionProperty (',' connectionProperty)*)? ')' (';' | '{' schema* '}');
 
 connectionProperty: name=IDENTIFIER '=' value=literal;
 schema: SCHEMA name=IDENTIFIER ('(' physicalName=STRING ')')?;
