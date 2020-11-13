@@ -32,17 +32,23 @@ public class Domain implements ModelObject, Annotated {
 
     @Override
     public void reset() {
-
+        for(Annotation a : annotations) {
+            a.reset();
+        }
     }
 
     @Override
     public void init(Model model, Configuration configuration) {
-
+        for(Annotation a : annotations) {
+            a.init(model, configuration);
+        }
     }
 
     @Override
     public void link(Model model, Configuration configuration) {
-
+        for(Annotation a : annotations) {
+            a.link(model, configuration);
+        }
     }
 
     @Override
