@@ -22,6 +22,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ import java.util.Properties;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode"})
+@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","entityMode","annotations"})
 @XmlRootElement
 public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     public static final String copyright =
@@ -59,7 +60,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
 
     protected ConnectionProvider connectionProvider;
     protected Properties settings;
-
+    protected final List<Annotation> annotations = new ArrayList<>();
     
     //**************************************************************************
     // Logging
@@ -96,7 +97,11 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
         return domain.getName();
     }
 
-    public void reset() {}
+    public void reset() {
+        for(Annotation a : annotations) {
+            a.reset();
+        }
+    }
 
     public void init(Model model, Configuration configuration) {
         if(domain.getName() == null) {
@@ -105,9 +110,16 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
         if(domain.getName().contains("/") || domain.getName().contains("\\")) {
             throw new IllegalStateException("Database name contains slashes or backslashes: " + domain.getName());
         }
+        for(Annotation a : annotations) {
+            a.init(model, configuration);
+        }
     }
 
-    public void link(Model model, Configuration configuration) {}
+    public void link(Model model, Configuration configuration) {
+        for(Annotation a : annotations) {
+            a.link(model, configuration);
+        }
+    }
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Schema schema : schemas) {
@@ -233,5 +245,13 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
 
     public void setSettings(Properties settings) {
         this.settings = settings;
+    }
+
+    @Override
+    @XmlElementWrapper(name = "annotations")
+    @XmlElement(name = "annotation", type = Annotation.class)
+    @NotNull
+    public List<Annotation> getAnnotations() {
+        return annotations;
     }
 }

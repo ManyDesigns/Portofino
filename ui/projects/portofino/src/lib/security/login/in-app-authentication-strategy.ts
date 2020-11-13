@@ -4,7 +4,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {Observable} from "rxjs";
 import {NO_REFRESH_TOKEN_HEADER} from "../authentication.headers";
 import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/common/http";
-import {PortofinoService} from "../../portofino.service";
+import {ApiInfo, PortofinoService} from "../../portofino.service";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {filter, map, mergeMap} from "rxjs/operators";
@@ -15,6 +15,9 @@ export const RESET_PASSWORD_COMPONENT = new InjectionToken('Reset Password Compo
 
 @Injectable()
 export class InAppAuthenticationStrategy extends AuthenticationStrategy {
+
+  supportsSelfRegistration = false;
+
   constructor(
     protected portofino: PortofinoService, protected http: HttpClient,
     protected notifications: NotificationService, protected translate: TranslateService,
@@ -23,6 +26,13 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
     @Inject(CHANGE_PASSWORD_COMPONENT) protected changePasswordComponent,
     @Inject(RESET_PASSWORD_COMPONENT) protected resetPasswordComponent) {
     super();
+  }
+
+  init(response: ApiInfo) {
+    super.init(response);
+    this.http.get<any>(`${this.loginPath}/capabilities`).subscribe(capabilities => {
+      this.supportsSelfRegistration = capabilities.supportsSelfRegistration;
+    });
   }
 
   askForCredentials(): Observable<any> {
@@ -66,7 +76,7 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
   }
 
   confirmSignup(token: string) {
-    this.http.post(`${this.loginPath}/user/:confirm`,{ token: token });
+    return this.http.post(`${this.loginPath}/user/:confirm`,{ token: token });
   }
 
   get loginPath() {

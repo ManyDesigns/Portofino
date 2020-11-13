@@ -47,8 +47,8 @@ export class ForgottenPasswordComponent implements OnInit {
     return this.http.post(`${(this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath}/:send-reset-password-email`,{
       email: this.form.get('email').value,
       loginPageUrl:
-        //TODO alternative to window.location?
-        window.location.origin + this.location.normalize("/") + "?resetPassword=x&token=TOKEN",
+        //TODO alternative to document.baseUri?
+        document.baseURI + "?resetPassword=x&token=TOKEN",
       siteNameOrAddress: this.portofino.applicationName
     }).subscribe(
       () => {

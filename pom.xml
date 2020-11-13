@@ -86,8 +86,8 @@
         <commons.vfs.version>2.2</commons.vfs.version>
         <fop.version>2.1</fop.version>
         <groovy.version>3.0.6</groovy.version>
-        <guava.version>27.0.1-jre</guava.version>
-        <hibernate.version>5.4.21.Final</hibernate.version>
+        <guava.version>30.0-jre</guava.version>
+        <hibernate.version>5.4.23.Final</hibernate.version>
         <jackson.version>2.10.0</jackson.version>
         <jackson.databind.version>2.10.0</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
@@ -107,7 +107,7 @@
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.5.2.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.6.0</shiro.version>
+        <shiro.version>1.7.0</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.version>5.2.9.RELEASE</spring.version>
 
@@ -317,7 +317,7 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.2</version>
+            <version>2.3.3</version>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>

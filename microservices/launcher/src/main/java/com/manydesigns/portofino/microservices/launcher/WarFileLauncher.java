@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.microservices.launcher;
 
-import org.apache.catalina.LifecycleException;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;

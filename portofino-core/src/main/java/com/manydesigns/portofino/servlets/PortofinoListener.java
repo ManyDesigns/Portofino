@@ -319,6 +319,8 @@ public class PortofinoListener extends DispatcherInitializer
             this.configurationFile = new Configurations().propertiesBuilder(localConfigurationPath).configure(parameters);
             PropertiesConfiguration localConfiguration = this.configurationFile.getConfiguration();
             CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
+            compositeConfiguration.setPrefixLookups(getConfigurationLookups());
+            compositeConfiguration.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
             //Note: order is important. The localConfiguration must be added here, and not in the constructor,
             //otherwise it is consulted last and not first.
             compositeConfiguration.addConfiguration(localConfiguration, true);
