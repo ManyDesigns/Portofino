@@ -4,6 +4,7 @@ import org.apache.commons.configuration2.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Domain implements ModelObject, Annotated {
 
@@ -80,22 +81,22 @@ public class Domain implements ModelObject, Annotated {
     }
 
     public void addEntity(Entity entity) {
-        Domain domain = entity.getDomain();
-        if(domain == null) {
-            Entity existing = findEntity(entity.name);
-            if(existing != null && !existing.equals(entity)) {
-                throw new IllegalArgumentException("An entity named " + entity.name + " already exists in domain " + this);
-            }
-            entity.setDomain(this);
+        Entity existing = findEntity(entity.name);
+        if(existing != null && !existing.equals(entity)) {
+            throw new IllegalArgumentException("An entity named " + entity.name + " already exists in domain " + this);
+        }
+        entity.setDomain(this);
+        if(!entities.contains(entity)) {
             entities.add(entity);
-        } else if(domain != this) {
-            throw new IllegalArgumentException("Entity " + entity + " already belongs to domain " + domain);
         }
     }
 
     public Entity findEntity(String name) {
+        if(name == null) {
+            return null;
+        }
         for (Entity e : entities) {
-            if(e.getName().equals(name)) {
+            if(name.equals(e.name)) {
                 return e;
             }
         }

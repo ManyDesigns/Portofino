@@ -72,8 +72,8 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     //**************************************************************************
 
     protected final List<ForeignKey> oneToManyRelationships;
-    protected Class actualJavaClass;
-    protected String actualEntityName;
+    protected Class<?> actualJavaClass;
+    protected String entityName;
 
     //**************************************************************************
     // Logging
@@ -129,7 +129,6 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public void reset() {
-        actualEntityName = null;
         actualJavaClass = null;
         oneToManyRelationships.clear();
     }
@@ -142,10 +141,10 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
         String baseEntityName;
-        if (entity.getName() == null) {
+        if (entityName == null) {
             baseEntityName = DatabaseLogic.normalizeName(getTableName());
         } else {
-            baseEntityName = DatabaseLogic.normalizeName(entity.getName());
+            baseEntityName = DatabaseLogic.normalizeName(entityName);
         }
 
         String calculatedEntityName = baseEntityName;
@@ -157,10 +156,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
             calculatedEntityName = baseEntityName + "_" + (i++);
         }
 
-        actualEntityName = calculatedEntityName;
-        if(entity.getName() == null) {
-            entity.setName(actualEntityName);
-        }
+        entity.setName(calculatedEntityName);
     }
 
     public void link(Model model, Configuration configuration) {}
@@ -266,15 +262,15 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     @XmlAttribute(required = false)
     public String getEntityName() {
-        return entity.getName();
+        return entityName;
     }
 
     public void setEntityName(String entityName) {
-        entity.setName(entityName);
+        this.entityName = entityName;
     }
 
     public String getActualEntityName() {
-        return actualEntityName;
+        return entity.getName();
     }
 
     public List<ForeignKey> getOneToManyRelationships() {

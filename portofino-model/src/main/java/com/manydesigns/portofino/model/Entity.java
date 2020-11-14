@@ -68,6 +68,8 @@ public class Entity implements ModelObject, Annotated {
     public void setDomain(Domain domain) {
         if(this.domain == domain) {
             return;
+        } else if(this.domain != null) {
+            throw new IllegalArgumentException("Entity " + this + " already belongs to domain " + this.domain);
         }
         this.domain = domain;
         domain.addEntity(this);
