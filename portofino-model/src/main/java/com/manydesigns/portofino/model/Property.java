@@ -65,8 +65,8 @@ public class Property implements ModelObject, Annotated {
         } else if(this.owner != null) {
             throw new IllegalArgumentException("Cannot change owner");
         }
-        owner.getProperties().add(this);
         this.owner = owner;
+        owner.addProperty(this);
     }
 
     @Override

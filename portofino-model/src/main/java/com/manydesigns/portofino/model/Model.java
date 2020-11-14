@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -72,6 +73,15 @@ public class Model {
         new ResetVisitor().visit(rootObject);
         new InitVisitor(this, configuration).visit(rootObject);
         new LinkVisitor(this, configuration).visit(rootObject);
+    }
+
+    public Domain ensureDomain(String name) {
+        return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
+            Domain domain = new Domain();
+            domain.setName(name);
+            getDomains().add(domain);
+            return domain;
+        });
     }
 
     //**************************************************************************

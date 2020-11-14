@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.java.JavaTypesDomain;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
@@ -22,7 +23,7 @@ public class DefaultModelIOTest {
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             assertEquals(parser.getNumberOfSyntaxErrors(), 0);
-            Domain domain = new EntityModelVisitor(new JavaTypesDomain()).visit(parseTree);
+            Domain domain = new EntityModelVisitor(new Model(), new JavaTypesDomain()).visitStandaloneDomain(parseTree);
             assertEquals(domain.getEntities().size(), 1);
         }
     }

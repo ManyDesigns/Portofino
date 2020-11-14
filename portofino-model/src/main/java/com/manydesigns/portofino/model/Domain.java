@@ -26,6 +26,7 @@ public class Domain implements ModelObject, Annotated {
 
     @Override
     public void setParent(Object parent) {
+        //TODO check it doesn't already have a different parent
         parents.add((Domain) parent);
         ((Domain) parent).getSubdomains().add(this);
     }
@@ -70,7 +71,10 @@ public class Domain implements ModelObject, Annotated {
         } else if(domain != this) {
             throw new IllegalArgumentException("Entity " + entity + " already belongs to domain " + domain);
         }
-        //TODO check for duplicate name?
+        Entity existing = findEntity(entity.name);
+        if(existing != null && !existing.equals(entity)) {
+            throw new IllegalArgumentException("An entity named " + entity.name + " already exists in domain " + domain);
+        }
         entities.add(entity);
     }
 
@@ -87,6 +91,16 @@ public class Domain implements ModelObject, Annotated {
             }
         }
         return null;
+    }
+
+    public Entity ensureEntity(String name) {
+        Entity entity = findEntity(name);
+        if(entity == null) {
+            entity = new Entity();
+            entity.setName(name);
+            addEntity(entity);
+        }
+        return entity;
     }
 
     public Type findType(String name) {

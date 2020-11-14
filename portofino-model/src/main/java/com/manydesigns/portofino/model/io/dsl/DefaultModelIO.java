@@ -45,13 +45,13 @@ public class DefaultModelIO implements ModelIO {
             return model;
         }
         if (modelDir.exists()) {
-            loadEntities(modelDir, model.getDomains());
+            loadEntities(modelDir, model);
             loadDatabasePersistence(modelDir, model);
         }
         return model;
     }
 
-    protected void loadEntities(FileObject directory, List<Domain> domains) throws IOException {
+    protected void loadEntities(FileObject directory, Model model) throws IOException {
         for(FileObject dir : directory.getChildren()) {
             String domainName = dir.getName().getBaseName();
             FileObject domainDefFile = dir.resolveFile(domainName + "domain");
@@ -60,7 +60,9 @@ public class DefaultModelIO implements ModelIO {
                     ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
                     ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
                     ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
-                    if(parser.getNumberOfSyntaxErrors() > 0) {
+                    if(parser.getNumberOfSyntaxErrors() == 0) {
+                        new EntityModelVisitor(model).visit(parseTree);
+                    } else {
                         logger.error("Could not parse domain definition file " + domainDefFile.getName().getPath()); //TODO properly report errors
                     }
                 }
@@ -76,11 +78,11 @@ public class DefaultModelIO implements ModelIO {
                 ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
                 ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
                 ModelParser.DatabasePersistenceContext parseTree = parser.databasePersistence();
-                if(parser.getNumberOfSyntaxErrors() > 0) {
+                if(parser.getNumberOfSyntaxErrors() == 0) {
+                    new DatabasePersistenceVisitor(model).visit(parseTree);
+                } else {
                     logger.error("Could not parse database connections file"); //TODO properly report errors
-                    return;
                 }
-                new DatabasePersistenceVisitor(model).visit(parseTree);
             }
         } else {
             logger.info("No database persistence defined in " + modelDirectory.getName().getPath());

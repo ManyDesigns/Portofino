@@ -5,70 +5,73 @@ import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.Token;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
-public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
+public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
 
-    protected Domain baseDomain;
+    protected final Model model;
+    protected Domain parentDomain;
     protected Entity entity;
     protected Annotated annotated;
 
-    public List<Domain> domains = new ArrayList<>();
+    public EntityModelVisitor(Model model) {
+        this(model, null);
+    }
 
-    public EntityModelVisitor() {}
+    public EntityModelVisitor(Model model, Domain parentDomain) {
+        this.model = model;
+        this.parentDomain = parentDomain;
+    }
 
-    public EntityModelVisitor(Domain baseDomain) {
-        this.baseDomain = baseDomain;
+    @Override
+    public Domain visitStandaloneDomain(ModelParser.StandaloneDomainContext ctx) {
+        return visitDomain(ctx.domain());
     }
 
     @Override
     public Domain visitDomain(ModelParser.DomainContext ctx) {
-        Domain previous = baseDomain;
-        Domain domain = new Domain();
-        if(baseDomain != null) {
-            domain.setParent(baseDomain);
+        Domain previous = parentDomain;
+        String name = ctx.name.getText();
+        Domain domain = model.ensureDomain(name);
+        if(parentDomain != null) {
+            domain.setParent(parentDomain);
         }
         domain.setName(ctx.name.getText());
-        baseDomain = domain;
+        parentDomain = domain;
         annotated = domain;
         visitChildren(ctx);
-        baseDomain = previous;
+        parentDomain = previous;
         annotated = previous;
-        domains.add(domain);
         return domain;
     }
 
     @Override
-    public Domain visitEntity(ModelParser.EntityContext ctx) {
+    public Entity visitEntity(ModelParser.EntityContext ctx) {
         String entityName = ctx.name.getText();
-        if(baseDomain == null) {
+        if(parentDomain == null) {
             throw new IllegalStateException("Entity definition without a domain: " + entityName);
         }
         Entity previous = entity;
-        entity = new Entity();
-        entity.setName(entityName);
-        entity.setDomain(baseDomain);
+        entity = parentDomain.ensureEntity(entityName);
         annotated = entity;
         visitChildren(ctx);
         entity = previous;
         annotated = previous;
-        return baseDomain;
+        return entity;
     }
 
     @Override
-    public Domain visitAnnotation(ModelParser.AnnotationContext ctx) {
+    public Annotation visitAnnotation(ModelParser.AnnotationContext ctx) {
         String annotationType = ctx.name.getText();
         if(annotated == null) {
             throw new IllegalStateException("Annotation without an element: " + annotationType);
         }
-        Annotation annotation = new Annotation(annotated, resolveAnnotationType(annotationType));
+        Annotation annotation = annotated.ensureAnnotation(resolveAnnotationType(annotationType));
         ModelParser.AnnotationParamsContext params = ctx.annotationParams();
         if(params != null) {
             visitAnnotationParams(annotation, params);
         }
-        annotated.getAnnotations().add(annotation);
-        return baseDomain;
+        return annotation;
     }
 
     public void visitAnnotationParams(Annotation annotation, ModelParser.AnnotationParamsContext params) {
@@ -84,15 +87,15 @@ public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
     }
 
     @Override
-    public Domain visitProperty(ModelParser.PropertyContext ctx) {
-        String name = ctx.name.getText();
+    public Property visitProperty(ModelParser.PropertyContext ctx) {
+        String propertyName = ctx.name.getText();
         Annotated previous = annotated;
         if(entity == null) {
-            throw new IllegalStateException("Property without an entity: " + name);
+            throw new IllegalStateException("Property without an entity: " + propertyName);
         }
         Type type;
         if(ctx.type() != null) {
-            String typeName = ctx.type().IDENTIFIER().getText();
+            String typeName = ctx.type().name.getText();
             type = entity.getDomain().findType(typeName);
             if(type == null) {
                 throw new RuntimeException("Unknown type: " + typeName); //TODO
@@ -104,14 +107,17 @@ public class EntityModelVisitor extends ModelBaseVisitor<Domain> {
             }
         }
 
-        Property property = new Property();
-        property.setName(name);
-        property.setOwner(entity);
+        Property property = entity.findProperty(propertyName);
+        if(property == null) {
+            property = new Property();
+            property.setName(propertyName);
+            entity.addProperty(property);
+        }
         property.setType(type);
         annotated = property;
         visitChildren(ctx);
         annotated = previous;
-        return baseDomain;
+        return property;
     }
 
     protected String decodeType(String typeName) {

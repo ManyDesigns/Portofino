@@ -73,6 +73,26 @@ public class Entity implements ModelObject, Annotated {
         domain.addEntity(this);
     }
 
+    public void addProperty(Property property) {
+        Entity owner = property.owner;
+        if(owner == null) {
+            property.setOwner(this);
+        } else if(owner != this) {
+            throw new IllegalArgumentException("Property " + property + " already belongs to entity " + owner);
+        }
+        //TODO check for property with the same name
+        properties.add(property);
+    }
+
+    public Property findProperty(String name) {
+        for(Property p : getProperties()) {
+            if(p.name.equals(name)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
     public void addRelationship(Entity other) {
         Relationship r = new Relationship(this, other);
         domain.addRelationship(r);

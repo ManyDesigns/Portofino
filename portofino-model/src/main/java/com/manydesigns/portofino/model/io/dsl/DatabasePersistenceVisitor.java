@@ -2,6 +2,7 @@ package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.database.JndiConnectionProvider;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
+public class DatabasePersistenceVisitor extends ModelBaseVisitor<ModelObject> {
 
     protected final Model model;
     protected Database currentDatabase;
@@ -23,7 +24,7 @@ public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitDatabase(ModelParser.DatabaseContext ctx) {
+    public Database visitDatabase(ModelParser.DatabaseContext ctx) {
         String name = ctx.name.getText();
         boolean jdbc = true;
         Optional<String> connectionType = getConnectionProperty(ctx, "type");
@@ -62,18 +63,22 @@ public class DatabasePersistenceVisitor extends ModelBaseVisitor<Void> {
             property.ifPresent(cp::setJndiResource);
             currentDatabase.setConnectionProvider(cp);
         }
-        super.visitDatabase(ctx);
-        return null;
+        try {
+            super.visitDatabase(ctx);
+            return currentDatabase;
+        } finally {
+            currentDatabase = null;
+        }
     }
 
     @Override
-    public Void visitSchema(ModelParser.SchemaContext ctx) {
+    public Schema visitSchema(ModelParser.SchemaContext ctx) {
         Schema schema = new Schema(currentDatabase);
         schema.setSchemaName(ctx.name.getText());
         if(ctx.physicalName != null) {
             schema.setActualSchemaName(getText(ctx.physicalName));
         }
-        return null;
+        return schema;
     }
 
     @NotNull

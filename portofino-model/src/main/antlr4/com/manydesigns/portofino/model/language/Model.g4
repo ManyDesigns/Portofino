@@ -26,7 +26,7 @@ relationship: annotation* name=IDENTIFIER ':' a=type '-->' b=type;
 
 relationshipProperty: annotation* name=IDENTIFIER '-->' type;
 
-type: IDENTIFIER nullable='?'?;
+type: name=IDENTIFIER nullable='?'?;
 
 annotation: '@' name=IDENTIFIER annotationParams?;
 
