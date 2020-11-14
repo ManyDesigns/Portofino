@@ -8,8 +8,9 @@ import java.util.List;
 public class Domain implements ModelObject, Annotated {
 
     protected String name;
+    protected Domain parent;
 
-    protected final List<Domain> parents = new ArrayList<>();
+    protected final List<Domain> imports = new ArrayList<>();
     protected final List<Domain> subdomains = new ArrayList<>();
     protected final List<Annotation> annotations = new ArrayList<>();
     protected final List<Type> types = new ArrayList<>();
@@ -26,9 +27,13 @@ public class Domain implements ModelObject, Annotated {
 
     @Override
     public void setParent(Object parent) {
-        //TODO check it doesn't already have a different parent
-        parents.add((Domain) parent);
-        ((Domain) parent).getSubdomains().add(this);
+        if(this.parent == null) {
+            Domain parentDomain = (Domain) parent;
+            this.parent = parentDomain;
+            parentDomain.getSubdomains().add(this);
+        } else if(!this.parent.equals(parent)) {
+            throw new IllegalStateException("Domain " + this + " already has a different parent");
+        }
     }
 
     @Override
@@ -64,18 +69,28 @@ public class Domain implements ModelObject, Annotated {
         return annotations;
     }
 
+    public Domain ensureSubdomain(String name) {
+        return getSubdomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
+            Domain domain = new Domain();
+            domain.setName(name);
+            domain.setParent(this);
+            domain.getImports().addAll(imports); //TODO think better about the design
+            return domain;
+        });
+    }
+
     public void addEntity(Entity entity) {
         Domain domain = entity.getDomain();
         if(domain == null) {
+            Entity existing = findEntity(entity.name);
+            if(existing != null && !existing.equals(entity)) {
+                throw new IllegalArgumentException("An entity named " + entity.name + " already exists in domain " + this);
+            }
             entity.setDomain(this);
+            entities.add(entity);
         } else if(domain != this) {
             throw new IllegalArgumentException("Entity " + entity + " already belongs to domain " + domain);
         }
-        Entity existing = findEntity(entity.name);
-        if(existing != null && !existing.equals(entity)) {
-            throw new IllegalArgumentException("An entity named " + entity.name + " already exists in domain " + domain);
-        }
-        entities.add(entity);
     }
 
     public Entity findEntity(String name) {
@@ -84,7 +99,7 @@ public class Domain implements ModelObject, Annotated {
                 return e;
             }
         }
-        for(Domain dom : parents) {
+        for(Domain dom : imports) {
             Entity entity = dom.findEntity(name);
             if(entity != null) {
                 return entity;
@@ -109,7 +124,7 @@ public class Domain implements ModelObject, Annotated {
                 return t;
             }
         }
-        for(Domain dom : parents) {
+        for(Domain dom : imports) {
             Type type = dom.findType(name);
             if(type != null) {
                 return type;
@@ -129,8 +144,12 @@ public class Domain implements ModelObject, Annotated {
         r.getB().getRelationships().add(r);
     }
 
-    public List<Domain> getParents() {
-        return parents;
+    public Domain getParent() {
+        return parent;
+    }
+
+    public List<Domain> getImports() {
+        return imports;
     }
 
     public List<Domain> getSubdomains() {
@@ -150,8 +169,8 @@ public class Domain implements ModelObject, Annotated {
     }
 
     public Type getDefaultType() {
-        for(Domain parent : parents) {
-            Type defaultType = parent.getDefaultType();
+        for(Domain imported : imports) {
+            Type defaultType = imported.getDefaultType();
             if(defaultType != null) {
                 return defaultType;
             }

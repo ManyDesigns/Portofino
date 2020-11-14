@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.model.java.JavaTypesDomain;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ public class Model {
 
     protected final LinkedList<Database> databases;
     protected final List<Domain> domains = new ArrayList<>();
+    protected final Domain javaTypes = new JavaTypesDomain();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -79,6 +81,7 @@ public class Model {
         return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
             Domain domain = new Domain();
             domain.setName(name);
+            domain.getImports().add(javaTypes);
             getDomains().add(domain);
             return domain;
         });

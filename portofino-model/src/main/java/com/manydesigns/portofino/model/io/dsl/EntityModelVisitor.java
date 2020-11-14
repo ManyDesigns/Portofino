@@ -32,17 +32,23 @@ public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
     public Domain visitDomain(ModelParser.DomainContext ctx) {
         Domain previous = parentDomain;
         String name = ctx.name.getText();
-        Domain domain = model.ensureDomain(name);
+        Domain domain;
         if(parentDomain != null) {
-            domain.setParent(parentDomain);
+            domain = parentDomain.ensureSubdomain(name);
+        } else {
+            domain = model.ensureDomain(name);
         }
-        domain.setName(ctx.name.getText());
         parentDomain = domain;
         annotated = domain;
         visitChildren(ctx);
         parentDomain = previous;
         annotated = previous;
         return domain;
+    }
+
+    @Override
+    public ModelObject visitStandaloneEntity(ModelParser.StandaloneEntityContext ctx) {
+        return super.visitStandaloneEntity(ctx);
     }
 
     @Override

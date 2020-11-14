@@ -4,6 +4,7 @@ import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.io.ModelIO;
+import com.manydesigns.portofino.model.java.JavaTypesDomain;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -19,11 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class DefaultModelIO implements ModelIO {
 
@@ -52,20 +50,56 @@ public class DefaultModelIO implements ModelIO {
     }
 
     protected void loadEntities(FileObject directory, Model model) throws IOException {
-        for(FileObject dir : directory.getChildren()) {
-            String domainName = dir.getName().getBaseName();
-            FileObject domainDefFile = dir.resolveFile(domainName + "domain");
-            if(domainDefFile.exists()) {
-                try(InputStream inputStream = domainDefFile.getContent().getInputStream()) {
-                    ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
-                    ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
-                    ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
-                    if(parser.getNumberOfSyntaxErrors() == 0) {
-                        new EntityModelVisitor(model).visit(parseTree);
-                    } else {
-                        logger.error("Could not parse domain definition file " + domainDefFile.getName().getPath()); //TODO properly report errors
-                    }
-                }
+        for(FileObject domainDir : directory.getChildren()) {
+            if(domainDir.isFolder()) {
+                loadDomain(model, null, domainDir);
+            }
+        }
+    }
+
+    protected void loadDomain(Model model, Domain parent, FileObject domainDir) throws IOException {
+        String domainName = domainDir.getName().getBaseName();
+        FileObject domainDefFile = domainDir.resolveFile(domainName + ".domain");
+        if(domainDefFile.exists()) {
+            loadDomainDefinition(model, parent, domainDefFile);
+        }
+        Domain domain;
+        if(parent != null) {
+            domain = parent.ensureSubdomain(domainName);
+        } else {
+            domain = model.ensureDomain(domainName);
+        }
+        for (FileObject child : domainDir.getChildren()) {
+            if(child.isFile() && child.getName().getBaseName().endsWith(".entity")) {
+                loadEntity(model, domain, child);
+            } else if(child.isFolder()) {
+                loadDomain(model, domain, child);
+            }
+        }
+    }
+
+    protected void loadEntity(Model model, Domain domain, FileObject entityFile) throws IOException {
+        try(InputStream inputStream = entityFile.getContent().getInputStream()) {
+            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
+            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+            ModelParser.StandaloneEntityContext parseTree = parser.standaloneEntity();
+            if (parser.getNumberOfSyntaxErrors() == 0) {
+                new EntityModelVisitor(model, domain).visit(parseTree);
+            } else {
+                logger.error("Could not parse entity definition " + entityFile.getName().getPath()); //TODO properly report errors
+            }
+        }
+    }
+
+    protected void loadDomainDefinition(Model model, Domain parent, FileObject domainDefFile) throws IOException {
+        try(InputStream inputStream = domainDefFile.getContent().getInputStream()) {
+            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
+            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+            ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
+            if(parser.getNumberOfSyntaxErrors() == 0) {
+                new EntityModelVisitor(model, parent).visit(parseTree);
+            } else {
+                logger.error("Could not parse domain definition file " + domainDefFile.getName().getPath()); //TODO properly report errors
             }
         }
     }
@@ -97,14 +131,21 @@ public class DefaultModelIO implements ModelIO {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
         if (modelDir.exists()) {
-            saveEntities(modelDir, model.getDomains());
+            saveEntities(modelDir, model);
             saveDatabasePersistence(modelDir, model);
+        }
+        if (configurationFile != null) {
+            configurationFile.save();
+            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
         }
     }
 
     protected void saveDatabasePersistence(FileObject modelDir, Model model) throws IOException {
         FileObject persistenceFile = modelDir.resolveFile("persistence.database");
         persistenceFile.createFile();
+        if(model.getDatabases().isEmpty()) {
+            persistenceFile.delete();
+        }
         try(OutputStreamWriter os = new OutputStreamWriter(persistenceFile.getContent().getOutputStream(), StandardCharsets.UTF_8)) {
             for(Database db : model.getDatabases()) {
                 os.write("database " + db.getName() + " (");
@@ -129,7 +170,7 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void saveEntities(FileObject modelDir, List<Domain> domains) {
+    protected void saveEntities(FileObject modelDir, Model model) {
         //TODO
     }
 

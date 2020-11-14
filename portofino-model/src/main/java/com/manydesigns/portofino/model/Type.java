@@ -8,6 +8,7 @@ import java.util.List;
 public class Type implements ModelObject, Annotated {
 
     protected String name;
+    protected Domain owner;
 
     protected final List<Annotation> annotations = new ArrayList<>();
 
@@ -24,7 +25,9 @@ public class Type implements ModelObject, Annotated {
     }
 
     @Override
-    public void setParent(Object parent) {}
+    public void setParent(Object parent) {
+        this.owner = (Domain) parent;
+    }
 
     @Override
     public void reset() {

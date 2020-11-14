@@ -70,7 +70,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     //**************************************************************************
 
     protected String actualPropertyName;
-    protected Class actualJavaType;
+    protected Class<?> actualJavaType;
 
     public static final Logger logger = LoggerFactory.getLogger(Column.class);
 
