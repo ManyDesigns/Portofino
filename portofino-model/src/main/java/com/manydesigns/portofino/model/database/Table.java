@@ -151,7 +151,11 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
         int i = 2;
         Database database = schema.getDatabase();
-        while(DatabaseLogic.findTableByEntityName(database, calculatedEntityName) != null) {
+        while(true) {
+            Table existing = DatabaseLogic.findTableByEntityName(database, calculatedEntityName);
+            if (existing == null || existing == this) {
+                break;
+            }
             logger.warn("Entity name {} already taken, generating a new one", calculatedEntityName);
             calculatedEntityName = baseEntityName + "_" + (i++);
         }
