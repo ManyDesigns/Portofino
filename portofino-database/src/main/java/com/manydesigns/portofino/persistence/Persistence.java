@@ -27,6 +27,7 @@ import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
@@ -57,13 +58,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -126,17 +125,32 @@ public class Persistence {
     // Model loading
     //**************************************************************************
 
-    public synchronized void loadModel(ModelIO modelIO) throws IOException {
-        model = modelIO.load();
-        initModel();
+    public synchronized Model loadModel(ModelIO modelIO) throws IOException {
+        Model loaded = modelIO.load();
+        if(loaded != null) {
+            model = loaded;
+            initModel();
+        }
+        return model;
     }
 
-    @Deprecated
-    public synchronized void loadXmlModel() {
+    public synchronized void loadModel() {
+        boolean loaded = false;
         try {
-            loadModel(new XMLModel(getModelDirectory()));
+            //Legacy model
+            Model model = loadModel(new XMLModel(getModelDirectory()));
+            loaded = model != null;
         } catch (Exception e) {
-            logger.error("Cannot load/parse model", e);
+            logger.error("Cannot load/parse XML model", e);
+        }
+        if(!loaded) {
+            try {
+                loadModel(new DefaultModelIO(getModelDirectory()));
+            } catch (Exception e) {
+                logger.error("Cannot load/parse model", e);
+            }
+        } else {
+            logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
         }
     }
 
@@ -173,8 +187,8 @@ public class Persistence {
         }
     }
 
-    @Deprecated
-    public synchronized void saveXmlModel() throws IOException, ConfigurationException {
+    public synchronized void saveModel() throws IOException, ConfigurationException {
+        //TODO delete old XML model and save in new format
         new XMLModel(getModelDirectory()).save(model, configurationFile);
     }
 
@@ -358,7 +372,7 @@ public class Persistence {
 
     public void start() {
         status.onNext(Status.STARTING);
-        loadXmlModel();
+        loadModel();
         for(Database database : model.getDatabases()) {
             if(ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 runLiquibase(database);

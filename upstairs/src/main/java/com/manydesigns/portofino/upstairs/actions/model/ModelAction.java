@@ -33,7 +33,7 @@ public class ModelAction extends AbstractResourceAction {
     @POST
     @Path(":reload")
     public void reloadModel() {
-        persistence.loadXmlModel();
+        persistence.loadModel();
     }
 
 }

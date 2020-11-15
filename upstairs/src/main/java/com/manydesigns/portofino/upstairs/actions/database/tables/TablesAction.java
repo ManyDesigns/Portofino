@@ -229,7 +229,7 @@ public class TablesAction extends AbstractResourceAction {
             });
         });
         persistence.initModel();
-        persistence.saveXmlModel();
+        persistence.saveModel();
     }
 
     @Path("{db}/{schema}/{table}/{column}")
@@ -350,7 +350,7 @@ public class TablesAction extends AbstractResourceAction {
                 }
             });
             persistence.initModel();
-            persistence.saveXmlModel();
+            persistence.saveModel();
         } else {
             throw new WebApplicationException(Response.serverError().entity(annotationsForm).build());
         }

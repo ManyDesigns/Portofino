@@ -1,7 +1,6 @@
 package com.manydesigns.portofino.model.io.dsl;
 
-import com.manydesigns.portofino.model.Domain;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.java.JavaTypesDomain;
@@ -15,6 +14,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +38,11 @@ public class DefaultModelIO implements ModelIO {
         logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
         Model model = new Model();
         FileObject modelDir = getModelDirectory();
-        if(!modelDirectory.getType().equals(FileType.FOLDER)) {
-            logger.error("Not a directory: " + modelDirectory.getName().getPath());
-            return model;
+        if(!modelDirectory.exists() || !modelDirectory.getType().equals(FileType.FOLDER)) {
+            throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
-        if (modelDir.exists()) {
-            loadEntities(modelDir, model);
-            loadDatabasePersistence(modelDir, model);
-        }
+        loadEntities(modelDir, model);
+        loadDatabasePersistence(modelDir, model);
         return model;
     }
 
@@ -127,13 +124,14 @@ public class DefaultModelIO implements ModelIO {
     public void save(Model model, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile) throws IOException, ConfigurationException {
         logger.info("Saving model into directory: {}", getModelDirectory().getName().getPath());
         FileObject modelDir = getModelDirectory();
+        if(!modelDirectory.exists()) {
+            modelDirectory.createFolder();
+        }
         if(!modelDirectory.getType().equals(FileType.FOLDER)) {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
-        if (modelDir.exists()) {
-            saveEntities(modelDir, model);
-            saveDatabasePersistence(modelDir, model);
-        }
+        saveEntities(modelDir, model);
+        saveDatabasePersistence(modelDir, model);
         if (configurationFile != null) {
             configurationFile.save();
             logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
@@ -146,7 +144,7 @@ public class DefaultModelIO implements ModelIO {
         if(model.getDatabases().isEmpty()) {
             persistenceFile.delete();
         }
-        try(OutputStreamWriter os = new OutputStreamWriter(persistenceFile.getContent().getOutputStream(), StandardCharsets.UTF_8)) {
+        try(OutputStreamWriter os = fileWriter(persistenceFile)) {
             for(Database db : model.getDatabases()) {
                 os.write("database " + db.getName() + " (");
                 ConnectionProvider cp = db.getConnectionProvider();
@@ -170,8 +168,83 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void saveEntities(FileObject modelDir, Model model) {
-        //TODO
+    @NotNull
+    protected OutputStreamWriter fileWriter(FileObject file) throws FileSystemException {
+        return new OutputStreamWriter(file.getContent().getOutputStream(), StandardCharsets.UTF_8);
+    }
+
+    protected void saveEntities(FileObject modelDir, Model model) throws IOException {
+        for(Domain domain : model.getDomains()) {
+            saveDomain(domain, modelDir);
+        }
+    }
+
+    protected void saveDomain(Domain domain, FileObject directory) throws IOException {
+        FileObject domainDir = directory.resolveFile(domain.getName());
+        domainDir.createFolder();
+        FileObject domainDefFile = domainDir.resolveFile(domain.getName() + ".domain");
+        domainDefFile.delete(); //TODO
+        for(Entity entity : domain.getEntities()) {
+            saveEntity(entity, domainDir);
+        }
+        //TODO imports
+        for(Domain subdomain : domain.getSubdomains()) {
+            saveDomain(subdomain, domainDir);
+        }
+    }
+
+    protected void saveEntity(Entity entity, FileObject domainDir) throws IOException {
+        FileObject entityFile = domainDir.resolveFile(entity.getName() + ".entity");
+        try(OutputStreamWriter os = fileWriter(entityFile)) {
+            for(Annotation annotation : entity.getAnnotations()) {
+                writeAnnotation(annotation, os);
+            }
+            os.write("entity " + entity.getName() + " {" + System.lineSeparator());
+            for(Property property : entity.getProperties()) {
+                os.write("\t" + property.getName());
+                if(property.getType() != entity.getDomain().getDefaultType()) {
+                    os.write(": " + property.getType().getName());
+                }
+                os.write(System.lineSeparator());
+            }
+            os.write("}");
+        }
+    }
+
+    protected void writeAnnotation(Annotation annotation, OutputStreamWriter os) throws IOException {
+        os.write("@" + annotation.getType());
+        if(!annotation.getProperties().isEmpty()) {
+            os.write("(");
+            if(annotation.getProperties().size() == 1 && annotation.getProperties().get(0).getName().equals("value")) {
+                writeAnnotationPropertyValue(annotation, annotation.getProperty("value"), os);
+            } else {
+                boolean first = true;
+                for(AnnotationProperty property : annotation.getProperties()) {
+                    if(first) {
+                        first = false;
+                    } else {
+                        os.write(", ");
+                    }
+                    os.write(property.getName() + " = ");
+                    writeAnnotationPropertyValue(annotation, property, os);
+                }
+            }
+            os.write(")");
+        }
+        os.write(System.lineSeparator());
+    }
+
+    protected void writeAnnotationPropertyValue(Annotation annotation, AnnotationProperty property, OutputStreamWriter os) throws IOException {
+        String value = property.getValue();
+        try {
+            Class<?> type = annotation.getJavaAnnotationClass().getMethod(property.getName()).getReturnType();
+            if(type == String.class || type == Class.class || Enum.class.isAssignableFrom(type)) {
+                value = "\"" + value + "\""; //TODO escape
+            }
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Invalid annotation " + annotation, e); //TODO
+        }
+        os.write(value);
     }
 
     @Override

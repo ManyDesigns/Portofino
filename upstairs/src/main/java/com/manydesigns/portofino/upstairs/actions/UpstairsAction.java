@@ -676,7 +676,7 @@ public class UpstairsAction extends AbstractResourceAction {
             template.make(bindings).writeTo(fw);
             logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
         }
-        persistence.saveXmlModel();
+        persistence.saveModel();
     }
 
     private void removeSecurityAnnotations(Table table) {

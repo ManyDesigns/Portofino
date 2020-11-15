@@ -37,7 +37,6 @@ import com.manydesigns.portofino.upstairs.actions.database.connections.support.C
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.ExcludeFromWizard;
 import com.manydesigns.portofino.upstairs.actions.database.connections.support.SelectableSchema;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
@@ -53,8 +52,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -156,13 +153,13 @@ public class ConnectionsAction extends AbstractResourceAction {
         try {
             String connectionsWithSchemas =
                     connectionWithSchemas(connectionProvider.getDatabase().getDatabaseName(), connectionProvider, form);
-            persistence.saveXmlModel();
+            persistence.saveModel();
             return Response.created(new URI(getActionPath() + "/" + databaseName)).entity(connectionsWithSchemas).build();
         } catch (Exception e) {
             persistence.getModel().getDatabases().remove(connectionProvider.getDatabase());
             persistence.initModel();
             try {
-                persistence.saveXmlModel();
+                persistence.saveModel();
             } catch (Exception ex) {
                 logger.error("Cannot save restored model", ex);
             }
@@ -210,7 +207,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         connectionProvider.init(persistence.getDatabasePlatformsRegistry());
         persistence.initModel();
         try {
-            persistence.saveXmlModel();
+            persistence.saveModel();
             String connectionsWithSchemas =
                     connectionWithSchemas(connectionProvider.getDatabase().getDatabaseName(), connectionProvider, form);
             return Response.ok(connectionsWithSchemas).build();
@@ -230,7 +227,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         updateSchemas(connectionProvider, new JSONArray(jsonInput), (database, schema) -> schema.ensureAnnotation(ExcludeFromWizard.class));
         persistence.syncDataModel(databaseName);
         persistence.initModel();
-        persistence.saveXmlModel();
+        persistence.saveModel();
         logger.info("Schemas for database {} updated", databaseName);
         List<TableInfo> tableInfos = determineRoots(connectionProvider.getDatabase().getSchemas());
         tableInfos.sort(Comparator.comparing(t -> t.table.getQualifiedName()));
@@ -383,7 +380,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         } else {
             persistence.getModel().getDatabases().remove(database);
             persistence.initModel();
-            persistence.saveXmlModel();
+            persistence.saveModel();
             logger.info("Database {} deleted", databaseName);
         }
     }
@@ -393,7 +390,7 @@ public class ConnectionsAction extends AbstractResourceAction {
     public void synchronize(@PathParam("databaseName") String databaseName) throws Exception {
         persistence.syncDataModel(databaseName);
         persistence.initModel();
-        persistence.saveXmlModel();
+        persistence.saveModel();
         RequestMessages.addInfoMessage("Model synchronized");
     }
 

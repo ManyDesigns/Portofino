@@ -603,7 +603,7 @@ public class PersistenceTest {
             FileObject file;
             file = appDir.resolveFile("portofino-model").resolveFile("test");
             assertFalse(file.exists());
-            persistence.saveXmlModel();
+            persistence.saveModel();
             assertTrue(file.exists());
             //Old directory is deleted
             assertFalse(appDir.resolveFile("portofino-model").resolveFile("hibernatetest").exists());
