@@ -57,6 +57,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -297,6 +298,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
         email.setFrom(from);
         email.setSubject(subject);
         email.setHtmlBody(body);
+        email.setTextBody(Jsoup.parse(body).text().toString());
         try {
             mailQueue.enqueue(email);
         } catch (QueueException e) {
