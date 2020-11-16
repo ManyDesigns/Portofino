@@ -56,7 +56,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
-
+import org.jsoup.Jsoup;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
@@ -161,6 +161,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
         email.setFrom(from);
         email.setSubject(subject);
         email.setHtmlBody(body);
+        email.setTextBody( Jsoup.parse(body).text().toString() );
         try {
             mailQueue.enqueue(email);
         } catch (QueueException e) {
