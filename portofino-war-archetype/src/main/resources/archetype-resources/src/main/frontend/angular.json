@@ -25,13 +25,16 @@
             ],
             "styles": [
               {
-                "input": "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+                "input": "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+                "inject": true
               },
               {
-                "input": "node_modules/material-design-icons/iconfont/material-icons.css"
+                "input": "node_modules/material-design-icons/iconfont/material-icons.css",
+                "inject": true
               },
               {
-                "input": "node_modules/roboto-fontface/css/roboto/roboto-fontface.css"
+                "input": "node_modules/roboto-fontface/css/roboto/roboto-fontface.css",
+                "inject": true
               },
               "src/styles.scss"
             ],
@@ -47,8 +50,7 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
+              "sourceMap": true,
               "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
@@ -89,10 +91,23 @@
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [],
             "styles": [
-              "src/styles.css"
+              {
+                "input": "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+                "inject": true
+              },
+              {
+                "input": "node_modules/material-design-icons/iconfont/material-icons.css",
+                "inject": true
+              },
+              {
+                "input": "node_modules/roboto-fontface/css/roboto/roboto-fontface.css",
+                "inject": true
+              },
+              "src/styles.scss"
             ],
             "assets": [
               "src/assets",
+              "src/pages",
               "src/favicon.ico"
             ]
           }
@@ -141,7 +156,7 @@
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
-      "styleext": "scss"
+      "style": "scss"
     },
     "@schematics/angular:directive": {
       "prefix": "app"

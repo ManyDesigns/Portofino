@@ -7,7 +7,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {WebStorageService} from "../storage/storage.services";
 import {NO_AUTH_HEADER, NO_REFRESH_TOKEN_HEADER} from "./authentication.headers";
 import jwt_decode from 'jwt-decode';
-import moment from "moment-with-locales-es6";
+import * as moment from 'moment';
 import {ApiInfo} from "../portofino.service";
 
 export const TOKEN_STORAGE_SERVICE = new InjectionToken('JSON Web Token Storage');
@@ -134,7 +134,7 @@ export class AuthenticationService {
       return of(requestWithHeader(req));
     }
 
-    const token = jwt_decode(this.jsonWebToken);
+    const token: any = jwt_decode(this.jsonWebToken);
     if(token.exp && moment().isAfter(moment(token.exp * 1000 - this.tokenExpirationThresholdMs))) {
       return this.strategy.refreshToken().pipe(map(token => {
         this.setJsonWebToken(token);
