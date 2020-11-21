@@ -140,16 +140,21 @@ public class DefaultLoginAction extends AbstractResourceAction {
         }
     }
 
-    @Path(":renew-token")
-    @POST
-    @Deprecated
     /**
      * @deprecated use {@link #refreshToken()} instead.
      */
+    @Path(":renew-token")
+    @POST
+    @Deprecated
     public String renewToken() {
         return refreshToken();
     }
 
+    /**
+     * Refreshes the JSON Web Token of the authenticated user.
+     * @return the refreshed token
+     * @throws WebApplicationException (status 403) if the user is not authenticated.
+     */
     @Path(":refresh-token")
     @POST
     public String refreshToken() {
@@ -163,7 +168,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             return token;
         } else {
             logger.warn("Token renew request for unauthenticated user");
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
     }
 

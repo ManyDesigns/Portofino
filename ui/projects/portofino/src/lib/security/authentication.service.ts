@@ -41,7 +41,7 @@ export class AuthenticationService {
     }
     return httpHandler.handle(req).pipe(catchError((error) => {
       if (error.status === 401) {
-        return this.authenticate(req);
+        return this.retry(req);
       } else if (error.status === 403) {
         this.notifications.error(this.translate.get("You do not have the permission to do that!"));
       }
@@ -53,7 +53,7 @@ export class AuthenticationService {
     this.storage.set('jwt', token);
   }
 
-  protected authenticate(req: HttpRequest<any>) {
+  protected retry(req: HttpRequest<any>) {
     const hasToken = !!this.jsonWebToken;
     this.removeAuthenticationInfo();
     if (hasToken || !this.retryUnauthenticatedOnSessionExpiration) {
@@ -125,6 +125,25 @@ export class AuthenticationService {
     if(!this.jsonWebToken) {
       return of(req);
     }
+    let token: any;
+    try {
+      token = jwt_decode(this.jsonWebToken);
+    } catch (e) {
+      if(this.retryUnauthenticatedOnSessionExpiration) {
+        this.notifications.error(this.translate.get("Invalid authentication token, you've been logged out"));
+        this.removeAuthenticationInfo();
+        return of(req);
+      } else {
+        return this.askForCredentials().pipe(
+          map(result => {
+            if (!result) {
+              this.declinedLogins.emit();
+              throw new LoginDeclinedException("User declined login");
+            }
+          }),
+          mergeMap(() => this.withAuthenticationHeader(req)));
+      }
+    }
     const requestWithHeader = r => r.clone({
       setHeaders: {
         Authorization: `Bearer ${this.jsonWebToken}`
@@ -134,7 +153,6 @@ export class AuthenticationService {
       return of(requestWithHeader(req));
     }
 
-    const token: any = jwt_decode(this.jsonWebToken);
     if(token.exp && moment().isAfter(moment(token.exp * 1000 - this.tokenExpirationThresholdMs))) {
       return this.strategy.refreshToken().pipe(map(token => {
         this.setJsonWebToken(token);
