@@ -9,6 +9,6 @@
   "template": "mainWithTabs",
   "script": "custom.js",
   "buttons": {
-    "search-results": [{ "text": "Another custom button", "method": "customButtonAction" }]
+    "detail": [{ "text": "Custom button", "method": "customButtonAction" }]
   }
 }

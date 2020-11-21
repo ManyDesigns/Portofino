@@ -60,7 +60,11 @@ export class DefaultToolbarComponent implements ToolbarComponent {
 
 @Component({
   selector: 'portofino-default-footer',
-  template: `<mat-toolbar fxLayoutAlign="center center"><footer style="font-size: 10px">{{'Powered by Portofino 5'|translate}}</footer></mat-toolbar>`
+  template: `<mat-toolbar fxLayoutAlign="center center">
+    <footer style="font-size: 10px">
+      {{'Powered by'|translate}} <a href="https://portofino.manydesigns.com" target="_blank">Portofino 5</a>
+    </footer>
+  </mat-toolbar>`
 })
 export class DefaultFooterComponent {}
 
