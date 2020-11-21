@@ -86,7 +86,7 @@
         <fop.version>2.1</fop.version>
         <groovy.version>3.0.6</groovy.version>
         <guava.version>30.0-jre</guava.version>
-        <hibernate.version>5.4.23.Final</hibernate.version>
+        <hibernate.version>5.4.24.Final</hibernate.version>
         <jackson.version>2.10.0</jackson.version>
         <jackson.databind.version>2.10.0</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
