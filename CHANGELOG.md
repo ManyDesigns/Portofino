@@ -26,13 +26,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Quartz jobs now run with a working Shiro environment.
 
 ### Changed
-- Angular updated to version 10
+- Angular updated to version 11
 - Groovy updated to version 3
 - Various other dependencies updated for security & bug fixes
 - CRUD REST API versioning with X-Portofino-API-Version header
 - CRUD REST API changes (legacy behavior is still the default):
-  - Bulk update (PUT) returns list of modified IDs
-  - Bulk delete (DELETE) returns list of deleted IDs
+  - Bulk update (PUT) optionally returns list of modified IDs
+  - Bulk delete (DELETE) optionally returns list of deleted IDs
 - Generated Security.groovy is now based on annotations on the model rather than hard-coded values
   
 
@@ -141,7 +141,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Generic database platform for unrecognized databases.
 - Support for development and debug with Docker, both in demo-tt and in the archetype.
 - Periodically retry database connections that have failed at startup if Quartz is available.
-- Fallback database platform for unrecognized database systems.
 - Filter CRUD fields according to permissions (at the level of the ClassAccessor).
 - Filter configuration fields according to permissions.
   In particular, the CRUD query is hidden if the user is not a developer.
