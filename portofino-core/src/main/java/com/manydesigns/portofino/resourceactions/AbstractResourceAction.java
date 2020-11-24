@@ -29,10 +29,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.actions.*;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
@@ -48,6 +45,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.VFS;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.NotNull;
@@ -69,6 +67,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Convenient abstract base class for ResourceActions. It has fields to hold values of properties specified by the
@@ -169,6 +168,29 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     public void consumeParameter(String pathSegment) {
         super.consumeParameter(pathSegment);
         actionInstance.getParameters().add(pathSegment);
+    }
+
+    @Override
+    protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
+        Optional<AdditionalChild> child =
+                getActionDescriptor().getAdditionalChildren().stream()
+                        .filter(c -> c.getSegment().equals(pathSegment))
+                        .findFirst();
+        if(child.isPresent()) {
+            return VFS.getManager().resolveFile(child.get().getPath());
+        }
+        return super.getChildLocation(pathSegment);
+    }
+
+    @Override
+    public Collection<String> getSubResources() {
+        Collection<String> subResources = super.getSubResources();
+        getActionDescriptor().getAdditionalChildren().forEach(c -> {
+            if(!subResources.contains(c.getSegment())) {
+                subResources.add(c.getSegment());
+            }
+        });
+        return subResources;
     }
 
     @Override

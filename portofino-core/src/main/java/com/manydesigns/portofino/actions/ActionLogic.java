@@ -30,6 +30,7 @@ import com.manydesigns.portofino.resourceactions.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -39,10 +40,7 @@ import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -118,6 +116,24 @@ public class ActionLogic {
         initConfigurationCache(maxSize, refreshCheckFrequency);
     }
 
+    public static void mount(FileObject actionDirectory, String segment, String path) throws Exception {
+        ActionDescriptor descriptor = getActionDescriptor(actionDirectory);
+        Optional<AdditionalChild> existing =
+                descriptor.getAdditionalChildren().stream().filter(c -> c.getSegment().equals(segment)).findFirst();
+        if(existing.isPresent()) {
+            String existingPath = existing.get().getPath();
+            if(!path.equals(existingPath)) {
+                throw new IllegalArgumentException("Another path is already mounted at " + segment + ": " + existingPath);
+            }
+        } else {
+            AdditionalChild child = new AdditionalChild();
+            child.setSegment(segment);
+            child.setPath(path);
+            descriptor.getAdditionalChildren().add(child);
+            saveActionDescriptor(actionDirectory, descriptor);
+        }
+    }
+
     protected static class FileCacheEntry<T> {
         public final T object;
         public final long lastModified;
@@ -155,20 +171,20 @@ public class ActionLogic {
                         .build(new CacheLoader<FileObject, FileCacheEntry<ActionDescriptor>>() {
 
                             @Override
-                            public FileCacheEntry<ActionDescriptor> load(FileObject key) throws Exception {
+                            public FileCacheEntry<ActionDescriptor> load(@NotNull FileObject key) throws Exception {
                                 return new FileCacheEntry<>(loadActionDescriptor(key), key.getContent().getLastModifiedTime(), false);
                             }
 
                             @Override
                             public ListenableFuture<FileCacheEntry<ActionDescriptor>> reload(
-                                    final FileObject key, FileCacheEntry<ActionDescriptor> oldValue)
+                                    @NotNull final FileObject key, FileCacheEntry<ActionDescriptor> oldValue)
                                     throws Exception {
                                 if(!key.exists()) {
                                     //Se la pagina non esiste più, registro questo fatto nella cache;
                                     //a questo livello non è un errore, sarà il metodo getActionDescriptor() a gestire
                                     //la entry problematica.
                                     return Futures.immediateFuture(
-                                            new FileCacheEntry<ActionDescriptor>(null, 0, true));
+                                            new FileCacheEntry<>(null, 0, true));
                                 } else if (key.getContent().getLastModifiedTime() > oldValue.lastModified) {
                                     /*return ListenableFutureTask.create(new Callable<PageCacheEntry>() {
                                         public PageCacheEntry call() throws Exception {
@@ -205,7 +221,7 @@ public class ActionLogic {
                         .build(new CacheLoader<FileObject, ConfigurationCacheEntry>() {
 
                             @Override
-                            public ConfigurationCacheEntry load(FileObject key) throws Exception {
+                            public ConfigurationCacheEntry load(FileObject key) {
                                 throw new UnsupportedOperationException();
                             }
 

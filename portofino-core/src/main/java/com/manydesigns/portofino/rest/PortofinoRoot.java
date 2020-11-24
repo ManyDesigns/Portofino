@@ -22,14 +22,13 @@ package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.i18n.TextProviderBean;
-import com.manydesigns.portofino.resourceactions.*;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.resourceactions.ActionContext;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
@@ -38,7 +37,9 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -52,12 +53,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PortofinoRoot extends AbstractResourceAction {
 
@@ -71,8 +68,6 @@ public class PortofinoRoot extends AbstractResourceAction {
     protected HttpServletRequest request;
 
     protected ResourceResolver resourceResolver;
-
-    protected static final ConcurrentMap<String, FileObject> children = new ConcurrentHashMap<>();
 
     protected PortofinoRoot(FileObject location, ResourceResolver resourceResolver) {
         setLocation(location);
@@ -102,15 +97,6 @@ public class PortofinoRoot extends AbstractResourceAction {
     }
 
     @Override
-    protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
-        FileObject child = children.get(pathSegment);
-        if(child != null) {
-            return child;
-        }
-        return super.getChildLocation(pathSegment);
-    }
-
-    @Override
     public PortofinoRoot init() {
         super.init();
         ActionDescriptor rootActionDescriptor = ActionLogic.getActionDescriptor(location);
@@ -133,32 +119,6 @@ public class PortofinoRoot extends AbstractResourceAction {
         return null;
     }
 
-    public static void mount(FileObject fileObject) {
-        FileObject previous = children.putIfAbsent(getDefaultMountPointName(fileObject), fileObject);
-        if(previous != null) {
-            throw new RuntimeException("Already mounted: " + previous);
-        }
-    }
-
-    public static void mount(FileObject fileObject, String name) {
-        FileObject previous = children.putIfAbsent(name, fileObject);
-        if(previous != null && !previous.equals(fileObject)) {
-            throw new RuntimeException("Already mounted: " + previous);
-        }
-    }
-
-    public static String getDefaultMountPointName(FileObject fileObject) {
-        return fileObject.getName().getBaseName();
-    }
-
-    public static FileObject unmount(String child) {
-        return children.remove(child);
-    }
-
-    public static boolean unmount(FileObject object) {
-        return children.remove(getDefaultMountPointName(object), object);
-    }
-
     /**
      * Returns a description of the root.
      * @since 5.0
@@ -169,7 +129,7 @@ public class PortofinoRoot extends AbstractResourceAction {
     @GET
     @RequiresPermissions(level = AccessLevel.NONE)
     public Map<String, Object> getJSONDescription() {
-        Map<String, Object> description = new HashMap<String, Object>();
+        Map<String, Object> description = new HashMap<>();
         description.put("superclass", getClass().getSuperclass().getName());
         description.put("class", getClass().getName());
         description.put("page", actionInstance.getActionDescriptor());
@@ -184,13 +144,6 @@ public class PortofinoRoot extends AbstractResourceAction {
     @GET
     public boolean isAccessible() {
         return true;
-    }
-
-    @Override
-    public Collection<String> getSubResources() {
-        Set<String> subresources = new HashSet<>(super.getSubResources());
-        subresources.addAll(children.keySet());
-        return subresources;
     }
 
     @Override
