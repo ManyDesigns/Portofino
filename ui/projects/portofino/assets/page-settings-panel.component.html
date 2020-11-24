@@ -83,7 +83,7 @@
         <td class="mat-cell">
           <mat-select [(ngModel)]="child.embeddedIn">
             <mat-option [value]="null">{{'Not embedded'|translate}}</mat-option>
-            <mat-option *ngFor="let section of page.template.sections" [value]="section">{{section|translate}}</mat-option>
+            <mat-option *ngFor="let section of template.sections" [value]="section">{{section|translate}}</mat-option>
           </mat-select>
         </td>
         <td class="mat-cell"><mat-checkbox [(ngModel)]="child.showInNavigation"></mat-checkbox></td>
