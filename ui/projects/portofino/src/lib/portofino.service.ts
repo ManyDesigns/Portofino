@@ -107,7 +107,6 @@ export class PortofinoService {
       } else {
         this.initLoginPath();
       }
-      this.injector.get(AuthenticationStrategy).init(response);
       if(response.disableAdministration) {
         this.localApiPath = null; //Disable local API
       }
@@ -116,7 +115,7 @@ export class PortofinoService {
     });
   }
 
-  private setLoginPath(response: ApiInfo) {
+  protected setLoginPath(response: ApiInfo) {
     this.loginPath = this.sanitizeLoginPath(response.loginPath);
     this.injector.get(AuthenticationStrategy).init({
       apiRoot: this.apiRoot, loginPath: this.loginPath

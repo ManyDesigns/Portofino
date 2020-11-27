@@ -9,6 +9,7 @@ import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.database.JndiConnectionProvider;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.EntityMode;
 
 import java.util.Date;
 
@@ -190,9 +191,12 @@ public class ConnectionProviderDetail {
         }
     }
 
-    @Updatable(false)
     public String getEntityMode() {
         return database.getEntityMode();
+    }
+
+    public void setEntityMode(String mode) {
+        database.setEntityMode(mode != null ? mode : EntityMode.MAP.getExternalName());
     }
 
 }

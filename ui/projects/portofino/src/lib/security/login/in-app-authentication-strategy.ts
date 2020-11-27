@@ -29,7 +29,6 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
   }
 
   init(response: ApiInfo) {
-    super.init(response);
     this.http.get<any>(`${this.loginPath}/capabilities`).subscribe(capabilities => {
       this.supportsSelfRegistration = capabilities.supportsSelfRegistration;
     });
