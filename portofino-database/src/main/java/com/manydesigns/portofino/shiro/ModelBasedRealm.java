@@ -2,6 +2,7 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
@@ -9,6 +10,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.PkHelper;
 import groovy.lang.Tuple3;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.*;
 import org.hibernate.Session;
@@ -24,6 +26,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -253,6 +256,21 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
         } else {
             throw new IncorrectCredentialsException("Invalid token");
         }
+    }
+
+    @Override
+    protected Object cleanUserPrincipal(Object principal) {
+        if(principal instanceof Map) {
+            return super.cleanUserPrincipal(principal);
+        }
+        Object clean = persistence.getTableAccessor(usersTable).newInstance();
+        PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(principal);
+        for(PropertyDescriptor pd : propertyDescriptors) {
+            if(DatabaseLogic.findColumnByName(usersTable, pd.getName()) != null) {
+                setUserProperty(clean, pd.getName(), getUserProperty(principal, pd.getName()));
+            }
+        }
+        return clean;
     }
 
     @Override
