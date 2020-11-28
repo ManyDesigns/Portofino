@@ -1,6 +1,6 @@
 {
   "name": "portofino",
-  "version": "5.2.0-RC1",
+  "version": "5.2.0",
   "description": "The Angular UI component of the Java/Groovy web application maker tool Portofino by ManyDesigns",
   "homepage": "https://portofino.manydesigns.com",
   "bugs": {

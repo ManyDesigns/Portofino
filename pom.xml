@@ -4,7 +4,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>5.2-RC1</version>
+    <version>5.2.0</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
@@ -385,20 +385,6 @@
                     </descriptors>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- Tests and coverage -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -509,6 +495,7 @@
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
@@ -540,6 +527,20 @@
                                 <goals>
                                     <goal>jar</goal>
                                     <goal>aggregate-jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
                                 </goals>
                             </execution>
                         </executions>

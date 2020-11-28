@@ -180,7 +180,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
         SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
         try {
             LifecycleUtils.init(realm);
-        } catch (Exception  e) {
+        } catch (Exception e) {
             logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
         }
         rsm.setRealm(realm);

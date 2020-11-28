@@ -56,6 +56,9 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
 
     @PostConstruct
     public void configure() {
+        if(persistence.status.getValue() != Persistence.Status.STARTED) {
+            throw new IllegalStateException("Persistence is not yet started");
+        }
         persistence.getModel().getDatabases().forEach(d -> {
             d.getAllTables().forEach(t -> {
                 t.getColumns().forEach(c -> {
