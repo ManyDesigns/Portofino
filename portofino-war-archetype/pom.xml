@@ -9,6 +9,7 @@
     </parent>
     <artifactId>portofino-war-archetype</artifactId>
     <packaging>maven-archetype</packaging>
+    <version>5.2.0-archetype-fix</version>
     <build>
         <extensions>
             <extension>

@@ -11,7 +11,7 @@
     </fileSets>
     <requiredProperties>
         <requiredProperty key="portofinoVersion">
-            <defaultValue>${project.version}</defaultValue>
+            <defaultValue>5.2.0</defaultValue>
         </requiredProperty>
     </requiredProperties>
 </archetype-descriptor>
