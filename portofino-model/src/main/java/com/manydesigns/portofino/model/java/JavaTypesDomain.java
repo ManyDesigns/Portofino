@@ -5,12 +5,13 @@ import com.manydesigns.portofino.model.Type;
 
 public class JavaTypesDomain extends Domain {
 
-    public static final Type STRING_TYPE = new Type("java.lang.String");
+    public static final Type STRING_TYPE = new Type("java.lang.String", "string");
 
     public JavaTypesDomain() {
         types.add(STRING_TYPE);
-        types.add(new Type("java.lang.Integer"));
-        types.add(new Type("java.lang.Long"));
+        types.add(new Type("java.lang.Boolean", "boolean"));
+        types.add(new Type("java.lang.Integer", "integer"));
+        types.add(new Type("java.lang.Long", "long"));
     }
 
     @Override

@@ -103,6 +103,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void setParent(Object parent) {
         database = (Database) parent;
+        this.domain.setParent(database.getDomain());
         tables.addAll(immediateTables);
         immediateTables.clear();
     }

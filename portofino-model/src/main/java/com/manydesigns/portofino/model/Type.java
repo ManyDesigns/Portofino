@@ -8,12 +8,18 @@ import java.util.List;
 public class Type implements ModelObject, Annotated {
 
     protected String name;
+    protected String alias;
     protected Domain owner;
 
     protected final List<Annotation> annotations = new ArrayList<>();
 
     public Type(String name) {
         this.name = name;
+    }
+
+    public Type(String name, String alias) {
+        this.name = name;
+        this.alias = alias;
     }
 
     public String getName() {
@@ -56,4 +62,22 @@ public class Type implements ModelObject, Annotated {
         return annotations;
     }
 
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public void setOwner(Domain owner) {
+        if(this.owner != null && this.owner != owner) {
+            throw new IllegalStateException("Type " + name + " already has an owner");
+        }
+        this.owner = owner;
+    }
+
+    public Domain getOwner() {
+        return owner;
+    }
 }

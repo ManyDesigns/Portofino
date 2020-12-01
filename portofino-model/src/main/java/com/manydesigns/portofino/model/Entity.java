@@ -76,20 +76,20 @@ public class Entity implements ModelObject, Annotated {
     }
 
     public void addProperty(Property property) {
-        Entity owner = property.owner;
-        if(owner == null) {
-            Property existing = findProperty(property.name);
-            if(existing != null && !existing.equals(property)) {
-                throw new IllegalArgumentException("A property named " + property.name + " already exists in entity " + this);
-            }
-            property.setOwner(this);
+        Property existing = findProperty(property.name);
+        if(existing != null && !existing.equals(property)) {
+            throw new IllegalArgumentException("A property named " + property.name + " already exists in entity " + this);
+        }
+        property.setOwner(this);
+        if(!properties.contains(property)) {
             properties.add(property);
-        } else if(owner != this) {
-            throw new IllegalArgumentException("Property " + property + " already belongs to entity " + owner);
         }
     }
 
     public Property findProperty(String name) {
+        if(name == null) {
+            return null;
+        }
         for(Property p : getProperties()) {
             if(p.name.equals(name)) {
                 return p;

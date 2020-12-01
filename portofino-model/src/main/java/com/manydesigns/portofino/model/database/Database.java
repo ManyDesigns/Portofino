@@ -77,6 +77,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
 
     public Database() {
         this(new Domain());
+        domain.getImports().add(Model.JAVA_TYPES);
     }
 
     //**************************************************************************

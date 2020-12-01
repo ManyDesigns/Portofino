@@ -29,7 +29,6 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +48,7 @@ public class Model {
 
     protected final LinkedList<Database> databases;
     protected final List<Domain> domains = new ArrayList<>();
-    protected final Domain javaTypes = new JavaTypesDomain();
+    public static final Domain JAVA_TYPES = new JavaTypesDomain();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -81,7 +80,7 @@ public class Model {
         return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
             Domain domain = new Domain();
             domain.setName(name);
-            domain.getImports().add(javaTypes);
+            domain.getImports().add(JAVA_TYPES);
             getDomains().add(domain);
             return domain;
         });

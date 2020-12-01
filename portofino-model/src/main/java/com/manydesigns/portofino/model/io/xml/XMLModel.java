@@ -4,9 +4,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.io.ModelParseException;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -88,7 +85,9 @@ public class XMLModel implements ModelIO {
                     return;
                 }
                 model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
+                model.getDomains().removeIf(d -> databaseName.equals(d.getName()));
                 model.getDatabases().add(database);
+                model.getDomains().add(database.getDomain());
             }
 
             FileObject settingsFile = databaseDir.resolveFile("hibernate.properties");
@@ -144,8 +143,7 @@ public class XMLModel implements ModelIO {
     }
 
     @Override
-    public void save(Model model, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile)
-            throws IOException, ConfigurationException {
+    public void save(Model model) throws IOException {
         try {
             JAXBContext jc = createModelJAXBContext();
             Marshaller m = jc.createMarshaller();
@@ -185,10 +183,6 @@ public class XMLModel implements ModelIO {
             }
             deleteUnusedDatabaseDirectories(model);
             logger.info("Saved xml model to directory: {}", modelDir.getName().getPath());
-            if (configurationFile != null) {
-                configurationFile.save();
-                logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
-            }
 
             FileObject appModelFile = getLegacyModelFile();
             if (appModelFile.exists()) {
@@ -260,6 +254,7 @@ public class XMLModel implements ModelIO {
         if (appModelFile.exists()) {
             appModelFile.delete();
         }
-        getModelDirectory().delete(new PatternFileSelector("(database|.*[.]table)[.]xml"));
+        getModelDirectory().delete(new PatternFileSelector(".*/database[.]xml"));
+        getModelDirectory().delete(new PatternFileSelector(".*/.*[.]table[.]xml"));
     }
 }

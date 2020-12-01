@@ -121,7 +121,7 @@ public class Domain implements ModelObject, Annotated {
 
     public Type findType(String name) {
         for (Type t : types) {
-            if(t.getName().equals(name)) {
+            if(name.equals(t.getAlias()) || name.equals(t.getName())) {
                 return t;
             }
         }
@@ -131,7 +131,20 @@ public class Domain implements ModelObject, Annotated {
                 return type;
             }
         }
+        if(parent != null) {
+            return parent.findType(name);
+        }
         return null;
+    }
+
+    public Type ensureType(String name) {
+        Type type = findType(name);
+        if(type == null) {
+            type = new Type(name);
+            type.setOwner(this);
+            types.add(type);
+        }
+        return type;
     }
 
     public void addRelationship(Relationship r) {
@@ -175,6 +188,9 @@ public class Domain implements ModelObject, Annotated {
             if(defaultType != null) {
                 return defaultType;
             }
+        }
+        if(parent != null) {
+            return parent.getDefaultType();
         }
         return null;
     }

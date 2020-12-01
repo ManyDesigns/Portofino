@@ -6,7 +6,6 @@ import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
@@ -33,13 +32,13 @@ public class DefaultModelIOTest {
     }
 
     @Test
-    public void testSimpleModel() throws IOException, ConfigurationException {
+    public void testSimpleModel() throws IOException {
         DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 1);
         FileObject outDir = VFS.getManager().resolveFile("ram://portofino/test-model-1");
         io = new DefaultModelIO(outDir);
-        io.save(model, null);
+        io.save(model);
         FileObject domainFile = outDir.resolveFile("testDomain1/testDomain1.domain");
         assertFalse(domainFile.exists());
         FileObject entityFile = outDir.resolveFile("testDomain1/Foo.entity");

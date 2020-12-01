@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.Type;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.java.JavaTypesDomain;
@@ -8,12 +9,11 @@ import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.PatternFileSelector;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,7 +121,7 @@ public class DefaultModelIO implements ModelIO {
     }
 
     @Override
-    public void save(Model model, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile) throws IOException, ConfigurationException {
+    public void save(Model model) throws IOException {
         logger.info("Saving model into directory: {}", getModelDirectory().getName().getPath());
         FileObject modelDir = getModelDirectory();
         if(!modelDirectory.exists()) {
@@ -132,10 +132,6 @@ public class DefaultModelIO implements ModelIO {
         }
         saveEntities(modelDir, model);
         saveDatabasePersistence(modelDir, model);
-        if (configurationFile != null) {
-            configurationFile.save();
-            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
-        }
     }
 
     protected void saveDatabasePersistence(FileObject modelDir, Model model) throws IOException {
@@ -202,8 +198,10 @@ public class DefaultModelIO implements ModelIO {
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
             for(Property property : entity.getProperties()) {
                 os.write("\t" + property.getName());
-                if(property.getType() != entity.getDomain().getDefaultType()) {
-                    os.write(": " + property.getType().getName());
+                Type type = property.getType();
+                if(type != entity.getDomain().getDefaultType()) {
+                    String typeName = type.getAlias() != null ? type.getAlias() : type.getName();
+                    os.write(": " + typeName);
                 }
                 os.write(System.lineSeparator());
             }
@@ -239,7 +237,7 @@ public class DefaultModelIO implements ModelIO {
         try {
             Class<?> type = annotation.getJavaAnnotationClass().getMethod(property.getName()).getReturnType();
             if(type == String.class || type == Class.class || Enum.class.isAssignableFrom(type)) {
-                value = "\"" + value + "\""; //TODO escape
+                value = "\"" + StringEscapeUtils.escapeJava(value) + "\"";
             }
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Invalid annotation " + annotation, e); //TODO
@@ -254,6 +252,6 @@ public class DefaultModelIO implements ModelIO {
 
     @Override
     public void delete() throws IOException {
-        //TODO
+        getModelDirectory().delete(new PatternFileSelector(".*[.](domain|entity)"));
     }
 }

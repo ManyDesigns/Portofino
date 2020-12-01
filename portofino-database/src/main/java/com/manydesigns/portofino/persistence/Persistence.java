@@ -188,8 +188,12 @@ public class Persistence {
     }
 
     public synchronized void saveModel() throws IOException, ConfigurationException {
-        //TODO delete old XML model and save in new format
-        new XMLModel(getModelDirectory()).save(model, configurationFile);
+        new XMLModel(getModelDirectory()).delete();
+        new DefaultModelIO(getModelDirectory()).save(model);
+        if (configurationFile != null) {
+            configurationFile.save();
+            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+        }
     }
 
     public synchronized void initModel() {

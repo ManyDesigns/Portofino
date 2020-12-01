@@ -15,8 +15,7 @@ public interface ModelIO {
 
     FileObject getModelDirectory() throws FileSystemException;
 
-    void save(Model model, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile)
-            throws IOException, ConfigurationException;
+    void save(Model model) throws IOException;
 
     void delete() throws IOException;
 }

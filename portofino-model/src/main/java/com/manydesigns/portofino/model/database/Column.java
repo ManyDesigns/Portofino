@@ -69,7 +69,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     // Fields for wire-up
     //**************************************************************************
 
-    protected String actualPropertyName;
+    protected String propertyName;
     protected Class<?> actualJavaType;
 
     public static final Logger logger = LoggerFactory.getLogger(Column.class);
@@ -87,7 +87,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
     public Column(Table table) {
         this();
-        this.table = table;
+        setTable(table);
     }
 
     //**************************************************************************
@@ -113,7 +113,6 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public void reset() {
-        actualPropertyName = null;
         actualJavaType = null;
     }
 
@@ -123,25 +122,36 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         assert columnName != null;
         assert columnType != null;
 
-        if (property.getName() == null) {
-            actualPropertyName = DatabaseLogic.getUniquePropertyName(table, DatabaseLogic.normalizeName(columnName));
+        if (propertyName == null) {
+            property.setName(DatabaseLogic.getUniquePropertyName(table, DatabaseLogic.normalizeName(columnName)));
         } else {
-            actualPropertyName = property.getName(); //AS do not normalize (can be mixed-case Java properties)
+            property.setName(propertyName); //AS do not normalize (can be mixed-case Java properties)
         }
 
         if(javaType != null) {
             actualJavaType = ReflectionUtil.loadClass(javaType);
-            if (actualJavaType == null) {
+            if (actualJavaType != null) {
+                property.setType(table.getEntity().getDomain().ensureType(actualJavaType.getName()));
+            } else {
                 logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
+                property.setType(table.getEntity().getDomain().getDefaultType());
             }
-        } else {
+        } else if(property.getType() == null) {
             actualJavaType = Type.getDefaultJavaType(jdbcType, columnType, length, scale);
-            if (actualJavaType == null) {
+            if (actualJavaType != null) {
+                property.setType(table.getEntity().getDomain().ensureType(actualJavaType.getName()));
+            } else {
                 logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
                         table.getTableName(),
                         getColumnName(),
                         jdbcType,
                         javaType);
+                property.setType(table.getEntity().getDomain().getDefaultType());
+            }
+        } else {
+            actualJavaType = ReflectionUtil.loadClass(property.getType().getName());
+            if (actualJavaType == null) {
+                logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), property.getType().getName());
             }
         }
     }
@@ -261,16 +271,16 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public String getActualPropertyName() {
-        return actualPropertyName;
+        return property.getName();
     }
 
     @XmlAttribute()
     public String getPropertyName() {
-        return property.getName();
+        return propertyName;
     }
 
     public void setPropertyName(String propertyName) {
-        property.setName(propertyName);
+        this.propertyName = propertyName;
     }
 
     @XmlElementWrapper(name = "annotations")
