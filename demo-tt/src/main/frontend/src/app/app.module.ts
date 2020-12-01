@@ -160,8 +160,13 @@ export class ProjectsSummary extends DetailComponent {
     super.ngOnInit();
   }
 
+  // Return to read instead of search
   afterSaved() {
-    this.editMode = false;
+    const objectUrl = `${this.sourceUrl}/${this.id}`;
+    //Refresh the object
+    this.loadObject(objectUrl, () => {
+      this.setEditMode(false);
+    });
   }
 }
 

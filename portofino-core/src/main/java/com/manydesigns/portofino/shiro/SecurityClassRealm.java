@@ -90,7 +90,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
         try {
             doEnsureDelegate();
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

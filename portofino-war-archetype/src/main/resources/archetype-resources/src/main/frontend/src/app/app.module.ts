@@ -4,22 +4,30 @@ import {
   NotificationService, MatSnackBarNotificationService, NOTIFICATION_HANDLERS,
   Page, PortofinoComponent, PortofinoService, SidenavService,
   CrudComponent, CustomPageComponent, TextPageComponent,
-  UpstairsComponent
+  UpstairsComponent,
+  PageLayout
 } from "portofino";
-import {
-  MatAutocompleteModule,
-  MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-  MatFormFieldModule,
-  MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule,
-  MatSidenavModule,
-  MatSnackBarModule,
-  MatSortModule,
-  MatTableModule, MatToolbarModule
-} from "@angular/material";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatMenuModule } from "@angular/material/menu";
+import { MatPaginatorModule } from "@angular/material/paginator";
+import { MatRadioModule } from "@angular/material/radio";
+import { MatSelectModule } from "@angular/material/select";
+import { MatSidenavModule } from "@angular/material/sidenav";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSortModule } from "@angular/material/sort";
+import { MatTableModule } from "@angular/material/table";
+import { MatToolbarModule } from "@angular/material/toolbar";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {QuillModule} from "ngx-quill";
 import {HttpClientModule, HttpClient} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
@@ -106,7 +114,8 @@ export class WelcomeComponent extends Page {
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true }
   ],
   imports: [
-    PortofinoModule.forRoot(), PortofinoUpstairsModule,
+    RouterModule.forRoot([...PortofinoModule.defaultRoutes()], PortofinoModule.defaultRouterConfig()),
+    PortofinoModule, PortofinoUpstairsModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,

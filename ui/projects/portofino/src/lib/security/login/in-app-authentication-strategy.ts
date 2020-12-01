@@ -29,7 +29,6 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
   }
 
   init(response: ApiInfo) {
-    super.init(response);
     this.http.get<any>(`${this.loginPath}/capabilities`).subscribe(capabilities => {
       this.supportsSelfRegistration = capabilities.supportsSelfRegistration;
     });
@@ -53,7 +52,7 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
   refreshToken(): Observable<string> {
     //The body here is to work around CORS requests failing with an empty body (TODO investigate)
     return this.authentication.withAuthenticationHeader(
-      new HttpRequest<any>("POST", `${this.loginPath}/:refresh-token`, "renew", {
+      new HttpRequest<any>("POST", `${this.loginPath}/:refresh-token`, "refresh", {
         headers: new HttpHeaders().set(NO_REFRESH_TOKEN_HEADER, 'true'), responseType: 'text'
       })).pipe(
         mergeMap(req => this.http.request(req)),

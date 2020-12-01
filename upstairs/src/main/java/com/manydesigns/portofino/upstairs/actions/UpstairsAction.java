@@ -626,7 +626,7 @@ public class UpstairsAction extends AbstractResourceAction {
             throws Exception {
         Table userTable = getTable(persistence.getModel(), wizard.usersTable);
         if(userTable == null) {
-            throw new IllegalArgumentException("User table must not be null");
+            return;
         }
 
         PortofinoRealm currentRealm = ShiroUtils.getPortofinoRealm();

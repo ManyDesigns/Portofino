@@ -57,6 +57,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,16 +141,21 @@ public class DefaultLoginAction extends AbstractResourceAction {
         }
     }
 
-    @Path(":renew-token")
-    @POST
-    @Deprecated
     /**
      * @deprecated use {@link #refreshToken()} instead.
      */
+    @Path(":renew-token")
+    @POST
+    @Deprecated
     public String renewToken() {
         return refreshToken();
     }
 
+    /**
+     * Refreshes the JSON Web Token of the authenticated user.
+     * @return the refreshed token
+     * @throws WebApplicationException (status 403) if the user is not authenticated.
+     */
     @Path(":refresh-token")
     @POST
     public String refreshToken() {
@@ -163,7 +169,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             return token;
         } else {
             logger.warn("Token renew request for unauthenticated user");
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
     }
 
@@ -292,6 +298,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
         email.setFrom(from);
         email.setSubject(subject);
         email.setHtmlBody(body);
+        email.setTextBody(Jsoup.parse(body).text().toString());
         try {
             mailQueue.enqueue(email);
         } catch (QueueException e) {

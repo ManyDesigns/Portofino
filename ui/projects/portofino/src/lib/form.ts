@@ -24,7 +24,7 @@ import {
   FormGroupDirective, ValidationErrors, ValidatorFn
 } from "@angular/forms";
 import {FieldFactoryComponent} from "./fields/field.factory";
-import moment from "moment-with-locales-es6";
+import * as moment from 'moment';
 import {BlobFile} from "./pages/crud/crud.common";
 
 export type FormElement =

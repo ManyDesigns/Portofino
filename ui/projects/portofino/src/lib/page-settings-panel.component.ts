@@ -13,4 +13,8 @@ export class PageSettingsPanelComponent {
   extraConfiguration: TemplateRef<any>;
 
   emptyDataSource = new MatTableDataSource([]);
+
+  get template() {
+    return this.page.template || { sections: ["default"] };
+  }
 }

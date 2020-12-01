@@ -28,7 +28,7 @@ import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {NO_AUTH_HEADER} from "./security/authentication.headers";
 import {ThemePalette} from "@angular/material/core";
-import moment from 'moment-with-locales-es6';
+import * as moment from 'moment';
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
