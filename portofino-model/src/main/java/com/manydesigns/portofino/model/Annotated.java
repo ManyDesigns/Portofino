@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -64,5 +66,9 @@ public interface Annotated {
             getAnnotations().add(annotation);
             return annotation;
         });
+    }
+
+    default boolean removeAnnotation(Class<? extends java.lang.annotation.Annotation> annotationClass) {
+        return getAnnotations().removeIf(a -> a.getJavaAnnotationClass() == annotationClass);
     }
 }

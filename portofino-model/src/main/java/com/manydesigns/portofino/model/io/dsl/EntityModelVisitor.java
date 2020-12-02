@@ -4,8 +4,8 @@ import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.Token;
-
-import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
 
@@ -140,13 +140,5 @@ public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
             text = text.substring(1, text.length() - 2);
         }
         return text;
-    }
-
-    private String getText(Token token) {
-        if(token.getType() == ModelParser.STRING) {
-            return token.getText().substring(1, token.getText().length() - 2);
-        } else {
-            return token.getText();
-        }
     }
 }

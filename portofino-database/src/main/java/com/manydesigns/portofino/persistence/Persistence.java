@@ -24,8 +24,11 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
+import com.manydesigns.portofino.model.database.annotations.JNDIConnection;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
 import com.manydesigns.portofino.modules.DatabaseModule;
@@ -49,6 +52,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -63,6 +67,7 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -129,7 +134,6 @@ public class Persistence {
         Model loaded = modelIO.load();
         if(loaded != null) {
             model = loaded;
-            initModel();
         }
         return model;
     }
@@ -145,13 +149,64 @@ public class Persistence {
         }
         if(!loaded) {
             try {
-                loadModel(new DefaultModelIO(getModelDirectory()));
+                Model model = loadModel(new DefaultModelIO(getModelDirectory()));
+                model.getDomains().forEach(domain -> {
+                    Database database = setupDatabase(model, domain);
+                    if(database != null) {
+                        domain.getSubdomains().forEach(subd -> setupSchema(database, subd));
+                    }
+                });
+                initModel();
             } catch (Exception e) {
                 logger.error("Cannot load/parse model", e);
             }
         } else {
             logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
+            initModel();
         }
+    }
+
+    protected Database setupDatabase(Model model, Domain domain) {
+        Optional<JDBCConnection> jdbc = domain.getJavaAnnotation(JDBCConnection.class);
+        if(jdbc.isPresent()) {
+            Database database = new Database(domain);
+            model.getDatabases().add(database);
+            JdbcConnectionProvider cp = new JdbcConnectionProvider();
+            cp.setUrl(jdbc.get().url());
+            cp.setDriver(StringUtils.trimToNull(jdbc.get().driver()));
+            cp.setUsername(StringUtils.trimToNull(jdbc.get().username()));
+            cp.setPassword(StringUtils.trimToNull(jdbc.get().password()));
+            database.setConnectionProvider(cp);
+            return database;
+        } else {
+            Optional<JNDIConnection> jndi = domain.getJavaAnnotation(JNDIConnection.class);
+            if(jndi.isPresent()) {
+                Database database = new Database(domain);
+                model.getDatabases().add(database);
+                JndiConnectionProvider cp = new JndiConnectionProvider();
+                cp.setJndiResource(jndi.get().name());
+                database.setConnectionProvider(cp);
+                return database;
+            }
+        }
+        return null;
+    }
+
+    protected Schema setupSchema(Database database, Domain domain) {
+        Schema schema = new Schema(domain);
+        schema.setDatabase(database);
+        Optional<com.manydesigns.portofino.model.database.annotations.Schema> schemaAnn =
+                domain.getJavaAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
+        schemaAnn.ifPresent(ann -> schema.setActualSchemaName(ann.name()));
+        domain.getEntities().forEach(entity -> {
+            Table table = new Table(entity);
+            table.setSchema(schema);
+            schema.getTables().add(table);
+            Optional<javax.persistence.Table> tableAnn = entity.getJavaAnnotation(javax.persistence.Table.class);
+            tableAnn.ifPresentOrElse(a -> table.setTableName(a.name()), () -> table.setTableName(entity.getName()));
+            //TODO columns
+        });
+        return schema;
     }
 
     public FileObject getModelDirectory() throws FileSystemException {

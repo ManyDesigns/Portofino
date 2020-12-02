@@ -1,10 +1,8 @@
 package com.manydesigns.portofino.model.io.dsl;
 
-import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.Type;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.ModelIO;
-import com.manydesigns.portofino.model.java.JavaTypesDomain;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -42,7 +40,6 @@ public class DefaultModelIO implements ModelIO {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
         loadEntities(modelDir, model);
-        loadDatabasePersistence(modelDir, model);
         return model;
     }
 
@@ -101,25 +98,6 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadDatabasePersistence(FileObject modelDirectory, Model model) throws IOException {
-        FileObject persistenceFile = modelDirectory.resolveFile("persistence.database");
-        if(persistenceFile.exists()) {
-            logger.info("Loading database connections from " + persistenceFile.getName().getPath());
-            try(InputStream inputStream = persistenceFile.getContent().getInputStream()) {
-                ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
-                ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
-                ModelParser.DatabasePersistenceContext parseTree = parser.databasePersistence();
-                if(parser.getNumberOfSyntaxErrors() == 0) {
-                    new DatabasePersistenceVisitor(model).visit(parseTree);
-                } else {
-                    logger.error("Could not parse database connections file"); //TODO properly report errors
-                }
-            }
-        } else {
-            logger.info("No database persistence defined in " + modelDirectory.getName().getPath());
-        }
-    }
-
     @Override
     public void save(Model model) throws IOException {
         logger.info("Saving model into directory: {}", getModelDirectory().getName().getPath());
@@ -131,37 +109,6 @@ public class DefaultModelIO implements ModelIO {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
         saveEntities(modelDir, model);
-        saveDatabasePersistence(modelDir, model);
-    }
-
-    protected void saveDatabasePersistence(FileObject modelDir, Model model) throws IOException {
-        FileObject persistenceFile = modelDir.resolveFile("persistence.database");
-        persistenceFile.createFile();
-        if(model.getDatabases().isEmpty()) {
-            persistenceFile.delete();
-        }
-        try(OutputStreamWriter os = fileWriter(persistenceFile)) {
-            for(Database db : model.getDatabases()) {
-                os.write("database " + db.getName() + " (");
-                ConnectionProvider cp = db.getConnectionProvider();
-                if(cp instanceof JdbcConnectionProvider) {
-                    os.write("type = \"jdbc\"");
-                } else if(cp instanceof JndiConnectionProvider) {
-                    os.write("type = \"jndi\"");
-                } else {
-                    throw new IllegalStateException("Unknown connection provider type: " + cp.getClass()); //TODO should check earlier to avoid leaving a broken file
-                }
-                os.write(") {" + System.lineSeparator());
-                for(Schema schema : db.getSchemas()) {
-                    os.write("\tschema " + schema.getSchemaName());
-                    if(!schema.getActualSchemaName().equals(schema.getSchemaName())) {
-                        os.write(" (" + schema.getActualSchemaName() + ")");
-                    }
-                    os.write(System.lineSeparator());
-                }
-                os.write("}");
-            }
-        }
     }
 
     @NotNull

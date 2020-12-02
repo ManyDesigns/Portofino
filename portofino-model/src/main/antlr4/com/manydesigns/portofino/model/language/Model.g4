@@ -2,13 +2,6 @@ grammar Model;
 
 importDeclaration: IMPORT IDENTIFIER ('.' wildcard='*')?;
 
-databasePersistence: database*;
-
-database: DATABASE name=IDENTIFIER '(' (connectionProperty (',' connectionProperty)*)? ')' (';' | '{' schema* '}');
-
-connectionProperty: name=IDENTIFIER '=' value=literal;
-schema: SCHEMA name=IDENTIFIER ('(' physicalName=STRING ')')?;
-
 standaloneDomain: domain;
 
 domain: annotation* DOMAIN name=IDENTIFIER (';' | '{' (domain | entity | relationship)* '}');

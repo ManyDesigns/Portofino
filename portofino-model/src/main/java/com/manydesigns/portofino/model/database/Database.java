@@ -21,6 +21,8 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
+import com.manydesigns.portofino.model.database.annotations.JNDIConnection;
 import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -204,6 +206,18 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
 
     public void setConnectionProvider(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
+        if(connectionProvider instanceof JdbcConnectionProvider) {
+            domain.removeAnnotation(JNDIConnection.class);
+            Annotation annotation = domain.ensureAnnotation(JDBCConnection.class);
+            annotation.setProperty("url", ((JdbcConnectionProvider) connectionProvider).getUrl());
+            annotation.setProperty("driver", ((JdbcConnectionProvider) connectionProvider).getDriver());
+            annotation.setProperty("username", ((JdbcConnectionProvider) connectionProvider).getUsername());
+            annotation.setProperty("password", ((JdbcConnectionProvider) connectionProvider).getPassword());
+        } else {
+            domain.removeAnnotation(JDBCConnection.class);
+            Annotation annotation = domain.ensureAnnotation(JNDIConnection.class);
+            annotation.setProperty("name", ((JndiConnectionProvider) connectionProvider).getJndiResource());
+        }
     }
 
     @XmlAttribute(required = false)

@@ -125,6 +125,10 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + getSchemaName();
         if(actualSchemaName == null) {
             actualSchemaName = configuration.getString(key);
+            domain.removeAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
+        } else {
+            Annotation annotation = domain.ensureAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
+            annotation.setProperty("name", actualSchemaName);
         }
         if(actualSchemaName == null) {
             actualSchemaName = getSchemaName();
