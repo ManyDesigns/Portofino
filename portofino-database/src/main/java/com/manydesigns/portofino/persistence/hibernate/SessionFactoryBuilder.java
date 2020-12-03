@@ -456,7 +456,7 @@ public class SessionFactoryBuilder {
         table.getAnnotations().forEach(ann -> {
             Class annotationClass = ann.getJavaAnnotationClass();
             if(javax.persistence.Table.class.equals(annotationClass) || Entity.class.equals(annotationClass)) {
-                logger.warn("@Table or @Entity specified on table {}, skipping annotation {}", table.getQualifiedName(), annotationClass);
+                logger.debug("@Table or @Entity specified on table {}, skipping annotation {}", table.getQualifiedName(), annotationClass);
                 return;
             }
             Annotation classAnn = convertAnnotation(constPool, ann);

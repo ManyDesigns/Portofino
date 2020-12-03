@@ -126,7 +126,14 @@ public class DefaultModelIO implements ModelIO {
         FileObject domainDir = directory.resolveFile(domain.getName());
         domainDir.createFolder();
         FileObject domainDefFile = domainDir.resolveFile(domain.getName() + ".domain");
-        domainDefFile.delete(); //TODO
+        if(domain.getAnnotations().isEmpty()) {
+            domainDefFile.delete();
+        } else {
+            try(OutputStreamWriter os = fileWriter(domainDefFile)) {
+                writeAnnotations(domain, os);
+                os.write("domain " + domain.getName() + ";");
+            }
+        }
         for(Entity entity : domain.getEntities()) {
             saveEntity(entity, domainDir);
         }
@@ -139,9 +146,7 @@ public class DefaultModelIO implements ModelIO {
     protected void saveEntity(Entity entity, FileObject domainDir) throws IOException {
         FileObject entityFile = domainDir.resolveFile(entity.getName() + ".entity");
         try(OutputStreamWriter os = fileWriter(entityFile)) {
-            for(Annotation annotation : entity.getAnnotations()) {
-                writeAnnotation(annotation, os);
-            }
+            writeAnnotations(entity, os);
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
             for(Property property : entity.getProperties()) {
                 os.write("\t" + property.getName());
@@ -153,6 +158,12 @@ public class DefaultModelIO implements ModelIO {
                 os.write(System.lineSeparator());
             }
             os.write("}");
+        }
+    }
+
+    protected void writeAnnotations(Annotated annotated, OutputStreamWriter writer) throws IOException {
+        for(Annotation annotation : annotated.getAnnotations()) {
+            writeAnnotation(annotation, writer);
         }
     }
 

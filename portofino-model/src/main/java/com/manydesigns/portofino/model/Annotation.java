@@ -288,9 +288,18 @@ public class Annotation implements ModelObject {
         return null;
     }
 
-    public void setProperty(String name, String value) {
+    public String getPropertyValue(String name) {
         AnnotationProperty property = getProperty(name);
-        if(property == null) {
+        return property != null ? property.getValue() : null;
+    }
+
+    public void setPropertyValue(String name, String value) {
+        AnnotationProperty property = getProperty(name);
+        if(value == null) {
+            if(property != null) {
+                properties.remove(property);
+            }
+        } else if(property == null) {
             property = new AnnotationProperty(name, value);
             properties.add(property);
         } else {

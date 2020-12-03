@@ -1,17 +1,15 @@
 grammar Model;
 
-importDeclaration: IMPORT IDENTIFIER ('.' wildcard='*')?;
+standaloneDomain: importDeclaration* domain;
+domain: annotation* DOMAIN name=IDENTIFIER (';' | '{' (domain | entity | relationship)* '}')?;
 
-standaloneDomain: domain;
-
-domain: annotation* DOMAIN name=IDENTIFIER (';' | '{' (domain | entity | relationship)* '}');
-
-standaloneEntity: entity;
-
+standaloneEntity: importDeclaration* entity;
 entity: annotation* ENTITY name=IDENTIFIER '{'
   property*
   relationshipProperty*
 '}';
+
+importDeclaration: IMPORT IDENTIFIER ('.' wildcard='*')?;
 
 property: annotation* name=IDENTIFIER (':' type)?;
 

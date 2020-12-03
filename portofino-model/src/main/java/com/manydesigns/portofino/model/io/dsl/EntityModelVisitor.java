@@ -137,7 +137,7 @@ public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
     private String getText(ModelParser.LiteralContext value) {
         String text = value.getText();
         if(value.STRING() != null) {
-            text = text.substring(1, text.length() - 2);
+            text = text.substring(1, text.length() - 1);
         }
         return text;
     }

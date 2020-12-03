@@ -51,12 +51,17 @@ public class XMLModel implements ModelIO {
                 model = new Model();
             }
             FileObject modelDir = getModelDirectory();
+            boolean loaded = false;
             if (modelDir.exists()) {
                 for (FileObject databaseDir : modelDir.getChildren()) {
-                    loadXmlDatabase(um, model, databaseDir);
+                    loaded = loadXmlDatabase(um, model, databaseDir) || loaded;
                 }
             }
-            return model;
+            if(loaded) {
+                return model;
+            } else {
+                return null;
+            }
         } catch (JAXBException e) {
             throw new IOException("Error unmarshalling model", e);
         }
@@ -66,10 +71,10 @@ public class XMLModel implements ModelIO {
         return JAXBContext.newInstance(Model.class, View.class);
     }
 
-    protected void loadXmlDatabase(Unmarshaller um, Model model, FileObject databaseDir) throws IOException, JAXBException {
+    protected boolean loadXmlDatabase(Unmarshaller um, Model model, FileObject databaseDir) throws IOException, JAXBException {
         if(!databaseDir.getType().equals(FileType.FOLDER)) {
             logger.error("Not a directory: " + databaseDir.getName().getPath());
-            return;
+            return false;
         }
         String databaseName = databaseDir.getName().getBaseName();
         FileObject databaseFile = databaseDir.resolveFile("database.xml");
@@ -82,7 +87,7 @@ public class XMLModel implements ModelIO {
                 database.setParent(model);
                 if(!databaseName.equals(database.getDatabaseName())) {
                     logger.error("Database named {} defined in directory named {}, skipping", database.getDatabaseName(), databaseName);
-                    return;
+                    return false;
                 }
                 model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
                 model.getDomains().removeIf(d -> databaseName.equals(d.getName()));
@@ -103,8 +108,8 @@ public class XMLModel implements ModelIO {
             if(database != null) {
                 logger.info("Using legacy database defined in portofino-model.xml: " + databaseName + "; it will be automatically migrated to database.xml upon save.");
             } else {
-                logger.warn("No database defined in " + databaseDir.getName().getPath());
-                return;
+                logger.debug("No database defined in " + databaseDir.getName().getPath());
+                return false;
             }
         }
 
@@ -131,6 +136,7 @@ public class XMLModel implements ModelIO {
                 logger.debug("Schema directory {} does not exist", schemaDir);
             }
         }
+        return true;
     }
 
     public FileObject getLegacyModelFile() throws FileSystemException {

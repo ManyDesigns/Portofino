@@ -24,6 +24,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -139,17 +140,9 @@ public class Persistence {
     }
 
     public synchronized void loadModel() {
-        boolean loaded = false;
-        try {
-            //Legacy model
-            Model model = loadModel(new XMLModel(getModelDirectory()));
-            loaded = model != null;
-        } catch (Exception e) {
-            logger.error("Cannot load/parse XML model", e);
-        }
-        if(!loaded) {
+        if(!loadLegacyModel()) {
             try {
-                Model model = loadModel(new DefaultModelIO(getModelDirectory()));
+                loadModel(new DefaultModelIO(getModelDirectory()));
                 model.getDomains().forEach(domain -> {
                     Database database = setupDatabase(model, domain);
                     if(database != null) {
@@ -160,31 +153,77 @@ public class Persistence {
             } catch (Exception e) {
                 logger.error("Cannot load/parse model", e);
             }
-        } else {
-            logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
-            initModel();
         }
     }
 
+    protected boolean loadLegacyModel() {
+        try {
+            Model model = loadModel(new XMLModel(getModelDirectory()));
+            if(model != null) {
+                logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
+                initModel();
+                return true;
+            }
+        } catch (Exception e) {
+            logger.error("Cannot load/parse XML model", e);
+        }
+        return false;
+    }
+
+    protected void annotateModel(Model model) {
+        model.getDatabases().forEach(db -> {
+            ConnectionProvider connectionProvider = db.getConnectionProvider();
+            if(connectionProvider instanceof JdbcConnectionProvider) {
+                db.removeAnnotation(JNDIConnection.class);
+                Annotation annotation = db.ensureAnnotation(JDBCConnection.class);
+                annotation.setPropertyValue("url", ((JdbcConnectionProvider) connectionProvider).getUrl());
+                annotation.setPropertyValue("driver", ((JdbcConnectionProvider) connectionProvider).getDriver());
+                annotation.setPropertyValue("username", ((JdbcConnectionProvider) connectionProvider).getUsername());
+                annotation.setPropertyValue("password", ((JdbcConnectionProvider) connectionProvider).getPassword());
+            } else {
+                db.removeAnnotation(JDBCConnection.class);
+                Annotation annotation = db.ensureAnnotation(JNDIConnection.class);
+                annotation.setPropertyValue("name", ((JndiConnectionProvider) connectionProvider).getJndiResource());
+            }
+
+            db.getAllTables().forEach(table -> {
+                if(!table.getTableName().equals(table.getActualEntityName())) {
+                    Annotation tableAnn = table.ensureAnnotation(javax.persistence.Table.class);
+                    tableAnn.setPropertyValue("name", table.getTableName());
+                }
+                table.getColumns().forEach(column -> {
+                    if(!column.getColumnName().equals(column.getActualPropertyName())) {
+                        Annotation colAnn = column.ensureAnnotation(javax.persistence.Column.class);
+                        colAnn.setPropertyValue("name", column.getColumnName());
+                    }
+                });
+            });
+        });
+    }
+
     protected Database setupDatabase(Model model, Domain domain) {
-        Optional<JDBCConnection> jdbc = domain.getJavaAnnotation(JDBCConnection.class);
+        //Can't use getJavaAnnotation as they've not yet been resolved
+        Optional<Annotation> jdbc = domain.getAnnotation(JDBCConnection.class.getName());
         if(jdbc.isPresent()) {
+            Annotation ann = jdbc.get();
             Database database = new Database(domain);
             model.getDatabases().add(database);
             JdbcConnectionProvider cp = new JdbcConnectionProvider();
-            cp.setUrl(jdbc.get().url());
-            cp.setDriver(StringUtils.trimToNull(jdbc.get().driver()));
-            cp.setUsername(StringUtils.trimToNull(jdbc.get().username()));
-            cp.setPassword(StringUtils.trimToNull(jdbc.get().password()));
+            cp.setDatabase(database);
+            cp.setUrl(ann.getPropertyValue("url"));
+            cp.setDriver(ann.getPropertyValue("driver"));
+            cp.setUsername(ann.getPropertyValue("username"));
+            cp.setPassword(ann.getPropertyValue("password"));
             database.setConnectionProvider(cp);
             return database;
         } else {
-            Optional<JNDIConnection> jndi = domain.getJavaAnnotation(JNDIConnection.class);
+            Optional<Annotation> jndi = domain.getAnnotation(JNDIConnection.class.getName());
             if(jndi.isPresent()) {
                 Database database = new Database(domain);
                 model.getDatabases().add(database);
                 JndiConnectionProvider cp = new JndiConnectionProvider();
-                cp.setJndiResource(jndi.get().name());
+                cp.setDatabase(database);
+                cp.setJndiResource(jndi.get().getPropertyValue("name"));
                 database.setConnectionProvider(cp);
                 return database;
             }
@@ -195,6 +234,7 @@ public class Persistence {
     protected Schema setupSchema(Database database, Domain domain) {
         Schema schema = new Schema(domain);
         schema.setDatabase(database);
+        database.getSchemas().add(schema);
         Optional<com.manydesigns.portofino.model.database.annotations.Schema> schemaAnn =
                 domain.getJavaAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
         schemaAnn.ifPresent(ann -> schema.setActualSchemaName(ann.name()));
@@ -204,7 +244,15 @@ public class Persistence {
             schema.getTables().add(table);
             Optional<javax.persistence.Table> tableAnn = entity.getJavaAnnotation(javax.persistence.Table.class);
             tableAnn.ifPresentOrElse(a -> table.setTableName(a.name()), () -> table.setTableName(entity.getName()));
-            //TODO columns
+            entity.getProperties().forEach(property -> {
+                Column column = new Column(property);
+                column.setTable(table);
+                table.getColumns().add(column);
+                Optional<javax.persistence.Column> colAnn = property.getJavaAnnotation(javax.persistence.Column.class);
+                colAnn.ifPresentOrElse(a -> column.setColumnName(a.name()),
+                        () -> column.setColumnName(property.getName()));
+            });
+
         });
         return schema;
     }
@@ -268,6 +316,7 @@ public class Persistence {
         //TODO it would perhaps be preferable if we generated REPLACED events here rather than REMOVED followed by ADDED
         setups.clear();
         model.init(configuration);
+        annotateModel(model);
         for (Database database : model.getDatabases()) {
             initConnectionProvider(database);
         }

@@ -79,7 +79,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
 
     public CrudConfiguration() {
         super();
-        selectionProviders = new ArrayList<SelectionProviderReference>();
+        selectionProviders = new ArrayList<>();
     }
 
     public CrudConfiguration(String name, String database, String query,

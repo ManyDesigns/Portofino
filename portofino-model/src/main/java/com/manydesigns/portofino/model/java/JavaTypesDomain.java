@@ -12,6 +12,11 @@ public class JavaTypesDomain extends Domain {
         types.add(new Type("java.lang.Boolean", "boolean"));
         types.add(new Type("java.lang.Integer", "integer"));
         types.add(new Type("java.lang.Long", "long"));
+        types.add(new Type("java.lang.Float", "float"));
+        types.add(new Type("java.lang.Double", "double"));
+        types.add(new Type("java.util.Date", "datetime"));
+        types.add(new Type("java.sql.Date"));
+        types.add(new Type("java.sql.Timestamp"));
     }
 
     @Override

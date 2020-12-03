@@ -407,7 +407,7 @@ public class UpstairsAction extends AbstractResourceAction {
             Annotation annotation = DatabaseLogic.findAnnotation(column, Multiline.class);
             if (annotation == null) {
                 annotation = new Annotation(column, Multiline.class.getName());
-                annotation.setProperty("value", "true");
+                annotation.setPropertyValue("value", "true");
                 column.getAnnotations().add(annotation);
             }
         }

@@ -288,7 +288,6 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     public List<Annotation> getAnnotations() {
         return property.getAnnotations();
     }
-
         
     @Override
     public String toString() {

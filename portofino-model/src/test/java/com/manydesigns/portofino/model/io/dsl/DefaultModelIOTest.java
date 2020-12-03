@@ -44,11 +44,11 @@ public class DefaultModelIOTest {
         FileObject entityFile = outDir.resolveFile("testDomain1/Foo.entity");
         assertTrue(entityFile.exists());
         String contents = IOUtils.toString(entityFile.getContent().getInputStream(), StandardCharsets.UTF_8);
-        assertEquals("entity Foo {\n" +
+        assertEquals(contents, "entity Foo {\n" +
                 "\tname\n" +
                 "\temail\n" +
-                "\tage: java.lang.Integer\n" +
-                "}", contents);
+                "\tage: integer\n" +
+                "}");
         Model model2 = io.load();
         assertEquals(model2.getDomains().size(), 1);
     }

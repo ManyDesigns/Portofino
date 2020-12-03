@@ -294,15 +294,15 @@ public class TablesAction extends AbstractResourceAction {
                             break;
                         case "databaseBlobContentTypeProperty":
                             Annotation databaseBlobAnn1 = existing.ensureAnnotation(DATABASE_BLOB);
-                            databaseBlobAnn1.setProperty("contentTypeProperty", value);
+                            databaseBlobAnn1.setPropertyValue("contentTypeProperty", value);
                             break;
                         case "databaseBlobFileNameProperty":
                             Annotation databaseBlobAnn2 = existing.ensureAnnotation(DATABASE_BLOB);
-                            databaseBlobAnn2.setProperty("fileNameProperty", value);
+                            databaseBlobAnn2.setPropertyValue("fileNameProperty", value);
                             break;
                         case "databaseBlobTimestampProperty":
                             Annotation databaseBlobAnn3 = existing.ensureAnnotation(DATABASE_BLOB);
-                            databaseBlobAnn3.setProperty("timestampProperty", value);
+                            databaseBlobAnn3.setPropertyValue("timestampProperty", value);
                             break;
                         case "highlightLinks":
                             a = new Annotation(HIGHLIGHT_LINKS);
