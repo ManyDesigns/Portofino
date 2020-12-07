@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+
 public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
 
     protected final Model model;
@@ -61,6 +63,17 @@ public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
         entity = parentDomain.ensureEntity(entityName);
         annotated = entity;
         visitChildren(ctx);
+        ctx.idProperties.forEach(idp -> {
+            String propertyName = idp.name.getText();
+            Optional<Property> property = entity.getProperties().stream().filter(
+                    p -> p.getName().equals(propertyName)
+            ).findFirst();
+            if(property.isPresent()) {
+                entity.getId().add(property.get());
+            } else {
+                throw new IllegalStateException("Id property not found: " + propertyName);
+            }
+        });
         entity = previous;
         annotated = previous;
         return entity;

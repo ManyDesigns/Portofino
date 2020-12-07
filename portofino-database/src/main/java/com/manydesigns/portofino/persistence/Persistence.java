@@ -53,7 +53,6 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -65,10 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.sql.Connection;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -162,6 +158,7 @@ public class Persistence {
             if(model != null) {
                 logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
                 initModel();
+                annotateDatabases(model.getDatabases());
                 return true;
             }
         } catch (Exception e) {
@@ -170,8 +167,8 @@ public class Persistence {
         return false;
     }
 
-    protected void annotateModel(Model model) {
-        model.getDatabases().forEach(db -> {
+    protected void annotateDatabases(Collection<Database> databases) {
+        databases.forEach(db -> {
             ConnectionProvider connectionProvider = db.getConnectionProvider();
             if(connectionProvider instanceof JdbcConnectionProvider) {
                 db.removeAnnotation(JNDIConnection.class);
@@ -316,7 +313,6 @@ public class Persistence {
         //TODO it would perhaps be preferable if we generated REPLACED events here rather than REMOVED followed by ADDED
         setups.clear();
         model.init(configuration);
-        annotateModel(model);
         for (Database database : model.getDatabases()) {
             initConnectionProvider(database);
         }

@@ -5,7 +5,8 @@ domain: annotation* DOMAIN name=IDENTIFIER (';' | '{' (domain | entity | relatio
 
 standaloneEntity: importDeclaration* entity;
 entity: annotation* ENTITY name=IDENTIFIER '{'
-  property*
+  ID '{' idProperties+=property+ '}'
+  properties+=property*
   relationshipProperty*
 '}';
 
@@ -15,7 +16,8 @@ property: annotation* name=IDENTIFIER (':' type)?;
 
 relationship: annotation* name=IDENTIFIER ':' a=type '-->' b=type;
 
-relationshipProperty: annotation* name=IDENTIFIER '-->' type;
+relationshipProperty: annotation* name=IDENTIFIER '-->' type multiplicity?;
+multiplicity: atLeast=NUMBER ('..' (atMost=NUMBER | unbounded='*')) | any='*';
 
 type: name=IDENTIFIER nullable='?'?;
 
@@ -31,6 +33,7 @@ STRING: '"' ('\\'('"'|'\\')|.)*? '"';
 
 SCHEMA: 'schema';
 IMPORT: 'import';
+ID: 'id';
 ENTITY: 'entity';
 DOMAIN: 'domain';
 DATABASE: 'database';

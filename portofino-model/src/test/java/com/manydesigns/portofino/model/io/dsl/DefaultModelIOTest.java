@@ -41,13 +41,14 @@ public class DefaultModelIOTest {
         io.save(model);
         FileObject domainFile = outDir.resolveFile("testDomain1/testDomain1.domain");
         assertFalse(domainFile.exists());
-        FileObject entityFile = outDir.resolveFile("testDomain1/Foo.entity");
+        FileObject entityFile = outDir.resolveFile("testDomain1/Person.entity");
         assertTrue(entityFile.exists());
         String contents = IOUtils.toString(entityFile.getContent().getInputStream(), StandardCharsets.UTF_8);
-        assertEquals(contents, "entity Foo {\n" +
-                "\tname\n" +
+        assertEquals(contents, "entity Person {\n" +
+                "\tid {\n\t\tname\n\t}\n" +
                 "\temail\n" +
                 "\tage: integer\n" +
+                "\tregistrationDate: datetime\n" +
                 "}");
         Model model2 = io.load();
         assertEquals(model2.getDomains().size(), 1);

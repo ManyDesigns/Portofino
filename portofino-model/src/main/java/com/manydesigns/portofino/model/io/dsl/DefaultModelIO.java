@@ -148,17 +148,28 @@ public class DefaultModelIO implements ModelIO {
         try(OutputStreamWriter os = fileWriter(entityFile)) {
             writeAnnotations(entity, os);
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
+            os.write("\tid {" + System.lineSeparator());
+            for(Property property : entity.getId()) {
+                writeProperty(property, os, "\t\t");
+            }
+            os.write("\t}" + System.lineSeparator());
             for(Property property : entity.getProperties()) {
-                os.write("\t" + property.getName());
-                Type type = property.getType();
-                if(type != entity.getDomain().getDefaultType()) {
-                    String typeName = type.getAlias() != null ? type.getAlias() : type.getName();
-                    os.write(": " + typeName);
+                if(!entity.getId().contains(property)) {
+                    writeProperty(property, os, "\t");
                 }
-                os.write(System.lineSeparator());
             }
             os.write("}");
         }
+    }
+
+    protected void writeProperty(Property property, OutputStreamWriter writer, String indent) throws IOException {
+        writer.write(indent + property.getName());
+        Type type = property.getType();
+        if(type != property.getOwner().getDomain().getDefaultType()) {
+            String typeName = type.getAlias() != null ? type.getAlias() : type.getName();
+            writer.write(": " + typeName);
+        }
+        writer.write(System.lineSeparator());
     }
 
     protected void writeAnnotations(Annotated annotated, OutputStreamWriter writer) throws IOException {
