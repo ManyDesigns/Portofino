@@ -24,6 +24,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,8 +123,11 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         assert columnName != null;
         assert columnType != null;
 
-        if (propertyName == null) {
-            property.setName(DatabaseLogic.getUniquePropertyName(table, DatabaseLogic.normalizeName(columnName)));
+        if (StringUtils.isEmpty(propertyName)) {
+            String initialName = DatabaseLogic.normalizeName(columnName);
+            if(!initialName.equals(property.getName())) {
+                property.setName(DatabaseLogic.getUniquePropertyName(table, initialName));
+            }
         } else {
             property.setName(propertyName); //AS do not normalize (can be mixed-case Java properties)
         }

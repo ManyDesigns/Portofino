@@ -94,16 +94,13 @@ public class PrimaryKey implements ModelObject, Named, Unmarshallable {
 
     public void setParent(Object parent) {
         setTable((Table) parent);
-        List<Property> idProps = columns.stream().map(Column::getProperty).collect(Collectors.toList());
-        table.getEntity().getId().clear();
-        table.getEntity().getId().addAll(idProps);
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
         setParent(parent);
     }
 
-        public void reset() {
+    public void reset() {
         columns.clear();
         valid = true;
     }
@@ -135,6 +132,10 @@ public class PrimaryKey implements ModelObject, Named, Unmarshallable {
         if (columns.isEmpty()) {
             logger.warn("Primary key '{}' has no columns", this);
         }
+
+        List<Property> idProps = columns.stream().map(Column::getProperty).collect(Collectors.toList());
+        table.getEntity().getId().clear();
+        table.getEntity().getId().addAll(idProps);
     }
 
     public void visitChildren(ModelObjectVisitor visitor) {

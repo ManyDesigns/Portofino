@@ -25,6 +25,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +142,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
 
         String baseEntityName;
-        if (entityName == null) {
+        if (StringUtils.isEmpty(entityName)) {
             baseEntityName = DatabaseLogic.normalizeName(getTableName());
         } else {
             baseEntityName = DatabaseLogic.normalizeName(entityName);

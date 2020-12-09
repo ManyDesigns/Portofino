@@ -232,26 +232,37 @@ public class Persistence {
         Schema schema = new Schema(domain);
         schema.setDatabase(database);
         database.getSchemas().add(schema);
-        Optional<com.manydesigns.portofino.model.database.annotations.Schema> schemaAnn =
-                domain.getJavaAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
-        schemaAnn.ifPresent(ann -> schema.setActualSchemaName(ann.name()));
-        domain.getEntities().forEach(entity -> {
-            Table table = new Table(entity);
-            table.setSchema(schema);
-            schema.getTables().add(table);
-            Optional<javax.persistence.Table> tableAnn = entity.getJavaAnnotation(javax.persistence.Table.class);
-            tableAnn.ifPresentOrElse(a -> table.setTableName(a.name()), () -> table.setTableName(entity.getName()));
-            entity.getProperties().forEach(property -> {
-                Column column = new Column(property);
-                column.setTable(table);
-                table.getColumns().add(column);
-                Optional<javax.persistence.Column> colAnn = property.getJavaAnnotation(javax.persistence.Column.class);
-                colAnn.ifPresentOrElse(a -> column.setColumnName(a.name()),
-                        () -> column.setColumnName(property.getName()));
-            });
-
-        });
+        Optional<Annotation> schemaAnn =
+                domain.getAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
+        schemaAnn.ifPresent(ann -> schema.setActualSchemaName(ann.getPropertyValue("name")));
+        domain.getEntities().forEach(entity -> setupTable(schema, entity));
         return schema;
+    }
+
+    protected void setupTable(Schema schema, com.manydesigns.portofino.model.Entity entity) {
+        Table table = new Table(entity);
+        table.setSchema(schema);
+        schema.getTables().add(table);
+        PrimaryKey pk = new PrimaryKey(table);
+        table.setPrimaryKey(pk);
+        Optional<Annotation> tableAnn = entity.getAnnotation(javax.persistence.Table.class);
+        tableAnn.ifPresentOrElse(
+                a -> table.setTableName(a.getPropertyValue("name")),
+                () -> table.setTableName(entity.getName()));
+        entity.getProperties().forEach(property -> setupColumn(table, pk, property));
+    }
+
+    protected void setupColumn(Table table, PrimaryKey pk, com.manydesigns.portofino.model.Property property) {
+        Column column = new Column(property);
+        column.setTable(table);
+        table.getColumns().add(column);
+        Optional<Annotation> colAnn = property.getAnnotation(javax.persistence.Column.class);
+        colAnn.ifPresentOrElse(
+                a -> column.setColumnName(a.getPropertyValue("name")),
+                () -> column.setColumnName(property.getName()));
+        if(table.getEntity().getId().contains(property)) {
+            pk.add(column);
+        }
     }
 
     public FileObject getModelDirectory() throws FileSystemException {
