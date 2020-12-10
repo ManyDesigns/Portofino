@@ -49,7 +49,7 @@ public class CacheResetListenerRegistry {
     public static final Logger logger = LoggerFactory.getLogger(CacheResetListenerRegistry.class);
 
     protected final List<CacheResetListener> listeners =
-            Collections.synchronizedList(new ArrayList<CacheResetListener>());
+            Collections.synchronizedList(new ArrayList<>());
 
     public List<CacheResetListener> getCacheResetListeners() {
         return listeners;
@@ -58,7 +58,7 @@ public class CacheResetListenerRegistry {
     public void fireReset(CacheResetEvent e) {
         List<CacheResetListener> listeners;
         synchronized (this.listeners) {
-            listeners = new ArrayList<CacheResetListener>(this.listeners);
+            listeners = new ArrayList<>(this.listeners);
         }
         for(CacheResetListener listener : listeners) {
             try {

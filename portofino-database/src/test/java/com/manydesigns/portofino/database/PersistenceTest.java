@@ -59,7 +59,7 @@ public class PersistenceTest {
 
     @BeforeMethod
     public void setup() throws Exception {
-        FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model");
+        FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model/legacy");
         setup(appDir);
     }
 
@@ -592,7 +592,7 @@ public class PersistenceTest {
 
     public void testSaveModel() throws Exception {
         persistence.stop();
-        FileObject modelSource = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model");
+        FileObject modelSource = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model/legacy");
         FileObject appDir = VFS.getManager().resolveFile("ram:/portofino");
         appDir.createFolder();
         try {

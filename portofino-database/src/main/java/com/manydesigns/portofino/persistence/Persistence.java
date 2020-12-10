@@ -415,7 +415,9 @@ public class Persistence {
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         Database targetDatabase = dbSyncer.syncDatabase(model);
         model.getDatabases().remove(sourceDatabase);
+        model.getDomains().remove(sourceDatabase.getDomain());
         model.getDatabases().add(targetDatabase);
+        model.getDomains().add(targetDatabase.getDomain());
     }
 
     //**************************************************************************

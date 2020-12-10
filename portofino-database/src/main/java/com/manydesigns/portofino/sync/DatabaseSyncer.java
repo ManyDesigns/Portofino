@@ -131,8 +131,7 @@ public class DatabaseSyncer {
                         dsgf.createSnapshot(new CatalogAndSchema(catalog, actualSchemaName), liquibaseDatabase, snapshotControl);
 
                 logger.debug("Synchronizing schema");
-                Schema targetSchema = new Schema();
-                targetSchema.setDatabase(targetDatabase);
+                Schema targetSchema = new Schema(targetDatabase);
                 targetSchema.setCatalog(catalog);
                 targetSchema.setSchemaName(sourceSchema.getSchemaName());
                 targetSchema.setActualSchemaName(sourceSchema.getActualSchemaName());
@@ -360,12 +359,9 @@ public class DatabaseSyncer {
                 Column pkColumn = DatabaseLogic.findColumnByNameIgnoreCase(targetTable, columnName);
                 if (pkColumn == null) {
                     logger.error("Primary key (table: {}, pk: {}) has invalid column: {}",
-                            new Object[] {
-                                pkTableName,
-                                primaryKeyName,
-                                columnName
-                            }
-                    );
+                            pkTableName,
+                            primaryKeyName,
+                            columnName);
                     pkColumnsHaveErrors = true;
                     break;
                 }
@@ -612,7 +608,7 @@ public class DatabaseSyncer {
         }
 
         logger.debug("Sorting columns to preserve their previous order as much as possible");
-        targetTable.getColumns().sort(new Comparator<Column>() {
+        targetTable.getColumns().sort(new Comparator<>() {
             private int oldIndex(Column c) {
                 int i = 0;
                 for (Column old : sourceTable.getColumns()) {

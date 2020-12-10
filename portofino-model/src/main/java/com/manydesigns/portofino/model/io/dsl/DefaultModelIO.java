@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 public class DefaultModelIO implements ModelIO {
 
@@ -101,25 +103,21 @@ public class DefaultModelIO implements ModelIO {
     @Override
     public void save(Model model) throws IOException {
         logger.info("Saving model into directory: {}", getModelDirectory().getName().getPath());
-        FileObject modelDir = getModelDirectory();
         if(!modelDirectory.exists()) {
             modelDirectory.createFolder();
         }
         if(!modelDirectory.getType().equals(FileType.FOLDER)) {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
-        saveEntities(modelDir, model);
+        for(Domain domain : model.getDomains()) {
+            saveDomain(domain, modelDirectory);
+        }
+        deleteUnusedDomainDirectories(modelDirectory, model.getDomains());
     }
 
     @NotNull
     protected OutputStreamWriter fileWriter(FileObject file) throws FileSystemException {
         return new OutputStreamWriter(file.getContent().getOutputStream(), StandardCharsets.UTF_8);
-    }
-
-    protected void saveEntities(FileObject modelDir, Model model) throws IOException {
-        for(Domain domain : model.getDomains()) {
-            saveDomain(domain, modelDir);
-        }
     }
 
     protected void saveDomain(Domain domain, FileObject directory) throws IOException {
@@ -137,10 +135,38 @@ public class DefaultModelIO implements ModelIO {
         for(Entity entity : domain.getEntities()) {
             saveEntity(entity, domainDir);
         }
+        deleteUnusedEntityFiles(domainDir, domain.getEntities());
         //TODO imports
         for(Domain subdomain : domain.getSubdomains()) {
             saveDomain(subdomain, domainDir);
         }
+        deleteUnusedDomainDirectories(domainDir, domain.getSubdomains());
+    }
+
+    /**
+     * Delete the directories of the domains that are no longer present in the model
+     *
+     * @throws FileSystemException if the subdomain directories cannot be listed.
+     */
+    protected void deleteUnusedDomainDirectories(FileObject baseDir, List<Domain> domains) throws FileSystemException {
+        Arrays.stream(baseDir.getChildren()).forEach(dir -> {
+            String dirPath = dir.getName().getPath();
+            try {
+                if(dir.getType() == FileType.FOLDER) {
+                    String dirName = dir.getName().getBaseName();
+                    if (domains.stream().noneMatch(d -> d.getName().equals(dirName))) {
+                        logger.info("Deleting unused domain directory {}", dirPath);
+                        try {
+                            dir.deleteAll();
+                        } catch (FileSystemException e) {
+                            logger.warn("Could not delete unused domain directory " + dirPath, e);
+                        }
+                    }
+                }
+            } catch (FileSystemException e) {
+                logger.error("Unexpected filesystem error when trying to delete domain directory " + dirPath, e);
+            }
+        });
     }
 
     protected void saveEntity(Entity entity, FileObject domainDir) throws IOException {
@@ -160,6 +186,32 @@ public class DefaultModelIO implements ModelIO {
             }
             os.write("}");
         }
+    }
+
+    /**
+     * Delete the directories of the domains that are no longer present in the model
+     *
+     * @throws FileSystemException if the subdomain directories cannot be listed.
+     */
+    protected void deleteUnusedEntityFiles(FileObject baseDir, List<Entity> entities) throws FileSystemException {
+        Arrays.stream(baseDir.getChildren()).forEach(file -> {
+            String filePath = file.getName().getPath();
+            try {
+                String fileName = file.getName().getBaseName();
+                if(file.getType() == FileType.FILE && fileName.endsWith(".entity")) {
+                    if (entities.stream().noneMatch(e -> (e.getName() + ".entity").equals(fileName))) {
+                        logger.info("Deleting unused entity file {}", filePath);
+                        try {
+                            file.deleteAll();
+                        } catch (FileSystemException e) {
+                            logger.warn("Could not delete unused entity file " + filePath, e);
+                        }
+                    }
+                }
+            } catch (FileSystemException e) {
+                logger.error("Unexpected filesystem error when trying to delete entity file " + filePath, e);
+            }
+        });
     }
 
     protected void writeProperty(Property property, OutputStreamWriter writer, String indent) throws IOException {
@@ -215,7 +267,7 @@ public class DefaultModelIO implements ModelIO {
     }
 
     @Override
-    public FileObject getModelDirectory() throws FileSystemException {
+    public FileObject getModelDirectory() {
         return modelDirectory;
     }
 
