@@ -46,6 +46,7 @@ public class DefaultModelIOTest {
         String contents = IOUtils.toString(entityFile.getContent().getInputStream(), StandardCharsets.UTF_8);
         assertEquals(contents, "entity Person {\n" +
                 "\tid {\n\t\tname\n\t}\n" +
+                "\t@Email\n" +
                 "\temail\n" +
                 "\tage: integer\n" +
                 "\tregistrationDate: datetime\n" +

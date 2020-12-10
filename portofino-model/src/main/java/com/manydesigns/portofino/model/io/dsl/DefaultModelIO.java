@@ -128,7 +128,7 @@ public class DefaultModelIO implements ModelIO {
             domainDefFile.delete();
         } else {
             try(OutputStreamWriter os = fileWriter(domainDefFile)) {
-                writeAnnotations(domain, os);
+                writeAnnotations(domain, os, "");
                 os.write("domain " + domain.getName() + ";");
             }
         }
@@ -172,7 +172,7 @@ public class DefaultModelIO implements ModelIO {
     protected void saveEntity(Entity entity, FileObject domainDir) throws IOException {
         FileObject entityFile = domainDir.resolveFile(entity.getName() + ".entity");
         try(OutputStreamWriter os = fileWriter(entityFile)) {
-            writeAnnotations(entity, os);
+            writeAnnotations(entity, os, "");
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
             os.write("\tid {" + System.lineSeparator());
             for(Property property : entity.getId()) {
@@ -215,6 +215,7 @@ public class DefaultModelIO implements ModelIO {
     }
 
     protected void writeProperty(Property property, OutputStreamWriter writer, String indent) throws IOException {
+        writeAnnotations(property, writer, indent);
         writer.write(indent + property.getName());
         Type type = property.getType();
         if(type != property.getOwner().getDomain().getDefaultType()) {
@@ -224,14 +225,14 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    protected void writeAnnotations(Annotated annotated, OutputStreamWriter writer) throws IOException {
+    protected void writeAnnotations(Annotated annotated, OutputStreamWriter writer, String indent) throws IOException {
         for(Annotation annotation : annotated.getAnnotations()) {
-            writeAnnotation(annotation, writer);
+            writeAnnotation(annotation, writer, indent);
         }
     }
 
-    protected void writeAnnotation(Annotation annotation, OutputStreamWriter os) throws IOException {
-        os.write("@" + annotation.getType());
+    protected void writeAnnotation(Annotation annotation, OutputStreamWriter os, String indent) throws IOException {
+        os.write(indent + "@" + annotation.getType());
         if(!annotation.getProperties().isEmpty()) {
             os.write("(");
             if(annotation.getProperties().size() == 1 && annotation.getProperties().get(0).getName().equals("value")) {

@@ -158,7 +158,6 @@ public class Persistence {
             if(model != null) {
                 logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
                 initModel();
-                annotateDatabases(model.getDatabases());
                 return true;
             }
         } catch (Exception e) {
@@ -327,6 +326,7 @@ public class Persistence {
         for (Database database : model.getDatabases()) {
             initConnectionProvider(database);
         }
+        annotateDatabases(model.getDatabases());
         if(cacheResetListenerRegistry != null) {
             cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
         }
