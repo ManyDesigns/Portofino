@@ -134,7 +134,7 @@ import java.util.regex.Pattern;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
-public abstract class AbstractCrudAction<T extends Serializable> extends AbstractResourceAction {
+public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public static final String COPYRIGHT =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -447,7 +447,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected void deleteOldBlobs(List<Blob> blobsBefore, List<Blob> blobsAfter) {
-        List<Blob> toDelete = new ArrayList<Blob>(blobsBefore);
+        List<Blob> toDelete = new ArrayList<>(blobsBefore);
         toDelete.removeAll(blobsAfter);
         for(Blob blob : toDelete) {
             try {
@@ -598,7 +598,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
 
         if(!parameters.isEmpty()) {
             String encoding = getUrlEncoding();
-            pk = parameters.toArray(new String[parameters.size()]);
+            pk = parameters.toArray(new String[0]);
             try {
                 for(int i = 0; i < pk.length; i++) {
                     pk[i] = URLDecoder.decode(pk[i], encoding);
@@ -873,7 +873,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
 
     public String getLinkToPage(int page) {
         int rowsPerPage = getCrudConfiguration().getRowsPerPage();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("sortProperty", getSortProperty());
         parameters.put("sortDirection", getSortDirection());
         parameters.put("firstResult", page * rowsPerPage);
@@ -1172,7 +1172,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<Blob> getBlobsFromObject(T object) {
-        List<Blob> blobs = new ArrayList<Blob>();
+        List<Blob> blobs = new ArrayList<>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             if(property.getAnnotation(FileBlob.class) != null) {
                 String code = (String) property.get(object);
@@ -1185,7 +1185,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<Blob> getBlobsFromForm() {
-        List<Blob> blobs = new ArrayList<Blob>();
+        List<Blob> blobs = new ArrayList<>();
         for(FileBlobField blobField : getBlobFields()) {
             if(blobField.getValue() != null) {
                 blobs.add(blobField.getValue());
@@ -1195,7 +1195,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<FileBlobField> getBlobFields() {
-        List<FileBlobField> blobFields = new ArrayList<FileBlobField>();
+        List<FileBlobField> blobFields = new ArrayList<>();
         for(FieldSet fieldSet : form) {
             for(FormElement field : fieldSet) {
                 if(field instanceof FileBlobField) {
@@ -1354,7 +1354,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     @SuppressWarnings("unchecked")
     @Operation(summary = "The list of selection providers supported by this resource")
     public List selectionProviders() {
-        List result = new ArrayList();
+        List<Map<?, ?>> result = new ArrayList<>();
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
