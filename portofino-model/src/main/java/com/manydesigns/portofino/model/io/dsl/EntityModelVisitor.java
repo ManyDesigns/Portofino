@@ -94,12 +94,12 @@ public class EntityModelVisitor extends ModelBaseVisitor<ModelObject> {
     }
 
     public void visitAnnotationParams(Annotation annotation, ModelParser.AnnotationParamsContext params) {
-        if (params.IDENTIFIER().isEmpty()) {
+        if (params.simpleIdentifier().isEmpty()) {
             annotation.getProperties().add(new AnnotationProperty("value", getText(params.literal(0))));
         } else {
-            for (int i = 0; i < params.IDENTIFIER().size(); i++) {
+            for (int i = 0; i < params.simpleIdentifier().size(); i++) {
                 AnnotationProperty prop =
-                        new AnnotationProperty(params.IDENTIFIER(i).getText(), getText(params.literal(i)));
+                        new AnnotationProperty(params.simpleIdentifier(i).getText(), getText(params.literal(i)));
                 annotation.getProperties().add(prop);
             }
         }
