@@ -153,7 +153,9 @@ export class AuthenticationService {
       return of(requestWithHeader(req));
     }
 
-    if(token.exp && moment().isAfter(moment(token.exp * 1000 - this.tokenExpirationThresholdMs))) {
+    if(token.exp &&
+      moment().isBefore(moment(token.exp * 1000)) &&
+      moment().isAfter(moment(token.exp * 1000 - this.tokenExpirationThresholdMs))) {
       return this.strategy.refreshToken().pipe(map(token => {
         this.setJsonWebToken(token);
         return requestWithHeader(req);
