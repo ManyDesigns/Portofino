@@ -106,7 +106,7 @@
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.5.8.SP1</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.7.0</shiro.version>
+        <shiro.version>1.7.1</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.version>5.2.9.RELEASE</spring.version>
 
