@@ -29,17 +29,19 @@
 
 package com.manydesigns.elements.xls;
 
-import com.manydesigns.elements.fields.DateField;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.NumericField;
-import com.manydesigns.elements.fields.PasswordField;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.fields.*;
 import jxl.CellView;
 import jxl.write.*;
 import jxl.write.Number;
 
+import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+
+import static com.manydesigns.elements.fields.BooleanField.FALSE_LABEL_I18N;
+import static com.manydesigns.elements.fields.BooleanField.TRUE_LABEL_I18N;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -80,10 +82,21 @@ public class XlsUtil {
         dateCell = new DateTime(j, i, date, getDateFormat(dateField.getDatePattern()));
         sheet.addCell(dateCell);
       }
+    }else if (field instanceof BooleanField) {
+      BooleanField booleanField = (BooleanField) field;
+      Boolean booleanFieldValue = booleanField.getValue();
+      if (booleanFieldValue != null) {
+        Label label = new Label(j, i, booleanFieldValue? getText(TRUE_LABEL_I18N):getText(FALSE_LABEL_I18N));
+        sheet.addCell(label);
+      }
     } else {
       Label label = new Label(j, i, field.getStringValue());
       sheet.addCell(label);
     }
+  }
+
+  protected String getText(String key, Object... args) {
+    return ElementsThreadLocals.getTextProvider().getText(key, args);
   }
 
   public static void autoSizeColumns(WritableSheet sheet, int columns) {
