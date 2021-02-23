@@ -77,13 +77,9 @@ import java.util.stream.Collectors;
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(CrudConfiguration.class)
 @ResourceActionName("Crud")
-public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
+public class CrudAction<T> extends AbstractCrudAction<T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    public static final String[][] CRUD_CONFIGURATION_FIELDS =
-                {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-                  "largeResultSet", "rowsPerPage", "columns"}};
 
     public Table baseTable;
 

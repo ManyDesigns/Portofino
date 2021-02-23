@@ -85,11 +85,11 @@
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.2</commons.vfs.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>3.0.6</groovy.version>
+        <groovy.version>3.0.7</groovy.version>
         <guava.version>30.0-jre</guava.version>
         <hibernate.version>5.4.24.Final</hibernate.version>
-        <jackson.version>2.10.0</jackson.version>
-        <jackson.databind.version>2.10.0</jackson.databind.version>
+        <jackson.version>2.11.0</jackson.version>
+        <jackson.databind.version>2.10.5.1</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
@@ -105,9 +105,9 @@
         <logback.version>1.2.3</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
-        <resteasy.version>4.5.2.Final</resteasy.version>
+        <resteasy.version>4.5.8.SP1</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.7.0</shiro.version>
+        <shiro.version>1.7.1</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <spring.version>5.2.9.RELEASE</spring.version>
 
@@ -310,19 +310,19 @@
     <dependencies>
         <!-- JAXB for Java 11+ -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
             <version>2.3.3</version>
         </dependency>
         <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>1.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>1.2.2</version>
         </dependency>
         <!-- Test dependencies -->
         <dependency>
