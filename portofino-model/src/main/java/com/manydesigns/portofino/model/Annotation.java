@@ -28,6 +28,7 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class Annotation implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected Object parent;
+    protected Annotated parent;
     @Deprecated
     protected List<String> values = new ArrayList<>();
     protected List<AnnotationProperty> properties = new ArrayList<>();
@@ -97,7 +98,7 @@ public class Annotation implements ModelObject {
 
     public Annotation(Object parent, String type) {
         this();
-        this.parent = parent;
+        setParent(parent);
         setType(type);
     }
 
@@ -105,9 +106,9 @@ public class Annotation implements ModelObject {
         this(null, type);
     }
 
-    public Annotation(Object parent, Class<? extends java.lang.annotation.Annotation> type) {
+    public Annotation(Annotated parent, Class<? extends java.lang.annotation.Annotation> type) {
         this();
-        this.parent = parent;
+        setParent(parent);
         setType(type.getName());
         this.javaAnnotationClass = type;
     }
@@ -118,7 +119,10 @@ public class Annotation implements ModelObject {
     //**************************************************************************
 
     public void setParent(Object parent) {
-        this.parent = parent;
+        this.parent = (Annotated) parent;
+        if(parent instanceof ModelObject) {
+            ((ModelObject) parent).getModelElement().getEAnnotations().add(eAnnotation);
+        }
     }
 
     public void reset() {
@@ -319,5 +323,10 @@ public class Annotation implements ModelObject {
         } else {
             property.setValue(value);
         }
+    }
+
+    @Override
+    public EAnnotation getModelElement() {
+        return eAnnotation;
     }
 }

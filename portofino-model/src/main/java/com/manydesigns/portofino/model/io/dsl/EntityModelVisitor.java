@@ -80,7 +80,7 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
         for (int i = 0; i < ctx.idProperties.size(); i++) {
             ModelParser.PropertyContext idp = ctx.idProperties.get(i);
             String propertyName = idp.name.getText();
-            Optional<EAttribute> property = entity.getEAttributes().stream().filter(
+            Optional<EStructuralFeature> property = entity.getEStructuralFeatures().stream().filter(
                     p -> p.getName().equals(propertyName)
             ).findFirst();
             if (property.isPresent()) {
@@ -128,7 +128,7 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
     }
 
     @Override
-    public EAttribute visitProperty(ModelParser.PropertyContext ctx) {
+    public EStructuralFeature visitProperty(ModelParser.PropertyContext ctx) {
         String propertyName = ctx.name.getText();
         EModelElement previous = annotated;
         if(entity == null) {
@@ -145,11 +145,11 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
             type = EcorePackage.eINSTANCE.getEString();
         }
 
-        EAttribute property = entity.getEAttributes().stream().filter(a -> propertyName.equals(a.getName()))
+        EStructuralFeature property = entity.getEStructuralFeatures().stream().filter(a -> propertyName.equals(a.getName()))
                 .findFirst().orElseGet(() -> {
                     EAttribute attr = EcoreFactory.eINSTANCE.createEAttribute();
                     attr.setName(propertyName);
-                    entity.getEAttributes().add(attr);
+                    entity.getEStructuralFeatures().add(attr);
                     return attr;
                 });
         property.setEType(type);

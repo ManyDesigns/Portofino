@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.manydesigns.portofino.model.PortofinoPackage.ensureType;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -67,6 +69,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
     protected String javaType;
     protected EAttribute property;
+    protected List<Annotation> annotations = new ArrayList<>();
 
     //**************************************************************************
     // Fields for wire-up
@@ -162,29 +165,13 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         }
     }
 
-    public EClassifier ensureType(Class<?> javaType) {
-        return EcorePackage.eINSTANCE.getEClassifiers().stream().filter(
-                c -> c.getInstanceClass() == javaType).findFirst().orElseGet(() -> {
-            EPackage rootPackage = getRootPackage(table.getModelClass().getEPackage());
-            return rootPackage.getEClassifiers().stream().filter(
-                    c -> c.getInstanceClass() == javaType).findFirst().orElseGet(() -> {
-                EDataType type = EcoreFactory.eINSTANCE.createEDataType();
-                rootPackage.getEClassifiers().add(type);
-                return type;
-            });
-        });
-    }
-
-    public static EPackage getRootPackage(EPackage ePackage) {
-        while (ePackage.getESuperPackage() != null) {
-            ePackage = ePackage.getESuperPackage();
-        }
-        return ePackage;
-    }
-
     public void link(Model model, Configuration configuration) {}
 
-    public void visitChildren(ModelObjectVisitor visitor) {}
+    public void visitChildren(ModelObjectVisitor visitor) {
+        for (Annotation a : annotations) {
+            visitor.visit(a);
+        }
+    }
 
     //**************************************************************************
     // Getters/setter
@@ -197,7 +184,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     public void setTable(Table table) {
         this.table = table;
         if(this.table != null) {
-            this.table.getModelClass().getEAttributes().add(property);
+            this.table.getModelElement().getEStructuralFeatures().add(property);
         }
     }
 
@@ -312,9 +299,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation", type = Annotation.class)
     public List<Annotation> getAnnotations() {
-        return property.getEAnnotations().stream().map(Annotation::new).collect(Collectors.toList());
+        return annotations;
     }
-        
+
     @Override
     public String toString() {
         return MessageFormat.format("column {0} {1}({2},{3}){4}",
@@ -351,7 +338,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         return null;
     }
 
-    public EAttribute getProperty() {
+    public EAttribute getModelElement() {
         return property;
     }
 }

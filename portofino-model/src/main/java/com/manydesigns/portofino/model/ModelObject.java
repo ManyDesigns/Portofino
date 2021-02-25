@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EModelElement;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -29,7 +30,7 @@ import org.apache.commons.configuration2.Configuration;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public interface ModelObject {
-    String COPYRIGHT = "Copyright (C) 2005-2020 ManyDesigns srl";
+    String COPYRIGHT = "Copyright (C) 2005-2021 ManyDesigns srl";
 
     void setParent(Object parent);
 
@@ -38,5 +39,9 @@ public interface ModelObject {
     void link(Model model, Configuration configuration);
 
     void visitChildren(ModelObjectVisitor visitor);
+
+    default EModelElement getModelElement() {
+        return null;
+    }
 
 }

@@ -565,11 +565,10 @@ public class PersistenceTest {
         } catch (Exception e) {}
         Table table = DatabaseLogic.findTableByName(persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
         assertNotNull(table);
-        Annotation nq = new Annotation(table, "javax.persistence.NamedQuery");
+        Annotation nq = table.ensureAnnotation("javax.persistence.NamedQuery");
         nq.setProperties(Arrays.asList(
                 new AnnotationProperty(nq, "name", "all_questions"),
                 new AnnotationProperty(nq, "query", "from domanda")));
-        table.getAnnotations().add(nq);
         persistence.initModel();
         session = persistence.getSession("hibernatetest");
         List<Object> allQuestions = session.createNamedQuery("all_questions", Object.class).list();

@@ -56,7 +56,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     @Deprecated
     protected final List<Table> immediateTables;
 
-    protected EPackage domain;
+    protected EPackage ePackage;
     protected String actualSchemaName;
     protected String catalog;
 
@@ -78,16 +78,16 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         this(EcoreFactory.eINSTANCE.createEPackage());
     }
 
-    public Schema(EPackage domain) {
-        this.domain = domain;
+    public Schema(EPackage ePackage) {
+        this.ePackage = ePackage;
         immediateTables = new ArrayList<>();
     }
 
     public Schema(Database database) {
         this();
         setDatabase(database);
-        EPackage parent = database.getDomain();
-        parent.getESubpackages().add(this.domain);
+        EPackage parent = database.getModelElement();
+        parent.getESubpackages().add(this.ePackage);
     }
 
     //**************************************************************************
@@ -104,7 +104,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void setParent(Object parent) {
         database = (Database) parent;
-        database.getDomain().getESubpackages().add(this.domain);
+        database.getModelElement().getESubpackages().add(this.ePackage);
         tables.addAll(immediateTables);
         immediateTables.clear();
     }
@@ -126,7 +126,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + getSchemaName();
         if(actualSchemaName == null) {
             actualSchemaName = configuration.getString(key);
-            domain.getEAnnotations().removeIf(a -> a.getSource().equals(com.manydesigns.portofino.model.database.annotations.Schema.class.getName()));
+            ePackage.getEAnnotations().removeIf(a -> a.getSource().equals(com.manydesigns.portofino.model.database.annotations.Schema.class.getName()));
         } else {
             Annotation annotation = ensureAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
             annotation.setPropertyValue("name", actualSchemaName);
@@ -141,6 +141,9 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Table table : tables) {
             visitor.visit(table);
+        }
+        for (Annotation a : annotations) {
+            visitor.visit(a);
         }
     }
 
@@ -162,11 +165,11 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
 
     @XmlAttribute(required = true)
     public String getSchemaName() {
-        return domain.getName();
+        return ePackage.getName();
     }
 
     public void setSchemaName(String schemaName) {
-        domain.setName(schemaName);
+        ePackage.setName(schemaName);
     }
 
     public String getActualSchemaName() {
@@ -273,11 +276,8 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         return annotations;
     }
 
-    public EPackage getDomain() {
-        return domain;
+    public EPackage getModelElement() {
+        return ePackage;
     }
 
-    public void setDomain(EPackage domain) {
-        this.domain = domain;
-    }
 }

@@ -146,9 +146,9 @@ public class ForeignKey extends DatabaseSelectionProvider
             if(relationship == null) {
                 relationship = EcoreFactory.eINSTANCE.createEReference();
                 relationship.setContainment(false);
-                relationship.setEType(toTable.getModelClass());
+                relationship.setEType(toTable.getModelElement());
                 relationship.setName(name);
-                fromTable.getModelClass().getEReferences().add(relationship);
+                fromTable.getModelElement().getEReferences().add(relationship);
                 //TODO opposite?
             }
         } else {

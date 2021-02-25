@@ -37,7 +37,6 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,6 +58,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<ModelSelectionProvider> selectionProviders;
+    protected List<Annotation> annotations = new ArrayList<>();
 
     protected Schema schema;
     protected String tableName;
@@ -69,7 +69,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     protected PrimaryKey primaryKey;
 
-    protected EClass modelClass;
+    protected EClass eClass;
 
     //**************************************************************************
     // Fields for wire-up
@@ -90,8 +90,8 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     //**************************************************************************
 
 
-    public Table(EClass modelClass) {
-        this.modelClass = modelClass;
+    public Table(EClass eClass) {
+        this.eClass = eClass;
         columns = new ArrayList<>();
         foreignKeys = new ArrayList<>();
         oneToManyRelationships = new ArrayList<>();
@@ -164,13 +164,15 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
             calculatedEntityName = baseEntityName + "_" + (i++);
         }
 
-        modelClass.setName(calculatedEntityName);
+        eClass.setName(calculatedEntityName);
     }
 
     public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
-        //TODO validate modelClass?
+        for (Annotation a : annotations) {
+            visitor.visit(a);
+        }
 
         for (Column column : columns) {
             visitor.visit(column);
@@ -268,7 +270,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         return foreignKeys;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute()
     public String getEntityName() {
         return entityName;
     }
@@ -278,7 +280,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public String getActualEntityName() {
-        return modelClass.getName();
+        return eClass.getName();
     }
 
     public List<ForeignKey> getOneToManyRelationships() {
@@ -289,7 +291,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     @XmlElement(name = "annotation", type = Annotation.class)
     @NotNull
     public List<Annotation> getAnnotations() {
-        return modelClass.getEAnnotations().stream().map(Annotation::new).collect(Collectors.toList());
+        return annotations;
     }
 
     @XmlElementWrapper(name="selectionProviders")
@@ -327,7 +329,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 
-    public EClass getModelClass() {
-        return modelClass;
+    public EClass getModelElement() {
+        return eClass;
     }
 }

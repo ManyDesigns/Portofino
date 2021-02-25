@@ -214,13 +214,13 @@ public class DefaultModelIO implements ModelIO {
         try(OutputStreamWriter os = fileWriter(entityFile)) {
             writeAnnotations(entity, os, "");
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
-            List<EAttribute> id = entity.getEAttributes().stream().filter(a -> a.getEAnnotation(Id.class.getName()) != null).collect(Collectors.toList());
+            List<EStructuralFeature> id = entity.getEStructuralFeatures().stream().filter(a -> a.getEAnnotation(Id.class.getName()) != null).collect(Collectors.toList());
             os.write("\tid {" + System.lineSeparator());
-            for(EAttribute property : id) {
+            for(EStructuralFeature property : id) {
                 writeProperty(property, os, "\t\t");
             }
             os.write("\t}" + System.lineSeparator());
-            for(EAttribute property : entity.getEAttributes()) {
+            for(EStructuralFeature property : entity.getEStructuralFeatures()) {
                 if(!id.contains(property)) {
                     writeProperty(property, os, "\t");
                 }
@@ -255,7 +255,7 @@ public class DefaultModelIO implements ModelIO {
         });
     }
 
-    protected void writeProperty(EAttribute property, OutputStreamWriter writer, String indent) throws IOException {
+    protected void writeProperty(EStructuralFeature property, OutputStreamWriter writer, String indent) throws IOException {
         writeAnnotations(property, writer, indent);
         writer.write(indent + property.getName());
         EClassifier type = property.getEType();

@@ -20,8 +20,6 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
-
 import java.util.List;
 import java.util.Optional;
 

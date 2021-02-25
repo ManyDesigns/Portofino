@@ -92,7 +92,7 @@ public class XMLModel implements ModelIO {
                 model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
                 model.getDomains().removeIf(d -> databaseName.equals(d.getName()));
                 model.getDatabases().add(database);
-                model.getDomains().add(database.getDomain());
+                model.getDomains().add(database.getModelElement());
             }
 
             FileObject settingsFile = databaseDir.resolveFile("hibernate.properties");

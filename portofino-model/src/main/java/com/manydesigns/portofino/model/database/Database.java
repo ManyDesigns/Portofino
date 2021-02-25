@@ -34,7 +34,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,8 +53,9 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     //**************************************************************************
 
     protected final List<Schema> schemas;
+    protected final List<Annotation> annotations;
 
-    protected EPackage domain;
+    protected EPackage ePackage;
 
     protected String trueString = null;
     protected String falseString = null;
@@ -73,9 +73,10 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public Database(EPackage domain) {
-        this.domain = domain;
+    public Database(EPackage ePackage) {
+        this.ePackage = ePackage;
         this.schemas = new ArrayList<>();
+        this.annotations = new ArrayList<>();
     }
 
     public Database() {
@@ -96,17 +97,17 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     }
 
     public String getQualifiedName() {
-        return domain.getName();
+        return ePackage.getName();
     }
 
     public void reset() {}
 
     public void init(Model model, Configuration configuration) {
-        if(domain.getName() == null) {
+        if(ePackage.getName() == null) {
             throw new IllegalStateException("Database name is null");
         }
-        if(domain.getName().contains("/") || domain.getName().contains("\\")) {
-            throw new IllegalStateException("Database name contains slashes or backslashes: " + domain.getName());
+        if(ePackage.getName().contains("/") || ePackage.getName().contains("\\")) {
+            throw new IllegalStateException("Database name contains slashes or backslashes: " + ePackage.getName());
         }
     }
 
@@ -124,11 +125,11 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
 
     @XmlAttribute(required = true)
     public String getDatabaseName() {
-        return domain.getName();
+        return ePackage.getName();
     }
 
     public void setDatabaseName(String databaseName) {
-        domain.setName(databaseName);
+        ePackage.setName(databaseName);
     }
 
     @XmlElementWrapper(name="schemas")
@@ -217,12 +218,8 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
         this.entityMode = entityMode;
     }
 
-    public EPackage getDomain() {
-        return domain;
-    }
-
-    public void setDomain(EPackage domain) {
-        this.domain = domain;
+    public EPackage getModelElement() {
+        return ePackage;
     }
 
     @Override
@@ -230,7 +227,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     @XmlElement(name = "annotation", type = Annotation.class)
     @NotNull
     public List<Annotation> getAnnotations() {
-        return domain.getEAnnotations().stream().map(Annotation::new).collect(Collectors.toList());
+        return annotations;
     }
 
     public Properties getSettings() {
