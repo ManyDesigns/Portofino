@@ -25,7 +25,6 @@ import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
@@ -56,6 +55,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.eclipse.emf.ecore.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
@@ -142,7 +142,7 @@ public class Persistence {
                 model.getDomains().forEach(domain -> {
                     Database database = setupDatabase(model, domain);
                     if(database != null) {
-                        domain.getSubdomains().forEach(subd -> setupSchema(database, subd));
+                        domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
                     }
                 });
                 initModel();
@@ -197,29 +197,28 @@ public class Persistence {
         });
     }
 
-    protected Database setupDatabase(Model model, Domain domain) {
+    protected Database setupDatabase(Model model, EPackage domain) {
         //Can't use getJavaAnnotation as they've not yet been resolved
-        Optional<Annotation> jdbc = domain.getAnnotation(JDBCConnection.class.getName());
-        if(jdbc.isPresent()) {
-            Annotation ann = jdbc.get();
+        EAnnotation ann = domain.getEAnnotation(JDBCConnection.class.getName());
+        if(ann != null) {
             Database database = new Database(domain);
             model.getDatabases().add(database);
             JdbcConnectionProvider cp = new JdbcConnectionProvider();
             cp.setDatabase(database);
-            cp.setUrl(ann.getPropertyValue("url"));
-            cp.setDriver(ann.getPropertyValue("driver"));
-            cp.setUsername(ann.getPropertyValue("username"));
-            cp.setPassword(ann.getPropertyValue("password"));
+            cp.setUrl(ann.getDetails().get("url"));
+            cp.setDriver(ann.getDetails().get("driver"));
+            cp.setUsername(ann.getDetails().get("username"));
+            cp.setPassword(ann.getDetails().get("password"));
             database.setConnectionProvider(cp);
             return database;
         } else {
-            Optional<Annotation> jndi = domain.getAnnotation(JNDIConnection.class.getName());
-            if(jndi.isPresent()) {
+            ann = domain.getEAnnotation(JNDIConnection.class.getName());
+            if(ann != null) {
                 Database database = new Database(domain);
                 model.getDatabases().add(database);
                 JndiConnectionProvider cp = new JndiConnectionProvider();
                 cp.setDatabase(database);
-                cp.setJndiResource(jndi.get().getPropertyValue("name"));
+                cp.setJndiResource(ann.getDetails().get("name"));
                 database.setConnectionProvider(cp);
                 return database;
             }
@@ -227,41 +226,51 @@ public class Persistence {
         return null;
     }
 
-    protected Schema setupSchema(Database database, Domain domain) {
+    protected Schema setupSchema(Database database, EPackage domain) {
         Schema schema = new Schema(domain);
         schema.setDatabase(database);
         database.getSchemas().add(schema);
-        Optional<Annotation> schemaAnn =
-                domain.getAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
-        schemaAnn.ifPresent(ann -> schema.setActualSchemaName(ann.getPropertyValue("name")));
-        domain.getEntities().forEach(entity -> setupTable(schema, entity));
+        EAnnotation schemaAnn =
+                domain.getEAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class.getName());
+        if(schemaAnn != null) {
+            schema.setActualSchemaName(schemaAnn.getDetails().get("name"));
+        }
+        domain.getEClassifiers().forEach(entity -> {
+            if(entity instanceof EClass) {
+                setupTable(schema, (EClass) entity);
+            }
+        });
         return schema;
     }
 
-    protected void setupTable(Schema schema, com.manydesigns.portofino.model.Entity entity) {
+    protected void setupTable(Schema schema, EClass entity) {
         Table table = new Table(entity);
         table.setSchema(schema);
         schema.getTables().add(table);
         PrimaryKey pk = new PrimaryKey(table);
         table.setPrimaryKey(pk);
-        Optional<Annotation> tableAnn = entity.getAnnotation(javax.persistence.Table.class);
-        tableAnn.ifPresentOrElse(
-                a -> table.setTableName(a.getPropertyValue("name")),
-                () -> table.setTableName(entity.getName()));
-        entity.getProperties().forEach(property -> setupColumn(table, pk, property));
+        EAnnotation tableAnn = entity.getEAnnotation(javax.persistence.Table.class.getName());
+        if(tableAnn != null) {
+            table.setTableName(tableAnn.getDetails().get("name"));
+        } else {
+            table.setTableName(entity.getName());
+        }
+        entity.getEAttributes().forEach(property -> setupColumn(table, pk, property));
     }
 
-    protected void setupColumn(Table table, PrimaryKey pk, com.manydesigns.portofino.model.Property property) {
+    protected void setupColumn(Table table, PrimaryKey pk, EAttribute property) {
         Column column = new Column(property);
         column.setTable(table);
         table.getColumns().add(column);
-        Optional<Annotation> colAnn = property.getAnnotation(javax.persistence.Column.class);
-        colAnn.ifPresentOrElse(
-                a -> column.setColumnName(a.getPropertyValue("name")),
-                () -> column.setColumnName(property.getName()));
-        if(table.getEntity().getId().contains(property)) {
-            pk.add(column);
+        EAnnotation colAnn = property.getEAnnotation(javax.persistence.Column.class.getName());
+        if(colAnn != null) {
+            column.setColumnName(colAnn.getDetails().get("name"));
+        } else {
+            column.setColumnName(property.getName());
         }
+        /*TODO id if(table.getModelClass().getId().contains(property)) {
+            pk.add(column);
+        }*/
     }
 
     public FileObject getModelDirectory() throws FileSystemException {

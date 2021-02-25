@@ -27,7 +27,7 @@ public class DefaultModelIOTest {
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             assertEquals(parser.getNumberOfSyntaxErrors(), 0);
-            EPackage domain = new EntityModelVisitor(new Model()).visitStandaloneDomain(parseTree);
+            EPackage domain = new EntityModelVisitor().visitStandaloneDomain(parseTree);
             assertEquals(domain.getEClassifiers().size(), 1);
         }
     }
@@ -47,8 +47,11 @@ public class DefaultModelIOTest {
         assertTrue(entityFile.exists());
         String contents = IOUtils.toString(entityFile.getContent().getInputStream(), StandardCharsets.UTF_8);
         assertEquals(contents, "entity Person {\n" +
-                "\t@com.manydesigns.portofino.model.database.annotations.Id(order = 0)\n" +
-                "\tname\n" +
+                "\tid {\n" +
+                "\t\t@com.manydesigns.portofino.model.database.annotations.Id(order = 0)\n" +
+                "\t\tname\n" +
+                "\t}\n" +
+                "\t@Email\n" +
                 "\temail\n" +
                 "\tage: EInt\n" +
                 "\tregistrationDate: EDate\n" +

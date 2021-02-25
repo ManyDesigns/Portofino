@@ -13,17 +13,15 @@ import java.util.Optional;
 
 public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
 
-    protected final Model model;
     protected EPackage parentDomain;
     protected EClass entity;
     protected EModelElement annotated;
 
-    public EntityModelVisitor(Model model) {
-        this(model, null);
+    public EntityModelVisitor() {
+        this(null);
     }
 
-    public EntityModelVisitor(Model model, EPackage parentDomain) {
-        this.model = model;
+    public EntityModelVisitor(EPackage parentDomain) {
         this.parentDomain = parentDomain;
     }
 
@@ -45,7 +43,8 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
                 return ePackage;
             });
         } else {
-            domain = model.ensureDomain(name);
+            domain = EcoreFactory.eINSTANCE.createEPackage();
+            domain.setName(name);
         }
         parentDomain = domain;
         annotated = domain;
@@ -63,17 +62,20 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
     @Override
     public EClass visitEntity(ModelParser.EntityContext ctx) {
         String entityName = ctx.name.getText();
-        if(parentDomain == null) {
-            throw new IllegalStateException("Entity definition without a domain: " + entityName);
-        }
         EClass previous = entity;
-        entity = (EClass) parentDomain.getEClassifier(entityName);
+        EClass entity = null;
+        if(parentDomain != null) {
+            entity = (EClass) parentDomain.getEClassifier(entityName);
+        }
         if(entity == null) {
             entity = EcoreFactory.eINSTANCE.createEClass();
             entity.setName(entityName);
-            parentDomain.getEClassifiers().add(entity);
+            if(parentDomain != null) {
+                parentDomain.getEClassifiers().add(entity);
+            }
         }
         annotated = entity;
+        this.entity = entity;
         visitChildren(ctx);
         for (int i = 0; i < ctx.idProperties.size(); i++) {
             ModelParser.PropertyContext idp = ctx.idProperties.get(i);
@@ -90,8 +92,8 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
                 throw new IllegalStateException("Id property not found: " + propertyName);
             }
         }
-        entity = previous;
         annotated = previous;
+        this.entity = previous;
         return entity;
     }
 
@@ -101,7 +103,13 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
         if(annotated == null) {
             throw new IllegalStateException("Annotation without an element: " + annotationType);
         }
-        EAnnotation annotation = annotated.getEAnnotation(resolveAnnotationType(annotationType));
+        String source = resolveAnnotationType(annotationType);
+        EAnnotation annotation = annotated.getEAnnotation(source);
+        if(annotation == null) {
+            annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+            annotation.setSource(source);
+            annotated.getEAnnotations().add(annotation);
+        }
         ModelParser.AnnotationParamsContext params = ctx.annotationParams();
         if(params != null) {
             visitAnnotationParams(annotation, params);

@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
@@ -11,7 +12,16 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.PatternFileSelector;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.*;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
+import org.eclipse.emf.ecore.xmi.impl.XMLResourceFactoryImpl;
+import org.emfjson.jackson.resource.JsonResourceFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +40,28 @@ public class DefaultModelIO implements ModelIO {
     private static final Logger logger = LoggerFactory.getLogger(DefaultModelIO.class);
 
     private final FileObject modelDirectory;
+    protected final ResourceSet resourceSet = new ResourceSetImpl();
 
     public DefaultModelIO(FileObject modelDirectory) {
         this.modelDirectory = modelDirectory;
+        resourceSet.getResourceFactoryRegistry()
+                .getExtensionToFactoryMap()
+                .put("json", new JsonResourceFactory());
+        resourceSet.getResourceFactoryRegistry()
+                .getExtensionToFactoryMap()
+                .put("xmi", new XMIResourceFactoryImpl());
+        resourceSet.getResourceFactoryRegistry()
+                .getExtensionToFactoryMap()
+                .put("ecore", new EcoreResourceFactoryImpl());
+        resourceSet.getResourceFactoryRegistry()
+                .getExtensionToFactoryMap()
+                .put("entity", new EntityResource.Factory());
+        resourceSet.getResourceFactoryRegistry()
+                .getExtensionToFactoryMap()
+                .put("domain", new DomainResource.Factory());
+        resourceSet.getResourceFactoryRegistry()
+                .getExtensionToFactoryMap()
+                .put("*", new XMLResourceFactoryImpl());
     }
 
     @Override
@@ -57,10 +86,6 @@ public class DefaultModelIO implements ModelIO {
 
     protected void loadDomain(Model model, EPackage parent, FileObject domainDir) throws IOException {
         String domainName = domainDir.getName().getBaseName();
-        FileObject domainDefFile = domainDir.resolveFile(domainName + ".domain");
-        if(domainDefFile.exists()) {
-            loadDomainDefinition(model, parent, domainDefFile);
-        }
         EPackage domain;
         if(parent != null) {
             domain = parent.getESubpackages().stream().filter(p -> p.getName().equals(domainName)).findFirst().orElseGet(() -> {
@@ -73,24 +98,32 @@ public class DefaultModelIO implements ModelIO {
             domain = model.ensureDomain(domainName);
         }
         for (FileObject child : domainDir.getChildren()) {
-            if(child.isFile() && child.getName().getBaseName().endsWith(".entity")) {
-                loadEntity(model, domain, child);
+            if(child.isFile()) {
+                loadResource(domain, child);
             } else if(child.isFolder()) {
                 loadDomain(model, domain, child);
             }
         }
     }
 
-    protected void loadEntity(Model model, EPackage domain, FileObject entityFile) throws IOException {
+    protected void loadResource(EPackage domain, FileObject entityFile) throws IOException {
         try(InputStream inputStream = entityFile.getContent().getInputStream()) {
-            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
-            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
-            ModelParser.StandaloneEntityContext parseTree = parser.standaloneEntity();
-            if (parser.getNumberOfSyntaxErrors() == 0) {
-                new EntityModelVisitor(model, domain).visit(parseTree);
-            } else {
-                logger.error("Could not parse entity definition " + entityFile.getName().getPath()); //TODO properly report errors
-            }
+            Resource resource = resourceSet.createResource(URI.createURI(entityFile.getName().getURI()));
+            resource.load(inputStream, null);
+            EList<EObject> contents = resource.getContents();
+            contents.forEach(o -> {
+                if(o instanceof EClass) {
+                    domain.getEClassifiers().add((EClassifier) o);
+                } else if(o instanceof EPackage) {
+                    EPackage pkg = (EPackage) o;
+                    if(pkg.getName().equals(domain.getName())) {
+                        domain.getEClassifiers().addAll(pkg.getEClassifiers());
+                        domain.getEAnnotations().addAll(pkg.getEAnnotations());
+                    } else {
+                        logger.error("Invalid domain, expected " + domain.getName() + ", got " + pkg.getName());
+                    }
+                }
+            });
         }
     }
 
@@ -100,7 +133,7 @@ public class DefaultModelIO implements ModelIO {
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             if(parser.getNumberOfSyntaxErrors() == 0) {
-                new EntityModelVisitor(model, parent).visit(parseTree);
+                new EntityModelVisitor(parent).visit(parseTree);
             } else {
                 logger.error("Could not parse domain definition file " + domainDefFile.getName().getPath()); //TODO properly report errors
             }
@@ -181,15 +214,16 @@ public class DefaultModelIO implements ModelIO {
         try(OutputStreamWriter os = fileWriter(entityFile)) {
             writeAnnotations(entity, os, "");
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
-            /*TODO os.write("\tid {" + System.lineSeparator());
-            for(Property property : entity.getId()) {
+            List<EAttribute> id = entity.getEAttributes().stream().filter(a -> a.getEAnnotation(Id.class.getName()) != null).collect(Collectors.toList());
+            os.write("\tid {" + System.lineSeparator());
+            for(EAttribute property : id) {
                 writeProperty(property, os, "\t\t");
             }
-            os.write("\t}" + System.lineSeparator());*/
+            os.write("\t}" + System.lineSeparator());
             for(EAttribute property : entity.getEAttributes()) {
-                //TODO if(!entity.getId().contains(property)) {
+                if(!id.contains(property)) {
                     writeProperty(property, os, "\t");
-                //}
+                }
             }
             os.write("}");
         }
