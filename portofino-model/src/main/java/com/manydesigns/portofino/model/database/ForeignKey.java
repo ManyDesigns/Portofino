@@ -22,13 +22,13 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Pair;
-import com.manydesigns.portofino.model.Relationship;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ObjectUtils;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 
@@ -74,7 +74,7 @@ public class ForeignKey extends DatabaseSelectionProvider
     protected String actualManyPropertyName;
     protected String actualOnePropertyName;
     protected Table toTable;
-    Relationship relationship;
+    EReference relationship;
 
     //**************************************************************************
     // Logging
@@ -144,9 +144,12 @@ public class ForeignKey extends DatabaseSelectionProvider
                 : manyPropertyName;
 
             if(relationship == null) {
-                relationship = new Relationship(fromTable.getEntity(), toTable.getEntity());
+                relationship = EcoreFactory.eINSTANCE.createEReference();
+                relationship.setContainment(false);
+                relationship.setEType(toTable.getModelClass());
                 relationship.setName(name);
-                fromTable.getEntity().getDomain().addRelationship(relationship);
+                fromTable.getModelClass().getEReferences().add(relationship);
+                //TODO opposite?
             }
         } else {
             logger.warn("Cannot find destination table '{}'",
@@ -210,7 +213,7 @@ public class ForeignKey extends DatabaseSelectionProvider
         this.onDelete = onDelete;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute
     public String getManyPropertyName() {
         return manyPropertyName;
     }
@@ -219,7 +222,7 @@ public class ForeignKey extends DatabaseSelectionProvider
         this.manyPropertyName = manyPropertyName;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute
     public String getOnePropertyName() {
         return onePropertyName;
     }

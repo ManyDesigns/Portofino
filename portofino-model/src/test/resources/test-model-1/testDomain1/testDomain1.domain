@@ -3,7 +3,7 @@ domain testDomain1 {
         id { name }
         @Email
         email
-        age: integer
-        registrationDate: java.util.Date
+        age: EInt
+        registrationDate: EDate
     }
 }

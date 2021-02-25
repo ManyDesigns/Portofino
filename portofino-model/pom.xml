@@ -42,6 +42,16 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-vfs2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.emfjson</groupId>
+            <artifactId>emfjson-jackson</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.emf</groupId>
+            <artifactId>ecore-xmi</artifactId>
+            <version>2.2.3</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>

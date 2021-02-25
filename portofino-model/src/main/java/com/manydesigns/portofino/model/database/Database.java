@@ -22,6 +22,8 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,7 +55,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
 
     protected final List<Schema> schemas;
 
-    protected Domain domain;
+    protected EPackage domain;
 
     protected String trueString = null;
     protected String falseString = null;
@@ -70,14 +73,13 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public Database(Domain domain) {
+    public Database(EPackage domain) {
         this.domain = domain;
         this.schemas = new ArrayList<>();
     }
 
     public Database() {
-        this(new Domain());
-        domain.getImports().add(Model.JAVA_TYPES);
+        this(EcoreFactory.eINSTANCE.createEPackage());
     }
 
     //**************************************************************************
@@ -215,11 +217,11 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
         this.entityMode = entityMode;
     }
 
-    public Domain getDomain() {
+    public EPackage getDomain() {
         return domain;
     }
 
-    public void setDomain(Domain domain) {
+    public void setDomain(EPackage domain) {
         this.domain = domain;
     }
 
@@ -228,7 +230,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     @XmlElement(name = "annotation", type = Annotation.class)
     @NotNull
     public List<Annotation> getAnnotations() {
-        return domain.getAnnotations();
+        return domain.getEAnnotations().stream().map(Annotation::new).collect(Collectors.toList());
     }
 
     public Properties getSettings() {

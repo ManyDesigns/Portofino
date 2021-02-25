@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.model.io.dsl;
 
-import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
+import org.eclipse.emf.ecore.EPackage;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -26,13 +27,14 @@ public class DefaultModelIOTest {
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             assertEquals(parser.getNumberOfSyntaxErrors(), 0);
-            Domain domain = new EntityModelVisitor(new Model()).visitStandaloneDomain(parseTree);
-            assertEquals(domain.getEntities().size(), 1);
+            EPackage domain = new EntityModelVisitor(new Model()).visitStandaloneDomain(parseTree);
+            assertEquals(domain.getEClassifiers().size(), 1);
         }
     }
 
     @Test
     public void testSimpleModel() throws IOException {
+        ElementsThreadLocals.setupDefaultElementsContext();
         DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 1);
@@ -45,11 +47,11 @@ public class DefaultModelIOTest {
         assertTrue(entityFile.exists());
         String contents = IOUtils.toString(entityFile.getContent().getInputStream(), StandardCharsets.UTF_8);
         assertEquals(contents, "entity Person {\n" +
-                "\tid {\n\t\tname\n\t}\n" +
-                "\t@Email\n" +
+                "\t@com.manydesigns.portofino.model.database.annotations.Id(order = 0)\n" +
+                "\tname\n" +
                 "\temail\n" +
-                "\tage: integer\n" +
-                "\tregistrationDate: datetime\n" +
+                "\tage: EInt\n" +
+                "\tregistrationDate: EDate\n" +
                 "}");
         Model model2 = io.load();
         assertEquals(model2.getDomains().size(), 1);

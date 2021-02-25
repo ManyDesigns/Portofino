@@ -22,7 +22,9 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.database.annotations.Id;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,8 +110,8 @@ public class PrimaryKey implements ModelObject, Named, Unmarshallable {
     public void init(Model model, Configuration configuration) {
         assert table != null;
 
-// Liquibase on MySQL returns null primaryKey name if the name is "PRIMARY"
-//        assert primaryKeyName != null;
+        // Liquibase on MySQL returns null primaryKey name if the name is "PRIMARY"
+        // assert primaryKeyName != null;
 
         if (primaryKeyColumns.isEmpty()) {
             throw new Error(MessageFormat.format("Primary key {0} has no columns", getQualifiedName()));
@@ -133,9 +135,10 @@ public class PrimaryKey implements ModelObject, Named, Unmarshallable {
             logger.warn("Primary key '{}' has no columns", this);
         }
 
-        List<Property> idProps = columns.stream().map(Column::getProperty).collect(Collectors.toList());
-        table.getEntity().getId().clear();
-        table.getEntity().getId().addAll(idProps);
+        table.getColumns().forEach(c -> c.removeAnnotation(Id.class));
+        for(int i = 0; i < columns.size(); i++) {
+            columns.get(i).ensureAnnotation(Id.class).setPropertyValue("order", i + "");
+        }
     }
 
     public void visitChildren(ModelObjectVisitor visitor) {

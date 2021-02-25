@@ -27,6 +27,8 @@ import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +59,6 @@ public class Annotation implements ModelObject {
     //**************************************************************************
 
     protected Object parent;
-    protected String type;
     @Deprecated
     protected List<String> values = new ArrayList<>();
     protected List<AnnotationProperty> properties = new ArrayList<>();
@@ -68,6 +69,7 @@ public class Annotation implements ModelObject {
 
     protected Class<? extends java.lang.annotation.Annotation> javaAnnotationClass;
     protected java.lang.annotation.Annotation javaAnnotation;
+    protected EAnnotation eAnnotation;
 
     //**************************************************************************
     // Logging
@@ -80,15 +82,23 @@ public class Annotation implements ModelObject {
     // Contruction
     //**************************************************************************
 
-    public Annotation() {}
+    public Annotation() {
+        this.eAnnotation = EcoreFactory.eINSTANCE.createEAnnotation();
+    }
+
+    public Annotation(EAnnotation eAnnotation) {
+        this.eAnnotation = eAnnotation;
+        this.eAnnotation.getDetails().forEach(e -> setPropertyValue(e.getKey(), e.getValue()));
+    }
 
     public Annotation(String type) {
         this(null, type);
     }
 
     public Annotation(Object parent, String type) {
+        this();
         this.parent = parent;
-        this.type = type;
+        setType(type);
     }
 
     public Annotation(Class<? extends java.lang.annotation.Annotation> type) {
@@ -96,8 +106,9 @@ public class Annotation implements ModelObject {
     }
 
     public Annotation(Object parent, Class<? extends java.lang.annotation.Annotation> type) {
+        this();
         this.parent = parent;
-        this.type = type.getName();
+        setType(type.getName());
         this.javaAnnotationClass = type;
     }
 
@@ -116,9 +127,9 @@ public class Annotation implements ModelObject {
     }
 
     public void init(Model model, Configuration configuration) {
-        javaAnnotationClass = ReflectionUtil.loadClass(type);
+        javaAnnotationClass = ReflectionUtil.loadClass(getType());
         if (javaAnnotationClass == null) {
-            logger.error("Cannot load annotation class: {}", type);
+            logger.error("Cannot load annotation class: {}", getType());
             return;
         }
         if(!java.lang.annotation.Annotation.class.isAssignableFrom(javaAnnotationClass)) {
@@ -226,7 +237,9 @@ public class Annotation implements ModelObject {
 
     public void link(Model model, Configuration configuration) {}
 
-    public void visitChildren(ModelObjectVisitor visitor) {}
+    public void visitChildren(ModelObjectVisitor visitor) {
+        properties.forEach(visitor::visit);
+    }
 
     //**************************************************************************
     // Getters and setters
@@ -238,11 +251,11 @@ public class Annotation implements ModelObject {
 
     @XmlAttribute(required = true)
     public String getType() {
-        return type;
+        return eAnnotation.getSource();
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.eAnnotation.setSource(type);
     }
 
     @JsonProperty("values")
@@ -298,9 +311,10 @@ public class Annotation implements ModelObject {
         if(value == null) {
             if(property != null) {
                 properties.remove(property);
+                eAnnotation.getDetails().removeKey(name);
             }
         } else if(property == null) {
-            property = new AnnotationProperty(name, value);
+            property = new AnnotationProperty(this, name, value);
             properties.add(property);
         } else {
             property.setValue(value);

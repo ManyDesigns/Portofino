@@ -566,7 +566,9 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
         assertNotNull(table);
         Annotation nq = new Annotation(table, "javax.persistence.NamedQuery");
-        nq.setProperties(Arrays.asList(new AnnotationProperty("name", "all_questions"), new AnnotationProperty("query", "from domanda")));
+        nq.setProperties(Arrays.asList(
+                new AnnotationProperty(nq, "name", "all_questions"),
+                new AnnotationProperty(nq, "query", "from domanda")));
         table.getAnnotations().add(nq);
         persistence.initModel();
         session = persistence.getSession("hibernatetest");

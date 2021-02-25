@@ -21,8 +21,9 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.java.JavaTypesDomain;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.*;
@@ -47,8 +48,7 @@ public class Model {
     //**************************************************************************
 
     protected final LinkedList<Database> databases;
-    protected final List<Domain> domains = new ArrayList<>();
-    public static final Domain JAVA_TYPES = new JavaTypesDomain();
+    protected final List<EPackage> domains = new ArrayList<>();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -76,13 +76,12 @@ public class Model {
         new LinkVisitor(this, configuration).visit(rootObject);
     }
 
-    public Domain ensureDomain(String name) {
+    public EPackage ensureDomain(String name) {
         return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
-            Domain domain = new Domain();
-            domain.setName(name);
-            domain.getImports().add(JAVA_TYPES);
-            getDomains().add(domain);
-            return domain;
+            EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
+            ePackage.setName(name);
+            getDomains().add(ePackage);
+            return ePackage;
         });
     }
 
@@ -97,7 +96,7 @@ public class Model {
         return databases;
     }
 
-    public List<Domain> getDomains() {
+    public List<EPackage> getDomains() {
         return domains;
     }
 }

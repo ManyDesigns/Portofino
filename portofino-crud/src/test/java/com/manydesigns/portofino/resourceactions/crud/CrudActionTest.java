@@ -201,7 +201,7 @@ public class CrudActionTest extends JerseyTest {
         property.setInsertable(true);
         property.setUpdatable(true);
         ann = new Annotation(column, Required.class.getName());
-        ann.getProperties().add(new AnnotationProperty("value", "true"));
+        ann.setPropertyValue("value", "true");
         property.getAnnotations().add(ann);
         configuration.getProperties().add(property);
 

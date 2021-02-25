@@ -25,6 +25,7 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +66,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     //**************************************************************************
 
     protected String javaType;
-    protected Property property;
+    protected EAttribute property;
 
     //**************************************************************************
     // Fields for wire-up
@@ -79,10 +81,10 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     // Constructors and init
     //**************************************************************************
     public Column() {
-        this(new Property());
+        this(EcoreFactory.eINSTANCE.createEAttribute());
     }
 
-    public Column(Property property) {
+    public Column(EAttribute property) {
         this.property = property;
     }
 
@@ -135,36 +137,54 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         if(javaType != null) {
             actualJavaType = ReflectionUtil.loadClass(javaType);
             if (actualJavaType != null) {
-                property.setType(table.getEntity().getDomain().ensureType(actualJavaType.getName()));
+                property.setEType(ensureType(actualJavaType));
             } else {
                 logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
-                property.setType(table.getEntity().getDomain().getDefaultType());
+                property.setEType(EcorePackage.eINSTANCE.getEString());
             }
-        } else if(property.getType() == null) {
+        } else if(property.getEType() == null) {
             actualJavaType = Type.getDefaultJavaType(jdbcType, columnType, length, scale);
             if (actualJavaType != null) {
-                property.setType(table.getEntity().getDomain().ensureType(actualJavaType.getName()));
+                property.setEType(ensureType(actualJavaType));
             } else {
                 logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
                         table.getTableName(),
                         getColumnName(),
                         jdbcType,
                         javaType);
-                property.setType(table.getEntity().getDomain().getDefaultType());
+                property.setEType(EcorePackage.eINSTANCE.getEString());
             }
         } else {
-            actualJavaType = ReflectionUtil.loadClass(property.getType().getName());
+            actualJavaType = property.getEType().getInstanceClass();
             if (actualJavaType == null) {
-                logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), property.getType().getName());
+                logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), property.getEType().getName());
             }
         }
     }
 
+    public EClassifier ensureType(Class<?> javaType) {
+        return EcorePackage.eINSTANCE.getEClassifiers().stream().filter(
+                c -> c.getInstanceClass() == javaType).findFirst().orElseGet(() -> {
+            EPackage rootPackage = getRootPackage(table.getModelClass().getEPackage());
+            return rootPackage.getEClassifiers().stream().filter(
+                    c -> c.getInstanceClass() == javaType).findFirst().orElseGet(() -> {
+                EDataType type = EcoreFactory.eINSTANCE.createEDataType();
+                rootPackage.getEClassifiers().add(type);
+                return type;
+            });
+        });
+    }
+
+    public static EPackage getRootPackage(EPackage ePackage) {
+        while (ePackage.getESuperPackage() != null) {
+            ePackage = ePackage.getESuperPackage();
+        }
+        return ePackage;
+    }
+
     public void link(Model model, Configuration configuration) {}
 
-    public void visitChildren(ModelObjectVisitor visitor) {
-        visitor.visit(property);
-    }
+    public void visitChildren(ModelObjectVisitor visitor) {}
 
     //**************************************************************************
     // Getters/setter
@@ -176,7 +196,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void setTable(Table table) {
         this.table = table;
-        this.property.setOwner(table != null ? table.getEntity() : null);
+        if(this.table != null) {
+            this.table.getModelClass().getEAttributes().add(property);
+        }
     }
 
     public String getDatabaseName() {
@@ -261,7 +283,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         return true;
     }
 
-    public Class getActualJavaType() {
+    public Class<?> getActualJavaType() {
         return actualJavaType;
     }
 
@@ -290,7 +312,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     @XmlElementWrapper(name = "annotations")
     @XmlElement(name = "annotation", type = Annotation.class)
     public List<Annotation> getAnnotations() {
-        return property.getAnnotations();
+        return property.getEAnnotations().stream().map(Annotation::new).collect(Collectors.toList());
     }
         
     @Override
@@ -329,7 +351,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         return null;
     }
 
-    public Property getProperty() {
+    public EAttribute getProperty() {
         return property;
     }
 }

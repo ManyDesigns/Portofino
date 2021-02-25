@@ -1,20 +1,23 @@
 package com.manydesigns.portofino.model;
 
+import org.apache.commons.configuration2.Configuration;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 @XmlAccessorType(XmlAccessType.NONE)
-public class AnnotationProperty {
+public class AnnotationProperty implements ModelObject {
 
-    private String name;
-    private String value;
+    protected Annotation owner;
+    protected String name;
 
     public AnnotationProperty() {}
 
-    public AnnotationProperty(String name, String value) {
+    public AnnotationProperty(Annotation annotation, String name, String value) {
+        setParent(annotation);
         this.name = name;
-        this.value = value;
+        setValue(value);
     }
 
     @XmlAttribute
@@ -28,10 +31,35 @@ public class AnnotationProperty {
 
     @XmlAttribute
     public String getValue() {
-        return value;
+        return owner.eAnnotation.getDetails().get(name);
     }
 
     public void setValue(String value) {
-        this.value = value;
+        owner.eAnnotation.getDetails().put(name, value);
+    }
+
+    @Override
+    public void setParent(Object parent) {
+        this.owner = (Annotation) parent;
+    }
+
+    @Override
+    public void reset() {
+
+    }
+
+    @Override
+    public void init(Model model, Configuration configuration) {
+
+    }
+
+    @Override
+    public void link(Model model, Configuration configuration) {
+
+    }
+
+    @Override
+    public void visitChildren(ModelObjectVisitor visitor) {
+
     }
 }

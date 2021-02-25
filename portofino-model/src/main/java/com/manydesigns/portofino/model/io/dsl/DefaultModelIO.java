@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.model.io.dsl;
 
-import com.manydesigns.portofino.model.Type;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.language.ModelLexer;
@@ -12,6 +11,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.PatternFileSelector;
+import org.eclipse.emf.ecore.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,8 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DefaultModelIO implements ModelIO {
 
@@ -53,15 +55,20 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadDomain(Model model, Domain parent, FileObject domainDir) throws IOException {
+    protected void loadDomain(Model model, EPackage parent, FileObject domainDir) throws IOException {
         String domainName = domainDir.getName().getBaseName();
         FileObject domainDefFile = domainDir.resolveFile(domainName + ".domain");
         if(domainDefFile.exists()) {
             loadDomainDefinition(model, parent, domainDefFile);
         }
-        Domain domain;
+        EPackage domain;
         if(parent != null) {
-            domain = parent.ensureSubdomain(domainName);
+            domain = parent.getESubpackages().stream().filter(p -> p.getName().equals(domainName)).findFirst().orElseGet(() -> {
+                EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
+                ePackage.setName(domainName);
+                parent.getESubpackages().add(ePackage);
+                return ePackage;
+            });
         } else {
             domain = model.ensureDomain(domainName);
         }
@@ -74,7 +81,7 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadEntity(Model model, Domain domain, FileObject entityFile) throws IOException {
+    protected void loadEntity(Model model, EPackage domain, FileObject entityFile) throws IOException {
         try(InputStream inputStream = entityFile.getContent().getInputStream()) {
             ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
@@ -87,7 +94,7 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadDomainDefinition(Model model, Domain parent, FileObject domainDefFile) throws IOException {
+    protected void loadDomainDefinition(Model model, EPackage parent, FileObject domainDefFile) throws IOException {
         try(InputStream inputStream = domainDefFile.getContent().getInputStream()) {
             ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
@@ -109,7 +116,7 @@ public class DefaultModelIO implements ModelIO {
         if(!modelDirectory.getType().equals(FileType.FOLDER)) {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
-        for(Domain domain : model.getDomains()) {
+        for(EPackage domain : model.getDomains()) {
             saveDomain(domain, modelDirectory);
         }
         deleteUnusedDomainDirectories(modelDirectory, model.getDomains());
@@ -120,11 +127,11 @@ public class DefaultModelIO implements ModelIO {
         return new OutputStreamWriter(file.getContent().getOutputStream(), StandardCharsets.UTF_8);
     }
 
-    protected void saveDomain(Domain domain, FileObject directory) throws IOException {
+    protected void saveDomain(EPackage domain, FileObject directory) throws IOException {
         FileObject domainDir = directory.resolveFile(domain.getName());
         domainDir.createFolder();
         FileObject domainDefFile = domainDir.resolveFile(domain.getName() + ".domain");
-        if(domain.getAnnotations().isEmpty()) {
+        if(domain.getEAnnotations().isEmpty()) {
             domainDefFile.delete();
         } else {
             try(OutputStreamWriter os = fileWriter(domainDefFile)) {
@@ -132,15 +139,15 @@ public class DefaultModelIO implements ModelIO {
                 os.write("domain " + domain.getName() + ";");
             }
         }
-        for(Entity entity : domain.getEntities()) {
-            saveEntity(entity, domainDir);
+        for(EClassifier entity : domain.getEClassifiers().stream().filter(c -> c instanceof EClass).collect(Collectors.toList())) {
+            saveEntity((EClass) entity, domainDir);
         }
-        deleteUnusedEntityFiles(domainDir, domain.getEntities());
+        deleteUnusedEntityFiles(domainDir, domain.getEClassifiers());
         //TODO imports
-        for(Domain subdomain : domain.getSubdomains()) {
+        for(EPackage subdomain : domain.getESubpackages()) {
             saveDomain(subdomain, domainDir);
         }
-        deleteUnusedDomainDirectories(domainDir, domain.getSubdomains());
+        deleteUnusedDomainDirectories(domainDir, domain.getESubpackages());
     }
 
     /**
@@ -148,7 +155,7 @@ public class DefaultModelIO implements ModelIO {
      *
      * @throws FileSystemException if the subdomain directories cannot be listed.
      */
-    protected void deleteUnusedDomainDirectories(FileObject baseDir, List<Domain> domains) throws FileSystemException {
+    protected void deleteUnusedDomainDirectories(FileObject baseDir, List<EPackage> domains) throws FileSystemException {
         Arrays.stream(baseDir.getChildren()).forEach(dir -> {
             String dirPath = dir.getName().getPath();
             try {
@@ -169,20 +176,20 @@ public class DefaultModelIO implements ModelIO {
         });
     }
 
-    protected void saveEntity(Entity entity, FileObject domainDir) throws IOException {
+    protected void saveEntity(EClass entity, FileObject domainDir) throws IOException {
         FileObject entityFile = domainDir.resolveFile(entity.getName() + ".entity");
         try(OutputStreamWriter os = fileWriter(entityFile)) {
             writeAnnotations(entity, os, "");
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
-            os.write("\tid {" + System.lineSeparator());
+            /*TODO os.write("\tid {" + System.lineSeparator());
             for(Property property : entity.getId()) {
                 writeProperty(property, os, "\t\t");
             }
-            os.write("\t}" + System.lineSeparator());
-            for(Property property : entity.getProperties()) {
-                if(!entity.getId().contains(property)) {
+            os.write("\t}" + System.lineSeparator());*/
+            for(EAttribute property : entity.getEAttributes()) {
+                //TODO if(!entity.getId().contains(property)) {
                     writeProperty(property, os, "\t");
-                }
+                //}
             }
             os.write("}");
         }
@@ -193,7 +200,7 @@ public class DefaultModelIO implements ModelIO {
      *
      * @throws FileSystemException if the subdomain directories cannot be listed.
      */
-    protected void deleteUnusedEntityFiles(FileObject baseDir, List<Entity> entities) throws FileSystemException {
+    protected void deleteUnusedEntityFiles(FileObject baseDir, List<EClassifier> entities) throws FileSystemException {
         Arrays.stream(baseDir.getChildren()).forEach(file -> {
             String filePath = file.getName().getPath();
             try {
@@ -214,39 +221,38 @@ public class DefaultModelIO implements ModelIO {
         });
     }
 
-    protected void writeProperty(Property property, OutputStreamWriter writer, String indent) throws IOException {
+    protected void writeProperty(EAttribute property, OutputStreamWriter writer, String indent) throws IOException {
         writeAnnotations(property, writer, indent);
         writer.write(indent + property.getName());
-        Type type = property.getType();
-        if(type != property.getOwner().getDomain().getDefaultType()) {
-            String typeName = type.getAlias() != null ? type.getAlias() : type.getName();
-            writer.write(": " + typeName);
+        EClassifier type = property.getEType();
+        if(!type.equals(EcorePackage.eINSTANCE.getEString())) {
+            writer.write(": " + type.getName());
         }
         writer.write(System.lineSeparator());
     }
 
-    protected void writeAnnotations(Annotated annotated, OutputStreamWriter writer, String indent) throws IOException {
-        for(Annotation annotation : annotated.getAnnotations()) {
+    protected void writeAnnotations(EModelElement annotated, OutputStreamWriter writer, String indent) throws IOException {
+        for(EAnnotation annotation : annotated.getEAnnotations()) {
             writeAnnotation(annotation, writer, indent);
         }
     }
 
-    protected void writeAnnotation(Annotation annotation, OutputStreamWriter os, String indent) throws IOException {
-        os.write(indent + "@" + annotation.getType());
-        if(!annotation.getProperties().isEmpty()) {
+    protected void writeAnnotation(EAnnotation annotation, OutputStreamWriter os, String indent) throws IOException {
+        os.write(indent + "@" + annotation.getSource());
+        if(!annotation.getDetails().isEmpty()) {
             os.write("(");
-            if(annotation.getProperties().size() == 1 && annotation.getProperties().get(0).getName().equals("value")) {
-                writeAnnotationPropertyValue(annotation, annotation.getProperty("value"), os);
+            if(annotation.getDetails().size() == 1 && annotation.getDetails().containsKey("value")) {
+                writeAnnotationPropertyValue(annotation, "value", os);
             } else {
                 boolean first = true;
-                for(AnnotationProperty property : annotation.getProperties()) {
+                for(Map.Entry<String, String> property : annotation.getDetails().entrySet()) {
                     if(first) {
                         first = false;
                     } else {
                         os.write(", ");
                     }
-                    os.write(property.getName() + " = ");
-                    writeAnnotationPropertyValue(annotation, property, os);
+                    os.write(property.getKey() + " = ");
+                    writeAnnotationPropertyValue(annotation, property.getKey(), os);
                 }
             }
             os.write(")");
@@ -254,10 +260,13 @@ public class DefaultModelIO implements ModelIO {
         os.write(System.lineSeparator());
     }
 
-    protected void writeAnnotationPropertyValue(Annotation annotation, AnnotationProperty property, OutputStreamWriter os) throws IOException {
-        String value = property.getValue();
+    protected void writeAnnotationPropertyValue(
+            EAnnotation annotation, String name, OutputStreamWriter os) throws IOException {
+        String value = annotation.getDetails().get(name);
         try {
-            Class<?> type = annotation.getJavaAnnotationClass().getMethod(property.getName()).getReturnType();
+            Annotation ann = new Annotation(annotation);
+            ann.init(null, null);
+            Class<?> type = ann.getJavaAnnotationClass().getMethod(name).getReturnType();
             if(type == String.class || type == Class.class || Enum.class.isAssignableFrom(type)) {
                 value = "\"" + StringEscapeUtils.escapeJava(value) + "\"";
             }

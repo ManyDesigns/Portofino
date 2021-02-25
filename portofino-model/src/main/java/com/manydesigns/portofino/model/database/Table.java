@@ -26,6 +26,8 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,7 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -66,7 +69,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     protected PrimaryKey primaryKey;
 
-    protected Entity entity;
+    protected EClass modelClass;
 
     //**************************************************************************
     // Fields for wire-up
@@ -87,8 +90,8 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     //**************************************************************************
 
 
-    public Table(Entity entity) {
-        this.entity = entity;
+    public Table(EClass modelClass) {
+        this.modelClass = modelClass;
         columns = new ArrayList<>();
         foreignKeys = new ArrayList<>();
         oneToManyRelationships = new ArrayList<>();
@@ -96,7 +99,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public Table() {
-        this(new Entity());
+        this(EcoreFactory.eINSTANCE.createEClass());
     }
 
     public Table(Schema schema) {
@@ -161,13 +164,13 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
             calculatedEntityName = baseEntityName + "_" + (i++);
         }
 
-        entity.setName(calculatedEntityName);
+        modelClass.setName(calculatedEntityName);
     }
 
     public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
-        visitor.visit(entity);
+        //TODO validate modelClass?
 
         for (Column column : columns) {
             visitor.visit(column);
@@ -198,7 +201,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
-        this.entity.setDomain(schema != null ? schema.getDomain() : null);
+        //TODO this.entity.setDomain(schema != null ? schema.getDomain() : null);
     }
 
     @Required
@@ -275,7 +278,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public String getActualEntityName() {
-        return entity.getName();
+        return modelClass.getName();
     }
 
     public List<ForeignKey> getOneToManyRelationships() {
@@ -286,7 +289,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     @XmlElement(name = "annotation", type = Annotation.class)
     @NotNull
     public List<Annotation> getAnnotations() {
-        return entity.getAnnotations();
+        return modelClass.getEAnnotations().stream().map(Annotation::new).collect(Collectors.toList());
     }
 
     @XmlElementWrapper(name="selectionProviders")
@@ -324,7 +327,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 
-    public Entity getEntity() {
-        return entity;
+    public EClass getModelClass() {
+        return modelClass;
     }
 }

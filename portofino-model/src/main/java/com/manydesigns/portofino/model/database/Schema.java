@@ -23,6 +23,8 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +56,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     @Deprecated
     protected final List<Table> immediateTables;
 
-    protected Domain domain;
+    protected EPackage domain;
     protected String actualSchemaName;
     protected String catalog;
 
@@ -73,10 +75,10 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     // Constructors and init
     //**************************************************************************
     public Schema() {
-        this(new Domain());
+        this(EcoreFactory.eINSTANCE.createEPackage());
     }
 
-    public Schema(Domain domain) {
+    public Schema(EPackage domain) {
         this.domain = domain;
         immediateTables = new ArrayList<>();
     }
@@ -84,8 +86,8 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     public Schema(Database database) {
         this();
         setDatabase(database);
-        Domain parent = database.getDomain();
-        this.domain.setParent(parent);
+        EPackage parent = database.getDomain();
+        parent.getESubpackages().add(this.domain);
     }
 
     //**************************************************************************
@@ -102,7 +104,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void setParent(Object parent) {
         database = (Database) parent;
-        this.domain.setParent(database.getDomain());
+        database.getDomain().getESubpackages().add(this.domain);
         tables.addAll(immediateTables);
         immediateTables.clear();
     }
@@ -124,9 +126,9 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + getSchemaName();
         if(actualSchemaName == null) {
             actualSchemaName = configuration.getString(key);
-            domain.removeAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
+            domain.getEAnnotations().removeIf(a -> a.getSource().equals(com.manydesigns.portofino.model.database.annotations.Schema.class.getName()));
         } else {
-            Annotation annotation = domain.ensureAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
+            Annotation annotation = ensureAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class);
             annotation.setPropertyValue("name", actualSchemaName);
         }
         if(actualSchemaName == null) {
@@ -271,11 +273,11 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         return annotations;
     }
 
-    public Domain getDomain() {
+    public EPackage getDomain() {
         return domain;
     }
 
-    public void setDomain(Domain domain) {
+    public void setDomain(EPackage domain) {
         this.domain = domain;
     }
 }
