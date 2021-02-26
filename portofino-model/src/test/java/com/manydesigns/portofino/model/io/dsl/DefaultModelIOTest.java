@@ -48,7 +48,6 @@ public class DefaultModelIOTest {
         String contents = IOUtils.toString(entityFile.getContent().getInputStream(), StandardCharsets.UTF_8);
         assertEquals(contents, "entity Person {\n" +
                 "\tid {\n" +
-                "\t\t@com.manydesigns.portofino.model.database.annotations.Id(order = 0)\n" +
                 "\t\tname\n" +
                 "\t}\n" +
                 "\t@Email\n" +

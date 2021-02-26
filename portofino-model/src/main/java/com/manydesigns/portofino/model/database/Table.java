@@ -92,6 +92,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     public Table(EClass eClass) {
         this.eClass = eClass;
+        initAnnotations(eClass);
         columns = new ArrayList<>();
         foreignKeys = new ArrayList<>();
         oneToManyRelationships = new ArrayList<>();

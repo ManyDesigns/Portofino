@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -214,15 +215,27 @@ public class DefaultModelIO implements ModelIO {
         try(OutputStreamWriter os = fileWriter(entityFile)) {
             writeAnnotations(entity, os, "");
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
-            List<EStructuralFeature> id = entity.getEStructuralFeatures().stream().filter(a -> a.getEAnnotation(Id.class.getName()) != null).collect(Collectors.toList());
+            List<EStructuralFeature> id = entity.getEStructuralFeatures().stream()
+                    .filter(a -> a instanceof EAttribute && a.getEAnnotation(Id.class.getName()) != null)
+                    .collect(Collectors.toList());
             os.write("\tid {" + System.lineSeparator());
             for(EStructuralFeature property : id) {
-                writeProperty(property, os, "\t\t");
+                EAnnotation ann = property.getEAnnotation(Id.class.getName());
+                try {
+                    property.getEAnnotations().remove(ann);
+                    writeProperty((EAttribute) property, os, "\t\t");
+                } finally {
+                    property.getEAnnotations().add(ann);
+                }
             }
             os.write("\t}" + System.lineSeparator());
             for(EStructuralFeature property : entity.getEStructuralFeatures()) {
                 if(!id.contains(property)) {
-                    writeProperty(property, os, "\t");
+                    if(property instanceof EAttribute) {
+                        writeProperty((EAttribute) property, os, "\t");
+                    } else {
+                        writeReference((EReference) property, os, "\t");
+                    }
                 }
             }
             os.write("}");
@@ -255,7 +268,7 @@ public class DefaultModelIO implements ModelIO {
         });
     }
 
-    protected void writeProperty(EStructuralFeature property, OutputStreamWriter writer, String indent) throws IOException {
+    protected void writeProperty(EAttribute property, Writer writer, String indent) throws IOException {
         writeAnnotations(property, writer, indent);
         writer.write(indent + property.getName());
         EClassifier type = property.getEType();
@@ -265,37 +278,50 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    protected void writeAnnotations(EModelElement annotated, OutputStreamWriter writer, String indent) throws IOException {
+    protected void writeReference(EReference reference, Writer writer, String indent) throws IOException {
+        writeAnnotations(reference, writer, indent);
+        writer.write(indent + reference.getName());
+        writer.write(" --> ");
+        writer.write(reference.getEType().getName());
+        writer.write(" ");
+        if(reference.getUpperBound() >= 0) {
+            writer.write(reference.getLowerBound() + ".." + reference.getUpperBound());
+        } else {
+            writer.write(reference.getLowerBound() + "..*");
+        }
+        writer.write(System.lineSeparator());
+    }
+
+    protected void writeAnnotations(EModelElement annotated, Writer writer, String indent) throws IOException {
         for(EAnnotation annotation : annotated.getEAnnotations()) {
             writeAnnotation(annotation, writer, indent);
         }
     }
 
-    protected void writeAnnotation(EAnnotation annotation, OutputStreamWriter os, String indent) throws IOException {
-        os.write(indent + "@" + annotation.getSource());
+    protected void writeAnnotation(EAnnotation annotation, Writer writer, String indent) throws IOException {
+        writer.write(indent + "@" + annotation.getSource());
         if(!annotation.getDetails().isEmpty()) {
-            os.write("(");
+            writer.write("(");
             if(annotation.getDetails().size() == 1 && annotation.getDetails().containsKey("value")) {
-                writeAnnotationPropertyValue(annotation, "value", os);
+                writeAnnotationPropertyValue(annotation, "value", writer);
             } else {
                 boolean first = true;
                 for(Map.Entry<String, String> property : annotation.getDetails().entrySet()) {
                     if(first) {
                         first = false;
                     } else {
-                        os.write(", ");
+                        writer.write(", ");
                     }
-                    os.write(property.getKey() + " = ");
-                    writeAnnotationPropertyValue(annotation, property.getKey(), os);
+                    writer.write(property.getKey() + " = ");
+                    writeAnnotationPropertyValue(annotation, property.getKey(), writer);
                 }
             }
-            os.write(")");
+            writer.write(")");
         }
-        os.write(System.lineSeparator());
+        writer.write(System.lineSeparator());
     }
 
-    protected void writeAnnotationPropertyValue(
-            EAnnotation annotation, String name, OutputStreamWriter os) throws IOException {
+    protected void writeAnnotationPropertyValue(EAnnotation annotation, String name, Writer writer) throws IOException {
         String value = annotation.getDetails().get(name);
         try {
             Annotation ann = new Annotation(annotation);
@@ -307,7 +333,7 @@ public class DefaultModelIO implements ModelIO {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Invalid annotation " + annotation, e); //TODO
         }
-        os.write(value);
+        writer.write(value);
     }
 
     @Override

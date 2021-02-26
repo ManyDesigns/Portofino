@@ -77,6 +77,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
         this.ePackage = ePackage;
         this.schemas = new ArrayList<>();
         this.annotations = new ArrayList<>();
+        initAnnotations(ePackage);
     }
 
     public Database() {

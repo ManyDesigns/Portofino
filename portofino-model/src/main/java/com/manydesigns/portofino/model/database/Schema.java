@@ -80,6 +80,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
 
     public Schema(EPackage ePackage) {
         this.ePackage = ePackage;
+        initAnnotations(ePackage);
         immediateTables = new ArrayList<>();
     }
 

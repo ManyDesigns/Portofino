@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.model;
 
+import org.eclipse.emf.ecore.EModelElement;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +32,7 @@ import java.util.Optional;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface Annotated {
-    String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2021 ManyDesigns srl";
 
     List<Annotation> getAnnotations();
 
@@ -68,5 +70,13 @@ public interface Annotated {
 
     default boolean removeAnnotation(Class<? extends java.lang.annotation.Annotation> annotationClass) {
         return getAnnotations().removeIf(a -> a.getJavaAnnotationClass() == annotationClass);
+    }
+
+    default void initAnnotations(EModelElement modelElement) {
+        modelElement.getEAnnotations().forEach(a -> {
+            Annotation e = new Annotation(a);
+            e.setParent(this);
+            getAnnotations().add(e);
+        });
     }
 }
