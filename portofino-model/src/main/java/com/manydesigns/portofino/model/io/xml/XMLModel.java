@@ -128,7 +128,7 @@ public class XMLModel implements ModelIO {
                             logger.error("Skipping table " + table.getTableName() + " defined in file " + tableFile);
                             continue;
                         }
-                        table.setParent(schema);
+                        table.setSchema(schema);
                         schema.getTables().add(table);
                     }
                 }

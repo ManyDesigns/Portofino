@@ -203,7 +203,9 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void setSchema(Schema schema) {
         this.schema = schema;
-        //TODO this.entity.setDomain(schema != null ? schema.getDomain() : null);
+        if(this.schema != null) {
+            schema.getModelElement().getEClassifiers().add(getModelElement());
+        }
     }
 
     @Required

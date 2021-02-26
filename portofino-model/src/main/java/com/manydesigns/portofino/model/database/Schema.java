@@ -86,8 +86,6 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     public Schema(Database database) {
         this();
         setDatabase(database);
-        EPackage parent = database.getModelElement();
-        parent.getESubpackages().add(this.ePackage);
     }
 
     //**************************************************************************
@@ -103,8 +101,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public void setParent(Object parent) {
-        database = (Database) parent;
-        database.getModelElement().getESubpackages().add(this.ePackage);
+        setDatabase((Database) parent);
         tables.addAll(immediateTables);
         immediateTables.clear();
     }
@@ -157,6 +154,9 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void setDatabase(Database database) {
         this.database = database;
+        if(this.database != null) {
+            database.getModelElement().getESubpackages().add(this.ePackage);
+        }
     }
 
     public String getDatabaseName() {

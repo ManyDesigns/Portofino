@@ -147,9 +147,18 @@ public class ForeignKey extends DatabaseSelectionProvider
                 relationship = EcoreFactory.eINSTANCE.createEReference();
                 relationship.setContainment(false);
                 relationship.setEType(toTable.getModelElement());
+                relationship.setLowerBound(0);
+                relationship.setUpperBound(1);
                 relationship.setName(name);
-                fromTable.getModelElement().getEReferences().add(relationship);
-                //TODO opposite?
+                fromTable.getModelElement().getEStructuralFeatures().add(relationship);
+
+                EReference opposite = EcoreFactory.eINSTANCE.createEReference();
+                opposite.setName(name);
+                opposite.setEType(fromTable.getModelElement());
+                opposite.setLowerBound(0);
+                opposite.setUpperBound(EReference.UNBOUNDED_MULTIPLICITY);
+                toTable.getModelElement().getEStructuralFeatures().add(opposite);
+                relationship.setEOpposite(opposite);
             }
         } else {
             logger.warn("Cannot find destination table '{}'",

@@ -11,13 +11,14 @@ public class AnnotationProperty implements ModelObject {
 
     protected Annotation owner;
     protected String name;
+    protected String value;
 
     public AnnotationProperty() {}
 
     public AnnotationProperty(Annotation annotation, String name, String value) {
-        setParent(annotation);
-        this.name = name;
+        setName(name);
         setValue(value);
+        setParent(annotation);
     }
 
     @XmlAttribute
@@ -31,16 +32,22 @@ public class AnnotationProperty implements ModelObject {
 
     @XmlAttribute
     public String getValue() {
-        return owner.eAnnotation.getDetails().get(name);
+        return owner != null ? owner.eAnnotation.getDetails().get(name) : value;
     }
 
     public void setValue(String value) {
-        owner.eAnnotation.getDetails().put(name, value);
+        if(owner != null) {
+            owner.eAnnotation.getDetails().put(name, value);
+        } else {
+            this.value = value;
+        }
     }
 
     @Override
     public void setParent(Object parent) {
+        String value = getValue();
         this.owner = (Annotation) parent;
+        setValue(value);
     }
 
     @Override
