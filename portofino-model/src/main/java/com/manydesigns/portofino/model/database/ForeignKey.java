@@ -92,6 +92,10 @@ public class ForeignKey extends DatabaseSelectionProvider
 
     public ForeignKey(Table fromTable) {
         this();
+        setFromTable(fromTable);
+    }
+
+    public void setFromTable(Table fromTable) {
         this.fromTable = fromTable;
     }
 
@@ -101,8 +105,7 @@ public class ForeignKey extends DatabaseSelectionProvider
 
     @Override
     public String getQualifiedName() {
-        return MessageFormat.format("{0}${1}",
-                fromTable.getQualifiedName(), name);
+        return MessageFormat.format("{0}${1}", fromTable.getQualifiedName(), getName());
     }
 
     @Override
@@ -116,11 +119,6 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     public void init(Model model, Configuration configuration) {
         super.init(model, configuration);
-
-        assert fromTable != null;
-        assert name != null;
-        assert toSchema != null;
-        assert toTableName != null;
 
         if (references.isEmpty()) {
             throw new Error(MessageFormat.format(
@@ -137,10 +135,10 @@ public class ForeignKey extends DatabaseSelectionProvider
         if(toTable != null) {
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);
-            hql = "from " + toTable.getActualEntityName();
+            setHql("from " + toTable.getActualEntityName());
 
             actualManyPropertyName = (manyPropertyName == null)
-                ? DatabaseLogic.getUniquePropertyName(toTable, DatabaseLogic.normalizeName(name))
+                ? DatabaseLogic.getUniquePropertyName(toTable, DatabaseLogic.normalizeName(getName()))
                 : manyPropertyName;
 
             if(relationship == null) {
@@ -149,11 +147,11 @@ public class ForeignKey extends DatabaseSelectionProvider
                 relationship.setEType(toTable.getModelElement());
                 relationship.setLowerBound(0);
                 relationship.setUpperBound(1);
-                relationship.setName(name);
+                relationship.setName(getName());
                 fromTable.getModelElement().getEStructuralFeatures().add(relationship);
 
                 EReference opposite = EcoreFactory.eINSTANCE.createEReference();
-                opposite.setName(name);
+                opposite.setName(getName());
                 opposite.setEType(fromTable.getModelElement());
                 opposite.setLowerBound(0);
                 opposite.setUpperBound(EReference.UNBOUNDED_MULTIPLICITY);
@@ -165,12 +163,12 @@ public class ForeignKey extends DatabaseSelectionProvider
                     Table.composeQualifiedName(toDatabase, toSchema, toTableName));
 
             actualManyPropertyName = (manyPropertyName == null)
-                ? DatabaseLogic.normalizeName(name)
+                ? DatabaseLogic.normalizeName(getName())
                 : manyPropertyName;
         }
 
         actualOnePropertyName = (onePropertyName == null)
-                ? DatabaseLogic.getUniquePropertyName(fromTable, DatabaseLogic.normalizeName(name))
+                ? DatabaseLogic.getUniquePropertyName(fromTable, DatabaseLogic.normalizeName(getName()))
                 : onePropertyName;
     }
 
@@ -251,7 +249,7 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     @XmlTransient
     public String getHql() {
-        return hql;
+        return super.getHql();
     }
 
     @XmlAttribute(required = true)

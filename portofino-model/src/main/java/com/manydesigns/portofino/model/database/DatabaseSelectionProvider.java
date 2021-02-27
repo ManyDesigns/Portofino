@@ -23,7 +23,11 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
 import com.manydesigns.portofino.model.Named;
+import com.manydesigns.portofino.model.database.annotations.SelectionProvider;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,12 +50,10 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
 
     protected final List<Reference> references;
 
-    protected String name;
     protected String toDatabase;
-    protected String sql;
-    protected String hql;
 
     protected Table fromTable;
+    protected EAnnotation annotation;
 
     //**************************************************************************
     // Logging
@@ -66,11 +68,13 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
 
     public DatabaseSelectionProvider() {
         references = new ArrayList<>();
+        annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+        annotation.setSource(SelectionProvider.class.getName());
     }
 
     public DatabaseSelectionProvider(Table fromTable) {
         this();
-        this.fromTable = fromTable;
+        setFromTable(fromTable);
     }
 
     //**************************************************************************
@@ -78,18 +82,18 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
     //**************************************************************************
 
     public void setParent(Object parent) {
-        fromTable = (Table) parent;
+        setFromTable((Table) parent);
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        fromTable = (Table) parent;
+        setFromTable((Table) parent);
     }
 
     public void reset() {}
 
     public void init(Model model, Configuration configuration) {
         assert fromTable != null;
-        if(name == null) {
+        if(getName() == null) {
             throw new RuntimeException("name is required. Parent: " + fromTable.getQualifiedName());
         }
         if(toDatabase == null) {
@@ -111,7 +115,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
     }
 
     public String getQualifiedName() {
-        return name;
+        return getName();
     }
 
     //**************************************************************************
@@ -125,11 +129,11 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
 
     @XmlAttribute(required = true)
     public String getName() {
-        return name;
+        return annotation.getDetails().get("name");
     }
 
     public void setName(String name) {
-        this.name = name;
+        annotation.getDetails().put("name", name);
     }
 
     @XmlAttribute(required = true)
@@ -141,22 +145,28 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
         this.toDatabase = toDatabase;
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute()
     public String getSql() {
-        return sql;
+        return "SQL".equals(annotation.getDetails().get("language")) ? annotation.getDetails().get("query") : null;
     }
 
     public void setSql(String sql) {
-        this.sql = sql;
+        if(StringUtils.isNotBlank(sql) || "SQL".equals(annotation.getDetails().get("language"))) {
+            annotation.getDetails().put("query", sql);
+            annotation.getDetails().put("language", "SQL");
+        }
     }
 
-    @XmlAttribute(required = false)
+    @XmlAttribute()
     public String getHql() {
-        return hql;
+        return "HQL".equals(annotation.getDetails().get("language")) ? annotation.getDetails().get("query") : null;
     }
 
     public void setHql(String hql) {
-        this.hql = hql;
+        if(StringUtils.isNotBlank(hql) || "HQL".equals(annotation.getDetails().get("language"))) {
+            annotation.getDetails().put("query", hql);
+            annotation.getDetails().put("language", "HQL");
+        }
     }
 
     public Table getFromTable() {
@@ -165,6 +175,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
 
     public void setFromTable(Table fromTable) {
         this.fromTable = fromTable;
+        fromTable.getModelElement().getEAnnotations().add(annotation);
     }
 
     public Table getToTable() {

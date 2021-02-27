@@ -20,10 +20,12 @@
 
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;
@@ -38,6 +40,11 @@ import static org.testng.Assert.assertNotNull;
 */
 @Test
 public class TableTest {
+
+    @BeforeMethod
+    public void setup() {
+        ElementsThreadLocals.setupDefaultElementsContext();
+    }
 
     public void testActualEntityNames(){
         Model model = new Model();
