@@ -622,7 +622,7 @@ public class PersistenceTest {
         sp.setName("dbsp");
         sp.setHql("from table1");
         Reference ref = new Reference(sp);
-        ref.setFromColumn("id");
+        ref.setFromColumn("ID");
         sp.getReferences().add(ref);
         table1.getSelectionProviders().add(sp);
         persistence.saveModel();
