@@ -16,8 +16,7 @@ property: annotation* name=simpleIdentifier (':' type)?;
 
 relationship: annotation* name=identifier ':' a=type '-->' b=type;
 
-relationshipProperty: annotation* name=identifier '-->' type multiplicity?;
-multiplicity: atLeast=NUMBER ('..' (atMost=NUMBER | unbounded='*')) | any='*';
+relationshipProperty: annotation* name=identifier '-->' type RANGE?;
 
 type: name=identifier nullable='?'?;
 
@@ -30,7 +29,10 @@ literal: BOOLEAN | NUMBER | STRING;
 identifier: simpleIdentifier ('.' simpleIdentifier)*;
 simpleIdentifier: IDENTIFIER_COMPONENT | ID | SCHEMA | IMPORT | ENTITY | DOMAIN | DATABASE | BOOLEAN;
 
+RANGE: UNSIGNED_INTEGER ('..' (UNSIGNED_INTEGER | '*')) | '*';
 BOOLEAN: 'true' | 'false';
+UNSIGNED_INTEGER: [0-9]+;
+INTEGER: ('+' | '-')? UNSIGNED_INTEGER;
 NUMBER: ('+' | '-')?([0-9]+('.'[0-9]*)?|[0-9]*'.'[0-9]+);
 STRING: '"' ('\\'('"'|'\\')|.)*? '"';
 

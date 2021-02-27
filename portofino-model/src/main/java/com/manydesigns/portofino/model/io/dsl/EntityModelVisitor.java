@@ -1,9 +1,32 @@
+/*
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.model.io.dsl;
 
+import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.eclipse.emf.ecore.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -12,6 +35,7 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
     protected EPackage parentDomain;
     protected EClass entity;
     protected EModelElement annotated;
+    private static final Logger logger = LoggerFactory.getLogger(EntityModelVisitor.class);
 
     public EntityModelVisitor() {
         this(null);
@@ -133,10 +157,8 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
         EDataType type;
         if(ctx.type() != null) {
             String typeName = ctx.type().name.getText();
-            type = (EDataType) EcorePackage.eINSTANCE.getEClassifier(typeName);
-            if(type == null) {
-                throw new RuntimeException("Unknown type: " + typeName); //TODO
-            }
+            //TODO should we be using the CodeBase for this?
+            type = PortofinoPackage.ensureType(typeName);
         } else {
             type = EcorePackage.eINSTANCE.getEString();
         }

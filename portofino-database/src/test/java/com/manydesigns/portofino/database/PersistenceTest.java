@@ -19,6 +19,7 @@ import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
@@ -29,6 +30,7 @@ import org.hibernate.jdbc.Work;
 import org.testng.annotations.*;
 
 import javax.persistence.criteria.CriteriaQuery;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -612,6 +614,25 @@ public class PersistenceTest {
         } finally {
             appDir.deleteAll();
         }
+    }
+
+    public void testSelectionProviders() throws IOException, ConfigurationException {
+        Table table1 = persistence.getTableAccessor("hibernatetest", "table1").getTable();
+        DatabaseSelectionProvider sp = new DatabaseSelectionProvider(table1);
+        sp.setName("dbsp");
+        sp.setHql("from table1");
+        Reference ref = new Reference(sp);
+        ref.setFromColumn("id");
+        sp.getReferences().add(ref);
+        table1.getSelectionProviders().add(sp);
+        persistence.saveModel();
+        persistence.stop();
+        persistence.start();
+        table1 = persistence.getTableAccessor("hibernatetest", "table1").getTable();
+        assertEquals(1, table1.getSelectionProviders().size());
+        DatabaseSelectionProvider dbsp = (DatabaseSelectionProvider) table1.getSelectionProviders().get(0);
+        assertEquals("dbsp", dbsp.getName());
+        assertEquals("from table1", dbsp.getHql());
     }
 
 }
