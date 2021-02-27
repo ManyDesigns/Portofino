@@ -125,9 +125,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void init(Model model, Configuration configuration) {
         assert table != null;
-        //TODO questi assert dovrebbero essere test + throw exception
-        assert columnName != null;
-        assert columnType != null;
+        if(columnName == null) {
+            throw new IllegalStateException("columnName must not be null");
+        }
 
         if (StringUtils.isEmpty(propertyName)) {
             String initialName = DatabaseLogic.normalizeName(columnName);
@@ -147,6 +147,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
                 property.setEType(EcorePackage.eINSTANCE.getEString());
             }
         } else if(property.getEType() == null) {
+            if(columnType == null) {
+                throw new IllegalStateException("columnType must not be null when property type is null");
+            }
             actualJavaType = Type.getDefaultJavaType(jdbcType, columnType, length, scale);
             if (actualJavaType != null) {
                 property.setEType(ensureType(actualJavaType));

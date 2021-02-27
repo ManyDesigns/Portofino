@@ -27,6 +27,7 @@ import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
 import com.manydesigns.portofino.model.database.annotations.JNDIConnection;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
@@ -51,6 +52,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -248,14 +250,19 @@ public class Persistence {
         table.setSchema(schema);
         schema.getTables().add(table);
         PrimaryKey pk = new PrimaryKey(table);
-        table.setPrimaryKey(pk);
         EAnnotation tableAnn = entity.getEAnnotation(javax.persistence.Table.class.getName());
         if(tableAnn != null) {
             table.setTableName(tableAnn.getDetails().get("name"));
-        } else {
+        }
+        if(StringUtils.isBlank(table.getTableName())) {
             table.setTableName(entity.getName());
         }
         entity.getEAttributes().forEach(property -> setupColumn(table, pk, property));
+        if(!pk.getColumns().isEmpty()) {
+            pk.getColumns().sort(Comparator.comparingInt(c ->
+                    Integer.parseInt(c.getAnnotation(Id.class).get().getPropertyValue("order"))));
+            table.setPrimaryKey(pk);
+        }
     }
 
     protected void setupColumn(Table table, PrimaryKey pk, EAttribute property) {
@@ -265,12 +272,14 @@ public class Persistence {
         EAnnotation colAnn = property.getEAnnotation(javax.persistence.Column.class.getName());
         if(colAnn != null) {
             column.setColumnName(colAnn.getDetails().get("name"));
-        } else {
+        }
+        if(StringUtils.isBlank(column.getColumnName())) {
             column.setColumnName(property.getName());
         }
-        /*TODO id if(table.getModelClass().getId().contains(property)) {
+        //TODO column type
+        if(property.getEAnnotation(Id.class.getName()) != null) {
             pk.add(column);
-        }*/
+        }
     }
 
     public FileObject getModelDirectory() throws FileSystemException {

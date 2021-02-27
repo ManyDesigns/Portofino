@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -7,12 +8,18 @@ import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.AssertJUnit.assertEquals;
 
 @Test
 public class QueryUtilsTest {
+
+    @BeforeClass
+    public void setupElements() {
+        ElementsThreadLocals.setupDefaultElementsContext();
+    }
 
     public void testMergeQueryWithAlias() throws NoSuchFieldException {
         Model model = new Model();

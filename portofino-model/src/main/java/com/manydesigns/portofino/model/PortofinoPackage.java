@@ -34,8 +34,7 @@ public class PortofinoPackage {
                 eINSTANCE.getEClassifiers().stream().filter(
                         c -> c.getName().equals(className) || className.equals(c.getInstanceClassName())).findFirst().orElseGet(() -> {
                     EDataType type = EcoreFactory.eINSTANCE.createEDataType();
-                    String[] components = className.split("[.]");
-                    type.setName(components[components.length - 1]);
+                    type.setName(className);
                     try {
                         type.setInstanceClass(Class.forName(className));
                     } catch (ClassNotFoundException e) {

@@ -140,7 +140,9 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void init(Model model, Configuration configuration) {
         assert schema != null;
-        assert tableName != null;
+        if(tableName == null) {
+            throw new IllegalStateException("Table name must not be null");
+        }
         
         // wire up javaClass
         actualJavaClass = ReflectionUtil.loadClass(javaClass);

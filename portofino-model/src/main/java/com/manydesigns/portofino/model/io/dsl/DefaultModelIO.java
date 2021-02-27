@@ -218,17 +218,19 @@ public class DefaultModelIO implements ModelIO {
             List<EStructuralFeature> id = entity.getEStructuralFeatures().stream()
                     .filter(a -> a instanceof EAttribute && a.getEAnnotation(Id.class.getName()) != null)
                     .collect(Collectors.toList());
-            os.write("\tid {" + System.lineSeparator());
-            for(EStructuralFeature property : id) {
-                EAnnotation ann = property.getEAnnotation(Id.class.getName());
-                try {
-                    property.getEAnnotations().remove(ann);
-                    writeProperty((EAttribute) property, os, "\t\t");
-                } finally {
-                    property.getEAnnotations().add(ann);
+            if(!id.isEmpty()) {
+                os.write("\tid {" + System.lineSeparator());
+                for (EStructuralFeature property : id) {
+                    EAnnotation ann = property.getEAnnotation(Id.class.getName());
+                    try {
+                        property.getEAnnotations().remove(ann);
+                        writeProperty((EAttribute) property, os, "\t\t");
+                    } finally {
+                        property.getEAnnotations().add(ann);
+                    }
                 }
+                os.write("\t}" + System.lineSeparator());
             }
-            os.write("\t}" + System.lineSeparator());
             for(EStructuralFeature property : entity.getEStructuralFeatures()) {
                 if(!id.contains(property)) {
                     if(property instanceof EAttribute) {

@@ -5,7 +5,7 @@ domain: annotation* DOMAIN name=simpleIdentifier (';' | '{' (domain | entity | r
 
 standaloneEntity: importDeclaration* entity;
 entity: annotation* ENTITY name=simpleIdentifier '{'
-  ID '{' idProperties+=property+ '}'
+  (ID '{' idProperties+=property+ '}')?
   properties+=property*
   relationshipProperty*
 '}';
@@ -24,7 +24,7 @@ annotation: '@' name=identifier annotationParams?;
 
 annotationParams: '(' (literal | (simpleIdentifier '=' literal (',' simpleIdentifier '=' literal)*)) ')';
 
-literal: BOOLEAN | NUMBER | STRING;
+literal: BOOLEAN | UNSIGNED_INTEGER | SIGNED_INTEGER | REAL | STRING;
 
 identifier: simpleIdentifier ('.' simpleIdentifier)*;
 simpleIdentifier: IDENTIFIER_COMPONENT | ID | SCHEMA | IMPORT | ENTITY | DOMAIN | DATABASE | BOOLEAN;
@@ -32,8 +32,8 @@ simpleIdentifier: IDENTIFIER_COMPONENT | ID | SCHEMA | IMPORT | ENTITY | DOMAIN 
 RANGE: UNSIGNED_INTEGER ('..' (UNSIGNED_INTEGER | '*')) | '*';
 BOOLEAN: 'true' | 'false';
 UNSIGNED_INTEGER: [0-9]+;
-INTEGER: ('+' | '-')? UNSIGNED_INTEGER;
-NUMBER: ('+' | '-')?([0-9]+('.'[0-9]*)?|[0-9]*'.'[0-9]+);
+SIGNED_INTEGER: ('+' | '-') UNSIGNED_INTEGER;
+REAL: ('+' | '-')?([0-9]+('.'[0-9]*)?|[0-9]*'.'[0-9]+);
 STRING: '"' ('\\'('"'|'\\')|.)*? '"';
 
 SCHEMA: 'schema';
