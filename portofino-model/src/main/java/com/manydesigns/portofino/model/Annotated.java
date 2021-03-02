@@ -24,6 +24,7 @@ import org.eclipse.emf.ecore.EModelElement;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,7 +40,9 @@ public interface Annotated {
     @SuppressWarnings("unchecked")
     default <T extends java.lang.annotation.Annotation> Optional<T> getJavaAnnotation(Class<T> annotationClass) {
         return (Optional<T>) getAnnotations().stream()
-                .filter(a -> annotationClass.isAssignableFrom(a.getJavaAnnotationClass()))
+                .filter(a ->
+                        a.getJavaAnnotationClass() != null &&
+                        annotationClass.isAssignableFrom(a.getJavaAnnotationClass()))
                 .map(Annotation::getJavaAnnotation)
                 .findFirst();
     }
@@ -69,7 +72,11 @@ public interface Annotated {
     }
 
     default boolean removeAnnotation(Class<? extends java.lang.annotation.Annotation> annotationClass) {
-        return getAnnotations().removeIf(a -> a.getJavaAnnotationClass() == annotationClass);
+        List<Annotation> toRemove =
+                getAnnotations().stream().filter(a -> a.getJavaAnnotationClass() == annotationClass)
+                        .collect(Collectors.toList());
+        toRemove.forEach(Annotation::remove);
+        return !toRemove.isEmpty();
     }
 
     default void initAnnotations(EModelElement modelElement) {

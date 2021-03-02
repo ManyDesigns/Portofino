@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.AnnotationFactory;
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
@@ -328,5 +329,12 @@ public class Annotation implements ModelObject {
     @Override
     public EAnnotation getModelElement() {
         return eAnnotation;
+    }
+
+    public void remove() {
+        parent.getAnnotations().remove(this);
+        if(parent instanceof ModelObject) {
+            ((ModelObject) parent).getModelElement().getEAnnotations().remove(eAnnotation);
+        }
     }
 }

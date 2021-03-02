@@ -175,6 +175,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
 
     public void setFromTable(Table fromTable) {
         this.fromTable = fromTable;
+        fromTable.ensureAnnotation(SelectionProvider.class).remove();
         fromTable.getModelElement().getEAnnotations().add(annotation);
     }
 

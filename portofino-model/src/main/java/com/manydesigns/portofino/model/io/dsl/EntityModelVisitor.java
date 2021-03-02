@@ -104,10 +104,15 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
                     p -> p.getName().equals(propertyName)
             ).findFirst();
             if (property.isPresent()) {
-                EAnnotation idAnn = EcoreFactory.eINSTANCE.createEAnnotation();
-                idAnn.setSource(Id.class.getName());
+                EAnnotation idAnn = property.get().getEAnnotations().stream()
+                        .filter(a -> a.getSource().equals(Id.class.getName())).findFirst()
+                        .orElseGet(() -> {
+                            EAnnotation ann = EcoreFactory.eINSTANCE.createEAnnotation();
+                            ann.setSource(Id.class.getName());
+                            property.get().getEAnnotations().add(ann);
+                            return ann;
+                        });
                 idAnn.getDetails().put("order", i + "");
-                property.get().getEAnnotations().add(idAnn);
             } else {
                 throw new IllegalStateException("Id property not found: " + propertyName);
             }
