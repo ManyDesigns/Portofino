@@ -2,8 +2,8 @@ domain testDomain1 {
     entity Person {
         id { name }
         @Email
-        email
-        age: EInt
+        email?
+        age: int
         registrationDate: EDate
     }
 }

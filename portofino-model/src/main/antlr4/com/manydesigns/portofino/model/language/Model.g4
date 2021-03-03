@@ -10,17 +10,17 @@ entity: annotation* ENTITY name=simpleIdentifier '{'
   relationshipProperty*
 '}';
 
-importDeclaration: IMPORT identifier ('.' wildcard='*')?;
+importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)?;
 
-property: annotation* name=simpleIdentifier (':' type)?;
+property: annotation* name=simpleIdentifier nullable='?'? (':' type)?;
 
 relationship: annotation* name=identifier ':' a=type '-->' b=type;
 
 relationshipProperty: annotation* name=identifier '-->' type RANGE?;
 
-type: name=identifier nullable='?'?;
+type: name=identifier;
 
-annotation: '@' name=identifier annotationParams?;
+annotation: '@' type annotationParams?;
 
 annotationParams: '(' (literal | (simpleIdentifier '=' literal (',' simpleIdentifier '=' literal)*)) ')';
 
@@ -42,6 +42,7 @@ ID: 'id';
 ENTITY: 'entity';
 DOMAIN: 'domain';
 DATABASE: 'database';
+AS: 'as';
 
 IDENTIFIER_COMPONENT: [a-zA-Z_][a-zA-Z0-9_]*;
 

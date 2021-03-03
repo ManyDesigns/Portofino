@@ -28,6 +28,9 @@ import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
@@ -35,6 +38,7 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
     protected EPackage parentDomain;
     protected EClass entity;
     protected EModelElement annotated;
+    protected final Map<String, String> typeAliases = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(EntityModelVisitor.class);
 
     public EntityModelVisitor() {
@@ -47,7 +51,29 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
 
     @Override
     public EPackage visitStandaloneDomain(ModelParser.StandaloneDomainContext ctx) {
+        List<ModelParser.ImportDeclarationContext> importDeclarations = ctx.importDeclaration();
+        initTypeAliases(importDeclarations);
         return visitDomain(ctx.domain());
+    }
+
+    protected void initTypeAliases(List<ModelParser.ImportDeclarationContext> importDeclarations) {
+        typeAliases.clear();
+        typeAliases.putAll(getDefaultTypeAliases());
+        importDeclarations.forEach(i -> {
+            String alias;
+            String typeName = i.name.getText();
+            if(i.alias != null) {
+                alias = i.alias.getText();
+            } else {
+                int beginIndex = typeName.lastIndexOf('.');
+                if(beginIndex < 0) {
+                    return;
+                }
+                alias = typeName.substring(beginIndex);
+            }
+            //TODO warning/error if already present
+            typeAliases.put(alias, typeName);
+        });
     }
 
     @Override
@@ -75,8 +101,30 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
     }
 
     @Override
-    public EModelElement visitStandaloneEntity(ModelParser.StandaloneEntityContext ctx) {
-        return super.visitStandaloneEntity(ctx);
+    public EClass visitStandaloneEntity(ModelParser.StandaloneEntityContext ctx) {
+        List<ModelParser.ImportDeclarationContext> importDeclarations = ctx.importDeclaration();
+        initTypeAliases(importDeclarations);
+        return visitEntity(ctx.entity());
+    }
+
+    protected Map<String, String> getDefaultTypeAliases() {
+        HashMap<String, String> defaults = new HashMap<>();
+        defaults.put("long", "ELong");
+        defaults.put("long?", "ELongObject");
+        defaults.put("int", "EInt");
+        defaults.put("int?", "EIntObject");
+        return defaults;
+    }
+
+    public String resolveType(String typeName, boolean nullable) {
+        String resolved = null;
+        if(nullable) {
+            resolved = typeAliases.get(typeName + "?");
+        }
+        if(resolved == null) {
+            resolved = typeAliases.get(typeName);
+        }
+        return resolved != null ? resolved : typeName;
     }
 
     @Override
@@ -124,11 +172,11 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
 
     @Override
     public EAnnotation visitAnnotation(ModelParser.AnnotationContext ctx) {
-        String annotationType = ctx.name.getText();
+        String annotationType = ctx.type().getText();
         if(annotated == null) {
             throw new IllegalStateException("Annotation without an element: " + annotationType);
         }
-        String source = resolveAnnotationType(annotationType);
+        String source = resolveType(annotationType, false);
         EAnnotation annotation = annotated.getEAnnotation(source);
         if(annotation == null) {
             annotation = EcoreFactory.eINSTANCE.createEAnnotation();
@@ -163,7 +211,7 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
         if(ctx.type() != null) {
             String typeName = ctx.type().name.getText();
             //TODO should we be using the CodeBase for this?
-            type = PortofinoPackage.ensureType(typeName);
+            type = PortofinoPackage.ensureType(resolveType(typeName, ctx.nullable != null));
         } else {
             type = EcorePackage.eINSTANCE.getEString();
         }
@@ -180,14 +228,6 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
         visitChildren(ctx);
         annotated = previous;
         return property;
-    }
-
-    protected String decodeType(String typeName) {
-        return typeName;
-    }
-
-    protected String resolveAnnotationType(String annotationType) {
-        return annotationType;
     }
 
     private String getText(ModelParser.LiteralContext value) {
