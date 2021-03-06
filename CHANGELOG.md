@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Render internal links in text pages with no target attribute (that the Quill editor adds by default).
+- The welcome page is now a standard text page.
 
 ## [5.2.0] – 2020-11-30
 
