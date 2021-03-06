@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Render internal links in text pages with no target attribute (that the Quill editor adds by default).
 - The welcome page is now a standard text page.
 
+### Fixed
+- Backwards compatibility: revert `T extends Serializable` in CRUD actions, introduces in v5.2.0. [#428](https://github.com/ManyDesigns/Portofino/issues/428)
+- Authentication token refresh after expiration. [#430](https://github.com/ManyDesigns/Portofino/issues/430)
+
 ## [5.2.0] – 2020-11-30
 
 ### Added
