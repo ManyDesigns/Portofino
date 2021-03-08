@@ -60,6 +60,13 @@ public final class PortofinoProperties {
     public static final String GROOVY_PRELOAD_PAGES = "groovy.preloadPages";
     public static final String GROOVY_PRELOAD_CLASSES = "groovy.preloadClasses";
 
+    //BLOB Manager
+    public static final String BLOB_MANAGER_TYPE = "blobmanager.type";
+    public static final String AWS_REGION = "aws.region";
+    public static final String AWS_CREDENTIAL_KEY = "aws.credential.key";
+    public static final String AWS_CREDENTIAL_SECRET = "aws.credential.secret";
+    public static final String AWS_S3_BUCKET = "aws.s3.bucket";
+
     private PortofinoProperties() {}
 
 }

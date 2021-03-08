@@ -2,6 +2,7 @@ package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.HierarchicalBlobManager;
+import com.manydesigns.elements.blobs.S3BlobManager;
 import com.manydesigns.elements.blobs.SimpleBlobManager;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
@@ -10,6 +11,7 @@ import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
@@ -67,6 +69,28 @@ public class PortofinoSpringConfiguration {
     public BlobManager getDefaultBlobManager(
             @Autowired @Qualifier(PORTOFINO_CONFIGURATION) Configuration configuration,
             @Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject applicationDirectory) {
+
+        if(configuration.getString(PortofinoProperties.BLOB_MANAGER_TYPE, "standard").equalsIgnoreCase( "s3" )){
+            String key = configuration.getString(PortofinoProperties.AWS_CREDENTIAL_KEY);
+            String secret = configuration.getString(PortofinoProperties.AWS_CREDENTIAL_SECRET);
+            String region = configuration.getString(PortofinoProperties.AWS_REGION);
+            String bucketName = configuration.getString(PortofinoProperties.AWS_S3_BUCKET);
+            logger.info("Using S3 blob manager");
+            if(StringUtils.trimToNull( key )==null){
+                logger.error(PortofinoProperties.AWS_CREDENTIAL_KEY+ " property not found" );
+            }
+            if(StringUtils.trimToNull( secret )==null){
+                logger.error( PortofinoProperties.AWS_CREDENTIAL_SECRET+" property not found" );
+            }
+            if(StringUtils.trimToNull( region )==null){
+                logger.error(PortofinoProperties.AWS_REGION+ " property not found" );
+            }
+            if(StringUtils.trimToNull( bucketName )==null){
+                logger.error( PortofinoProperties.AWS_S3_BUCKET + " property not found" );
+            }
+            return new S3BlobManager(key, secret, region, bucketName);
+        }
+
         File appBlobsDir;
         if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
             appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
