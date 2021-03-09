@@ -75,6 +75,7 @@ public class PortofinoSpringConfiguration {
             String secret = configuration.getString(PortofinoProperties.AWS_CREDENTIAL_SECRET);
             String region = configuration.getString(PortofinoProperties.AWS_REGION);
             String bucketName = configuration.getString(PortofinoProperties.AWS_S3_BUCKET);
+            String location =   configuration.getString(PortofinoProperties.AWS_S3_LOCATION);
             logger.info("Using S3 blob manager");
             if(StringUtils.trimToNull( key )==null){
                 logger.error(PortofinoProperties.AWS_CREDENTIAL_KEY+ " property not found" );
@@ -88,7 +89,10 @@ public class PortofinoSpringConfiguration {
             if(StringUtils.trimToNull( bucketName )==null){
                 logger.error( PortofinoProperties.AWS_S3_BUCKET + " property not found" );
             }
-            return new S3BlobManager(key, secret, region, bucketName);
+            if(StringUtils.trimToNull(location) == null)
+                return new S3BlobManager(key, secret, region, bucketName);
+            else
+                return new S3BlobManager(key, secret, region, bucketName, location);
         }
 
         File appBlobsDir;

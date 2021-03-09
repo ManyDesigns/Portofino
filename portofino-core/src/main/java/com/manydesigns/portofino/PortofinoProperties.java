@@ -66,6 +66,7 @@ public final class PortofinoProperties {
     public static final String AWS_CREDENTIAL_KEY = "aws.credential.key";
     public static final String AWS_CREDENTIAL_SECRET = "aws.credential.secret";
     public static final String AWS_S3_BUCKET = "aws.s3.bucket";
+    public static final String AWS_S3_LOCATION = "aws.s3.location";
 
     private PortofinoProperties() {}
 

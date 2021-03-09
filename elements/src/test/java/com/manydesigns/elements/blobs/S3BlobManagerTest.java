@@ -45,9 +45,6 @@ public class S3BlobManagerTest extends AbstractElementsTest {
     String sampleContent = "This is some content";
     String sampleFilename = "sample.txt";
     String sampleContentType = "text/plain";
-    /**
-     * To run this test pleas insert you  key, secret, region and bucket name during
-     * the creation of S3BlobManager
 
 
     @Override
@@ -58,7 +55,7 @@ public class S3BlobManagerTest extends AbstractElementsTest {
     }
 
     protected void createManager() {
-        manager = new S3BlobManager("XXXXX", "XXXXX", "eu-west-1", "XXX");
+        manager = new S3BlobManager("AKIAXSHNNED3R6ZGQSAQ", "+QtASC/A462EHyHWPnx2B7PX0up+HPRQcJVv3owc", "eu-west-1", "test-portofino-s3-noencrypt-bucket");
     }
 
     @Test
@@ -99,6 +96,6 @@ public class S3BlobManagerTest extends AbstractElementsTest {
         assertNotSame(blob, blob2);
         assertEquals(blob, blob2);
     }
-    */
+    
 
 }

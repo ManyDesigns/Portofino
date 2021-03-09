@@ -23,6 +23,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -45,6 +46,7 @@ import java.util.Properties;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class S3BlobManager implements BlobManager{
+    public static final String S3_PROPERTIES_PREFIX = "x-amz-meta-";
     //**************************************************************************
     // Fields
     //**************************************************************************
@@ -74,6 +76,16 @@ public class S3BlobManager implements BlobManager{
         this.s3 = AmazonS3ClientBuilder.standard().withCredentials( credential ).withRegion( Regions.fromName(region)).build();
     }
 
+    public S3BlobManager(String key, String secret, String region, String bucketName, String endPoint) {
+        this.key = key;
+        this.secret = secret;
+        this.bucketName = bucketName;
+        AwsClientBuilder.EndpointConfiguration  endpointConfiguration = new AwsClientBuilder.EndpointConfiguration( endPoint, region );
+
+        AWSCredentialsProvider credential = new AWSStaticCredentialsProvider( new BasicAWSCredentials( key, secret ) );
+        this.s3 = AmazonS3ClientBuilder.standard().withEndpointConfiguration( endpointConfiguration ).withCredentials( credential ).build();
+    }
+
     //**************************************************************************
     // Methods
     //**************************************************************************
@@ -98,8 +110,10 @@ public class S3BlobManager implements BlobManager{
         try {
             ObjectMetadata metadata = s3.getObjectMetadata(this.bucketName, code );
             for(String key : metadata.getUserMetadata().keySet()){
-                metaProperties.put(key,  metadata.getUserMetadata().get( key ) );
+                metaProperties.put(key.replaceAll( S3_PROPERTIES_PREFIX, "" ),  metadata.getUserMetadata().get( key ) );
             }
+            metaProperties.put(Blob.SIZE_PROPERTY, Long.toString( metadata.getContentLength()));
+
         } catch (AmazonServiceException e) {
             throw new IOException( e.getMessage() );
         }
@@ -131,10 +145,12 @@ public class S3BlobManager implements BlobManager{
             InputStream inputStream = blob.getInputStream();
             ObjectMetadata metadata = new ObjectMetadata();
             Properties properties = blob.getMetaProperties();
+            
             for(Object obj : properties.keySet()){
                 metadata.addUserMetadata( "app_creator", "Portofino" );
                 metadata.addUserMetadata( obj.toString(), properties.get( obj ).toString() );
             }
+
             PutObjectResult result;
             if(blob.isEncrypted()){
                 encryptInputStream = BlobUtils.encrypt(inputStream,blob.getEncryptionType());
@@ -170,16 +186,7 @@ public class S3BlobManager implements BlobManager{
     //**************************************************************************
 
 
-    public String getKey() {
-        return key;
-    }
-
-
-
     public String getBucketName() {
         return bucketName;
     }
-
-
-
 }
