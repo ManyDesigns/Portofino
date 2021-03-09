@@ -23,6 +23,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -51,8 +52,7 @@ public class S3BlobManager implements BlobManager{
     // Fields
     //**************************************************************************
 
-    final private String key;
-    final private String secret;
+
     final private String bucketName;
     final AmazonS3 s3;
     //**************************************************************************
@@ -67,22 +67,20 @@ public class S3BlobManager implements BlobManager{
     //**************************************************************************
 
 
-    public S3BlobManager(String key, String secret, String region, String bucketName) {
-        this.key = key;
-        this.secret = secret;
+    public S3BlobManager( String region, String bucketName) {
+
         this.bucketName = bucketName;
 
-        AWSCredentialsProvider credential = new AWSStaticCredentialsProvider( new BasicAWSCredentials( key, secret ) );
+        AWSCredentialsProvider credential = new DefaultAWSCredentialsProviderChain();
         this.s3 = AmazonS3ClientBuilder.standard().withCredentials( credential ).withRegion( Regions.fromName(region)).build();
     }
 
-    public S3BlobManager(String key, String secret, String region, String bucketName, String endPoint) {
-        this.key = key;
-        this.secret = secret;
+    public S3BlobManager( String region, String bucketName, String endPoint) {
+
         this.bucketName = bucketName;
         AwsClientBuilder.EndpointConfiguration  endpointConfiguration = new AwsClientBuilder.EndpointConfiguration( endPoint, region );
 
-        AWSCredentialsProvider credential = new AWSStaticCredentialsProvider( new BasicAWSCredentials( key, secret ) );
+        AWSCredentialsProvider credential = new DefaultAWSCredentialsProviderChain();
         this.s3 = AmazonS3ClientBuilder.standard().withEndpointConfiguration( endpointConfiguration ).withCredentials( credential ).build();
     }
 

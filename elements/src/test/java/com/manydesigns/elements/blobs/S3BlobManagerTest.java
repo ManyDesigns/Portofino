@@ -41,7 +41,7 @@ public class S3BlobManagerTest extends AbstractElementsTest {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     S3BlobManager manager;
-    /**
+
     String sampleContent = "This is some content";
     String sampleFilename = "sample.txt";
     String sampleContentType = "text/plain";
@@ -55,7 +55,7 @@ public class S3BlobManagerTest extends AbstractElementsTest {
     }
 
     protected void createManager() {
-        manager = new S3BlobManager("XXXX", "XXXXX", "eu-west-1", "test-portofino-s3-noencrypt-bucket");
+        manager = new S3BlobManager( "eu-west-1", "test-portofino-s3-noencrypt-bucket");
     }
 
     @Test
@@ -97,5 +97,5 @@ public class S3BlobManagerTest extends AbstractElementsTest {
         assertEquals(blob, blob2);
     }
     
-   */
+
 }
