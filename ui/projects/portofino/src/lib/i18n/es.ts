@@ -70,6 +70,7 @@ export const TRANSLATIONS_ES = {
   "Old password": "Contraseña anterior",
   "Old password is required.": "La Contraseña anterior es obligatoria",
   "Page not found! Error: _": "Página no encontrada! Error: {{error}}",
+  "page type: custom": "Página tipo 'custom'",
   "page type: crud": "Página tipo CRUD",
   "page type: text": "Pagina di testo",
   "Pages created. Setting up authc/authz.": "Pagine create. Configurazione di autenticazione e autorizzazione.",

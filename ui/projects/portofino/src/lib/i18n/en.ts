@@ -2,6 +2,7 @@ export const TRANSLATIONS_EN = {
   "Page not found! Error: _": "Page not found! Error: {{error}}",
   "Inherited (_)": "Inherited ({{level}})",
   "page type: crud": "CRUD page",
+  "page type: custom": "Custom page",
   "page type: manyToMany": "Many-to-many",
   "page type: text": "Text page",
   "_ not found": "{{what}} not found",
