@@ -223,6 +223,8 @@ public class TablesAction extends AbstractResourceAction {
             BeanUtils.copyProperties(column, c2);
             c2.setTable(existing);
         }
+        existing.getColumns().sort(Comparator.comparingInt(c ->
+                table.getColumns().indexOf(DatabaseLogic.findColumnByName(table, c.getColumnName()))));
         existing.getSelectionProviders().clear();
         existing.getSelectionProviders().addAll(table.getSelectionProviders());
         existing.getSelectionProviders().forEach(sp -> {

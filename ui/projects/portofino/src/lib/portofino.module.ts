@@ -131,6 +131,7 @@ import {
   RESET_PASSWORD_COMPONENT,
   InAppAuthenticationStrategy,
 } from "./security/login/in-app-authentication-strategy";
+import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
   declarations: [
@@ -218,7 +219,7 @@ export class PortofinoCrudModule {}
     ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
     WizardComponent],
   imports: [
-    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+    BrowserModule, BrowserAnimationsModule, DragDropModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
     MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
