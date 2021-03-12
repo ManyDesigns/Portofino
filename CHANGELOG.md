@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Render internal links in text pages with no target attribute (that the Quill editor adds by default).
 - The welcome page is now a standard text page.
+- Security.groovy can now have user beans injected with @Autowired.
 
 ### Fixed
 - Backwards compatibility: revert `T extends Serializable` in CRUD actions, introduces in v5.2.0. [#428](https://github.com/ManyDesigns/Portofino/issues/428)

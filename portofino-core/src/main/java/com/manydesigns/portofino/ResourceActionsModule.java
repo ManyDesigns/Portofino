@@ -56,6 +56,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -177,7 +179,10 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
             }
         }
         logger.debug("Creating SecurityClassRealm");
-        SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", applicationContext);
+        SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", () -> {
+            WebApplicationContext userCtx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            return userCtx != null ? userCtx : applicationContext;
+        });
         try {
             LifecycleUtils.init(realm);
         } catch (Exception e) {

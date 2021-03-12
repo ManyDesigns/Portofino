@@ -37,10 +37,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Realm implementation that delegates to another class, written in Groovy and dynamically reloaded.
@@ -66,7 +65,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
 
     protected final CodeBase codeBase;
     protected final String className;
-    protected final ApplicationContext applicationContext;
+    protected final Supplier<ApplicationContext> contextFactory;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
 
@@ -76,10 +75,10 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityClassRealm(CodeBase codeBase, String className, ApplicationContext applicationContext) {
+    public SecurityClassRealm(CodeBase codeBase, String className, Supplier<ApplicationContext> contextFactory) {
         this.codeBase = codeBase;
         this.className = className;
-        this.applicationContext = applicationContext;
+        this.contextFactory = contextFactory;
     }
 
     //--------------------------------------------------------------------------
@@ -132,6 +131,10 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     }
 
     protected void configureDelegate(PortofinoRealm security) {
+        ApplicationContext applicationContext = contextFactory.get();
+        if(applicationContext == null) {
+            throw new IllegalStateException("Application context is not yet ready");
+        }
         AutowireCapableBeanFactory bf = applicationContext.getAutowireCapableBeanFactory();
         bf.autowireBean(security);
         bf.initializeBean(security, "Security.groovy");
