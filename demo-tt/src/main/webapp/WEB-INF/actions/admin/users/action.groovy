@@ -8,7 +8,6 @@ import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 
@@ -19,15 +18,9 @@ class AdminUsersCrudAction extends CrudAction {
 
     Object old;
 
-
     @Override
-    Resolution create() {
-        throw new UnsupportedOperationException("Users cannot be created");
-    }
-
-    @Override
-    Resolution save() {
-        throw new UnsupportedOperationException("Users cannot be created");
+    boolean isCreateEnabled() {
+        false
     }
 
     @Override
@@ -112,6 +105,5 @@ class AdminUsersCrudAction extends CrudAction {
                 null
         );
     }
-
 
 }
