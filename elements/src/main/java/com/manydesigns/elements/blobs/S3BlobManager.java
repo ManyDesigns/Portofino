@@ -20,6 +20,7 @@
 package com.manydesigns.elements.blobs;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SDKGlobalConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -68,7 +69,6 @@ public class S3BlobManager implements BlobManager{
 
 
     public S3BlobManager( String region, String bucketName) {
-
         this.bucketName = bucketName;
 
         AWSCredentialsProvider credential = new DefaultAWSCredentialsProviderChain();
@@ -76,13 +76,15 @@ public class S3BlobManager implements BlobManager{
     }
 
     public S3BlobManager( String region, String bucketName, String endPoint) {
-
         this.bucketName = bucketName;
         AwsClientBuilder.EndpointConfiguration  endpointConfiguration = new AwsClientBuilder.EndpointConfiguration( endPoint, region );
 
         AWSCredentialsProvider credential = new DefaultAWSCredentialsProviderChain();
-        this.s3 = AmazonS3ClientBuilder.standard().withEndpointConfiguration( endpointConfiguration ).withCredentials( credential ).build();
-    }
+        this.s3 = AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration( endpointConfiguration )
+                .withPathStyleAccessEnabled(true)
+                .build();
+    }                                                                              
 
     //**************************************************************************
     // Methods
