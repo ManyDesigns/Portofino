@@ -45,11 +45,13 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Properties;
 
 /*
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Iacopo Filiberto - iacopo.filiberto@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"driver", "url", "username", "rdsInstanceHostName", "rdsInstancePort", "regionName"})
@@ -139,9 +141,13 @@ public class AWSConnectionProvider extends ConnectionProvider {
                 "RDS connection to URL: {0}", actualUrl);
     }
 
-    public Connection acquireConnection() throws Exception {
-        if(driver != null) {
-            Class.forName(driver);
+    public Connection acquireConnection() throws SQLException {
+        try {
+            if(driver != null) {
+                Class.forName(driver);
+            }
+        } catch (ClassNotFoundException e) {
+            throw new SQLException( e.getMessage() );
         }
         return DriverManager.getConnection(url, setConnectionProperties());
     }
