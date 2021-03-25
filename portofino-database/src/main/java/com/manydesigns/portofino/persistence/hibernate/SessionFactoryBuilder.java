@@ -258,6 +258,20 @@ public class SessionFactoryBuilder {
             if(jdbcConnectionProvider.getActualPassword() != null) {
                 settings.put("hibernate.connection.password", jdbcConnectionProvider.getActualPassword());
             }
+        }else if(connectionProvider instanceof AWSConnectionProvider) {
+            AWSConnectionProvider awsConnectionProvider =
+                    (AWSConnectionProvider) connectionProvider;
+            settings.put("hibernate.connection.url", awsConnectionProvider.getActualUrl());
+            String driver = awsConnectionProvider.getDriver();
+            if(driver != null) {
+                settings.put("hibernate.connection.driver_class", driver);
+            }
+            if(awsConnectionProvider.getActualUsername() != null) {
+                settings.put("hibernate.connection.username", awsConnectionProvider.getActualUsername());
+            }
+            if(awsConnectionProvider.getActualPassword() != null) {
+                settings.put("hibernate.connection.password", awsConnectionProvider.getActualPassword());
+            }
         } else if(connectionProvider instanceof JndiConnectionProvider) {
             JndiConnectionProvider jndiConnectionProvider =
                     (JndiConnectionProvider) connectionProvider;

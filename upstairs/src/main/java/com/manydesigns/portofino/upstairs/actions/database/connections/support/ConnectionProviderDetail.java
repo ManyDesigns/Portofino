@@ -3,10 +3,7 @@ package com.manydesigns.portofino.upstairs.actions.database.connections.support;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.manydesigns.elements.annotations.*;
-import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
-import com.manydesigns.portofino.model.database.JndiConnectionProvider;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.EntityMode;
@@ -24,6 +21,8 @@ public class ConnectionProviderDetail {
     @JsonIgnore
     protected JdbcConnectionProvider jdbcConnectionProvider;
     @JsonIgnore
+    protected AWSConnectionProvider awsConnectionProvider;
+    @JsonIgnore
     protected JndiConnectionProvider jndiConnectionProvider;
 
     public ConnectionProviderDetail(ConnectionProvider connectionProvider) {
@@ -34,6 +33,8 @@ public class ConnectionProviderDetail {
             jdbcConnectionProvider = (JdbcConnectionProvider) connectionProvider;
         } else if(connectionProvider instanceof JndiConnectionProvider) {
             jndiConnectionProvider = (JndiConnectionProvider) connectionProvider;
+        } else if(connectionProvider instanceof AWSConnectionProvider) {
+            awsConnectionProvider = (AWSConnectionProvider) connectionProvider;
         } else {
             throw new IllegalArgumentException("Invalid connection provider type: " + connectionProvider);
         }

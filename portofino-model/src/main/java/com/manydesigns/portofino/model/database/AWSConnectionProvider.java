@@ -20,7 +20,12 @@
 
 package com.manydesigns.portofino.model.database;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.rds.auth.GetIamAuthTokenRequest;
 import com.amazonaws.services.rds.auth.RdsIamAuthTokenGenerator;
 import com.manydesigns.elements.text.OgnlTextFormat;
@@ -31,15 +36,23 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.KeyStore;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.MessageFormat;
+import java.util.Properties;
 
 /*
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"driver", "url", "username", "password"})
+@XmlType(propOrder = {"driver", "url", "username", "rdsInstanceHostName", "rdsInstancePort", "regionName"})
 public class AWSConnectionProvider extends ConnectionProvider {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
@@ -51,9 +64,19 @@ public class AWSConnectionProvider extends ConnectionProvider {
     protected String driver;
     protected String url;
     protected String username;
-    protected String password;
-
     protected String keyPrefix;
+
+    //AWS
+    protected String rdsInstanceHostName;
+    protected String rdsInstancePort;
+    protected String regionName;
+
+    private static final String KEY_STORE_TYPE = "JKS";
+    private static final String KEY_STORE_PROVIDER = "SUN";
+    private static final String KEY_STORE_FILE_PREFIX = "sys-connect-via-ssl-test-cacerts";
+    private static final String KEY_STORE_FILE_SUFFIX = ".jks";
+    private static final String DEFAULT_KEY_STORE_PASSWORD = "changeit";
+
 
     //**************************************************************************
     // Fields (calcuated values)
@@ -77,6 +100,11 @@ public class AWSConnectionProvider extends ConnectionProvider {
 
     @Override
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
+        try{
+            setSslProperties();
+        } catch( Exception e){
+            logger.error("Cannot upload AWS keystore", e.getMessage() );
+        }
         keyPrefix = "portofino.database." + getDatabase().getDatabaseName() + ".";
         configuration = databasePlatformsRegistry.getPortofinoConfiguration();
         if(url == null || url.equals(keyPrefix + "url")) {
@@ -98,11 +126,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
         } else {
             actualUsername = username;
         }
-        if(password == null || password.equals(keyPrefix + "password")) {
-            actualPassword = configuration.getString(keyPrefix + "password");
-        } else {
-            actualPassword = password;
-        }
+
         super.init(databasePlatformsRegistry);
     }
 
@@ -119,7 +143,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
         if(driver != null) {
             Class.forName(driver);
         }
-        return DriverManager.getConnection(actualUrl, actualUsername, actualPassword);
+        return DriverManager.getConnection(url, setConnectionProperties());
     }
 
     //**************************************************************************
@@ -153,15 +177,6 @@ public class AWSConnectionProvider extends ConnectionProvider {
         this.username = username;
     }
 
-    @XmlAttribute(required = false)
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getActualUrl() {
         return actualUrl;
     }
@@ -189,16 +204,34 @@ public class AWSConnectionProvider extends ConnectionProvider {
     }
 
     public String getActualPassword() {
-        return actualPassword;
+        return generateAuthToken();
     }
 
-    public void setActualPassword(String password) {
-        if(this.password == null || this.password.equals(keyPrefix + "url")) {
-            configuration.setProperty(keyPrefix + "password", password);
-        } else {
-            this.password = password;
-        }
-        actualPassword = password;
+    @XmlAttribute(required = true)
+    public String getRdsInstanceHostName() {
+        return rdsInstanceHostName;
+    }
+
+    public void setRdsInstanceHostName(String rdsInstanceHostName) {
+        this.rdsInstanceHostName = rdsInstanceHostName;
+    }
+
+    @XmlAttribute(required = true)
+    public String getRdsInstancePort() {
+        return rdsInstancePort;
+    }
+
+    public void setRdsInstancePort(String rdsInstancePort) {
+        this.rdsInstancePort = rdsInstancePort;
+    }
+
+    @XmlAttribute(required = true)
+    public String getRegionName() {
+        return regionName;
+    }
+
+    public void setRegionName(String regionName) {
+        this.regionName = regionName;
     }
 
     //**************************************************************************
@@ -215,7 +248,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
                 .toString();
     }
 
-    static String generateAuthToken(String region, String hostName, String port, String username) {
+    String generateAuthToken(String region, String hostName, String port, String username) {
 
         RdsIamAuthTokenGenerator generator = RdsIamAuthTokenGenerator.builder()
                 .credentials(new DefaultAWSCredentialsProviderChain())
@@ -224,11 +257,152 @@ public class AWSConnectionProvider extends ConnectionProvider {
 
         String authToken = generator.getAuthToken(
                 GetIamAuthTokenRequest.builder()
-                        .hostname(hostName)
-                        .port(Integer.parseInt(port))
+                        .hostname(rdsInstanceHostName)
+                        .port(Integer.parseInt(rdsInstancePort))
                         .userName(username)
                         .build());
 
         return authToken;
+    }
+
+    /**
+     * This method sets the mysql connection properties which includes the IAM Database Authentication token
+     * as the password. It also specifies that SSL verification is required.
+     * @return
+     */
+    private Properties setConnectionProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("verifyServerCertificate","true");
+        properties.setProperty("useSSL", "true");
+        properties.setProperty("user",this.username);
+        properties.setProperty("password",generateAuthToken());
+        return properties;
+    }
+
+    /**
+     * This method generates the IAM Auth Token.
+     * An example IAM Auth Token would look like follows:
+     * btusi123.cmz7kenwo2ye.rds.cn-north-1.amazonaws.com.cn:3306/?Action=connect&DBUser=iamtestuser&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20171003T010726Z&X-Amz-SignedHeaders=host&X-Amz-Expires=899&X-Amz-Credential=AKIAPFXHGVDI5RNFO4AQ%2F20171003%2Fcn-north-1%2Frds-db%2Faws4_request&X-Amz-Signature=f9f45ef96c1f770cdad11a53e33ffa4c3730bc03fdee820cfdf1322eed15483b
+     * @return
+     */
+    private String generateAuthToken() {
+        AWSCredentials awsCredentials;
+        awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
+
+        RdsIamAuthTokenGenerator generator = RdsIamAuthTokenGenerator.builder()
+                .credentials(new AWSStaticCredentialsProvider(awsCredentials)).region(regionName).build();
+        return generator.getAuthToken(GetIamAuthTokenRequest.builder()
+                .hostname(rdsInstanceHostName).port(Integer.parseInt(  rdsInstancePort)).userName(username).build());
+    }
+
+    /**
+     * This method sets the SSL properties which specify the key store file, its type and password:
+     * @throws Exception
+     */
+    private void setSslProperties() throws Exception {
+        System.setProperty("javax.net.ssl.trustStore", createKeyStoreFile());
+        System.setProperty("javax.net.ssl.trustStoreType", KEY_STORE_TYPE);
+        System.setProperty("javax.net.ssl.trustStorePassword", DEFAULT_KEY_STORE_PASSWORD);
+    }
+
+    /**
+     * This method returns the path of the Key Store File needed for the SSL verification during the IAM Database Authentication to
+     * the db instance.
+     * @return
+     * @throws Exception
+     */
+    private String createKeyStoreFile() throws Exception {
+        return createKeyStoreFile(createCertificate()).getPath();
+    }
+
+    /**
+     *  This method generates the SSL certificate
+     * @return
+     * @throws Exception
+     */
+    private X509Certificate createCertificate() throws Exception {
+        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+        URL url = new File(getCertificateFromRegion(regionName)).toURI().toURL();
+        if (url == null) {
+            throw new Exception();
+        }
+        try (InputStream certInputStream = url.openStream()) {
+            return (X509Certificate) certFactory.generateCertificate(certInputStream);
+        }
+    }
+
+    private String getCertificateFromRegion(String regionName) {
+        switch(Regions.fromName( regionName )) {
+            case AP_EAST_1:
+                return "rds-ca-2019-ap-east-1.pem";
+            case EU_WEST_1:
+                return "rds-ca-2019-eu-west-1.pem";
+            case EU_WEST_2:
+                return "rds-ca-2019-eu-west-2.pem";
+            case EU_WEST_3:
+                return "rds-ca-2019-eu-west-3.pem";
+            case US_EAST_1:
+                return "rds-ca-2019-us-east-1.pem";
+            case US_EAST_2:
+                return "rds-ca-2019-us-east-2.pem";
+            case US_WEST_2:
+                return "rds-ca-2019-eu-west-2.pem";
+            case EU_SOUTH_1:
+                return "rds-ca-2019-eu-south-1.pem";
+            case EU_NORTH_1:
+                return "rds-ca-2019-eu-north-1.pem";
+            case EU_CENTRAL_1:
+                return "rds-ca-2019-eu-central-1.pem";
+            case CA_CENTRAL_1:
+                return "rds-ca-2019-ca-central-1.pem";
+            case AF_SOUTH_1:
+                return "rds-ca-2019-af-south-1.pem";
+            case AP_NORTHEAST_1:
+                return "rds-ca-2019-ap-northeast-1.pem";
+            case AP_NORTHEAST_2:
+                return "rds-ca-2019-ap-northeast-2.pem";
+            case AP_NORTHEAST_3:
+                return "rds-ca-2019-ap-northeast-3.pem";
+            case AP_SOUTH_1:
+                return "rds-ca-2019-ap-south-1.pem";
+            case AP_SOUTHEAST_1:
+                return "rds-ca-2019-ap-southeast-1.pem";
+            case AP_SOUTHEAST_2:
+                return "rds-ca-2019-ap-southeast-2.pem";
+            case ME_SOUTH_1:
+                return "rds-ca-2019-me-south-1.pem";
+            case SA_EAST_1:
+                return "rds-ca-2019-sa-east-1.pem";
+            default :
+            return "rds-ca-2019-eu-west-1.pem";
+
+        }
+    }
+
+    /**
+     * This method creates the Key Store File
+     * @param rootX509Certificate - the SSL certificate to be stored in the KeyStore
+     * @return
+     * @throws Exception
+     */
+    private  File createKeyStoreFile(X509Certificate rootX509Certificate) throws Exception {
+        File keyStoreFile = File.createTempFile(KEY_STORE_FILE_PREFIX, KEY_STORE_FILE_SUFFIX);
+        try (FileOutputStream fos = new FileOutputStream(keyStoreFile.getPath())) {
+            KeyStore ks = KeyStore.getInstance(KEY_STORE_TYPE, KEY_STORE_PROVIDER);
+            ks.load(null);
+            ks.setCertificateEntry("rootCaCertificate", rootX509Certificate);
+            ks.store(fos, DEFAULT_KEY_STORE_PASSWORD.toCharArray());
+        }
+        return keyStoreFile;
+    }
+
+    /**
+     * This method clears the SSL properties.
+     * @throws Exception
+     */
+    private  void clearSslProperties() throws Exception {
+        System.clearProperty("javax.net.ssl.trustStore");
+        System.clearProperty("javax.net.ssl.trustStoreType");
+        System.clearProperty("javax.net.ssl.trustStorePassword");
     }
 }
