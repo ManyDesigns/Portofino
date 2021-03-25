@@ -29,6 +29,12 @@
             <version>${commons.dbutils.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-rds</artifactId>
+            <version>1.11.982</version>
+        </dependency>
+
     </dependencies>
     <build>
         <resources>

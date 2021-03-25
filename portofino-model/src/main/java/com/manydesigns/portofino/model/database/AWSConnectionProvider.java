@@ -20,6 +20,9 @@
 
 package com.manydesigns.portofino.model.database;
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.services.rds.auth.GetIamAuthTokenRequest;
+import com.amazonaws.services.rds.auth.RdsIamAuthTokenGenerator;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -210,5 +213,22 @@ public class AWSConnectionProvider extends ConnectionProvider {
                 .append("username", actualUsername)
                 .append("password", actualPassword)
                 .toString();
+    }
+
+    static String generateAuthToken(String region, String hostName, String port, String username) {
+
+        RdsIamAuthTokenGenerator generator = RdsIamAuthTokenGenerator.builder()
+                .credentials(new DefaultAWSCredentialsProviderChain())
+                .region(region)
+                .build();
+
+        String authToken = generator.getAuthToken(
+                GetIamAuthTokenRequest.builder()
+                        .hostname(hostName)
+                        .port(Integer.parseInt(port))
+                        .userName(username)
+                        .build());
+
+        return authToken;
     }
 }
