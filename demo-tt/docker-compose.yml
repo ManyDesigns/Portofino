@@ -1,0 +1,13 @@
+version: '3.5'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+      - "9000:5005"
+    volumes:
+      - ./target/demo-tt-5.2.1-SNAPSHOT.war:/usr/local/tomcat/webapps/ROOT.war
+    environment:
+      AWS_ACCESS_KEY_ID: '${DC_AWS_ACCESS_KEY_ID}'
+      AWS_SECRET_ACCESS_KEY: '${DC_AWS_SECRET_ACCESS_KEY}'

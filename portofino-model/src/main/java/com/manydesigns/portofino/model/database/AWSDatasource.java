@@ -23,6 +23,7 @@ public class AWSDatasource  implements DataSource, Serializable {
         this.awsConnectionProvider = awsConnectionProvider;
         loginTimeOut = 10; //taken from Default Postgres Value
     }
+
     public String getDescription() {
         return "Non-Pooling DataSource for AWS RDS";
     }

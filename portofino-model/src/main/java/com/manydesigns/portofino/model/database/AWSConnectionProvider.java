@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -278,10 +279,10 @@ public class AWSConnectionProvider extends ConnectionProvider {
      */
     private Properties setConnectionProperties() {
         Properties properties = new Properties();
-        properties.setProperty("verifyServerCertificate","true");
+        properties.setProperty("verifyServerCertificate", "true");
         properties.setProperty("useSSL", "true");
-        properties.setProperty("user",this.username);
-        properties.setProperty("password",generateAuthToken());
+        properties.setProperty("user" ,this.username);
+        properties.setProperty("password", generateAuthToken());
         return properties;
     }
 
@@ -296,9 +297,15 @@ public class AWSConnectionProvider extends ConnectionProvider {
         awsCredentials = new DefaultAWSCredentialsProviderChain().getCredentials();
 
         RdsIamAuthTokenGenerator generator = RdsIamAuthTokenGenerator.builder()
-                .credentials(new AWSStaticCredentialsProvider(awsCredentials)).region(regionName).build();
+                .credentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .region(regionName)
+                .build();
+
         return generator.getAuthToken(GetIamAuthTokenRequest.builder()
-                .hostname(rdsInstanceHostName).port(Integer.parseInt(  rdsInstancePort)).userName(username).build());
+                .hostname(rdsInstanceHostName)
+                .port(Integer.parseInt(rdsInstancePort))
+                .userName(username)
+                .build());
     }
 
     /**
@@ -328,9 +335,9 @@ public class AWSConnectionProvider extends ConnectionProvider {
      */
     private X509Certificate createCertificate() throws Exception {
         CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-        URL url = new File(getCertificateFromRegion(regionName)).toURI().toURL();
+        URL url = getClass().getClassLoader().getResource("rds-combined-ca-bundle.pem");
         if (url == null) {
-            throw new Exception();
+            throw new FileNotFoundException("rds-ca certificate not found");
         }
         try (InputStream certInputStream = url.openStream()) {
             return (X509Certificate) certFactory.generateCertificate(certInputStream);
@@ -352,7 +359,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
             case US_EAST_2:
                 return "rds-ca-2019-us-east-2.pem";
             case US_WEST_2:
-                return "rds-ca-2019-eu-west-2.pem";
+                return "rds-ca-2019-us-west-2.pem";
             case EU_SOUTH_1:
                 return "rds-ca-2019-eu-south-1.pem";
             case EU_NORTH_1:

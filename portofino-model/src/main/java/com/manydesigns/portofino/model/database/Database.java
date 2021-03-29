@@ -201,7 +201,8 @@ public class Database implements ModelObject, Annotated {
 
     @XmlElements({
         @XmlElement(name="jdbcConnection", type=JdbcConnectionProvider.class),
-        @XmlElement(name="jndiConnection", type=JndiConnectionProvider.class)
+        @XmlElement(name="jndiConnection", type=JndiConnectionProvider.class),
+        @XmlElement(name="awsConnection", type = AWSConnectionProvider.class)
     })
     public ConnectionProvider getConnectionProvider() {
         return connectionProvider;
