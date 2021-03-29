@@ -259,7 +259,7 @@ public class SessionFactoryBuilder {
                 settings.put("hibernate.connection.password", jdbcConnectionProvider.getActualPassword());
             }
         }else if(connectionProvider instanceof AWSConnectionProvider) {
-            settings.put("hibernate.connection.datasource", PoolingAWSDataSourceFactory.create( (AWSConnectionProvider) connectionProvider ));
+            settings.put("hibernate.connection.datasource", new AWSDatasource( (AWSConnectionProvider) connectionProvider ));
         } else if(connectionProvider instanceof JndiConnectionProvider) {
             JndiConnectionProvider jndiConnectionProvider =
                     (JndiConnectionProvider) connectionProvider;
