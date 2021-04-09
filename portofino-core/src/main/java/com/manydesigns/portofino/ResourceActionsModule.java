@@ -35,6 +35,8 @@ import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
+import com.manydesigns.portofino.shiro.ShiroUtils;
+import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
 import org.apache.commons.configuration2.Configuration;
@@ -48,6 +50,7 @@ import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -55,7 +58,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -73,7 +78,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORT
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ResourceActionsModule implements Module, ApplicationContextAware {
+public class ResourceActionsModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
     public static final String ACTIONS_DIRECTORY = "actionsDirectory";
@@ -104,7 +109,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
     public CacheResetListenerRegistry cacheResetListenerRegistry;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
-    protected ApplicationContext applicationContext;
+    protected SecurityClassRealm realm;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -179,15 +184,15 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
             }
         }
         logger.debug("Creating SecurityClassRealm");
-        SecurityClassRealm realm = new SecurityClassRealm(codeBase, "Security", () -> {
-            WebApplicationContext userCtx = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-            return userCtx != null ? userCtx : applicationContext;
-        });
-        try {
-            LifecycleUtils.init(realm);
-        } catch (Exception e) {
-            logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
-        }
+        realm = new SecurityClassRealm(codeBase, "Security",
+                () -> {
+                    PortofinoContextLoaderListener listener = PortofinoContextLoaderListener.get(servletContext);
+                    if (listener != null && listener.isUserContextRefreshing()) {
+                        return null;
+                    } else {
+                        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
+                    }
+                });
         rsm.setRealm(realm);
         status = ModuleStatus.STARTED;
     }
@@ -212,7 +217,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
 
     protected void preloadResourceActions(FileObject directory, ResourceResolver resourceResolver) throws FileSystemException {
         for(FileObject child : directory.getChildren()) {
-            logger.debug("visit {}", child);
+            logger.debug("Preload resource action {}", child);
             if(child.getType() == FileType.FOLDER) {
                 if(!child.equals(directory) && !child.equals(directory.getParent())) {
                     try {
@@ -273,7 +278,11 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
+        try {
+            LifecycleUtils.init(realm);
+        } catch (Exception e) {
+            logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
+        }
     }
 }

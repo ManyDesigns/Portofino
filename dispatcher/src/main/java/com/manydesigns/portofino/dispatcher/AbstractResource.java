@@ -126,7 +126,7 @@ public abstract class AbstractResource implements SecureResource {
             try {
                 subResource = getSubResource(resourceLocation, pathSegment, resourceResolver);
             } catch (Exception e) {
-                logger.error("Could not resolve sub resource", e);
+                logger.error("Could not resolve sub resource " + pathSegment + " at " + resourceLocation, e);
                 throw new WebApplicationException(500);
             }
             if(subResource == null) {

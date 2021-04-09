@@ -150,7 +150,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         ActionContext context = new ActionContext();
         context.setRequest(request);
         context.setResponse(response);
-        context.setServletContext(request.getServletContext());
+        context.setServletContext(ElementsThreadLocals.getServletContext());
         if(uriInfo != null) { //TODO for Swagger
             String path = uriInfo.getPath();
             if (!path.startsWith("/")) {

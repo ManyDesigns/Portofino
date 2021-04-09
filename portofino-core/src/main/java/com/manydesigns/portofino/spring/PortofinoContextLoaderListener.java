@@ -192,7 +192,9 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
 
     @Override
     protected void customizeContext(@NotNull ServletContext sc, ConfigurableWebApplicationContext bridgeContext) {
-        ElementsThreadLocals.setupDefaultElementsContext();
+        if(ElementsThreadLocals.getElementsContext() == null) {
+            ElementsThreadLocals.setupDefaultElementsContext();
+        }
         ConfigurableWebApplicationContext userContext = (ConfigurableWebApplicationContext) bridgeContext.getParent();
         assert userContext != null;
         super.customizeContext(sc, userContext);
@@ -220,6 +222,10 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
 
     protected ConfigurableWebApplicationContext createParentApplicationContext() {
         return new AnnotationConfigWebApplicationContext();
+    }
+
+    public boolean isUserContextRefreshing() {
+        return refreshing.get();
     }
 
 }

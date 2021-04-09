@@ -106,7 +106,9 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
 
     private PortofinoRealm doEnsureDelegate() throws Exception {
         Class<?> scriptClass = codeBase.loadClass(className);
-        if(scriptClass.isInstance(security)) { //Class did not change
+        ApplicationContext applicationContext = contextFactory.get();
+        if(scriptClass.isInstance(security) || (security != null && applicationContext == null)) {
+            //Class did not change or context is refreshing
             return security;
         } else {
             logger.info("Refreshing Portofino Realm Delegate instance (Security.groovy)");
@@ -116,7 +118,16 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
             Object securityTemp = scriptClass.getConstructor().newInstance();
             if(securityTemp instanceof PortofinoRealm) {
                 PortofinoRealm realm = (PortofinoRealm) securityTemp;
-                configureDelegate(realm);
+                try {
+                    configureDelegate(realm, applicationContext);
+                } catch (Exception e) {
+                    if(security != null) {
+                        logger.warn("Could not refresh Security.groovy delegate, returning old instance", e);
+                        return security;
+                    } else {
+                        throw e;
+                    }
+                }
                 PortofinoRealm oldSecurity = security;
                 security = realm;
                 LifecycleUtils.destroy(oldSecurity);
@@ -130,8 +141,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
         }
     }
 
-    protected void configureDelegate(PortofinoRealm security) {
-        ApplicationContext applicationContext = contextFactory.get();
+    protected void configureDelegate(PortofinoRealm security, ApplicationContext applicationContext) {
         if(applicationContext == null) {
             throw new IllegalStateException("Application context is not yet ready");
         }
