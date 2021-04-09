@@ -42,7 +42,7 @@
     "tslib": "^2.0.3",
     "zone.js": "~0.10.3",
     "@angular/service-worker": "^11.0.2",
-    "portofino": "file:../../../../ui/dist/portofino/portofino-5.2.0.tgz"
+    "portofino": "file:../../../../ui/dist/portofino/portofino-5.2.1.tgz"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1102.3",
