@@ -13,8 +13,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Security.groovy can now have user beans injected with @Autowired.
 
 ### Fixed
-- Backwards compatibility: revert `T extends Serializable` in CRUD actions, introduced in v5.2.0. [#428](https://github.com/ManyDesigns/Portofino/issues/428)
+- Important security vulnerability that may have allowed access with forged tokens.
 - Authentication token refresh after expiration. [#430](https://github.com/ManyDesigns/Portofino/issues/430)
+- Backwards compatibility: revert `T extends Serializable` in CRUD actions, introduced in v5.2.0. [#428](https://github.com/ManyDesigns/Portofino/issues/428)
 
 ## [5.2.0] – 2020-11-30
 
