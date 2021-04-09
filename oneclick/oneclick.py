@@ -81,6 +81,7 @@ shutil.copy(oneclick_path + "/target/portofino-oneclick-" + local.portofino_vers
 shutil.copy("setenv.sh", tomcat_path + "/bin")
 shutil.copy("setenv.bat", tomcat_path + "/bin")
 shutil.copy("context.xml", tomcat_path + "/conf")
+shutil.copy("server.xml", tomcat_path + "/conf")
 
 os.chmod(tomcat_path + "/bin/catalina.sh", 0755)
 os.chmod(tomcat_path + "/bin/digest.sh", 0755)
