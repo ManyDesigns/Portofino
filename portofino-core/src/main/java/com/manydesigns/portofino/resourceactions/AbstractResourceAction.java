@@ -327,8 +327,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     /**
-     * Returns an error response with message saying that the resourceaction is not properly
+     * Returns an error response with message saying that the resource-action is not properly
      * configured.
+     * @return the {@link Response}.
      */
     public Response resourceActionNotConfigured() {
         return Response.serverError().entity("resource-action-not-configured").build();
