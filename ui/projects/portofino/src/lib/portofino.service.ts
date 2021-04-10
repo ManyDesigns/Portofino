@@ -20,7 +20,6 @@ export class PortofinoService {
   defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
   localApiPath = 'portofino';
-  loginPath = 'login';
   upstairsLink = "/portofino-upstairs";
   callsInProgress = 0;
 
@@ -102,11 +101,9 @@ export class PortofinoService {
     headers[NO_REFRESH_TOKEN_HEADER] = true; //Avoid refreshing the token on startup as this might hit the wrong login action
     this.http.get<ApiInfo>(this.localApiPath, { headers: headers }).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
-      if(response.loginPath) {
-        this.setLoginPath(response);
-      } else {
-        this.initLoginPath();
-      }
+      this.injector.get(AuthenticationStrategy).init({
+        apiRoot: this.apiRoot
+      });
       if(response.disableAdministration) {
         this.localApiPath = null; //Disable local API
       }
@@ -115,36 +112,9 @@ export class PortofinoService {
     });
   }
 
-  protected setLoginPath(response: ApiInfo) {
-    this.loginPath = this.sanitizeLoginPath(response.loginPath);
-    this.injector.get(AuthenticationStrategy).init({
-      apiRoot: this.apiRoot, loginPath: this.loginPath
-    });
-  }
-
-  private initLoginPath() {
-    const headers = {};
-    headers[NO_REFRESH_TOKEN_HEADER] = true; //Avoid refreshing the token on startup as this might hit the wrong login action
-    this.http.get<any>(this.apiRoot + ':description', { headers: headers }).subscribe(response => {
-      if (response.loginPath) {
-        this.setLoginPath(response);
-      }
-    },
-      () => alert(this.translate.instant(
-        'Cannot connect to login. The application may not work properly. Please reload the page at a later time or contact the administrator.')));
-  }
-
-  private sanitizeLoginPath(loginPath) {
-    if (loginPath.startsWith('/')) {
-      loginPath = loginPath.substring(1);
-    }
-    return loginPath;
-  }
-
   private fallbackInit() {
     this.localApiPath = null;
     this.apiRoot = this.sanitizeApiRoot(this.defaultApiRoot);
-    this.initLoginPath();
   }
 
   private sanitizeApiRoot(apiRoot) {
@@ -161,7 +131,6 @@ export class PortofinoService {
 
 export class ApiInfo {
   apiRoot: string;
-  loginPath: string;
   disableAdministration?: boolean = false;
 }
 

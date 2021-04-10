@@ -151,6 +151,10 @@ public class PortofinoRoot extends AbstractResourceAction {
     @Path(":auth")
     public DefaultLoginAction getLoginAction() throws Exception {
         String loginPath = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH);
+        return getLoginAction(loginPath);
+    }
+
+    public DefaultLoginAction getLoginAction(String loginPath) throws Exception {
         String[] segments = loginPath.split("/");
         ResourceAction action = this;
         for(String segment : segments) {
