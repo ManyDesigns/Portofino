@@ -17,21 +17,10 @@ public class ApiInfo extends Resource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Map info() {
+    public Map<String, String> info() {
         Map<String, String> info = new HashMap<>();
         info.put("apiRoot", getApiRootUri(servletContext, uriInfo));
-        try {
-            Invocation.Builder request = path(":description").request();
-            Response response = request.get();
-            if (response.getStatus() == 200) {
-                Map map = response.readEntity(Map.class);
-                info.put("loginPath", map.get("loginPath").toString());
-            } else {
-                //Ignore. The client will ask for the loginPath itself.
-            }
-        } catch (Exception e) {
-            //Ignore. The client will ask for the loginPath itself.
-        }
+        info.put("loginPath", "/:auth"); //For legacy clients
         return info;
     }
 
