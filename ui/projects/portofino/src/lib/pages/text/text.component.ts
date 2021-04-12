@@ -20,7 +20,7 @@ export class TextPageComponent extends Page {
   }
 
   get text(): string {
-    return this.configuration.text;
+    return this.processLinks(this.configuration.text);
   }
 
   protected getPageSettingsPanel(): PageSettingsPanel {
@@ -43,6 +43,25 @@ export class TextPageComponent extends Page {
 
   hasSource(): boolean {
     return false;
+  }
+
+  protected processLinks(text: any) {
+    if(!text || typeof(text.replaceAll) !== 'function') {
+      return text;
+    }
+    return text.replaceAll(/<a.*?<\/a>/g,
+      function (match) {
+        const container = document.createElement("span");
+        container.innerHTML = match;
+        const link = container.children[0] as any;
+        link.removeAttribute("target");
+        let href = link.getAttribute("href");
+        const out = href.startsWith("http:") || href.startsWith("https:");
+        if(out) {
+          link.target = "_blank";
+        }
+        return link.outerHTML;
+    });
   }
 }
 

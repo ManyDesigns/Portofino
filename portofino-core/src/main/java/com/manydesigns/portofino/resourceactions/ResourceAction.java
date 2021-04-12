@@ -52,6 +52,7 @@ public interface ResourceAction extends SecureResource {
 
     /**
      * Sets the ActionInstance of this element. Invoked automatically by the framework.
+     * @param actionInstance the new {@link ActionInstance}.
      */
     void setActionInstance(ActionInstance actionInstance);
 

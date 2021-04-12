@@ -37,10 +37,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Realm implementation that delegates to another class, written in Groovy and dynamically reloaded.
@@ -66,7 +65,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
 
     protected final CodeBase codeBase;
     protected final String className;
-    protected final ApplicationContext applicationContext;
+    protected final Supplier<ApplicationContext> contextFactory;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
 
@@ -76,10 +75,10 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityClassRealm(CodeBase codeBase, String className, ApplicationContext applicationContext) {
+    public SecurityClassRealm(CodeBase codeBase, String className, Supplier<ApplicationContext> contextFactory) {
         this.codeBase = codeBase;
         this.className = className;
-        this.applicationContext = applicationContext;
+        this.contextFactory = contextFactory;
     }
 
     //--------------------------------------------------------------------------
@@ -107,7 +106,9 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
 
     private PortofinoRealm doEnsureDelegate() throws Exception {
         Class<?> scriptClass = codeBase.loadClass(className);
-        if(scriptClass.isInstance(security)) { //Class did not change
+        ApplicationContext applicationContext = contextFactory.get();
+        if(scriptClass.isInstance(security) || (security != null && applicationContext == null)) {
+            //Class did not change or context is refreshing
             return security;
         } else {
             logger.info("Refreshing Portofino Realm Delegate instance (Security.groovy)");
@@ -117,7 +118,16 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
             Object securityTemp = scriptClass.getConstructor().newInstance();
             if(securityTemp instanceof PortofinoRealm) {
                 PortofinoRealm realm = (PortofinoRealm) securityTemp;
-                configureDelegate(realm);
+                try {
+                    configureDelegate(realm, applicationContext);
+                } catch (Exception e) {
+                    if(security != null) {
+                        logger.warn("Could not refresh Security.groovy delegate, returning old instance", e);
+                        return security;
+                    } else {
+                        throw e;
+                    }
+                }
                 PortofinoRealm oldSecurity = security;
                 security = realm;
                 LifecycleUtils.destroy(oldSecurity);
@@ -131,7 +141,10 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
         }
     }
 
-    protected void configureDelegate(PortofinoRealm security) {
+    protected void configureDelegate(PortofinoRealm security, ApplicationContext applicationContext) {
+        if(applicationContext == null) {
+            throw new IllegalStateException("Application context is not yet ready");
+        }
         AutowireCapableBeanFactory bf = applicationContext.getAutowireCapableBeanFactory();
         bf.autowireBean(security);
         bf.initializeBean(security, "Security.groovy");

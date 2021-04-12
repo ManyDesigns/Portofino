@@ -24,10 +24,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.security.SecurityLogic;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.authc.AuthenticationException;
@@ -100,9 +97,9 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     public AuthenticationInfo loadAuthenticationInfo(JSONWebToken token) {
         Key key = getJWTKey();
-        Jwt jwt;
+        Jws<Claims> jwt;
         try {
-            jwt = Jwts.parser().setSigningKey(key).parse(token.getPrincipal());
+            jwt = Jwts.parser().setSigningKey(key).parseClaimsJws(token.getPrincipal());
         } catch (JwtException e) {
             throw new AuthenticationException(e);
         }
@@ -111,8 +108,8 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         return new SimpleAuthenticationInfo(principal, credentials, getName());
     }
 
-    protected Object extractPrincipalFromWebToken(Jwt jwt) {
-        Map body = (Map) jwt.getBody();
+    protected Object extractPrincipalFromWebToken(Jws<Claims> jwt) {
+        Map<String, Object> body = jwt.getBody();
         String base64Principal = (String) body.get("serialized-principal");
         byte[] serializedPrincipal = Base64.decode(base64Principal);
         Object principal;

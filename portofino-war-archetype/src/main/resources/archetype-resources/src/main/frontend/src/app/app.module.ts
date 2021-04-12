@@ -50,66 +50,8 @@ registerLocaleData(localeIt);
 })
 export class AppComponent {}
 
-@Component({
-  selector: 'portofino-welcome',
-  template: `
-    <portofino-page-layout [page]="this">
-      <ng-template #content>
-        <p>Welcome to Portofino 5. This is your new, empty application.</p>
-        <p>
-          Use the navigation button
-          <button title="{{ 'Navigation' | translate }}" type="button" mat-icon-button
-                  (click)="sidenav.toggle()">
-            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-          </button>
-          to explore the pages.
-        </p>
-        <p>
-          Initially, the application has the user admin/admin built in.
-          You can use that to <a [routerLink]="portofino.upstairsLink + '/wizard'">run the wizard</a>,
-          connect to your database, and build a complete application from it in a few clicks. Please refer to the
-          <a href="https://github.com/ManyDesigns/Portofino/wiki/Getting-started-with-Portofino-5">getting started page</a>.
-        </p>
-        <p>
-          The wizard is one of the tools that can be found in the administration section
-          <a [routerLink]="portofino.upstairsLink">"upstairs"</a> (link in the toolbar).
-          The "upstairs" section is optional and can be disabled in production, leaving only the "downstairs" floor,
-          i.e., the application.
-          <small>"Upstairs" and "downstairs" are historical references to Portofino 3, which used the same model-driven interface
-            both for the application and for the application's model (the metamodel).</small>
-        </p>
-        <h3>API</h3>
-        <p>
-          Your application exposes a REST API which depends on the resource-actions that it's made of (when you create
-          a page, a corresponding resource-action is created for you).
-          You can download <a [href]="portofino.apiRoot">the documentation of the REST API</a> in OpenAPI (aka Swagger)
-          format. This is machine-readable, so you have the option of generating a client automatically in many
-          programming languages.
-          Note that currently the documentation is cached, and if you change the structure of the application, you'll
-          have to restart it in order to see the updated documentation.
-        </p>
-        <h3>I want to know more</h3>
-        <p>
-          You can find additional documentation in the <a href="https://github.com/ManyDesigns/Portofino/wiki">wiki</a>
-          and in the <a href="https://portofino.manydesigns.com/en/docs">documentation center</a>, which was written for
-          Portofino 4.x, but is in many cases still applicable.
-        </p>
-      </ng-template>
-    </portofino-page-layout>`
-})
-@PortofinoComponent({ name: 'welcome' })
-export class WelcomeComponent extends Page {
-  constructor(
-    portofino: PortofinoService, http: HttpClient, router: Router,
-    @Optional() route: ActivatedRoute, authenticationService: AuthenticationService,
-    notificationService: NotificationService, translate: TranslateService,
-    public sidenav: SidenavService) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
-  }
-}
-
 @NgModule({
-  declarations: [AppComponent, WelcomeComponent],
+  declarations: [AppComponent],
   providers: [
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true }
   ],
@@ -128,5 +70,5 @@ export class AppModule {
   // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
   // https://github.com/angular/angular/issues/35314#issuecomment-584821399
   static entryComponents = [
-    CrudComponent, CustomPageComponent, TextPageComponent, UpstairsComponent, WelcomeComponent ];
+    CrudComponent, CustomPageComponent, TextPageComponent, UpstairsComponent ];
 }

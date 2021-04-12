@@ -12,7 +12,7 @@ It's written in Java and extensible using Groovy, and it's distributed under the
 open-source license. It's developed and supported by the company, ManyDesigns, based in Genova, Italy
 (http://www.manydesigns.com).
 
-You can use Portofino to create good lookins applications for the Web and mobile devices. The creation process can include:
+You can use Portofino to create good-looking applications for the Web and mobile devices. The creation process can include:
  - automatic generation through a "wizard" tool that analyses the structure of your existing relational database;
  - manual configuration through a web-based administration interface that lives alongside the application;
  - customization with Groovy (for the backend) and Angular/JavaScript (for the frontend).
@@ -38,7 +38,7 @@ Portofino is based on popular and proven open-source libraries such as Hibernate
 The home of Portofino is http://portofino.manydesigns.com. There you can find the documentation, pointers to community
 resources (forums, wiki, issue tracker), commercial support.
 
-Portofino is translated in several languages, thanks to Manydesigns and various contributors. Languages include English, Italian, French, German, Spanish and Arabic.
+Portofino is translated into several languages, thanks to Manydesigns and various contributors. Languages include English, Italian, French, German, Spanish and Arabic.
 
 ## Getting Started ##
 

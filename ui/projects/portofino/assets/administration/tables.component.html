@@ -37,7 +37,7 @@
           </mat-form-field>
           <fieldset>
             <legend>{{'Columns'|translate}}</legend>
-            <table class="mat-table">
+            <table cdkDropList class="mat-table" (cdkDropListDropped)="moveColumn($event)">
               <tr class="mat-header-row">
                 <th class="mat-header-cell">{{'Name'|translate}}</th>
                 <th class="mat-header-cell">{{'Property name'|translate}}</th>
@@ -47,7 +47,7 @@
                 <th class="mat-header-cell">{{'Scale'|translate}}</th>
                 <th class="mat-header-cell">{{'Nullable'|translate}}</th>
               </tr>
-              <tr *ngFor="let column of tableInfo.table.columns; let i = index;" class="mat-row">
+              <tr *ngFor="let column of tableInfo.table.columns; let i = index;" class="mat-row" cdkDrag>
                 <td class="mat-cell"><a href="javascript:void(0)" (click)="editColumn(column, i);">{{column.columnName}}</a></td>
                 <td class="mat-cell"><input matInput [(ngModel)]="column.propertyName" /></td>
                 <td class="mat-cell" style="min-width: 100px;">

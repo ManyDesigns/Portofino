@@ -92,5 +92,4 @@ public class PortofinoSpringConfiguration {
         return new CacheResetListenerRegistry();
     }
 
-
 }
