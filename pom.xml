@@ -86,7 +86,7 @@
         <commons.vfs.version>2.2</commons.vfs.version>
         <fop.version>2.1</fop.version>
         <groovy.version>3.0.7</groovy.version>
-        <guava.version>30.0-jre</guava.version>
+        <guava.version>30.1.1-jre</guava.version>
         <hibernate.version>5.4.24.Final</hibernate.version>
         <jackson.version>2.11.0</jackson.version>
         <jackson.databind.version>2.10.5.1</jackson.databind.version>

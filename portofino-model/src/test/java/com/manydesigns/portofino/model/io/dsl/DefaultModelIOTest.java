@@ -23,6 +23,7 @@ public class DefaultModelIOTest {
     @Test
     public void testSimpleDomain() throws IOException {
         try(InputStream inputStream = getClass().getResourceAsStream("/test-model-1/testDomain1/testDomain1.domain")) {
+            assertNotNull(inputStream);
             ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
@@ -52,7 +53,7 @@ public class DefaultModelIOTest {
                 "\t}\n" +
                 "\t@Email\n" +
                 "\temail\n" +
-                "\tage: EInt\n" +
+                "\tage: int\n" +
                 "\tregistrationDate: EDate\n" +
                 "}");
         Model model2 = io.load();

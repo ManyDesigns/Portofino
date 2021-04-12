@@ -275,7 +275,9 @@ public class DefaultModelIO implements ModelIO {
         writer.write(indent + property.getName());
         EClassifier type = property.getEType();
         if(!type.equals(EcorePackage.eINSTANCE.getEString())) {
-            writer.write(": " + type.getName());
+            String name = type.getName();
+            String alias = EntityModelVisitor.getDefaultTypeAliases().inverse().get(name);
+            writer.write(": " + (alias != null ? alias : name));
         }
         writer.write(System.lineSeparator());
     }

@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.model.io.dsl;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
 import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
@@ -107,13 +109,13 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
         return visitEntity(ctx.entity());
     }
 
-    protected Map<String, String> getDefaultTypeAliases() {
-        HashMap<String, String> defaults = new HashMap<>();
+    public static BiMap<String, String> getDefaultTypeAliases() {
+        ImmutableBiMap.Builder<String, String> defaults = ImmutableBiMap.builder();
         defaults.put("long", "ELong");
         defaults.put("long?", "ELongObject");
         defaults.put("int", "EInt");
         defaults.put("int?", "EIntObject");
-        return defaults;
+        return defaults.build();
     }
 
     public String resolveType(String typeName, boolean nullable) {
