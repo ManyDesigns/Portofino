@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -35,7 +35,6 @@ import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
@@ -53,16 +52,12 @@ import org.apache.shiro.web.env.WebEnvironment;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -80,7 +75,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORT
 */
 public class ResourceActionsModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
     public static final String ACTIONS_DIRECTORY = "actionsDirectory";
 
     //**************************************************************************
@@ -184,15 +179,7 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
             }
         }
         logger.debug("Creating SecurityClassRealm");
-        realm = new SecurityClassRealm(codeBase, "Security",
-                () -> {
-                    PortofinoContextLoaderListener listener = PortofinoContextLoaderListener.get(servletContext);
-                    if (listener != null && listener.isUserContextRefreshing()) {
-                        return null;
-                    } else {
-                        return WebApplicationContextUtils.getWebApplicationContext(servletContext);
-                    }
-                });
+        realm = new SecurityClassRealm(codeBase, "Security");
         rsm.setRealm(realm);
         status = ModuleStatus.STARTED;
     }
@@ -279,10 +266,14 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
 
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        try {
-            LifecycleUtils.init(realm);
-        } catch (Exception e) {
-            logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
+        ApplicationContext applicationContext = event.getApplicationContext();
+        if(PortofinoContextLoaderListener.BRIDGE_CONTEXT.equals(applicationContext.getId())) {
+            realm.setApplicationContext(applicationContext);
+            try {
+                LifecycleUtils.init(realm);
+            } catch (Exception e) {
+                logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
+            }
         }
     }
 }
