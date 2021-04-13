@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <database databaseName="tt">
-    <awsConnection driver="org.postgresql.Driver"
-                   url="jdbc:postgresql://md-postgres01.cqeklspk4krg.eu-south-1.rds.amazonaws.com:5432/demo_tt"
+    <awsConnection driver="com.manydesigns.portofino.model.database.driver.AWSRdsPostgreSQLDriver"
+                   url="jdbc-rds:postgresql://md-postgres01.cqeklspk4krg.eu-south-1.rds.amazonaws.com:5432/demo_tt"
                    username="demo_tt"
                    rdsInstanceHostName="md-postgres01.cqeklspk4krg.eu-south-1.rds.amazonaws.com"
                    rdsInstancePort="5432"
