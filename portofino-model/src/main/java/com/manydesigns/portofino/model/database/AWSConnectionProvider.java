@@ -22,13 +22,12 @@ package com.manydesigns.portofino.model.database;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.rds.auth.GetIamAuthTokenRequest;
 import com.amazonaws.services.rds.auth.RdsIamAuthTokenGenerator;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.portofino.model.database.driver.AWSRdsDriver;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -51,9 +50,9 @@ import java.text.MessageFormat;
 import java.util.Properties;
 
 /*
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Iacopo Filiberto - iacopo.filiberto@manydesigns.com
-*/
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Iacopo Filiberto - iacopo.filiberto@manydesigns.com
+ */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"driver", "url", "username", "rdsInstanceHostName", "rdsInstancePort", "regionName"})
 public class AWSConnectionProvider extends ConnectionProvider {
@@ -103,16 +102,16 @@ public class AWSConnectionProvider extends ConnectionProvider {
 
     @Override
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
-        try{
+        try {
             setSslProperties();
-        } catch( Exception e){
-            logger.error("Cannot upload AWS keystore", e.getMessage() );
+        } catch (Exception e) {
+            logger.error("Cannot upload AWS keystore", e.getMessage());
         }
         keyPrefix = "portofino.database." + getDatabase().getDatabaseName() + ".";
         configuration = databasePlatformsRegistry.getPortofinoConfiguration();
-        if(url == null || url.equals(keyPrefix + "url")) {
+        if (url == null || url.equals(keyPrefix + "url")) {
             actualUrl = configuration.getString(keyPrefix + "url");
-            if(actualUrl == null) {
+            if (actualUrl == null) {
                 status = STATUS_ERROR;
                 throw new RuntimeException("Invalid connection provider for database " + getDatabase().getDatabaseName() + " - no URL specified");
             }
@@ -120,9 +119,9 @@ public class AWSConnectionProvider extends ConnectionProvider {
             actualUrl = url;
         }
         actualUrl = OgnlTextFormat.format(actualUrl, null);
-        if(username == null || username.equals(keyPrefix + "username")) {
+        if (username == null || username.equals(keyPrefix + "username")) {
             actualUsername = configuration.getString(keyPrefix + "username");
-            if(actualUsername == null) {
+            if (actualUsername == null) {
                 status = STATUS_ERROR;
                 throw new RuntimeException("Invalid connection provider for database " + getDatabase().getDatabaseName() + " - no username specified");
             }
@@ -144,11 +143,11 @@ public class AWSConnectionProvider extends ConnectionProvider {
 
     public Connection acquireConnection() throws SQLException {
         try {
-            if(driver != null) {
+            if (driver != null) {
                 Class.forName(driver);
             }
         } catch (ClassNotFoundException e) {
-            throw new SQLException( e.getMessage() );
+            throw new SQLException(e.getMessage());
         }
         return DriverManager.getConnection(url, setConnectionProperties());
     }
@@ -189,7 +188,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
     }
 
     public void setActualUrl(String url) {
-        if(this.url == null || this.url.equals(keyPrefix + "url")) {
+        if (this.url == null || this.url.equals(keyPrefix + "url")) {
             configuration.setProperty(keyPrefix + "url", url);
         } else {
             this.url = url;
@@ -202,7 +201,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
     }
 
     public void setActualUsername(String username) {
-        if(this.username == null || this.username.equals(keyPrefix + "username")) {
+        if (this.username == null || this.username.equals(keyPrefix + "username")) {
             configuration.setProperty(keyPrefix + "username", username);
         } else {
             this.username = username;
@@ -255,34 +254,21 @@ public class AWSConnectionProvider extends ConnectionProvider {
                 .toString();
     }
 
-    String generateAuthToken(String region, String hostName, String port, String username) {
-
-        RdsIamAuthTokenGenerator generator = RdsIamAuthTokenGenerator.builder()
-                .credentials(new DefaultAWSCredentialsProviderChain())
-                .region(region)
-                .build();
-
-        String authToken = generator.getAuthToken(
-                GetIamAuthTokenRequest.builder()
-                        .hostname(rdsInstanceHostName)
-                        .port(Integer.parseInt(rdsInstancePort))
-                        .userName(username)
-                        .build());
-
-        return authToken;
-    }
-
     /**
      * This method sets the mysql connection properties which includes the IAM Database Authentication token
      * as the password. It also specifies that SSL verification is required.
+     *
      * @return
      */
-    private Properties setConnectionProperties() {
+    public Properties setConnectionProperties() {
         Properties properties = new Properties();
         properties.setProperty("verifyServerCertificate", "true");
         properties.setProperty("useSSL", "true");
-        properties.setProperty("user" ,this.username);
-        properties.setProperty("password", generateAuthToken());
+        properties.setProperty(AWSRdsDriver.PROPERTY_PREFIX + ".rdsInstanceHostName", rdsInstanceHostName);
+        properties.setProperty(AWSRdsDriver.PROPERTY_PREFIX + ".rdsInstancePort", rdsInstancePort);
+        properties.setProperty(AWSRdsDriver.PROPERTY_PREFIX + ".regionName", regionName);
+        properties.setProperty("username", this.username);
+//        properties.setProperty("password", generateAuthToken());
         return properties;
     }
 
@@ -290,6 +276,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
      * This method generates the IAM Auth Token.
      * An example IAM Auth Token would look like follows:
      * btusi123.cmz7kenwo2ye.rds.cn-north-1.amazonaws.com.cn:3306/?Action=connect&DBUser=iamtestuser&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20171003T010726Z&X-Amz-SignedHeaders=host&X-Amz-Expires=899&X-Amz-Credential=AKIAPFXHGVDI5RNFO4AQ%2F20171003%2Fcn-north-1%2Frds-db%2Faws4_request&X-Amz-Signature=f9f45ef96c1f770cdad11a53e33ffa4c3730bc03fdee820cfdf1322eed15483b
+     *
      * @return
      */
     private String generateAuthToken() {
@@ -310,6 +297,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
 
     /**
      * This method sets the SSL properties which specify the key store file, its type and password:
+     *
      * @throws Exception
      */
     private void setSslProperties() throws Exception {
@@ -321,6 +309,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
     /**
      * This method returns the path of the Key Store File needed for the SSL verification during the IAM Database Authentication to
      * the db instance.
+     *
      * @return
      * @throws Exception
      */
@@ -329,7 +318,8 @@ public class AWSConnectionProvider extends ConnectionProvider {
     }
 
     /**
-     *  This method generates the SSL certificate
+     * This method generates the SSL certificate
+     *
      * @return
      * @throws Exception
      */
@@ -345,7 +335,7 @@ public class AWSConnectionProvider extends ConnectionProvider {
     }
 
     private String getCertificateFromRegion(String regionName) {
-        switch(Regions.fromName( regionName )) {
+        switch (Regions.fromName(regionName)) {
             case AP_EAST_1:
                 return "rds-ca-2019-ap-east-1.pem";
             case EU_WEST_1:
@@ -386,19 +376,20 @@ public class AWSConnectionProvider extends ConnectionProvider {
                 return "rds-ca-2019-me-south-1.pem";
             case SA_EAST_1:
                 return "rds-ca-2019-sa-east-1.pem";
-            default :
-            return "rds-ca-2019-eu-west-1.pem";
+            default:
+                return "rds-ca-2019-eu-west-1.pem";
 
         }
     }
 
     /**
      * This method creates the Key Store File
+     *
      * @param rootX509Certificate - the SSL certificate to be stored in the KeyStore
      * @return
      * @throws Exception
      */
-    private  File createKeyStoreFile(X509Certificate rootX509Certificate) throws Exception {
+    private File createKeyStoreFile(X509Certificate rootX509Certificate) throws Exception {
         File keyStoreFile = File.createTempFile(KEY_STORE_FILE_PREFIX, KEY_STORE_FILE_SUFFIX);
         try (FileOutputStream fos = new FileOutputStream(keyStoreFile.getPath())) {
             KeyStore ks = KeyStore.getInstance(KEY_STORE_TYPE, KEY_STORE_PROVIDER);
@@ -411,9 +402,10 @@ public class AWSConnectionProvider extends ConnectionProvider {
 
     /**
      * This method clears the SSL properties.
+     *
      * @throws Exception
      */
-    private  void clearSslProperties() throws Exception {
+    private void clearSslProperties() throws Exception {
         System.clearProperty("javax.net.ssl.trustStore");
         System.clearProperty("javax.net.ssl.trustStoreType");
         System.clearProperty("javax.net.ssl.trustStorePassword");
