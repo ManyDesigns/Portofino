@@ -42,7 +42,7 @@ public class S3BlobManagerTest {
     S3BlobManager manager;
 
     String sampleContent = "This is some content";
-    String sampleFilename = "sample.txt";
+    String sampleFilename = "*/--+#%!Perchè?-01.txt";
     String sampleContentType = "text/plain";
 
 
@@ -84,6 +84,7 @@ public class S3BlobManagerTest {
         // verifica esistenza e corrispondenza contenuto
         assertTrue(dataFile.available()==1);
         // verifica esistenza e corrispondenza metadati
+        System.out.println("");
         System.out.println(metaFile);
         
         // ricarica il blob

@@ -30,12 +30,15 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
+import com.google.common.escape.UnicodeEscaper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 /**
@@ -107,7 +110,11 @@ public class S3BlobManager implements BlobManager{
         try {
             ObjectMetadata metadata = s3.getObjectMetadata(this.bucketName, code );
             for(String key : metadata.getUserMetadata().keySet()){
-                metaProperties.put(key.replaceAll( S3_PROPERTIES_PREFIX, "" ),  metadata.getUserMetadata().get( key ) );
+                String cleanKey=key.replaceAll( S3_PROPERTIES_PREFIX, "" );
+                if( "filename".equals(cleanKey)){
+                    metaProperties.put(cleanKey, URLDecoder.decode( metadata.getUserMetadata().get( key ),"UTF-8"));
+                }else
+                    metaProperties.put(cleanKey,  metadata.getUserMetadata().get( key ) );
             }
             metaProperties.put(Blob.SIZE_PROPERTY, Long.toString( metadata.getContentLength()));
 
@@ -142,10 +149,21 @@ public class S3BlobManager implements BlobManager{
             InputStream inputStream = blob.getInputStream();
             ObjectMetadata metadata = new ObjectMetadata();
             Properties properties = blob.getMetaProperties();
-            
+
+            metadata.setContentEncoding("UTF-8");
+            metadata.setContentType("plain/text");
+
+
             for(Object obj : properties.keySet()){
                 metadata.addUserMetadata( "app_creator", "Portofino" );
-                metadata.addUserMetadata( obj.toString(), properties.get( obj ).toString() );
+                if("filename".equals(obj.toString())) {
+                    //metadata.addUserMetadata( obj.toString(),properties.get( obj ).toString() );
+
+                    metadata.addUserMetadata( obj.toString(), URLEncoder.encode(properties.get( obj ).toString(), "UTF-8") );
+                }
+                else
+                    metadata.addUserMetadata( obj.toString(),properties.get( obj ).toString());
+
             }
 
             PutObjectResult result;
