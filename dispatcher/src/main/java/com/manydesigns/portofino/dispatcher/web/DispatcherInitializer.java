@@ -72,7 +72,8 @@ public class DispatcherInitializer implements ServletContextListener {
         }
 
         String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
-        initApplicationRoot(servletContext, actionsDirectory);
+        CodeBase codeBase = initApplicationRoot(actionsDirectory);
+        servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
         logger.info("Application initialized.");
     }
 
@@ -103,22 +104,24 @@ public class DispatcherInitializer implements ServletContextListener {
         servletContext.setAttribute(ApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, this.configuration);
     }
 
-    protected void initApplicationRoot(ServletContext servletContext, String actionsDirectoryName) {
+    protected CodeBase initApplicationRoot(String actionsDirectoryName) {
         try {
             FileObject actionsDirectory = applicationRoot.getChild(actionsDirectoryName);
             if(actionsDirectory == null || actionsDirectory.getType() != FileType.FOLDER) {
                 initializationFailed(new Exception("Not a directory: " + actionsDirectoryName));
             }
-            CodeBase codeBase = createAndStoreCodeBase(servletContext);
+            CodeBase codeBase = createCodeBase();
             ResourceResolvers resourceResolver = new ResourceResolvers();
             configureResourceResolvers(resourceResolver, codeBase);
             DocumentedApiRoot.setRootFactory(() -> getRoot(actionsDirectory, resourceResolver));
+            return codeBase;
         } catch (Exception e) {
             initializationFailed(e);
+            return null;
         }
     }
 
-    protected CodeBase createAndStoreCodeBase(ServletContext servletContext) throws IOException {
+    protected CodeBase createCodeBase() throws IOException {
         //TODO auto discovery?
         FileObject codeBaseRoot = getCodeBaseRoot();
         JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot, null, getClass().getClassLoader());
@@ -131,7 +134,6 @@ public class DispatcherInitializer implements ServletContextListener {
         } catch (Exception e) {
             logger.debug("Groovy not available", e);
         }
-        servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
         return codeBase;
     }
 

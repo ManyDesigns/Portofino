@@ -305,7 +305,7 @@ export abstract class Page implements WithButtons, OnDestroy {
           Form: Form,
         };
         userFunction(this, forms, moment);
-      }, e => {
+      }, () => {
         this.notificationService.error(this.translate.get("Could not load page script"));
       });
     }

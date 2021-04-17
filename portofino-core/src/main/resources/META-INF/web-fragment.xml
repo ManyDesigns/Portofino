@@ -8,13 +8,6 @@
         <after><name>elements</name></after>
     </ordering>
 
-    <listener>
-        <description>Application context and session listener</description>
-        <listener-class>
-            com.manydesigns.portofino.servlets.PortofinoListener
-        </listener-class>
-    </listener>
-
     <!-- Shiro -->
     <filter>
         <filter-name>ShiroFilter</filter-name>

@@ -25,6 +25,7 @@ import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.servlet.AttributeMap;
 import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
 import com.manydesigns.portofino.modules.Module;
@@ -98,24 +99,7 @@ public class PortofinoListener extends DispatcherInitializer
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
             ServletContext servletContext = servletContextEvent.getServletContext();
-            ElementsThreadLocals.setServletContext(servletContext);
-            AttributeMap servletContextAttributeMap = AttributeMap.createAttributeMap(servletContext);
-            ElementsThreadLocals.getOgnlContext().put(
-                    ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
-                    servletContextAttributeMap);
-            init(servletContextEvent);
-            String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
-            initApplicationRoot(servletContext, actionsDirectory);
-
-            String portofinoVersion = Module.getPortofinoVersion();
-            String lineSeparator = System.getProperty("line.separator", "\n");
-            logger.info(lineSeparator + SEPARATOR +
-                            lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
-                            lineSeparator + "--- Context path: {}" +
-                            lineSeparator + "--- Real path: {}" +
-                            lineSeparator + "--- Visit https://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
-                            lineSeparator + SEPARATOR,
-                    serverInfo.getContextPath(), serverInfo.getRealPath());
+            initWithServletContext(servletContext);
         } catch (Throwable e) {
             logger.error("Could not start ManyDesigns Portofino", e);
             throw new Error(e);
@@ -124,11 +108,34 @@ public class PortofinoListener extends DispatcherInitializer
         }
     }
 
-    private void init(ServletContextEvent servletContextEvent) {
+    public void initWithServletContext(ServletContext servletContext) {
+        ElementsThreadLocals.setServletContext(servletContext);
+        AttributeMap servletContextAttributeMap = AttributeMap.createAttributeMap(servletContext);
+        ElementsThreadLocals.getOgnlContext().put(
+                ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
+                servletContextAttributeMap);
+        ElementsThreadLocals.getOgnlContext().put(
+                PORTOFINO_APPLICATION_DIRECTORY_PARAMETER,
+                servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER));
+        init(servletContext);
+        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
+        CodeBase codeBase = initApplicationRoot(actionsDirectory);
+        servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
+
+        String portofinoVersion = Module.getPortofinoVersion();
+        String lineSeparator = System.getProperty("line.separator", "\n");
+        logger.info(lineSeparator + SEPARATOR +
+                        lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
+                        lineSeparator + "--- Context path: {}" +
+                        lineSeparator + "--- Real path: {}" +
+                        lineSeparator + "--- Visit https://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
+                        lineSeparator + SEPARATOR,
+                serverInfo.getContextPath(), serverInfo.getRealPath());
+    }
+
+    private void init(ServletContext servletContext) {
         // clear the Mapping Diagnostic Context for logging
         MDC.clear();
-        servletContext = servletContextEvent.getServletContext();
-
         serverInfo = new ServerInfo(servletContext);
 
         String applicationDirectoryPath = servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER);
@@ -165,7 +172,7 @@ public class PortofinoListener extends DispatcherInitializer
         logger.info("Application directory: {}", applicationRoot.getName().getPath());
 
         try {
-            loadConfiguration();
+            loadConfiguration(servletContext);
         } catch (Exception e) {
             logger.error("Could not load configuration", e);
             throw new Error(e);
@@ -203,7 +210,7 @@ public class PortofinoListener extends DispatcherInitializer
     // Setup
     //**************************************************************************
 
-    protected void loadConfiguration() throws ConfigurationException, FileSystemException {
+    protected void loadConfiguration(ServletContext servletContext) throws ConfigurationException, FileSystemException {
         FileObject configurationFile = applicationRoot.resolveFile("portofino.properties");
         PropertiesBuilderParameters parameters =
                 new Parameters()
