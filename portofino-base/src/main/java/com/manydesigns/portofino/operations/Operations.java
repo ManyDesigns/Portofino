@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -46,7 +46,7 @@ import java.util.concurrent.ExecutionException;
  */
 public class Operations {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     public static List<Operation> getOperations(Class<?> someClass) {
         try {

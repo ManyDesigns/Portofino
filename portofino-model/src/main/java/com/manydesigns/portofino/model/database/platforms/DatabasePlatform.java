@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,7 +37,7 @@ import java.util.Properties;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public interface DatabasePlatform {
-    String copyright = "Copyright (C) 2005-2017 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2021 ManyDesigns srl";
 
     String STATUS_CREATED = "created";
     String STATUS_OK = "ok";

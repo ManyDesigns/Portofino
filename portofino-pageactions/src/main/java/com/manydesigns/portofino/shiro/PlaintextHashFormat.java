@@ -11,7 +11,7 @@ import org.apache.shiro.crypto.hash.format.HashFormat;
  */
 public class PlaintextHashFormat implements HashFormat {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     @Override
     public String format(Hash hash) {

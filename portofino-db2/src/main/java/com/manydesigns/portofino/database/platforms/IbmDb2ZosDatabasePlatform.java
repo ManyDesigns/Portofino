@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -34,7 +34,7 @@ import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatfo
 */
 public class IbmDb2ZosDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     public final static String DESCRIPTION = "IBM DB2 for ZOS";
     public final static String STANDARD_DRIVER_CLASS_NAME =

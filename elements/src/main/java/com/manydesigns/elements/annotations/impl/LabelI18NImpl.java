@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -34,7 +34,7 @@ import java.lang.annotation.Annotation;
 @Deprecated
 public class LabelI18NImpl implements LabelI18N {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     private final String value;
 

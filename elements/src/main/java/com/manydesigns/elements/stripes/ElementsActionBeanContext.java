@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -43,7 +43,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ElementsActionBeanContext extends ActionBeanContext {
     public static final String copyright =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     protected String actionPath;
 

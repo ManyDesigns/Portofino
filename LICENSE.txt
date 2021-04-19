@@ -1,5 +1,5 @@
 ManyDesigns Portofino
-Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
 http://www.manydesigns.com/
 This software is licensed under the following terms:
 

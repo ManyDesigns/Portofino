@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2017 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -47,7 +47,7 @@ import java.util.List;
 */
 public abstract class AbstractField<T> implements Field<T> {
     public static final String COPYRIGHT =
-            "Copyright (C) 2005-2017 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     public static final String INPUT_CONTAINER_CSS_CLASS = "input-container";
     public static final String FORM_LABEL_CSS_CLASS = "control-label";
