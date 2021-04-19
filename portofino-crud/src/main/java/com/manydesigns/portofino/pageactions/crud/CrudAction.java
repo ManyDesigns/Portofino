@@ -51,6 +51,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -145,7 +146,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
             logger.debug("Query string {} contains select");
-            List items = plainSelect.getSelectItems();
+            List<SelectItem> items = plainSelect.getSelectItems();
             if(items.size() != 1) {
                 logger.error("I don't know how to generate a count query for {}", queryString);
                 return null;
@@ -207,6 +208,22 @@ public class CrudAction extends AbstractCrudAction<Object> {
             session = persistence.getSession(getCrudConfiguration().getDatabase());
             selectionProviderSupport = createSelectionProviderSupport();
             selectionProviderSupport.setup();
+        }
+        if(sortDirection != null) {
+            if(!"asc".equalsIgnoreCase(sortDirection) && !"desc".equalsIgnoreCase(sortDirection)) {
+                throw new IllegalArgumentException("Unsupported sort direction: " + sortDirection);
+            }
+        }
+        if(sortProperty != null) {
+            if(classAccessor != null) {
+                try {
+                    classAccessor.getProperty(sortProperty);
+                } catch (NoSuchFieldException e) {
+                    throw new IllegalArgumentException("Invalid sort property: " + sortProperty, e);
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid sort property: " + sortProperty);
+            }
         }
     }
 
@@ -272,7 +289,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             }
             objects = QueryUtils.getObjects(session, getBaseQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
-            objects=new ArrayList<Object>();
+            objects= new ArrayList<>();
             logger.warn("Incorrect Field Type", e);
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
         }
