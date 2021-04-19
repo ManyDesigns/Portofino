@@ -197,6 +197,10 @@ public class DefaultMailSender implements MailSender {
         email.setSubject(emailBean.getSubject());
         email.setFrom(emailBean.getFrom());
 
+        String replyTo=emailBean.getReplyTo();
+        if( null!=replyTo )
+            email.addReplyTo(replyTo);
+
         for(Recipient recipient : emailBean.getRecipients()) {
             switch (recipient.getType()) {
                 case TO:
