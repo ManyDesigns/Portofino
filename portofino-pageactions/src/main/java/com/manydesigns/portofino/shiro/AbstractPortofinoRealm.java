@@ -88,13 +88,13 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     public AuthenticationInfo loadAuthenticationInfo(JSONWebToken token) {
         Key key = getJWTKey();
-        Jwt jwt;
+        Jws<Claims>  jwt;
         try {
-            jwt = Jwts.parser().setSigningKey(key).parse(token.getPrincipal());
+            jwt = Jwts.parser().setSigningKey(key).parseClaimsJws(token.getPrincipal());
         } catch (JwtException e) {
             throw new AuthenticationException(e);
         }
-        Map body = (Map) jwt.getBody();
+        Map<String, Object> body = jwt.getBody();
         String credentials = legacyHashing ? token.getCredentials() : encryptPassword(token.getCredentials());
         String base64Principal = (String) body.get("serialized-principal");
         byte[] serializedPrincipal = Base64.decode(base64Principal);
