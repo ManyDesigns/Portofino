@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -27,7 +27,7 @@ import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
-import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
+import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoRoot;
@@ -60,7 +60,7 @@ import java.util.Map;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PortofinoListener extends DispatcherInitializer
+public class PortofinoListener extends WebDispatcherInitializer
         implements ServletContextListener, ServletContextAttributeListener {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
@@ -221,7 +221,7 @@ public class PortofinoListener extends DispatcherInitializer
         parameters.setFileName(path);
         this.configurationFile = new Configurations().propertiesBuilder(path).configure(parameters);
         configuration =  this.configurationFile.getConfiguration();
-        servletContext.setAttribute(PortofinoApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, this.configuration);
+        servletContext.setAttribute(PortofinoApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, configuration);
 
         String localConfigurationPath = null;
         try {

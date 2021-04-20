@@ -22,7 +22,7 @@ package com.manydesigns.portofino.spring;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
+import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.i18n.I18nUtils;
 import com.manydesigns.portofino.modules.Module;
 import org.apache.commons.configuration2.Configuration;
@@ -72,7 +72,7 @@ public class PortofinoWebSpringConfiguration implements InitializingBean {
 
     @Bean
     public CodeBase getCodeBase() {
-        return (CodeBase) getServletContext().getAttribute(DispatcherInitializer.CODE_BASE_ATTRIBUTE);
+        return (CodeBase) getServletContext().getAttribute(WebDispatcherInitializer.CODE_BASE_ATTRIBUTE);
     }
 
     @Bean
