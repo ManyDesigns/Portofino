@@ -2,7 +2,12 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.2.1] – Unreleased
+## [5.2.2] – Unreleased
+
+### Changed
+- Authentication/authorization endpoint is fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
+
+## [5.2.1] – 2020-04-10
 
 ### Added
 - Possibility to reorder table columns in the tables section upstairs.
