@@ -20,24 +20,20 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.elements.crypto.KeyManager;
 import com.manydesigns.elements.servlet.AttributeMap;
 import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
-import com.manydesigns.portofino.i18n.I18nUtils;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -47,24 +43,16 @@ import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.interpol.ConfigurationInterpolator;
 import org.apache.commons.configuration2.interpol.Lookup;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.servlet.*;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -84,15 +72,12 @@ public class PortofinoListener extends DispatcherInitializer
     public static final String SEPARATOR =
             "----------------------------------------" +
             "----------------------------------------";
-    
-    public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
     public static final String PORTOFINO_CONFIGURATION_FILE_PROPERTY = "portofino.configuration.file";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
-    protected Configuration elementsConfiguration;
     protected FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
 
     protected ServletContext servletContext;
@@ -114,35 +99,7 @@ public class PortofinoListener extends DispatcherInitializer
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
             ServletContext servletContext = servletContextEvent.getServletContext();
-            ElementsThreadLocals.setServletContext(servletContext);
-            AttributeMap servletContextAttributeMap = AttributeMap.createAttributeMap(servletContext);
-            ElementsThreadLocals.getOgnlContext().put(
-                    ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
-                    servletContextAttributeMap);
-            init(servletContextEvent);
-            String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
-            initApplicationRoot(servletContext, actionsDirectory);
-
-            String portofinoVersion = Module.getPortofinoVersion();
-            String lineSeparator = System.getProperty("line.separator", "\n");
-            logger.info(lineSeparator + SEPARATOR +
-                            lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
-                            lineSeparator + "--- Context path: {}" +
-                            lineSeparator + "--- Real path: {}" +
-                            lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
-                            lineSeparator + SEPARATOR,
-                    serverInfo.getContextPath(), serverInfo.getRealPath());
-
-            String versionCheckUrl = configuration.getString(
-                    "portofino.version.check.url",
-                    "https://portofino.manydesigns.com/version-check.jsp");
-            if(!"off".equalsIgnoreCase(versionCheckUrl)) {
-                try {
-                    checkForNewVersion(portofinoVersion, versionCheckUrl);
-                } catch (Throwable t) {
-                    logger.warn("Version check failed unexpectedly", t);
-                }
-            }
+            initWithServletContext(servletContext);
         } catch (Throwable e) {
             logger.error("Could not start ManyDesigns Portofino", e);
             throw new Error(e);
@@ -151,16 +108,35 @@ public class PortofinoListener extends DispatcherInitializer
         }
     }
 
-    private void init(ServletContextEvent servletContextEvent) {
+    public void initWithServletContext(ServletContext servletContext) {
+        ElementsThreadLocals.setServletContext(servletContext);
+        AttributeMap servletContextAttributeMap = AttributeMap.createAttributeMap(servletContext);
+        ElementsThreadLocals.getOgnlContext().put(
+                ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
+                servletContextAttributeMap);
+        ElementsThreadLocals.getOgnlContext().put(
+                PORTOFINO_APPLICATION_DIRECTORY_PARAMETER,
+                servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER));
+        init(servletContext);
+        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
+        CodeBase codeBase = initApplicationRoot(actionsDirectory);
+        servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
+
+        String portofinoVersion = Module.getPortofinoVersion();
+        String lineSeparator = System.getProperty("line.separator", "\n");
+        logger.info(lineSeparator + SEPARATOR +
+                        lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
+                        lineSeparator + "--- Context path: {}" +
+                        lineSeparator + "--- Real path: {}" +
+                        lineSeparator + "--- Visit https://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
+                        lineSeparator + SEPARATOR,
+                serverInfo.getContextPath(), serverInfo.getRealPath());
+    }
+
+    private void init(ServletContext servletContext) {
         // clear the Mapping Diagnostic Context for logging
         MDC.clear();
-
-        servletContext = servletContextEvent.getServletContext();
-
         serverInfo = new ServerInfo(servletContext);
-        servletContext.setAttribute(SERVER_INFO, serverInfo);
-
-        elementsConfiguration = ElementsProperties.getConfiguration();
 
         String applicationDirectoryPath = servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER);
         FileSystemManager manager;
@@ -196,7 +172,7 @@ public class PortofinoListener extends DispatcherInitializer
         logger.info("Application directory: {}", applicationRoot.getName().getPath());
 
         try {
-            loadConfiguration();
+            loadConfiguration(servletContext);
         } catch (Exception e) {
             logger.error("Could not load configuration", e);
             throw new Error(e);
@@ -205,60 +181,11 @@ public class PortofinoListener extends DispatcherInitializer
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, configurationFile);
 
-        if(!KeyManager.isActive()) {
-            try {
-                logger.info("Initializing KeyManager ");
-                KeyManager.init(configuration);
-            } catch (Exception e) {
-                logger.error("Could not initialize KeyManager", e);
-            }
-        }
-
-        I18nUtils.setupResourceBundleManager(applicationRoot, servletContext);
-
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
             String msg = "Servlet API version should be >= 3.0.";
             logger.warn(msg);
         }
-
-        String encoding = configuration.getString(
-                PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
-        logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
-        if(!Charset.isSupported(encoding)) {
-            logger.error("The encoding is not supported by the JVM!");
-        }
-    }
-
-    protected void checkForNewVersion(String portofinoVersion, String versionCheckUrl) {
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(versionCheckUrl).queryParam("version", portofinoVersion);
-        Future<Response> responseFuture = target.request().async().get();
-        Executors.newSingleThreadExecutor().submit(() -> {
-            try {
-                Response response = responseFuture.get();
-                if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-                    String latestVersion = response.readEntity(String.class).trim();
-                    if (Objects.equals(portofinoVersion, latestVersion)) {
-                        logger.info("Your installation of Portofino is up-to-date");
-                    } else {
-                        String lineSeparator = System.getProperty("line.separator", "\n");
-                        logger.info(lineSeparator + SEPARATOR + lineSeparator +
-                                "A new version of Portofino is available: " + latestVersion +
-                                lineSeparator + SEPARATOR);
-                    }
-                } else {
-                    logger.info("Version check failed: " + response.getStatus());
-                }
-                String message = response.getHeaderString("X-Message");
-                if (message != null) {
-                    logger.info(message);
-                }
-            } catch (Exception e) {
-                logger.info("Could not check for new version: " + e.getMessage());
-                logger.debug("Additional information", e);
-            }
-        });
     }
 
     @Override
@@ -283,7 +210,7 @@ public class PortofinoListener extends DispatcherInitializer
     // Setup
     //**************************************************************************
 
-    protected void loadConfiguration() throws ConfigurationException, FileSystemException {
+    protected void loadConfiguration(ServletContext servletContext) throws ConfigurationException, FileSystemException {
         FileObject configurationFile = applicationRoot.resolveFile("portofino.properties");
         PropertiesBuilderParameters parameters =
                 new Parameters()

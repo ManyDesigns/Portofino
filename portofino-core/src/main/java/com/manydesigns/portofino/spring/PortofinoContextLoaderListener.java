@@ -53,6 +53,9 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     protected static final
     AtomicBoolean refreshing = new AtomicBoolean(true);
     private static final Logger logger = LoggerFactory.getLogger(PortofinoContextLoaderListener.class);
+    public static final String PARENT_CONTEXT = "portofino-parent";
+    public static final String BRIDGE_CONTEXT = "portofino-bridge";
+    public static final String USER_CONTEXT = "portofino-user";
 
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
     protected ServletContext servletContext;
@@ -70,13 +73,14 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
+        bridgeContext.setId(BRIDGE_CONTEXT);
+        servletContext = event.getServletContext();
+        servletContext.setAttribute(PORTOFINO_CONTEXT_LOADER_LISTENER, this);
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
-            servletContext = event.getServletContext();
             ElementsThreadLocals.setServletContext(servletContext);
-            bridgeContext.setId("portofino-bridge");
+            new PortofinoListener().initWithServletContext(servletContext);
             super.contextInitialized(event);
-            servletContext.setAttribute(PORTOFINO_CONTEXT_LOADER_LISTENER, this);
             refreshing.set(false);
         } finally {
             ElementsThreadLocals.removeElementsContext();
@@ -112,7 +116,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     protected ConfigurableWebApplicationContext setupUserContext() {
         ConfigurableWebApplicationContext userContext = new AnnotationConfigWebApplicationContext();
         userContext.setParent(parentContext);
-        userContext.setId("portofino-user");
+        userContext.setId(USER_CONTEXT);
         userContext.addApplicationListener(event -> {
             if(event instanceof ContextClosedEvent) {
                 if(reloadingUserContext.get()) {
@@ -163,7 +167,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
 
     protected void setupParentContext() {
         parentContext = new AnnotationConfigWebApplicationContext();
-        parentContext.setId("portofino-parent");
+        parentContext.setId(PARENT_CONTEXT);
         parentContext.setServletContext(servletContext);
         ConfigurableEnvironment environment = parentContext.getEnvironment();
         MutablePropertySources sources = environment.getPropertySources();
@@ -175,6 +179,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         for (Class<?> moduleClass : moduleClasses) {
             annotationConfig.register(moduleClass);
         }
+        annotationConfig.register(PortofinoWebSpringConfiguration.class);
         annotationConfig.register(PortofinoSpringConfiguration.class);
         logger.info("Refreshing parent application context");
         parentContext.refresh();

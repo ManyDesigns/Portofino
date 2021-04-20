@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -51,7 +51,7 @@ import java.util.function.Supplier;
  */
 public class SecurityClassRealm implements PortofinoRealm, Initializable, Destroyable {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Logger
@@ -65,20 +65,19 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
 
     protected final CodeBase codeBase;
     protected final String className;
-    protected final Supplier<ApplicationContext> contextFactory;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
 
     protected CacheManager cacheManager;
+    protected ApplicationContext applicationContext;
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityClassRealm(CodeBase codeBase, String className, Supplier<ApplicationContext> contextFactory) {
+    public SecurityClassRealm(CodeBase codeBase, String className) {
         this.codeBase = codeBase;
         this.className = className;
-        this.contextFactory = contextFactory;
     }
 
     //--------------------------------------------------------------------------
@@ -106,7 +105,6 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
 
     private PortofinoRealm doEnsureDelegate() throws Exception {
         Class<?> scriptClass = codeBase.loadClass(className);
-        ApplicationContext applicationContext = contextFactory.get();
         if(scriptClass.isInstance(security) || (security != null && applicationContext == null)) {
             //Class did not change or context is refreshing
             return security;
@@ -351,6 +349,10 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
         if(security != null) {
             security.setCacheManager(cacheManager);
         }
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     @Override
