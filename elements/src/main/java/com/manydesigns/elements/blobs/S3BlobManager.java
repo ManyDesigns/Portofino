@@ -20,10 +20,7 @@
 package com.manydesigns.elements.blobs;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SDKGlobalConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
@@ -33,12 +30,15 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
+import com.google.common.escape.UnicodeEscaper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Properties;
 
 /**
@@ -68,14 +68,14 @@ public class S3BlobManager implements BlobManager{
     //**************************************************************************
 
 
-    public S3BlobManager( String region, String bucketName) {
+    public S3BlobManager(String region, String bucketName) {
         this.bucketName = bucketName;
 
         AWSCredentialsProvider credential = new DefaultAWSCredentialsProviderChain();
         this.s3 = AmazonS3ClientBuilder.standard().withCredentials( credential ).withRegion( Regions.fromName(region)).build();
     }
 
-    public S3BlobManager( String region, String bucketName, String endPoint) {
+    public S3BlobManager(String region, String bucketName, String endPoint) {
         this.bucketName = bucketName;
         AwsClientBuilder.EndpointConfiguration  endpointConfiguration = new AwsClientBuilder.EndpointConfiguration( endPoint, region );
 
@@ -84,7 +84,7 @@ public class S3BlobManager implements BlobManager{
                 .withEndpointConfiguration( endpointConfiguration )
                 .withPathStyleAccessEnabled(true)
                 .build();
-    }                                                                              
+    }
 
     //**************************************************************************
     // Methods
@@ -110,7 +110,11 @@ public class S3BlobManager implements BlobManager{
         try {
             ObjectMetadata metadata = s3.getObjectMetadata(this.bucketName, code );
             for(String key : metadata.getUserMetadata().keySet()){
-                metaProperties.put(key.replaceAll( S3_PROPERTIES_PREFIX, "" ),  metadata.getUserMetadata().get( key ) );
+                String cleanKey=key.replaceAll( S3_PROPERTIES_PREFIX, "" );
+                if( "filename".equals(cleanKey)){
+                    metaProperties.put(cleanKey, URLDecoder.decode( metadata.getUserMetadata().get( key ),"UTF-8"));
+                }else
+                    metaProperties.put(cleanKey,  metadata.getUserMetadata().get( key ) );
             }
             metaProperties.put(Blob.SIZE_PROPERTY, Long.toString( metadata.getContentLength()));
 
@@ -129,12 +133,11 @@ public class S3BlobManager implements BlobManager{
 
     public InputStream getDataFile(String code) throws IOException {
         try {
-              S3Object s3Object = s3.getObject(this.bucketName, code );
-              return s3Object.getObjectContent();
+            S3Object s3Object = s3.getObject(this.bucketName, code );
+            return s3Object.getObjectContent();
         } catch (AmazonServiceException e) {
             throw new IOException( e.getMessage() );
         }
-
     }
 
     @Override
@@ -145,10 +148,15 @@ public class S3BlobManager implements BlobManager{
             InputStream inputStream = blob.getInputStream();
             ObjectMetadata metadata = new ObjectMetadata();
             Properties properties = blob.getMetaProperties();
-            
+            metadata.setContentEncoding("UTF-8");
+
             for(Object obj : properties.keySet()){
                 metadata.addUserMetadata( "app_creator", "Portofino" );
-                metadata.addUserMetadata( obj.toString(), properties.get( obj ).toString() );
+                if("filename".equals(obj.toString())) {
+                    metadata.addUserMetadata( obj.toString(), URLEncoder.encode(properties.get( obj ).toString(), "UTF-8") );
+                } else {
+                    metadata.addUserMetadata( obj.toString(),properties.get( obj ).toString());
+                }
             }
 
             PutObjectResult result;
@@ -177,15 +185,13 @@ public class S3BlobManager implements BlobManager{
             logger.warn("Cound not delete meta file", e);
             success = false;
         }
-        
+
         return success;
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-
     public String getBucketName() {
         return bucketName;
     }
