@@ -559,8 +559,7 @@ export abstract class Page implements WithButtons, OnDestroy {
       }
       saveConfObservable = this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
         params: {
-          actionConfigurationPath: this.configurationUrl,
-          loginPath: this.portofino.loginPath
+          actionConfigurationPath: this.configurationUrl
         }
       });
     } else {
@@ -641,8 +640,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     const path = this.getConfigurationLocation(this.path);
-    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
-      params: { loginPath: this.portofino.loginPath }}).subscribe(
+    this.http.put(`${this.portofino.localApiPath}/${path}`, data).subscribe(
       () => {
         this.configuration = pageConfiguration;
         this.settingsPanel.hide(true);

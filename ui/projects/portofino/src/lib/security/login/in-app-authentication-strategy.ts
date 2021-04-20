@@ -79,7 +79,7 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
   }
 
   get loginPath() {
-    return `${this.portofino.apiRoot}${this.portofino.loginPath}`;
+    return `${this.portofino.apiRoot}:auth`;
   }
 
 

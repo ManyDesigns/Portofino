@@ -32,10 +32,12 @@ import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionContext;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
+import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +137,7 @@ public class PortofinoRoot extends AbstractResourceAction {
         description.put("page", actionInstance.getActionDescriptor());
         description.put("path", getPath());
         description.put("children", getSubResources());
-        description.put("loginPath", portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH));
+        description.put("loginPath", "/:auth"); //For legacy clients
         return description;
     }
 
@@ -144,6 +146,23 @@ public class PortofinoRoot extends AbstractResourceAction {
     @GET
     public boolean isAccessible() {
         return true;
+    }
+
+    @Path(":auth")
+    public DefaultLoginAction getLoginAction() throws Exception {
+        String loginPath = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH);
+        return getLoginAction(loginPath);
+    }
+
+    public DefaultLoginAction getLoginAction(String loginPath) throws Exception {
+        String[] segments = loginPath.split("/");
+        ResourceAction action = this;
+        for(String segment : segments) {
+            if(!StringUtils.isBlank(segment)) {
+                action = (ResourceAction) action.getSubResource(segment.trim());
+            }
+        }
+        return (DefaultLoginAction) action;
     }
 
     @Override
