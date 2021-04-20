@@ -84,7 +84,7 @@
         <commons.io.version>2.6</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>3.0.7</groovy.version>
+        <groovy.version>3.0.8</groovy.version>
         <guava.version>30.0-jre</guava.version>
         <hibernate.version>5.4.24.Final</hibernate.version>
         <jackson.version>2.11.0</jackson.version>
