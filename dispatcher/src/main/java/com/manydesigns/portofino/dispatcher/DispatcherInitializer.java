@@ -81,7 +81,7 @@ public abstract class DispatcherInitializer {
         }
         logger.info("Application directory: {}", applicationRoot);
         try {
-            loadConfiguration(applicationRoot);
+            loadConfiguration();
         } catch (Exception e) {
             initializationFailed(e);
         }
@@ -95,7 +95,7 @@ public abstract class DispatcherInitializer {
 
     protected abstract String getApplicationDirectoryPath();
 
-    protected void loadConfiguration(FileObject applicationRoot)
+    protected void loadConfiguration()
             throws FileSystemException, ConfigurationException {
         FileObject configurationFile = applicationRoot.getChild("portofino.properties");
         CombinedConfiguration compositeConfiguration = new CombinedConfiguration();

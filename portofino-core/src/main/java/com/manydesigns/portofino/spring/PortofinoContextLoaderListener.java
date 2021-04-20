@@ -1,17 +1,40 @@
+/*
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoListener;
+import com.manydesigns.portofino.servlets.ServerInfo;
 import io.reactivex.disposables.Disposable;
 import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigRegistry;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -50,8 +73,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     public static final String PORTOFINO_CONTEXT_LOADER_LISTENER = PortofinoContextLoaderListener.class.getName();
 
     protected static final ThreadLocal<Boolean> reloadingUserContext = ThreadLocal.withInitial(() -> false);
-    protected static final
-    AtomicBoolean refreshing = new AtomicBoolean(true);
+    protected static final AtomicBoolean refreshing = new AtomicBoolean(true);
     private static final Logger logger = LoggerFactory.getLogger(PortofinoContextLoaderListener.class);
     public static final String PARENT_CONTEXT = "portofino-parent";
     public static final String BRIDGE_CONTEXT = "portofino-bridge";
@@ -60,6 +82,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
     protected ServletContext servletContext;
     protected ConfigurableWebApplicationContext parentContext;
+    protected PortofinoListener initializer = new PortofinoListener();
     protected final ConfigurableWebApplicationContext bridgeContext = new AnnotationConfigWebApplicationContext();
 
     public PortofinoContextLoaderListener(Set<Class<?>> candidateModuleClasses) {
@@ -79,7 +102,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
             ElementsThreadLocals.setServletContext(servletContext);
-            new PortofinoListener().initWithServletContext(servletContext);
+            initializer.initWithServletContext(servletContext);
             super.contextInitialized(event);
             refreshing.set(false);
         } finally {
@@ -113,7 +136,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     }
 
     @NotNull
-    protected ConfigurableWebApplicationContext setupUserContext() {
+    public ConfigurableWebApplicationContext setupUserContext() {
         ConfigurableWebApplicationContext userContext = new AnnotationConfigWebApplicationContext();
         userContext.setParent(parentContext);
         userContext.setId(USER_CONTEXT);
@@ -126,12 +149,11 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
                 }
             }
         });
-        CodeBase codeBase = (CodeBase) servletContext.getAttribute(PortofinoListener.CODE_BASE_ATTRIBUTE);
         try {
-            Class<?> userConfigurationClass = codeBase.loadClass("SpringConfiguration");
-            ((DefaultResourceLoader) userContext).setClassLoader(codeBase.asClassLoader());
+            Class<?> userConfigurationClass = initializer.getCodeBase().loadClass("SpringConfiguration");
+            ((DefaultResourceLoader) userContext).setClassLoader(initializer.getCodeBase().asClassLoader());
             ((AnnotationConfigRegistry) userContext).register(userConfigurationClass);
-            configureContextReload(userContext, codeBase);
+            configureContextReload(userContext, initializer.getCodeBase());
         } catch (Exception e) {
             logger.info("User-defined Spring configuration not found");
             logger.debug("Additional info", e);
@@ -166,7 +188,8 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     }
 
     protected void setupParentContext() {
-        parentContext = new AnnotationConfigWebApplicationContext();
+        AnnotationConfigWebApplicationContext parentContext = new AnnotationConfigWebApplicationContext();
+        parentContext.setParent(setupGrandParentContext());
         parentContext.setId(PARENT_CONTEXT);
         parentContext.setServletContext(servletContext);
         ConfigurableEnvironment environment = parentContext.getEnvironment();
@@ -175,14 +198,28 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
                 (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
         sources.addFirst(
                 new ConfigurationPropertySource("portofino.properties", configuration));
-        AnnotationConfigRegistry annotationConfig = (AnnotationConfigRegistry) parentContext;
         for (Class<?> moduleClass : moduleClasses) {
-            annotationConfig.register(moduleClass);
+            parentContext.register(moduleClass);
         }
-        annotationConfig.register(PortofinoWebSpringConfiguration.class);
-        annotationConfig.register(PortofinoSpringConfiguration.class);
+        parentContext.register(PortofinoWebSpringConfiguration.class);
+        parentContext.register(PortofinoSpringConfiguration.class);
         logger.info("Refreshing parent application context");
         parentContext.refresh();
+        this.parentContext = parentContext;
+    }
+
+    @NotNull
+    protected ApplicationContext setupGrandParentContext() {
+        GenericApplicationContext grandParent = new GenericApplicationContext();
+        grandParent.refresh();
+        grandParent.getBeanFactory().registerSingleton("codeBase", initializer.getCodeBase());
+        grandParent.getBeanFactory().registerSingleton(
+                PortofinoSpringConfiguration.APPLICATION_DIRECTORY, initializer.getApplicationRoot());
+        grandParent.getBeanFactory().registerSingleton(
+                PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, initializer.getConfiguration());
+        grandParent.getBeanFactory().registerSingleton(
+                PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, initializer.getConfigurationFile());
+        return grandParent;
     }
 
     @Override

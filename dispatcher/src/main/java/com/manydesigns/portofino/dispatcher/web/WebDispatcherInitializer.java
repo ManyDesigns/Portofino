@@ -46,7 +46,11 @@ public class WebDispatcherInitializer extends DispatcherInitializer implements S
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        servletContext = sce.getServletContext();
+        initWithServletContext(sce.getServletContext());
+    }
+
+    public void initWithServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
         initialize();
         servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
         servletContext.setAttribute(ApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, configuration);
@@ -54,7 +58,7 @@ public class WebDispatcherInitializer extends DispatcherInitializer implements S
 
     @Override
     protected FileObject getDefaultApplicationRoot() throws FileSystemException {
-        return VFS.getManager().toFileObject(new File(servletContext.getRealPath(""), "WEB-INF"));
+        return VFS.getManager().resolveFile(servletContext.getRealPath("")).resolveFile("WEB-INF");
     }
 
     @Override

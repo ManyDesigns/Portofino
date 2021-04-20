@@ -21,18 +21,16 @@
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.i18n.I18nUtils;
 import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.servlets.ServerInfo;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 
 import javax.servlet.ServletContext;
@@ -45,35 +43,18 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.*;
-
 @org.springframework.context.annotation.Configuration
 public class PortofinoWebSpringConfiguration implements InitializingBean {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoWebSpringConfiguration.class);
 
     protected ServletContext servletContext;
+    protected FileObject applicationDirectory;
+    protected Configuration configuration;
+    protected static final String SEPARATOR =
+            "----------------------------------------" +
+            "----------------------------------------";
 
-    @Bean(name = PORTOFINO_CONFIGURATION)
-    public Configuration getPortofinoConfiguration() {
-        return (Configuration) getServletContext().getAttribute(PORTOFINO_CONFIGURATION);
-    }
-
-    @Bean(name = PORTOFINO_CONFIGURATION_FILE)
-    public FileBasedConfigurationBuilder<PropertiesConfiguration> getPortofinoConfigurationFile() {
-        Object attribute = getServletContext().getAttribute(PORTOFINO_CONFIGURATION_FILE);
-        return (FileBasedConfigurationBuilder<PropertiesConfiguration>) attribute;
-    }
-
-    @Bean(name = APPLICATION_DIRECTORY)
-    public FileObject getApplicationDirectory() {
-        return (FileObject) getServletContext().getAttribute(APPLICATION_DIRECTORY);
-    }
-
-    @Bean
-    public CodeBase getCodeBase() {
-        return (CodeBase) getServletContext().getAttribute(WebDispatcherInitializer.CODE_BASE_ATTRIBUTE);
-    }
 
     @Bean
     public ServletContext getServletContext() {
@@ -85,17 +66,29 @@ public class PortofinoWebSpringConfiguration implements InitializingBean {
         this.servletContext = servletContext;
     }
 
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
+    public void setApplicationDirectory(FileObject applicationDirectory) {
+        this.applicationDirectory = applicationDirectory;
+    }
+
+    @Autowired
+    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        I18nUtils.setupResourceBundleManager(getApplicationDirectory(), servletContext);
-        String encoding = getPortofinoConfiguration().getString(
+        I18nUtils.setupResourceBundleManager(applicationDirectory, servletContext);
+        String encoding = configuration.getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
         if(!Charset.isSupported(encoding)) {
             logger.error("The encoding is not supported by the JVM!");
         }
 
-        String versionCheckUrl = getPortofinoConfiguration().getString(
+        String versionCheckUrl = configuration.getString(
                 "portofino.version.check.url",
                 "https://portofino.manydesigns.com/version-check.jsp");
         if(!"off".equalsIgnoreCase(versionCheckUrl)) {
@@ -106,6 +99,17 @@ public class PortofinoWebSpringConfiguration implements InitializingBean {
                 logger.warn("Version check failed unexpectedly", t);
             }
         }
+
+        String portofinoVersion = Module.getPortofinoVersion();
+        String lineSeparator = System.getProperty("line.separator", "\n");
+        ServerInfo serverInfo = new ServerInfo(servletContext);
+        logger.info(lineSeparator + SEPARATOR +
+                        lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
+                        lineSeparator + "--- Context path: {}" +
+                        lineSeparator + "--- Real path: {}" +
+                        lineSeparator + "--- Visit https://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
+                        lineSeparator + SEPARATOR,
+                serverInfo.getContextPath(), serverInfo.getRealPath());
     }
 
     protected void checkForNewVersion(String portofinoVersion, String versionCheckUrl) {

@@ -69,9 +69,6 @@ public class PortofinoListener extends WebDispatcherInitializer
     // Constants
     //**************************************************************************
 
-    public static final String SEPARATOR =
-            "----------------------------------------" +
-            "----------------------------------------";
     public static final String PORTOFINO_CONFIGURATION_FILE_PROPERTY = "portofino.configuration.file";
 
     //**************************************************************************
@@ -79,8 +76,6 @@ public class PortofinoListener extends WebDispatcherInitializer
     //**************************************************************************
 
     protected FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
-
-    protected ServletContext servletContext;
     protected ServerInfo serverInfo;
 
     //**************************************************************************
@@ -95,88 +90,11 @@ public class PortofinoListener extends WebDispatcherInitializer
     //**************************************************************************
 
     @Override
-    public void contextInitialized(ServletContextEvent servletContextEvent) {
-        try {
-            ElementsThreadLocals.setupDefaultElementsContext();
-            ServletContext servletContext = servletContextEvent.getServletContext();
-            initWithServletContext(servletContext);
-        } catch (Throwable e) {
-            logger.error("Could not start ManyDesigns Portofino", e);
-            throw new Error(e);
-        } finally {
-            ElementsThreadLocals.removeElementsContext();
-        }
-    }
-
     public void initWithServletContext(ServletContext servletContext) {
-        ElementsThreadLocals.setServletContext(servletContext);
-        AttributeMap servletContextAttributeMap = AttributeMap.createAttributeMap(servletContext);
-        ElementsThreadLocals.getOgnlContext().put(
-                ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
-                servletContextAttributeMap);
-        ElementsThreadLocals.getOgnlContext().put(
-                PORTOFINO_APPLICATION_DIRECTORY_PARAMETER,
-                servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER));
-        init(servletContext);
-        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
-        CodeBase codeBase = initApplicationRoot(actionsDirectory);
-        servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
-
-        String portofinoVersion = Module.getPortofinoVersion();
-        String lineSeparator = System.getProperty("line.separator", "\n");
-        logger.info(lineSeparator + SEPARATOR +
-                        lineSeparator + "--- ManyDesigns Portofino " + portofinoVersion + " started successfully" +
-                        lineSeparator + "--- Context path: {}" +
-                        lineSeparator + "--- Real path: {}" +
-                        lineSeparator + "--- Visit https://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
-                        lineSeparator + SEPARATOR,
-                serverInfo.getContextPath(), serverInfo.getRealPath());
-    }
-
-    private void init(ServletContext servletContext) {
         // clear the Mapping Diagnostic Context for logging
         MDC.clear();
         serverInfo = new ServerInfo(servletContext);
-
-        String applicationDirectoryPath = servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER);
-        FileSystemManager manager;
-        try {
-            manager = VFS.getManager();
-        } catch (FileSystemException e) {
-            logger.error("Failed to obtain VFS manager", e);
-            throw new RuntimeException(e);
-        }
-        if(applicationDirectoryPath != null) try {
-            ConfigurationInterpolator interpolator = new BaseConfiguration().getInterpolator();
-            interpolator.registerLookups(getConfigurationLookups());
-            applicationDirectoryPath = (String) interpolator.interpolate(applicationDirectoryPath);
-            if(!StringUtils.isEmpty(applicationDirectoryPath)) {
-                applicationRoot = manager.resolveFile(applicationDirectoryPath);
-                if (applicationRoot.getType() != FileType.FOLDER) {
-                    logger.error("Configured application directory " + applicationDirectoryPath + " is not a directory");
-                    applicationRoot = null;
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Configured application directory " + applicationDirectoryPath + " is not valid", e);
-        }
-        if(applicationRoot == null) {
-            try {
-                logger.info("Using default application directory (WEB-INF)");
-                applicationRoot = manager.resolveFile(serverInfo.getRealPath()).resolveFile("WEB-INF");
-            } catch (FileSystemException e) {
-                logger.error("Failed to obtain application real path", e);
-                throw new RuntimeException(e);
-            }
-        }
-        logger.info("Application directory: {}", applicationRoot.getName().getPath());
-
-        try {
-            loadConfiguration(servletContext);
-        } catch (Exception e) {
-            logger.error("Could not load configuration", e);
-            throw new Error(e);
-        }
+        super.initWithServletContext(servletContext);
         servletContext.setAttribute(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, applicationRoot);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, configurationFile);
@@ -185,6 +103,18 @@ public class PortofinoListener extends WebDispatcherInitializer
         if (serverInfo.getServletApiMajor() < 3) {
             String msg = "Servlet API version should be >= 3.0.";
             logger.warn(msg);
+        }
+    }
+
+    @Override
+    protected String getApplicationDirectoryPath() {
+        String applicationDirectoryPath = super.getApplicationDirectoryPath();
+        if(applicationDirectoryPath != null) {
+            ConfigurationInterpolator interpolator = new BaseConfiguration().getInterpolator();
+            interpolator.registerLookups(getConfigurationLookups());
+            return (String) interpolator.interpolate(applicationDirectoryPath);
+        } else {
+            return null;
         }
     }
 
@@ -210,7 +140,7 @@ public class PortofinoListener extends WebDispatcherInitializer
     // Setup
     //**************************************************************************
 
-    protected void loadConfiguration(ServletContext servletContext) throws ConfigurationException, FileSystemException {
+    protected void loadConfiguration() throws ConfigurationException, FileSystemException {
         FileObject configurationFile = applicationRoot.resolveFile("portofino.properties");
         PropertiesBuilderParameters parameters =
                 new Parameters()
@@ -262,6 +192,10 @@ public class PortofinoListener extends WebDispatcherInitializer
         Map<String, Lookup> lookupMap = new HashMap<>();
         lookupMap.put("serverInfo", new BeanLookup(serverInfo));
         return lookupMap;
+    }
+
+    public FileBasedConfigurationBuilder<PropertiesConfiguration> getConfigurationFile() {
+        return configurationFile;
     }
 
     @Override
