@@ -26,6 +26,8 @@ import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,17 +113,17 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
 
     public static BiMap<String, String> getDefaultTypeAliases() {
         ImmutableBiMap.Builder<String, String> defaults = ImmutableBiMap.builder();
-        defaults.put("long", "ELong");
-        defaults.put("long?", "ELongObject");
-        defaults.put("int", "EInt");
-        defaults.put("int?", "EIntObject");
+        defaults.put("long!", "ELong");
+        defaults.put("long", "ELongObject");
+        defaults.put("int!", "EInt");
+        defaults.put("int", "EIntObject");
         return defaults.build();
     }
 
     public String resolveType(String typeName, boolean nullable) {
         String resolved = null;
-        if(nullable) {
-            resolved = typeAliases.get(typeName + "?");
+        if(!nullable) {
+            resolved = typeAliases.get(typeName + "!");
         }
         if(resolved == null) {
             resolved = typeAliases.get(typeName);
@@ -210,10 +212,11 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
             throw new IllegalStateException("Property without an entity: " + propertyName);
         }
         EDataType type;
+        boolean nullable = ctx.NOT_NULLABLE() == null;
         if(ctx.type() != null) {
             String typeName = ctx.type().name.getText();
             //TODO should we be using the CodeBase for this?
-            type = PortofinoPackage.ensureType(resolveType(typeName, ctx.nullable != null));
+            type = PortofinoPackage.ensureType(resolveType(typeName, nullable));
         } else {
             type = EcorePackage.eINSTANCE.getEString();
         }
@@ -222,10 +225,56 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
                 .findFirst().orElseGet(() -> {
                     EAttribute attr = EcoreFactory.eINSTANCE.createEAttribute();
                     attr.setName(propertyName);
+                    attr.setLowerBound(nullable ? 0 : 1);
                     entity.getEStructuralFeatures().add(attr);
                     return attr;
                 });
+        if(!(property instanceof EAttribute)) {
+            throw new IllegalStateException("Cannot define property " + propertyName + ", a reference with the same name already exists in " + entity.getName());
+        }
         property.setEType(type);
+        annotated = property;
+        visitChildren(ctx);
+        annotated = previous;
+        return property;
+    }
+
+    @Override
+    public EModelElement visitRelationshipProperty(ModelParser.RelationshipPropertyContext ctx) {
+        String propertyName = ctx.name.getText();
+        EModelElement previous = annotated;
+        if(entity == null) {
+            throw new IllegalStateException("Relationship without an entity: " + propertyName);
+        }
+        String typeName = ctx.type().name.getText();
+        //TODO should we be using the CodeBase for this?
+        EDataType type = PortofinoPackage.ensureType(resolveType(typeName, false));
+
+        EStructuralFeature property = entity.getEStructuralFeatures().stream().filter(a -> propertyName.equals(a.getName()))
+                .findFirst().orElseGet(() -> {
+                    EReference reference = EcoreFactory.eINSTANCE.createEReference();
+                    reference.setName(propertyName);
+                    entity.getEStructuralFeatures().add(reference);
+                    return reference;
+                });
+        if(!(property instanceof EReference)) {
+            throw new IllegalStateException("Cannot define reference " + propertyName + ", an attribute with the same name already exists in " + entity.getName());
+        }
+
+        property.setEType(type);
+        TerminalNode range = ctx.RANGE();
+        if(range != null) {
+            int sepIndex = range.getText().indexOf("..");
+            String upperBound = "";
+            if(sepIndex > 0) {
+                property.setLowerBound(Integer.parseInt(range.getText().substring(0, sepIndex)));
+                upperBound = range.getText().substring(sepIndex + 2).trim();
+            }
+            if(StringUtils.isNotEmpty(upperBound) && !"*".equals(upperBound)) {
+                property.setUpperBound(Integer.parseInt(upperBound));
+            }
+        }
+
         annotated = property;
         visitChildren(ctx);
         annotated = previous;

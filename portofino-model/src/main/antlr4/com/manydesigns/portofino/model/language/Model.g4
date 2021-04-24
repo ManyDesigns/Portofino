@@ -12,7 +12,7 @@ entity: annotation* ENTITY name=simpleIdentifier '{'
 
 importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)?;
 
-property: annotation* name=simpleIdentifier nullable='?'? (':' type)?;
+property: annotation* name=simpleIdentifier (':' type)? (NOT_NULLABLE)?;
 
 relationship: annotation* name=identifier ':' a=type '-->' b=type;
 
@@ -35,6 +35,7 @@ UNSIGNED_INTEGER: [0-9]+;
 SIGNED_INTEGER: ('+' | '-') UNSIGNED_INTEGER;
 REAL: ('+' | '-')?([0-9]+('.'[0-9]*)?|[0-9]*'.'[0-9]+);
 STRING: '"' ('\\'('"'|'\\')|.)*? '"';
+NOT_NULLABLE: '!';
 
 SCHEMA: 'schema';
 IMPORT: 'import';
