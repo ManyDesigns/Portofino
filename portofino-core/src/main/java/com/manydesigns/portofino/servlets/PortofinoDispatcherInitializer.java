@@ -20,15 +20,10 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.elements.servlet.AttributeMap;
-import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
-import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -43,27 +38,28 @@ import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.interpol.ConfigurationInterpolator;
 import org.apache.commons.configuration2.interpol.Lookup;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.VFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import javax.servlet.*;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PortofinoListener extends WebDispatcherInitializer
-        implements ServletContextListener, ServletContextAttributeListener {
+public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2021 ManyDesigns srl";
 
     //**************************************************************************
     // Constants
@@ -83,7 +79,7 @@ public class PortofinoListener extends WebDispatcherInitializer
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(PortofinoListener.class);
+            LoggerFactory.getLogger(PortofinoDispatcherInitializer.class);
 
     //**************************************************************************
     // ServletContextListener implementation
@@ -198,18 +194,4 @@ public class PortofinoListener extends WebDispatcherInitializer
         return configurationFile;
     }
 
-    @Override
-    public void attributeAdded(ServletContextAttributeEvent servletContextAttributeEvent) {
-        logger.debug("Servlet context attribute added: " + servletContextAttributeEvent.getName() + " = " + servletContextAttributeEvent.getValue());
-    }
-
-    @Override
-    public void attributeRemoved(ServletContextAttributeEvent servletContextAttributeEvent) {
-        logger.debug("Servlet context attribute removed: " + servletContextAttributeEvent.getName() + " = " + servletContextAttributeEvent.getValue());
-    }
-
-    @Override
-    public void attributeReplaced(ServletContextAttributeEvent servletContextAttributeEvent) {
-        logger.debug("Servlet context attribute replaced: " + servletContextAttributeEvent.getName() + " = " + servletContextAttributeEvent.getValue());
-    }
 }

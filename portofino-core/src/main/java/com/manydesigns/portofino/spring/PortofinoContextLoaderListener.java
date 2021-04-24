@@ -23,8 +23,7 @@ package com.manydesigns.portofino.spring;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.modules.Module;
-import com.manydesigns.portofino.servlets.PortofinoListener;
-import com.manydesigns.portofino.servlets.ServerInfo;
+import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import io.reactivex.disposables.Disposable;
 import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +81,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
     protected ServletContext servletContext;
     protected ConfigurableWebApplicationContext parentContext;
-    protected PortofinoListener initializer = new PortofinoListener();
+    protected PortofinoDispatcherInitializer initializer = new PortofinoDispatcherInitializer();
     protected final ConfigurableWebApplicationContext bridgeContext = new AnnotationConfigWebApplicationContext();
 
     public PortofinoContextLoaderListener(Set<Class<?>> candidateModuleClasses) {

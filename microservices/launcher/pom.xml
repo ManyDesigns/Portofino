@@ -11,7 +11,7 @@
     </parent>
     <artifactId>portofino-microservice-launcher</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>commons-io</groupId>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.36</version>
+            <version>9.0.41</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
