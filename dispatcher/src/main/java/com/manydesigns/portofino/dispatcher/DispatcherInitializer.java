@@ -1,10 +1,27 @@
-package com.manydesigns.portofino.dispatcher.web;
+/*
+ * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
-import com.manydesigns.portofino.dispatcher.Resource;
-import com.manydesigns.portofino.dispatcher.ResourceResolver;
-import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.resolvers.CachingResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
@@ -21,32 +38,30 @@ import org.apache.commons.vfs2.VFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
-/**
- * Created by alessio on 28/07/16.
- */
-public class DispatcherInitializer implements ServletContextListener {
-
-    public static final String PORTOFINO_APPLICATION_DIRECTORY_PARAMETER = "portofino.application.directory";
+public abstract class DispatcherInitializer {
     protected FileObject applicationRoot;
     protected Configuration configuration;
+    protected CodeBase codeBase;
+
     private static final Logger logger = LoggerFactory.getLogger(DispatcherInitializer.class);
 
-    public static final String CODE_BASE_ATTRIBUTE = "portofino.codebase";
-    
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        initialize(sce.getServletContext());
+    public FileObject getApplicationRoot() {
+        return applicationRoot;
     }
 
-    public void initialize(ServletContext servletContext) {
-        String applicationDirectoryPath = getApplicationDirectoryPath(servletContext);
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public CodeBase getCodeBase() {
+        return codeBase;
+    }
+
+    public void initialize() {
+        String applicationDirectoryPath = getApplicationDirectoryPath();
         if(applicationDirectoryPath != null) try {
             //TODO allow placeholders?
             applicationRoot = VFS.getManager().resolveFile(applicationDirectoryPath);
@@ -59,28 +74,28 @@ public class DispatcherInitializer implements ServletContextListener {
         }
         if(applicationRoot == null) {
             try {
-                applicationRoot = VFS.getManager().toFileObject(new File(servletContext.getRealPath(""), "WEB-INF"));
+                applicationRoot = getDefaultApplicationRoot();
             } catch (FileSystemException e) {
                 initializationFailed(e);
             }
         }
         logger.info("Application directory: {}", applicationRoot);
         try {
-            loadConfiguration(servletContext, applicationRoot);
+            loadConfiguration();
         } catch (Exception e) {
             initializationFailed(e);
         }
 
-        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
-        initApplicationRoot(servletContext, actionsDirectory);
+        String actionsDirectory = getConfiguration().getString("portofino.actions.path", "actions");
+        codeBase = initApplicationRoot(actionsDirectory);
         logger.info("Application initialized.");
     }
 
-    protected String getApplicationDirectoryPath(ServletContext servletContext) {
-        return servletContext.getInitParameter(PORTOFINO_APPLICATION_DIRECTORY_PARAMETER);
-    }
+    protected abstract FileObject getDefaultApplicationRoot() throws FileSystemException;
 
-    protected void loadConfiguration(ServletContext servletContext, FileObject applicationRoot)
+    protected abstract String getApplicationDirectoryPath();
+
+    protected void loadConfiguration()
             throws FileSystemException, ConfigurationException {
         FileObject configurationFile = applicationRoot.getChild("portofino.properties");
         CombinedConfiguration compositeConfiguration = new CombinedConfiguration();
@@ -100,25 +115,26 @@ public class DispatcherInitializer implements ServletContextListener {
             this.configuration = new PropertiesConfiguration();
             logger.warn("portofino.properties file not found in " + applicationRoot);
         }
-        servletContext.setAttribute(ApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, this.configuration);
     }
 
-    protected void initApplicationRoot(ServletContext servletContext, String actionsDirectoryName) {
+    protected CodeBase initApplicationRoot(String actionsDirectoryName) {
         try {
             FileObject actionsDirectory = applicationRoot.getChild(actionsDirectoryName);
             if(actionsDirectory == null || actionsDirectory.getType() != FileType.FOLDER) {
                 initializationFailed(new Exception("Not a directory: " + actionsDirectoryName));
             }
-            CodeBase codeBase = createAndStoreCodeBase(servletContext);
+            CodeBase codeBase = createCodeBase();
             ResourceResolvers resourceResolver = new ResourceResolvers();
             configureResourceResolvers(resourceResolver, codeBase);
             DocumentedApiRoot.setRootFactory(() -> getRoot(actionsDirectory, resourceResolver));
+            return codeBase;
         } catch (Exception e) {
             initializationFailed(e);
+            return null;
         }
     }
 
-    protected CodeBase createAndStoreCodeBase(ServletContext servletContext) throws IOException {
+    protected CodeBase createCodeBase() throws IOException {
         //TODO auto discovery?
         FileObject codeBaseRoot = getCodeBaseRoot();
         JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot, null, getClass().getClassLoader());
@@ -131,7 +147,6 @@ public class DispatcherInitializer implements ServletContextListener {
         } catch (Exception e) {
             logger.debug("Groovy not available", e);
         }
-        servletContext.setAttribute(CODE_BASE_ATTRIBUTE, codeBase);
         return codeBase;
     }
 
@@ -172,10 +187,5 @@ public class DispatcherInitializer implements ServletContextListener {
     protected void initializationFailed(Exception e) {
         logger.error("Could not initialize application", e);
         throw new RuntimeException(e);
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        logger.info("Application destroyed.");
     }
 }

@@ -139,8 +139,7 @@ export class WizardComponent extends Page implements OnInit {
       page.title = a.title;
       return this.http.post(`${this.portofino.localApiPath}/${confPath}`, page, {
         params: {
-          childrenProperty: a.detail ? "detailChildren" : "children",
-          loginPath: this.portofino.loginPath
+          childrenProperty: a.detail ? "detailChildren" : "children"
         }
       });
     }, 1)); //Note concurrent: 1. It is necessary for calls to be executed sequentially.

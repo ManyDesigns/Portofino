@@ -2,7 +2,7 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.dispatcher.security.ShiroResourceFilter;
 import com.manydesigns.portofino.dispatcher.web.ApplicationRoot;
-import com.manydesigns.portofino.dispatcher.web.DispatcherInitializer;
+import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -36,7 +36,7 @@ public class TestRESTWeb extends JerseyTestNg.ContainerPerClassTest {
             String applicationRoot = VFS.getManager().resolveFile("res:java-sources").getParent().getURL().toString();
             return ServletDeploymentContext.forServlet(new ServletContainer(configure())).
                     contextParam("portofino.application.directory", applicationRoot).
-                    addListener(DispatcherInitializer.class).
+                    addListener(WebDispatcherInitializer.class).
                     build();
         } catch (FileSystemException e) {
             throw new RuntimeException(e);

@@ -58,15 +58,7 @@ export class UpstairsComponent extends Page implements OnInit {
       this.portofino.apiRoot += "/";
     }
     this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(response => {
-      if(response.loginPath) {
-        let loginPath = response.loginPath;
-        if(loginPath.startsWith('/')) {
-          loginPath = loginPath.substring(1);
-        }
-        this.portofino.loginPath = loginPath;
-        this.storage.set("portofino.upstairs.apiRoot", this.portofino.apiRoot);
-        this.checkAccess(true);
-      }
+      this.checkAccess(true);
     }, error => {
       console.error(error);
       this.notificationService.error(this.translate.get("Invalid API root (see console for details)"));
