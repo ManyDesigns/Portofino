@@ -249,36 +249,45 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
         String typeName = ctx.type().name.getText();
         //TODO should we be using the CodeBase for this?
         EDataType type = PortofinoPackage.ensureType(resolveType(typeName, false));
+        EReference reference = ensureReference(entity, propertyName);
+        reference.setEType(type);
+        if(type instanceof EClass) {
+            EReference opposite = ensureReference((EClass) type, propertyName);
+            opposite.setDerived(true);
+            opposite.setEOpposite(reference);
+            reference.setEOpposite(opposite);
+        }
+        TerminalNode range = ctx.RANGE();
+        if(range != null) {
+            int sepIndex = range.getText().indexOf("..");
+            String upperBound = "";
+            if(sepIndex > 0) {
+                reference.setLowerBound(Integer.parseInt(range.getText().substring(0, sepIndex)));
+                upperBound = range.getText().substring(sepIndex + 2).trim();
+            }
+            if(StringUtils.isNotEmpty(upperBound) && !"*".equals(upperBound)) {
+                reference.setUpperBound(Integer.parseInt(upperBound));
+            }
+        }
 
-        EStructuralFeature property = entity.getEStructuralFeatures().stream().filter(a -> propertyName.equals(a.getName()))
+        annotated = reference;
+        visitChildren(ctx);
+        annotated = previous;
+        return reference;
+    }
+
+    protected EReference ensureReference(EClass entity, String propertyName) {
+        EStructuralFeature feature = entity.getEStructuralFeatures().stream().filter(a -> propertyName.equals(a.getName()))
                 .findFirst().orElseGet(() -> {
                     EReference reference = EcoreFactory.eINSTANCE.createEReference();
                     reference.setName(propertyName);
                     entity.getEStructuralFeatures().add(reference);
                     return reference;
                 });
-        if(!(property instanceof EReference)) {
+        if(!(feature instanceof EReference)) {
             throw new IllegalStateException("Cannot define reference " + propertyName + ", an attribute with the same name already exists in " + entity.getName());
         }
-
-        property.setEType(type);
-        TerminalNode range = ctx.RANGE();
-        if(range != null) {
-            int sepIndex = range.getText().indexOf("..");
-            String upperBound = "";
-            if(sepIndex > 0) {
-                property.setLowerBound(Integer.parseInt(range.getText().substring(0, sepIndex)));
-                upperBound = range.getText().substring(sepIndex + 2).trim();
-            }
-            if(StringUtils.isNotEmpty(upperBound) && !"*".equals(upperBound)) {
-                property.setUpperBound(Integer.parseInt(upperBound));
-            }
-        }
-
-        annotated = property;
-        visitChildren(ctx);
-        annotated = previous;
-        return property;
+        return (EReference) feature;
     }
 
     private String getText(ModelParser.LiteralContext value) {

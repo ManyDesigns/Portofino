@@ -99,7 +99,7 @@ public class DefaultModelIO implements ModelIO {
             domain = model.ensureDomain(domainName);
         }
         for (FileObject child : domainDir.getChildren()) {
-            if(child.isFile()) {
+            if(child.isFile() && !child.getName().getBaseName().endsWith(".changelog.xml")) {
                 loadResource(domain, child);
             } else if(child.isFolder()) {
                 loadDomain(model, domain, child);
@@ -232,12 +232,12 @@ public class DefaultModelIO implements ModelIO {
                 os.write("\t}" + System.lineSeparator());
             }
             for(EStructuralFeature property : entity.getEStructuralFeatures()) {
-                if(!id.contains(property)) {
-                    if(property instanceof EAttribute) {
+                if(property instanceof EAttribute) {
+                    if(!id.contains(property)) {
                         writeProperty((EAttribute) property, os, "\t");
-                    } else {
-                        writeReference((EReference) property, os, "\t");
                     }
+                } else if(property instanceof EReference && !property.isDerived()) {
+                    writeReference((EReference) property, os, "\t");
                 }
             }
             os.write("}");
@@ -288,9 +288,9 @@ public class DefaultModelIO implements ModelIO {
         writer.write(" --> ");
         writer.write(reference.getEType().getName());
         writer.write(" ");
-        if(reference.getUpperBound() >= 0) {
+        if(reference.getUpperBound() > 1) {
             writer.write(reference.getLowerBound() + ".." + reference.getUpperBound());
-        } else {
+        } else if(reference.getLowerBound() > 0) {
             writer.write(reference.getLowerBound() + "..*");
         }
         writer.write(System.lineSeparator());

@@ -86,7 +86,8 @@ public class GrizzlyMain {
         config.property(ServletProperties.FILTER_FORWARD_ON_404, true);
         try {
             config.register(Class.forName("org.glassfish.jersey.jackson.JacksonFeature"));
-            ResourceResolver jacksonRR = (ResourceResolver) Class.forName("com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver").newInstance();
+            ResourceResolver jacksonRR =
+                    (ResourceResolver) Class.forName("com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver").getConstructor().newInstance();
             resourceResolver.resourceResolvers.add(new CachingResourceResolver(jacksonRR));
         } catch (ClassNotFoundException e) {
             //Jackson not available
