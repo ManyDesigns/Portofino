@@ -70,4 +70,9 @@ public interface ResourceAction extends SecureResource {
      * @return true if the action is accessible. Note that a client will either receive true or a 401/403 status.
      */
     boolean isAccessible();
+
+    /**
+     * Returns the list of accessible children (according to {@link #isAccessible()}).
+     */
+    String[] getAccessibleChildren();
 }

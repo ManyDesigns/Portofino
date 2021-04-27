@@ -67,6 +67,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -409,7 +410,43 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":accessible")
     @GET
     public boolean isAccessible() {
-        return true;
+        try {
+            return SecurityLogic.isAllowed(context.request, actionInstance, this, getClass().getMethod("isAccessible"));
+        } catch (NoSuchMethodException e) {
+            return true;
+        }
+    }
+
+    @Override
+    @io.swagger.v3.oas.annotations.Operation(
+            operationId =
+                    "com.manydesigns.portofino.resourceactions.AbstractResourceAction#getAccessibleChildren",
+            description =
+                    "Returns the list of accessible children.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "The the list of accessible children, if the action itself is accessible."),
+            @ApiResponse(responseCode = "401", description = "If the action is not accessible and the request is not authenticated."),
+            @ApiResponse(responseCode = "403", description = "If the action is not accessible for the authenticated user.")
+    })
+    @Path(":accessible-children")
+    @GET
+    public String[] getAccessibleChildren() {
+        return getSubResources().stream().filter(this::isChildResourceAccessible)
+                .collect(Collectors.toUnmodifiableList()).toArray(new String[0]);
+    }
+
+    private boolean isChildResourceAccessible(String segment) {
+        try {
+            Object subResource = getSubResource(segment);
+            if(subResource instanceof ResourceAction) {
+                return ((ResourceAction) subResource).isAccessible();
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            logger.debug("Inaccessible sub-resource: " + segment, e);
+            return false;
+        }
     }
 
     ////////////////

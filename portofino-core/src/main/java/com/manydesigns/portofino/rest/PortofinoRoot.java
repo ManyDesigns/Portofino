@@ -141,13 +141,6 @@ public class PortofinoRoot extends AbstractResourceAction {
         return description;
     }
 
-    @Override
-    @Path(":accessible")
-    @GET
-    public boolean isAccessible() {
-        return true;
-    }
-
     @Path(":auth")
     public DefaultLoginAction getLoginAction() throws Exception {
         String loginPath = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH);
