@@ -134,6 +134,16 @@ public class ActionLogic {
         }
     }
 
+    public static void unmount(FileObject actionDirectory, String segment) throws Exception {
+        ActionDescriptor descriptor = getActionDescriptor(actionDirectory);
+        Optional<AdditionalChild> existing =
+                descriptor.getAdditionalChildren().stream().filter(c -> c.getSegment().equals(segment)).findFirst();
+        if(existing.isPresent()) {
+            descriptor.getAdditionalChildren().remove(existing.get());
+            saveActionDescriptor(actionDirectory, descriptor);
+        }
+    }
+
     protected static class FileCacheEntry<T> {
         public final T object;
         public final long lastModified;

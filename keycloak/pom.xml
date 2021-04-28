@@ -11,11 +11,11 @@
     <description>Integration of KeyCloak token login into Portofino</description>
     <artifactId>portofino-keycloak</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-core</artifactId>
+            <artifactId>portofino-security-shiro</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -20,27 +20,27 @@
         web application based on an automatic analysis of the database's
         structure.
     </description>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <licenses>
         <license>
             <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
-            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <url>https://www.gnu.org/licenses/lgpl.html</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
     <organization>
         <name>MANYDESIGNS s.r.l.</name>
-        <url>http://www.manydesigns.com/</url>
+        <url>https://www.manydesigns.com/</url>
     </organization>
     <mailingLists>
         <mailingList>
             <name>Portofino mailing list in English</name>
-            <archive>http://groups.google.com/group/manydesigns-portofino</archive>
+            <archive>https://groups.google.com/group/manydesigns-portofino</archive>
         </mailingList>
         <mailingList>
             <name>Portofino mailing list in Italian</name>
-            <archive>http://groups.google.com/group/manydesigns-portofino-it</archive>
+            <archive>https://groups.google.com/group/manydesigns-portofino-it</archive>
         </mailingList>
     </mailingLists>
     <scm>
@@ -131,6 +131,7 @@
         <module>modules</module>
         <module>mail</module>
         <module>portofino-core</module>
+        <module>security-shiro</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>

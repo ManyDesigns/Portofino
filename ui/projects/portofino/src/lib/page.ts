@@ -467,20 +467,31 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   checkAccess(askForLogin: boolean): Observable<any> {
+    return this.doCheckAccess(askForLogin, this.computeSecurityCheckUrl(), true);
+  }
+
+  get accessibleChildren(): Observable<string[]> {
+    return this.doCheckAccess(false, this.computeChildrenSecurityCheckUrl(), []);
+  }
+
+  protected doCheckAccess<T>(askForLogin: boolean, securityCheckUrl: string, defaultResult: T): Observable<T> {
     let headers = new HttpHeaders();
-    if(!askForLogin) {
+    if (!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
-    let securityCheckUrl = this.computeSecurityCheckUrl();
-    if(securityCheckUrl) {
-      return this.http.get(securityCheckUrl,{ headers: headers, observe: "response" });
+    if (securityCheckUrl) {
+      return this.http.get(securityCheckUrl, {headers: headers, observe: "response"}).pipe(map(r => r.body as T));
     } else {
-      return of(true);
+      return of(defaultResult);
     }
   }
 
   protected computeSecurityCheckUrl() {
     return this.computeSourceUrl() + "/:accessible";
+  }
+
+  protected computeChildrenSecurityCheckUrl() {
+    return this.computeSourceUrl() + "/:accessible-children";
   }
 
   computeSourceUrl() {

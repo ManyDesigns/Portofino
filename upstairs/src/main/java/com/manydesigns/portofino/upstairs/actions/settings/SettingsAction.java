@@ -27,6 +27,7 @@ import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -114,11 +115,14 @@ public class SettingsAction extends AbstractResourceAction {
             try {
                 Settings settings = new Settings();
                 form.writeToObject(settings);
-                try {
-                    PortofinoRoot root = (PortofinoRoot) getRoot();
-                    root.getLoginAction(settings.loginPath);
-                } catch (Exception e) {
-                    throw new WebApplicationException("Invalid login path", e);
+                ResourceAction action = (ResourceAction) getRoot();
+                String[] loginPath = settings.loginPath.split("/");
+                for(String loginPathSegment : loginPath) {
+                    Object subResource = action.getSubResource(loginPathSegment);
+                    if(!(subResource instanceof ResourceAction)) {
+                        throw new WebApplicationException("Invalid login path");
+                    }
+                    action = (ResourceAction) subResource;
                 }
                 configuration.setProperty(PortofinoProperties.APP_NAME, settings.appName);
                 configuration.setProperty(PortofinoProperties.APP_VERSION, settings.appVersion);
