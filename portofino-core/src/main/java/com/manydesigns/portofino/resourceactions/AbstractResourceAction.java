@@ -67,8 +67,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Convenient abstract base class for ResourceActions. It has fields to hold values of properties specified by the
@@ -353,19 +351,16 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":operations")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public List describeOperations() {
+    public List<Map<String, Object>> describeOperations() {
         HttpServletRequest request = context.getRequest();
         List<Operation> operations = Operations.getOperations(getClass());
-        List result = new ArrayList();
+        List<Map<String, Object>> result = new ArrayList<>();
         Subject subject = SecurityUtils.getSubject();
         for(Operation operation : operations) {
             logger.trace("Operation: {}", operation);
             Method handler = operation.getMethod();
-            boolean isAdmin = SecurityLogic.isAdministrator(request);
-            if(!isAdmin &&
-                    ((actionInstance != null && !SecurityLogic.hasPermissions(
-                            portofinoConfiguration, operation.getMethod(), getClass(), actionInstance, subject)) ||
-                            !SecurityLogic.satisfiesRequiresAdministrator(request, this, handler))) {
+            if (!SecurityLogic.isOperationAllowed(
+                    this, portofinoConfiguration, request, subject, operation, handler)) {
                 continue;
             }
             boolean visible = Operations.doGuardsPass(this, handler, GuardType.VISIBLE);

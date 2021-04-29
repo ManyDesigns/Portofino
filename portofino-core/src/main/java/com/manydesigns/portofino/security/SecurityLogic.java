@@ -21,9 +21,11 @@
 package com.manydesigns.portofino.security;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.shiro.GroupPermission;
 import com.manydesigns.portofino.shiro.ActionPermission;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -187,7 +189,7 @@ public class SecurityLogic {
     public static boolean hasAnonymousPermissions
             (Configuration conf, Permissions configuration, AccessLevel level, String... permissions) {
         ActionPermission actionPermission = new ActionPermission(configuration, level, permissions);
-        List<String> groups = new ArrayList<String>();
+        List<String> groups = new ArrayList<>();
         groups.add(getAllGroup(conf));
         groups.add(getAnonymousGroup(conf));
         return new GroupPermission(groups).implies(actionPermission);
@@ -295,5 +297,15 @@ public class SecurityLogic {
         } else {
             return true;
         }
+    }
+
+    public static boolean isOperationAllowed(
+            ResourceAction action, Configuration portofinoConfiguration, HttpServletRequest request, Subject subject,
+            Operation operation, Method handler) {
+        boolean isAdmin = isAdministrator(request);
+        return isAdmin ||
+                ((action.getActionInstance() == null || hasPermissions(
+                        portofinoConfiguration, operation.getMethod(), action.getClass(), action.getActionInstance(), subject)) &&
+                        satisfiesRequiresAdministrator(request, action, handler));
     }
 }

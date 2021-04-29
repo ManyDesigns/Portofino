@@ -113,6 +113,12 @@
         ///////////////////////////////////////////////////////////////////////
         -->
 
+        <!-- Security using Apache Shiro -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-security-shiro</artifactId>
+            <version>${portofino.version}</version>
+        </dependency>
         <!-- Angular UI support -->
         <dependency>
             <groupId>com.manydesigns</groupId>
