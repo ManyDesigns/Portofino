@@ -20,7 +20,7 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-core</artifactId>
+            <artifactId>portofino-database</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
