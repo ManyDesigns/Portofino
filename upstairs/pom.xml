@@ -31,6 +31,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-security-shiro</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-templates</artifactId>
             <version>${groovy.version}</version>
