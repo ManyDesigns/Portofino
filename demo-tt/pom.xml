@@ -57,12 +57,12 @@
         </dependency>
         -->
         <!-- Security -->
-        <!--<dependency>
+        <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-security-shiro</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
-        </dependency>-->
+        </dependency>
         <!-- Keycloak support -->
         <dependency>
             <groupId>com.manydesigns</groupId>
