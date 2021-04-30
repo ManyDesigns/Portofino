@@ -4,6 +4,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.WithParameters;
@@ -12,17 +13,15 @@ import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ConfigurationWithDefaults;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionInfo;
-import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.security.SecurityLogic;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -30,8 +29,6 @@ import javax.ws.rs.core.Response;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RequiresAdministrator
 public class ActionsAction extends AbstractResourceAction {
@@ -172,7 +169,7 @@ public class ActionsAction extends AbstractResourceAction {
     public void checkPermissions(ActionInstance actionInstance) {
         if (!checkPermissionsOnTargetPage(actionInstance)) {
             Response.Status status =
-                    SecurityUtils.getSubject().isAuthenticated() ?
+                    security.isUserAuthenticated() ?
                             Response.Status.FORBIDDEN :
                             Response.Status.UNAUTHORIZED;
             throw new WebApplicationException(status);

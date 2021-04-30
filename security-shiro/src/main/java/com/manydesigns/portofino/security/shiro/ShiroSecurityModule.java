@@ -142,11 +142,6 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         logger.debug("Creating SecurityClassRealm");
         realm = new SecurityClassRealm(codeBase, "Security");
         rsm.setRealm(realm);
-
-        String loginPath = actionsDirectory.getName().getPath() + configuration.getString(PortofinoProperties.LOGIN_PATH);
-        logger.info("Login action: " + loginPath);
-        ActionLogic.unmount(actionsDirectory, ":auth");
-        ActionLogic.mount(actionsDirectory, ":auth", loginPath);
         status = ModuleStatus.STARTED;
     }
 

@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.upstairs.appwizard
+package com.manydesigns.portofino.shiro
 
 import com.manydesigns.elements.messages.RequestMessages
 import com.manydesigns.portofino.persistence.Persistence

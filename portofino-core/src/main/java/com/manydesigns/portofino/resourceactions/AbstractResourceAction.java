@@ -38,6 +38,7 @@ import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.security.*;
+import com.manydesigns.portofino.security.noop.NoSecurity;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -98,6 +98,12 @@
             <version>${groovy.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-templates</artifactId>
+            <version>${groovy.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- To avoid Groovy compilation error in IDEA -->
         <dependency>
             <groupId>org.slf4j</groupId>

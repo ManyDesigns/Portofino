@@ -103,6 +103,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
+    @Deprecated
     public Response login(@FormParam("username") String username, @FormParam("password") String password)
             throws AuthenticationException {
         return Response.ok(doLogin(username, password)).build();

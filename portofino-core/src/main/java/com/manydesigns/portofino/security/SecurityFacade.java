@@ -7,10 +7,13 @@ import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -120,4 +123,8 @@ public abstract class SecurityFacade {
     public abstract Object getUserId();
 
     public abstract Set<String> getGroups();
+
+    public abstract void setup(FileObject appDirectory, String adminGroupName, String encryptionAlgorithm) throws IOException;
+
+    public abstract boolean isUserAuthenticated();
 }

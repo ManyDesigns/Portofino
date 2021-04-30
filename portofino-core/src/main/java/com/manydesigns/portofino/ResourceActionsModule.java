@@ -109,7 +109,7 @@ public class ResourceActionsModule implements Module {
     }
 
     @PostConstruct
-    public void init() throws FileSystemException {
+    public void init() throws Exception {
         logger.debug("Initializing dispatcher");
         ActionLogic.init(configuration);
 
@@ -134,6 +134,11 @@ public class ResourceActionsModule implements Module {
         }
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
+
+        String loginPath = actionsDirectory.getName().getPath() + configuration.getString(PortofinoProperties.LOGIN_PATH);
+        logger.info("Login action: " + loginPath);
+        ActionLogic.unmount(actionsDirectory, ":auth");
+        ActionLogic.mount(actionsDirectory, ":auth", loginPath);
         status = ModuleStatus.STARTED;
     }
 

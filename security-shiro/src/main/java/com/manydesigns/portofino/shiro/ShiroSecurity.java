@@ -3,13 +3,22 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.SecurityFacade;
+import groovy.text.SimpleTemplateEngine;
+import groovy.text.Template;
+import groovy.text.TemplateEngine;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.vfs2.AllFileSelector;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.*;
 
 import static com.manydesigns.portofino.security.SecurityLogic.*;
 
@@ -73,5 +82,57 @@ public class ShiroSecurity extends SecurityFacade {
     @Override
     public Set<String> getGroups() {
         return ShiroUtils.getPortofinoRealm().getGroups();
+    }
+
+    @Override
+    public void setup(FileObject appDirectory, String adminGroupName, String encryptionAlgorithm) throws IOException {
+        TemplateEngine engine = new SimpleTemplateEngine();
+        Template template;
+        try {
+            template = engine.createTemplate(
+                    ShiroSecurity.class.getResource("/com/manydesigns/portofino/shiro/Security.groovy.template"));
+        } catch (ClassNotFoundException e) {
+            throw new IOException(e);
+        }
+        Map<String, String> bindings = getSecurityGroovyBindings(adminGroupName, encryptionAlgorithm);
+        FileObject codeBaseRoot = appDirectory.resolveFile("classes");
+        FileObject securityGroovyFile = codeBaseRoot.resolveFile("Security.groovy");
+        if(securityGroovyFile.exists()) {
+            FileObject backupFile = securityGroovyFile.getParent().resolveFile("Security.groovy.backup");
+            backupFile.copyFrom(securityGroovyFile, new AllFileSelector());
+        }
+        try(Writer fw = new OutputStreamWriter(securityGroovyFile.getContent().getOutputStream())) {
+            template.make(bindings).writeTo(fw);
+            logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
+        }
+    }
+
+    @NotNull
+    protected Map<String, String> getSecurityGroovyBindings(String adminGroupName, String encryptionAlgorithm) {
+        Map<String, String> bindings = new HashMap<>();
+        bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
+
+        bindings.put("hashIterations", "1");
+        String[] algoAndEncoding = encryptionAlgorithm.split(":");
+        bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
+        switch (algoAndEncoding[1]) {
+            case "plaintext":
+                bindings.put("hashFormat", "null");
+                break;
+            case "hex":
+                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
+                break;
+            case "base64":
+                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported encoding: " + algoAndEncoding[1]);
+        }
+        return bindings;
+    }
+
+    @Override
+    public boolean isUserAuthenticated() {
+        return SecurityUtils.getSubject().isAuthenticated();
     }
 }
