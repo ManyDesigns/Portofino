@@ -28,7 +28,6 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
-import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.upstairs.Settings;

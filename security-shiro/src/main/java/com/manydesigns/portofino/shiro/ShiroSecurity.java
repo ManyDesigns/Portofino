@@ -85,6 +85,11 @@ public class ShiroSecurity extends SecurityFacade {
     }
 
     @Override
+    public Map getUsers() {
+        return ShiroUtils.getPortofinoRealm().getUsers();
+    }
+
+    @Override
     public void setup(FileObject appDirectory, String adminGroupName, String encryptionAlgorithm) throws IOException {
         TemplateEngine engine = new SimpleTemplateEngine();
         Template template;

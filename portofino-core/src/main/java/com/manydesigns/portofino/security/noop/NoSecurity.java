@@ -40,6 +40,7 @@ import org.apache.commons.vfs2.FileObject;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 public class NoSecurity extends SecurityFacade {
@@ -70,6 +71,11 @@ public class NoSecurity extends SecurityFacade {
     @Override
     public Set<String> getGroups() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public Map getUsers() {
+        return Collections.EMPTY_MAP;
     }
 
     @Override

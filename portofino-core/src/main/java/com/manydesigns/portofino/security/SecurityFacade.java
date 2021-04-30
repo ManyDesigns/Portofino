@@ -15,6 +15,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Set;
 
 import static com.manydesigns.portofino.security.SecurityLogic.*;
@@ -127,4 +128,6 @@ public abstract class SecurityFacade {
     public abstract void setup(FileObject appDirectory, String adminGroupName, String encryptionAlgorithm) throws IOException;
 
     public abstract boolean isUserAuthenticated();
+
+    public abstract Map getUsers();
 }
