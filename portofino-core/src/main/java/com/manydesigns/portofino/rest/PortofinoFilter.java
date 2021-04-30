@@ -23,21 +23,17 @@ package com.manydesigns.portofino.rest;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.servlet.ServletConstants;
-import com.manydesigns.portofino.operations.Guarded;
 import com.manydesigns.portofino.cache.ControlsCache;
+import com.manydesigns.portofino.operations.Guarded;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.resourceactions.log.LogAccesses;
-import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.shiro.SecurityUtilsBean;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import ognl.OgnlContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.aop.AnnotationsAuthorizingMethodInterceptor;
-import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -52,7 +48,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
-import java.io.Serializable;
 import java.lang.reflect.Method;
 
 import static javax.ws.rs.core.Response.Status.CONFLICT;
@@ -99,11 +94,23 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         if(resource.getClass() != resourceInfo.getResourceClass()) {
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
-        fillMDC();
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ognlContext.put("securityUtils", new SecurityUtilsBean());
+
+
+        logger.debug("Setting up logging MDC");
+        MDC.clear();
+        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+        if(request != null) {
+            MDC.put("req.requestURI", request.getRequestURI());
+        }
         if(resource instanceof ResourceAction) {
             ResourceAction resourceAction = (ResourceAction) resource;
+            logger.debug("Retrieving user");
+            Object userId = resourceAction.getSecurity().getUserId();
+            if(userId != null) { //Issue #755
+                MDC.put("userId", userId.toString());
+            }
+            OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+            ognlContext.put("securityUtils", resourceAction.getSecurity().getSecurityUtilsBean());
             resourceAction.prepareForExecution();
         }
         checkAuthorizations(requestContext, resource);
@@ -183,37 +190,10 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-    protected void fillMDC() {
-        logger.debug("Retrieving user");
-        Serializable userId = null;
-        Subject subject = SecurityUtils.getSubject();
-        Object principal = subject.getPrincipal();
-        if (principal == null) {
-            logger.debug("No user found");
-        } else {
-            try {
-                userId = ShiroUtils.getUserId(subject);
-                logger.debug("Retrieved userId = {}", userId);
-            } catch (Exception e) {
-                logger.warn("Could not retrieve user id. This usually happens if Security.groovy has been changed in an incompatible way.", e);
-            }
-        }
-
-        logger.debug("Setting up logging MDC");
-        MDC.clear();
-        if(userId != null) { //Issue #755
-            MDC.put("userId", userId.toString());
-        }
-        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        if(request != null) {
-            MDC.put("req.requestURI", request.getRequestURI());
-        }
-    }
-
     protected void checkResourceActionInvocation(ContainerRequestContext requestContext, ResourceAction resourceAction) {
         Method handler = resourceInfo.getResourceMethod();
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        if(!SecurityLogic.isAllowed(request, resourceAction.getActionInstance(), resourceAction, handler) ||
+        if(!resourceAction.getSecurity().isOperationAllowed(request, resourceAction.getActionInstance(), resourceAction, handler) ||
            !resourceAction.isAccessible()) {
             logger.warn("Request not allowed: " + request.getMethod() + " " + request.getRequestURI());
             Response.Status status =

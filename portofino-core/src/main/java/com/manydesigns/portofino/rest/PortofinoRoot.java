@@ -33,7 +33,6 @@ import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
@@ -89,7 +88,7 @@ public class PortofinoRoot extends AbstractResourceAction {
     public Object consumePathSegment(@PathParam("pathSegment") String pathSegment) {
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ognlContext.put("securityUtils", new SecurityUtilsBean());
+        ognlContext.put("securityUtils", security.getSecurityUtilsBean());
         logger.debug("Publishing textProvider in OGNL context");
         ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
         return super.consumePathSegment(pathSegment);

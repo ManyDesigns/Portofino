@@ -38,7 +38,6 @@ import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.security.*;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -46,8 +45,6 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONStringer;
@@ -71,8 +68,7 @@ import java.util.*;
 /**
  * Convenient abstract base class for ResourceActions. It has fields to hold values of properties specified by the
  * ResourceAction interface as well as other useful objects injected by the framework. It provides standard
- * implementations of many of the ResourceAction methods, as well as important utility methods to handle hierarchical
- * relations among pages, such as embedding.
+ * implementations of many of the ResourceAction methods.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -98,6 +94,8 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected ActionRegistry actionRegistry;
     @Autowired
     protected ApplicationContext applicationContext;
+    @Autowired(required = false)
+    protected SecurityFacade security = NoSecurity.AT_ALL;
     @Context
     protected UriInfo uriInfo;
 
@@ -263,56 +261,17 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return getActionInstance().getActionDescriptor();
     }
 
-    //--------------------------------------------------------------------------
-    // Scripting
-    //--------------------------------------------------------------------------
-
-//    protected void prepareScript() {
-//        String pageId = actionInstance.getPage().getId();
-//        File file = ScriptingUtil.getGroovyScriptFile(actionInstance.getDirectory(), "action");
-//        FileReader fr = null;
-//        try {
-//            fr = new FileReader(file);
-//            script = IOUtils.toString(fr);
-//        } catch (Exception e) {
-//            logger.warn("Couldn't load script for page " + pageId, e);
-//        } finally {
-//            IOUtils.closeQuietly(fr);
-//        }
-//    }
-//
-//    protected void updateScript() {
-//        File directory = actionInstance.getDirectory();
-//        File groovyScriptFile = ScriptingUtil.getGroovyScriptFile(directory, "action");
-//        FileWriter fw = null;
-//        try {
-//            fw = new FileWriter(groovyScriptFile);
-//            fw.write(script);
-//            fw.flush();
-//            fw.close();
-//            Class<?> scriptClass = PageLogic.getActionClass(portofinoConfiguration, directory, false);
-//            if(scriptClass == null) {
-//                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.class.is.not.valid"));
-//            }
-//        } catch (IOException e) {
-//            logger.error("Error writing script to " + groovyScriptFile, e);
-//            String msg = ElementsThreadLocals.getText("couldnt.write.script.to._", groovyScriptFile.getAbsolutePath());
-//            SessionMessages.addErrorMessage(msg);
-//        } catch (Exception e) {
-//            String pageId = actionInstance.getPage().getId();
-//            logger.warn("Couldn't compile script for page " + pageId, e);
-//            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("couldnt.compile.script"));
-//        } finally {
-//            IOUtils.closeQuietly(fw);
-//        }
-//    }
-
     public Map getOgnlContext() {
         return ElementsThreadLocals.getOgnlContext();
     }
 
     public Configuration getPortofinoConfiguration() {
         return portofinoConfiguration;
+    }
+
+    @Override
+    public SecurityFacade getSecurity() {
+        return security;
     }
 
     @Override
@@ -355,12 +314,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         HttpServletRequest request = context.getRequest();
         List<Operation> operations = Operations.getOperations(getClass());
         List<Map<String, Object>> result = new ArrayList<>();
-        Subject subject = SecurityUtils.getSubject();
         for(Operation operation : operations) {
             logger.trace("Operation: {}", operation);
             Method handler = operation.getMethod();
-            if (!SecurityLogic.isOperationAllowed(
-                    this, portofinoConfiguration, request, subject, operation, handler)) {
+            if (!security.isOperationAllowed(
+                    this, portofinoConfiguration, request, operation, handler)) {
                 continue;
             }
             boolean visible = Operations.doGuardsPass(this, handler, GuardType.VISIBLE);
@@ -406,7 +364,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @GET
     public boolean isAccessible() {
         try {
-            return SecurityLogic.isAllowed(context.request, actionInstance, this, getClass().getMethod("isAccessible"));
+            return security.isOperationAllowed(context.request, actionInstance, this, getClass().getMethod("isAccessible"));
         } catch (NoSuchMethodException e) {
             return true;
         }
@@ -492,19 +450,12 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @NotNull
     protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
         Permissions permissions = SecurityLogic.calculateActualPermissions(actionInstance);
-        Subject subject = SecurityUtils.getSubject();
-        return filterAccordingToPermissions(classAccessor, permissions, subject);
-    }
-
-    @NotNull
-    protected ClassAccessor filterAccordingToPermissions(
-            ClassAccessor classAccessor, Permissions permissions, Subject subject) {
         List<String> excluded = new ArrayList<>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             RequiresPermissions requiresPermissions = property.getAnnotation(RequiresPermissions.class);
             boolean permitted =
                     requiresPermissions == null ||
-                    SecurityLogic.hasPermissions(getPortofinoConfiguration(), permissions, subject, requiresPermissions);
+                    security.hasPermissions(getPortofinoConfiguration(), permissions, requiresPermissions);
             if(!permitted) {
                 logger.debug("Property not permitted, filtering: {}", property.getName());
                 excluded.add(property.getName());
@@ -581,7 +532,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Map<String, Object> getActionPermissions() {
         List<Group> allGroups = new ArrayList<>(getActionDescriptor().getPermissions().getGroups());
-        Set<String> possibleGroups = ShiroUtils.getPortofinoRealm().getGroups();
+        Set<String> possibleGroups = security.getGroups();
         for(String group : possibleGroups) {
             if(allGroups.stream().noneMatch(g -> group.equals(g.getName()))) {
                 Group emptyGroup = new Group();

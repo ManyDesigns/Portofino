@@ -185,8 +185,7 @@ public class ActionsAction extends AbstractResourceAction {
     }
 
     protected boolean checkPermissionsOnTargetPage(ActionInstance targetActionInstance, AccessLevel accessLevel) {
-        Subject subject = SecurityUtils.getSubject();
-        if(!SecurityLogic.hasPermissions(portofinoConfiguration, targetActionInstance, subject, accessLevel)) {
+        if(!security.hasPermissions(portofinoConfiguration, targetActionInstance, accessLevel)) {
             logger.warn("User not authorized modify actionDescriptor {}", targetActionInstance);
             return false;
         }

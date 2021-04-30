@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.resourceactions;
 
 import com.manydesigns.portofino.dispatcher.security.SecureResource;
+import com.manydesigns.portofino.security.SecurityFacade;
 
 /**
  * An element in Portofino's hierarchical resource structure.
@@ -34,6 +35,8 @@ public interface ResourceAction extends SecureResource {
     String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     ActionContext getContext();
+
+    SecurityFacade getSecurity();
 
     void setContext(ActionContext context);
 

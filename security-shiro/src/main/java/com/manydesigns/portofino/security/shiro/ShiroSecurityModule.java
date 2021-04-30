@@ -28,6 +28,7 @@ import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
+import com.manydesigns.portofino.shiro.ShiroSecurity;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
@@ -46,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
@@ -171,5 +173,10 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
                 logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
             }
         }
+    }
+
+    @Bean
+    public ShiroSecurity getSecurityFacade() {
+        return new ShiroSecurity();
     }
 }
