@@ -22,6 +22,7 @@ package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import io.reactivex.disposables.Disposable;
@@ -188,7 +189,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
 
     protected void setupParentContext() {
         AnnotationConfigWebApplicationContext parentContext = new AnnotationConfigWebApplicationContext();
-        parentContext.setParent(setupGrandParentContext());
+        parentContext.setParent(setupGrandParentContext(initializer));
         parentContext.setId(PARENT_CONTEXT);
         parentContext.setServletContext(servletContext);
         ConfigurableEnvironment environment = parentContext.getEnvironment();
@@ -208,7 +209,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     }
 
     @NotNull
-    protected ApplicationContext setupGrandParentContext() {
+    public static ApplicationContext setupGrandParentContext(PortofinoDispatcherInitializer initializer) {
         GenericApplicationContext grandParent = new GenericApplicationContext();
         grandParent.refresh();
         grandParent.getBeanFactory().registerSingleton("codeBase", initializer.getCodeBase());
