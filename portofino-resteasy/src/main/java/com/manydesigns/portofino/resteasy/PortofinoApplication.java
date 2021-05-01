@@ -21,10 +21,22 @@ public class PortofinoApplication extends Application {
         classes.add(PortofinoFilter.class);
         classes.add(FormMessageBodyWriter.class);
         classes.add(XhtmlFragmentMessageBodyWriter.class);
-        classes.add(SendMailAction.class);
+        try {
+            classes.add(new MailInit().getSendMailAction());
+        } catch (NoClassDefFoundError e) {
+            //Mail not available
+        }
         //TODO discovery?
         //TODO configure user classes
         return classes;
     }
+
+    private static class MailInit {
+        private Class<?> getSendMailAction() {
+            return SendMailAction.class;
+        }
+    }
+
+
 
 }

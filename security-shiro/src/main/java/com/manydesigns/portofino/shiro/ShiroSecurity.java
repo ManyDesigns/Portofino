@@ -12,12 +12,19 @@ import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.aop.MethodInvocation;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.UnauthenticatedException;
+import org.apache.shiro.authz.aop.AnnotationsAuthorizingMethodInterceptor;
 import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.NotNull;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static com.manydesigns.portofino.security.SecurityLogic.*;
@@ -140,4 +147,47 @@ public class ShiroSecurity extends SecurityFacade {
     public boolean isUserAuthenticated() {
         return SecurityUtils.getSubject().isAuthenticated();
     }
+
+    @Override
+    public void checkWebResourceIsAccessible(ContainerRequestContext requestContext, Object resource, Method handler) {
+        try {
+            AUTH_CHECKER.assertAuthorized(resource, handler);
+            logger.debug("Standard Shiro security check passed.");
+        } catch (UnauthenticatedException e) {
+            logger.debug("Method required authentication", e);
+            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
+        } catch (AuthorizationException e) {
+            logger.warn("Method invocation not authorized", e);
+            requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
+        }
+    }
+
+    public static final class AuthChecker extends AnnotationsAuthorizingMethodInterceptor {
+
+        public void assertAuthorized(final Object resource, final Method handler) throws AuthorizationException {
+            super.assertAuthorized(new MethodInvocation() {
+                @Override
+                public Object proceed() {
+                    return null;
+                }
+
+                @Override
+                public Method getMethod() {
+                    return handler;
+                }
+
+                @Override
+                public Object[] getArguments() {
+                    return new Object[0];
+                }
+
+                @Override
+                public Object getThis() {
+                    return resource;
+                }
+            });
+        }
+    }
+
+    protected static final AuthChecker AUTH_CHECKER = new AuthChecker();
 }

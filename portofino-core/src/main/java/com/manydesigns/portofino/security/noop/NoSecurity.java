@@ -38,6 +38,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.ContainerRequestContext;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
@@ -45,6 +46,7 @@ import java.util.Set;
 
 public class NoSecurity extends SecurityFacade {
     public static final NoSecurity AT_ALL = new NoSecurity();
+    public static final Object BEAN = new Object();
 
     private NoSecurity() {}
 
@@ -85,4 +87,12 @@ public class NoSecurity extends SecurityFacade {
     public boolean isUserAuthenticated() {
         return true;
     }
+
+    @Override
+    public Object getSecurityUtilsBean() {
+        return BEAN;
+    }
+
+    @Override
+    public void checkWebResourceIsAccessible(ContainerRequestContext requestContext, Object resource, Method handler) {}
 }

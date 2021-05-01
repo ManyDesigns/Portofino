@@ -10,7 +10,7 @@
     </parent>
     <artifactId>portofino-core</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mail</artifactId>
+            <artifactId>portofino-modules</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

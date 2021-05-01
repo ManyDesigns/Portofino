@@ -8,11 +8,11 @@ import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.ContainerRequestContext;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -117,9 +117,7 @@ public abstract class SecurityFacade {
 
     public abstract boolean isAdministrator(Configuration conf);
 
-    public Object getSecurityUtilsBean() {
-        return null;
-    }
+    public abstract Object getSecurityUtilsBean();
 
     public abstract Object getUserId();
 
@@ -130,4 +128,6 @@ public abstract class SecurityFacade {
     public abstract boolean isUserAuthenticated();
 
     public abstract Map getUsers();
+
+    public abstract void checkWebResourceIsAccessible(ContainerRequestContext requestContext, Object resource, Method handler);
 }

@@ -14,7 +14,17 @@ public class PortofinoApplication extends ResourceConfig {
         packages("com.manydesigns.portofino.rest"); //TODO configure user packages
         register(OpenApiResource.class);
         register(JacksonFeature.class);
-        register(SendMailAction.class);
+        try {
+            register(new MailInit().getSendMailAction());
+        } catch (NoClassDefFoundError e) {
+            //Mail not available
+        }
+    }
+
+    private static class MailInit {
+        private Class<?> getSendMailAction() {
+            return SendMailAction.class;
+        }
     }
 
 }

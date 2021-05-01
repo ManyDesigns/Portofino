@@ -94,6 +94,13 @@
         ///////////////////////////////////////////////////////////////////////
         -->
 
+        <!-- Email -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-mail</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- javax.mail. Some application servers natively provide it. -->
         <dependency>
             <groupId>com.sun.mail</groupId>

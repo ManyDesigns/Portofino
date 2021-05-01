@@ -28,15 +28,15 @@ import com.manydesigns.portofino.operations.Guarded;
 import com.manydesigns.portofino.operations.Operations;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.resourceactions.log.LogAccesses;
+import com.manydesigns.portofino.security.SecurityFacade;
+import com.manydesigns.portofino.security.noop.NoSecurity;
 import ognl.OgnlContext;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.aop.MethodInvocation;
-import org.apache.shiro.authz.AuthorizationException;
-import org.apache.shiro.authz.UnauthenticatedException;
-import org.apache.shiro.authz.aop.AnnotationsAuthorizingMethodInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -113,7 +113,19 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             ognlContext.put("securityUtils", resourceAction.getSecurity().getSecurityUtilsBean());
             resourceAction.prepareForExecution();
         }
-        checkAuthorizations(requestContext, resource);
+        WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+        SecurityFacade facade = NoSecurity.AT_ALL;
+        if(context != null) {
+            try {
+                facade = context.getBean(SecurityFacade.class);
+            } catch (NoSuchBeanDefinitionException e) {
+                //Not found, let's use default
+            }
+        }
+        facade.checkWebResourceIsAccessible(requestContext, resource, resourceInfo.getResourceMethod());
+        if(resource instanceof ResourceAction) {
+            checkResourceActionInvocation(requestContext, (ResourceAction) resource);
+        }
         Method resourceMethod = resourceInfo.getResourceMethod();
         if(isAccessToBeLogged(resource, resourceMethod)) {
             accessLogger.info(
@@ -173,22 +185,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-    protected void checkAuthorizations(ContainerRequestContext requestContext, Object resource) {
-        try {
-            Method handler = resourceInfo.getResourceMethod();
-            AUTH_CHECKER.assertAuthorized(resource, handler);
-            logger.debug("Standard Shiro security check passed.");
-            if(resource instanceof ResourceAction) {
-                checkResourceActionInvocation(requestContext, (ResourceAction) resource);
-            }
-        } catch (UnauthenticatedException e) {
-            logger.debug("Method required authentication", e);
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
-        } catch (AuthorizationException e) {
-            logger.warn("Method invocation not authorized", e);
-            requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());
-        }
-    }
+
 
     protected void checkResourceActionInvocation(ContainerRequestContext requestContext, ResourceAction resourceAction) {
         Method handler = resourceInfo.getResourceMethod();
@@ -197,7 +194,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
            !resourceAction.isAccessible()) {
             logger.warn("Request not allowed: " + request.getMethod() + " " + request.getRequestURI());
             Response.Status status =
-                    SecurityUtils.getSubject().isAuthenticated() ?
+                    resourceAction.getSecurity().isUserAuthenticated() ?
                             Response.Status.FORBIDDEN :
                             Response.Status.UNAUTHORIZED;
             requestContext.abortWith(Response.status(status).build());
@@ -215,34 +212,5 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             logger.debug("Portofino-specific security check passed");
         }
     }
-
-    public static final class AuthChecker extends AnnotationsAuthorizingMethodInterceptor {
-
-        public void assertAuthorized(final Object resource, final Method handler) throws AuthorizationException {
-            super.assertAuthorized(new MethodInvocation() {
-                @Override
-                public Object proceed() {
-                    return null;
-                }
-
-                @Override
-                public Method getMethod() {
-                    return handler;
-                }
-
-                @Override
-                public Object[] getArguments() {
-                    return new Object[0];
-                }
-
-                @Override
-                public Object getThis() {
-                    return resource;
-                }
-            });
-        }
-    }
-
-    protected static final AuthChecker AUTH_CHECKER = new AuthChecker();
 
 }

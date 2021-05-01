@@ -65,6 +65,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Convenient abstract base class for ResourceActions. It has fields to hold values of properties specified by the
@@ -384,8 +385,8 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     })
     @Path(":accessible-children")
     @GET
-    public String[] getAccessibleChildren() {
-        return getSubResources().stream().filter(this::isChildResourceAccessible).toArray(String[]::new);
+    public List<String> getAccessibleChildren() {
+        return getSubResources().stream().filter(this::isChildResourceAccessible).collect(Collectors.toUnmodifiableList());
     }
 
     private boolean isChildResourceAccessible(String segment) {

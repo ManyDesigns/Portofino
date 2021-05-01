@@ -23,6 +23,8 @@ package com.manydesigns.portofino.resourceactions;
 import com.manydesigns.portofino.dispatcher.security.SecureResource;
 import com.manydesigns.portofino.security.SecurityFacade;
 
+import java.util.List;
+
 /**
  * An element in Portofino's hierarchical resource structure.
  *
@@ -77,5 +79,5 @@ public interface ResourceAction extends SecureResource {
     /**
      * Returns the list of accessible children (according to {@link #isAccessible()}).
      */
-    String[] getAccessibleChildren();
+    List<String> getAccessibleChildren();
 }

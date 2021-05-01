@@ -20,6 +20,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-mail</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-servlet-initializer</artifactId>
             <version>${resteasy.version}</version>
