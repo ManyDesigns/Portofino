@@ -386,7 +386,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":accessible-children")
     @GET
     public List<String> getAccessibleChildren() {
-        return getSubResources().stream().filter(this::isChildResourceAccessible).collect(Collectors.toUnmodifiableList());
+        return getSubResources().stream().filter(this::isChildResourceAccessible).collect(Collectors.toList());
     }
 
     private boolean isChildResourceAccessible(String segment) {
