@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.security.noop;
+package com.manydesigns.portofino.security.noop.login;
 
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -47,15 +47,10 @@ public class NoOpLoginAction extends AbstractResourceAction {
         return Collections.emptyMap();
     }
 
-    public static class LoginData {
-        public String username;
-        public String password;
-    }
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(LoginData data) {
+    public Response login() {
         return Response.ok(getUserInfo()).build();
     }
 

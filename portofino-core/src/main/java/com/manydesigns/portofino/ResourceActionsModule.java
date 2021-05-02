@@ -34,7 +34,7 @@ import com.manydesigns.portofino.resourceactions.form.TableFormAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.security.noop.NoOpLoginAction;
+import com.manydesigns.portofino.security.noop.login.NoOpLoginAction;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;

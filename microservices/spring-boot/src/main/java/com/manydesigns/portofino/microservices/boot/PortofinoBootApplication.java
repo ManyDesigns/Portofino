@@ -2,6 +2,7 @@ package com.manydesigns.portofino.microservices.boot;
 
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.slf4j.Logger;
@@ -28,7 +29,9 @@ import java.nio.file.attribute.FileAttribute;
 public class PortofinoBootApplication {
 	public static final Logger logger = LoggerFactory.getLogger(PortofinoBootApplication.class);
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
+		installCommonsVfsBootSupport();
+
 		SpringApplication application = new SpringApplication(PortofinoBootApplication.class);
 		ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 		application.setApplicationContextFactory(webApplicationType -> {
@@ -48,6 +51,11 @@ public class PortofinoBootApplication {
 			}
 		});
 		application.run(args);
+	}
+
+	public static void installCommonsVfsBootSupport() throws FileSystemException {
+		((DefaultFileSystemManager) VFS.getManager()).removeProvider("res");
+		((DefaultFileSystemManager) VFS.getManager()).addProvider("res", new SpringBootResourceFileProvider());
 	}
 
 	public static String getApplicationDirectoryPath(ApplicationArguments applicationArguments) throws IOException {
