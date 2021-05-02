@@ -1,5 +1,9 @@
 package com.manydesigns.portofino.microservices.boot;
 
+import org.apache.commons.vfs2.AllFileSelector;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -12,9 +16,7 @@ import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoC
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +34,13 @@ public class PortofinoBootApplication {
 		application.setApplicationContextFactory(webApplicationType -> {
 			switch (webApplicationType) {
 				case SERVLET:
-					return new PortofinoAnnotationConfigServletWebServerApplicationContext(getApplicationDirectoryPath(applicationArguments));
+					try {
+						return new PortofinoAnnotationConfigServletWebServerApplicationContext(getApplicationDirectoryPath(applicationArguments));
+					} catch (IOException e) {
+						logger.error("Could not create application", e);
+						System.exit(1);
+						return null;
+					}
 				case REACTIVE:
 					return new AnnotationConfigServletWebServerApplicationContext();
 				default:
@@ -42,38 +50,55 @@ public class PortofinoBootApplication {
 		application.run(args);
 	}
 
-	public static String getApplicationDirectoryPath(ApplicationArguments applicationArguments) {
+	public static String getApplicationDirectoryPath(ApplicationArguments applicationArguments) throws IOException {
+		((DefaultFileSystemManager) VFS.getManager()).setBaseFile(new File(""));
 		if(applicationArguments.containsOption("app-dir")) {
-			return applicationArguments.getOptionValues("app-dir").get(0);
+			FileObject applicationDirectory = VFS.getManager().resolveFile(applicationArguments.getOptionValues("app-dir").get(0));
+				initAppDirectory(applicationDirectory);
+			return applicationDirectory.getName().getURI();
 		}
-		File main = new File(new File("src"), "main");
-		if(main.isDirectory()) {
-			File appDir = new File(main, "portofino");
-			if(appDir.isDirectory()) {
-				return appDir.getAbsolutePath();
+		FileObject main = VFS.getManager().resolveFile("src").resolveFile("main");
+		if(main.isFolder()) {
+			FileObject appDir = main.resolveFile( "resources").resolveFile("portofino-application");
+			if(appDir.isFolder()) {
+				return appDir.getName().getURI();
 			}
-			appDir = new File(new File(main, "webapp"), "WEB-INF");
-			if(appDir.isDirectory()) {
-				return appDir.getAbsolutePath();
+			appDir = main.resolveFile("webapp").resolveFile("WEB-INF");
+			if(appDir.isFolder()) {
+				return appDir.getName().getURI();
 			}
 		}
 		if(new File("portofino.properties").isFile()) {
 			return new File("").getAbsolutePath();
 		}
-		try {
-			File tempDirectory = Files.createTempDirectory("portofino").toFile();
-			File actions = new File(tempDirectory, "actions");
-			actions.mkdirs();
-			try(FileWriter fw = new FileWriter(new File(actions, "action.xml"))) {
-				fw.write("<action><permissions /></action>");
-			}
-			new File(tempDirectory, "portofino.properties").createNewFile();
-			return tempDirectory.getAbsolutePath();
-		} catch (IOException e) {
-			logger.error("Could not create application directory", e);
-			System.exit(1);
-			return null;
+		if(new File("portofino-application").isDirectory()) {
+			return new File("portofino-application").getAbsolutePath();
 		}
+		FileObject applicationDirectory = VFS.getManager().resolveFile("portofino-application");
+		initAppDirectory(applicationDirectory);
+		return applicationDirectory.getName().getURI();
+	}
+
+	protected static void initAppDirectory(FileObject applicationDirectory) throws IOException {
+		if(!applicationDirectory.exists()) {
+			applicationDirectory.createFolder();
+			if(PortofinoBootApplication.class.getClassLoader().getResource("portofino-application") != null) {
+				FileObject bundledApplication = VFS.getManager().resolveFile("res:portofino-application");
+				applicationDirectory.copyFrom(bundledApplication, new AllFileSelector());
+			}
+		}
+
+		FileObject actions = applicationDirectory.resolveFile("actions");
+		actions.createFolder();
+
+		FileObject actionXml = actions.resolveFile("action.xml");
+		if(!actionXml.exists()) {
+			actionXml.createFile();
+			try (Writer w = new OutputStreamWriter(actionXml.getContent().getOutputStream())) {
+				w.write("<action><permissions /></action>");
+			}
+		}
+		applicationDirectory.resolveFile("portofino.properties").createFile();
 	}
 
 }
