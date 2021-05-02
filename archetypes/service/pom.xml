@@ -34,7 +34,7 @@
             </resource>
             <resource>
                 <directory>src/main/resources/META-INF/maven</directory>
-                <targetPath>src/main/resources/META-INF/maven</targetPath>
+                <targetPath>META-INF/maven</targetPath>
                 <filtering>true</filtering>
             </resource>
 

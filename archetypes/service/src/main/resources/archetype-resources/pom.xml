@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>${artifactId}</artifactId>
     <groupId>${groupId}</groupId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>${version}</version>
     <properties>
         <portofino.version>${portofinoVersion}</portofino.version>
