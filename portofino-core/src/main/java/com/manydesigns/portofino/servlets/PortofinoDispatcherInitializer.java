@@ -187,11 +187,18 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
     public Map<String, Lookup> getConfigurationLookups() {
         Map<String, Lookup> lookupMap = new HashMap<>();
         lookupMap.put("serverInfo", new BeanLookup(serverInfo));
+        lookupMap.put("applicationInfo", new BeanLookup(new ApplicationInfo()));
         return lookupMap;
     }
 
     public FileBasedConfigurationBuilder<PropertiesConfiguration> getConfigurationFile() {
         return configurationFile;
+    }
+
+    public class ApplicationInfo {
+        public String getApplicationDirectory() {
+            return applicationRoot.getName().getPath();
+        }
     }
 
 }

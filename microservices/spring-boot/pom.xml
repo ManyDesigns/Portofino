@@ -10,28 +10,27 @@
 	</parent>
 	<groupId>com.manydesigns</groupId>
 	<artifactId>portofino-spring-boot</artifactId>
-	<version>${portofino.version}</version>
+	<version>5.2.2-SNAPSHOT</version>
 	<name>portofino-spring-boot</name>
 	<description>Launch Portofino as a Spring Boot application</description>
 	<properties>
 		<java.version>11</java.version>
-		<portofino.version>5.2.2-SNAPSHOT</portofino.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>com.manydesigns</groupId>
 			<artifactId>portofino-core</artifactId>
-			<version>${portofino.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.manydesigns</groupId>
 			<artifactId>portofino-jersey</artifactId>
-			<version>${portofino.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.manydesigns</groupId>
 			<artifactId>portofino-upstairs</artifactId>
-			<version>${portofino.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -61,5 +60,25 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.manydesigns.portofino.microservices.boot.PortofinoBootApplication</mainClass>
+					<classifier>standalone</classifier>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
