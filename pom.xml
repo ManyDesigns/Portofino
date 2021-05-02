@@ -157,7 +157,8 @@
         <!-- upstairs -->
         <module>upstairs</module>
         <!-- Archetypes -->
-        <module>portofino-war-archetype</module>
+        <module>archetypes/service</module>
+        <module>archetypes/war</module>
         <!-- Applications -->
         <module>demo-tt</module>
     </modules>
