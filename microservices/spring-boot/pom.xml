@@ -17,18 +17,6 @@
 		<java.version>11</java.version>
 		<portofino.version>5.2.2-SNAPSHOT</portofino.version>
 	</properties>
-	<dependencyManagement>
-		<dependencies>
-			<!-- Portofino parent POM that defines the versions of all dependencies (notice scope: import) -->
-			<dependency>
-				<groupId>com.manydesigns</groupId>
-				<artifactId>portofino</artifactId>
-				<version>${portofino.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>com.manydesigns</groupId>

@@ -6,6 +6,7 @@
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
         <version>5.2.2-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>portofino-service-archetype</artifactId>
     <packaging>maven-archetype</packaging>
