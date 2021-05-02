@@ -134,6 +134,14 @@ public class ActionLogic {
         }
     }
 
+    public static void mountPackage(FileObject actionDirectory, String segment, String packageName) throws Exception {
+        mount(actionDirectory, segment, "res:" + packageName.replace('.', '/'));
+    }
+
+    public static void mountPackage(FileObject actionDirectory, String segment, Package pkg) throws Exception {
+        mountPackage(actionDirectory, segment, pkg.getName());
+    }
+
     public static void unmount(FileObject actionDirectory, String segment) throws Exception {
         ActionDescriptor descriptor = getActionDescriptor(actionDirectory);
         Optional<AdditionalChild> existing =

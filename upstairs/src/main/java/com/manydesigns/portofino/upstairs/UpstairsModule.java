@@ -26,6 +26,7 @@ import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
+import com.manydesigns.portofino.upstairs.actions.UpstairsAction;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
@@ -99,8 +100,7 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         try {
-            ActionLogic.mount(actionsDirectory, "portofino-upstairs",
-                    "res:com/manydesigns/portofino/upstairs/actions");
+            ActionLogic.mountPackage(actionsDirectory, "portofino-upstairs", UpstairsAction.class.getPackage());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -26,6 +26,8 @@ import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
+import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.shiro.ShiroSecurity;
@@ -142,6 +144,7 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         logger.debug("Creating SecurityClassRealm");
         realm = new SecurityClassRealm(codeBase, "Security");
         rsm.setRealm(realm);
+        SecurityLogic.installLogin(actionsDirectory, configuration, DefaultLoginAction.class);
         status = ModuleStatus.STARTED;
     }
 

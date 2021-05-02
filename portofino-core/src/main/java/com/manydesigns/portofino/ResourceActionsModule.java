@@ -33,6 +33,8 @@ import com.manydesigns.portofino.resourceactions.form.FormAction;
 import com.manydesigns.portofino.resourceactions.form.TableFormAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
+import com.manydesigns.portofino.security.SecurityLogic;
+import com.manydesigns.portofino.security.noop.NoOpLoginAction;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
@@ -135,10 +137,7 @@ public class ResourceActionsModule implements Module {
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
 
-        String loginPath = actionsDirectory.getName().getPath() + configuration.getString(PortofinoProperties.LOGIN_PATH);
-        logger.info("Login action: " + loginPath);
-        ActionLogic.unmount(actionsDirectory, ":auth");
-        ActionLogic.mount(actionsDirectory, ":auth", loginPath);
+        SecurityLogic.installLogin(actionsDirectory, configuration, NoOpLoginAction.class);
         status = ModuleStatus.STARTED;
     }
 

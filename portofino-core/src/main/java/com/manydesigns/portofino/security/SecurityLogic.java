@@ -20,10 +20,14 @@
 
 package com.manydesigns.portofino.security;
 
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,4 +160,17 @@ public class SecurityLogic {
         return conf.getString(GROUP_REGISTERED, GROUP_REGISTERED_DEFAULT);
     }
 
+    public static void installLogin(
+            FileObject actionsDirectory, Configuration configuration, Class<? extends ResourceAction> fallbackLoginClass)
+            throws Exception {
+        String relLoginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
+        String loginPath;
+        if(relLoginPath != null) {
+            loginPath = actionsDirectory.getName().getPath() + relLoginPath;
+        } else {
+            loginPath = "res:" + fallbackLoginClass.getPackage().getName().replace('.', '/');
+        }
+        ActionLogic.unmount(actionsDirectory, ":auth");
+        ActionLogic.mount(actionsDirectory, ":auth", loginPath);
+    }
 }
