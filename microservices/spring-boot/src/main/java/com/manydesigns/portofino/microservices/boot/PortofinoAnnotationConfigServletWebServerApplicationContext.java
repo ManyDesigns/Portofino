@@ -6,6 +6,8 @@ import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.spring.PortofinoWebSpringConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
@@ -14,12 +16,12 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import javax.servlet.ServletContext;
-import java.io.File;
 import java.util.Set;
 
 public class PortofinoAnnotationConfigServletWebServerApplicationContext extends AnnotationConfigServletWebServerApplicationContext {
 
     protected final String applicationDirectoryPath;
+    private static final Logger logger = LoggerFactory.getLogger(PortofinoAnnotationConfigServletWebServerApplicationContext.class);
 
     public PortofinoAnnotationConfigServletWebServerApplicationContext(String applicationDirectoryPath) {
         this.applicationDirectoryPath = applicationDirectoryPath;
@@ -52,12 +54,23 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
             try {
                 parent.register(initializer.getCodeBase().loadClass(c.getBeanClassName()));
             } catch (Exception e) {
-                PortofinoBootApplication.logger.error("Could not load module class", e);
+                logger.error("Could not load module class", e);
             }
         });
 
         parent.register(PortofinoWebSpringConfiguration.class);
         parent.register(PortofinoSpringConfiguration.class);
+
+        //User-defined beans
+        try {
+            Class<?> userConfigurationClass = initializer.getCodeBase().loadClass("SpringConfiguration");
+            parent.setClassLoader(initializer.getCodeBase().asClassLoader());
+            parent.register(userConfigurationClass);
+        } catch (Exception e) {
+            logger.info("User-defined Spring configuration not found");
+            logger.debug("Additional info", e);
+        }
+
         parent.refresh();
         setParent(parent);
     }

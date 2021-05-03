@@ -17,17 +17,16 @@ import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoC
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 @SpringBootApplication(exclude = {
 		DispatcherServletAutoConfiguration.class, ErrorMvcAutoConfiguration.class,
 		GroovyTemplateAutoConfiguration.class })
 public class PortofinoBootApplication {
-	public static final Logger logger = LoggerFactory.getLogger(PortofinoBootApplication.class);
+	private static final Logger logger = LoggerFactory.getLogger(PortofinoBootApplication.class);
 
 	public static void main(String[] args) throws Exception {
 		installCommonsVfsBootSupport();
