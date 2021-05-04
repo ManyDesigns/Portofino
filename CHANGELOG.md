@@ -2,7 +2,14 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.2.2] – Unreleased
+## [5.3.0] – Unreleased
+
+### Added
+- Microservice deployment option using Spring Boot.
+- Easier Quartz job registration using Spring beans.
+- Email microservice.
+- Possibility to exclude Shiro-based security from the application (and possibly implement security using other
+  libraries).
 
 ### Changed
 - Authentication/authorization endpoint is fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
