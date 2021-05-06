@@ -152,6 +152,8 @@
         <!-- Microservices -->
         <module>microservices/launcher</module>
         <module>microservices/spring-boot</module>
+        <module>microservices/scheduler</module>
+        <module>microservices/mail</module>
         <!-- UI -->
         <module>ui</module>
         <!-- upstairs -->

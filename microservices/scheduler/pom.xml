@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>portofino-mail-service</artifactId>
+    <artifactId>portofino-scheduler-service</artifactId>
     <groupId>com.manydesigns</groupId>
     <packaging>jar</packaging>
     <version>5.2.2-SNAPSHOT</version>
@@ -24,16 +24,11 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-        <!-- Email -->
+        <!-- Quartz -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mail</artifactId>
+            <artifactId>portofino-quartz</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
