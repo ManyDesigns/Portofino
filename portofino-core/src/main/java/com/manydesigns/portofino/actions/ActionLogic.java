@@ -134,6 +134,10 @@ public class ActionLogic {
         }
     }
 
+    public static void mount(FileObject actionDirectory, String segment, Class<?> actionClass) throws Exception {
+        mount(actionDirectory, segment, "res:" + actionClass.getName().replace('.', '/') + ".class");
+    }
+
     public static void mountPackage(FileObject actionDirectory, String segment, String packageName) throws Exception {
         mount(actionDirectory, segment, "res:" + packageName.replace('.', '/'));
     }

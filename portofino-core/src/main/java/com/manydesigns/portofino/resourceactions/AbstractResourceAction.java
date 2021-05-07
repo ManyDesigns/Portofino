@@ -171,14 +171,18 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
 
     @Override
     protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
-        Optional<AdditionalChild> child =
-                getActionDescriptor().getAdditionalChildren().stream()
-                        .filter(c -> c.getSegment().equals(pathSegment))
-                        .findFirst();
+        Optional<AdditionalChild> child = getAdditionalChild(pathSegment);
         if(child.isPresent()) {
             return VFS.getManager().resolveFile(child.get().getPath());
         }
         return super.getChildLocation(pathSegment);
+    }
+
+    @NotNull
+    protected Optional<AdditionalChild> getAdditionalChild(String pathSegment) {
+        return getActionDescriptor().getAdditionalChildren().stream()
+                .filter(c -> c.getSegment().equals(pathSegment))
+                .findFirst();
     }
 
     @Override

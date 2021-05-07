@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.resteasy;
 
-import com.manydesigns.mail.rest.SendMailAction;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoFilter;
 import com.manydesigns.portofino.rest.messagebodywriters.FormMessageBodyWriter;
@@ -21,22 +20,9 @@ public class PortofinoApplication extends Application {
         classes.add(PortofinoFilter.class);
         classes.add(FormMessageBodyWriter.class);
         classes.add(XhtmlFragmentMessageBodyWriter.class);
-        try {
-            classes.add(new MailInit().getSendMailAction());
-        } catch (NoClassDefFoundError e) {
-            //Mail not available
-        }
         //TODO discovery?
         //TODO configure user classes
         return classes;
     }
-
-    private static class MailInit {
-        private Class<?> getSendMailAction() {
-            return SendMailAction.class;
-        }
-    }
-
-
 
 }

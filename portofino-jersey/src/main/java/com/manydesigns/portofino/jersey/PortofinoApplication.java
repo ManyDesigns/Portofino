@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.jersey;
 
-import com.manydesigns.mail.rest.SendMailAction;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -25,17 +24,6 @@ public class PortofinoApplication extends ResourceConfig {
                 .collect(Collectors.toSet()));
         register(OpenApiResource.class);
         register(JacksonFeature.class);
-        try {
-            register(new MailInit().getSendMailAction());
-        } catch (NoClassDefFoundError e) {
-            //Mail not available
-        }
-    }
-
-    private static class MailInit {
-        private Class<?> getSendMailAction() {
-            return SendMailAction.class;
-        }
     }
 
 }
