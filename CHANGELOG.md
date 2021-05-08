@@ -8,12 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Microservice deployment option using Spring Boot.
 - Easier Quartz job registration using Spring beans.
 - Email microservice.
+- Quartz scheduler microservice.
 - Possibility to exclude Shiro-based security from the application (and possibly implement security using other
   libraries).
 
 ### Changed
 - Authentication/authorization endpoint is fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
-- Simplify initialization by removing PortofinoListener
+- Simplify initialization by removing PortofinoListener.
+- URL to trigger mail sender changed from `/actions/mail-sender-run` to `/portofino-send-mail` and HTTP method changed from GET to POST.
+- Mail sender action can be disabled with `mail.sender.action.enabled=false`.
 
 ## [5.2.1] – 2020-04-10
 

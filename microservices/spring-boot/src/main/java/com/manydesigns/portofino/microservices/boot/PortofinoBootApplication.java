@@ -29,24 +29,28 @@ public class PortofinoBootApplication {
 	private static final Logger logger = LoggerFactory.getLogger(PortofinoBootApplication.class);
 
 	public static void main(String[] args) throws Exception {
-		installCommonsVfsBootSupport();
+		run(PortofinoBootApplication.class, args);
+	}
 
-		SpringApplication application = new SpringApplication(PortofinoBootApplication.class);
+	public static void run(Class<?> applicationClass, String[] args) throws FileSystemException {
+		installCommonsVfsBootSupport();
+		SpringApplication application = new SpringApplication(applicationClass);
 		ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 		application.setApplicationContextFactory(webApplicationType -> {
-			switch (webApplicationType) {
-				case SERVLET:
-					try {
-						return new PortofinoAnnotationConfigServletWebServerApplicationContext(getApplicationDirectoryPath(applicationArguments));
-					} catch (IOException e) {
-						logger.error("Could not create application", e);
-						System.exit(1);
-						return null;
-					}
-				case REACTIVE:
-					return new AnnotationConfigServletWebServerApplicationContext();
-				default:
-					return ApplicationContextFactory.DEFAULT.create(webApplicationType);
+			try {
+				switch (webApplicationType) {
+					case SERVLET:
+							return new PortofinoAnnotationConfigServletWebServerApplicationContext(getApplicationDirectoryPath(applicationArguments));
+
+					case REACTIVE:
+						return new AnnotationConfigServletWebServerApplicationContext();
+					default:
+						return ApplicationContextFactory.DEFAULT.create(webApplicationType);
+				}
+			} catch (IOException e) {
+				logger.error("Could not create application", e);
+				System.exit(1);
+				return null;
 			}
 		});
 		application.run(args);

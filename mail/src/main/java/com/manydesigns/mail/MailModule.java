@@ -24,6 +24,7 @@ import com.manydesigns.mail.quartz.MailScheduler;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.rest.SendMailAction;
 import com.manydesigns.mail.sender.MailSender;
+import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.actions.ActionLogic;
@@ -98,7 +99,10 @@ public class MailModule implements Module {
             logger.debug(e.getMessage(), e);
             logger.info("Quartz is not available, mail scheduler not started");
         }
-        ActionLogic.mount(actionsDirectory, "portofino-send-mail", SendMailAction.class);
+        if(configuration.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
+            String segment = configuration.getString(MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
+            ActionLogic.mount(actionsDirectory, segment, SendMailAction.class);
+        }
         status = ModuleStatus.STARTED;
     }
 

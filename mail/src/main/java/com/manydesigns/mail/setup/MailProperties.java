@@ -42,6 +42,8 @@ public class MailProperties {
 
     public static final String MAIL_SENDER_POLL_INTERVAL = "mail.sender.poll.interval";
     public static final String MAIL_SENDER_SERVER_URL = "mail.sender.server_url";
+    public static final String MAIL_SENDER_ACTION_ENABLED = "mail.sender.action.enabled";
+    public static final String MAIL_SENDER_ACTION_SEGMENT = "mail.sender.action.segment";
     public static final String MAIL_QUARTZ_ENABLED = "mail.quartz.enabled";
 
 }
