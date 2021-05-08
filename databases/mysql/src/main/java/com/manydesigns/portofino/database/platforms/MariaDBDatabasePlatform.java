@@ -21,15 +21,6 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
-import org.apache.commons.dbutils.DbUtils;
-import org.hibernate.dialect.MySQLDialect;
-
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

@@ -137,13 +137,13 @@
         <module>portofino-model</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
-        <module>portofino-db2</module>
-        <module>portofino-derby</module>
-        <module>portofino-googlecloudsql</module>
-        <module>portofino-mssql</module>
-        <module>portofino-mysql</module>
-        <module>portofino-oracle</module>
-        <module>portofino-postgresql</module>
+        <module>databases/db2</module>
+        <module>databases/derby</module>
+        <module>databases/googlecloudsql</module>
+        <module>databases/mssql</module>
+        <module>databases/mysql</module>
+        <module>databases/oracle</module>
+        <module>databases/postgresql</module>
         <!-- Pages -->
         <module>portofino-crud</module>
         <!-- Optional services and integrations -->

@@ -7,14 +7,21 @@
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
         <version>5.2.2-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>portofino-mssql</artifactId>
+    <artifactId>portofino-googlecloudsql</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-mysql</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
