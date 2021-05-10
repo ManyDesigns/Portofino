@@ -119,16 +119,17 @@
         ///////////////////////////////////////////////////////////////////////
         -->
 
+        <!-- Microservice implementation. Note that this does NOT include Groovy. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-core</artifactId>
+            <artifactId>portofino-spring-boot</artifactId>
             <version>${portofino.version}</version>
+            <scope>compile</scope>
         </dependency>
-        <!-- Security using Apache Shiro -->
+        <!-- Uncomment to enable Groovy. -->
         <!--<dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-security-shiro</artifactId>
-            <version>${portofino.version}</version>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
         </dependency>-->
         <!-- Support for database connectivity. -->
         <dependency>
@@ -161,12 +162,12 @@
             <artifactId>resteasy-servlet-initializer</artifactId>
         </dependency>
         -->
-        <!-- Servlet API -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
+        <!-- Security using Apache Shiro -->
+        <!--<dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-security-shiro</artifactId>
+            <version>${portofino.version}</version>
+        </dependency>-->
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -179,13 +180,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-        </dependency>
-        <!-- Microservice implementation. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-spring-boot</artifactId>
-            <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

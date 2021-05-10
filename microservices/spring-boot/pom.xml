@@ -21,6 +21,18 @@
 			<groupId>com.manydesigns</groupId>
 			<artifactId>portofino-core</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.groovy</groupId>
+					<artifactId>groovy</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Groovy is optional -->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.manydesigns</groupId>
@@ -28,13 +40,18 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.manydesigns</groupId>
-			<artifactId>portofino-upstairs</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-undertow</artifactId>
 		</dependency>
 		<!-- JAXB for Java 11+ -->
 		<dependency>
