@@ -163,11 +163,11 @@
         </dependency>
         -->
         <!-- Security using Apache Shiro -->
-        <!--<dependency>
+        <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-security-shiro</artifactId>
             <version>${portofino.version}</version>
-        </dependency>-->
+        </dependency>
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>

@@ -1,4 +1,4 @@
-<action id="root">
+<action>
     <permissions>
         <group level="VIEW" name="all"/>
     </permissions>

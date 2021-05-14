@@ -1,5 +1,3 @@
-<action id="root">
-    <permissions>
-        <group level="VIEW" name="all"/>
-    </permissions>
+<action>
+    <permissions />
 </action>
