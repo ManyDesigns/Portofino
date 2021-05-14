@@ -120,7 +120,7 @@ public class ResourceActionsModule implements Module {
         logger.info("Actions directory: " + actionsDirectory);
         //TODO ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
 
-        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false)) {
+        if(configuration.getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false)) {
             logger.info("Preloading actions");
             try {
                 ResourceResolver resourceResolver =
@@ -130,7 +130,7 @@ public class ResourceActionsModule implements Module {
                 logger.warn("Could not preload actions", e);
             }
         }
-        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false)) {
+        if(configuration.getBoolean(PortofinoProperties.PRELOAD_CLASSES, false)) {
             logger.info("Preloading Groovy classes");
             preloadClasses(codeBase.getRoot());
         }

@@ -4,11 +4,11 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.persistence.CriteriaDefinition;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.util.PkHelper;
-import groovy.lang.Tuple3;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -185,11 +185,11 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
     protected AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String userName = usernamePasswordToken.getUsername();
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> criteriaTuple =
+        CriteriaDefinition criteriaTuple =
                 QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.getV1();
-        CriteriaBuilder cb = criteriaTuple.getV2();
-        Root<?> from = criteriaTuple.getV3();
+        CriteriaQuery<Object> criteria = criteriaTuple.query;
+        CriteriaBuilder cb = criteriaTuple.builder;
+        Root<?> from = criteriaTuple.root;
         criteria.where(cb.equal(from.get(userNameProperty), userName));
 
         List<?> result = session.createQuery(criteria).list();
@@ -208,11 +208,11 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> criteriaTuple =
+        CriteriaDefinition criteriaTuple =
                 QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.getV1();
-        CriteriaBuilder cb = criteriaTuple.getV2();
-        Root<?> from = criteriaTuple.getV3();
+        CriteriaQuery<Object> criteria = criteriaTuple.query;
+        CriteriaBuilder cb = criteriaTuple.builder;
+        Root<?> from = criteriaTuple.root;
         criteria.where(cb.equal(from.get(userTokenProperty), token.getPrincipal()));
 
         List result = session.createQuery(criteria).list();
@@ -239,11 +239,11 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> criteriaTuple =
+        CriteriaDefinition criteriaTuple =
                 QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.getV1();
-        CriteriaBuilder cb = criteriaTuple.getV2();
-        Root<?> from = criteriaTuple.getV3();
+        CriteriaQuery<Object> criteria = criteriaTuple.query;
+        CriteriaBuilder cb = criteriaTuple.builder;
+        Root<?> from = criteriaTuple.root;
         criteria.where(cb.equal(from.get(userTokenProperty), token.getPrincipal()));
 
         List result = session.createQuery(criteria).list();
@@ -327,11 +327,11 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
             throw new UnsupportedOperationException("Email property not configured.");
         }
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> criteriaTuple =
+        CriteriaDefinition criteriaTuple =
                 QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.getV1();
-        CriteriaBuilder cb = criteriaTuple.getV2();
-        Root<?> from = criteriaTuple.getV3();
+        CriteriaQuery<Object> criteria = criteriaTuple.query;
+        CriteriaBuilder cb = criteriaTuple.builder;
+        Root<?> from = criteriaTuple.root;
         criteria.where(cb.equal(from.get(userEmailProperty), email));
         return (Serializable) session.createQuery(criteria).uniqueResult();
     }
@@ -418,11 +418,11 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
         Set<String> groups = super.getGroups();
         if(groupsTable != null) {
             Session session = persistence.getSession(groupsTable.getDatabaseName());
-            Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> criteriaTuple =
-                    QueryUtils.createCriteria(session, groupsTable.getActualEntityName());
-            CriteriaQuery<Object> criteria = criteriaTuple.getV1();
-            CriteriaBuilder cb = criteriaTuple.getV2();
-            Root<?> from = criteriaTuple.getV3();
+            CriteriaDefinition criteriaTuple =
+                    QueryUtils.createCriteria(session, usersTable.getActualEntityName());
+            CriteriaQuery<Object> criteria = criteriaTuple.query;
+            CriteriaBuilder cb = criteriaTuple.builder;
+            Root<?> from = criteriaTuple.root;
 
             Path<Object> groupNameExpression = from.get(groupNameProperty);
             criteria.select(groupNameExpression).orderBy(cb.asc(groupNameExpression));

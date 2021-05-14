@@ -21,12 +21,6 @@
 			<groupId>com.manydesigns</groupId>
 			<artifactId>portofino-core</artifactId>
 			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.codehaus.groovy</groupId>
-					<artifactId>groovy</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- Groovy is optional -->
 		<dependency>

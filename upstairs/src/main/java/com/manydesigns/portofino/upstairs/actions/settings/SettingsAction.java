@@ -81,8 +81,8 @@ public class SettingsAction extends AbstractResourceAction {
         settings.appName = configuration.getString(PortofinoProperties.APP_NAME);
         settings.appVersion = configuration.getString(PortofinoProperties.APP_VERSION);
         settings.loginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
-        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false);
-        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false);
+        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false);
+        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.PRELOAD_CLASSES, false);
         Form form = new FormBuilder(Settings.class).build();
         form.readFromObject(settings);
         return form;
@@ -127,12 +127,12 @@ public class SettingsAction extends AbstractResourceAction {
                 configuration.setProperty(PortofinoProperties.APP_VERSION, settings.appVersion);
                 configuration.setProperty(PortofinoProperties.LOGIN_PATH, settings.loginPath);
                 if(!settings.preloadGroovyPages ||
-                   configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES) != null) {
-                    configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES, settings.preloadGroovyPages);
+                   configuration.getProperty(PortofinoProperties.PRELOAD_ACTIONS) != null) {
+                    configuration.setProperty(PortofinoProperties.PRELOAD_ACTIONS, settings.preloadGroovyPages);
                 }
                 if(!settings.preloadGroovyClasses ||
-                   configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES) != null) {
-                    configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES, settings.preloadGroovyClasses);
+                   configuration.getProperty(PortofinoProperties.PRELOAD_CLASSES) != null) {
+                    configuration.setProperty(PortofinoProperties.PRELOAD_CLASSES, settings.preloadGroovyClasses);
                 }
                 configurationFile.save();
                 logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());

@@ -30,7 +30,6 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import groovy.lang.Tuple3;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
@@ -808,7 +807,7 @@ public class QueryUtils {
         ClassAccessor toAccessor = persistence.getTableAccessor(databaseName, entityName);
 
         try {
-            Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> criteria = createCriteria(session, fromTable);
+            CriteriaDefinition criteria = createCriteria(session, fromTable);
             List<Predicate> where = new ArrayList<>();
             for (Reference reference : relationship.getReferences()) {
                 Column fromColumn = reference.getActualFromColumn();
@@ -816,9 +815,9 @@ public class QueryUtils {
                 PropertyAccessor toPropertyAccessor
                         = toAccessor.getProperty(toColumn.getActualPropertyName());
                 Object toValue = toPropertyAccessor.get(obj);
-                where.add(criteria.getSecond().equal(criteria.getThird().get(fromColumn.getActualPropertyName()), toValue));
+                where.add(criteria.builder.equal(criteria.root.get(fromColumn.getActualPropertyName()), toValue));
             }
-            return session.createQuery(criteria.getFirst().where(where.toArray(new Predicate[0]))).list();
+            return session.createQuery(criteria.query.where(where.toArray(new Predicate[0]))).list();
         } catch (Throwable e) {
             String msg = String.format(
                     "Cannot access relationship %s on entity %s.%s",
@@ -828,15 +827,15 @@ public class QueryUtils {
         return null;
     }
 
-    public static Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> createCriteria(Session session, Table table) {
+    public static CriteriaDefinition createCriteria(Session session, Table table) {
         return createCriteria(session, table.getActualEntityName());
     }
 
-    public static Tuple3<CriteriaQuery<Object>, CriteriaBuilder, Root> createCriteria(Session session, String entityName) {
+    public static CriteriaDefinition createCriteria(Session session, String entityName) {
         CriteriaBuilder cb = session.getCriteriaBuilder();
         CriteriaQuery<Object> criteria = cb.createQuery();
         Root from = criteria.from(getEntityType(session, entityName));
-        return new Tuple3<>(criteria.select(from), cb, from);
+        return new CriteriaDefinition(criteria.select(from), cb, from);
     }
 
     public static EntityType<?> getEntityType(Session session, Table table) {
