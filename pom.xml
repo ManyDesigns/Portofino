@@ -159,7 +159,8 @@
         <!-- upstairs -->
         <module>upstairs</module>
         <!-- Archetypes -->
-        <module>archetypes/service</module>
+        <module>archetypes/service-groovy</module>
+        <module>archetypes/service-java</module>
         <module>archetypes/war</module>
         <!-- Applications -->
         <module>demo-tt</module>

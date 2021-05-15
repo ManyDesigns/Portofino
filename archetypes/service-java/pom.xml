@@ -8,7 +8,7 @@
         <version>5.2.2-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>portofino-service-archetype</artifactId>
+    <artifactId>portofino-java-service-archetype</artifactId>
     <packaging>maven-archetype</packaging>
     <build>
         <extensions>

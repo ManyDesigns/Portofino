@@ -70,7 +70,7 @@ public class PortofinoBootApplication {
 		}
 		FileObject main = VFS.getManager().resolveFile("src").resolveFile("main");
 		if(main.isFolder()) {
-			FileObject appDir = main.resolveFile( "resources").resolveFile("portofino-application");
+			FileObject appDir = main.resolveFile( "resources").resolveFile("portofino");
 			if(appDir.isFolder()) {
 				return appDir.getName().getURI();
 			}
@@ -93,9 +93,12 @@ public class PortofinoBootApplication {
 	protected static void initAppDirectory(FileObject applicationDirectory) throws IOException {
 		if(!applicationDirectory.exists()) {
 			applicationDirectory.createFolder();
-			if(PortofinoBootApplication.class.getClassLoader().getResource("portofino-application") != null) {
-				FileObject bundledApplication = VFS.getManager().resolveFile("res:portofino-application");
+			if(PortofinoBootApplication.class.getClassLoader().getResource("portofino") != null) try {
+				FileObject bundledApplication = VFS.getManager().resolveFile("res:portofino");
 				applicationDirectory.copyFrom(bundledApplication, new AllFileSelector());
+			} catch (IOException e) {
+				applicationDirectory.deleteAll();
+				throw e;
 			}
 		}
 

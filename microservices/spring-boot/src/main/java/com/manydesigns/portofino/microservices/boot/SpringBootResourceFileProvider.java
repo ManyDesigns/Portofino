@@ -10,6 +10,8 @@ import org.apache.commons.vfs2.provider.res.ResourceFileProvider;
 import org.apache.commons.vfs2.provider.res.ResourceFileSystemConfigBuilder;
 
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SpringBootResourceFileProvider extends ResourceFileProvider {
 
@@ -44,12 +46,14 @@ public class SpringBootResourceFileProvider extends ResourceFileProvider {
             return uri;
         } else {
             StringBuilder prefix = new StringBuilder();
-            for(int i = bang + 1; i < uri.length(); i++) {
-                if(uri.charAt(i) == '!') {
+            Matcher matcher = Pattern.compile("[.]jar!").matcher(uri);
+            if(matcher.find()) {
+                while (matcher.find()) {
                     prefix.append("jar:");
                 }
             }
-            return prefix + uri;
+            matcher = Pattern.compile("([^.][^j][^a][^r])!").matcher(uri);
+            return prefix + matcher.replaceAll("$1");
         }
     }
 }
