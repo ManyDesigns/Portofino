@@ -62,7 +62,10 @@ class Security extends AbstractPortofinoRealm {
         String encryptedPassword = encryptPassword(plainTextPassword);
         Session session = persistence.getSession("tt");
 
-        def (criteria, cb, from) = QueryUtils.createCriteria(session, 'users')
+        def cdef = QueryUtils.createCriteria(session, 'users')
+        def criteria = cdef.query
+        def cb = cdef.builder
+        def from = cdef.root
         criteria.where(cb.equal(cb.lower(from.get("email")), login?.toLowerCase()))
 
         Serializable principal = (Serializable) session.createQuery(criteria).uniqueResult()
