@@ -76,7 +76,7 @@ public class Database implements ModelObject, Annotated {
     }
 
     //**************************************************************************
-    // DatamodelObject implementation
+    // ModelObject implementation
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {}
