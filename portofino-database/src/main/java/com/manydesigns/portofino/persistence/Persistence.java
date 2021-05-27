@@ -418,7 +418,7 @@ public class Persistence {
                         new HibernateDatabaseSetup(
                                 database, sessionFactoryAndCodeBase.sessionFactory,
                                 sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(), configuration,
-                                implementation);
+                                implementation, this);
                 String databaseName = database.getDatabaseName();
                 HibernateDatabaseSetup oldSetup = setups.get(databaseName);
                 setups.put(databaseName, setup);
@@ -443,7 +443,8 @@ public class Persistence {
                 throw new ClassCastException(implClass + " does not extend " + MultiTenancyImplementation.class);
             }
             try {
-                MultiTenancyImplementation implementation = implClass.getConstructor().newInstance();
+//                MultiTenancyImplementation implementation = implClass.getConstructor().newInstance();
+                MultiTenancyImplementation implementation = implClass.getConstructor(Persistence.class).newInstance(this);
                 MultiTenancyStrategy strategy = implementation.getStrategy();
                 if (strategy.requiresMultiTenantConnectionProvider()) {
                     return implementation;

@@ -22,6 +22,7 @@ package com.manydesigns.portofino.persistence.hibernate;
 
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
 import org.apache.commons.configuration2.Configuration;
 import org.hibernate.EntityMode;
@@ -51,19 +52,21 @@ public class HibernateDatabaseSetup {
     protected final Configuration configuration;
     protected final Map<String, String> jpaEntityNameToClassNameMap = new HashMap<>();
     protected final MultiTenancyImplementation multiTenancyImplementation;
+    protected final Persistence persistence;
 
         public static final Logger logger =
             LoggerFactory.getLogger(HibernateDatabaseSetup.class);
 
     public HibernateDatabaseSetup(
             Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode,
-            Configuration configuration, MultiTenancyImplementation multiTenancyImplementation) {
+            Configuration configuration, MultiTenancyImplementation multiTenancyImplementation, Persistence persistence) {
         this.database = database;
         this.sessionFactory = sessionFactory;
         this.codeBase = codeBase;
         this.entityMode = entityMode;
         this.configuration = configuration;
         this.multiTenancyImplementation = multiTenancyImplementation;
+        this.persistence = persistence;
         threadSessions = new ThreadLocal<>();
         database.getAllTables().forEach(t -> {
             jpaEntityNameToClassNameMap.put(t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode));
