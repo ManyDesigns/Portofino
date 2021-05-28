@@ -57,6 +57,7 @@ import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 
 import javax.xml.bind.JAXBContext;
@@ -452,7 +453,13 @@ public class Persistence {
                 throw new ClassCastException(implClass + " does not extend " + MultiTenancyImplementation.class);
             }
             try {
-                MultiTenancyImplementation implementation = context.getBean(implClass);
+                MultiTenancyImplementation implementation;
+                try {
+                    implementation = context.getBean(implClass);
+                } catch (BeansException e) {
+                    logger.error("MultiTenancyImplementation is not a valid spring bean, trying default constructor");
+                    implementation = implClass.getConstructor().newInstance();
+                }
                 MultiTenancyStrategy strategy = implementation.getStrategy();
                 if (strategy.requiresMultiTenantConnectionProvider()) {
                     return implementation;
