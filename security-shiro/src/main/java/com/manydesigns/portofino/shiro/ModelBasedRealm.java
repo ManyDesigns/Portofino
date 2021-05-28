@@ -316,8 +316,7 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
 
     public Serializable getUserById(String encodedId) {
         TableAccessor accessor = persistence.getTableAccessor(usersTable);
-        PkHelper pkHelper = new PkHelper(accessor);
-        Serializable id = pkHelper.getPrimaryKey(encodedId);
+        Serializable id = (Serializable) accessor.getIdStrategy().getPrimaryKey(encodedId);
         Session session = persistence.getSession(usersTable.getActualEntityName());
         return (Serializable) QueryUtils.getObjectByPk(session, accessor, id);
     }

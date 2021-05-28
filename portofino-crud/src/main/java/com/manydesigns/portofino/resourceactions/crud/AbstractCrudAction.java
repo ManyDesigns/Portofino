@@ -46,6 +46,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.annotations.Guard;
+import com.manydesigns.portofino.persistence.IdStrategy;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
@@ -69,6 +70,7 @@ import ognl.OgnlContext;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -194,7 +196,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     //--------------------------------------------------------------------------
 
     public ClassAccessor classAccessor;
-    public PkHelper pkHelper;
+    public IdStrategy idStrategy;
 
     public T object;
     public List<T> objects;
@@ -234,7 +236,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * The only constraint is that it is serializable.
      * @return the loaded object, or null if it couldn't be found or it didn't satisfy the search criteria.
      */
-    protected abstract T loadObjectByPrimaryKey(Serializable pkObject);
+    protected abstract T loadObjectByPrimaryKey(Object pkObject);
 
     /**
      * Saves a new object to the persistent storage. The actual implementation is left to subclasses.
@@ -258,11 +260,11 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected abstract void doDelete(T object);
 
     /**
-     * {@link #loadObjectByPrimaryKey(java.io.Serializable)}
+     * {@link #loadObjectByPrimaryKey(java.lang.Object)}
      * @param identifier the object identifier in String form
      */
     protected void loadObject(String... identifier) {
-        Serializable pkObject = pkHelper.getPrimaryKey(identifier);
+        Object pkObject = idStrategy.getPrimaryKey(identifier);
         object = loadObjectByPrimaryKey(pkObject);
     }
 
@@ -577,9 +579,11 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             return;
         }
         classAccessor = filterAccordingToPermissions(new CrudAccessor(crudConfiguration, innerAccessor));
-        pkHelper = new PkHelper(classAccessor);
+        idStrategy = getIdStrategy(classAccessor, innerAccessor);
         maxParameters = classAccessor.getKeyProperties().length;
     }
+
+    protected abstract IdStrategy getIdStrategy(ClassAccessor classAccessor, ClassAccessor innerAccessor);
 
     @Override
     public String getParameterName(int index) {
@@ -592,7 +596,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @Override
     public void parametersAcquired() {
         super.parametersAcquired();
-        if(pkHelper == null) {
+        if(idStrategy == null) {
             return;
         }
 
@@ -608,9 +612,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             }
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
 
-            Serializable pkObject;
+            Object pkObject;
             try {
-                pkObject = pkHelper.getPrimaryKey(pk);
+                pkObject = idStrategy.getPrimaryKey(pk);
             } catch (Exception e) {
                 logger.warn("Invalid primary key", e);
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -694,7 +698,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected String generateObjectUrl(String baseUrl, Object o) {
-        String[] objPk = pkHelper.generatePkStringArray(o);
+        String[] objPk = idStrategy.generatePkStringArray(o);
         String url = baseUrl + "/" + getPkForUrl(objPk);
         return appendSearchStringParamIfNecessary(url);
     }
@@ -889,7 +893,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
-        tableForm.setKeyGenerator(pkHelper.createPkGenerator());
+        tableForm.setKeyGenerator(idStrategy.createPkGenerator());
         tableForm.setCondensed(true);
 
         return tableForm;
@@ -1389,7 +1393,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected String getPkForUrl(String[] pk) {
         String encoding = getUrlEncoding();
         try {
-            return pkHelper.getPkStringForUrl(pk, encoding);
+            return idStrategy.getPkStringForUrl(pk, encoding);
         } catch (UnsupportedEncodingException e) {
             throw new Error(e);
         }
@@ -1406,7 +1410,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(!actionPath.endsWith("/")) {
             sb.append("/");
         }
-        sb.append(pkHelper.getFormatString());
+        sb.append(idStrategy.getFormatString());
         appendSearchStringParamIfNecessary(sb);
         return sb.toString();
     }
@@ -1882,7 +1886,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         Response.ResponseBuilder response = Response.ok();
         if(returnIds) {
             if(deleted == 1) {
-                response.entity(Collections.singletonList(pkHelper.getPkString(object)));
+                response.entity(Collections.singletonList(idStrategy.getPkString(object)));
             } else {
                 response.status(Response.Status.CONFLICT).entity(getDeleteDeniedMessage());
             }
@@ -1929,12 +1933,12 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         }
     }
 
-    protected List<String> bulkDelete(List<String> ids) throws Exception {
+    protected List<String> bulkDelete(List<String> ids) {
         List<T> objects = new ArrayList<>(ids.size());
         List<String> deleted = new ArrayList<>();
         for (String current : ids) {
             String[] pkArr = current.split("/");
-            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
+            Object pkObject = idStrategy.getPrimaryKey(pkArr);
             T obj = loadObjectByPrimaryKey(pkObject);
             if(obj != null && deleteValidate(obj)) {
                 doDelete(obj);
@@ -1986,12 +1990,12 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         this.classAccessor = classAccessor;
     }
 
-    public PkHelper getPkHelper() {
-        return pkHelper;
+    public IdStrategy getIdStrategy() {
+        return idStrategy;
     }
 
-    public void setPkHelper(PkHelper pkHelper) {
-        this.pkHelper = pkHelper;
+    public void setIdStrategy(IdStrategy idStrategy) {
+        this.idStrategy = idStrategy;
     }
 
     public List<CrudSelectionProvider> getCrudSelectionProviders() {
