@@ -57,8 +57,7 @@ export class PageCrudService {
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
     const parameters: any = {
       actionPath: Page.removeDoubleSlashesFromUrl(`${parentPage.computeSourceUrl()}/${page.source}`),
-      childrenProperty: parentPage.childrenProperty,
-      loginPath: this.portofino.loginPath
+      childrenProperty: parentPage.childrenProperty
     };
     const actionClass = PageFactoryComponent.components[page.type].defaultActionClass;
     if(actionClass) {
@@ -77,8 +76,7 @@ export class PageCrudService {
     const path = page.getConfigurationLocation();
     const goUpOnePage = () => this.router.navigateByUrl(parentPage.url);
     const params: any = {
-      childrenProperty: parentPage.childrenProperty,
-      loginPath: this.portofino.loginPath
+      childrenProperty: parentPage.childrenProperty
     };
     if(page.hasSource()) {
       params.actionPath = page.computeSourceUrl();
@@ -101,7 +99,6 @@ export class PageCrudService {
     return this.pageFactory.loadPath(sanitizedDestination).pipe(mergeMap(newParent => {
       let params: any = {
         detail: !!moveInstruction.detail + "",
-        loginPath: this.portofino.loginPath,
         segment: page.segment
       };
 

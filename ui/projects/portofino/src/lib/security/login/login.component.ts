@@ -7,6 +7,9 @@ import {TranslateService} from "@ngx-translate/core";
 import {SignupComponent} from "./signup.component";
 import {ForgottenPasswordComponent} from "./forgotten-password.component";
 import {ResetPasswordComponent} from "./reset-password.component";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {NO_AUTH_HEADER} from "../authentication.headers";
+import {InAppAuthenticationStrategy} from "./in-app-authentication-strategy";
 
 @Component({
   selector: 'portofino-login',
@@ -20,10 +23,10 @@ export class LoginComponent implements OnInit {
   resetPasswordComponent = ResetPasswordComponent;
   signupComponent = SignupComponent;
 
-  constructor(protected dialog: MatDialog, protected dialogRef: MatDialogRef<LoginComponent>,
-              protected authenticationService: AuthenticationService,
+  constructor(public authenticationService: AuthenticationService,
+              protected dialog: MatDialog, protected dialogRef: MatDialogRef<LoginComponent>,
               protected formBuilder: FormBuilder, protected notificationService: NotificationService,
-              protected translate: TranslateService) {
+              protected translate: TranslateService, protected http: HttpClient) {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
@@ -33,7 +36,16 @@ export class LoginComponent implements OnInit {
   ngOnInit() {}
 
   login() {
-    this.authenticationService.login(this.loginForm.get('username').value, this.loginForm.get('password').value).subscribe(
+    const username = this.loginForm.get('username').value;
+    const password = this.loginForm.get('password').value;
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .set(NO_AUTH_HEADER, 'true');
+    this.http.post(
+      (this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath,
+      new HttpParams({fromObject: {"username": username, "password": password}}),
+      {headers: headers}
+    ).subscribe(
       result => {
         this.dialogRef.close(result);
         this.loginForm.get('password').setValue("");

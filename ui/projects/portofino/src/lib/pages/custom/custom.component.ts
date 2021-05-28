@@ -70,17 +70,20 @@ export class CustomPageComponent extends Page implements OnDestroy {
   }
 
   initialize() {
-    super.initialize();
     const config = this.configuration;
     if(config && config.html) {
       this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.html}`), {
         responseType: "text"
       }).subscribe(html => {
         this.html = this.domSanitizer.bypassSecurityTrustHtml(html);
-        setTimeout(() => this.htmlLoadStatus.next(HtmlLoadStatus.LOADED), 0);
-      }, e => {
+        setTimeout(() => {
+          this.htmlLoadStatus.next(HtmlLoadStatus.LOADED);
+          super.initialize();
+        }, 0);
+      }, () => {
         this.notificationService.error(this.translate.get("Could not load page HTML"));
         this.htmlLoadStatus.next(HtmlLoadStatus.ERRORED);
+        super.initialize();
       });
     }
   }

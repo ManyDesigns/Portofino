@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.2.2-SNAPSHOT</version>
     </parent>
     <artifactId>portofino-angular-ui</artifactId>
     <packaging>pom</packaging>
@@ -19,12 +19,13 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>${project.basedir}/dist</directory>
+                            <directory>dist</directory>
                             <includes>
                                 <include>**</include>
                             </includes>
@@ -37,9 +38,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>no-frontend-build</id>
-        </profile>
         <profile>
             <id>build-frontend</id>
             <activation>
@@ -63,7 +61,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v12.3.1</nodeVersion>
-                                    <npmVersion>6.11.3</npmVersion>
+                                    <npmVersion>6.14.8</npmVersion>
                                 </configuration>
                             </execution>
 

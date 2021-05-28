@@ -54,13 +54,13 @@ export class WizardComponent extends Page implements OnInit {
     } else {
       const url = `${this.portofino.apiRoot}portofino-upstairs/database/connections`;
       const conn = new ConnectionProviderDetails();
-      conn.databaseName = {value: this.wizard.databaseName};
-      conn.jndiResource = {value: this.wizard.jndiResource};
-      conn.driver = {value: this.wizard.driver.standardDriverClassName};
-      conn.url = {value: this.wizard.connectionUrl};
-      conn.username = {value: this.wizard.username};
-      conn.password = {value: this.wizard.password};
-      conn.entityMode = {value: this.wizard.entityMode};
+      conn.databaseName = this.wizard.databaseName;
+      conn.jndiResource = this.wizard.jndiResource;
+      conn.driver = this.wizard.driver.standardDriverClassName;
+      conn.url = this.wizard.connectionUrl;
+      conn.username = this.wizard.username;
+      conn.password = this.wizard.password;
+      conn.entityMode = this.wizard.entityMode;
       this.http.post<ConnectionProviderDetails>(url, conn).subscribe(c => {
         this.notificationService.info(this.translate.instant("Database created."));
         const summary = new ConnectionProviderSummary();
@@ -139,8 +139,7 @@ export class WizardComponent extends Page implements OnInit {
       page.title = a.title;
       return this.http.post(`${this.portofino.localApiPath}/${confPath}`, page, {
         params: {
-          childrenProperty: a.detail ? "detailChildren" : "children",
-          loginPath: this.portofino.loginPath
+          childrenProperty: a.detail ? "detailChildren" : "children"
         }
       });
     }, 1)); //Note concurrent: 1. It is necessary for calls to be executed sequentially.

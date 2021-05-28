@@ -15,6 +15,7 @@ import {ClassAccessor} from "../class-accessor";
 import {BehaviorSubject, merge, Observable, Subscription} from "rxjs";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {map} from "rxjs/operators";
+import {CdkDragDrop, moveItemInArray} from "@angular/cdk/drag-drop";
 
 @Component({
   templateUrl: '../../../assets/administration/tables.component.html'
@@ -126,6 +127,10 @@ export class TablesComponent extends Page implements OnInit {
   @Button({ list: "column", text: "Cancel" })
   cancelColumn() {
     this.column = null;
+  }
+
+  moveColumn(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.tableInfo.table.columns, event.previousIndex, event.currentIndex);
   }
 
   changeType(column, newType) {

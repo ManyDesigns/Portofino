@@ -12,6 +12,9 @@ import {Component} from "@angular/core";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {samePasswordChecker} from "../../form";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {NO_AUTH_HEADER} from "../authentication.headers";
+import {InAppAuthenticationStrategy} from "./in-app-authentication-strategy";
 
 @Component({
   selector: 'portofino-change-password',
@@ -66,7 +69,7 @@ export class ChangePasswordComponent {
 
   constructor(protected dialogRef: MatDialogRef<ChangePasswordComponent>, protected authenticationService: AuthenticationService,
               protected formBuilder: FormBuilder, protected notificationService: NotificationService,
-              protected translate: TranslateService) {
+              protected translate: TranslateService, protected http: HttpClient) {
     this.form = this.formBuilder.group({
       oldPassword: ['', Validators.required],
       newPassword: ['', Validators.required],
@@ -75,11 +78,22 @@ export class ChangePasswordComponent {
   }
 
   change() {
-    this.authenticationService.changePassword(this.form.get('oldPassword').value, this.form.get('newPassword').value).subscribe(
+    this.changePassword(this.form.get('oldPassword').value, this.form.get('newPassword').value).subscribe(
       result => {
         this.dialogRef.close(result);
         this.notificationService.info(this.translate.get("Password successfully changed."));
       });
+  }
+
+  changePassword(oldPassword, newPassword) {
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .set(NO_AUTH_HEADER, 'true');
+    return this.http.put(
+      `${(this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath}/password`,
+      new HttpParams({fromObject: {"oldPassword": oldPassword, "newPassword": newPassword}}),
+      {headers: headers}
+    );
   }
 
 }

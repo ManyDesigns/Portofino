@@ -12,10 +12,9 @@ import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.core.jackson.TypeNameResolver;
 import io.swagger.v3.core.util.Json;
-import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.api.OpenApiReader;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.apache.commons.vfs2.FileObject;
 import org.springframework.web.context.WebApplicationContext;
@@ -81,7 +80,7 @@ public class PortofinoApplicationRoot extends ApplicationRoot {
     }
 
     @Override
-    public void beforeScan(Reader reader, OpenAPI openAPI) {
+    public void beforeScan(OpenApiReader reader, OpenAPI openAPI) {
         super.beforeScan(reader, openAPI);
         ModelConverters.getInstance().addConverter(new PortofinoModelResolver(Json.mapper()));
     }

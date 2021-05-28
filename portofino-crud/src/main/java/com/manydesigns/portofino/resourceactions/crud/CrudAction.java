@@ -51,6 +51,7 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
@@ -60,10 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -79,13 +77,9 @@ import java.util.stream.Collectors;
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(CrudConfiguration.class)
 @ResourceActionName("Crud")
-public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
+public class CrudAction<T> extends AbstractCrudAction<T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    public static final String[][] CRUD_CONFIGURATION_FIELDS =
-                {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-                  "largeResultSet", "rowsPerPage", "columns"}};
 
     public Table baseTable;
 
@@ -141,7 +135,7 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
             logger.debug("Query string {} contains select", queryString);
-            List items = plainSelect.getSelectItems();
+            List<SelectItem> items = plainSelect.getSelectItems();
             if(items.size() != 1) {
                 logger.error("I don't know how to generate a count query for {}", queryString);
                 return null;
@@ -149,7 +143,7 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             SelectExpressionItem item = (SelectExpressionItem) items.get(0);
             Function function = new Function();
             function.setName("count");
-            function.setParameters(new ExpressionList(Arrays.asList(item.getExpression())));
+            function.setParameters(new ExpressionList(Collections.singletonList(item.getExpression())));
             item.setExpression(function);
             plainSelect.setOrderByElements(null);
             return plainSelect.toString();
@@ -309,8 +303,9 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             }
             if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
                 try {
-                    PropertyAccessor orderByProperty = classAccessor.getProperty(sortProperty);
-                    criteria.orderBy(orderByProperty, sortDirection);
+                    PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
+                    if(orderByProperty != null)
+                        criteria.orderBy(orderByProperty, sortDirection);
                 } catch (NoSuchFieldException e) {
                     logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
                 }
@@ -322,6 +317,13 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             RequestMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
         }
         return objects;
+    }
+
+    /**
+     * @return an PropertyAccessor object
+     */
+    protected PropertyAccessor getOrderByProperty(String sortProperty) throws NoSuchFieldException {
+        return this.classAccessor.getProperty(sortProperty);
     }
 
     /**

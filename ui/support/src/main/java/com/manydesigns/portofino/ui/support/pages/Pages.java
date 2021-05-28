@@ -37,10 +37,10 @@ public class Pages extends Resource {
     @Path("{path:.+}")
     public Response createPageAndAction(
         @HeaderParam(AUTHORIZATION_HEADER) String auth,
-        @PathParam("path") String path, @QueryParam("loginPath") String loginPath,
+        @PathParam("path") String path,
         @QueryParam("actionClass") String actionClass, @QueryParam("actionPath") String actionPath,
         @QueryParam("childrenProperty") String childrenProperty, String pageConfigurationString) {
-        checkPathAndAuth(path, auth, loginPath);
+        checkPathAndAuth(path, auth);
         actionPath = getActionPath(actionPath);
         if(actionPath != null && actionClass != null) {
             Invocation.Builder request = path(actionPath).request().header(AUTHORIZATION_HEADER, auth);
@@ -94,9 +94,8 @@ public class Pages extends Resource {
     @Path("{path:.+}")
     public Response updatePageAndConfiguration(
         @HeaderParam(AUTHORIZATION_HEADER) String auth,
-        @PathParam("path") String path, @QueryParam("actionConfigurationPath") String actionConfigurationPath,
-        @QueryParam("loginPath") String loginPath) { //TODO should the login path be asked once and then cached?
-        checkPathAndAuth(path, auth, loginPath);
+        @PathParam("path") String path, @QueryParam("actionConfigurationPath") String actionConfigurationPath) {
+        checkPathAndAuth(path, auth);
         MultipartWrapper multipart = ElementsThreadLocals.getMultipart();
         String[] actionConfigurationParameter = multipart.getParameterValues("actionConfiguration");
         String pageConfiguration = multipart.getParameterValues("pageConfiguration")[0];
@@ -117,9 +116,9 @@ public class Pages extends Resource {
     @Path("{path:.+}")
     public Response deletePageAndAction(
         @PathParam("path") String path, @HeaderParam(AUTHORIZATION_HEADER) String auth,
-        @QueryParam("loginPath") String loginPath, @QueryParam("actionPath") String actionPath,
+        @QueryParam("actionPath") String actionPath,
         @QueryParam("childrenProperty") String childrenProperty) throws IOException {
-        checkPathAndAuth(path, auth, loginPath);
+        checkPathAndAuth(path, auth);
         actionPath = getActionPath(actionPath);
         Response response;
         if(actionPath != null) {
@@ -169,13 +168,13 @@ public class Pages extends Resource {
     @Consumes(PORTOFINO_PAGE_MOVE_TYPE)
     public Response movePageAndAction(
         @HeaderParam(AUTHORIZATION_HEADER) String auth,
-        @PathParam("destinationPath") String destinationPath, @QueryParam("loginPath") String loginPath,
+        @PathParam("destinationPath") String destinationPath,
         @QueryParam("segment") String segment,
         @QueryParam("sourceActionPath") String sourceActionPath,
         @QueryParam("destinationActionParent") String destinationActionParent,
         @QueryParam("detail") boolean detail,
         String sourcePath) throws IOException {
-        checkPathAndAuth(destinationPath, auth, loginPath);
+        checkPathAndAuth(destinationPath, auth);
         checkPath(sourcePath);
         String baseUri = ApiInfo.getApiRootUri(servletContext, uriInfo);
         File destParentConfigFile = new File(servletContext.getRealPath("pages/" + destinationPath));
@@ -298,9 +297,9 @@ public class Pages extends Resource {
         return actionPath;
     }
 
-    public void checkPathAndAuth(String path, String auth, String loginPath) {
+    public void checkPathAndAuth(String path, String auth) {
         checkPath(path);
-        if (!checkAdmin(loginPath, auth)) {
+        if (!checkAdmin(auth)) {
             //Must be explicitly checked because the action configuration path comes as a parameter and could be anything
             throw new WebApplicationException(
                 Response.status(auth != null ? Response.Status.UNAUTHORIZED : Response.Status.FORBIDDEN).build());
@@ -346,8 +345,8 @@ public class Pages extends Resource {
         }
     }
 
-    protected boolean checkAdmin(String loginPath, String authorization) {
-        Invocation.Builder req = path(loginPath).request();
+    protected boolean checkAdmin(String authorization) {
+        Invocation.Builder req = path(":auth").request();
         req = req.header(AUTHORIZATION_HEADER, authorization);
         Response response = req.get();
         if (response.getStatus() == 200) {

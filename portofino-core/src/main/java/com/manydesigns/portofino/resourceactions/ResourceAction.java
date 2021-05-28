@@ -21,6 +21,9 @@
 package com.manydesigns.portofino.resourceactions;
 
 import com.manydesigns.portofino.dispatcher.security.SecureResource;
+import com.manydesigns.portofino.security.SecurityFacade;
+
+import java.util.List;
 
 /**
  * An element in Portofino's hierarchical resource structure.
@@ -34,6 +37,8 @@ public interface ResourceAction extends SecureResource {
     String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     ActionContext getContext();
+
+    SecurityFacade getSecurity();
 
     void setContext(ActionContext context);
 
@@ -52,6 +57,7 @@ public interface ResourceAction extends SecureResource {
 
     /**
      * Sets the ActionInstance of this element. Invoked automatically by the framework.
+     * @param actionInstance the new {@link ActionInstance}.
      */
     void setActionInstance(ActionInstance actionInstance);
 
@@ -69,4 +75,9 @@ public interface ResourceAction extends SecureResource {
      * @return true if the action is accessible. Note that a client will either receive true or a 401/403 status.
      */
     boolean isAccessible();
+
+    /**
+     * Returns the list of accessible children (according to {@link #isAccessible()}).
+     */
+    List<String> getAccessibleChildren();
 }

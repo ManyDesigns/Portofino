@@ -1,4 +1,6 @@
 import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.quartz.JobRegistration
+import com.manydesigns.portofino.quartz.SchedulerService
 import com.manydesigns.portofino.tt.Dependency
 import com.manydesigns.portofino.tt.NotificationsJob
 import com.manydesigns.portofino.tt.Refresh
@@ -20,19 +22,23 @@ import javax.annotation.PreDestroy
 @Configuration
 class SpringConfiguration {
 
-    Scheduler scheduler
-    JobKey notificationJobKey
     Disposable subscription
 
     @Autowired
     Persistence persistence
 
+    @Autowired
+    SchedulerService schedulerService
+
     private static final Logger logger = LoggerFactory.getLogger(SpringConfiguration)
 
     @PostConstruct
-    void scheduleJobs() {
-        scheduler = StdSchedulerFactory.getDefaultScheduler()
-        notificationJobKey = scheduleJob(NotificationsJob, "NotificationsJob", 10, "tt")
+    void init() {
+        int pollSecInterval = 10
+        def schedule = TriggerBuilder.newTrigger()
+                .startAt(DateBuilder.futureDate(pollSecInterval, DateBuilder.IntervalUnit.SECOND))
+                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(pollSecInterval))
+        schedulerService.register(new JobRegistration(NotificationsJob, schedule, "tt"))
 
         subscription = persistence.status.subscribe({ status ->
             logger.info("Persistence status: ${status}")
@@ -40,32 +46,8 @@ class SpringConfiguration {
     }
 
     @PreDestroy
-    void unscheduleJobs() {
-        if(!scheduler.isShutdown()) {
-            scheduler.deleteJob(notificationJobKey)
-        }
+    void destroy() {
         subscription.dispose()
-    }
-
-    JobKey scheduleJob(Class jobClass, String jobName, int pollSecInterval, String jobGroup) {
-        try {
-            JobDetail job = JobBuilder
-                    .newJob(jobClass)
-                    .withIdentity(jobName + ".job", jobGroup)
-                    .build();
-
-            Trigger trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(jobName + ".trigger", jobGroup)
-                    .startAt(DateBuilder.futureDate(pollSecInterval, DateBuilder.IntervalUnit.SECOND))
-                    .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(pollSecInterval))
-                    .build();
-
-            scheduler.scheduleJob(job, trigger);
-            return job.getKey();
-        } catch (Exception e) {
-            logger.error("Could not schedule " + jobName + " job", e);
-            return null
-        }
     }
 
     @Bean

@@ -52,6 +52,7 @@ import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
+import com.manydesigns.portofino.rest.PortofinoFilter;
 import com.manydesigns.portofino.rest.Utilities;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -59,11 +60,12 @@ import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import com.vdurmont.semver4j.Semver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import ognl.OgnlContext;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -78,12 +80,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -135,7 +134,7 @@ import java.util.regex.Pattern;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
-public abstract class AbstractCrudAction<T extends Serializable> extends AbstractResourceAction {
+public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public static final String COPYRIGHT =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -159,6 +158,8 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractCrudAction.class);
     public static final String PORTOFINO_PRETTY_NAME_HEADER = "X-Portofino-Pretty-Name";
+    public static final Semver PORTOFINO_API_VERSION_5_2 = new Semver("5.2", Semver.SemverType.LOOSE);
+    public static final String PK_SEPARATOR = "/";
 
     //--------------------------------------------------------------------------
     // Web parameters
@@ -446,7 +447,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected void deleteOldBlobs(List<Blob> blobsBefore, List<Blob> blobsAfter) {
-        List<Blob> toDelete = new ArrayList<Blob>(blobsBefore);
+        List<Blob> toDelete = new ArrayList<>(blobsBefore);
         toDelete.removeAll(blobsAfter);
         for(Blob blob : toDelete) {
             try {
@@ -597,7 +598,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
 
         if(!parameters.isEmpty()) {
             String encoding = getUrlEncoding();
-            pk = parameters.toArray(new String[parameters.size()]);
+            pk = parameters.toArray(new String[0]);
             try {
                 for(int i = 0; i < pk.length; i++) {
                     pk[i] = URLDecoder.decode(pk[i], encoding);
@@ -842,7 +843,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
                 sortDirection = "asc";
             }
 
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put("sortProperty", propName);
             parameters.put("sortDirection", sortDirection);
             parameters.put(SEARCH_STRING_PARAM, searchString);
@@ -872,7 +873,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
 
     public String getLinkToPage(int page) {
         int rowsPerPage = getCrudConfiguration().getRowsPerPage();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("sortProperty", getSortProperty());
         parameters.put("sortDirection", getSortDirection());
         parameters.put("firstResult", page * rowsPerPage);
@@ -1171,7 +1172,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<Blob> getBlobsFromObject(T object) {
-        List<Blob> blobs = new ArrayList<Blob>();
+        List<Blob> blobs = new ArrayList<>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             if(property.getAnnotation(FileBlob.class) != null) {
                 String code = (String) property.get(object);
@@ -1184,7 +1185,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<Blob> getBlobsFromForm() {
-        List<Blob> blobs = new ArrayList<Blob>();
+        List<Blob> blobs = new ArrayList<>();
         for(FileBlobField blobField : getBlobFields()) {
             if(blobField.getValue() != null) {
                 blobs.add(blobField.getValue());
@@ -1194,7 +1195,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<FileBlobField> getBlobFields() {
-        List<FileBlobField> blobFields = new ArrayList<FileBlobField>();
+        List<FileBlobField> blobFields = new ArrayList<>();
         for(FieldSet fieldSet : form) {
             for(FormElement field : fieldSet) {
                 if(field instanceof FileBlobField) {
@@ -1353,7 +1354,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     @SuppressWarnings("unchecked")
     @Operation(summary = "The list of selection providers supported by this resource")
     public List selectionProviders() {
-        List result = new ArrayList();
+        List<Map<?, ?>> result = new ArrayList<>();
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1633,22 +1634,49 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
      * @param jsonObject the object (in serialized JSON form)
      * @param ids the list of object id's (keys) to save if this is a bulk operation.
      * @since 4.2
-     * @return the updated object as JSON (in a JAX-RS Response).
+     * @return in case of single update, the updated object as JSON (in a JAX-RS Response). For bulk updates, it depends
+     * on the API version:
+     * <ul>
+     *     <li>5.2+ returns the list of updated ids</li>
+     *     <li>legacy versions return the list of ids that have NOT been updated.</li>
+     * </ul>
+     * In any case, if the input JSON does not pass validation, an error response with the invalid form is returned.
      */
     @PUT
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     @Guard(test = "isEditEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
-    @Operation(summary = "Update one or more objects (without blob data)")
+    @Operation(summary = "Update one or more objects in JSON form. This doesn't handle blobs. If you need to update blobs, use the single object, multipart/form-data version.", responses = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description =
+                            "For a single object update, the updated object. For bulk updates, the list of the " +
+                            "ids of the object that have NOT been updated"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            "When the request is incorrect, i.e. it supplies neither a /objectKey path parameter " +
+                            "nor a list of id query parameters, or it supplies both at the same time"),
+            @ApiResponse(
+                    responseCode = "500",
+                    description =
+                            "When the JSON body does not pass validation against the CRUD's configuration " +
+                            "and possibly user-defined validation methods.")})
     public Response httpPutJson(
             @Parameter(description = "The (optional) list of object ids to update in bulk")
             @QueryParam("id")
             List<String> ids,
             @RequestBody(description = "The object in JSON form, as returned by GET")
-            String jsonObject) {
+            String jsonObject,
+            @HeaderParam(PortofinoFilter.PORTOFINO_API_VERSION_HEADER)
+            String apiVersion) {
         if(object == null) {
-            return bulkUpdate(jsonObject, ids);
+            boolean returnUpdated = true;
+            if(apiVersion != null) {
+                returnUpdated = new Semver(apiVersion, Semver.SemverType.LOOSE).isGreaterThanOrEqualTo(PORTOFINO_API_VERSION_5_2);
+            }
+            return bulkUpdate(jsonObject, ids, returnUpdated);
         }
         if(ids != null && !ids.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
@@ -1682,30 +1710,36 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         }
     }
 
+    @Deprecated
+    protected Response bulkUpdate(String jsonObject, List<String> ids) {
+        return bulkUpdate(jsonObject, ids, false);
+    }
+
     /**
      * Handles the update of multiple objects via REST.
      * Note: this doesn't support blobs, see {@link #httpPutMultipart()} and
      * {@link #uploadBlob(String, String, InputStream)}.
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @param jsonObject the object (in serialized JSON form)
+     * @param returnUpdated (5.2+) whether to return the ids of the objects that have been updated (Portofino 5.2+)
+     *                      or the ids of the objects that have NOT been updated (legacy versions).
      * @since 5.0
-     * @return the updated object as JSON (in a JAX-RS Response).
+     * @return the IDs of the objects that have NOT been updated (in a JAX-RS Response).
      */
-    protected Response bulkUpdate(String jsonObject, List<String> ids) {
-        List<String> idsNotUpdated = new ArrayList<>();
+    protected Response bulkUpdate(String jsonObject, List<String> ids, boolean returnUpdated) {
+        List<String> updated = new ArrayList<>();
         setupForm(Mode.BULK_EDIT);
         disableBlobFields();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
             for (String id : ids) {
-                loadObject(id.split("/"));
+                loadObject(id.split(PK_SEPARATOR));
                 editSetup(object);
                 writeFormToObject();
                 if(editValidate(object)) {
                     doUpdate(object);
                     editPostProcess(object);
-                } else {
-                    idsNotUpdated.add(id);
+                    updated.add(id);
                 }
             }
             try {
@@ -1715,7 +1749,15 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
                 logger.warn(rootCauseMessage, e);
                 return Response.serverError().entity(e).build();
             }
-            return Response.ok(idsNotUpdated).build();
+            if(returnUpdated) {
+                return Response.ok(updated).build();
+            } else {
+                List<String> idsNotUpdated = new ArrayList<>(ids);
+                idsNotUpdated.removeAll(updated);
+                return Response.ok(idsNotUpdated)
+                        .header(PortofinoFilter.PORTOFINO_API_VERSION_HEADER, "5.1")
+                        .build();
+            }
         } else {
             return Response.serverError().entity(form).build();
         }
@@ -1776,32 +1818,97 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         }
     }
 
+    @Deprecated
+    public Response httpDelete(List<String> ids) throws Exception {
+        return httpDelete(ids, null);
+    }
+
     /**
      * Handles object deletion via REST.
      * @param ids the list of object id's (keys) to delete if this is a bulk deletion.
+     * @param apiVersion the version of the REST API
      * See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2
      */
     @DELETE
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     @Guard(test = "isDeleteEnabled() && (getObject() != null || isBulkOperationsEnabled())", type = GuardType.VISIBLE)
-    @Operation(summary = "Delete one or more objects")
-    public int httpDelete(
+    @Operation(summary = "Delete one or more objects", responses = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description =
+                            "The ids of the objects that have been deleted (Portofino 5.2+) " +
+                            "or the number of deleted objects (legacy versions)."),
+            @ApiResponse(
+                    responseCode = "400",
+                    description =
+                            "When the request is incorrect, i.e. it supplies neither a /objectKey path parameter " +
+                            "nor a list of id query parameters, or it supplies both at the same time"),
+            @ApiResponse(
+                    responseCode = "409",
+                    description =
+                            "When the application does not allow deleting this specific resource because the " +
+                            "deleteValidate method returns false (since Portofino 5.2)"),
+    })
+    public Response httpDelete(
             @Parameter(description = "The (optional) list of object ids to delete in bulk")
             @QueryParam("id")
-            List<String> ids) throws Exception {
+            List<String> ids,
+            @HeaderParam(PortofinoFilter.PORTOFINO_API_VERSION_HEADER)
+            String apiVersion) throws Exception {
+        boolean returnIds = false;
+        if(apiVersion != null) {
+            returnIds = new Semver(apiVersion, Semver.SemverType.LOOSE).isGreaterThanOrEqualTo(PORTOFINO_API_VERSION_5_2);
+        }
+        Response.ResponseBuilder responseBuilder;
         if(object == null) {
-            if(ids == null || ids.isEmpty()) {
+            responseBuilder = deleteMany(ids, returnIds);
+        } else {
+            if (ids != null && !ids.isEmpty()) {
                 throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
                         "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
             }
-            return bulkDelete(ids);
+            responseBuilder = deleteOne(returnIds);
         }
-        if(ids != null && !ids.isEmpty()) {
+        if(!returnIds) {
+            responseBuilder.header(PortofinoFilter.PORTOFINO_API_VERSION_HEADER, "5.1");
+        }
+        return responseBuilder.build();
+    }
+
+    protected Response.ResponseBuilder deleteOne(boolean returnIds) {
+        int deleted = delete(object);
+        Response.ResponseBuilder response = Response.ok();
+        if(returnIds) {
+            if(deleted == 1) {
+                response.entity(Collections.singletonList(pkHelper.getPkString(object)));
+            } else {
+                response.status(Response.Status.CONFLICT).entity(getDeleteDeniedMessage());
+            }
+        } else {
+            response.entity(deleted);
+        }
+        return response;
+    }
+
+    protected Response.ResponseBuilder deleteMany(List<String> ids, boolean returnIds) throws Exception {
+        if(ids == null || ids.isEmpty()) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
                     "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
         }
-        return delete(object);
+        List<String> deleted = bulkDelete(ids);
+        Response.ResponseBuilder response = Response.ok();
+        if(returnIds) {
+            response.entity(deleted);
+        } else {
+            response.entity(deleted.size());
+        }
+        return response;
+    }
+
+    protected String getDeleteDeniedMessage() {
+        return ElementsThreadLocals.getText("the.deleteValidate.method.returned.false");
     }
 
     protected int delete(T object) {
@@ -1822,9 +1929,9 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         }
     }
 
-    protected int bulkDelete(List<String> ids) throws Exception {
-        List<T> objects = new ArrayList<T>(ids.size());
-        int deleted = 0;
+    protected List<String> bulkDelete(List<String> ids) throws Exception {
+        List<T> objects = new ArrayList<>(ids.size());
+        List<String> deleted = new ArrayList<>();
         for (String current : ids) {
             String[] pkArr = current.split("/");
             Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
@@ -1833,7 +1940,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
                 doDelete(obj);
                 deletePostProcess(obj);
                 objects.add(obj);
-                deleted++;
+                deleted.add(current);
             }
         }
         commitTransaction();

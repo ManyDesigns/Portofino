@@ -1,13 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ComponentFactoryResolver,
-  ComponentRef,
-  Injector,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { AfterViewInit, Component, ComponentFactoryResolver, ComponentRef, Injector, OnDestroy, OnInit, ViewChild, Directive } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 import {HttpClient} from "@angular/common/http";
 import {MainPageDirective} from "./content.directive";
@@ -97,10 +88,19 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
       page.configure();
     } else if (!page.parent) {
       if (params.hasOwnProperty('resetPassword')) {
-        this.authenticationService.showResetPasswordDialog(params.token);
+        this.authenticationService.goToResetPassword(params.token);
       } else if (params.hasOwnProperty('confirmSignup')) {
         this.authenticationService.confirmSignup(params.token).subscribe(
-          () => this.notificationService.info(this.translate.get("User successfully created."))
+          () => {
+            this.notificationService.info(this.translate.get("User successfully created."));
+            this.router.navigate(
+              [],
+              {
+                relativeTo: this.route,
+                queryParams: { confirmSignup: null },
+                queryParamsHandling: 'merge'
+              });
+          }
         );
       }
     }
@@ -149,6 +149,7 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
 
 }
 
+@Directive()
 class DummyPage extends Page {
 
   constructor(

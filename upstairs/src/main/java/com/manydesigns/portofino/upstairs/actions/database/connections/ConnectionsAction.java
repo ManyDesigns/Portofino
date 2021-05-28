@@ -121,12 +121,12 @@ public class ConnectionsAction extends AbstractResourceAction {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createConnection(String jsonInput) throws Exception {
+    public Response createConnection(String jsonInput) {
         JSONObject jsonObject = new JSONObject(jsonInput);
         Database database = new Database();
-        database.setDatabaseName(jsonObject.getJSONObject("databaseName").getString("value"));
+        database.setDatabaseName(jsonObject.getString("databaseName"));
         ConnectionProvider connectionProvider;
-        if(jsonObject.getJSONObject("jndiResource").isNull("value")) {
+        if(jsonObject.isNull("jndiResource")) {
             JdbcConnectionProvider jdbcConnectionProvider = new JdbcConnectionProvider();
             //Fill with dummy values so the form overwrites them (and doesn't try to write on the Configuration which
             //is not available and anyway should not be modified right now)
@@ -139,10 +139,6 @@ public class ConnectionsAction extends AbstractResourceAction {
         }
         connectionProvider.setDatabase(database);
         database.setConnectionProvider(connectionProvider);
-        if(jsonObject.has("entityMode")) {
-            String entityMode = jsonObject.getJSONObject("entityMode").optString("value", EntityMode.MAP.getExternalName());
-            database.setEntityMode(entityMode);
-        }
         return saveConnectionProvider(connectionProvider, jsonObject, this::doCreateConnectionProvider);
     }
 

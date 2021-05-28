@@ -1,5 +1,6 @@
 import {Component, Input, TemplateRef} from "@angular/core";
 import {Page} from "./page";
+import {MatTableDataSource} from "@angular/material/table";
 
 @Component({
   selector: 'portofino-page-settings-panel',
@@ -10,4 +11,10 @@ export class PageSettingsPanelComponent {
   page: Page;
   @Input()
   extraConfiguration: TemplateRef<any>;
+
+  emptyDataSource = new MatTableDataSource([]);
+
+  get template() {
+    return this.page.template || { sections: ["default"] };
+  }
 }

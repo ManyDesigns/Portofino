@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,6 +59,7 @@ public class Database implements ModelObject, Annotated {
     protected String entityMode = null;
 
     protected ConnectionProvider connectionProvider;
+    protected Properties settings;
     protected final List<Annotation> annotations = new ArrayList<>();
     
     //**************************************************************************
@@ -212,6 +214,14 @@ public class Database implements ModelObject, Annotated {
 
     public void setEntityMode(String entityMode) {
         this.entityMode = entityMode;
+    }
+
+    public Properties getSettings() {
+        return settings;
+    }
+
+    public void setSettings(Properties settings) {
+        this.settings = settings;
     }
 
     @Override

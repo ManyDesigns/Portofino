@@ -203,8 +203,12 @@ public class SessionFactoryBuilder {
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
-        Map<String, Object> settings = setupConnection();
-        StandardServiceRegistry standardRegistry =
+        Map<String, Object> settings = new HashMap<>();
+        if(database.getSettings() != null) {
+            settings.putAll((Map) database.getSettings());
+        }
+        setupConnection(settings);
+        ServiceRegistry standardRegistry =
                 new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
         MetadataSources sources = new MetadataSources(standardRegistry);
         List<String> externallyMappedClasses = new ArrayList<>();

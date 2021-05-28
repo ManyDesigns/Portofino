@@ -4,7 +4,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.2-SNAPSHOT</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
@@ -20,27 +20,27 @@
         web application based on an automatic analysis of the database's
         structure.
     </description>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <licenses>
         <license>
             <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
-            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <url>https://www.gnu.org/licenses/lgpl.html</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
     <organization>
         <name>MANYDESIGNS s.r.l.</name>
-        <url>http://www.manydesigns.com/</url>
+        <url>https://www.manydesigns.com/</url>
     </organization>
     <mailingLists>
         <mailingList>
             <name>Portofino mailing list in English</name>
-            <archive>http://groups.google.com/group/manydesigns-portofino</archive>
+            <archive>https://groups.google.com/group/manydesigns-portofino</archive>
         </mailingList>
         <mailingList>
             <name>Portofino mailing list in Italian</name>
-            <archive>http://groups.google.com/group/manydesigns-portofino-it</archive>
+            <archive>https://groups.google.com/group/manydesigns-portofino-it</archive>
         </mailingList>
     </mailingLists>
     <scm>
@@ -77,18 +77,18 @@
     </developers>
     <properties>
         <commons.collections.version>3.2.2</commons.collections.version>
-        <commons.configuration.version>2.6</commons.configuration.version>
+        <commons.configuration.version>2.7</commons.configuration.version>
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
-        <commons.io.version>2.6</commons.io.version>
+        <commons.io.version>2.7</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <fop.version>2.1</fop.version>
-        <groovy.version>3.0.5</groovy.version>
-        <guava.version>27.0.1-jre</guava.version>
-        <hibernate.version>5.4.7.Final</hibernate.version>
-        <jackson.version>2.10.0</jackson.version>
-        <jackson.databind.version>2.10.0</jackson.databind.version>
+        <groovy.version>3.0.8</groovy.version>
+        <guava.version>30.0-jre</guava.version>
+        <hibernate.version>5.4.31.Final</hibernate.version>
+        <jackson.version>2.11.0</jackson.version>
+        <jackson.databind.version>2.10.5.1</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
@@ -100,15 +100,15 @@
         <json.version>20180813</json.version>
         <jsoup.version>1.9.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>3.8.2</liquibase.version>
+        <liquibase.version>3.10.1</liquibase.version>
         <logback.version>1.2.3</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
-        <resteasy.version>4.5.2.Final</resteasy.version>
+        <resteasy.version>4.5.8.SP1</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.5.1</shiro.version>
+        <shiro.version>1.7.1</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spring.version>5.2.7.RELEASE</spring.version>
+        <spring.version>5.3.7</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -131,30 +131,37 @@
         <module>modules</module>
         <module>mail</module>
         <module>portofino-core</module>
+        <module>security-shiro</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>
-        <!-- Microservices -->
-        <module>microservices/launcher</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
-        <module>portofino-db2</module>
-        <module>portofino-derby</module>
-        <module>portofino-googlecloudsql</module>
-        <module>portofino-mssql</module>
-        <module>portofino-mysql</module>
-        <module>portofino-oracle</module>
-        <module>portofino-postgresql</module>
+        <module>databases/db2</module>
+        <module>databases/derby</module>
+        <module>databases/googlecloudsql</module>
+        <module>databases/mssql</module>
+        <module>databases/mysql</module>
+        <module>databases/oracle</module>
+        <module>databases/postgresql</module>
         <!-- Pages -->
         <module>portofino-crud</module>
-        <!-- Optional services -->
+        <!-- Optional services and integrations -->
         <module>portofino-quartz</module>
+        <module>keycloak</module>
+        <!-- Microservices -->
+        <module>microservices/launcher</module>
+        <module>microservices/spring-boot</module>
+        <module>microservices/scheduler</module>
+        <module>microservices/mail</module>
         <!-- UI -->
         <module>ui</module>
         <!-- upstairs -->
         <module>upstairs</module>
         <!-- Archetypes -->
-        <module>portofino-war-archetype</module>
+        <module>archetypes/service-groovy</module>
+        <module>archetypes/service-java</module>
+        <module>archetypes/war</module>
         <!-- Applications -->
         <module>demo-tt</module>
     </modules>
@@ -303,20 +310,26 @@
     <dependencies>
         <!-- JAXB for Java 11+ -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>1.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.2</version>
+            <version>2.3.3</version>
         </dependency>
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-            <version>1.1.1</version>
-        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -383,20 +396,6 @@
                         <descriptor>assembly-upstairs-standalone.xml</descriptor>
                     </descriptors>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <!-- Tests and coverage -->
             <plugin>
@@ -508,6 +507,7 @@
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
@@ -524,11 +524,11 @@
                                 <link>https://commons.apache.org/proper/commons-configuration/apidocs/</link>
                                 <link>https://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
                                 <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
-                                <link>http://www.joda.org/joda-time/apidocs/</link>
+                                <link>https://www.joda.org/joda-time/apidocs/</link>
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link http://shiro.apache.org/static/1.5.2/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/3.0.1/html/gapi/ -link http://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link http://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/3.0.7/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
@@ -539,6 +539,20 @@
                                 <goals>
                                     <goal>jar</goal>
                                     <goal>aggregate-jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
                                 </goals>
                             </execution>
                         </executions>

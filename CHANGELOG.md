@@ -2,24 +2,89 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.2.0] – Unreleased
+## [5.3.0] – Unreleased
 
 ### Added
-
-- Pages can load custom JavaScript (example in demo-tt)
-- demo-tt profile page (example custom component)
-- Full support for POJO-based persistence:
-  - Export generated mapped classes to actions and shared code
-  - Export generated mapped classes to the file system so that an IDE can pick them up
-  - Allow to configure the entity mode of each database mapping from the UI
+- Microservice deployment options using Spring Boot.
+- Easier Quartz job registration using Spring beans.
+- Email microservice.
+- Quartz scheduler microservice.
+- Possibility to exclude Shiro-based security from the application (and implement security using other
+  libraries).
 - Support for multi-tenancy in Hibernate
 
 ### Changed
-- Angular updated to version 9
+- Authentication/authorization endpoint is fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
+- Simplify initialization by removing PortofinoListener.
+- URL to trigger mail sender changed from `/actions/mail-sender-run` to `/portofino-send-mail` and HTTP method changed from GET to POST.
+- Mail sender action can be disabled with `mail.sender.action.enabled=false`.
+- Ensured that Java-only microservices are possible.
+
+## [5.2.1] – 2020-04-10
+
+### Added
+- Possibility to reorder table columns in the tables section upstairs.
+
+### Changed
+- Render internal links in text pages with no target attribute (that the Quill editor adds by default).
+- The welcome page is now a standard text page.
+- Security.groovy can now have user beans injected with `@Autowired`.
+
+### Fixed
+- Important security vulnerability that may have allowed access with forged tokens.
+- Authentication token refresh after expiration. [#430](https://github.com/ManyDesigns/Portofino/issues/430)
+- Backwards compatibility: revert `T extends Serializable` in CRUD actions, introduced in v5.2.0. [#428](https://github.com/ManyDesigns/Portofino/issues/428)
+
+## [5.2.0] – 2020-11-30
+
+### Added
+
+- User interface extensibility improvements:
+  - Custom pages in HTML and JavaScript with no Angular knowledge required (example in demo-tt)
+  - All pages can load custom JavaScript (example in demo-tt)
+  - Page templates can include several sections where child pages can be embedded (like Portofino 4)
+  - demo-tt profile page (example of custom component)
+  - Progressive Web Application (PWA) using angular-pwa, example in demo-tt
+- Full support for POJO-based persistence:
+  - Export generated classes to actions and shared code
+  - Export generated classes to the file system so that your IDE can pick them up
+  - Allow to configure the entity mode of each database mapping from the UI (the default is still map-based)
+- Authentication improvements:
+  - Better support for external auth (e.g., in a microservices setting). Built-in support for authentication
+    against KeyCloak.
+  - application/json login endpoint (in addition to the existing form-based endpoint).
+  - Better handling of token expiration in the client.
+- Per-database Hibernate properties.
+- Support annotations on databases.
+- Quartz jobs now run with a working Shiro environment.
+- Ability for extensions and user code to "mount" actions to arbitrary mount points in the action tree.
+
+### Changed
+- Angular updated to version 11
 - Groovy updated to version 3
+- Various other dependencies updated for security & bug fixes
+- CRUD REST API versioning with X-Portofino-API-Version header
+- CRUD REST API changes (legacy behavior is still the default):
+  - Bulk update (PUT) optionally returns list of modified IDs
+  - Bulk delete (DELETE) optionally returns list of deleted IDs
+- Generated Security.groovy is now based on annotations on the model rather than hard-coded values
 
 ### Removed
 - Maven profile "portofino-development" which has been superseded by Docker
+- Maven profile "no-frontend-build" (use -P-build-frontend)
+- `PortofinoRoot.mount` method and related methods, replaced by `ActionLogic.mount`. This is a breaking API change for
+  extensions making use of the removed methods, but none are known to us (also because the methods are undocumented and
+  only used internally by portofino-upstairs).
+
+### Fixed
+
+- Newly created CRUD pages don't have create/update buttons ([#406](https://github.com/ManyDesigns/Portofino/issues/406))
+- Page configuration is broken for pages using the default template implicitly ([#423](https://github.com/ManyDesigns/Portofino/issues/423)).
+- User self-registration is broken in several ways ([#414](https://github.com/ManyDesigns/Portofino/issues/414)).
+  Note that **this involves a breaking API change** in `Security.groovy`, specifically, the signature of the method
+  `saveSelfRegisteredUser` has changed to return both the token and the email of the newly saved user.
+  However, typical `Security.groovy` files (generated by the wizard) don't override that method, so most users shouldn't
+  have to do anything.
 
 ## [5.1.4] – 2020-07-04
 
@@ -113,7 +178,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Generic database platform for unrecognized databases.
 - Support for development and debug with Docker, both in demo-tt and in the archetype.
 - Periodically retry database connections that have failed at startup if Quartz is available.
-- Fallback database platform for unrecognized database systems.
 - Filter CRUD fields according to permissions (at the level of the ClassAccessor).
 - Filter configuration fields according to permissions.
   In particular, the CRUD query is hidden if the user is not a developer.

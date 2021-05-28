@@ -3,7 +3,7 @@ import {Page, PageChild, PageConfiguration} from "../page";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
 import {Button} from "../buttons";
-import {Observable, of, throwError} from "rxjs";
+import {Observable, of} from "rxjs";
 import {PortofinoComponent} from "../page.factory";
 import {ConnectionsComponent} from "./connections.component";
 import {WizardComponent} from "./wizard.component";
@@ -15,7 +15,6 @@ import {AuthenticationService} from "../security/authentication.service";
 import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {NotificationService} from "../notifications/notification.services";
-import {map} from "rxjs/operators";
 import {WebStorageService} from "../storage/storage.services";
 
 @Component({
@@ -58,16 +57,8 @@ export class UpstairsComponent extends Page implements OnInit {
     if(!this.portofino.apiRoot.endsWith("/")) {
       this.portofino.apiRoot += "/";
     }
-    this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(response => {
-      if(response.loginPath) {
-        let loginPath = response.loginPath;
-        if(loginPath.startsWith('/')) {
-          loginPath = loginPath.substring(1);
-        }
-        this.portofino.loginPath = loginPath;
-        this.storage.set("portofino.upstairs.apiRoot", this.portofino.apiRoot);
-        this.checkAccess(true);
-      }
+    this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(() => {
+      this.checkAccess(true);
     }, error => {
       console.error(error);
       this.notificationService.error(this.translate.get("Invalid API root (see console for details)"));

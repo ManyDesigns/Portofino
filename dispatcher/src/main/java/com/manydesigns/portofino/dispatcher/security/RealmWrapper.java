@@ -43,10 +43,10 @@ public class RealmWrapper extends AuthorizingRealm {
                 info.getObjectPermissions().add(new RolesPermission(info.getRoles()));
             } else if(info instanceof SimpleAuthorizationInfo) {
                 ((SimpleAuthorizationInfo) info).setObjectPermissions(
-                        Collections.singleton((Permission) new RolesPermission(info.getRoles())));
+                        Collections.singleton(new RolesPermission(info.getRoles())));
             } else if(info instanceof SimpleAccount) {
                 ((SimpleAccount) info).setObjectPermissions(
-                        Collections.singleton((Permission) new RolesPermission(info.getRoles())));
+                        Collections.singleton(new RolesPermission(info.getRoles())));
             } else {
                 logger.warn("Cannot add RolesPermission to the AuthorizationInfo {}", info);
             }

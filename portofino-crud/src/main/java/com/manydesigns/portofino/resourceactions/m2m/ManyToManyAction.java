@@ -698,9 +698,9 @@ public class ManyToManyAction extends AbstractResourceAction {
             form.put(checkboxes);
         }
 
-        if(!SecurityLogic.hasPermissions(
+        if(!security.hasPermissions(
                 getPortofinoConfiguration(),
-                getActionInstance(), SecurityUtils.getSubject(),
+                getActionInstance(),
                 AccessLevel.VIEW, ManyToManyAction.PERMISSION_UPDATE)) {
             schema.put("readonly",true);
         }

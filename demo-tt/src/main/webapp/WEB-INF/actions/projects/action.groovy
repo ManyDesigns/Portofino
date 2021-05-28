@@ -1,8 +1,6 @@
-import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.operations.GuardType
-import com.manydesigns.portofino.operations.Operation
 import com.manydesigns.portofino.operations.annotations.Guard
 import com.manydesigns.portofino.resourceactions.crud.CrudAction
 import com.manydesigns.portofino.security.AccessLevel
@@ -12,7 +10,6 @@ import com.manydesigns.portofino.tt.ActivityItem
 import com.manydesigns.portofino.tt.Refresh
 import com.manydesigns.portofino.tt.TtUtils
 import org.apache.shiro.SecurityUtils
-import org.hibernate.Session
 import org.springframework.beans.factory.annotation.Autowired
 
 import javax.ws.rs.GET

@@ -22,14 +22,20 @@ package com.manydesigns.mail;
 
 import com.manydesigns.mail.quartz.MailScheduler;
 import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.rest.SendMailAction;
 import com.manydesigns.mail.sender.MailSender;
+import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
+import com.manydesigns.portofino.ResourceActionsModule;
+import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
@@ -56,6 +62,10 @@ public class MailModule implements Module {
     @Autowired
     public Configuration configuration;
 
+    @Autowired
+    @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
+    public FileObject actionsDirectory;
+
     protected MailQueueSetup mailQueueSetup;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
@@ -78,7 +88,7 @@ public class MailModule implements Module {
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws Exception {
         mailQueueSetup = new MailQueueSetup(configuration);
         mailQueueSetup.setup();
         //Quartz integration (optional)
@@ -88,6 +98,10 @@ public class MailModule implements Module {
         } catch (NoClassDefFoundError e) {
             logger.debug(e.getMessage(), e);
             logger.info("Quartz is not available, mail scheduler not started");
+        }
+        if(configuration.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
+            String segment = configuration.getString(MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
+            ActionLogic.mount(actionsDirectory, segment, SendMailAction.class);
         }
         status = ModuleStatus.STARTED;
     }

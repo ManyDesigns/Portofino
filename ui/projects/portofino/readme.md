@@ -1,9 +1,15 @@
-# ManyDesigns Portofino 5 #
+# This package
+
+This is the User Interface (UI) component of Portofino 5. It is built on Angular with TypeScript and it is meant to run in the browser.
+
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4.
+
+## ManyDesigns Portofino 5 ##
 
 Portofino is a web application framework written in Java and extensible using Groovy, distributed under the LGPL open
-source license. It is developed by ManyDesigns, based in Genoa, Italy (http://www.manydesigns.com).
+source license. It is developed by ManyDesigns, based in Genova, Italy (http://www.manydesigns.com).
 
-The framework can be used to create good looking applications for the Web and mobile devices. The creation process can include:
+The framework can be used to create good-looking applications for the Web and mobile devices. The creation process can include:
  - automatic generation through a "wizard" tool that analyses the structure of your existing relational database;
  - manual configuration through a web-based administration interface that lives alongside the application;
  - customization with Groovy (for the backend) and TypeScript (for the frontend).
@@ -17,18 +23,6 @@ Portofino is based on popular and proven open source libraries such as Hibernate
 
 The home of Portofino is http://portofino.manydesigns.com. There you can find the documentation, pointers to community
 resources (forums, wiki, issue tracker), commercial support.
-
-## Installation ##
-
-The official compiled distribution is hosted on SourceForge: http://sourceforge.net/projects/portofino
-It requires no installation, just unzip it. It is a bundle of Apache Tomcat, Portofino and JDBC drivers for popular
-open source databases.
-
-# This package
-
-This is the User Interface (UI) component of Portofino 5. It is built on Angular with TypeScript and it is meant to run in the browser.
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.4.
 
 ## Development server
 

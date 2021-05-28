@@ -126,7 +126,7 @@ public abstract class AbstractResource implements SecureResource {
             try {
                 subResource = getSubResource(resourceLocation, pathSegment, resourceResolver);
             } catch (Exception e) {
-                logger.error("Could not resolve sub resource", e);
+                logger.error("Could not resolve sub resource " + pathSegment + " at " + resourceLocation, e);
                 throw new WebApplicationException(500);
             }
             if(subResource == null) {
@@ -206,6 +206,8 @@ public abstract class AbstractResource implements SecureResource {
     /**
      * Returns the directory where this resource's children resources are defined.
      * @since 5.0.0
+     * @return the children's directory.
+     * @throws FileSystemException in case the directory cannot be determined.
      */
     public FileObject getChildrenLocation() throws FileSystemException {
         return location;

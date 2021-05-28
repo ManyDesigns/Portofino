@@ -5,7 +5,6 @@
   </div>
   <div [hidden]="!pageService.page">
     <ng-template portofino-main-page></ng-template>
-    <ng-template portofino-embedded-pages></ng-template>
   </div>
 </ng-container>
 <div *ngIf="!!pageService.error && pageService.error.status !== 0" class="mat-display-2 error">

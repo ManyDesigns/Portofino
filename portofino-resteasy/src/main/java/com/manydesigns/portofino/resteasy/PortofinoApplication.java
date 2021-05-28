@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.resteasy;
 
-import com.manydesigns.mail.rest.SendMailAction;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoFilter;
 import com.manydesigns.portofino.rest.messagebodywriters.FormMessageBodyWriter;
@@ -21,7 +20,6 @@ public class PortofinoApplication extends Application {
         classes.add(PortofinoFilter.class);
         classes.add(FormMessageBodyWriter.class);
         classes.add(XhtmlFragmentMessageBodyWriter.class);
-        classes.add(SendMailAction.class);
         //TODO discovery?
         //TODO configure user classes
         return classes;

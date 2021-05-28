@@ -43,6 +43,7 @@ public class Email {
     final List<Recipient> recipients = new ArrayList<Recipient>();
     final List<Attachment> attachments = new ArrayList<Attachment>();
     String from;
+    String replyTo;
 
     @XmlElement
     public List<Recipient> getRecipients() {
@@ -61,6 +62,15 @@ public class Email {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    @XmlAttribute
+    public String getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(String replyTo) {
+        this.replyTo = replyTo;
     }
 
     @XmlElement

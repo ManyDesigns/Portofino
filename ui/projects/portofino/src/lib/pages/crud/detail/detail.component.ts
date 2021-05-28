@@ -55,7 +55,6 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
     if(this.properties.length == 0) {
       this.initClassAccessor();
     }
-    this.loading = true;
     const objectUrl = `${this.sourceUrl}/${this.id}`;
     this.loadObject(objectUrl, () => {
       this.http.get<Operation[]>(objectUrl + this.operationsPath).subscribe(ops => {
@@ -78,6 +77,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
   }
 
   protected loadObject(objectUrl: string, onSuccess: () => void) {
+    this.loading = true;
     this.http.get(objectUrl, {params: {forEdit: "true"}, observe: 'response'}).subscribe(resp => {
       this.prettyName = resp.headers.get('X-Portofino-Pretty-Name') || this.id;
       this.loading = false;
@@ -90,10 +90,14 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
     });
   }
 
+  protected setEditMode(mode: boolean) {
+    this.editMode = mode;
+    this.editModeChanges.emit(mode);
+  }
+
   @Button({ text: 'Edit', icon: 'edit', color: 'primary', presentIf: DetailComponent.isEditButtonEnabled })
   edit() {
-    this.editMode = true;
-    this.editModeChanges.emit(true);
+    this.setEditMode(true);
     this.setupForm(this.object);
   }
 
@@ -105,8 +109,7 @@ export class DetailComponent extends BaseDetailComponent implements OnInit, OnDe
 
   @Button({ text: 'Cancel', presentIf: DetailComponent.isEditMode })
   cancel() {
-    this.editMode = false;
-    this.editModeChanges.emit(false);
+    this.setEditMode(false);
     this.setupForm(this.object);
   }
 

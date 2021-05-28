@@ -3,12 +3,12 @@
   "type": "projects-crud",
   "children": [],
   "detailChildren": [
-    {"path": "active-tickets-assigned-to-me", "title": "Active tickets assigned to me", "embedded": true, "showInNavigation": false },
-    {"path": "tickets", "title": "Tickets", "embedded": false, "showInNavigation": true }],
+    {"path": "active-tickets-assigned-to-me", "title": "Active tickets assigned to me", "embeddedIn": "default", "showInNavigation": false },
+    {"path": "tickets", "title": "Tickets", "showInNavigation": true }],
   "source": "projects",
   "template": "mainWithTabs",
   "script": "custom.js",
   "buttons": {
-    "search-results": [{ "text": "Another custom button", "method": "customButtonAction" }]
+    "detail": [{ "text": "Custom button", "method": "customButtonAction" }]
   }
 }

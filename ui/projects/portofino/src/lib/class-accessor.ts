@@ -1,7 +1,6 @@
 import {ValidatorFn, Validators} from "@angular/forms";
-import {map} from "rxjs/operators";
 
-export const loadClassAccessor = map((c: ClassAccessor) => {
+export const loadClassAccessor = (c: ClassAccessor) => {
   if(!c) {
     return c;
   }
@@ -11,39 +10,12 @@ export const loadClassAccessor = map((c: ClassAccessor) => {
   } else {
     return ClassAccessor.create(c);
   }
-});
+};
 
 export const BOOLEAN_TYPE = "boolean";
 export const DATE_TYPE = "date";
 export const NUMBER_TYPE = "number";
 export const STRING_TYPE = "string";
-
-export function forObject(object: any, options: {
-    name?: string, ownProperties?: boolean, types: { [property: string]: string } } = { types: {}
-  }): ClassAccessor {
-  let accessor = new ClassAccessor();
-  accessor.name = options.name;
-  for(let p in object) {
-    if(options.ownProperties && !object.hasOwnProperty(p)) {
-      continue;
-    }
-    let value = object[p];
-    if(value && value.value) {
-      value = value.value; //Handle objects returned by Elements that have value and displayValue
-    }
-    let property = Property.create({ name: p, label: p.charAt(0).toUpperCase() + p.slice(1) });
-    let userType = options.types[p];
-    if(userType) {
-      property.type = userType;
-    } else if(typeof(value) === NUMBER_TYPE) {
-      property.type = NUMBER_TYPE;
-    } else if(typeof(value) !== STRING_TYPE) {
-      continue; //We don't handle arrays and objects for now
-    }
-    accessor.properties.push(property);
-  }
-  return accessor;
-}
 
 export class ClassAccessor {
   name: string;
@@ -62,10 +34,55 @@ export class ClassAccessor {
     });
   }
 
+  static getProperty(self: ClassAccessor, name: string) {
+    for(const p in self.properties) {
+      let property = self.properties[p];
+      if(property.name == name) {
+        return property
+      }
+    }
+  }
+
   static create(values: ClassAccessor | any): ClassAccessor {
     const ca = Object.assign(new ClassAccessor(), values);
     ca.initSelectionProviders();
     return ca;
+  }
+
+  static forObject(object: any, options: {
+    name?: string, ownProperties?: boolean,
+    properties: { [name: string]: Property | any }
+  } = { properties: {} }): ClassAccessor {
+    let accessor = new ClassAccessor();
+    accessor.name = options.name;
+    for(let p in object) {
+      if(options.ownProperties && !object.hasOwnProperty(p)) {
+        continue;
+      }
+      let value = object[p];
+      if(value && value.value) {
+        value = value.value; //Handle objects returned by Elements that have value and displayValue
+      }
+      let property;
+      let defaultValues: any = { name: p, label: p.charAt(0).toUpperCase() + p.slice(1) };
+      if(typeof(value) === NUMBER_TYPE) {
+        defaultValues.type = NUMBER_TYPE;
+      }
+      //We don't handle arrays and objects for now
+      if(options.properties.hasOwnProperty(p)) {
+        if(options.properties[p]) {
+          property = Property.create({ ...defaultValues, ...options.properties[p] });
+        }
+      } else {
+        if(defaultValues.type || (typeof(value) == STRING_TYPE)) {
+          property = Property.create(defaultValues);
+        }
+      }
+      if(property) {
+        accessor.properties.push(property);
+      }
+    }
+    return accessor;
   }
 }
 
@@ -85,6 +102,10 @@ export class Property {
 
   static create(values: Property | any): Property {
     return Object.assign(new Property(), values)
+  }
+
+  static get(owner: ClassAccessor, name: string) {
+    return ClassAccessor.getProperty(owner, name);
   }
 
   required(value: boolean = true): Property {

@@ -153,7 +153,7 @@ public class FormUtil {
                 if(o instanceof JSONObject) {
                     JSONObject subObj = (JSONObject) o;
                     if(subObj.has(JSON_TYPE)) {
-                        return null; //TODO
+                        return null; //TODO blobs - how to handle?
                     } else {
                         return new JsonKeyValueAccessor(subObj).get(JSON_VALUE);
                     }

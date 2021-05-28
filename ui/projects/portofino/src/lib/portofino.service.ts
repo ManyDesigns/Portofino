@@ -1,14 +1,17 @@
-import {EventEmitter, Inject, Injectable, InjectionToken, TemplateRef} from '@angular/core';
+import {EventEmitter, Inject, Injectable, InjectionToken, Injector, TemplateRef} from '@angular/core';
 import {HttpClient, HttpEvent, HttpEventType, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
-import { DateAdapter } from "@angular/material/core";
+import {DateAdapter} from "@angular/material/core";
 import {Observable} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {WebStorageService} from "./storage/storage.services";
-import {NO_RENEW_HEADER} from "./security/authentication.headers";
+import {NO_REFRESH_TOKEN_HEADER} from "./security/authentication.headers";
+import {AuthenticationStrategy} from "./security/authentication.service";
 
 export const LOCALE_STORAGE_SERVICE = new InjectionToken('Locale Storage');
 export const LOCALES = new InjectionToken('Locales');
+
+export type TemplateDescriptor = { template: TemplateRef<any>, description: string, sections: string[] };
 
 @Injectable()
 export class PortofinoService {
@@ -17,19 +20,19 @@ export class PortofinoService {
   defaultApiRoot = 'http://localhost:8080/';
   apiRoot: string;
   localApiPath = 'portofino';
-  loginPath = 'login';
   upstairsLink = "/portofino-upstairs";
   callsInProgress = 0;
 
   readonly DEFAULT_LOCALE = 'en';
   readonly localeDefinitions = {};
   readonly localeChange = new EventEmitter<Locale>();
-  readonly templates: { [name: string]: { template: TemplateRef<any>, description?: string }} = {};
+  readonly templates: { [name: string]: TemplateDescriptor} = {};
 
   constructor(public http: HttpClient, protected translate: TranslateService,
               @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService,
               @Inject(LOCALES) locales: Locale[],
-              protected dateAdapter: DateAdapter<any>) {
+              protected dateAdapter: DateAdapter<any>,
+              protected injector: Injector) {
     this.setupTranslateService(locales);
   }
 
@@ -95,14 +98,12 @@ export class PortofinoService {
       return;
     }
     const headers = {};
-    headers[NO_RENEW_HEADER] = true; //Avoid renewing the token on startup as this might hit the wrong login action
+    headers[NO_REFRESH_TOKEN_HEADER] = true; //Avoid refreshing the token on startup as this might hit the wrong login action
     this.http.get<ApiInfo>(this.localApiPath, { headers: headers }).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
-      if(response.loginPath) {
-        this.loginPath = this.sanitizeLoginPath(response.loginPath);
-      } else {
-        this.initLoginPath();
-      }
+      this.injector.get(AuthenticationStrategy).init({
+        apiRoot: this.apiRoot
+      });
       if(response.disableAdministration) {
         this.localApiPath = null; //Disable local API
       }
@@ -111,29 +112,9 @@ export class PortofinoService {
     });
   }
 
-  private initLoginPath() {
-    const headers = {};
-    headers[NO_RENEW_HEADER] = true; //Avoid renewing the token on startup as this might hit the wrong login action
-    this.http.get<any>(this.apiRoot + ':description', { headers: headers }).subscribe(response => {
-      if (response.loginPath) {
-        this.loginPath = this.sanitizeLoginPath(response.loginPath);
-      }
-    },
-      () => alert(this.translate.instant(
-        'Cannot connect to login. The application may not work properly. Please reload the page at a later time or contact the administrator.')));
-  }
-
-  private sanitizeLoginPath(loginPath) {
-    if (loginPath.startsWith('/')) {
-      loginPath = loginPath.substring(1);
-    }
-    return loginPath;
-  }
-
   private fallbackInit() {
     this.localApiPath = null;
     this.apiRoot = this.sanitizeApiRoot(this.defaultApiRoot);
-    this.initLoginPath();
   }
 
   private sanitizeApiRoot(apiRoot) {
@@ -148,9 +129,8 @@ export class PortofinoService {
   }
 }
 
-class ApiInfo {
+export class ApiInfo {
   apiRoot: string;
-  loginPath: string;
   disableAdministration?: boolean = false;
 }
 
@@ -179,5 +159,15 @@ export class ProgressInterceptor implements HttpInterceptor {
       }
       throw e;
     }));
+  }
+}
+
+@Injectable()
+export class ApiVersionInterceptor implements HttpInterceptor {
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let request = req.clone({
+      headers: req.headers.append("X-Portofino-API-Version", "5.2")
+    });
+    return next.handle(request);
   }
 }

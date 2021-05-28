@@ -20,23 +20,17 @@
 
 package com.manydesigns.portofino.security;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.actions.Permissions;
-import com.manydesigns.portofino.shiro.GroupPermission;
-import com.manydesigns.portofino.shiro.ActionPermission;
-import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
+import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.Subject;
+import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,24 +61,6 @@ public class SecurityLogic {
     public static final String GROUP_ADMINISTRATORS_DEFAULT = "administrators";
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
-
-    public static boolean hasPermissions(Configuration conf, ActionInstance instance, Subject subject, Method handler) {
-        logger.debug("Checking action permissions");
-        Class<?> theClass = instance.getActionClass();
-        RequiresPermissions requiresPermissions = getRequiresPermissionsAnnotation(handler, theClass);
-        if(requiresPermissions != null) {
-            AccessLevel accessLevel = requiresPermissions.level();
-            String[] permissions = requiresPermissions.permissions();
-            return hasPermissions(conf, instance, subject, accessLevel, permissions);
-        }
-        return true;
-    }
-
-    public static boolean hasPermissions
-            (Configuration conf, ActionInstance instance, Subject subject, AccessLevel accessLevel, String... permissions) {
-        Permissions configuration = calculateActualPermissions(instance);
-        return hasPermissions(conf, configuration, subject, accessLevel, permissions);
-    }
 
     public static Permissions calculateActualPermissions(ActionInstance instance) {
         List<ActionDescriptor> actionDescriptors = new ArrayList<>();
@@ -127,22 +103,6 @@ public class SecurityLogic {
         return result;
     }
 
-    public static boolean hasPermissions
-            (Configuration conf, Permissions configuration, Subject subject, Method handler, Class<?> theClass) {
-        logger.debug("Checking action permissions");
-        RequiresPermissions requiresPermissions = getRequiresPermissionsAnnotation(handler, theClass);
-        if(requiresPermissions != null) {
-            return hasPermissions(conf, configuration, subject, requiresPermissions);
-        } else {
-            return true;
-        }
-    }
-
-    public static boolean hasPermissions
-            (Configuration conf, Permissions configuration, Subject subject, RequiresPermissions thing) {
-        return hasPermissions(conf, configuration, subject, thing.level(), thing.permissions());
-    }
-
     public static RequiresPermissions getRequiresPermissionsAnnotation(Method handler, Class<?> theClass) {
         RequiresPermissions requiresPermissions = handler.getAnnotation(RequiresPermissions.class);
         if (requiresPermissions != null) {
@@ -157,56 +117,8 @@ public class SecurityLogic {
         return requiresPermissions;
     }
 
-    public static boolean hasPermissions
-            (Configuration conf, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
-        Object principal = subject.getPrincipal();
-        if(principal != null) {
-            if(isAdministrator(conf)) {
-                return true;
-            }
-            ActionPermission actionPermission = new ActionPermission(configuration, level, permissions);
-            return subject.isPermitted(actionPermission);
-        } else {
-            //Shiro does not check permissions for non authenticated users
-            return hasAnonymousPermissions(conf, configuration, level, permissions);
-        }
-    }
-
-    public static boolean hasPermissions
-            (Configuration conf, Permissions configuration, org.apache.shiro.mgt.SecurityManager securityManager,
-             PrincipalCollection principals, AccessLevel level, String... permissions) {
-        if(principals != null) {
-            ActionPermission actionPermission = new ActionPermission(configuration, level, permissions);
-            return securityManager.isPermitted(principals, actionPermission);
-        } else {
-            //Shiro does not check permissions for non authenticated users
-            return hasAnonymousPermissions(conf, configuration, level, permissions);
-        }
-    }
-
-    public static boolean hasAnonymousPermissions
-            (Configuration conf, Permissions configuration, AccessLevel level, String... permissions) {
-        ActionPermission actionPermission = new ActionPermission(configuration, level, permissions);
-        List<String> groups = new ArrayList<String>();
-        groups.add(getAllGroup(conf));
-        groups.add(getAnonymousGroup(conf));
-        return new GroupPermission(groups).implies(actionPermission);
-    }
-
-    public static boolean isAdministrator(ServletRequest request) {
-        ServletContext servletContext = ElementsThreadLocals.getServletContext();
-        Configuration conf =
-                (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
-        return isAdministrator(conf);
-    }
-
-    public static boolean isAdministrator(Configuration conf) {
-        String administratorsGroup = getAdministratorsGroup(conf);
-        Subject subject = SecurityUtils.getSubject();
-        return subject.isAuthenticated() && subject.hasRole(administratorsGroup);
-    }
-
-    public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, Object actionBean, Method handler) {
+    public static boolean satisfiesRequiresAdministrator(
+            Object actionBean, Method handler, boolean isAdmin) {
         logger.debug("Checking if action or method required administrator");
         boolean requiresAdministrator = false;
         if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
@@ -224,8 +136,7 @@ public class SecurityLogic {
             }
         }
 
-        boolean isNotAdmin = !isAdministrator(request);
-        boolean doesNotSatisfy = requiresAdministrator && isNotAdmin;
+        boolean doesNotSatisfy = requiresAdministrator && !isAdmin;
         if (doesNotSatisfy) {
             logger.debug("User is not an administrator");
             return false;
@@ -249,51 +160,17 @@ public class SecurityLogic {
         return conf.getString(GROUP_REGISTERED, GROUP_REGISTERED_DEFAULT);
     }
 
-    public static boolean isAllowed(
-            HttpServletRequest request, ActionInstance actionInstance, Object actionBean, Method handler) {
-        Subject subject = SecurityUtils.getSubject();
-
-        if (!satisfiesRequiresAdministrator(request, actionBean, handler)) {
-            return false;
-        }
-
-        logger.debug("Checking actionDescriptor permissions");
-        boolean isNotAdmin = !isAdministrator(request);
-        if (isNotAdmin) {
-            ServletContext servletContext = request.getServletContext();
-            Configuration configuration = (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
-            Permissions permissions;
-            String resource;
-            boolean allowed;
-            if(actionInstance != null) {
-                logger.debug("The protected resource is a actionDescriptor action");
-                resource = actionInstance.getPath();
-                allowed = hasPermissions(configuration, actionInstance, subject, handler);
-            } else {
-                logger.debug("The protected resource is a regular JAX-RS resource");
-                resource = request.getRequestURI();
-                permissions = new Permissions();
-                allowed = hasPermissions
-                        (configuration, permissions, subject, handler, actionBean.getClass());
-            }
-            if(!allowed) {
-                logger.info("Access to {} is forbidden", resource);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static boolean hasPermissions
-            (Configuration conf, Method method, Class fallbackClass, ActionInstance actionInstance, Subject subject) {
-        RequiresPermissions requiresPermissions =
-                    SecurityLogic.getRequiresPermissionsAnnotation(method, fallbackClass);
-        if(requiresPermissions != null) {
-            Permissions permissions = SecurityLogic.calculateActualPermissions(actionInstance);
-            return SecurityLogic.hasPermissions
-                    (conf, permissions, subject, requiresPermissions);
+    public static void installLogin(
+            FileObject actionsDirectory, Configuration configuration, Class<? extends ResourceAction> fallbackLoginClass)
+            throws Exception {
+        String relLoginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
+        String loginPath;
+        if(relLoginPath != null) {
+            loginPath = actionsDirectory.getName().getPath() + relLoginPath;
         } else {
-            return true;
+            loginPath = "res:" + fallbackLoginClass.getPackage().getName().replace('.', '/');
         }
+        ActionLogic.unmount(actionsDirectory, ":auth");
+        ActionLogic.mount(actionsDirectory, ":auth", loginPath);
     }
 }

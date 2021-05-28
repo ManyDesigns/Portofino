@@ -69,6 +69,14 @@
         <mat-hint>{{'leave empty to use default'|translate}}</mat-hint>
       </mat-form-field>
       <mat-form-field>
+        <mat-label>{{'Entity mode'|translate}}</mat-label>
+        <mat-select [(ngModel)]="connectionProvider.entityMode.value" name="entityMode"
+                    [disabled]="!isEditConnectionProvider">
+          <mat-option value="MAP">{{'Map'|translate}}</mat-option>
+          <mat-option value="POJO">{{'POJO'|translate}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field>
         <mat-label>{{'True string'|translate}}</mat-label>
         <input name="true-string" matInput [(ngModel)]="connectionProvider.trueString.value"
                [disabled]="!isEditConnectionProvider" />
