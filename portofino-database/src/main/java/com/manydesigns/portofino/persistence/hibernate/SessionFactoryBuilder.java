@@ -39,6 +39,7 @@ import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.service.ServiceRegistry;
 import org.jadira.usertype.dateandtime.joda.PersistentDateTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -203,11 +204,7 @@ public class SessionFactoryBuilder {
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
-        Map<String, Object> settings = new HashMap<>();
-        if(database.getSettings() != null) {
-            settings.putAll((Map) database.getSettings());
-        }
-        setupConnection(settings);
+        Map<String, Object> settings = setupConnection();
         ServiceRegistry standardRegistry =
                 new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
         MetadataSources sources = new MetadataSources(standardRegistry);
@@ -254,7 +251,6 @@ public class SessionFactoryBuilder {
                     AvailableSettings.DIALECT,
                     connectionProvider.getActualHibernateDialectName());
         }
-        settings.put(AvailableSettings.JPA_METAMODEL_POPULATION, "enabled");
         if(multiTenancyImplementation != null) {
             MultiTenancyStrategy strategy = multiTenancyImplementation.getStrategy();
             if (strategy.requiresMultiTenantConnectionProvider()) {
@@ -265,10 +261,9 @@ public class SessionFactoryBuilder {
         } else {
             setupSingleTenantConnection(connectionProvider, settings);
         }
-        //TODO evaluate if they're still applicable:
-        //  .setProperty("hibernate.current_session_context_class", "org.hibernate.context.internal.ThreadLocalSessionContext")
-        //  .setProperty("org.hibernate.hql.ast.AST", "true")
-        //  .setProperty("hibernate.globally_quoted_identifiers", "false");
+        if(database.getSettings() != null) {
+            settings.putAll((Map) database.getSettings());
+        }
         return settings;
     }
 
