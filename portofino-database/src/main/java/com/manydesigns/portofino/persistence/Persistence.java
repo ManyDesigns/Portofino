@@ -57,6 +57,7 @@ import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -117,6 +118,8 @@ public class Persistence {
     public static final Logger logger =
             LoggerFactory.getLogger(Persistence.class);
 
+    protected final ApplicationContext context;
+
     //**************************************************************************
     // Constructors
     //**************************************************************************
@@ -124,11 +127,12 @@ public class Persistence {
     public Persistence(
             FileObject applicationDirectory, Configuration configuration,
             FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile,
-            DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
+            DatabasePlatformsRegistry databasePlatformsRegistry, ApplicationContext context) throws FileSystemException {
         this.applicationDirectory = applicationDirectory;
         this.configuration = configuration;
         this.configurationFile = configurationFile;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
+        this.context = context;
 
         if(getModelFile().exists()) {
             logger.info("Legacy application model file: {}", getModelFile().getName().getPath());
@@ -448,7 +452,7 @@ public class Persistence {
                 throw new ClassCastException(implClass + " does not extend " + MultiTenancyImplementation.class);
             }
             try {
-                MultiTenancyImplementation implementation = implClass.getConstructor().newInstance();
+                MultiTenancyImplementation implementation = context.getBean(implClass);
                 MultiTenancyStrategy strategy = implementation.getStrategy();
                 if (strategy.requiresMultiTenantConnectionProvider()) {
                     return implementation;

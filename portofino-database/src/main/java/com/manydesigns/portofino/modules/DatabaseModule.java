@@ -131,7 +131,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
         Persistence persistence = new Persistence(
-                applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
+                applicationDirectory, configuration, configurationFile, databasePlatformsRegistry, applicationContext);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
 
         FileObject generatedClassesRoot = applicationDirectory.resolveFile(GENERATED_CLASSES_DIRECTORY_NAME);

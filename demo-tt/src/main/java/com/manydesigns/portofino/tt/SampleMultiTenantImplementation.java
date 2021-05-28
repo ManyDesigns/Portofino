@@ -5,6 +5,11 @@ import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancy
 public class SampleMultiTenantImplementation extends MultiTenancyImplementation {
 
     @Override
+    public String getTenant() {
+        return null;
+    }
+
+    @Override
     public String getConnectionURL(String tenant) {
         if(tenant.equals(getDefaultTenant())) {
             return null;

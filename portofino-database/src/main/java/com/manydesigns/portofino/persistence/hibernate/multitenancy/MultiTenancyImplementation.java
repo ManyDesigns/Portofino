@@ -1,11 +1,5 @@
 package com.manydesigns.portofino.persistence.hibernate.multitenancy;
 
-import com.manydesigns.portofino.shiro.PortofinoRealm;
-import com.manydesigns.portofino.shiro.ShiroUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
@@ -15,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  * Implementors should keep in mind that two instances will be created to perform the two different tasks,
  * and they will not share state.
  */
-public class MultiTenancyImplementation extends AbstractMultiTenantConnectionProvider
+public abstract class MultiTenancyImplementation extends AbstractMultiTenantConnectionProvider
         implements ServiceRegistryAwareService, Configurable, Stoppable {
 
     public static final String CONNECTION_PROVIDER_CLASS = "portofino.persistence.hibernate.multitenancy.connectionProviderClass";
@@ -46,7 +39,8 @@ public class MultiTenancyImplementation extends AbstractMultiTenantConnectionPro
     private Map configurationValues;
     private final ConcurrentMap<Object, ConnectionProvider> connectionProviders = new ConcurrentHashMap<>();
 
-    public MultiTenancyImplementation() {}
+    public MultiTenancyImplementation() {
+    }
 
     public MultiTenancyStrategy getStrategy() {
         return MultiTenancyStrategy.DATABASE;
@@ -61,18 +55,7 @@ public class MultiTenancyImplementation extends AbstractMultiTenantConnectionPro
         return "portofino";
     }
 
-    public String getTenant() {
-        SecurityManager securityManager = ThreadContext.getSecurityManager();
-        if(securityManager == null) {
-            return getDefaultTenant(); //Out of Shiro context
-        }
-        Subject subject = SecurityUtils.getSubject();
-        if(!subject.isAuthenticated()) {
-            return getDefaultTenant();
-        }
-        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
-        return portofinoRealm.getUsername((Serializable) subject.getPrincipal());
-    }
+    public abstract String getTenant();
 
     @Override
     protected ConnectionProvider selectConnectionProvider(String tenantIdentifier) {
@@ -94,24 +77,24 @@ public class MultiTenancyImplementation extends AbstractMultiTenantConnectionPro
             throw new RuntimeException("Could not instantiate connection provider " + connectionProviderClass, e);
         }
         String url = getConnectionURL(tenant);
-        if(url != null) {
+        if (url != null) {
             configuration.put(AvailableSettings.URL, url);
         }
         String username = getUsername(tenant);
-        if(username != null) {
+        if (username != null) {
             configuration.put(AvailableSettings.USER, username);
         }
         String password = getPassword(tenant);
-        if(password != null) {
+        if (password != null) {
             configuration.put(AvailableSettings.PASS, username);
         }
-        if(connectionProvider instanceof ServiceRegistryAwareService) {
+        if (connectionProvider instanceof ServiceRegistryAwareService) {
             ((ServiceRegistryAwareService) connectionProvider).injectServices(serviceRegistry);
         }
-        if(connectionProvider instanceof Configurable) {
+        if (connectionProvider instanceof Configurable) {
             ((Configurable) connectionProvider).configure(configuration);
         }
-        if(connectionProvider instanceof Startable) {
+        if (connectionProvider instanceof Startable) {
             ((Startable) connectionProvider).start();
         }
         return connectionProvider;
@@ -138,7 +121,7 @@ public class MultiTenancyImplementation extends AbstractMultiTenantConnectionPro
     public void configure(Map configurationValues) {
         this.configurationValues = configurationValues;
         connectionProviderClass = (Class<ConnectionProvider>) configurationValues.get(CONNECTION_PROVIDER_CLASS);
-        if(!ConnectionProvider.class.isAssignableFrom(connectionProviderClass)) {
+        if (!ConnectionProvider.class.isAssignableFrom(connectionProviderClass)) {
             throw new RuntimeException("Class " + connectionProviderClass.getName() + " does not implement ConnectionProvider");
         }
     }
@@ -146,7 +129,7 @@ public class MultiTenancyImplementation extends AbstractMultiTenantConnectionPro
     @Override
     public void stop() {
         connectionProviders.values().forEach(cp -> {
-            if(cp instanceof Stoppable) {
+            if (cp instanceof Stoppable) {
                 try {
                     ((Stoppable) cp).stop();
                 } catch (Exception e) {

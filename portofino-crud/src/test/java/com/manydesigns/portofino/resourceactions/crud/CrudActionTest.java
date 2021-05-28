@@ -98,7 +98,7 @@ public class CrudActionTest extends JerseyTest {
         Configuration configuration = new PropertiesConfiguration();
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
-        persistence = new Persistence(appDir, configuration, null, databasePlatformsRegistry);
+        persistence = new Persistence(appDir, configuration, null, databasePlatformsRegistry, null);
         persistence.start();
         setupJPetStore();
         persistence.initModel();

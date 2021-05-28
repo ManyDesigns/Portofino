@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.tt;
 
-import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.SchemaBasedMultiTenancy;
 
 import java.sql.Connection;
@@ -16,5 +15,10 @@ public class SampleSchemaBasedMultiTenantImplementation extends SchemaBasedMulti
         } else {
             connection.createStatement().execute("set search_path to tt2;");
         }
+    }
+
+    @Override
+    public String getTenant() {
+        return null;
     }
 }
