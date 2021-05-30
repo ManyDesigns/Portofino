@@ -25,6 +25,7 @@ import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.reactivex.disposables.Disposable;
 import org.apache.commons.configuration2.Configuration;
@@ -127,12 +128,27 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     }
 
     @Bean
+    public MultiTenancyImplementationFactory getApplicationContextMTImplFactory() {
+        return implClass -> {
+            try {
+                return applicationContext.getBean(implClass);
+            } catch (BeansException e) {
+                logger.error("MultiTenancyImplementation is not a valid spring bean, trying default constructor");
+                return MultiTenancyImplementationFactory.DEFAULT.make(implClass);
+            }
+        };
+    }
+
+    @Bean
     public Persistence getPersistence(
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
         Persistence persistence = new Persistence(
-                applicationDirectory, configuration, configurationFile, databasePlatformsRegistry, applicationContext);
+                applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
+        if(applicationContext != null) { //We may want it to be null when testing
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(persistence);
+        }
 
         FileObject generatedClassesRoot = applicationDirectory.resolveFile(GENERATED_CLASSES_DIRECTORY_NAME);
         generatedClassesRoot.createFolder();

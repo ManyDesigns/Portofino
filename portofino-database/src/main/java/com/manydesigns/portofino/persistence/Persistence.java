@@ -33,6 +33,7 @@ import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -57,20 +58,17 @@ import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Connection;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -103,6 +101,8 @@ public class Persistence {
     protected final FileObject applicationDirectory;
     protected final Configuration configuration;
     protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
+    @Autowired
+    protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
     public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
 
@@ -119,8 +119,6 @@ public class Persistence {
     public static final Logger logger =
             LoggerFactory.getLogger(Persistence.class);
 
-    protected final ApplicationContext context;
-
     //**************************************************************************
     // Constructors
     //**************************************************************************
@@ -128,12 +126,11 @@ public class Persistence {
     public Persistence(
             FileObject applicationDirectory, Configuration configuration,
             FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile,
-            DatabasePlatformsRegistry databasePlatformsRegistry, ApplicationContext context) throws FileSystemException {
+            DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
         this.applicationDirectory = applicationDirectory;
         this.configuration = configuration;
         this.configurationFile = configurationFile;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
-        this.context = context;
 
         if(getModelFile().exists()) {
             logger.info("Legacy application model file: {}", getModelFile().getName().getPath());
@@ -447,19 +444,13 @@ public class Persistence {
     protected MultiTenancyImplementation getMultiTenancyImplementation(Database database) {
         Optional<MultiTenant> multiTenant = database.getJavaAnnotation(MultiTenant.class);
         if(multiTenant.isPresent()) {
-            Class<MultiTenancyImplementation> implClass = multiTenant.get().strategy();
+            Class<? extends MultiTenancyImplementation> implClass = multiTenant.get().strategy();
             //TODO injection?
             if(!MultiTenancyImplementation.class.isAssignableFrom(implClass)) {
                 throw new ClassCastException(implClass + " does not extend " + MultiTenancyImplementation.class);
             }
             try {
-                MultiTenancyImplementation implementation;
-                try {
-                    implementation = context.getBean(implClass);
-                } catch (BeansException e) {
-                    logger.error("MultiTenancyImplementation is not a valid spring bean, trying default constructor");
-                    implementation = implClass.getConstructor().newInstance();
-                }
+                MultiTenancyImplementation implementation = multiTenancyImplementationFactory.make(implClass);
                 MultiTenancyStrategy strategy = implementation.getStrategy();
                 if (strategy.requiresMultiTenantConnectionProvider()) {
                     return implementation;
@@ -677,4 +668,11 @@ public class Persistence {
         public HibernateDatabaseSetup oldSetup;
     }
 
+    public MultiTenancyImplementationFactory getMultiTenancyImplementationFactory() {
+        return multiTenancyImplementationFactory;
+    }
+
+    public void setMultiTenancyImplementationFactory(MultiTenancyImplementationFactory multiTenancyImplementationFactory) {
+        this.multiTenancyImplementationFactory = multiTenancyImplementationFactory;
+    }
 }
