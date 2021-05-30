@@ -571,7 +571,6 @@ public class ManyToManyAction extends AbstractResourceAction {
                 return Response.serverError().entity(e).build();
             }
 
-            PkHelper pkHelper = new PkHelper(manyTableAccessor);
             //TODO chiave multipla
             String onePropertyName = m2mConfiguration.getActualOnePropertyName();
             PropertyAccessor onePropertyAccessor = relationTableAccessor.getProperty(onePropertyName);
@@ -582,7 +581,7 @@ public class ManyToManyAction extends AbstractResourceAction {
             //TODO handle manyKeyProperties.length > 1
             PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
             for(String pkString : selectedPrimaryKeys) {
-                Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
+                Object pkObject = manyTableAccessor.getIdStrategy().getPrimaryKey(pkString.split("/"));
                 Object pk = manyPkAccessor.get(pkObject);
                 if(!isExistingAssociation(manyPropertyAccessor, pk)) {
                     Object newRelation = saveNewRelation(pk, onePropertyAccessor, manyPropertyAccessor);
@@ -594,7 +593,7 @@ public class ManyToManyAction extends AbstractResourceAction {
                 Object o = it.next();
                 //TODO handle manyKeyProperties.length > 1
                 Object pkObject = manyPropertyAccessor.get(o);
-                String pkString = (String) OgnlUtils.convertValue(pkObject, String.class);
+                String pkString = OgnlUtils.convertValue(pkObject, String.class);
                 if(!selectedPrimaryKeys.contains(pkString)) {
                     deleteRelation(o);
                     it.remove();
@@ -618,7 +617,6 @@ public class ManyToManyAction extends AbstractResourceAction {
         if( onePk==null ){
             Map<Object,SelectionModel.Option> map = oneSelectField.getOptions();
             for(Object key : map.keySet()) {
-                //logger.info( map.get(key).label);
                 onePk=map.get(key).value;
                 if(onePk != null) {
                     JSONObject jsonKey = new JSONObject();
