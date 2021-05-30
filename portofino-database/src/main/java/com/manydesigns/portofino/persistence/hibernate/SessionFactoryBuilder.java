@@ -251,6 +251,7 @@ public class SessionFactoryBuilder {
                     AvailableSettings.DIALECT,
                     connectionProvider.getActualHibernateDialectName());
         }
+        settings.put(AvailableSettings.JPA_METAMODEL_POPULATION, "enabled");
         if(multiTenancyImplementation != null) {
             MultiTenancyStrategy strategy = multiTenancyImplementation.getStrategy();
             if (strategy.requiresMultiTenantConnectionProvider()) {
