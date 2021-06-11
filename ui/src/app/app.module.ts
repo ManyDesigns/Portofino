@@ -62,7 +62,7 @@ export class AppComponent {
     if(apiRoot) {
       app.apiRoot = apiRoot;
     } else {
-      app.apiRoot = "http://localhost:18080/demo-tt/api";
+      app.apiRoot = "http://localhost:8080/api";
     }
     console.log("API root:", app.apiRoot);
     app.upstairsLink = null;

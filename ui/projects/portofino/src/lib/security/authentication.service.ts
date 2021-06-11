@@ -159,12 +159,12 @@ export class AuthenticationService {
     if(token.exp &&
       moment().isBefore(moment(token.exp * 1000)) &&
       moment().isAfter(moment(token.exp * 1000 - this.tokenExpirationThresholdMs))) {
-      return this.strategy.refreshToken().pipe(map(token => {
+      return this.strategy.refreshToken(this.jsonWebToken).pipe(map(token => {
         this.setJsonWebToken(token);
         return requestWithHeader(req);
       }), catchError(() => {
         this.notifications.error(this.translate.get("Failed to refresh access token"));
-        return token;
+        return requestWithHeader(req);
       }));
     } else {
       return of(requestWithHeader(req));
@@ -229,7 +229,7 @@ export abstract class AuthenticationStrategy {
 
   abstract goToResetPassword(token: string);
 
-  abstract refreshToken(): Observable<string>;
+  abstract refreshToken(token: string): Observable<string>;
 
   abstract logout(): Observable<any>;
 
