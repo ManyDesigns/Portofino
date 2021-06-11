@@ -145,7 +145,7 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     TranslateModule.forChild()],
   providers: [ FieldFactory ],
   entryComponents: [
-    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent,
+    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent, FormComponent,
     NumberFieldComponent, SelectFieldComponent, TextFieldComponent],
   exports: [
     FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,

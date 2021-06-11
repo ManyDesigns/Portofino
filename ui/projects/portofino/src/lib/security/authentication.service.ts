@@ -129,9 +129,12 @@ export class AuthenticationService {
     try {
       token = jwt_decode(this.jsonWebToken);
     } catch (e) {
+      this.notifications.error(this.translate.get("Invalid authentication token, you've been logged out"));
+      this.removeAuthenticationInfo();
+      if(console && console.error) {
+        console.error(e);
+      }
       if(this.retryUnauthenticatedOnSessionExpiration) {
-        this.notifications.error(this.translate.get("Invalid authentication token, you've been logged out"));
-        this.removeAuthenticationInfo();
         return of(req);
       } else {
         return this.askForCredentials().pipe(
