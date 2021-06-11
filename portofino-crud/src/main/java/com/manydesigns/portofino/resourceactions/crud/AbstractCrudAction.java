@@ -82,6 +82,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -212,6 +213,11 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public CrudConfiguration crudConfiguration;
     public Form crudConfigurationForm;
     public TableForm selectionProvidersForm;
+    private SelectionProviderLoadStrategy selectionProviderLoadStrategy = SelectionProviderLoadStrategy.ONLY_ENFORCED;
+
+    static enum SelectionProviderLoadStrategy {
+        NONE, ONLY_ENFORCED, ALL
+    }
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -260,7 +266,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected abstract void doDelete(T object);
 
     /**
-     * {@link #loadObjectByPrimaryKey(java.lang.Object)}
+     * {@link #loadObjectByPrimaryKey(Object)}
      * @param identifier the object identifier in String form
      */
     protected void loadObject(String... identifier) {
@@ -717,7 +723,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * Populates the search form from request parameters.
      * <ul>
      *     <li>If <code>searchString</code> is blank, then the form is read from the request
-     *     (by {@link SearchForm#readFromRequest(javax.servlet.http.HttpServletRequest)}) and <code>searchString</code>
+     *     (by {@link SearchForm#readFromRequest(HttpServletRequest)}) and <code>searchString</code>
      *     is generated accordingly.</li>
      *     <li>Else, <code>searchString</code> is interpreted as a query string and the form is populated from it.</li>
      * </ul>
@@ -761,7 +767,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(selectionProviderSupport != null) {
             for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
                 SelectionProvider selectionProvider = current.getSelectionProvider();
-                if(selectionProvider == null) {
+                if(selectionProvider == null || !current.isEnforced()) {
                     continue;
                 }
                 String[] fieldNames = current.getFieldNames();
@@ -793,17 +799,16 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
-        if(selectionProviderSupport == null) {
-            return;
-        }
         // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
+        if(selectionProviderSupport != null) {
+            for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+                SelectionProvider selectionProvider = current.getSelectionProvider();
+                if (selectionProvider == null) {
+                    continue;
+                }
+                String[] fieldNames = current.getFieldNames();
+                tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
             }
-            String[] fieldNames = current.getFieldNames();
-            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
     }
 
@@ -937,13 +942,14 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected void configureFormSelectionProviders(FormBuilder formBuilder) {
-        if(selectionProviderSupport == null) {
+        if(selectionProviderSupport == null || selectionProviderLoadStrategy == SelectionProviderLoadStrategy.NONE) {
             return;
         }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
+            if(selectionProvider == null || (
+                    selectionProviderLoadStrategy == SelectionProviderLoadStrategy.ONLY_ENFORCED  && !current.isEnforced())) {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
@@ -1503,6 +1509,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * @param searchString the search string
      * @param firstResult pagination: the index of the first result returned by the search
      * @param maxResults pagination: the maximum number of results returned by the search
+     * @param newObject The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.
      * @since 4.2
      * @return search results (/) or single object (/pk) as JSON
      */
@@ -1510,20 +1517,25 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "The contents of this resource: either search results or a single object, depending on path parameters")
     public Response getAsJson(
-            @Parameter(description = "The search string (see http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
+            @Parameter(description = "The search string (see https://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
             @QueryParam("searchString") String searchString,
-            @Parameter(description = "The index of the first search result")
+            @Parameter(description = "The index of the first search result. Only valid for search.")
             @QueryParam("firstResult") Integer firstResult,
-            @Parameter(description = "The maximum number of returned search results")
+            @Parameter(description = "The maximum number of returned search results. Only valid for search.")
             @QueryParam("maxResults") Integer maxResults,
-            @Parameter(description = "The property according to which the search results are sorted")
+            @Parameter(description = "The property according to which the search results are sorted. Only valid for search.")
             @QueryParam("sortProperty") String sortProperty,
-            @Parameter(description = "The direction of the sort (asc or desc)")
+            @Parameter(description = "The direction of the sort (asc or desc). Only valid for search.")
             @QueryParam("sortDirection") String sortDirection,
-            @Parameter(description = "The returned object is pre-populated for being edited (including computed fields)")
+            @Parameter(description = "The returned object is pre-populated for being edited (including computed fields). Only valid for create, read, edit.")
             @QueryParam("forEdit") boolean forEdit,
-            @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields)")
-            @QueryParam("newObject") boolean newObject) {
+            @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.")
+            @QueryParam("newObject") boolean newObject,
+            @Parameter(description = "The returned object does not load a displayValue for fields that have selection providers. The client will have to query selection providers by itself. Only valid for create, read, edit.")
+            @QueryParam("skipSelectionProviders") boolean skipSelectionProviders) {
+        selectionProviderLoadStrategy = skipSelectionProviders ?
+                SelectionProviderLoadStrategy.NONE :
+                SelectionProviderLoadStrategy.ALL;
         if(newObject) {
             return jsonCreateData();
         }

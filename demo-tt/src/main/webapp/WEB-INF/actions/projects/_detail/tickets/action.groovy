@@ -60,20 +60,18 @@ class ProjectsTicketsAction extends CrudAction {
 
     @Override
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
-        formBuilder.configPrefix(prefix).configMode(mode);
-        configureFormSelectionProviders(formBuilder);
-
+        super.configureFormBuilder(formBuilder, mode)
         if (mode == Mode.VIEW) {
-            def viewFields = [];
+            def viewFields = []
             for (String fieldName : VIEW_FIELDS) {
-                Object fieldValue = object.get(fieldName);
+                Object fieldValue = object.get(fieldName)
                 if (fieldValue != null) {
-                    viewFields.add(fieldName);
+                    viewFields.add(fieldName)
                 }
             }
-            formBuilder.configFields((String[])viewFields);
+            formBuilder.configFields((String[])viewFields)
         }
-        return formBuilder;
+        formBuilder
     }
 
     public static final String[] WORKFLOW_FIELDS = [
