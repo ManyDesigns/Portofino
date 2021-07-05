@@ -348,7 +348,7 @@ public class PersistenceTest {
 
         List objs = QueryUtils.getRelatedObjects(persistence, "jpetstore", "category",
                 bird, "fk_product_1");
-        assertTrue(objs.size()>0);
+        assertTrue(objs.size() > 0);
     }
 
     @Test(enabled = false) //Disable because it fails on the CI server where the timezone is different

@@ -107,7 +107,7 @@
         <resteasy.version>4.6.1.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
         <shiro.version>1.7.1</shiro.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <spring.version>5.3.7</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -52,7 +52,7 @@ import java.net.URI;
  */
 public class GrizzlyMain {
 
-    private static Logger logger = LoggerFactory.getLogger(GrizzlyMain.class);
+    private static final Logger logger = LoggerFactory.getLogger(GrizzlyMain.class);
     
     public static void main(String[] args) throws Exception {
         File currentDirectory = new File("");

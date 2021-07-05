@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Quartz scheduler microservice.
 - Possibility to exclude Shiro-based security from the application (and implement security using other
   libraries).
+- Support for multi-tenancy in Hibernate
 
 ### Changed
 - Authentication/authorization endpoint is fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
