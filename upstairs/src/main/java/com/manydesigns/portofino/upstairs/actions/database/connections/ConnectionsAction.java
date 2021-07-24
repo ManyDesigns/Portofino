@@ -387,6 +387,9 @@ public class ConnectionsAction extends AbstractResourceAction {
     @POST
     @Path("{databaseName}/:synchronize")
     public void synchronize(@PathParam("databaseName") String databaseName) throws Exception {
+        if(DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName) == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
         persistence.syncDataModel(databaseName);
         persistence.initModel();
         persistence.saveXmlModel();
