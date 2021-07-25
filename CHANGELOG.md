@@ -19,8 +19,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - URL to trigger mail sender changed from `/actions/mail-sender-run` to `/portofino-send-mail` and HTTP method changed from GET to POST.
 - Mail sender action can be disabled with `mail.sender.action.enabled=false`.
 - Ensured that Java-only microservices without Groovy are possible.
-– Optimized selection providers based on foreign keys on save.
-– Reduce assumptions on persistent entities by CRUD actions allowing more possibilities for custom entities.
+- Optimized selection providers based on foreign keys on save.
+- Reduce assumptions on persistent entities by CRUD actions allowing more possibilities for custom entities.
 - Liquibase updated to version 4, minor library updates to fix vulnerabilities.
 
 ## [5.2.1] – 2020-04-10
