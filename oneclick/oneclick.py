@@ -61,7 +61,7 @@ shutil.copy(portofino_path + "/THIRDPARTIES.txt", base_path + "/THIRDPARTIES.txt
 
 print "Downloading JDBC drivers..."
 for driver in local.drivers:
-    urllib.urlretrieve("http://repo1.maven.org/maven2/" + driver[0] + driver[1], tomcat_path + "/lib/" + driver[1])
+    urllib.urlretrieve("https://repo1.maven.org/maven2/" + driver[0] + driver[1], tomcat_path + "/lib/" + driver[1])
 
 command = "cd " + portofino_path + "; mvn clean install"
 print "Building Portofino with command: " + command
