@@ -55,6 +55,7 @@ public class S3BlobManager implements BlobManager{
 
 
     final private String bucketName;
+    final private String region;
     final AmazonS3 s3;
     //**************************************************************************
     // Logging
@@ -67,19 +68,30 @@ public class S3BlobManager implements BlobManager{
     // Constructors and initialization
     //**************************************************************************
 
-
     public S3BlobManager(String region, String bucketName) {
         this.bucketName = bucketName;
+        this.region = region;
 
+        logger.info("[S3] Connecting to bucket "+bucketName+" from region "+region);
         AWSCredentialsProvider credential = new DefaultAWSCredentialsProviderChain();
-        this.s3 = AmazonS3ClientBuilder.standard().withCredentials( credential ).withRegion( Regions.fromName(region)).build();
+
+        logger.debug("[S3] using credentials "+credential.getCredentials().getAWSAccessKeyId()+" "
+                +credential.getCredentials().getAWSSecretKey());
+
+        this.s3 = AmazonS3ClientBuilder.standard()
+                .withCredentials( credential )
+                .withRegion( Regions.fromName(region) )
+                .build();
     }
 
     public S3BlobManager(String region, String bucketName, String endPoint) {
         this.bucketName = bucketName;
+        this.region = region;
+
+        logger.info("[S3] Connecting to bucket "+bucketName+" from region "+region);
+
         AwsClientBuilder.EndpointConfiguration  endpointConfiguration = new AwsClientBuilder.EndpointConfiguration( endPoint, region );
 
-        AWSCredentialsProvider credential = new DefaultAWSCredentialsProviderChain();
         this.s3 = AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration( endpointConfiguration )
                 .withPathStyleAccessEnabled(true)
@@ -89,9 +101,6 @@ public class S3BlobManager implements BlobManager{
     //**************************************************************************
     // Methods
     //**************************************************************************
-
-
-
     public void ensureValidCode(String code) {
         if (!StringUtils.isAlphanumeric(code)) {
             throw new IllegalArgumentException(
@@ -145,14 +154,13 @@ public class S3BlobManager implements BlobManager{
     public void save(Blob blob) throws IOException {
         ensureValidCode(blob.getCode());
         try {
-            InputStream encryptInputStream;
+
             InputStream inputStream = blob.getInputStream();
             ObjectMetadata metadata = new ObjectMetadata();
             Properties properties = blob.getMetaProperties();
 
             metadata.setContentEncoding("UTF-8");
-            metadata.setContentType("plain/text");
-
+            metadata.setContentLength(blob.getSize());
 
             for(Object obj : properties.keySet()){
                 metadata.addUserMetadata( "app_creator", "Portofino" );
@@ -168,8 +176,9 @@ public class S3BlobManager implements BlobManager{
 
             PutObjectResult result;
             if(blob.isEncrypted()){
-                encryptInputStream = BlobUtils.encrypt(inputStream,blob.getEncryptionType());
-                result = s3.putObject(bucketName, blob.getCode(), inputStream, metadata);
+                InputStream encryptedInputStream;
+                encryptedInputStream = BlobUtils.encrypt(inputStream,blob.getEncryptionType());
+                result = s3.putObject(bucketName, blob.getCode(), encryptedInputStream, metadata);
             } else {
                 result = s3.putObject(bucketName, blob.getCode(), inputStream, metadata);
             }
@@ -199,8 +208,6 @@ public class S3BlobManager implements BlobManager{
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-
     public String getBucketName() {
         return bucketName;
     }
