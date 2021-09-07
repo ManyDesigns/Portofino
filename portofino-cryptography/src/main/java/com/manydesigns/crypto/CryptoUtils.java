@@ -1,9 +1,7 @@
 package com.manydesigns.crypto;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.security.MessageDigest;
 
@@ -36,9 +34,6 @@ class CryptoUtils {
         }
         if( pass.length()<PASS_MIN_LEN){
             throw new InvalidPassphraseException("Passphrase too short, it should be at least "+PASS_MIN_LEN+" chars");
-        }
-        if(!StringUtils.isAlphanumeric(pass)){
-            throw new InvalidPassphraseException("Passphrase not alphanumeric");
         }
     }
 
