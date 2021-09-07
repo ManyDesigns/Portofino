@@ -99,7 +99,7 @@
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.6</jsqlparser.version>
         <json.version>20180813</json.version>
-        <jsoup.version>1.9.2</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
         <jstl.version>1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>3.8.2</liquibase.version>
