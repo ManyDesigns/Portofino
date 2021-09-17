@@ -119,7 +119,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             try {
                 facade = context.getBean(SecurityFacade.class);
             } catch (NoSuchBeanDefinitionException e) {
-                //Not found, let's use default
+                logger.debug("No security facade found, using no-op", e);
             }
         }
         facade.checkWebResourceIsAccessible(requestContext, resource, resourceInfo.getResourceMethod());

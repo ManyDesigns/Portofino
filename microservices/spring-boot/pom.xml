@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.5</version>
+		<version>2.4.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.manydesigns</groupId>
@@ -42,7 +42,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-			<version>2.4.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
@@ -84,7 +83,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
 				<configuration>
 					<mavenExecutorId>forked-path</mavenExecutorId>
 					<useReleaseProfile>false</useReleaseProfile>
@@ -145,16 +143,12 @@
 							<!-- workaround for https://bugs.openjdk.java.net/browse/JDK-8212233 -->
 							<source>8</source>
 							<links>
-								<link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
 								<link>https://commons.apache.org/proper/commons-configuration/apidocs/</link>
 								<link>https://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
-								<link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
+								<link>https://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
 								<link>https://www.joda.org/joda-time/apidocs/</link>
 								<link>https://docs.oracle.com/javaee/7/api/</link>
 								<link>https://docs.oracle.com/javase/8/docs/api/</link>
-								<!-- Corresponding javadoc command line:
-                                -source 8 -link http://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/3.0.7/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
-                                -->
 							</links>
 						</configuration>
 						<executions>

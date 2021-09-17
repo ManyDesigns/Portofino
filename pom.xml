@@ -420,7 +420,7 @@
             <plugin>
               <groupId>com.github.spotbugs</groupId>
               <artifactId>spotbugs-maven-plugin</artifactId>
-              <version>4.0.0</version>
+              <version>4.3.0</version>
               <configuration>
                 <plugins>
                   <plugin>
@@ -439,7 +439,7 @@
                 <dependency>
                   <groupId>com.github.spotbugs</groupId>
                   <artifactId>spotbugs</artifactId>
-                  <version>4.0.0-beta2</version>
+                  <version>4.4.0</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -520,15 +520,15 @@
                             <!-- workaround for https://bugs.openjdk.java.net/browse/JDK-8212233 -->
                             <source>8</source>
                             <links>
-                                <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
+                                <link>https://shiro.apache.org/static/${shiro.version}/apidocs/</link>
                                 <link>https://commons.apache.org/proper/commons-configuration/apidocs/</link>
                                 <link>https://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
-                                <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
+                                <link>https://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
                                 <link>https://www.joda.org/joda-time/apidocs/</link>
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link http://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/3.0.7/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link https://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
