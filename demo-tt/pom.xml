@@ -249,8 +249,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v12.3.1</nodeVersion>
-                                    <npmVersion>6.11.3</npmVersion>
+                                    <nodeVersion>${nodejs.version}</nodeVersion>
+                                    <npmVersion>${npm.version}</npmVersion>
                                 </configuration>
                             </execution>
 

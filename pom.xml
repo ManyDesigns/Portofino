@@ -110,6 +110,9 @@
         <slf4j.version>1.7.30</slf4j.version>
         <spring.version>5.3.7</spring.version>
 
+        <nodejs.version>v12.22.6</nodejs.version>
+        <npm.version>6.14.15</npm.version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <sonar.projectKey>ManyDesigns_Portofino</sonar.projectKey>
