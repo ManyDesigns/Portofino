@@ -8,6 +8,7 @@ import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.jaxrs2.ReaderListener;
 import io.swagger.v3.oas.integration.api.OpenApiReader;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.PathParameter;
 import org.slf4j.Logger;
@@ -45,6 +46,9 @@ public abstract class DocumentedApiRoot implements ReaderListener {
             Resource root = rootFactory.createRoot();
             root.setResourceContext(getResourceContext());
             initRoot(root);
+            if(openAPI.getPaths() == null) {
+                openAPI.setPaths(new Paths());
+            }
             new DepthFirstVisitor(node -> {
                 try {
                     OpenAPI subApi = subResourceReader.readSubResource(node);

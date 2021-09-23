@@ -358,8 +358,8 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             operationId =
                     "com.manydesigns.portofino.resourceactions.AbstractResourceAction#isAccessible",
             description =
-                    "Returns true if this action is accessible, and an HTTP 40x error if it's not." +
-                    "Clients can use this method to check if the action is accessible without invoking any" +
+                    "Returns true if this action is accessible, and an HTTP 40x error if it's not. " +
+                    "Clients can use this method to check if the action is accessible without invoking any " +
                     "other operations.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "The string true, if the action is accessible."),

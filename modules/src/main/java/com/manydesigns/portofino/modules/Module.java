@@ -35,6 +35,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * A Module is a component in a Portofino application that offers capabilities to user code
+ * (actions and shared classes). Portofino discovers modules automatically at startup and registers
+ * them as Spring beans.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -53,10 +57,22 @@ public interface Module {
         }
     }
 
+    /**
+     * Each module has a version. Currently, its only use is to inform the user about installed modules.
+     * @return the version of this module.
+     */
     String getModuleVersion();
 
+    /**
+     * Each module has a name. Currently, its only use is to inform the user about installed modules.
+     * @return the name of this module.
+     */
     String getName();
 
+    /**
+     * Each module has a dynamic state representing the phase of its lifecycle that it's currently in.
+     * @return this module's status.
+     */
     ModuleStatus getStatus();
 
 }

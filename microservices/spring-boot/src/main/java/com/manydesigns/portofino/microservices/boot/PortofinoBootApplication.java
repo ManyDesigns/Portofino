@@ -40,8 +40,8 @@ public class PortofinoBootApplication {
 			try {
 				switch (webApplicationType) {
 					case SERVLET:
-							return new PortofinoAnnotationConfigServletWebServerApplicationContext(getApplicationDirectoryPath(applicationArguments));
-
+						return new PortofinoAnnotationConfigServletWebServerApplicationContext(
+								getApplicationDirectoryPath(applicationArguments));
 					case REACTIVE:
 						return new AnnotationConfigServletWebServerApplicationContext();
 					default:

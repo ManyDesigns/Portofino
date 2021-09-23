@@ -20,10 +20,7 @@
 
 package com.manydesigns.portofino.security;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Declares the minimum set of permissions that the user must have in order to invoke a specific method on a REST
@@ -36,6 +33,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface RequiresPermissions {
     String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 

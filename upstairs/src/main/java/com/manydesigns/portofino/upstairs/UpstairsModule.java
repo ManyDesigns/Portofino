@@ -24,12 +24,9 @@ import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
-import com.manydesigns.portofino.rest.PortofinoRoot;
-import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.upstairs.actions.UpstairsAction;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.VFS;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +95,7 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    public void onApplicationEvent(@NotNull ContextRefreshedEvent contextRefreshedEvent) {
         try {
             ActionLogic.mountPackage(actionsDirectory, "portofino-upstairs", UpstairsAction.class.getPackage());
         } catch (Exception e) {

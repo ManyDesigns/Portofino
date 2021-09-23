@@ -203,7 +203,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
