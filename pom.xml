@@ -98,7 +98,7 @@
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.7</jsqlparser.version>
         <json.version>20180813</json.version>
-        <jsoup.version>1.9.2</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>4.4.0</liquibase.version>
         <logback.version>1.2.3</logback.version>
@@ -106,7 +106,7 @@
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.6.1.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.7.1</shiro.version>
+        <shiro.version>1.8.0</shiro.version>
         <slf4j.version>1.7.30</slf4j.version>
         <spring.version>5.3.7</spring.version>
 
