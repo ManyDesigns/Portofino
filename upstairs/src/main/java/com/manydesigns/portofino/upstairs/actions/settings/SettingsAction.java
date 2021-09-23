@@ -27,7 +27,7 @@ import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
-import com.manydesigns.portofino.rest.PortofinoRoot;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.upstairs.Settings;
@@ -81,8 +81,8 @@ public class SettingsAction extends AbstractResourceAction {
         settings.appName = configuration.getString(PortofinoProperties.APP_NAME);
         settings.appVersion = configuration.getString(PortofinoProperties.APP_VERSION);
         settings.loginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
-        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false);
-        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false);
+        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false);
+        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.PRELOAD_CLASSES, false);
         Form form = new FormBuilder(Settings.class).build();
         form.readFromObject(settings);
         return form;
@@ -114,22 +114,25 @@ public class SettingsAction extends AbstractResourceAction {
             try {
                 Settings settings = new Settings();
                 form.writeToObject(settings);
-                try {
-                    PortofinoRoot root = (PortofinoRoot) getRoot();
-                    root.getLoginAction(settings.loginPath);
-                } catch (Exception e) {
-                    throw new WebApplicationException("Invalid login path", e);
+                ResourceAction action = (ResourceAction) getRoot();
+                String[] loginPath = settings.loginPath.split("/");
+                for(String loginPathSegment : loginPath) {
+                    Object subResource = action.getSubResource(loginPathSegment);
+                    if(!(subResource instanceof ResourceAction)) {
+                        throw new WebApplicationException("Invalid login path");
+                    }
+                    action = (ResourceAction) subResource;
                 }
                 configuration.setProperty(PortofinoProperties.APP_NAME, settings.appName);
                 configuration.setProperty(PortofinoProperties.APP_VERSION, settings.appVersion);
                 configuration.setProperty(PortofinoProperties.LOGIN_PATH, settings.loginPath);
                 if(!settings.preloadGroovyPages ||
-                   configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES) != null) {
-                    configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES, settings.preloadGroovyPages);
+                   configuration.getProperty(PortofinoProperties.PRELOAD_ACTIONS) != null) {
+                    configuration.setProperty(PortofinoProperties.PRELOAD_ACTIONS, settings.preloadGroovyPages);
                 }
                 if(!settings.preloadGroovyClasses ||
-                   configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES) != null) {
-                    configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES, settings.preloadGroovyClasses);
+                   configuration.getProperty(PortofinoProperties.PRELOAD_CLASSES) != null) {
+                    configuration.setProperty(PortofinoProperties.PRELOAD_CLASSES, settings.preloadGroovyClasses);
                 }
                 configurationFile.save();
                 logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());

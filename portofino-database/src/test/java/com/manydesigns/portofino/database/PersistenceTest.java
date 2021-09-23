@@ -148,7 +148,7 @@ public class PersistenceTest {
 
     public void testReadProdotti() {
         Session session = persistence.getSession("jpetstore");
-        CriteriaQuery criteria = QueryUtils.createCriteria(session,"product").getFirst();
+        CriteriaQuery criteria = QueryUtils.createCriteria(session,"product").query;
         List resultProd = new ArrayList(session.createQuery(criteria).list());
 
         int sizePrd = resultProd.size();
@@ -157,7 +157,7 @@ public class PersistenceTest {
 
     public void testSearchAndReadCategorieProdotti() {
         Session session = persistence.getSession("jpetstore");
-        CriteriaQuery criteria = QueryUtils.createCriteria(session,"category").getFirst();
+        CriteriaQuery criteria = QueryUtils.createCriteria(session,"category").query;
         List resultCat = new ArrayList(session.createQuery(criteria).list());
 
         int sizeCat = resultCat.size();
@@ -167,7 +167,7 @@ public class PersistenceTest {
             assertNotNull(get(cat, "name"));
         });
 
-        criteria = QueryUtils.createCriteria(session,"product").getFirst();
+        criteria = QueryUtils.createCriteria(session,"product").query;
         List resultProd = new ArrayList(session.createQuery(criteria).list());
 
         Table table = DatabaseLogic.findTableByName(
@@ -207,7 +207,7 @@ public class PersistenceTest {
         TableCriteria tableCriteria = new TableCriteria(table);
 
         Session session = persistence.getSession("jpetstore");
-        CriteriaQuery<Object> criteria = QueryUtils.createCriteria(session, "category").getFirst();
+        CriteriaQuery<Object> criteria = QueryUtils.createCriteria(session, "category").query;
         List<Object> resultCat = new ArrayList<>(session.createQuery(criteria).list());
 
         int sizeCat = resultCat.size();
@@ -350,7 +350,7 @@ public class PersistenceTest {
 
         List objs = QueryUtils.getRelatedObjects(persistence, "jpetstore", "category",
                 bird, "fk_product_1");
-        assertTrue(objs.size()>0);
+        assertTrue(objs.size() > 0);
     }
 
     @Test(enabled = false) //Disable because it fails on the CI server where the timezone is different
@@ -418,7 +418,7 @@ public class PersistenceTest {
 
     public void testFkComposite() throws Exception {
         Session session = persistence.getSession("hibernatetest");
-        List<Object> list2 = session.createQuery(QueryUtils.createCriteria(session, "table2").getFirst()).list();
+        List<Object> list2 = session.createQuery(QueryUtils.createCriteria(session, "table2").query).list();
         Object map = list2.get(0);
         List<?> obj = get(map, "table3_t2_id1_fkey");
         assertNotNull(obj);

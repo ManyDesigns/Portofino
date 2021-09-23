@@ -89,7 +89,7 @@ public abstract class ConnectionProvider implements Unmarshallable {
     public static final Logger logger = LoggerFactory.getLogger(ConnectionProvider.class);
 
     public ConnectionProvider() {
-        types = new ArrayList<Type>();
+        types = new ArrayList<>();
     }
 
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {

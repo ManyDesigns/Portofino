@@ -2,11 +2,26 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.2.2] – Unreleased
+## [5.3.0] – Unreleased
+
+### Added
+- Microservice deployment options using Spring Boot.
+- Easier Quartz job registration using Spring beans.
+- Email microservice.
+- Quartz scheduler microservice.
+- Possibility to exclude Shiro-based security from the application (and implement security using other
+  libraries).
+- Support for multi-tenancy in Hibernate.
 
 ### Changed
-- Authentication/authorization endpoint is fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
-- Simplify initialization by removing PortofinoListener
+- Authentication/authorization endpoint is now fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
+- Simplify initialization by removing PortofinoListener.
+- URL to trigger mail sender changed from `/actions/mail-sender-run` to `/portofino-send-mail` and HTTP method changed from GET to POST.
+- Mail sender action can be disabled with `mail.sender.action.enabled=false`.
+- Ensured that Java-only microservices without Groovy are possible.
+- Optimized selection providers based on foreign keys on save.
+- Reduce assumptions on persistent entities by CRUD actions allowing more possibilities for custom entities.
+- Liquibase updated to version 4, minor library updates to fix vulnerabilities.
 
 ## [5.2.1] – 2020-04-10
 

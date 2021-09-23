@@ -129,9 +129,12 @@ export class AuthenticationService {
     try {
       token = jwt_decode(this.jsonWebToken);
     } catch (e) {
+      this.notifications.error(this.translate.get("Invalid authentication token, you've been logged out"));
+      this.removeAuthenticationInfo();
+      if(console && console.error) {
+        console.error(e);
+      }
       if(this.retryUnauthenticatedOnSessionExpiration) {
-        this.notifications.error(this.translate.get("Invalid authentication token, you've been logged out"));
-        this.removeAuthenticationInfo();
         return of(req);
       } else {
         return this.askForCredentials().pipe(
@@ -156,12 +159,12 @@ export class AuthenticationService {
     if(token.exp &&
       moment().isBefore(moment(token.exp * 1000)) &&
       moment().isAfter(moment(token.exp * 1000 - this.tokenExpirationThresholdMs))) {
-      return this.strategy.refreshToken().pipe(map(token => {
+      return this.strategy.refreshToken(this.jsonWebToken).pipe(map(token => {
         this.setJsonWebToken(token);
         return requestWithHeader(req);
       }), catchError(() => {
         this.notifications.error(this.translate.get("Failed to refresh access token"));
-        return token;
+        return requestWithHeader(req);
       }));
     } else {
       return of(requestWithHeader(req));
@@ -226,7 +229,7 @@ export abstract class AuthenticationStrategy {
 
   abstract goToResetPassword(token: string);
 
-  abstract refreshToken(): Observable<string>;
+  abstract refreshToken(token: string): Observable<string>;
 
   abstract logout(): Observable<any>;
 

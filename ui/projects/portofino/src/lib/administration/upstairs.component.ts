@@ -57,7 +57,7 @@ export class UpstairsComponent extends Page implements OnInit {
     if(!this.portofino.apiRoot.endsWith("/")) {
       this.portofino.apiRoot += "/";
     }
-    this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(response => {
+    this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(() => {
       this.checkAccess(true);
     }, error => {
       console.error(error);

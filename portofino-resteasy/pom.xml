@@ -10,7 +10,7 @@
     </parent>
     <artifactId>portofino-resteasy</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>httpw://www.manydesigns.com/</url>
 
     <dependencies>
         <dependency>

@@ -10,7 +10,7 @@
     </parent>
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <properties>
         <portofino.application.directory>${serverInfo:realPath}/WEB-INF</portofino.application.directory>
         <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
@@ -56,6 +56,13 @@
             <scope>compile</scope>
         </dependency>
         -->
+        <!-- Security -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-security-shiro</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Keycloak support -->
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -68,6 +75,18 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Email support -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-mail</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
             <scope>compile</scope>
         </dependency>
         <!-- Angular UI support -->
@@ -101,12 +120,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
-        <!-- mail -->
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>com.sksamuel.diff</groupId>
             <artifactId>diff</artifactId>
@@ -129,7 +142,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.41</version>
+            <version>9.0.43</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -236,8 +249,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v12.3.1</nodeVersion>
-                                    <npmVersion>6.11.3</npmVersion>
+                                    <nodeVersion>${nodejs.version}</nodeVersion>
+                                    <npmVersion>${npm.version}</npmVersion>
                                 </configuration>
                             </execution>
 

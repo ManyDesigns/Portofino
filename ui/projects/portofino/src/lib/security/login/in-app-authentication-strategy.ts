@@ -1,7 +1,7 @@
 import {AuthenticationStrategy} from "../authentication.service";
 import {Inject, Injectable, InjectionToken} from "@angular/core";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
 import {NO_REFRESH_TOKEN_HEADER} from "../authentication.headers";
 import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/common/http";
 import {ApiInfo, PortofinoService} from "../../portofino.service";
@@ -49,7 +49,11 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
     });
   }
 
-  refreshToken(): Observable<string> {
+  refreshToken(token: string): Observable<string> {
+    if(!this.loginPath) {
+      //The app is initializing, we cannot yet refresh the token
+      return of(token);
+    }
     //The body here is to work around CORS requests failing with an empty body (TODO investigate)
     return this.authentication.withAuthenticationHeader(
       new HttpRequest<any>("POST", `${this.loginPath}/:refresh-token`, "refresh", {
@@ -79,7 +83,7 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
   }
 
   get loginPath() {
-    return `${this.portofino.apiRoot}:auth`;
+    return (this.portofino.apiRoot !== undefined) ? `${this.portofino.apiRoot}:auth` : undefined;
   }
 
 

@@ -134,6 +134,28 @@ public class ActionLogic {
         }
     }
 
+    public static void mount(FileObject actionDirectory, String segment, Class<?> actionClass) throws Exception {
+        mount(actionDirectory, segment, "res:" + actionClass.getName().replace('.', '/') + ".class");
+    }
+
+    public static void mountPackage(FileObject actionDirectory, String segment, String packageName) throws Exception {
+        mount(actionDirectory, segment, "res:" + packageName.replace('.', '/'));
+    }
+
+    public static void mountPackage(FileObject actionDirectory, String segment, Package pkg) throws Exception {
+        mountPackage(actionDirectory, segment, pkg.getName());
+    }
+
+    public static void unmount(FileObject actionDirectory, String segment) throws Exception {
+        ActionDescriptor descriptor = getActionDescriptor(actionDirectory);
+        Optional<AdditionalChild> existing =
+                descriptor.getAdditionalChildren().stream().filter(c -> c.getSegment().equals(segment)).findFirst();
+        if(existing.isPresent()) {
+            descriptor.getAdditionalChildren().remove(existing.get());
+            saveActionDescriptor(actionDirectory, descriptor);
+        }
+    }
+
     protected static class FileCacheEntry<T> {
         public final T object;
         public final long lastModified;

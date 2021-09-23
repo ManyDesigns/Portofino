@@ -151,7 +151,7 @@ public abstract class DispatcherInitializer {
     }
 
     protected FileObject getCodeBaseRoot() throws FileSystemException {
-        return VFS.getManager().resolveFile("res:");
+        return VFS.getManager().resolveFile("res:com").getParent();
     }
 
     protected void configureResourceResolvers(ResourceResolvers resourceResolver, CodeBase codeBase) {

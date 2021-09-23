@@ -33,36 +33,24 @@ import com.manydesigns.portofino.resourceactions.form.FormAction;
 import com.manydesigns.portofino.resourceactions.form.TableFormAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
-import com.manydesigns.portofino.shiro.SecurityClassRealm;
-import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
-import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
+import com.manydesigns.portofino.security.SecurityLogic;
+import com.manydesigns.portofino.security.noop.login.NoOpLoginAction;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import io.jsonwebtoken.io.Encoders;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.util.LifecycleUtils;
-import org.apache.shiro.web.env.EnvironmentLoader;
-import org.apache.shiro.web.env.WebEnvironment;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
-import java.util.UUID;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION;
@@ -73,7 +61,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORT
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ResourceActionsModule implements Module, ApplicationListener<ContextRefreshedEvent> {
+public class ResourceActionsModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
     public static final String ACTIONS_DIRECTORY = "actionsDirectory";
@@ -103,9 +91,6 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
     @Autowired
     public CacheResetListenerRegistry cacheResetListenerRegistry;
 
-    protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
-    protected SecurityClassRealm realm;
-
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
@@ -126,7 +111,7 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
     }
 
     @PostConstruct
-    public void init() throws FileSystemException {
+    public void init() throws Exception {
         logger.debug("Initializing dispatcher");
         ActionLogic.init(configuration);
 
@@ -135,7 +120,7 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
         logger.info("Actions directory: " + actionsDirectory);
         //TODO ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
 
-        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false)) {
+        if(configuration.getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false)) {
             logger.info("Preloading actions");
             try {
                 ResourceResolver resourceResolver =
@@ -145,42 +130,14 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
                 logger.warn("Could not preload actions", e);
             }
         }
-        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false)) {
+        if(configuration.getBoolean(PortofinoProperties.PRELOAD_CLASSES, false)) {
             logger.info("Preloading Groovy classes");
             preloadClasses(codeBase.getRoot());
         }
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
 
-        if(!configuration.containsKey("jwt.secret")) {
-            String jwtSecret = Encoders.BASE64.encode((UUID.randomUUID() + UUID.randomUUID().toString()).getBytes());
-            logger.warn("No jwt.secret property was set, so we generated one: {}.", jwtSecret);
-            configuration.setProperty("jwt.secret", jwtSecret);
-            try {
-                configurationFile.save();
-                logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
-            } catch (ConfigurationException e) {
-                logger.warn("Configuration could not be saved", e);
-            }
-        }
-
-        logger.info("Initializing Shiro environment");
-        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
-        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-        SelfRegisteringShiroFilter shiroFilter = SelfRegisteringShiroFilter.get(servletContext);
-        if(shiroFilter != null) {
-            try {
-                //when reloading the Spring context, this overwrites the filter's stale security manager.
-                shiroFilter.init();
-            } catch (Exception e) {
-                logger.error("Could not initialize the Shiro filter", e);
-                status = ModuleStatus.FAILED;
-                return;
-            }
-        }
-        logger.debug("Creating SecurityClassRealm");
-        realm = new SecurityClassRealm(codeBase, "Security");
-        rsm.setRealm(realm);
+        SecurityLogic.installLogin(actionsDirectory, configuration, NoOpLoginAction.class);
         status = ModuleStatus.STARTED;
     }
 
@@ -247,8 +204,6 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
 
     @PreDestroy
     public void destroy() {
-        logger.info("Destroying Shiro environment...");
-        environmentLoader.destroyEnvironment(servletContext);
         status = ModuleStatus.DESTROYED;
     }
 
@@ -261,19 +216,6 @@ public class ResourceActionsModule implements Module, ApplicationListener<Contex
         @Override
         public void handleReset(CacheResetEvent e) {
             ActionLogic.clearConfigurationCache();
-        }
-    }
-
-    @Override
-    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        ApplicationContext applicationContext = event.getApplicationContext();
-        if(PortofinoContextLoaderListener.BRIDGE_CONTEXT.equals(applicationContext.getId())) {
-            realm.setApplicationContext(applicationContext);
-            try {
-                LifecycleUtils.init(realm);
-            } catch (Exception e) {
-                logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
-            }
         }
     }
 }

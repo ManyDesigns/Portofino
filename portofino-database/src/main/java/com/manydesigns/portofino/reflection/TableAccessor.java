@@ -28,6 +28,8 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.PrimaryKey;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.persistence.IdStrategy;
+import com.manydesigns.portofino.util.PkHelper;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -55,6 +57,7 @@ public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAcc
     protected final ColumnAccessor[] columnAccessors;
     protected final ColumnAccessor[] keyColumnAccessors;
     protected ClassAccessor javaClassAccessor = null;
+    protected final IdStrategy idStrategy;
 
     public final static Logger logger = LoggerFactory.getLogger(TableAccessor.class);
 
@@ -73,6 +76,15 @@ public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAcc
         Class clazz = table.getActualJavaClass();
         if (clazz != null) {
             javaClassAccessor = JavaClassAccessor.getClassAccessor(clazz);
+        }
+        if(table.getActualIdStrategy() != null) {
+            try {
+                idStrategy = (IdStrategy) table.getActualIdStrategy().getConstructor(ClassAccessor.class).newInstance(this);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            idStrategy = new PkHelper(this);
         }
 
         this.table = table;
@@ -178,5 +190,9 @@ public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAcc
 
     public Table getTable() {
         return table;
+    }
+
+    public IdStrategy getIdStrategy() {
+        return idStrategy;
     }
 }

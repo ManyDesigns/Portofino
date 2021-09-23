@@ -10,7 +10,7 @@
     </parent>
     <artifactId>portofino-jersey</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
 
     <dependencyManagement>
         <dependencies>
@@ -60,7 +60,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.4.3.Final</version>
+            <version>6.1.7.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

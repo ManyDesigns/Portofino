@@ -24,23 +24,23 @@
     <licenses>
         <license>
             <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
-            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <url>https://www.gnu.org/licenses/lgpl.html</url>
             <distribution>repo</distribution>
             <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
     <organization>
         <name>MANYDESIGNS s.r.l.</name>
-        <url>http://www.manydesigns.com/</url>
+        <url>https://www.manydesigns.com/</url>
     </organization>
     <mailingLists>
         <mailingList>
             <name>Portofino mailing list in English</name>
-            <archive>http://groups.google.com/group/manydesigns-portofino</archive>
+            <archive>https://groups.google.com/group/manydesigns-portofino</archive>
         </mailingList>
         <mailingList>
             <name>Portofino mailing list in Italian</name>
-            <archive>http://groups.google.com/group/manydesigns-portofino-it</archive>
+            <archive>https://groups.google.com/group/manydesigns-portofino-it</archive>
         </mailingList>
     </mailingLists>
     <scm>
@@ -81,13 +81,13 @@
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
-        <commons.io.version>2.6</commons.io.version>
+        <commons.io.version>2.7</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.2</commons.vfs.version>
         <fop.version>2.1</fop.version>
         <groovy.version>3.0.8</groovy.version>
         <guava.version>30.1.1-jre</guava.version>
-        <hibernate.version>5.4.24.Final</hibernate.version>
+        <hibernate.version>5.5.3.Final</hibernate.version>
         <jackson.version>2.11.0</jackson.version>
         <jackson.databind.version>2.10.5.1</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
@@ -99,17 +99,20 @@
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.7</jsqlparser.version>
         <json.version>20180813</json.version>
-        <jsoup.version>1.9.2</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>3.10.1</liquibase.version>
+        <liquibase.version>4.4.0</liquibase.version>
         <logback.version>1.2.3</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
-        <resteasy.version>4.5.8.SP1</resteasy.version>
+        <resteasy.version>4.6.1.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.7.1</shiro.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <spring.version>5.2.9.RELEASE</spring.version>
+        <shiro.version>1.8.0</shiro.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <spring.version>5.3.7</spring.version>
+
+        <nodejs.version>v12.22.6</nodejs.version>
+        <npm.version>6.14.15</npm.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -120,7 +123,7 @@
     </properties>
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
+            <id>sonatype-nexus-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
@@ -132,18 +135,19 @@
         <module>modules</module>
         <module>mail</module>
         <module>portofino-core</module>
+        <module>security-shiro</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
         <module>portofino-model</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
-        <module>portofino-db2</module>
-        <module>portofino-derby</module>
-        <module>portofino-googlecloudsql</module>
-        <module>portofino-mssql</module>
-        <module>portofino-mysql</module>
-        <module>portofino-oracle</module>
-        <module>portofino-postgresql</module>
+        <module>databases/db2</module>
+        <module>databases/derby</module>
+        <module>databases/googlecloudsql</module>
+        <module>databases/mssql</module>
+        <module>databases/mysql</module>
+        <module>databases/oracle</module>
+        <module>databases/postgresql</module>
         <!-- Pages -->
         <module>portofino-crud</module>
         <!-- Optional services and integrations -->
@@ -151,12 +155,17 @@
         <module>keycloak</module>
         <!-- Microservices -->
         <module>microservices/launcher</module>
+        <module>microservices/spring-boot</module>
+        <module>microservices/scheduler</module>
+        <module>microservices/mail</module>
         <!-- UI -->
         <module>ui</module>
         <!-- upstairs -->
         <module>upstairs</module>
         <!-- Archetypes -->
-        <module>portofino-war-archetype</module>
+        <module>archetypes/service-groovy</module>
+        <module>archetypes/service-java</module>
+        <module>archetypes/war</module>
         <!-- Applications -->
         <module>demo-tt</module>
     </modules>
@@ -324,6 +333,12 @@
             <artifactId>jakarta.activation-api</artifactId>
             <version>1.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.3</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -414,7 +429,7 @@
             <plugin>
               <groupId>com.github.spotbugs</groupId>
               <artifactId>spotbugs-maven-plugin</artifactId>
-              <version>4.0.0</version>
+              <version>4.3.0</version>
               <configuration>
                 <plugins>
                   <plugin>
@@ -433,7 +448,7 @@
                 <dependency>
                   <groupId>com.github.spotbugs</groupId>
                   <artifactId>spotbugs</artifactId>
-                  <version>4.0.0-beta2</version>
+                  <version>4.4.0</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -499,7 +514,7 @@
                         <version>1.6.8</version>
                         <extensions>true</extensions>
                         <configuration>
-                            <serverId>ossrh</serverId>
+                            <serverId>sonatype-nexus-snapshots</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                             <skipStagingRepositoryClose>true</skipStagingRepositoryClose>
                             <autoReleaseAfterClose>false</autoReleaseAfterClose>
@@ -514,15 +529,15 @@
                             <!-- workaround for https://bugs.openjdk.java.net/browse/JDK-8212233 -->
                             <source>8</source>
                             <links>
-                                <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
+                                <link>https://shiro.apache.org/static/${shiro.version}/apidocs/</link>
                                 <link>https://commons.apache.org/proper/commons-configuration/apidocs/</link>
                                 <link>https://docs.jboss.org/hibernate/orm/5.4/javadocs/</link>
-                                <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
+                                <link>https://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/gapi/</link>
                                 <link>https://www.joda.org/joda-time/apidocs/</link>
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link http://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link http://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link https://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
@@ -592,7 +607,7 @@
                             <dependency>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>extra-enforcer-rules</artifactId>
-                                <version>1.2</version>
+                                <version>1.3</version>
                             </dependency>
                         </dependencies>
                     </plugin>

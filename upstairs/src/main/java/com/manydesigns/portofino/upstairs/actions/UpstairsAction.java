@@ -33,12 +33,9 @@ import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +76,7 @@ public class UpstairsAction extends AbstractResourceAction {
     @Qualifier(ACTIONS_DIRECTORY)
     FileObject actionsDirectory;
 
-    @SuppressWarnings({"RedundantStringConstructorCall"})
+    @SuppressWarnings("StringOperationCanBeSimplified")
     public static final String NO_LINK_TO_PARENT = new String();
     public static final int LARGE_RESULT_SET_THRESHOLD = 10000;
     public static final int MULTILINE_THRESHOLD = 256;
@@ -176,7 +173,7 @@ public class UpstairsAction extends AbstractResourceAction {
         }
 
         try {
-            setupSecurityGroovy(wizard);
+            setupSecurity(wizard);
         } catch (Exception e) {
             logger.error("Couldn't configure users", e);
             throw new WebApplicationException(e);
@@ -622,21 +619,14 @@ public class UpstairsAction extends AbstractResourceAction {
         }
     }
 
-    protected void setupSecurityGroovy(WizardInfo wizard)
+    protected void setupSecurity(WizardInfo wizard)
             throws Exception {
         Table userTable = getTable(persistence.getModel(), wizard.usersTable);
         if(userTable == null) {
             return;
         }
 
-        PortofinoRealm currentRealm = ShiroUtils.getPortofinoRealm();
-        if(currentRealm instanceof ModelBasedRealm) {
-            removeSecurityAnnotations(((ModelBasedRealm) currentRealm).getUsersTable());
-            removeSecurityAnnotations(((ModelBasedRealm) currentRealm).getGroupsTable());
-            removeSecurityAnnotations(((ModelBasedRealm) currentRealm).getUsersGroupsTable());
-        } else {
-            logger.info("The existing realm ({}) is not model-based. We'll assume that the model does not contain security annotations. If it's the case, you should remove them manually.", currentRealm);
-        }
+        persistence.getModel().getDatabases().forEach(d -> d.getAllTables().forEach(this::removeSecurityAnnotations));
 
         DatabaseLogic.findColumnByName(userTable, wizard.userNameProperty.getColumnName())
                 .ensureAnnotation(Username.class);
@@ -662,20 +652,7 @@ public class UpstairsAction extends AbstractResourceAction {
                     .ensureAnnotation(UserLink.class);
         }
 
-        TemplateEngine engine = new SimpleTemplateEngine();
-        Template template = engine.createTemplate(
-                UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/Security.groovy"));
-        Map<String, String> bindings = getSecurityGroovyBindings(wizard);
-        FileObject codeBaseRoot = actionsDirectory.getParent().resolveFile("classes");
-        FileObject securityGroovyFile = codeBaseRoot.resolveFile("Security.groovy");
-        if(securityGroovyFile.exists()) {
-            FileObject backupFile = securityGroovyFile.getParent().resolveFile("Security.groovy.backup");
-            backupFile.copyFrom(securityGroovyFile, new AllFileSelector());
-        }
-        try(Writer fw = new OutputStreamWriter(securityGroovyFile.getContent().getOutputStream())) {
-            template.make(bindings).writeTo(fw);
-            logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
-        }
+        security.setup(actionsDirectory.getParent(), wizard.adminGroupName, wizard.encryptionAlgorithm);
         persistence.saveModel();
     }
 
@@ -683,39 +660,6 @@ public class UpstairsAction extends AbstractResourceAction {
         table.getColumns().forEach(c -> {
             c.getAnnotations().removeIf(a -> a.getType().startsWith(Username.class.getPackage().getName()));
         });
-    }
-
-    @NotNull
-    protected Map<String, String> getSecurityGroovyBindings(WizardInfo wizard) {
-        Map<String, String> bindings = new HashMap<>();
-        bindings.put("adminGroupName", StringUtils.defaultString(wizard.adminGroupName));
-
-        bindings.put("hashIterations", "1");
-        String[] algoAndEncoding = wizard.encryptionAlgorithm.split(":");
-        bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
-        switch (algoAndEncoding[1]) {
-            case "plaintext":
-                bindings.put("hashFormat", "null");
-                break;
-            case "hex":
-                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
-                break;
-            case "base64":
-                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported encoding: " + algoAndEncoding[1]);
-        }
-        return bindings;
-    }
-
-    protected String getPropertyName(Table table, Column column) {
-        column = getColumn(table, column);
-        if(column == null) {
-            return null;
-        } else {
-            return column.getActualPropertyName();
-        }
     }
 
 }

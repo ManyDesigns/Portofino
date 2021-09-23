@@ -37,7 +37,7 @@ public class ActionRegistry implements Iterable<ActionInfo> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    protected final List<ActionInfo> registry = new CopyOnWriteArrayList<ActionInfo>();
+    protected final List<ActionInfo> registry = new CopyOnWriteArrayList<>();
 
     public ActionInfo register(Class<?> actionClass) {
         String descriptionKey = ResourceActionLogic.getDescriptionKey(actionClass);

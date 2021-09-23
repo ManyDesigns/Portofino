@@ -152,14 +152,14 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                     (current, fieldNames, fieldTypes, dm, sdm, newHref, newText);
 
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(selectionProvider, fieldNames);
+                new CrudSelectionProvider(selectionProvider, fieldNames, !(current instanceof ForeignKey));
             crudSelectionProviders.add(crudSelectionProvider);
             Collections.addAll(configuredSPs, fieldNames);
             return true;
         } else {
             //To avoid automatically adding a FK later
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(null, fieldNames);
+                new CrudSelectionProvider(null, fieldNames, false);
             crudSelectionProviders.add(crudSelectionProvider);
             return false;
         }

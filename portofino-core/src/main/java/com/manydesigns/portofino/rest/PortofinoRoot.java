@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.dispatcher.Resource;
@@ -32,12 +31,9 @@ import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionContext;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
-import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +88,7 @@ public class PortofinoRoot extends AbstractResourceAction {
     public Object consumePathSegment(@PathParam("pathSegment") String pathSegment) {
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ognlContext.put("securityUtils", new SecurityUtilsBean());
+        ognlContext.put("securityUtils", security.getSecurityUtilsBean());
         logger.debug("Publishing textProvider in OGNL context");
         ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
         return super.consumePathSegment(pathSegment);
@@ -139,30 +135,6 @@ public class PortofinoRoot extends AbstractResourceAction {
         description.put("children", getSubResources());
         description.put("loginPath", "/:auth"); //For legacy clients
         return description;
-    }
-
-    @Override
-    @Path(":accessible")
-    @GET
-    public boolean isAccessible() {
-        return true;
-    }
-
-    @Path(":auth")
-    public DefaultLoginAction getLoginAction() throws Exception {
-        String loginPath = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH);
-        return getLoginAction(loginPath);
-    }
-
-    public DefaultLoginAction getLoginAction(String loginPath) throws Exception {
-        String[] segments = loginPath.split("/");
-        ResourceAction action = this;
-        for(String segment : segments) {
-            if(!StringUtils.isBlank(segment)) {
-                action = (ResourceAction) action.getSubResource(segment.trim());
-            }
-        }
-        return (DefaultLoginAction) action;
     }
 
     @Override

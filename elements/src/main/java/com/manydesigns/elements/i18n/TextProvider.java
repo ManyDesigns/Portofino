@@ -30,6 +30,13 @@ public interface TextProvider {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
+    /**
+     * Get the localized string according to the key, and replace any placeholders with the arguments.
+     * @param key the key in the resource bundle.
+     * @param args arguments to insert where the string contains placeholders.
+     * @return the localized string corresponding to the key, with placeholders replaced, or the key itself if the
+     * resource bundle does not contain the key.
+     */
     public String getText(String key, Object... args);
 
     public String getTextOrNull(String key, Object... args);

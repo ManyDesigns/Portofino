@@ -28,6 +28,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     protected String tableName;
 
     protected String javaClass;
+    protected String idStrategy;
 
     protected String shortName;
 
@@ -77,6 +79,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class<?> actualJavaClass;
+    protected Class actualIdStrategy;
     protected String entityName;
 
     //**************************************************************************
@@ -135,6 +138,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void reset() {
         actualJavaClass = null;
+        actualIdStrategy = null;
         oneToManyRelationships.clear();
     }
 
@@ -146,6 +150,9 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         
         // wire up javaClass
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
+        if(!StringUtils.isBlank(idStrategy)) {
+            actualIdStrategy = ReflectionUtil.loadClass(idStrategy);
+        }
 
         String baseEntityName;
         if (StringUtils.isEmpty(entityName)) {
@@ -240,6 +247,15 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         this.javaClass = javaClass;
     }
 
+    @XmlAttribute
+    public String getIdStrategy() {
+        return idStrategy;
+    }
+
+    public void setIdStrategy(String idStrategy) {
+        this.idStrategy = idStrategy;
+    }
+
     @XmlElementWrapper(name="columns")
     @XmlElement(name = "column",
             type = Column.class)
@@ -259,6 +275,10 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     public Class getActualJavaClass() {
         return actualJavaClass;
+    }
+
+    public Class getActualIdStrategy() {
+        return actualIdStrategy;
     }
 
     public void setActualJavaClass(Class actualJavaClass) {

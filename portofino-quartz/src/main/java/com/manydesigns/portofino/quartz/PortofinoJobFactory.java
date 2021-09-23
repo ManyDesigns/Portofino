@@ -96,7 +96,7 @@ public class PortofinoJobFactory extends SimpleJobFactory {
         Class<?> jobClass = jobDetail.getJobClass();
         //Attempt to reload
         try {
-            Class newClass = codeBase.loadClass(jobClass.getName());
+            Class<?> newClass = codeBase.loadClass(jobClass.getName());
             if(Job.class.isAssignableFrom(newClass)) {
                 jobClass = newClass;
             } else {

@@ -59,12 +59,12 @@ export class AppComponent {
 
   initApiRoot = (app: PortofinoAppComponent) => {
     const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
-    console.log("API root:", apiRoot);
     if(apiRoot) {
       app.apiRoot = apiRoot;
     } else {
       app.apiRoot = "http://localhost:8080/api";
     }
+    console.log("API root:", app.apiRoot);
     app.upstairsLink = null;
   };
 }

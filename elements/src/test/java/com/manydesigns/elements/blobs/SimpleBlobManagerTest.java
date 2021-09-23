@@ -72,11 +72,11 @@ public class SimpleBlobManagerTest extends AbstractElementsTest {
         assertNotNull(blobsDir);
         String tmpDir = System.getProperty("java.io.tmpdir");
         String path = blobsDir.getAbsolutePath();
-        if(!path.endsWith("/")) {
-            path += "/";
+        if(!path.endsWith(File.separator)) {
+            path += File.separator;
         }
-        if(!tmpDir.endsWith("/")) {
-            tmpDir += "/";
+        if(!tmpDir.endsWith(File.separator)) {
+            tmpDir += File.separator;
         }
         assertEquals(tmpDir, path);
         assertEquals(META_FILE_NAME_PATTERN, manager.getMetaFileNamePattern());

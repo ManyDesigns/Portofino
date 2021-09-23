@@ -20,10 +20,7 @@
 
 package com.manydesigns.portofino.security;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Marks a method of a REST resource or a property of a form accessible only by an administrator.
@@ -35,6 +32,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
+@Documented
 public @interface RequiresAdministrator {
     String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";

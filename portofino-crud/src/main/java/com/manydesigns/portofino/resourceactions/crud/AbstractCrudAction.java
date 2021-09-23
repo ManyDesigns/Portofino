@@ -46,6 +46,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.annotations.Guard;
+import com.manydesigns.portofino.persistence.IdStrategy;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
@@ -69,6 +70,7 @@ import ognl.OgnlContext;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,6 +82,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -194,7 +197,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     //--------------------------------------------------------------------------
 
     public ClassAccessor classAccessor;
-    public PkHelper pkHelper;
+    public IdStrategy idStrategy;
 
     public T object;
     public List<T> objects;
@@ -210,6 +213,11 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public CrudConfiguration crudConfiguration;
     public Form crudConfigurationForm;
     public TableForm selectionProvidersForm;
+    private SelectionProviderLoadStrategy selectionProviderLoadStrategy = SelectionProviderLoadStrategy.ONLY_ENFORCED;
+
+    static enum SelectionProviderLoadStrategy {
+        NONE, ONLY_ENFORCED, ALL
+    }
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -234,7 +242,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * The only constraint is that it is serializable.
      * @return the loaded object, or null if it couldn't be found or it didn't satisfy the search criteria.
      */
-    protected abstract T loadObjectByPrimaryKey(Serializable pkObject);
+    protected abstract T loadObjectByPrimaryKey(Object pkObject);
 
     /**
      * Saves a new object to the persistent storage. The actual implementation is left to subclasses.
@@ -258,11 +266,11 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected abstract void doDelete(T object);
 
     /**
-     * {@link #loadObjectByPrimaryKey(java.io.Serializable)}
+     * {@link #loadObjectByPrimaryKey(Object)}
      * @param identifier the object identifier in String form
      */
     protected void loadObject(String... identifier) {
-        Serializable pkObject = pkHelper.getPrimaryKey(identifier);
+        Object pkObject = idStrategy.getPrimaryKey(identifier);
         object = loadObjectByPrimaryKey(pkObject);
     }
 
@@ -577,9 +585,11 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             return;
         }
         classAccessor = filterAccordingToPermissions(new CrudAccessor(crudConfiguration, innerAccessor));
-        pkHelper = new PkHelper(classAccessor);
+        idStrategy = getIdStrategy(classAccessor, innerAccessor);
         maxParameters = classAccessor.getKeyProperties().length;
     }
+
+    protected abstract IdStrategy getIdStrategy(ClassAccessor classAccessor, ClassAccessor innerAccessor);
 
     @Override
     public String getParameterName(int index) {
@@ -592,7 +602,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @Override
     public void parametersAcquired() {
         super.parametersAcquired();
-        if(pkHelper == null) {
+        if(idStrategy == null) {
             return;
         }
 
@@ -608,9 +618,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             }
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
 
-            Serializable pkObject;
+            Object pkObject;
             try {
-                pkObject = pkHelper.getPrimaryKey(pk);
+                pkObject = idStrategy.getPrimaryKey(pk);
             } catch (Exception e) {
                 logger.warn("Invalid primary key", e);
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -694,7 +704,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected String generateObjectUrl(String baseUrl, Object o) {
-        String[] objPk = pkHelper.generatePkStringArray(o);
+        String[] objPk = idStrategy.generatePkStringArray(o);
         String url = baseUrl + "/" + getPkForUrl(objPk);
         return appendSearchStringParamIfNecessary(url);
     }
@@ -713,7 +723,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * Populates the search form from request parameters.
      * <ul>
      *     <li>If <code>searchString</code> is blank, then the form is read from the request
-     *     (by {@link SearchForm#readFromRequest(javax.servlet.http.HttpServletRequest)}) and <code>searchString</code>
+     *     (by {@link SearchForm#readFromRequest(HttpServletRequest)}) and <code>searchString</code>
      *     is generated accordingly.</li>
      *     <li>Else, <code>searchString</code> is interpreted as a query string and the form is populated from it.</li>
      * </ul>
@@ -757,7 +767,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(selectionProviderSupport != null) {
             for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
                 SelectionProvider selectionProvider = current.getSelectionProvider();
-                if(selectionProvider == null) {
+                if(selectionProvider == null || !current.isEnforced()) {
                     continue;
                 }
                 String[] fieldNames = current.getFieldNames();
@@ -789,17 +799,16 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
-        if(selectionProviderSupport == null) {
-            return;
-        }
         // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
+        if(selectionProviderSupport != null) {
+            for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+                SelectionProvider selectionProvider = current.getSelectionProvider();
+                if (selectionProvider == null) {
+                    continue;
+                }
+                String[] fieldNames = current.getFieldNames();
+                tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
             }
-            String[] fieldNames = current.getFieldNames();
-            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
     }
 
@@ -889,7 +898,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
-        tableForm.setKeyGenerator(pkHelper.createPkGenerator());
+        tableForm.setKeyGenerator(idStrategy.createPkGenerator());
         tableForm.setCondensed(true);
 
         return tableForm;
@@ -933,13 +942,14 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected void configureFormSelectionProviders(FormBuilder formBuilder) {
-        if(selectionProviderSupport == null) {
+        if(selectionProviderSupport == null || selectionProviderLoadStrategy == SelectionProviderLoadStrategy.NONE) {
             return;
         }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
+            if(selectionProvider == null || (
+                    selectionProviderLoadStrategy == SelectionProviderLoadStrategy.ONLY_ENFORCED  && !current.isEnforced())) {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
@@ -1389,7 +1399,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected String getPkForUrl(String[] pk) {
         String encoding = getUrlEncoding();
         try {
-            return pkHelper.getPkStringForUrl(pk, encoding);
+            return idStrategy.getPkStringForUrl(pk, encoding);
         } catch (UnsupportedEncodingException e) {
             throw new Error(e);
         }
@@ -1406,7 +1416,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(!actionPath.endsWith("/")) {
             sb.append("/");
         }
-        sb.append(pkHelper.getFormatString());
+        sb.append(idStrategy.getFormatString());
         appendSearchStringParamIfNecessary(sb);
         return sb.toString();
     }
@@ -1499,6 +1509,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * @param searchString the search string
      * @param firstResult pagination: the index of the first result returned by the search
      * @param maxResults pagination: the maximum number of results returned by the search
+     * @param newObject The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.
      * @since 4.2
      * @return search results (/) or single object (/pk) as JSON
      */
@@ -1506,20 +1517,25 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "The contents of this resource: either search results or a single object, depending on path parameters")
     public Response getAsJson(
-            @Parameter(description = "The search string (see http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
+            @Parameter(description = "The search string (see https://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
             @QueryParam("searchString") String searchString,
-            @Parameter(description = "The index of the first search result")
+            @Parameter(description = "The index of the first search result. Only valid for search.")
             @QueryParam("firstResult") Integer firstResult,
-            @Parameter(description = "The maximum number of returned search results")
+            @Parameter(description = "The maximum number of returned search results. Only valid for search.")
             @QueryParam("maxResults") Integer maxResults,
-            @Parameter(description = "The property according to which the search results are sorted")
+            @Parameter(description = "The property according to which the search results are sorted. Only valid for search.")
             @QueryParam("sortProperty") String sortProperty,
-            @Parameter(description = "The direction of the sort (asc or desc)")
+            @Parameter(description = "The direction of the sort (asc or desc). Only valid for search.")
             @QueryParam("sortDirection") String sortDirection,
-            @Parameter(description = "The returned object is pre-populated for being edited (including computed fields)")
+            @Parameter(description = "The returned object is pre-populated for being edited (including computed fields). Only valid for create, read, edit.")
             @QueryParam("forEdit") boolean forEdit,
-            @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields)")
-            @QueryParam("newObject") boolean newObject) {
+            @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.")
+            @QueryParam("newObject") boolean newObject,
+            @Parameter(description = "The returned object does not load a displayValue for fields that have selection providers. The client will have to query selection providers by itself. Only valid for create, read, edit.")
+            @QueryParam("skipSelectionProviders") boolean skipSelectionProviders) {
+        selectionProviderLoadStrategy = skipSelectionProviders ?
+                SelectionProviderLoadStrategy.NONE :
+                SelectionProviderLoadStrategy.ALL;
         if(newObject) {
             return jsonCreateData();
         }
@@ -1882,7 +1898,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         Response.ResponseBuilder response = Response.ok();
         if(returnIds) {
             if(deleted == 1) {
-                response.entity(Collections.singletonList(pkHelper.getPkString(object)));
+                response.entity(Collections.singletonList(idStrategy.getPkString(object)));
             } else {
                 response.status(Response.Status.CONFLICT).entity(getDeleteDeniedMessage());
             }
@@ -1929,12 +1945,12 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         }
     }
 
-    protected List<String> bulkDelete(List<String> ids) throws Exception {
+    protected List<String> bulkDelete(List<String> ids) {
         List<T> objects = new ArrayList<>(ids.size());
         List<String> deleted = new ArrayList<>();
         for (String current : ids) {
             String[] pkArr = current.split("/");
-            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
+            Object pkObject = idStrategy.getPrimaryKey(pkArr);
             T obj = loadObjectByPrimaryKey(pkObject);
             if(obj != null && deleteValidate(obj)) {
                 doDelete(obj);
@@ -1986,12 +2002,12 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         this.classAccessor = classAccessor;
     }
 
-    public PkHelper getPkHelper() {
-        return pkHelper;
+    public IdStrategy getIdStrategy() {
+        return idStrategy;
     }
 
-    public void setPkHelper(PkHelper pkHelper) {
-        this.pkHelper = pkHelper;
+    public void setIdStrategy(IdStrategy idStrategy) {
+        this.idStrategy = idStrategy;
     }
 
     public List<CrudSelectionProvider> getCrudSelectionProviders() {

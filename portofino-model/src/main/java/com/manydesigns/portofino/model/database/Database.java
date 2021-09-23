@@ -171,10 +171,6 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
         return result;
     }
 
-    //**************************************************************************
-    // toString() override
-    //**************************************************************************
-
     @Override
     public String toString() {
         return MessageFormat.format("database {0}", getQualifiedName());

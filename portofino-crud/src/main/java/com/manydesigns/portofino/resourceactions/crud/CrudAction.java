@@ -31,9 +31,11 @@ import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.persistence.IdStrategy;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.TableCriteria;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
@@ -44,6 +46,7 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Sel
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
+import com.manydesigns.portofino.util.PkHelper;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -55,6 +58,7 @@ import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -294,6 +298,16 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     // Object loading
     //**************************************************************************
 
+    @NotNull
+    protected IdStrategy getIdStrategy(ClassAccessor classAccessor, ClassAccessor innerAccessor) {
+        Class<? extends IdStrategy> idStrategyClass = ((TableAccessor) innerAccessor).getIdStrategy().getClass();
+        try {
+            return idStrategyClass.getConstructor(ClassAccessor.class).newInstance(classAccessor);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List<T> loadObjects() {
         try {
@@ -338,10 +352,10 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected T loadObjectByPrimaryKey(Serializable pkObject) {
+    protected T loadObjectByPrimaryKey(Object pkObject) {
         return (T) QueryUtils.getObjectByPk(
                 persistence,
-                baseTable, pkObject,
+                baseTable, (Serializable) pkObject,
                 getBaseQuery(), this);
     }
 
