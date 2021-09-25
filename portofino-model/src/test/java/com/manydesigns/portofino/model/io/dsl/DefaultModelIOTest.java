@@ -53,8 +53,12 @@ public class DefaultModelIOTest {
                 "\t}\n" +
                 "\t@Email\n" +
                 "\temail\n" +
-                "\tage: int\n" +
+                "\tage: int!\n" +
                 "\tregistrationDate: EDate\n" +
+                "\tmother\n" +
+                "\tfather\n" +
+                "\tmother_rel --> Person(name=mother)\n" +
+                "\tfather_rel --> Person(name=father)\n" +
                 "}");
         Model model2 = io.load();
         assertEquals(model2.getDomains().size(), 1);

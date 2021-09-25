@@ -283,15 +283,44 @@ public class DefaultModelIO implements ModelIO {
     }
 
     protected void writeReference(EReference reference, Writer writer, String indent) throws IOException {
-        writeAnnotations(reference, writer, indent);
+        EAnnotation mappings = reference.getEAnnotation(KeyMappings.class.getName());
+        try {
+            if(mappings != null) {
+                reference.getEAnnotations().remove(mappings);
+            }
+            writeAnnotations(reference, writer, indent);
+        } finally {
+            if(mappings != null) {
+                reference.getEAnnotations().add(mappings);
+            }
+        }
         writer.write(indent + reference.getName());
         writer.write(" --> ");
         writer.write(reference.getEType().getName());
-        writer.write(" ");
+        if(!reference.getEKeys().isEmpty()) {
+            writer.write("(");
+            boolean first = true;
+            for(EAttribute k : reference.getEKeys()) {
+                if(first) {
+                    first = false;
+                } else {
+                    writer.write(", ");
+                }
+                writer.write(k.getName());
+                if(mappings != null) {
+                    String ownName = mappings.getDetails().get(k.getName());
+                    if(ownName != null) {
+                        writer.write("=");
+                        writer.write(ownName);
+                    }
+                }
+            }
+            writer.write(")");
+        }
         if(reference.getUpperBound() > 1) {
-            writer.write(reference.getLowerBound() + ".." + reference.getUpperBound());
+            writer.write(" " + reference.getLowerBound() + ".." + reference.getUpperBound());
         } else if(reference.getLowerBound() > 0) {
-            writer.write(reference.getLowerBound() + "..*");
+            writer.write(" " + reference.getLowerBound() + "..*");
         }
         writer.write(System.lineSeparator());
     }

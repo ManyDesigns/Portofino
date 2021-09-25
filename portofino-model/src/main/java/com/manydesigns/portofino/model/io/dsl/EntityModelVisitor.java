@@ -28,6 +28,7 @@ import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,20 +243,46 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
     @Override
     public EModelElement visitRelationshipProperty(ModelParser.RelationshipPropertyContext ctx) {
         String propertyName = ctx.name.getText();
-        EModelElement previous = annotated;
         if(entity == null) {
             throw new IllegalStateException("Relationship without an entity: " + propertyName);
         }
         String typeName = ctx.type().name.getText();
         //TODO should we be using the CodeBase for this?
-        EDataType type = PortofinoPackage.ensureType(resolveType(typeName, false));
-        EReference reference = ensureReference(entity, propertyName);
+        EClassifier type = null;
+        if(parentDomain != null) {
+            type = parentDomain.getEClassifier(typeName);
+        }
+        if(type == null) {
+            type = PortofinoPackage.ensureType(resolveType(typeName, false));
+        }
+        EReference reference = ensureReference(entity, propertyName, false);
         reference.setEType(type);
         if(type instanceof EClass) {
-            EReference opposite = ensureReference((EClass) type, propertyName);
-            opposite.setDerived(true);
-            opposite.setEOpposite(reference);
-            reference.setEOpposite(opposite);
+            EClass eClass = (EClass) type;
+            ModelParser.RelationshipMappingsContext mappings = ctx.relationshipMappings();
+            if(mappings != null) {
+                EList<EAttribute> eKeys = reference.getEKeys();
+                EAnnotation ann = EcoreFactory.eINSTANCE.createEAnnotation();
+                ann.setSource(KeyMappings.class.getName());
+                mappings.relationshipMapping().forEach(m -> {
+                    String otherName = m.otherName.getText();
+                    eKeys.add((EAttribute) eClass.getEStructuralFeature(otherName));
+                    if(m.ownName != null) {
+                        String ownName = m.ownName.getText();
+                        if(!(entity.getEStructuralFeature(ownName) instanceof EAttribute)) {
+                            throw new IllegalStateException("Invalid reference " + entity.getName() + "." + ownName);
+                        }
+                        ann.getDetails().put(otherName, ownName);
+                    }
+                });
+                reference.getEAnnotations().add(ann);
+            }
+
+            if(eClass != entity) {
+                EReference opposite = ensureReference(eClass, propertyName, true);
+                opposite.setEOpposite(reference);
+                reference.setEOpposite(opposite);
+            }
         }
         TerminalNode range = ctx.RANGE();
         if(range != null) {
@@ -270,24 +297,36 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
             }
         }
 
-        annotated = reference;
-        visitChildren(ctx);
-        annotated = previous;
+        EModelElement previous = annotated;
+        try {
+            annotated = reference;
+            visitChildren(ctx);
+        } finally {
+            annotated = previous;
+        }
+
         return reference;
     }
 
-    protected EReference ensureReference(EClass entity, String propertyName) {
-        EStructuralFeature feature = entity.getEStructuralFeatures().stream().filter(a -> propertyName.equals(a.getName()))
+    protected EReference ensureReference(EClass entity, String propertyName, boolean derived) {
+        EStructuralFeature feature = entity.getEStructuralFeatures().stream()
+                .filter(a -> propertyName.equals(a.getName()))
                 .findFirst().orElseGet(() -> {
                     EReference reference = EcoreFactory.eINSTANCE.createEReference();
                     reference.setName(propertyName);
+                    reference.setDerived(derived);
                     entity.getEStructuralFeatures().add(reference);
                     return reference;
                 });
-        if(!(feature instanceof EReference)) {
+        if(feature instanceof EReference) {
+            if(feature.isDerived() == derived) {
+                return (EReference) feature;
+            } else {
+                throw new IllegalStateException("Cannot redefine reference " + propertyName + " in " + entity.getName());
+            }
+        } else {
             throw new IllegalStateException("Cannot define reference " + propertyName + ", an attribute with the same name already exists in " + entity.getName());
         }
-        return (EReference) feature;
     }
 
     private String getText(ModelParser.LiteralContext value) {

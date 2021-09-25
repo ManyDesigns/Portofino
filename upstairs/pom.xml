@@ -7,11 +7,10 @@
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
         <version>6.0.0-SNAPSHOT</version>
-        <version>5.3.0</version>
     </parent>
     <artifactId>portofino-upstairs</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
