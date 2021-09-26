@@ -35,7 +35,7 @@
     "@angular/platform-browser-dynamic": "^12.2.6",
     "@angular/router": "^12.2.6",
     "@ngx-translate/core": "^13.0.0",
-    "@ngxd/core": "^10.0.0",
+    "@ngxd/core": "^12.0.0",
     "core-js": "^2.6.11",
     "file-input-accessor": "^11.0.0",
     "jwt-decode": "^3.1.2",
