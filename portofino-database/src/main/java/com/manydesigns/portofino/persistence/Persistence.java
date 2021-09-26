@@ -33,6 +33,7 @@ import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
 import com.manydesigns.portofino.model.database.annotations.JNDIConnection;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
+import com.manydesigns.portofino.model.database.KeyMappings;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
@@ -70,8 +71,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.util.*;
 
@@ -275,6 +274,11 @@ public class Persistence {
                     Integer.parseInt(c.getAnnotation(Id.class).get().getPropertyValue("order"))));
             table.setPrimaryKey(pk);
         }
+        entity.getEReferences().forEach(reference -> {
+            if(!reference.isDerived()) {
+                setupForeignKey(table, reference);
+            }
+        });
     }
 
     protected void setupColumn(Table table, PrimaryKey pk, EAttribute property) {
@@ -292,6 +296,22 @@ public class Persistence {
         if(property.getEAnnotation(Id.class.getName()) != null) {
             pk.add(column);
         }
+    }
+
+    protected void setupForeignKey(Table table, EReference reference) {
+        ForeignKey fk = new ForeignKey(table);
+        fk.setName(reference.getName());
+        fk.setToTableName(reference.getEType().getName());
+        EAnnotation mappings = reference.getEAnnotation(KeyMappings.class.getName());
+        if(mappings != null) {
+            mappings.getDetails().forEach(e -> {
+                Reference ref = new Reference(fk);
+                ref.setFromColumn(e.getValue());
+                ref.setToColumn(e.getKey());
+                fk.getReferences().add(ref);
+            });
+        }
+        table.getForeignKeys().add(fk);
     }
 
     public FileObject getModelDirectory() throws FileSystemException {

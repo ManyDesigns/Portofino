@@ -246,6 +246,11 @@ public class DatabaseLogic {
         return null;
     }
 
+    public static Table findTableByEntityName(Model model, String databaseName, String entityName) {
+        Database database = findDatabaseByName(model, databaseName);
+        return database != null ? findTableByEntityName(database, entityName) : null;
+    }
+
     public static ForeignKey findForeignKeyByName(Table table, String fkName) {
         for (ForeignKey current : table.foreignKeys) {
             if (current.getName().equals(fkName)) {

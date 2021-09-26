@@ -83,7 +83,7 @@
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
         <commons.io.version>2.7</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
-        <commons.vfs.version>2.2</commons.vfs.version>
+        <commons.vfs.version>2.8.0</commons.vfs.version>
         <fop.version>2.1</fop.version>
         <groovy.version>3.0.8</groovy.version>
         <guava.version>30.1.1-jre</guava.version>
@@ -111,7 +111,7 @@
         <slf4j.version>1.7.30</slf4j.version>
         <spring.version>5.3.7</spring.version>
 
-        <nodejs.version>v12.22.6</nodejs.version>
+        <nodejs.version>v14.17.6</nodejs.version>
         <npm.version>6.14.15</npm.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

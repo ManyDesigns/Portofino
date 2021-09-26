@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.*;
+import com.manydesigns.portofino.model.database.KeyMappings;
 import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.language.ModelLexer;
@@ -99,7 +100,8 @@ public class DefaultModelIO implements ModelIO {
             domain = model.ensureDomain(domainName);
         }
         for (FileObject child : domainDir.getChildren()) {
-            if(child.isFile() && !child.getName().getBaseName().endsWith(".changelog.xml")) {
+            String baseName = child.getName().getBaseName();
+            if(child.isFile() && !baseName.endsWith(".changelog.xml") && !baseName.endsWith(".properties")) {
                 loadResource(domain, child);
             } else if(child.isFolder()) {
                 loadDomain(model, domain, child);
@@ -125,6 +127,8 @@ public class DefaultModelIO implements ModelIO {
                     }
                 }
             });
+        } catch (IOException e) {
+            logger.error("Could not load resource: " + entityFile.getName().getURI(), e);
         }
     }
 
@@ -278,6 +282,9 @@ public class DefaultModelIO implements ModelIO {
             String name = type.getName();
             String alias = EntityModelVisitor.getDefaultTypeAliases().inverse().get(name);
             writer.write(": " + (alias != null ? alias : name));
+        }
+        if(property.getLowerBound() > 0) {
+            writer.write("!"); //Not nullable
         }
         writer.write(System.lineSeparator());
     }

@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.io.dsl;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.manydesigns.portofino.model.PortofinoPackage;
+import com.manydesigns.portofino.model.database.KeyMappings;
 import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;

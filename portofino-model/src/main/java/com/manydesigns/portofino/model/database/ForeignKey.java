@@ -24,8 +24,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Pair;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ObjectUtils;
-import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +65,7 @@ public class ForeignKey extends DatabaseSelectionProvider
      */
     protected String onePropertyName;
     protected String toTableName;
+    protected String toEntityName;
 
     //**************************************************************************
     // Fields for wire-up
@@ -74,7 +74,7 @@ public class ForeignKey extends DatabaseSelectionProvider
     protected String actualManyPropertyName;
     protected String actualOnePropertyName;
     protected Table toTable;
-    EReference relationship;
+    protected EReference relationship;
 
     //**************************************************************************
     // Logging
@@ -131,7 +131,11 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     public void link(Model model, Configuration configuration) {
         super.link(model, configuration);
-        toTable = DatabaseLogic.findTableByName(model, toDatabase, toSchema, toTableName);
+        if(toEntityName != null) {
+            toTable = DatabaseLogic.findTableByEntityName(model, toDatabase, toEntityName);
+        } else {
+            toTable = DatabaseLogic.findTableByName(model, toDatabase, toSchema, toTableName);
+        }
         if(toTable != null) {
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);
@@ -143,21 +147,38 @@ public class ForeignKey extends DatabaseSelectionProvider
 
             if(relationship == null) {
                 relationship = EcoreFactory.eINSTANCE.createEReference();
-                relationship.setContainment(false);
-                relationship.setEType(toTable.getModelElement());
-                relationship.setLowerBound(0);
-                relationship.setUpperBound(1);
-                relationship.setName(getName());
-                fromTable.getModelElement().getEStructuralFeatures().add(relationship);
-
                 EReference opposite = EcoreFactory.eINSTANCE.createEReference();
                 opposite.setName(getName());
+                opposite.setContainment(false);
                 opposite.setEType(fromTable.getModelElement());
                 opposite.setLowerBound(0);
                 opposite.setUpperBound(EReference.UNBOUNDED_MULTIPLICITY);
+                opposite.setDerived(true);
                 toTable.getModelElement().getEStructuralFeatures().add(opposite);
                 relationship.setEOpposite(opposite);
             }
+            relationship.setContainment(false);
+            relationship.setEType(toTable.getModelElement());
+            relationship.setLowerBound(0);
+            relationship.setUpperBound(1);
+            relationship.setName(getName());
+            EAnnotation mappings = relationship.getEAnnotation(KeyMappings.class.getName());
+            if(mappings == null) {
+                mappings = EcoreFactory.eINSTANCE.createEAnnotation();
+                mappings.setSource(KeyMappings.class.getName());
+            }
+            mappings.getDetails().clear();
+            final EAnnotation finalMappings = mappings;
+            getReferences().forEach(r -> {
+                EStructuralFeature feature = fromTable.getModelElement().getEStructuralFeature(r.getFromColumn());
+                if(!(feature instanceof EAttribute)) {
+                    throw new IllegalStateException("Not an attribute: " + fromTable.getQualifiedName() + "." + feature.getName());
+                }
+                relationship.getEKeys().add((EAttribute) feature);
+                finalMappings.getDetails().put(r.getToColumn(), r.getFromColumn());
+            });
+            relationship.getEAnnotations().add(mappings);
+            fromTable.getModelElement().getEStructuralFeatures().add(relationship);
         } else {
             logger.warn("Cannot find destination table '{}'",
                     Table.composeQualifiedName(toDatabase, toSchema, toTableName));
@@ -269,6 +290,10 @@ public class ForeignKey extends DatabaseSelectionProvider
         this.toTable = toTable;
     }
 
+    /**
+     * Target table name, for legacy XML-based models.
+     * @return the name of the table referenced by this fk.
+     */
     @XmlAttribute(name = "toTable")
     public String getToTableName() {
         return toTableName;
@@ -276,6 +301,14 @@ public class ForeignKey extends DatabaseSelectionProvider
 
     public void setToTableName(String toTableName) {
         this.toTableName = toTableName;
+    }
+
+    public String getToEntityName() {
+        return toEntityName;
+    }
+
+    public void setToEntityName(String toEntityName) {
+        this.toEntityName = toEntityName;
     }
 
     //**************************************************************************
