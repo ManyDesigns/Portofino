@@ -170,12 +170,11 @@ public class ForeignKey extends DatabaseSelectionProvider
             mappings.getDetails().clear();
             final EAnnotation finalMappings = mappings;
             getReferences().forEach(r -> {
-                EStructuralFeature feature = fromTable.getModelElement().getEStructuralFeature(r.getFromColumn());
-                if(!(feature instanceof EAttribute)) {
-                    throw new IllegalStateException("Not an attribute: " + fromTable.getQualifiedName() + "." + feature.getName());
-                }
-                relationship.getEKeys().add((EAttribute) feature);
-                finalMappings.getDetails().put(r.getToColumn(), r.getFromColumn());
+                r.link(model, configuration);
+                relationship.getEKeys().add(r.getActualToColumn().getModelElement());
+                finalMappings.getDetails().put(
+                        r.getActualFromColumn().getActualPropertyName(),
+                        r.getActualToColumn().getActualPropertyName());
             });
             relationship.getEAnnotations().add(mappings);
             fromTable.getModelElement().getEStructuralFeatures().add(relationship);

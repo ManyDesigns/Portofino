@@ -18,7 +18,7 @@ relationship: annotation* name=identifier ':' a=type '-->' b=type;
 
 relationshipProperty: annotation* name=identifier '-->' type relationshipMappings? RANGE?;
 relationshipMappings: '(' (relationshipMapping (',' relationshipMapping)*) ')';
-relationshipMapping: otherName=simpleIdentifier ('=' ownName=simpleIdentifier);
+relationshipMapping: otherName=simpleIdentifier '=' ownName=simpleIdentifier;
 
 type: name=identifier;
 

@@ -283,9 +283,6 @@ public class DefaultModelIO implements ModelIO {
             String alias = EntityModelVisitor.getDefaultTypeAliases().inverse().get(name);
             writer.write(": " + (alias != null ? alias : name));
         }
-        if(property.getLowerBound() > 0) {
-            writer.write("!"); //Not nullable
-        }
         writer.write(System.lineSeparator());
     }
 
@@ -304,23 +301,18 @@ public class DefaultModelIO implements ModelIO {
         writer.write(indent + reference.getName());
         writer.write(" --> ");
         writer.write(reference.getEType().getName());
-        if(!reference.getEKeys().isEmpty()) {
+        if(mappings != null) {
             writer.write("(");
             boolean first = true;
-            for(EAttribute k : reference.getEKeys()) {
+            for(Map.Entry<String, String> e : mappings.getDetails()) {
                 if(first) {
                     first = false;
                 } else {
                     writer.write(", ");
                 }
-                writer.write(k.getName());
-                if(mappings != null) {
-                    String ownName = mappings.getDetails().get(k.getName());
-                    if(ownName != null) {
-                        writer.write("=");
-                        writer.write(ownName);
-                    }
-                }
+                writer.write(e.getValue());
+                writer.write("=");
+                writer.write(e.getKey());
             }
             writer.write(")");
         }

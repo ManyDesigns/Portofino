@@ -34,10 +34,7 @@ import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
 
@@ -115,6 +112,8 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
 
     public static BiMap<String, String> getDefaultTypeAliases() {
         ImmutableBiMap.Builder<String, String> defaults = ImmutableBiMap.builder();
+        defaults.put("boolean!", "EBoolean");
+        defaults.put("boolean", "EBooleanObject");
         defaults.put("long!", "ELong");
         defaults.put("long", "ELongObject");
         defaults.put("int!", "EInt");
@@ -266,15 +265,16 @@ public class EntityModelVisitor extends ModelBaseVisitor<EModelElement> {
                 EAnnotation ann = EcoreFactory.eINSTANCE.createEAnnotation();
                 ann.setSource(KeyMappings.class.getName());
                 mappings.relationshipMapping().forEach(m -> {
+                    String ownName = m.ownName.getText();
                     String otherName = m.otherName.getText();
-                    eKeys.add((EAttribute) eClass.getEStructuralFeature(otherName));
-                    if(m.ownName != null) {
-                        String ownName = m.ownName.getText();
-                        if(!(entity.getEStructuralFeature(ownName) instanceof EAttribute)) {
-                            throw new IllegalStateException("Invalid reference " + entity.getName() + "." + ownName);
-                        }
-                        ann.getDetails().put(otherName, ownName);
+                    if(!(entity.getEStructuralFeature(ownName) instanceof EAttribute)) {
+                        throw new IllegalStateException("Invalid reference " + entity.getName() + "." + ownName);
                     }
+                    if(!(eClass.getEStructuralFeature(otherName) instanceof EAttribute)) {
+                        throw new IllegalStateException("Invalid reference " + eClass.getName() + "." + otherName);
+                    }
+                    eKeys.add((EAttribute) eClass.getEStructuralFeature(otherName));
+                    ann.getDetails().put(ownName, otherName);
                 });
                 reference.getEAnnotations().add(ann);
             }
