@@ -22,6 +22,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Pair;
+import com.manydesigns.portofino.model.database.annotations.KeyMappings;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.emf.ecore.*;

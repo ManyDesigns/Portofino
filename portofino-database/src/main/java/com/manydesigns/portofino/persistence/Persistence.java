@@ -33,7 +33,7 @@ import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
 import com.manydesigns.portofino.model.database.annotations.JNDIConnection;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
-import com.manydesigns.portofino.model.database.KeyMappings;
+import com.manydesigns.portofino.model.database.annotations.KeyMappings;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
