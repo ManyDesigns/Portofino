@@ -59,7 +59,7 @@ public class DefaultModelIOTest {
                 "\tfather\n" +
                 "\tmother_rel --> Person(name=mother)\n" +
                 "\tfather_rel --> Person(name=father)\n" +
-                "}");
+                "}".replace("\n", System.lineSeparator()));
         Model model2 = io.load();
         assertEquals(model2.getDomains().size(), 1);
     }
