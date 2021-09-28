@@ -306,8 +306,8 @@ public class Persistence {
         if(mappings != null) {
             mappings.getDetails().forEach(e -> {
                 Reference ref = new Reference(fk);
-                ref.setFromColumn(e.getKey());
-                ref.setToColumn(e.getValue());
+                ref.setFromPropertyName(e.getKey());
+                ref.setToPropertyName(e.getValue());
                 fk.getReferences().add(ref);
             });
         }

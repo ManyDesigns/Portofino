@@ -1,0 +1,10 @@
+@javax.persistence.Table(name = "TABLE1")
+@com.manydesigns.portofino.model.database.annotations.SelectionProvider(query = "from table1", language = "HQL", name = "dbsp")
+entity table1 {
+	id {
+		@javax.persistence.Column(name = "ID")
+		id: long
+	}
+	@javax.persistence.Column(name = "TESTO")
+	testo
+}

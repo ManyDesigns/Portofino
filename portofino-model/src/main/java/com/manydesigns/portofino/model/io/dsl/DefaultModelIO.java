@@ -8,21 +8,13 @@ import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.PatternFileSelector;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.*;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMLResourceFactoryImpl;
-import org.emfjson.jackson.resource.JsonResourceFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultModelIO implements ModelIO {
@@ -42,28 +32,20 @@ public class DefaultModelIO implements ModelIO {
     private static final Logger logger = LoggerFactory.getLogger(DefaultModelIO.class);
 
     private final FileObject modelDirectory;
-    protected final ResourceSet resourceSet = new ResourceSetImpl();
+    private final List<ToLink> toLinkQueue = new ArrayList<>();
+
+    private static class ToLink {
+        final ParseTree parseTree;
+        final EPackage domain;
+
+        private ToLink(ParseTree parseTree, EPackage domain) {
+            this.parseTree = parseTree;
+            this.domain = domain;
+        }
+    }
 
     public DefaultModelIO(FileObject modelDirectory) {
         this.modelDirectory = modelDirectory;
-        resourceSet.getResourceFactoryRegistry()
-                .getExtensionToFactoryMap()
-                .put("json", new JsonResourceFactory());
-        resourceSet.getResourceFactoryRegistry()
-                .getExtensionToFactoryMap()
-                .put("xmi", new XMIResourceFactoryImpl());
-        resourceSet.getResourceFactoryRegistry()
-                .getExtensionToFactoryMap()
-                .put("ecore", new EcoreResourceFactoryImpl());
-        resourceSet.getResourceFactoryRegistry()
-                .getExtensionToFactoryMap()
-                .put("entity", new EntityResource.Factory());
-        resourceSet.getResourceFactoryRegistry()
-                .getExtensionToFactoryMap()
-                .put("domain", new DomainResource.Factory());
-        resourceSet.getResourceFactoryRegistry()
-                .getExtensionToFactoryMap()
-                .put("*", new XMLResourceFactoryImpl());
     }
 
     @Override
@@ -74,19 +56,22 @@ public class DefaultModelIO implements ModelIO {
         if(!modelDirectory.exists() || !modelDirectory.getType().equals(FileType.FOLDER)) {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
-        loadEntities(modelDir, model);
-        return model;
-    }
-
-    protected void loadEntities(FileObject directory, Model model) throws IOException {
-        for(FileObject domainDir : directory.getChildren()) {
-            if(domainDir.isFolder()) {
-                loadDomain(model, null, domainDir);
+        try {
+            for (FileObject domainDir : modelDir.getChildren()) {
+                if (domainDir.isFolder()) {
+                    loadDomainDirectory(model, null, domainDir);
+                }
             }
+            for (ToLink toLink : toLinkQueue) {
+                new EntityModelLinkerVisitor(toLink.domain).visit(toLink.parseTree);
+            }
+            return model;
+        } finally {
+            toLinkQueue.clear();
         }
     }
 
-    protected void loadDomain(Model model, EPackage parent, FileObject domainDir) throws IOException {
+    protected void loadDomainDirectory(Model model, EPackage parent, FileObject domainDir) throws IOException {
         String domainName = domainDir.getName().getBaseName();
         EPackage domain;
         if(parent != null) {
@@ -102,46 +87,62 @@ public class DefaultModelIO implements ModelIO {
         for (FileObject child : domainDir.getChildren()) {
             String baseName = child.getName().getBaseName();
             if(child.isFile() && !baseName.endsWith(".changelog.xml") && !baseName.endsWith(".properties")) {
-                loadResource(domain, child);
+                if(baseName.endsWith(".domain")) {
+                    loadDomainFile(domain, child);
+                } else if(baseName.endsWith(".entity")) {
+                    loadEntity(domain, child);
+                } else {
+                    logger.warn("Unknown file ignored when loading model: " + child.getName().getPath());
+                }
             } else if(child.isFolder()) {
-                loadDomain(model, domain, child);
+                loadDomainDirectory(model, domain, child);
             }
         }
     }
 
-    protected void loadResource(EPackage domain, FileObject entityFile) throws IOException {
-        try(InputStream inputStream = entityFile.getContent().getInputStream()) {
-            Resource resource = resourceSet.createResource(URI.createURI(entityFile.getName().getURI()));
-            resource.load(inputStream, null);
-            EList<EObject> contents = resource.getContents();
-            contents.forEach(o -> {
-                if(o instanceof EClass) {
-                    domain.getEClassifiers().add((EClassifier) o);
-                } else if(o instanceof EPackage) {
-                    EPackage pkg = (EPackage) o;
-                    if(pkg.getName().equals(domain.getName())) {
-                        domain.getEClassifiers().addAll(pkg.getEClassifiers());
-                        domain.getEAnnotations().addAll(pkg.getEAnnotations());
-                    } else {
-                        logger.error("Invalid domain, expected " + domain.getName() + ", got " + pkg.getName());
-                    }
-                }
-            });
-        } catch (IOException e) {
-            logger.error("Could not load resource: " + entityFile.getName().getURI(), e);
-        }
-    }
-
-    protected void loadDomainDefinition(Model model, EPackage parent, FileObject domainDefFile) throws IOException {
-        try(InputStream inputStream = domainDefFile.getContent().getInputStream()) {
+    private void loadDomainFile(EPackage domain, FileObject file) throws IOException {
+        try (InputStream inputStream = file.getContent().getInputStream()) {
             ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
-            if(parser.getNumberOfSyntaxErrors() == 0) {
-                new EntityModelVisitor(parent).visit(parseTree);
+            if (parser.getNumberOfSyntaxErrors() == 0) {
+                EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
+                if(candidate instanceof EPackage) {
+                    EPackage pkg = (EPackage) candidate;
+                    if(pkg.getName().equals(domain.getName())) {
+                        domain.getEClassifiers().addAll(pkg.getEClassifiers());
+                        domain.getEAnnotations().addAll(pkg.getEAnnotations());
+                        toLinkQueue.add(new ToLink(parseTree, domain));
+                    } else {
+                        logger.error("Invalid domain, expected " + domain.getName() + ", got " + pkg.getName() + " in " + file.getName().getPath());
+                    }
+                } else {
+                    logger.error("Not a domain: " + candidate + " in " + file.getName().getPath());
+                }
             } else {
-                logger.error("Could not parse domain definition file " + domainDefFile.getName().getPath()); //TODO properly report errors
+                throw new IOException("Could not parse domain definition " + file.getName().getPath()); //TODO properly report errors
             }
+        }
+    }
+
+    protected void loadEntity(EPackage domain, FileObject file) throws IOException {
+        try(InputStream inputStream = file.getContent().getInputStream()) {
+            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
+            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+            ModelParser.StandaloneEntityContext parseTree = parser.standaloneEntity();
+            if (parser.getNumberOfSyntaxErrors() == 0) {
+                EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
+                if(candidate instanceof EClass) {
+                    domain.getEClassifiers().add((EClassifier) candidate);
+                    toLinkQueue.add(new ToLink(parseTree, domain));
+                } else {
+                    logger.error("Not an entity: " + candidate + " in " + file.getName().getPath());
+                }
+            } else {
+                throw new IOException("Could not parse entity definition " + file.getName().getPath()); //TODO properly report errors
+            }
+        } catch (IOException e) {
+            logger.error("Could not load resource: " + file.getName().getURI(), e);
         }
     }
 
@@ -177,7 +178,8 @@ public class DefaultModelIO implements ModelIO {
                 os.write("domain " + domain.getName() + ";");
             }
         }
-        for(EClassifier entity : domain.getEClassifiers().stream().filter(c -> c instanceof EClass).collect(Collectors.toList())) {
+        for(EClassifier entity :
+                domain.getEClassifiers().stream().filter(c -> c instanceof EClass).collect(Collectors.toList())) {
             saveEntity((EClass) entity, domainDir);
         }
         deleteUnusedEntityFiles(domainDir, domain.getEClassifiers());
@@ -280,7 +282,7 @@ public class DefaultModelIO implements ModelIO {
         EClassifier type = property.getEType();
         if(!type.equals(EcorePackage.eINSTANCE.getEString())) {
             String name = type.getName();
-            String alias = EntityModelVisitor.getDefaultTypeAliases().inverse().get(name);
+            String alias = EntityModelBaseVisitor.getDefaultTypeAliases().inverse().get(name);
             writer.write(": " + (alias != null ? alias : name));
         }
         writer.write(System.lineSeparator());
@@ -324,13 +326,13 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    protected void writeAnnotations(EModelElement annotated, Writer writer, String indent) throws IOException {
+    public static void writeAnnotations(EModelElement annotated, Writer writer, String indent) throws IOException {
         for(EAnnotation annotation : annotated.getEAnnotations()) {
             writeAnnotation(annotation, writer, indent);
         }
     }
 
-    protected void writeAnnotation(EAnnotation annotation, Writer writer, String indent) throws IOException {
+    public static void writeAnnotation(EAnnotation annotation, Writer writer, String indent) throws IOException {
         writer.write(indent + "@" + annotation.getSource());
         if(!annotation.getDetails().isEmpty()) {
             writer.write("(");
@@ -353,7 +355,7 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    protected void writeAnnotationPropertyValue(EAnnotation annotation, String name, Writer writer) throws IOException {
+    public static void writeAnnotationPropertyValue(EAnnotation annotation, String name, Writer writer) throws IOException {
         String value = annotation.getDetails().get(name);
         try {
             Annotation ann = new Annotation(annotation);

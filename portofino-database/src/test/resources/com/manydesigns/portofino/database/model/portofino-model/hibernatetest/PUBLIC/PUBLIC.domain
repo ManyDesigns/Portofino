@@ -1,0 +1,2 @@
+@com.manydesigns.portofino.model.database.annotations.Schema(name = "PUBLIC")
+domain PUBLIC;

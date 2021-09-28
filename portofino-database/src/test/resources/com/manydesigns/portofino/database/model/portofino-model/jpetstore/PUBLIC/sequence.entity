@@ -1,0 +1,9 @@
+@javax.persistence.Table(name = "SEQUENCE")
+entity sequence {
+	id {
+		@javax.persistence.Column(name = "NAME")
+		name
+	}
+	@javax.persistence.Column(name = "NEXTID")
+	nextid: EBigInteger
+}

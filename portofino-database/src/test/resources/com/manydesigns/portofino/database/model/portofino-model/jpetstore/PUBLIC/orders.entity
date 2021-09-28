@@ -1,0 +1,55 @@
+@javax.persistence.Table(name = "ORDERS")
+entity orders {
+	id {
+		@javax.persistence.Column(name = "ORDERID")
+		orderid: EBigInteger
+	}
+	@javax.persistence.Column(name = "USERID")
+	userid
+	@javax.persistence.Column(name = "ORDERDATE")
+	orderdate: java.sql.Date
+	@javax.persistence.Column(name = "SHIPADDR1")
+	shipaddr1
+	@javax.persistence.Column(name = "SHIPADDR2")
+	shipaddr2
+	@javax.persistence.Column(name = "SHIPCITY")
+	shipcity
+	@javax.persistence.Column(name = "SHIPSTATE")
+	shipstate
+	@javax.persistence.Column(name = "SHIPZIP")
+	shipzip
+	@javax.persistence.Column(name = "SHIPCOUNTRY")
+	shipcountry
+	@javax.persistence.Column(name = "BILLADDR1")
+	billaddr1
+	@javax.persistence.Column(name = "BILLADDR2")
+	billaddr2
+	@javax.persistence.Column(name = "BILLCITY")
+	billcity
+	@javax.persistence.Column(name = "BILLSTATE")
+	billstate
+	@javax.persistence.Column(name = "BILLZIP")
+	billzip
+	@javax.persistence.Column(name = "BILLCOUNTRY")
+	billcountry
+	@javax.persistence.Column(name = "COURIER")
+	courier
+	@javax.persistence.Column(name = "TOTALPRICE")
+	totalprice: EBigDecimal
+	@javax.persistence.Column(name = "BILLTOFIRSTNAME")
+	billtofirstname
+	@javax.persistence.Column(name = "BILLTOLASTNAME")
+	billtolastname
+	@javax.persistence.Column(name = "SHIPTOFIRSTNAME")
+	shiptofirstname
+	@javax.persistence.Column(name = "SHIPTOLASTNAME")
+	shiptolastname
+	@javax.persistence.Column(name = "CREDITCARD")
+	creditcard
+	@javax.persistence.Column(name = "EXPRDATE")
+	exprdate
+	@javax.persistence.Column(name = "CARDTYPE")
+	cardtype
+	@javax.persistence.Column(name = "LOCALE")
+	locale
+}

@@ -1,0 +1,13 @@
+@javax.persistence.Table(name = "ORDERSTATUS")
+entity orderstatus {
+	id {
+		@javax.persistence.Column(name = "ORDERID")
+		orderid: EBigInteger
+		@javax.persistence.Column(name = "LINENUM")
+		linenum: EBigInteger
+	}
+	@javax.persistence.Column(name = "TIMESTAMP")
+	timestamp: java.sql.Date
+	@javax.persistence.Column(name = "STATUS")
+	status
+}

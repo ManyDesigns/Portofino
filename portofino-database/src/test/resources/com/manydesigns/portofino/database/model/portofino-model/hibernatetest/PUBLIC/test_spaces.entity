@@ -1,0 +1,9 @@
+@javax.persistence.Table(name = "TEST_SPACES")
+entity test_spaces {
+	id {
+		@javax.persistence.Column(name = "id spaces")
+		id_spaces: long
+	}
+	@javax.persistence.Column(name = "some other column with spaces")
+	some_other_column_with_spaces
+}

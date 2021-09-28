@@ -1,0 +1,9 @@
+@javax.persistence.Table(name = "BANNERDATA")
+entity bannerdata {
+	id {
+		@javax.persistence.Column(name = "FAVCATEGORY")
+		favcategory
+	}
+	@javax.persistence.Column(name = "BANNERNAME")
+	bannername
+}

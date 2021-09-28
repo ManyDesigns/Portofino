@@ -1,0 +1,23 @@
+@javax.persistence.Table(name = "SUPPLIER")
+entity supplier {
+	id {
+		@javax.persistence.Column(name = "SUPPID")
+		suppid: EBigInteger
+	}
+	@javax.persistence.Column(name = "NAME")
+	name
+	@javax.persistence.Column(name = "STATUS")
+	status
+	@javax.persistence.Column(name = "ADDR1")
+	addr1
+	@javax.persistence.Column(name = "ADDR2")
+	addr2
+	@javax.persistence.Column(name = "CITY")
+	city
+	@javax.persistence.Column(name = "STATE")
+	state
+	@javax.persistence.Column(name = "ZIP")
+	zip
+	@javax.persistence.Column(name = "PHONE")
+	phone
+}

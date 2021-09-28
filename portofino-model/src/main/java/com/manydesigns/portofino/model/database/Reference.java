@@ -56,9 +56,10 @@ public class Reference implements ModelObject, Unmarshallable {
     // Fields for wire-up
     //**************************************************************************
 
+    protected String fromPropertyName;
+    protected String toPropertyName;
     protected Column actualFromColumn;
     protected Column actualToColumn;
-
 
     //**************************************************************************
     // Constructors
@@ -87,20 +88,31 @@ public class Reference implements ModelObject, Unmarshallable {
     }
 
     public void init(Model model, Configuration configuration) {
-        assert owner != null;
-        assert fromColumn != null;
+        if(owner == null) {
+            throw new IllegalStateException("Reference without an owner");
+        }
+        if(fromColumn == null && fromPropertyName == null) {
+            throw new IllegalStateException("Reference without a from column in " + owner);
+        }
     }
 
     public void link(Model model, Configuration configuration) {
-        actualFromColumn =
-                DatabaseLogic.findColumnByName(owner.getFromTable(), fromColumn);
+        if(fromPropertyName != null) {
+            actualFromColumn = DatabaseLogic.findColumnByPropertyName(owner.getFromTable(), fromPropertyName);
+        } else {
+            actualFromColumn = DatabaseLogic.findColumnByName(owner.getFromTable(), fromColumn);
+        }
         if (actualFromColumn == null) {
             throw new RuntimeException("Cannot resolve column: " + owner.getFromTable().getQualifiedName() + "." + fromColumn);
         }
 
         Table toTable = owner.getToTable();
         if (toTable != null) {
-            actualToColumn = DatabaseLogic.findColumnByName(toTable, toColumn);
+            if(toPropertyName != null) {
+                actualToColumn = DatabaseLogic.findColumnByPropertyName(toTable, toPropertyName);
+            } else {
+                actualToColumn = DatabaseLogic.findColumnByName(toTable, toColumn);
+            }
         }
     }
 
@@ -142,5 +154,21 @@ public class Reference implements ModelObject, Unmarshallable {
 
     public Column getActualToColumn() {
         return actualToColumn;
+    }
+
+    public String getFromPropertyName() {
+        return fromPropertyName;
+    }
+
+    public void setFromPropertyName(String fromPropertyName) {
+        this.fromPropertyName = fromPropertyName;
+    }
+
+    public String getToPropertyName() {
+        return toPropertyName;
+    }
+
+    public void setToPropertyName(String toPropertyName) {
+        this.toPropertyName = toPropertyName;
     }
 }

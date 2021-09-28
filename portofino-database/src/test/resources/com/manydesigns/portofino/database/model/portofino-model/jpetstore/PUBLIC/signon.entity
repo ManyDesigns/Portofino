@@ -1,0 +1,9 @@
+@javax.persistence.Table(name = "SIGNON")
+entity signon {
+	id {
+		@javax.persistence.Column(name = "USERNAME")
+		username
+	}
+	@javax.persistence.Column(name = "PASSWORD")
+	password
+}

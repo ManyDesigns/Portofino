@@ -28,7 +28,7 @@ public class DefaultModelIOTest {
             ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             assertEquals(parser.getNumberOfSyntaxErrors(), 0);
-            EPackage domain = new EntityModelVisitor().visitStandaloneDomain(parseTree);
+            EPackage domain = new EntityModelBuilderVisitor().visitStandaloneDomain(parseTree);
             assertEquals(domain.getEClassifiers().size(), 1);
         }
     }

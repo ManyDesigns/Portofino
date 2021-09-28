@@ -1,0 +1,29 @@
+@javax.persistence.Table(name = "ACCOUNT")
+entity account {
+	id {
+		@javax.persistence.Column(name = "USERID")
+		userid
+	}
+	@javax.persistence.Column(name = "EMAIL")
+	email
+	@javax.persistence.Column(name = "FIRSTNAME")
+	firstname
+	@javax.persistence.Column(name = "LASTNAME")
+	lastname
+	@javax.persistence.Column(name = "STATUS")
+	status
+	@javax.persistence.Column(name = "ADDR1")
+	addr1
+	@javax.persistence.Column(name = "ADDR2")
+	addr2
+	@javax.persistence.Column(name = "CITY")
+	city
+	@javax.persistence.Column(name = "STATE")
+	state
+	@javax.persistence.Column(name = "ZIP")
+	zip
+	@javax.persistence.Column(name = "COUNTRY")
+	country
+	@javax.persistence.Column(name = "PHONE")
+	phone
+}

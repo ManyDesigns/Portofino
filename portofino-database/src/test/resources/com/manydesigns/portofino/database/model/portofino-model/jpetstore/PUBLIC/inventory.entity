@@ -1,0 +1,9 @@
+@javax.persistence.Table(name = "INVENTORY")
+entity inventory {
+	id {
+		@javax.persistence.Column(name = "ITEMID")
+		itemid
+	}
+	@javax.persistence.Column(name = "QTY")
+	qty: EBigInteger
+}

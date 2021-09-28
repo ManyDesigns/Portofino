@@ -1,0 +1,29 @@
+@javax.persistence.Table(name = "ITEM")
+entity item {
+	id {
+		@javax.persistence.Column(name = "ITEMID")
+		itemid
+	}
+	@javax.persistence.Column(name = "PRODUCTID")
+	productid
+	@javax.persistence.Column(name = "LISTPRICE")
+	listprice: EBigDecimal
+	@javax.persistence.Column(name = "UNITCOST")
+	unitcost: EBigDecimal
+	@javax.persistence.Column(name = "SUPPLIER")
+	supplier: EBigInteger
+	@javax.persistence.Column(name = "STATUS")
+	status
+	@javax.persistence.Column(name = "ATTR1")
+	attr1
+	@javax.persistence.Column(name = "ATTR2")
+	attr2
+	@javax.persistence.Column(name = "ATTR3")
+	attr3
+	@javax.persistence.Column(name = "ATTR4")
+	attr4
+	@javax.persistence.Column(name = "ATTR5")
+	attr5
+	FK_ITEM_2 --> supplier(suppid=supplier)
+	FK_ITEM_1 --> product(productid=productid)
+}

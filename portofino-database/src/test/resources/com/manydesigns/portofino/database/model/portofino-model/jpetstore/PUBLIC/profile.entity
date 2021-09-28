@@ -1,0 +1,15 @@
+@javax.persistence.Table(name = "PROFILE")
+entity profile {
+	id {
+		@javax.persistence.Column(name = "USERID")
+		userid
+	}
+	@javax.persistence.Column(name = "LANGPREF")
+	langpref
+	@javax.persistence.Column(name = "FAVCATEGORY")
+	favcategory
+	@javax.persistence.Column(name = "MYLISTOPT")
+	mylistopt: boolean
+	@javax.persistence.Column(name = "BANNEROPT")
+	banneropt: boolean
+}

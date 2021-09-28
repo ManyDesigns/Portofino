@@ -1,0 +1,15 @@
+@javax.persistence.Table(name = "LINEITEM")
+entity lineitem {
+	id {
+		@javax.persistence.Column(name = "ORDERID")
+		orderid: EBigInteger
+		@javax.persistence.Column(name = "LINENUM")
+		linenum: EBigInteger
+	}
+	@javax.persistence.Column(name = "ITEMID")
+	itemid
+	@javax.persistence.Column(name = "QUANTITY")
+	quantity: EBigInteger
+	@javax.persistence.Column(name = "UNITPRICE")
+	unitprice: EBigDecimal
+}

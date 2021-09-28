@@ -1,0 +1,18 @@
+@javax.persistence.Table(name = "TABLE3")
+entity table3 {
+	id {
+		@javax.persistence.Column(name = "ID")
+		id: long
+	}
+	@javax.persistence.Column(name = "T2_ID1")
+	t2_id1
+	@javax.persistence.Column(name = "T2_ID2")
+	t2_id2
+	@javax.persistence.Column(name = "TB4_ID")
+	tb4_id: EBigInteger
+	@javax.persistence.Column(name = "TB1_ID")
+	tb1_id: EBigInteger
+	TABLE3_T2_ID1_FKEY --> table2(id1=t2_id1, id2=t2_id2)
+	TABLE3_TB1_ID_FKEY --> table1(id=tb1_id)
+	TABLE3_TB4_ID_FKEY --> table4(id=tb4_id)
+}

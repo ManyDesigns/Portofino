@@ -1,0 +1,19 @@
+@javax.persistence.Table(name = "DOMANDA")
+entity domanda {
+	id {
+		@javax.persistence.Column(name = "PROTOCOLLO")
+		protocollo
+	}
+	@javax.persistence.Column(name = "RICHIEDENTE")
+	richiedente
+	@javax.persistence.Column(name = "REGIONE")
+	regione
+	@javax.persistence.Column(name = "PROVINCIA")
+	provincia
+	@javax.persistence.Column(name = "COMUNE")
+	comune
+	@javax.persistence.Column(name = "DATA")
+	data: java.sql.Date
+	DOMANDA_COMUNE_FKEY --> comune(comune=comune)
+	DOMANDA_REGIONE_FKEY --> comune(regione=regione, provincia=provincia, comune=comune)
+}

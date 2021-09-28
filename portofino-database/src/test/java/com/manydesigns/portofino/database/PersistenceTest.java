@@ -61,7 +61,7 @@ public class PersistenceTest {
 
     @BeforeMethod
     public void setup() throws Exception {
-        FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model/legacy");
+        FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model");
         setup(appDir);
     }
 
