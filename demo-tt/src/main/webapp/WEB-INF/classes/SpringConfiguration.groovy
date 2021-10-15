@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy
 class SpringConfiguration {
 
     Disposable subscription
+    JobRegistration notificationsJob
 
     @Autowired
     Persistence persistence
@@ -38,7 +39,8 @@ class SpringConfiguration {
         def schedule = TriggerBuilder.newTrigger()
                 .startAt(DateBuilder.futureDate(pollSecInterval, DateBuilder.IntervalUnit.SECOND))
                 .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(pollSecInterval))
-        schedulerService.register(new JobRegistration(NotificationsJob, schedule, "tt"))
+        notificationsJob = new JobRegistration(NotificationsJob, schedule, "tt")
+        schedulerService.register(notificationsJob)
 
         subscription = persistence.status.subscribe({ status ->
             logger.info("Persistence status: ${status}")
@@ -48,6 +50,7 @@ class SpringConfiguration {
     @PreDestroy
     void destroy() {
         subscription.dispose()
+        schedulerService.unschedule(notificationsJob)
     }
 
     @Bean

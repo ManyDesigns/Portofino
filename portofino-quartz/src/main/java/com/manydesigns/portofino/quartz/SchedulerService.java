@@ -1,9 +1,6 @@
 package com.manydesigns.portofino.quartz;
 
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +37,7 @@ public class SchedulerService {
         started = true;
     }
 
-    public void schedule(JobRegistration j) {
+    public synchronized void schedule(JobRegistration j) {
         j.jobName = "Job " + j.jobClass.getSimpleName();
         JobDetail job = JobBuilder.newJob(j.jobClass).withIdentity(j.jobName).build();
         try {
@@ -52,8 +49,20 @@ public class SchedulerService {
         }
     }
 
+    public synchronized void unschedule(JobRegistration registration) {
+        try {
+            if(started) {
+                scheduler.deleteJob(registration.key);
+            }
+            jobs.remove(registration);
+            registration.key = null;
+        } catch (SchedulerException e) {
+            logger.error("Could not unschedule " + registration.jobName, e);
+        }
+    }
+
     @PreDestroy
-    public void unschedule() {
+    public synchronized void unschedule() {
         jobs.forEach(j -> {
             try {
                 if(!scheduler.isShutdown()) {
@@ -64,6 +73,7 @@ public class SchedulerService {
                 logger.error("Could not delete " + j.jobName, e);
             }
         });
+        started = false;
     }
 
     public Scheduler getScheduler() {
