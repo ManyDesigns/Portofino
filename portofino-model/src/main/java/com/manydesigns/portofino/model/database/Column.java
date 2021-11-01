@@ -34,7 +34,6 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.manydesigns.portofino.model.PortofinoPackage.ensureType;
 
@@ -55,13 +54,6 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     //**************************************************************************
 
     protected Table table;
-    protected String columnName;
-    protected int jdbcType;
-    protected String columnType;
-    protected boolean nullable;
-    protected boolean autoincrement;
-    protected Integer length;
-    protected Integer scale;
 
     //**************************************************************************
     // Fields (logical)
@@ -69,6 +61,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
     protected String javaType;
     protected EAttribute property;
+    protected Annotation columnInfo;
     protected List<Annotation> annotations = new ArrayList<>();
 
     //**************************************************************************
@@ -90,6 +83,8 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     public Column(EAttribute property) {
         this.property = property;
         initAnnotations(property);
+        columnInfo = ensureAnnotation(
+                com.manydesigns.portofino.model.database.annotations.Column.class);
     }
 
     public Column(Table table) {
@@ -108,7 +103,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
     public String getQualifiedName() {
         return MessageFormat.format("{0}.{1}",
-                table.getQualifiedName(), columnName);
+                table.getQualifiedName(), getColumnName());
     }
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
@@ -125,18 +120,20 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
     public void init(Model model, Configuration configuration) {
         assert table != null;
-        if(columnName == null) {
+        if(getColumnName() == null) {
             throw new IllegalStateException("columnName must not be null");
         }
 
         if (StringUtils.isEmpty(propertyName)) {
-            String initialName = DatabaseLogic.normalizeName(columnName);
+            String initialName = DatabaseLogic.normalizeName(getColumnName());
             if(!initialName.equals(property.getName())) {
                 property.setName(DatabaseLogic.getUniquePropertyName(table, initialName));
             }
         } else {
             property.setName(propertyName); //AS do not normalize (can be mixed-case Java properties)
         }
+        // Re-set the column name so that if it's equal to the property name it's not saved in the annotation
+        setColumnName(getColumnName());
 
         if(javaType != null) {
             actualJavaType = ReflectionUtil.loadClass(javaType);
@@ -147,17 +144,17 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
                 property.setEType(EcorePackage.eINSTANCE.getEString());
             }
         } else if(property.getEType() == null) {
-            if(columnType == null) {
+            if(getColumnType() == null) {
                 throw new IllegalStateException("columnType must not be null when property type is null");
             }
-            actualJavaType = Type.getDefaultJavaType(jdbcType, columnType, length, scale);
+            actualJavaType = Type.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
             if (actualJavaType != null) {
                 property.setEType(ensureType(actualJavaType));
             } else {
                 logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
                         table.getTableName(),
                         getColumnName(),
-                        jdbcType,
+                        getJdbcType(),
                         javaType);
                 property.setEType(EcorePackage.eINSTANCE.getEString());
             }
@@ -207,66 +204,81 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     @Required
     @XmlAttribute(required = true)
     public String getColumnName() {
-        return columnName;
+        String columnName = columnInfo.getPropertyValue("name");
+        return StringUtils.defaultIfEmpty(columnName, getActualPropertyName());
     }
 
     public void setColumnName(String columnName) {
-        this.columnName = columnName;
+        if(columnName.equals(getActualPropertyName())) {
+            columnInfo.removePropertyValue("name");
+        } else {
+            columnInfo.setPropertyValue("name", columnName);
+        }
     }
 
     @XmlAttribute(required = true)
     public int getJdbcType() {
-        return jdbcType;
+        return Integer.parseInt(columnInfo.getPropertyValue("jdbcType", String.valueOf(Integer.MIN_VALUE)));
     }
 
     public void setJdbcType(int jdbcType) {
-        this.jdbcType = jdbcType;
+        columnInfo.setPropertyValue("jdbcType", String.valueOf(jdbcType));
     }
 
     @Required
     @XmlAttribute(required = true)
     public String getColumnType() {
-        return columnType;
+        return columnInfo.getPropertyValue("columnType");
     }
 
     public void setColumnType(String columnType) {
-        this.columnType = columnType;
+        columnInfo.setPropertyValue("columnType", columnType);
     }
 
     @XmlAttribute(required = true)
     public boolean isNullable() {
-        return nullable;
+        return Boolean.parseBoolean(columnInfo.getPropertyValue("nullable"));
     }
 
     public void setNullable(boolean nullable) {
-        this.nullable = nullable;
+        columnInfo.setPropertyValue("nullable", String.valueOf(nullable));
     }
 
     @XmlAttribute(required = true)
     public Integer getLength() {
-        return length;
+        String length = columnInfo.getPropertyValue("length");
+        if(length != null) {
+            return Integer.parseInt(length);
+        } else {
+            return null;
+        }
     }
 
     public void setLength(Integer length) {
-        this.length = length;
+        columnInfo.setPropertyValue("length", length == null ? null : length.toString());
     }
 
     @XmlAttribute(required = true)
     public Integer getScale() {
-        return scale;
+        String scale = columnInfo.getPropertyValue("scale");
+        if(scale != null) {
+            return Integer.parseInt(scale);
+        } else {
+            return null;
+        }
     }
 
     public void setScale(Integer scale) {
-        this.scale = scale;
+        columnInfo.setPropertyValue("scale", scale == null ? null : scale.toString());
     }
 
     @XmlAttribute(required = true)
     public boolean isAutoincrement() {
-        return autoincrement;
+        return Boolean.parseBoolean(columnInfo.getPropertyValue("autoincrement"));
     }
 
     public void setAutoincrement(boolean autoincrement) {
-        this.autoincrement = autoincrement;
+        this.columnInfo.setPropertyValue("autoincrement", String.valueOf(autoincrement));
     }
 
     public boolean isSearchable() {
@@ -310,10 +322,10 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     public String toString() {
         return MessageFormat.format("column {0} {1}({2},{3}){4}",
                 getQualifiedName(),
-                columnType,
-                Integer.toString(length),
-                Integer.toString(scale),
-                nullable ? "" : " NOT NULL");
+                getColumnType(),
+                Integer.toString(getLength()),
+                Integer.toString(getScale()),
+                isNullable() ? "" : " NOT NULL");
     }
 
     //**************************************************************************

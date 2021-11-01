@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.model.database;
+package com.manydesigns.portofino.model;
 
 import javax.xml.bind.Unmarshaller;
 

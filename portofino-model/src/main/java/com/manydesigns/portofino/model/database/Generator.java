@@ -23,13 +23,16 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.Unmarshallable;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EModelElement;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
-/*
+/**
+ * Configures a generator for a primary key column.
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -88,4 +91,9 @@ public abstract class Generator implements ModelObject, Unmarshallable {
     public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {}
+
+    @Override
+    public EModelElement getModelElement() {
+        return null;
+    }
 }

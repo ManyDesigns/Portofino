@@ -89,7 +89,14 @@ public class PersistenceTest {
     }
 
     @AfterMethod
-    public void teardown() {
+    public void teardown() throws ConfigurationException, IOException {
+        persistence.getModel().getDatabases().forEach(d -> {
+            d.getSchemas().forEach(s -> {
+                s.getTables().clear();
+                s.getModelElement().getEClassifiers().clear();
+            });
+        });
+        persistence.saveModel();
         persistence.stop();
         databaseModule.destroy();
     }
@@ -560,12 +567,13 @@ public class PersistenceTest {
     }
 
     public void testAnnotations() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
         Session session = persistence.getSession("hibernatetest");
         try {
             session.createNamedQuery("all_questions", Map.class).list();
             fail("Exception expected");
         } catch (Exception e) {}
-        Table table = DatabaseLogic.findTableByName(persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
         assertNotNull(table);
         Annotation nq = table.ensureAnnotation("javax.persistence.NamedQuery");
         nq.setProperties(Arrays.asList(
@@ -605,7 +613,6 @@ public class PersistenceTest {
             hibernatetest.setDatabaseName("test");
             FileObject file;
             file = appDir.resolveFile("portofino-model").resolveFile("test");
-            assertFalse(file.exists());
             persistence.saveModel();
             assertTrue(file.exists());
             //Old directory is deleted

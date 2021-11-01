@@ -151,7 +151,7 @@ public class TablesAction extends AbstractResourceAction {
             Type type = null;
             for (Type candidate : types) {
                 if (candidate.getJdbcType() == column.getJdbcType() &&
-                        candidate.getTypeName().equalsIgnoreCase(column.getColumnType())) {
+                    candidate.getTypeName().equalsIgnoreCase(column.getColumnType())) {
                     type = candidate;
                     break;
                 }
@@ -329,6 +329,11 @@ public class TablesAction extends AbstractResourceAction {
                             a.setPropertyValue("value", value);
                             existing.getAnnotations().add(a);
                             break;
+                        case "maxLength":
+                            a = new Annotation(MAX_LENGTH);
+                            a.setPropertyValue("value", value);
+                            existing.getAnnotations().add(a);
+                            break;
                         case "regexp":
                             a = new Annotation(REGEXP);
                             a.setPropertyValue("value", value);
@@ -395,6 +400,8 @@ public class TablesAction extends AbstractResourceAction {
                 jsonStringer.key("maxValue");
             } else if(MAX_DECIMAL_VALUE.equals(annType)) {
                 jsonStringer.key("maxValue");
+            } else if(MAX_LENGTH.equals(annType)) {
+                jsonStringer.key("maxLength");
             } else if(MULTILINE.equals(annType)) {
                 jsonStringer.key("typeOfContent");
                 jsonStringer.object();
@@ -433,19 +440,15 @@ public class TablesAction extends AbstractResourceAction {
                 jsonStringer.object();
                 jsonStringer.key("type").value(annType);
                 jsonStringer.key("properties");
-                jsonStringer.array();
-                a.getProperties().forEach(p -> {
-                    jsonStringer.key(p.getName()).value(p.getValue());
-                });
-                jsonStringer.endArray();
+                jsonStringer.object();
+                a.getProperties().forEach(p -> jsonStringer.key(p.getName()).value(p.getValue()));
+                jsonStringer.endObject();
                 jsonStringer.endObject();
                 return;
             }
             if(a.getProperties().size() > 1) {
                 jsonStringer.object();
-                for (AnnotationProperty p : a.getProperties()) {
-                    jsonStringer.key(p.getName()).value(p.getValue());
-                }
+                a.getProperties().forEach(p -> jsonStringer.key(p.getName()).value(p.getValue()));
                 jsonStringer.endObject();
             } else {
                 jsonStringer.value(a.getProperties().get(0).getValue());

@@ -20,10 +20,7 @@
 
 package com.manydesigns.portofino.model.io.dsl;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.manydesigns.portofino.model.PortofinoPackage;
-import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.database.annotations.KeyMappings;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
@@ -34,10 +31,7 @@ import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
 
@@ -70,7 +64,10 @@ public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
         EPackage domain =
             parentDomain == null ?
             initialDomain :
-            parentDomain.getESubpackages().stream().filter(p -> name.equals(p.getName())).findFirst().orElseThrow();
+            parentDomain.getESubpackages().stream()
+                    .filter(p -> name.equals(p.getName()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("No subdomain called " + name + " found in " + parentDomain.getName()));
         parentDomain = domain;
         annotated = domain;
         visitChildren(ctx);

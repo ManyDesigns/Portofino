@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.model;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 
 import java.util.List;
@@ -79,11 +81,23 @@ public interface Annotated {
         return !toRemove.isEmpty();
     }
 
+    /////////
+    // EMF //
+    /////////
+
     default void initAnnotations(EModelElement modelElement) {
         modelElement.getEAnnotations().forEach(a -> {
             Annotation e = new Annotation(a);
             e.setParent(this);
             getAnnotations().add(e);
         });
+    }
+
+    default void addAnnotation(EAnnotation eAnnotation) {
+        if(this instanceof ModelObject) {
+            ((ModelObject) this).getModelElement().getEAnnotations().add(eAnnotation);
+        } else {
+            throw new NotImplementedException(this + " is not a ModelObject and doesn't specify how to add an annotation");
+        }
     }
 }

@@ -20,10 +20,12 @@
 
 package com.manydesigns.portofino.model.database.annotations;
 
-public @interface SelectionProvider {
-    String name();
-    String query();
-    String language();
-    String database();
-    String[] properties();
+public @interface Column {
+    String name() default "";
+    int jdbcType() default Integer.MIN_VALUE;
+    String columnType();
+    boolean autoincrement() default false;
+    boolean nullable() default false;
+    int length() default -1;
+    int scale() default -1;
 }

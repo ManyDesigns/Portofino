@@ -23,18 +23,22 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
 import com.manydesigns.portofino.model.Named;
+import com.manydesigns.portofino.model.Unmarshallable;
 import com.manydesigns.portofino.model.database.annotations.SelectionProvider;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,8 +53,6 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     protected final List<Reference> references;
-
-    protected String toDatabase;
 
     protected Table fromTable;
     protected EAnnotation annotation;
@@ -77,6 +79,12 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
         setFromTable(fromTable);
     }
 
+    public DatabaseSelectionProvider(Table fromTable, EAnnotation annotation) {
+        this();
+        this.annotation = annotation;
+        setFromTable(fromTable);
+    }
+
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
@@ -96,17 +104,29 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
         if(getName() == null) {
             throw new RuntimeException("name is required. Parent: " + fromTable.getQualifiedName());
         }
-        if(toDatabase == null) {
+        if(getToDatabase() == null) {
             if(fromTable.getSchema() != null) {
-                toDatabase = fromTable.getSchema().getDatabaseName();
+                setToDatabase(fromTable.getSchema().getDatabaseName());
             }
-            if(toDatabase == null) {
+            if(getToDatabase() == null) {
                 throw new RuntimeException("toDatabase is required. Parent: " + fromTable.getQualifiedName());
             }
         }
     }
 
     public void link(Model model, Configuration configuration) {}
+
+    @Override
+    public void afterLink(Model model, Configuration configuration) {
+        annotation.getDetails().put("properties", references.stream().map(r -> {
+            Column column = r.getActualFromColumn();
+            if(column == null) {
+                return r.fromPropertyName;
+            } else {
+                return column.getActualPropertyName();
+            }
+        }).collect(Collectors.joining(", ")));
+    }
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Reference reference : references) {
@@ -122,7 +142,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
     // Getters/setters
     //**************************************************************************
     @XmlElementWrapper(name="references")
-    @XmlElement(name="reference",type=Reference.class)
+    @XmlElement(name="reference", type = Reference.class)
     public List<Reference> getReferences() {
         return references;
     }
@@ -138,11 +158,11 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
 
     @XmlAttribute(required = true)
     public String getToDatabase() {
-        return toDatabase;
+        return annotation.getDetails().get("database");
     }
 
     public void setToDatabase(String toDatabase) {
-        this.toDatabase = toDatabase;
+        annotation.getDetails().put("database", toDatabase);
     }
 
     @XmlAttribute()
@@ -175,7 +195,6 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
 
     public void setFromTable(Table fromTable) {
         this.fromTable = fromTable;
-        fromTable.ensureAnnotation(SelectionProvider.class).remove();
         fromTable.getModelElement().getEAnnotations().add(annotation);
     }
 
@@ -183,4 +202,13 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider, Named,
         return null;
     }
 
+    @Override
+    public EModelElement getModelElement() {
+        return annotation;
+    }
+
+    @Override
+    public String toString() {
+        return MessageFormat.format("selection provider {0}", getQualifiedName());
+    }
 }

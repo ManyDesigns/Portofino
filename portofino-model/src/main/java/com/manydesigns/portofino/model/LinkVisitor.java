@@ -42,4 +42,9 @@ public class LinkVisitor extends ModelObjectVisitor {
     public void visitNodeBeforeChildren(ModelObject node) {
         node.link(model, configuration);
     }
+
+    @Override
+    public void visitNodeAfterChildren(ModelObject node) {
+        node.afterLink(model, configuration);
+    }
 }

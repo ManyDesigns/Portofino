@@ -34,7 +34,8 @@ public class AnnotationFactory {
     public <T extends Annotation> T make(Class<T> annotationClass, Map<String, Object> values) {
         getAnnotationMethods(annotationClass).forEach(m -> {
             if(m.getDefaultValue() == null && !values.containsKey(m.getName())) {
-                throw new IllegalArgumentException(m.getName() + " has no default and is missing from values for " + annotationClass);
+                throw new IllegalArgumentException(
+                        m.getName() + " has no default and is missing from values for " + annotationClass);
             }
         });
         return (T) Proxy.newProxyInstance(classLoader, new Class[] { annotationClass },

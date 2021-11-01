@@ -28,12 +28,11 @@ import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.model.database.annotations.Id;
-import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
-import com.manydesigns.portofino.model.database.annotations.JNDIConnection;
+import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.model.database.Schema;
+import com.manydesigns.portofino.model.database.annotations.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
-import com.manydesigns.portofino.model.database.annotations.KeyMappings;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
@@ -153,10 +152,7 @@ public class Persistence {
             try {
                 loadModel(new DefaultModelIO(getModelDirectory()));
                 model.getDomains().forEach(domain -> {
-                    Database database = setupDatabase(model, domain);
-                    if(database != null) {
-                        domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
-                    }
+                    setupDatabase(model, domain);
                 });
                 initModel();
             } catch (Exception e) {
@@ -200,12 +196,6 @@ public class Persistence {
                     Annotation tableAnn = table.ensureAnnotation(javax.persistence.Table.class);
                     tableAnn.setPropertyValue("name", table.getTableName());
                 }
-                table.getColumns().forEach(column -> {
-                    if(!column.getColumnName().equals(column.getActualPropertyName())) {
-                        Annotation colAnn = column.ensureAnnotation(javax.persistence.Column.class);
-                        colAnn.setPropertyValue("name", column.getColumnName());
-                    }
-                });
             });
         });
     }
@@ -223,6 +213,7 @@ public class Persistence {
             cp.setUsername(ann.getDetails().get("username"));
             cp.setPassword(ann.getDetails().get("password"));
             database.setConnectionProvider(cp);
+            domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
             return database;
         } else {
             ann = domain.getEAnnotation(JNDIConnection.class.getName());
@@ -233,6 +224,7 @@ public class Persistence {
                 cp.setDatabase(database);
                 cp.setJndiResource(ann.getDetails().get("name"));
                 database.setConnectionProvider(cp);
+                domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
                 return database;
             }
         }
@@ -279,16 +271,36 @@ public class Persistence {
                 setupForeignKey(table, reference);
             }
         });
+        //Copy to avoid ConcurrentModificationException as creating new database selection providers will add
+        //annotations to the table
+        new ArrayList<>(entity.getEAnnotations()).forEach(a -> {
+            if(a.getSource().equals(SelectionProvider.class.getName())) {
+                DatabaseSelectionProvider sp = new DatabaseSelectionProvider(table);
+                sp.setName(a.getDetails().get("name"));
+                sp.setToDatabase(a.getDetails().get("database"));
+                String language = a.getDetails().get("language");
+                if(language.equalsIgnoreCase("hql")) {
+                    sp.setHql(a.getDetails().get("query"));
+                } else if(language.equalsIgnoreCase("sql")) {
+                    sp.setSql(a.getDetails().get("query"));
+                } else {
+                    //TODO properly report errors
+                    throw new IllegalArgumentException("Invalid selection provider language: " + language);
+                }
+                for (String property : a.getDetails().get("properties").split(",")) {
+                    Reference ref = new Reference(sp);
+                    ref.setFromPropertyName(property.trim());
+                    sp.getReferences().add(ref);
+                }
+                table.getSelectionProviders().add(sp);
+            }
+        });
     }
 
     protected void setupColumn(Table table, PrimaryKey pk, EAttribute property) {
         Column column = new Column(property);
         column.setTable(table);
         table.getColumns().add(column);
-        EAnnotation colAnn = property.getEAnnotation(javax.persistence.Column.class.getName());
-        if(colAnn != null) {
-            column.setColumnName(colAnn.getDetails().get("name"));
-        }
         if(StringUtils.isBlank(column.getColumnName())) {
             column.setColumnName(property.getName());
         }
@@ -348,6 +360,7 @@ public class Persistence {
     }
 
     public synchronized void saveModel() throws IOException, ConfigurationException {
+        initModel();
         new XMLModel(getModelDirectory()).delete();
         new DefaultModelIO(getModelDirectory()).save(model);
         if (configurationFile != null) {

@@ -112,6 +112,7 @@ public class DefaultModelIO implements ModelIO {
                     if(pkg.getName().equals(domain.getName())) {
                         domain.getEClassifiers().addAll(pkg.getEClassifiers());
                         domain.getEAnnotations().addAll(pkg.getEAnnotations());
+                        domain.getESubpackages().addAll(pkg.getESubpackages());
                         toLinkQueue.add(new ToLink(parseTree, domain));
                     } else {
                         logger.error("Invalid domain, expected " + domain.getName() + ", got " + pkg.getName() + " in " + file.getName().getPath());
@@ -340,7 +341,7 @@ public class DefaultModelIO implements ModelIO {
                 writeAnnotationPropertyValue(annotation, "value", writer);
             } else {
                 boolean first = true;
-                for(Map.Entry<String, String> property : annotation.getDetails().entrySet()) {
+                for(Map.Entry<String, String> property : new LinkedHashSet<>(annotation.getDetails().entrySet())) {
                     if(first) {
                         first = false;
                     } else {
@@ -361,11 +362,22 @@ public class DefaultModelIO implements ModelIO {
             Annotation ann = new Annotation(annotation);
             ann.init(null, null);
             Class<?> type = ann.getJavaAnnotationClass().getMethod(name).getReturnType();
-            if(type == String.class || type == Class.class || Enum.class.isAssignableFrom(type)) {
-                value = "\"" + StringEscapeUtils.escapeJava(value) + "\"";
+            if(type.isArray()) {
+                Class<?> componentType = type.getComponentType();
+                for (String v : value.split(",")) {
+                    writeSingleAnnotationPropertyValue(writer, v.trim(), componentType);
+                }
+            } else {
+                writeSingleAnnotationPropertyValue(writer, value, type);
             }
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Invalid annotation " + annotation, e); //TODO
+        }
+    }
+
+    private static void writeSingleAnnotationPropertyValue(Writer writer, String value, Class<?> type) throws IOException {
+        if(type == String.class || type == Class.class || Enum.class.isAssignableFrom(type)) {
+            value = "\"" + StringEscapeUtils.escapeJava(value) + "\"";
         }
         writer.write(value);
     }

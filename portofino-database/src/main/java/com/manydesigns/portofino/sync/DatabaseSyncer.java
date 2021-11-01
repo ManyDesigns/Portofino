@@ -533,6 +533,8 @@ public class DatabaseSyncer {
                     targetSP.getReferences().add(targetReference);
                     targetReference.setFromColumn(sourceReference.getFromColumn());
                     targetReference.setToColumn(sourceReference.getToColumn());
+                    targetReference.setFromPropertyName(sourceReference.getFromPropertyName());
+                    targetReference.setToPropertyName(sourceReference.getToPropertyName());
                 }
             } catch (Exception e) {
                 logger.error("Couldn't copy selection provider {}", sourceSP);

@@ -26,6 +26,7 @@ import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,5 +168,10 @@ public class CrudProperty implements Annotated {
     public void setAnnotations(List<Annotation> annotations) {
         this.annotations.clear();
         this.annotations.addAll(annotations);
+    }
+
+    @Override
+    public void addAnnotation(EAnnotation eAnnotation) {
+        //Do nothing as we're not interested in EAnnotations here
     }
 }

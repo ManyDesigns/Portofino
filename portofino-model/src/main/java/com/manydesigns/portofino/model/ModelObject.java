@@ -37,11 +37,10 @@ public interface ModelObject {
     void reset();
     void init(Model model, Configuration configuration);
     void link(Model model, Configuration configuration);
+    default void afterLink(Model model, Configuration configuration) {}
 
     void visitChildren(ModelObjectVisitor visitor);
 
-    default EModelElement getModelElement() {
-        return null;
-    }
+    EModelElement getModelElement();
 
 }

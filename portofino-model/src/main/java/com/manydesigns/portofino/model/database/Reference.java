@@ -23,7 +23,9 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.Unmarshallable;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EModelElement;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -170,5 +172,10 @@ public class Reference implements ModelObject, Unmarshallable {
 
     public void setToPropertyName(String toPropertyName) {
         this.toPropertyName = toPropertyName;
+    }
+
+    @Override
+    public EModelElement getModelElement() {
+        return null;
     }
 }

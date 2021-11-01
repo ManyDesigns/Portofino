@@ -23,7 +23,9 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.Unmarshallable;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EModelElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
 
-/*
+/** A column in a {@link PrimaryKey primary key}.
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -136,7 +138,7 @@ public class PrimaryKeyColumn implements ModelObject, Unmarshallable {
             throw new IllegalArgumentException("Column " + actualColumn.getQualifiedName() + " does not belong to the primary key table " + table.getQualifiedName());
         }
         this.actualColumn = actualColumn;
-        this.columnName = actualColumn.columnName;
+        this.columnName = actualColumn.getColumnName();
     }
 
     @XmlElements({
@@ -150,5 +152,10 @@ public class PrimaryKeyColumn implements ModelObject, Unmarshallable {
 
     public void setGenerator(Generator generator) {
         this.generator = generator;
+    }
+
+    @Override
+    public EModelElement getModelElement() {
+        return null;
     }
 }

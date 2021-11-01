@@ -112,7 +112,7 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     public void reset() {
         super.reset();
-        toTable = null;
+        setToTable(null);
         actualManyPropertyName = null;
         actualOnePropertyName = null;
     }
@@ -133,9 +133,9 @@ public class ForeignKey extends DatabaseSelectionProvider
     public void link(Model model, Configuration configuration) {
         super.link(model, configuration);
         if(toEntityName != null) {
-            toTable = DatabaseLogic.findTableByEntityName(model, toDatabase, toEntityName);
+            setToTable(DatabaseLogic.findTableByEntityName(model, getToDatabase(), toEntityName));
         } else {
-            toTable = DatabaseLogic.findTableByName(model, toDatabase, toSchema, toTableName);
+            setToTable(DatabaseLogic.findTableByName(model, getToDatabase(), toSchema, toTableName));
         }
         if(toTable != null) {
             // wire up Table.oneToManyRelationships
@@ -181,7 +181,7 @@ public class ForeignKey extends DatabaseSelectionProvider
             fromTable.getModelElement().getEStructuralFeatures().add(relationship);
         } else {
             logger.warn("Cannot find destination table '{}'",
-                    Table.composeQualifiedName(toDatabase, toSchema, toTableName));
+                    Table.composeQualifiedName(getToDatabase(), toSchema, toTableName));
 
             actualManyPropertyName = (manyPropertyName == null)
                 ? DatabaseLogic.normalizeName(getName())
@@ -310,10 +310,6 @@ public class ForeignKey extends DatabaseSelectionProvider
     public void setToEntityName(String toEntityName) {
         this.toEntityName = toEntityName;
     }
-
-    //**************************************************************************
-    // toString() override
-    //**************************************************************************
 
     @Override
     public String toString() {

@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.AnnotationFactory;
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
@@ -29,11 +28,11 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EAnnotation;
-import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -45,14 +44,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * An annotation on a model object.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @XmlAccessorType(XmlAccessType.NONE)
-public class Annotation implements ModelObject {
+public class Annotation implements ModelObject, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -121,8 +121,8 @@ public class Annotation implements ModelObject {
 
     public void setParent(Object parent) {
         this.parent = (Annotated) parent;
-        if(parent instanceof ModelObject) {
-            ((ModelObject) parent).getModelElement().getEAnnotations().add(eAnnotation);
+        if(parent != null) {
+            this.parent.addAnnotation(eAnnotation);
         }
     }
 
@@ -164,18 +164,22 @@ public class Annotation implements ModelObject {
                 }
             }
         }
+        //Make sure the ECore annotation has the correct details. New ArrayList because otherwise the list is
+        //modified in place, losing properties before they can be added back.
+        setProperties(new ArrayList<>(properties));
         if(javaAnnotation == null) {
-            Map<String, Object> values = new HashMap<>();
+            Map<String, Object> valueMap = new HashMap<>();
             properties.forEach(p -> {
                 String name = p.getName();
                 try {
-                    values.put(name, OgnlUtils.convertValue(p.getValue(), javaAnnotationClass.getMethod(name).getReturnType()));
+                    valueMap.put(name, OgnlUtils.convertValue(
+                            p.getValue(), javaAnnotationClass.getMethod(name).getReturnType()));
                 } catch (NoSuchMethodException e) {
                     logger.warn("Ignoring nonexistent annotation property " + name + " for " + javaAnnotationClass);
                 }
             });
             try {
-                javaAnnotation = new AnnotationFactory().make(javaAnnotationClass, values);
+                javaAnnotation = new AnnotationFactory().make(javaAnnotationClass, valueMap);
             } catch (Exception e) {
                 logger.error("Could not make annotation proxy for " + javaAnnotationClass, e);
             }
@@ -283,10 +287,16 @@ public class Annotation implements ModelObject {
         return properties;
     }
 
-    //Needed for Jackson
     public void setProperties(List<AnnotationProperty> properties) {
+        properties.forEach(p -> {
+            p.setParent(null);
+        });
         this.properties.clear();
         this.properties.addAll(properties);
+        this.eAnnotation.getDetails().clear();
+        properties.forEach(p -> {
+            p.setParent(this);
+        });
     }
 
     public Class getJavaAnnotationClass() {
@@ -307,8 +317,12 @@ public class Annotation implements ModelObject {
     }
 
     public String getPropertyValue(String name) {
+        return getPropertyValue(name, null);
+    }
+
+    public String getPropertyValue(String name, String defaultValue) {
         AnnotationProperty property = getProperty(name);
-        return property != null ? property.getValue() : null;
+        return property != null ? property.getValue() : defaultValue;
     }
 
     public void setPropertyValue(String name, String value) {
@@ -326,6 +340,10 @@ public class Annotation implements ModelObject {
         }
     }
 
+    public void removePropertyValue(String name) {
+        setPropertyValue(name, null);
+    }
+
     @Override
     public EAnnotation getModelElement() {
         return eAnnotation;
@@ -336,5 +354,10 @@ public class Annotation implements ModelObject {
         if(parent instanceof ModelObject) {
             ((ModelObject) parent).getModelElement().getEAnnotations().remove(eAnnotation);
         }
+    }
+
+    @Override
+    public void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
+        setParent(parent);
     }
 }

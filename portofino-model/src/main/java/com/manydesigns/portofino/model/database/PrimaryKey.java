@@ -24,7 +24,7 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.database.annotations.Id;
 import org.apache.commons.configuration2.Configuration;
-import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EModelElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,16 +33,14 @@ import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-
+/**
+ * The primary key identifying records in the owning table.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class PrimaryKey implements ModelObject, Named, Unmarshallable {
     public static final String copyright =
@@ -223,9 +221,10 @@ public class PrimaryKey implements ModelObject, Named, Unmarshallable {
         return valid;
     }
 
-    //**************************************************************************
-    // toString() override
-    //**************************************************************************
+    @Override
+    public EModelElement getModelElement() {
+        return null;
+    }
 
     @Override
     public String toString() {

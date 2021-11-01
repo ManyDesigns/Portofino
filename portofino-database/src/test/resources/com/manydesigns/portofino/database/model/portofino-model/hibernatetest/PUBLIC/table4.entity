@@ -1,9 +1,0 @@
-@javax.persistence.Table(name = "TABLE4")
-entity table4 {
-	id {
-		@javax.persistence.Column(name = "ID")
-		id: long
-	}
-	@javax.persistence.Column(name = "TESTO")
-	testo
-}

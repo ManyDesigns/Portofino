@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Updatable;
+import com.manydesigns.portofino.model.Unmarshallable;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.database.platforms.GenericDatabasePlatform;
