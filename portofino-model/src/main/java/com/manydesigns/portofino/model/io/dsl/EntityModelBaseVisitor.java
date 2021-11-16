@@ -40,7 +40,7 @@ public class EntityModelBaseVisitor extends ModelBaseVisitor<EModelElement> {
                 if (beginIndex < 0) {
                     return;
                 }
-                alias = typeName.substring(beginIndex);
+                alias = typeName.substring(beginIndex + 1);
             }
             //TODO warning/error if already present
             typeAliases.put(alias, typeName);

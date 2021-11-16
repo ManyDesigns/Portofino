@@ -1,15 +1,18 @@
-@javax.persistence.Table(name = "PROFILE")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "PROFILE")
 entity profile {
 	id {
-		@javax.persistence.Column(name = "USERID")
+		@Column(name = "USERID")
 		userid
 	}
-	@javax.persistence.Column(name = "LANGPREF")
+	@Column(name = "LANGPREF")
 	langpref
-	@javax.persistence.Column(name = "FAVCATEGORY")
+	@Column(name = "FAVCATEGORY")
 	favcategory
-	@javax.persistence.Column(name = "MYLISTOPT")
+	@Column(name = "MYLISTOPT")
 	mylistopt: boolean
-	@javax.persistence.Column(name = "BANNEROPT")
+	@Column(name = "BANNEROPT")
 	banneropt: boolean
 }

@@ -1,9 +1,12 @@
-@javax.persistence.Table(name = "SIGNON")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "SIGNON")
 entity signon {
 	id {
-		@javax.persistence.Column(name = "USERNAME")
+		@Column(name = "USERNAME")
 		username
 	}
-	@javax.persistence.Column(name = "PASSWORD")
+	@Column(name = "PASSWORD")
 	password
 }

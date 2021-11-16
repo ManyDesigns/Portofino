@@ -1,14 +1,17 @@
-@javax.persistence.Table(name = "PRODUCT")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "PRODUCT")
 entity product {
 	id {
-		@javax.persistence.Column(name = "PRODUCTID")
+		@Column(name = "PRODUCTID")
 		productid
 	}
-	@javax.persistence.Column(name = "CATEGORY")
+	@Column(name = "CATEGORY")
 	category
-	@javax.persistence.Column(name = "NAME")
+	@Column(name = "NAME")
 	name
-	@javax.persistence.Column(name = "DESCN")
+	@Column(name = "DESCN")
 	descn
 	FK_PRODUCT_1 --> category(catid=category)
 }

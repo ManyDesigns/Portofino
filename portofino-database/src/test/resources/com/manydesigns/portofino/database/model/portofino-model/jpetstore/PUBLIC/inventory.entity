@@ -1,9 +1,12 @@
-@javax.persistence.Table(name = "INVENTORY")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "INVENTORY")
 entity inventory {
 	id {
-		@javax.persistence.Column(name = "ITEMID")
+		@Column(name = "ITEMID")
 		itemid
 	}
-	@javax.persistence.Column(name = "QTY")
+	@Column(name = "QTY")
 	qty: EBigInteger
 }

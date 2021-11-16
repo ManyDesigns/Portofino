@@ -1,23 +1,26 @@
-@javax.persistence.Table(name = "SUPPLIER")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "SUPPLIER")
 entity supplier {
 	id {
-		@javax.persistence.Column(name = "SUPPID")
+		@Column(name = "SUPPID")
 		suppid: EBigInteger
 	}
-	@javax.persistence.Column(name = "NAME")
+	@Column(name = "NAME")
 	name
-	@javax.persistence.Column(name = "STATUS")
+	@Column(name = "STATUS")
 	status
-	@javax.persistence.Column(name = "ADDR1")
+	@Column(name = "ADDR1")
 	addr1
-	@javax.persistence.Column(name = "ADDR2")
+	@Column(name = "ADDR2")
 	addr2
-	@javax.persistence.Column(name = "CITY")
+	@Column(name = "CITY")
 	city
-	@javax.persistence.Column(name = "STATE")
+	@Column(name = "STATE")
 	state
-	@javax.persistence.Column(name = "ZIP")
+	@Column(name = "ZIP")
 	zip
-	@javax.persistence.Column(name = "PHONE")
+	@Column(name = "PHONE")
 	phone
 }

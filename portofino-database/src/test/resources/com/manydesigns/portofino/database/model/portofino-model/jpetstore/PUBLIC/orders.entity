@@ -1,55 +1,58 @@
-@javax.persistence.Table(name = "ORDERS")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "ORDERS")
 entity orders {
 	id {
-		@javax.persistence.Column(name = "ORDERID")
+		@Column(name = "ORDERID")
 		orderid: EBigInteger
 	}
-	@javax.persistence.Column(name = "USERID")
+	@Column(name = "USERID")
 	userid
-	@javax.persistence.Column(name = "ORDERDATE")
+	@Column(name = "ORDERDATE")
 	orderdate: java.sql.Date
-	@javax.persistence.Column(name = "SHIPADDR1")
+	@Column(name = "SHIPADDR1")
 	shipaddr1
-	@javax.persistence.Column(name = "SHIPADDR2")
+	@Column(name = "SHIPADDR2")
 	shipaddr2
-	@javax.persistence.Column(name = "SHIPCITY")
+	@Column(name = "SHIPCITY")
 	shipcity
-	@javax.persistence.Column(name = "SHIPSTATE")
+	@Column(name = "SHIPSTATE")
 	shipstate
-	@javax.persistence.Column(name = "SHIPZIP")
+	@Column(name = "SHIPZIP")
 	shipzip
-	@javax.persistence.Column(name = "SHIPCOUNTRY")
+	@Column(name = "SHIPCOUNTRY")
 	shipcountry
-	@javax.persistence.Column(name = "BILLADDR1")
+	@Column(name = "BILLADDR1")
 	billaddr1
-	@javax.persistence.Column(name = "BILLADDR2")
+	@Column(name = "BILLADDR2")
 	billaddr2
-	@javax.persistence.Column(name = "BILLCITY")
+	@Column(name = "BILLCITY")
 	billcity
-	@javax.persistence.Column(name = "BILLSTATE")
+	@Column(name = "BILLSTATE")
 	billstate
-	@javax.persistence.Column(name = "BILLZIP")
+	@Column(name = "BILLZIP")
 	billzip
-	@javax.persistence.Column(name = "BILLCOUNTRY")
+	@Column(name = "BILLCOUNTRY")
 	billcountry
-	@javax.persistence.Column(name = "COURIER")
+	@Column(name = "COURIER")
 	courier
-	@javax.persistence.Column(name = "TOTALPRICE")
+	@Column(name = "TOTALPRICE")
 	totalprice: EBigDecimal
-	@javax.persistence.Column(name = "BILLTOFIRSTNAME")
+	@Column(name = "BILLTOFIRSTNAME")
 	billtofirstname
-	@javax.persistence.Column(name = "BILLTOLASTNAME")
+	@Column(name = "BILLTOLASTNAME")
 	billtolastname
-	@javax.persistence.Column(name = "SHIPTOFIRSTNAME")
+	@Column(name = "SHIPTOFIRSTNAME")
 	shiptofirstname
-	@javax.persistence.Column(name = "SHIPTOLASTNAME")
+	@Column(name = "SHIPTOLASTNAME")
 	shiptolastname
-	@javax.persistence.Column(name = "CREDITCARD")
+	@Column(name = "CREDITCARD")
 	creditcard
-	@javax.persistence.Column(name = "EXPRDATE")
+	@Column(name = "EXPRDATE")
 	exprdate
-	@javax.persistence.Column(name = "CARDTYPE")
+	@Column(name = "CARDTYPE")
 	cardtype
-	@javax.persistence.Column(name = "LOCALE")
+	@Column(name = "LOCALE")
 	locale
 }

@@ -1,9 +1,12 @@
-@javax.persistence.Table(name = "BANNERDATA")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "BANNERDATA")
 entity bannerdata {
 	id {
-		@javax.persistence.Column(name = "FAVCATEGORY")
+		@Column(name = "FAVCATEGORY")
 		favcategory
 	}
-	@javax.persistence.Column(name = "BANNERNAME")
+	@Column(name = "BANNERNAME")
 	bannername
 }

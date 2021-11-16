@@ -1,11 +1,14 @@
-@javax.persistence.Table(name = "CATEGORY")
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name = "CATEGORY")
 entity category {
 	id {
-		@javax.persistence.Column(name = "CATID")
+		@Column(name = "CATID")
 		catid
 	}
-	@javax.persistence.Column(name = "NAME")
+	@Column(name = "NAME")
 	name
-	@javax.persistence.Column(name = "DESCN")
+	@Column(name = "DESCN")
 	descn
 }

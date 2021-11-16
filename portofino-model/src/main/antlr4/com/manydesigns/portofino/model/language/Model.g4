@@ -10,7 +10,7 @@ entity: annotation* ENTITY name=simpleIdentifier '{'
   relationshipProperty*
 '}';
 
-importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)?;
+importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)? ';'?;
 
 property: annotation* name=simpleIdentifier (':' type)? (NOT_NULLABLE)?;
 

@@ -175,6 +175,7 @@ public class DefaultModelIO implements ModelIO {
             domainDefFile.delete();
         } else {
             try(OutputStreamWriter os = fileWriter(domainDefFile)) {
+                writeImports(domain, os);
                 writeAnnotations(domain, os, "");
                 os.write("domain " + domain.getName() + ";");
             }
@@ -220,6 +221,8 @@ public class DefaultModelIO implements ModelIO {
     protected void saveEntity(EClass entity, FileObject domainDir) throws IOException {
         FileObject entityFile = domainDir.resolveFile(entity.getName() + ".entity");
         try(OutputStreamWriter os = fileWriter(entityFile)) {
+            writeImports(entity, os);
+
             writeAnnotations(entity, os, "");
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
             List<EStructuralFeature> id = entity.getEStructuralFeatures().stream()
@@ -248,6 +251,78 @@ public class DefaultModelIO implements ModelIO {
                 }
             }
             os.write("}");
+        }
+    }
+
+    private Map<String, String> writeImports(EPackage domain, Writer writer) throws IOException {
+        Map<String, String> imports = collectImports(domain);
+        writeImports(imports, writer);
+        return imports;
+    }
+
+    private Map<String, String> writeImports(EClass entity, Writer writer) throws IOException {
+        Map<String, String> imports = collectImports(entity);
+        writeImports(imports, writer);
+        return imports;
+    }
+
+    private void writeImports(Map<String, String> imports, Writer writer) throws IOException {
+        List<Map.Entry<String, String>> sortedImports =
+                imports.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
+        for (Map.Entry<String, String> e : sortedImports) {
+            writer.write("import " + e.getValue() + ";" + System.lineSeparator());
+        }
+        if (!imports.isEmpty()) {
+            writer.write(System.lineSeparator());
+        }
+    }
+
+    private Map<String, String> collectImports(EModelElement element) {
+        Map<String, String> imports = new HashMap<>();
+        element.getEAnnotations().stream()
+                .filter(this::isNotTransient)
+                .forEach(ann -> addImport(ann.getSource(), imports));
+        return imports;
+    }
+
+    private Map<String, String> collectImports(EClass entity) {
+        Map<String, String> imports = collectImports((EModelElement) entity);
+        entity.getESuperTypes().forEach(t -> addImport(t, imports));
+        entity.getEStructuralFeatures().forEach(f -> imports.putAll(collectImports(f)));
+        String fullEntityName = entity.getName();
+        if(entity.getEPackage() != null) {
+            fullEntityName = entity.getEPackage().getName() + "." + fullEntityName;
+        }
+        imports.remove(entity.getName(), fullEntityName);
+        return imports;
+    }
+
+    private Map<String, String> collectImports(EStructuralFeature feature) {
+        Map<String, String> imports = collectImports((EModelElement) feature);
+        EClassifier type = feature.getEType();
+        addImport(type, imports);
+        return imports;
+    }
+
+    private boolean isNotTransient(EAnnotation a) {
+        return !Id.class.getName().equals(a.getSource()) && !KeyMappings.class.getName().equals(a.getSource());
+    }
+
+    private void addImport(EClassifier type, Map<String, String> imports) {
+        String fullTypeName = type.getName();
+        if(type.getEPackage() != null) {
+            if(type.getEPackage() == EcorePackage.eINSTANCE) {
+                return;
+            }
+            fullTypeName = type.getEPackage().getName() + "." + fullTypeName;
+        }
+        addImport(fullTypeName, imports);
+    }
+
+    private void addImport(String name, Map<String, String> imports) {
+        String shortName = name.substring(name.lastIndexOf('.') + 1);
+        if(!shortName.equals(name)) {
+            imports.putIfAbsent(shortName, name);
         }
     }
 
