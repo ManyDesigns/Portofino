@@ -5,6 +5,7 @@
   "projects": {
     "ui": {
       "root": "",
+      "prefix": "app",
       "sourceRoot": "src",
       "projectType": "application",
       "schematics": {},
@@ -118,14 +119,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }
@@ -184,14 +182,11 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "projects/portofino/tsconfig.lib.json",
-              "projects/portofino/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "lintFilePatterns": [
+              "projects/portofino/**/*.ts",
+              "projects/portofino/**/*.html"
             ]
           }
         }

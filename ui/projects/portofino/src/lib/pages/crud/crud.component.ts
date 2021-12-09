@@ -336,8 +336,12 @@ export class SearchComponentHolder extends SearchComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
-  ngOnDestroy(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
+  ngOnDestroy(): void {
+    //Skip
+  }
 }
 
 @Component({
@@ -349,7 +353,9 @@ export class DetailComponentHolder extends DetailComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
 }
 
 @Component({
@@ -361,7 +367,9 @@ export class CreateComponentHolder extends CreateComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
 }
 
 @Component({
@@ -373,7 +381,9 @@ export class BulkEditComponentHolder extends BulkEditComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
 }
 
 export class CrudPageSettingsPanel extends PageSettingsPanel {

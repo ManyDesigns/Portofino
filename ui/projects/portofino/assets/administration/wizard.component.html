@@ -26,13 +26,13 @@
                    [disabled]="!!wizard.connectionProvider">
             <mat-hint>{{ 'Logical name of your choosing' | translate}}</mat-hint>
           </mat-form-field>
-          <ng-container *ngIf="wizard.newConnectionType == 'jdbc'">
+          <ng-container *ngIf="wizard.newConnectionType === 'jdbc'">
             <mat-form-field>
               <mat-label>{{'Driver' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.driver" required name="driver"
                           [disabled]="!!wizard.connectionProvider" (selectionChange)="updateConnectionUrl()">
                 <ng-container *ngFor="let d of databasePlatforms">
-                  <mat-option *ngIf="d.status == 'ok'" [value]="d">{{d.description}}</mat-option>
+                  <mat-option *ngIf="d.status === 'ok'" [value]="d">{{d.description}}</mat-option>
                 </ng-container>
                 <mat-option [value]="{}">{{ 'Generic' | translate}}</mat-option>
               </mat-select>

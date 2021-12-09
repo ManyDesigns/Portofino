@@ -16,7 +16,7 @@ import {InAppAuthenticationStrategy} from "./in-app-authentication-strategy";
   templateUrl: '../../../../assets/security/login/login.component.html',
   styleUrls: ['../../../../assets/security/login/login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
 
   loginForm: FormGroup;
   forgottenPasswordComponent = ForgottenPasswordComponent;
@@ -32,8 +32,6 @@ export class LoginComponent implements OnInit {
       password: ['', Validators.required]
     });
   }
-
-  ngOnInit() {}
 
   login() {
     const username = this.loginForm.get('username').value;

@@ -1,5 +1,5 @@
 <portofino-templates></portofino-templates>
-<div *ngIf="sidenav.position == 'page'" fxFlexFill fxLayout="column" fxLayoutAlign="space-between" class="mat-app-background">
+<div *ngIf="sidenav.position === 'page'" fxFlexFill fxLayout="column" fxLayoutAlign="space-between" class="mat-app-background">
   <div fxFlex="none">
     <ng-template portofino-toolbar></ng-template>
   </div>
@@ -19,7 +19,7 @@
     <ng-template portofino-footer></ng-template>
   </div>
 </div>
-<ng-container *ngIf="sidenav.position == 'body'">
+<ng-container *ngIf="sidenav.position === 'body'">
   <mat-sidenav-container [autosize]="true">
     <mat-sidenav class="app-sidenav mat-elevation-z8" [opened]="sidenav.open" [mode]="sidenav.mode" [disableClose]="false"
                  role="navigation">
