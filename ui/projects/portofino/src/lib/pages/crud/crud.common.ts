@@ -1,6 +1,9 @@
 import {SelectionOption} from "../../class-accessor";
+import {PageChild} from "../../page";
 
 export class Configuration {
+  detailChildren: PageChild[];
+  openDetailInSamePageWhenEmbedded: boolean;
   rowsPerPage: number;
 }
 

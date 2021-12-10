@@ -15,6 +15,7 @@ import {Field, Form} from "../form";
 import {Property} from "../class-accessor";
 import {FormGroup} from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from "@angular/material/dialog";
+import {Location} from "@angular/common";
 
 @Component({ templateUrl: "../../../assets/administration/actions.component.html" })
 export class ActionsComponent extends Page implements OnInit {
@@ -26,8 +27,9 @@ export class ActionsComponent extends Page implements OnInit {
 
   constructor(http: HttpClient, portofino: PortofinoService, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, notificationService: NotificationService,
-              translate: TranslateService, parentInjector: Injector, protected dialog: MatDialog) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
+              translate: TranslateService, location: Location,
+              parentInjector: Injector, protected dialog: MatDialog) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate, location);
     this.treeControl = new FlatTreeControl<ActionFlatNode>(this._getLevel, this._isExpandable);
     this.dataSource = new PageTreeDataSource(this.treeControl, this.portofino.apiRoot, this.http);
     this.injector = Injector.create({

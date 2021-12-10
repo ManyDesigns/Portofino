@@ -8,7 +8,7 @@ import {
   Injectable,
   InjectionToken,
   Input,
-  OnDestroy,
+  OnDestroy, OnInit,
   Optional,
   TemplateRef,
   Type,
@@ -29,6 +29,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {NO_AUTH_HEADER} from "./security/authentication.headers";
 import {ThemePalette} from "@angular/material/core";
 import * as moment from 'moment';
+import {Location} from "@angular/common";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -246,7 +247,7 @@ export class PageSettingsPanel {
 }
 
 @Directive()
-export abstract class Page implements WithButtons, OnDestroy {
+export abstract class Page implements WithButtons, OnDestroy, OnInit {
 
   @Input()
   configuration: PageConfiguration & any;
@@ -271,7 +272,8 @@ export abstract class Page implements WithButtons, OnDestroy {
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
     @Optional() protected route: ActivatedRoute, public authenticationService: AuthenticationService,
-    protected notificationService: NotificationService, public translate: TranslateService) {
+    protected notificationService: NotificationService, public translate: TranslateService,
+    @Optional() protected location: Location) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
@@ -280,6 +282,18 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.subscribe(this.route.params, p => {
           this.returnUrl = p['returnUrl'];
       });
+    }
+  }
+
+  ngOnInit(): void {
+    // This.path is undefined when the page hasn't been created by the page factory and is, therefore, out of the
+    // Portofino application
+    if(this.path === undefined) {
+      // We're using embedded as a way to obtain a behaviour which is more suited to usage outside of Portofino,
+      // but this is incorrect and only a shortcut. Ideally, a dedicated flag should exist.
+      this.embedded = true;
+      this.baseUrl = this.url = this.location?.path() || "";
+      this.initialize();
     }
   }
 

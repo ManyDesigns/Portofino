@@ -7,7 +7,7 @@ import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/commo
 import {ApiInfo, PortofinoService} from "../../portofino.service";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
-import {filter, map, mergeMap} from "rxjs/operators";
+import {catchError, filter, map, mergeMap} from "rxjs/operators";
 
 export const LOGIN_COMPONENT = new InjectionToken('Login Component');
 export const CHANGE_PASSWORD_COMPONENT = new InjectionToken('Change Password Component');
@@ -66,6 +66,7 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
         if (event.status == 200) {
           return event.body as string;
         } else {
+          this.logout();
           throw "Failed to refresh access token";
         }
       }));
@@ -75,7 +76,10 @@ export class InAppAuthenticationStrategy extends AuthenticationStrategy {
     const url = `${this.loginPath}`;
     return this.http.delete(url, {
       headers: new HttpHeaders().set(NO_REFRESH_TOKEN_HEADER, 'true')
-    });
+    }).pipe(catchError(err => {
+      console?.log(err);
+      return of();
+    }));
   }
 
   confirmSignup(token: string) {
