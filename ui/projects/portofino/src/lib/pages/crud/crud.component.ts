@@ -67,7 +67,7 @@ export class CrudComponent extends Page {
   error: any;
 
   get rowsPerPage() {
-    return this.configuration.rowsPerPage ? this.configuration.rowsPerPage : 10;
+    return this.configuration?.rowsPerPage ? this.configuration.rowsPerPage : 10;
   }
 
   initialize() {
@@ -131,6 +131,7 @@ export class CrudComponent extends Page {
   }
 
   protected start() {
+    this.showSearch();
     if(this.route) {
       this.subscribe(this.route.queryParams,params => {
         if(params.hasOwnProperty('create') && this.createEnabled && !this.embedded) {

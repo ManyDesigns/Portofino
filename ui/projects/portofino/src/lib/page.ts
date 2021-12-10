@@ -293,7 +293,12 @@ export abstract class Page implements WithButtons, OnDestroy, OnInit {
       // but this is incorrect and only a shortcut. Ideally, a dedicated flag should exist.
       this.embedded = true;
       this.baseUrl = this.url = this.location?.path() || "";
-      this.initialize();
+      if(this.configuration) {
+        // If the configuration was provided to the component, let's init it.
+        // If we have no configuration now, it will be the responsibility of the application to provide it later
+        // and call initialize().
+        this.initialize();
+      }
     }
   }
 
@@ -377,19 +382,20 @@ export abstract class Page implements WithButtons, OnDestroy, OnInit {
   }
 
   get children(): PageChild[] {
-    return this.configuration[this.childrenProperty] || []
+    return (this.configuration || {})[this.childrenProperty] || []
   }
 
   get childrenProperty(): string {
     return "children";
   }
 
+  // Note this is actually used in page-layout.component.html
   getEmbeddedChildren(section = "default") {
     return this.children.filter(c => this.allowEmbeddedComponents && c.embeddedIn == section && c.accessible);
   }
 
   get title() {
-    let title = this.configuration.title;
+    let title = this.configuration?.title;
     if(!title && this.parent) {
       let pageChild = this.parent.children.find(c => c.path == this.segment);
       if(pageChild) {
@@ -453,19 +459,17 @@ export abstract class Page implements WithButtons, OnDestroy, OnInit {
   }
 
   noActionForButton(event) {
-    if(console) {
-      console.error("Not implemented", event);
-    }
+    console?.error("Not implemented", event);
   }
   //End buttons
 
   get template(): TemplateDescriptor {
-    const template = this.configuration.template;
+    const template = this.configuration?.template;
     const templateName = (template && template.v) ? template.v : template;
     if(templateName) {
       const template = this.portofino.templates[templateName];
       if(!template) {
-        console.error("Unknown template", templateName);
+        console?.error("Unknown template", templateName);
       }
       return template;
     } else {

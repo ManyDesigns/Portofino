@@ -17,6 +17,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {NotificationService} from "../notifications/notification.services";
 import {WebStorageService} from "../storage/storage.services";
 import {Location} from "@angular/common";
+import {CrudComponent} from "../pages/crud/crud.component";
 
 export const API_ROOT_KEY = "portofino.upstairs.apiRoot";
 
@@ -221,19 +222,33 @@ export class MailSettingsComponent extends Page implements AfterViewInit {
 @Component({
   selector: 'portofino-upstairs-generic-crud',
   template: `
-    <mat-form-field>
-      <mat-label>{{'Source'|translate}}</mat-label>
-      <input matInput [(ngModel)]="crudConfiguration.source" />
-    </mat-form-field>
-    <portofino-crud [configuration]="crudConfiguration"></portofino-crud>`
+    <mat-card>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>{{'Source'|translate}}</mat-label>
+          <input matInput [(ngModel)]="crudConfiguration.source"/>
+        </mat-form-field>
+        <button mat-button (click)="setSource()">{{"Connect"|translate}}</button>
+        <portofino-crud #crud></portofino-crud>
+      </mat-card-content>
+    </mat-card>`
 })
 export class GenericCrudComponent extends Page {
 
+  @ViewChild("crud")
+  crud: CrudComponent;
+
   crudConfiguration = {
     title: "Quick CRUD",
-    source: "/projects",
+    source: "/",
     children: [],
     openDetailInSamePageWhenEmbedded: true
   };
+
+  setSource() {
+    this.crud.configuration = {...this.crudConfiguration}; //Force creation of a new object for change detection
+    // TODO this is very brittle as the crud component doesn't refresh its subcomponents when the configuration changes
+    this.crud.initialize();
+  }
 
 }
