@@ -99,7 +99,10 @@ export class CrudComponent extends Page {
           this.start();
           super.initialize();
         },
-      () => this.error = this.translate.instant("This page is not configured correctly."));
+      e => {
+          this.error = this.translate.instant("This page is not configured correctly.");
+          console?.log(e);
+      });
   }
 
   protected initOperations(operations: Operation[]) {
@@ -194,6 +197,13 @@ export class CrudComponent extends Page {
     this.id = null;
     this.returnUrl = null;
     this.view = CrudView.SEARCH;
+  }
+
+  reset() {
+    this.allowEmbeddedComponents = true;
+    this.id = null;
+    this.returnUrl = null;
+    this.view = null;
   }
 
   static bulkEditPresent(self: CrudComponent) {

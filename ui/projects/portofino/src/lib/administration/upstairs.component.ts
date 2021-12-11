@@ -247,8 +247,10 @@ export class GenericCrudComponent extends Page {
 
   setSource() {
     this.crud.configuration = {...this.crudConfiguration}; //Force creation of a new object for change detection
-    // TODO this is very brittle as the crud component doesn't refresh its subcomponents when the configuration changes
-    this.crud.initialize();
+    this.crud.reset();
+    setTimeout(() => {
+      this.crud.initialize();
+    });
   }
 
 }
