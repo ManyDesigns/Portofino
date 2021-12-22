@@ -134,7 +134,6 @@ export class CrudComponent extends Page {
   }
 
   protected start() {
-    this.showSearch();
     if(this.route) {
       this.subscribe(this.route.queryParams,params => {
         if(params.hasOwnProperty('create') && this.createEnabled && !this.embedded) {
@@ -148,6 +147,8 @@ export class CrudComponent extends Page {
           this.showSearch();
         }
       });
+    } else {
+      this.showSearch();
     }
     this.subscribe(this.portofino.localeChange, _ => {
       if(this.view == CrudView.SEARCH) {
