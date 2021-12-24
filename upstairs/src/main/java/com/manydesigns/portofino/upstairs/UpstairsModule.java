@@ -48,12 +48,6 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
     @Autowired
     public ServletContext servletContext;
 

@@ -2,7 +2,21 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.3.0] – Unreleased
+## [5.3.1] – Unreleased
+
+### Added
+- Support building on Java 17
+- Generic CRUD page upstairs
+- Allow resource-actions to return synthetic resource-actions without any file object
+- Configurable API path with Spring Boot.
+
+### Changed
+- Updated Angular libraries and material icons package
+
+### Fixed
+- Refreshing the token when the app is starting
+
+## [5.3.0] – 2021-09-13
 
 ### Added
 - Microservice deployment options using Spring Boot.
