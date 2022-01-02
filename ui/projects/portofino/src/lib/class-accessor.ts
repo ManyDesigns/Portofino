@@ -274,7 +274,7 @@ export function getValidators(property: Property): ValidatorFn[] {
     getAnnotation(property, "com.manydesigns.elements.annotations.MinDecimalValue") ||
     getAnnotation(property, "com.manydesigns.elements.annotations.MinIntValue");
   if (minValue) {
-    validators.push(Validators.max(minValue.properties.value));
+    validators.push(Validators.min(minValue.properties.value));
   }
   return validators;
 }

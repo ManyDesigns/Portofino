@@ -11,6 +11,8 @@ export const TRANSLATIONS_EN = {
   "permission: crud-edit": "Edit",
   "permission: crud-delete": "Delete",
   "_ is required.": "{{label}} is required.",
-  '_: max _.': "{{label}}: max {{max}}.",
-  'Invalid date, _ expected.': "Invalid date, {{dateFormat}} expected."
+  '_: max _.': "{{label}}: max length is {{max}}.",
+  '_: max value _.': "{{label}}: max value is {{max}}.",
+  '_: min value _.': "{{label}}: min value is {{min}}.",
+  'Invalid date, _ expected.': "Invalid date, {{dateFormat}} expected.",
 };

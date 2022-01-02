@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Refreshing the token when the app is starting
+- Validation issues during insertion float/double numbers in Postgres [#471](https://github.com/ManyDesigns/Portofino/issues/471)
 
 ## [5.3.0] – 2021-09-13
 
