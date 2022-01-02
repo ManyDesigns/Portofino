@@ -1,35 +1,40 @@
-import {Component, Inject, NgModule} from '@angular/core';
+import {Component, Inject, NgModule, OnInit} from '@angular/core';
 import {
+  API_ROOT_KEY,
+  DefaultNavigationComponent,
+  LOCALE_STORAGE_SERVICE,
   LocalStorageService,
-  PortofinoModule,
-  PortofinoUpstairsModule,
-  NOTIFICATION_HANDLERS,
   MatSnackBarNotificationService,
-  LOCALE_STORAGE_SERVICE, PortofinoAppComponent, NAVIGATION_COMPONENT, DefaultNavigationComponent
+  NAVIGATION_COMPONENT,
+  NOTIFICATION_HANDLERS, Page,
+  PortofinoAppComponent,
+  PortofinoCrudModule,
+  PortofinoModule, PortofinoService,
+  PortofinoUpstairsModule
 } from "portofino";
-import { MatAutocompleteModule } from "@angular/material/autocomplete";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
-import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatDatepickerModule } from "@angular/material/datepicker";
-import { MatDialogModule } from "@angular/material/dialog";
-import { MatDividerModule } from "@angular/material/divider";
-import { MatExpansionModule } from "@angular/material/expansion";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatListModule } from "@angular/material/list";
-import { MatMenuModule } from "@angular/material/menu";
-import { MatPaginatorModule } from "@angular/material/paginator";
-import { MatProgressBarModule } from "@angular/material/progress-bar";
-import { MatRadioModule } from "@angular/material/radio";
-import { MatSelectModule } from "@angular/material/select";
-import { MatSidenavModule } from "@angular/material/sidenav";
-import { MatSnackBarModule } from "@angular/material/snack-bar";
-import { MatSortModule } from "@angular/material/sort";
-import { MatTableModule } from "@angular/material/table";
-import { MatToolbarModule } from "@angular/material/toolbar";
-import { MatTreeModule } from "@angular/material/tree";
+import {MatAutocompleteModule} from "@angular/material/autocomplete";
+import {MatButtonModule} from "@angular/material/button";
+import {MatCardModule} from "@angular/material/card";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatDialogModule} from "@angular/material/dialog";
+import {MatDividerModule} from "@angular/material/divider";
+import {MatExpansionModule} from "@angular/material/expansion";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatIconModule} from "@angular/material/icon";
+import {MatInputModule} from "@angular/material/input";
+import {MatListModule} from "@angular/material/list";
+import {MatMenuModule} from "@angular/material/menu";
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatProgressBarModule} from "@angular/material/progress-bar";
+import {MatRadioModule} from "@angular/material/radio";
+import {MatSelectModule} from "@angular/material/select";
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
+import {MatSortModule} from "@angular/material/sort";
+import {MatTableModule} from "@angular/material/table";
+import {MatToolbarModule} from "@angular/material/toolbar";
+import {MatTreeModule} from "@angular/material/tree";
 import {BrowserModule} from "@angular/platform-browser";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
@@ -58,12 +63,7 @@ export class AppComponent {
   constructor(@Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {}
 
   initApiRoot = (app: PortofinoAppComponent) => {
-    const apiRoot = this.storage.get("portofino.upstairs.apiRoot");
-    if(apiRoot) {
-      app.apiRoot = apiRoot;
-    } else {
-      app.apiRoot = "http://localhost:8080/api";
-    }
+    app.apiRoot = this.storage.get(API_ROOT_KEY) || "http://localhost:8080/api";
     console.log("API root:", app.apiRoot);
     app.upstairsLink = null;
   };

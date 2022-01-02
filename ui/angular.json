@@ -29,7 +29,7 @@
                 "inject": true
               },
               {
-                "input": "node_modules/material-design-icons/iconfont/material-icons.css",
+                "input": "node_modules/material-icons/iconfont/material-icons.css",
                 "inject": true
               },
               {
@@ -101,7 +101,7 @@
                 "inject": true
               },
               {
-                "input": "node_modules/material-design-icons/iconfont/material-icons.css",
+                "input": "node_modules/material-icons/iconfont/material-icons.css",
                 "inject": true
               },
               {
@@ -114,6 +114,15 @@
               "src/assets",
               "src/pages",
               "src/favicon.ico"
+            ]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
             ]
           }
         }
@@ -129,6 +138,17 @@
           "options": {
             "protractorConfig": "./protractor.conf.js",
             "devServerTarget": "ui:serve"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "e2e/tsconfig.e2e.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         }
       }
@@ -158,6 +178,15 @@
             "main": "projects/portofino/src/test.ts",
             "tsConfig": "projects/portofino/tsconfig.spec.json",
             "karmaConfig": "projects/portofino/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/portofino/**/*.ts",
+              "projects/portofino/**/*.html"
+            ]
           }
         }
       }

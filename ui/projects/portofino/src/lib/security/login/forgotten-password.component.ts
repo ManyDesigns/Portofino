@@ -29,7 +29,7 @@ import {InAppAuthenticationStrategy} from "./in-app-authentication-strategy";
       <button mat-button mat-dialog-close="">{{ 'Cancel' | translate }}</button>
     </mat-dialog-actions>`
 })
-export class ForgottenPasswordComponent implements OnInit {
+export class ForgottenPasswordComponent {
 
   form: FormGroup;
 
@@ -40,8 +40,6 @@ export class ForgottenPasswordComponent implements OnInit {
               protected portofino: PortofinoService, protected http: HttpClient) {
     this.form = this.formBuilder.group({email: ['', [Validators.required, Validators.email]]});
   }
-
-  ngOnInit() {}
 
   sendForgotPasswordEmail() {
     return this.http.post(`${(this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath}/:send-reset-password-email`,{

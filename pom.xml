@@ -84,7 +84,7 @@
         <commons.io.version>2.7</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.8.0</commons.vfs.version>
-        <fop.version>2.1</fop.version>
+        <fop.version>2.4</fop.version>
         <groovy.version>3.0.8</groovy.version>
         <guava.version>30.1.1-jre</guava.version>
         <hibernate.version>5.5.3.Final</hibernate.version>
@@ -102,7 +102,7 @@
         <jsoup.version>1.14.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>4.4.0</liquibase.version>
-        <logback.version>1.2.3</logback.version>
+        <logback.version>1.2.7</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.6.1.Final</resteasy.version>
@@ -111,8 +111,8 @@
         <slf4j.version>1.7.30</slf4j.version>
         <spring.version>5.3.7</spring.version>
 
-        <nodejs.version>v14.17.6</nodejs.version>
-        <npm.version>6.14.15</npm.version>
+        <nodejs.version>v16.13.0</nodejs.version>
+        <npm.version>7.5.6</npm.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 

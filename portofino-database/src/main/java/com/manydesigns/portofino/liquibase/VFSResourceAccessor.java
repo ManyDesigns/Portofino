@@ -6,12 +6,10 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class VFSResourceAccessor extends AbstractResourceAccessor {
 
@@ -49,7 +47,7 @@ public class VFSResourceAccessor extends AbstractResourceAccessor {
 
         if (finalDir.getType() == FileType.FOLDER) {
             SortedSet<String> returnSet = new TreeSet<>();
-            getContents(finalDir, recursive, includeFiles, includeDirectories, path, returnSet);
+            getContents(finalDir, recursive, includeFiles, includeDirectories, returnSet);
             return returnSet;
         }
 
@@ -65,7 +63,7 @@ public class VFSResourceAccessor extends AbstractResourceAccessor {
 
     protected void getContents(
             FileObject root, boolean recursive, boolean includeFiles, boolean includeDirectories,
-            String basePath, Set<String> returnSet) throws FileSystemException {
+            Set<String> returnSet) throws FileSystemException {
         FileObject[] files = root.getChildren();
         if (files == null) {
             return;
@@ -76,7 +74,7 @@ public class VFSResourceAccessor extends AbstractResourceAccessor {
                     returnSet.add(file.getName().getPath());
                 }
                 if (recursive) {
-                    getContents(file, true, includeFiles, includeDirectories, basePath, returnSet);
+                    getContents(file, true, includeFiles, includeDirectories, returnSet);
                 }
             } else {
                 if (includeFiles) {

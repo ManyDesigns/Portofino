@@ -10,7 +10,7 @@
     </parent>
     <artifactId>portofino-angular-ui</artifactId>
     <packaging>pom</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
 
     <modules>
         <module>support</module>

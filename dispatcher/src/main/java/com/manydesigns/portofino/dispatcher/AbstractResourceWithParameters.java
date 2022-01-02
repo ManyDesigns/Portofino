@@ -48,10 +48,9 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
             consumeParameter(pathSegment);
             return this;
         }
+        Object element;
         try {
-            Object element = super.consumePathSegment(pathSegment);
-            parametersAcquired();
-            return element;
+            element = super.consumePathSegment(pathSegment);
         } catch (WebApplicationException e) {
             logger.debug("Invalid subresource: " + pathSegment, e);
             if(parameters.size() < maxParameters) {
@@ -64,6 +63,8 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
                 throw new WebApplicationException("Too many path parameters", 404);
             }
         }
+        parametersAcquired();
+        return element;
     }
 
     public void consumeParameter(String pathSegment) {
@@ -85,7 +86,7 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
     public String getPath() {
         StringBuilder path = new StringBuilder(super.getPath());
         for(String param : parameters) {
-            path = path.append(param).append("/");
+            path.append(param).append("/");
         }
         return path.toString();
     }

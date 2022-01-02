@@ -132,20 +132,23 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     public static void initResourceAction(ResourceAction resourceAction, ActionInstance parentActionInstance, UriInfo uriInfo) {
+        if(resourceAction.getActionInstance() == null) {
+            ActionDescriptor action;
+            try {
+                action = ActionLogic.getActionDescriptor(resourceAction.getLocation());
+            } catch (ActionNotActiveException e) {
+                logger.debug("action.xml not found or not valid", e);
+                action = new ActionDescriptor();
+                action.init();
+            }
+            ActionInstance actionInstance = new ActionInstance(
+                    parentActionInstance, resourceAction.getLocation(), action, resourceAction.getClass());
+            actionInstance.setActionBean(resourceAction);
+            ActionLogic.configureResourceAction(resourceAction, actionInstance);
+        }
+
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         HttpServletResponse response = ElementsThreadLocals.getHttpServletResponse();
-        ActionDescriptor action;
-        try {
-            action = ActionLogic.getActionDescriptor(resourceAction.getLocation());
-        } catch (ActionNotActiveException e) {
-            logger.debug("action.xml not found or not valid", e);
-            action = new ActionDescriptor();
-            action.init();
-        }
-        ActionInstance actionInstance = new ActionInstance(
-                parentActionInstance, resourceAction.getLocation(), action, resourceAction.getClass());
-        actionInstance.setActionBean(resourceAction);
-        ActionLogic.configureResourceAction(resourceAction, actionInstance);
         ActionContext context = new ActionContext();
         context.setRequest(request);
         context.setResponse(response);

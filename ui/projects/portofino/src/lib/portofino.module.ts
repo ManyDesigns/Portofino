@@ -100,6 +100,7 @@ import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
 import {
+  GenericCrudComponent,
   MailSettingsComponent,
   PermissionsComponent,
   SettingsComponent,
@@ -215,18 +216,18 @@ export class PortofinoCrudModule {}
 @NgModule({
   declarations: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, CreateActionComponent,
+    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
     ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
     WizardComponent],
   imports: [
     BrowserModule, BrowserAnimationsModule, DragDropModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
+    HttpClientModule, PortofinoFormsModule, PortofinoCrudModule, PortofinoPagesModule,
     MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
   entryComponents: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, CreateActionComponent,
+    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
     ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
     WizardComponent],
   exports: [UpstairsComponent]

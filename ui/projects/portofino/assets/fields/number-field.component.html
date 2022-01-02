@@ -4,6 +4,12 @@
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
     {{ '_ is required.' | translate:{ label: property.label } }}
   </mat-error>
+  <mat-error *ngIf="control.hasError('max')" class="alert alert-danger">
+    {{ '_: max value _.' | translate:{ label: property.label, max: control.getError('max').max } }}
+  </mat-error>
+  <mat-error *ngIf="control.hasError('min')" class="alert alert-danger">
+    {{ '_: min value _.' | translate:{ label: property.label, min: control.getError('min').min } }}
+  </mat-error>
   <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
     <ng-container *ngFor="let error of control.getError('server-side')">
       {{error}}<br />

@@ -19,6 +19,7 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -245,7 +246,7 @@ public class TablesAction extends AbstractResourceAction {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         Table table = existing.getTable();
-        Class type = getColumnType(existing, existing.getJavaType());
+        Class<?> type = getColumnType(existing, existing.getJavaType());
         Form annotationsForm = new FormBuilder(getApplicableAnnotations(type)).build();
         MapKeyValueAccessor annotationsAccessor = new MapKeyValueAccessor(column.getAnnotations());
         annotationsForm.readFrom(annotationsAccessor);
@@ -255,105 +256,109 @@ public class TablesAction extends AbstractResourceAction {
             existing.getAnnotations().removeIf(a -> KNOWN_ANNOTATIONS.contains(a.getType()));
             Set<Map.Entry<String, Object>> set = column.getAnnotations().entrySet();
             set.forEach(e -> {
-                if(e.getValue() != null) {
-                    Annotation a;
-                    String value = e.getValue().toString();
-                    switch (e.getKey()) {
-                        case "dateFormat":
-                            try {
-                                new SimpleDateFormat(value);
-                            } catch (IllegalArgumentException ex) {
-                                logger.error("Invalid date format: " + value, ex);
-                                RequestMessages.addErrorMessage("Invalid date format: " + value); //TODO I18n
-                                break;
-                            }
-                            a = new Annotation(DATE_FORMAT);
+                if(e.getValue() == null) {
+                    return;
+                }
+                Annotation a;
+                String value = e.getValue().toString();
+                if(StringUtils.isBlank(value)) {
+                    return;
+                }
+                switch (e.getKey()) {
+                    case "dateFormat":
+                        try {
+                            new SimpleDateFormat(value);
+                        } catch (IllegalArgumentException ex) {
+                            logger.error("Invalid date format: " + value, ex);
+                            RequestMessages.addErrorMessage("Invalid date format: " + value); //TODO I18n
+                            break;
+                        }
+                        a = new Annotation(DATE_FORMAT);
                             a.setPropertyValue("value", value);
-                            existing.getAnnotations().add(a);
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "decimalFormat":
+                        try {
+                            new java.text.DecimalFormat(value);
+                        } catch (IllegalArgumentException ex) {
+                            logger.error("Invalid decimal format: " + value, ex);
+                            RequestMessages.addErrorMessage("Invalid decimal format: " + value); //TODO I18n
                             break;
-                        case "decimalFormat":
-                            try {
-                                new java.text.DecimalFormat(value);
-                            } catch (IllegalArgumentException ex) {
-                                logger.error("Invalid decimal format: " + value, ex);
-                                RequestMessages.addErrorMessage("Invalid decimal format: " + value); //TODO I18n
-                                break;
-                            }
-                            a = new Annotation(DECIMAL_FORMAT);
+                        }
+                        a = new Annotation(DECIMAL_FORMAT);
                             a.setPropertyValue("value", value);
-                            existing.getAnnotations().add(a);
-                            break;
-                        case "fieldSize":
-                            a = new Annotation(FIELD_SIZE);
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "fieldSize":
+                        a = new Annotation(FIELD_SIZE);
                             a.setPropertyValue("value", value);
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "fileBlob":
+                        if(Boolean.TRUE.equals(e.getValue())) {
+                            a = new Annotation(FILE_BLOB);
                             existing.getAnnotations().add(a);
-                            break;
-                        case "fileBlob":
-                            if(Boolean.TRUE.equals(e.getValue())) {
-                                a = new Annotation(FILE_BLOB);
-                                existing.getAnnotations().add(a);
-                            }
-                            break;
-                        case "databaseBlobContentTypeProperty":
-                            Annotation databaseBlobAnn1 = existing.ensureAnnotation(DATABASE_BLOB);
+                        }
+                        break;
+                    case "databaseBlobContentTypeProperty":
+                        Annotation databaseBlobAnn1 = existing.ensureAnnotation(DATABASE_BLOB);
                             databaseBlobAnn1.setPropertyValue("contentTypeProperty", value);
-                            break;
-                        case "databaseBlobFileNameProperty":
-                            Annotation databaseBlobAnn2 = existing.ensureAnnotation(DATABASE_BLOB);
+                        break;
+                    case "databaseBlobFileNameProperty":
+                        Annotation databaseBlobAnn2 = existing.ensureAnnotation(DATABASE_BLOB);
                             databaseBlobAnn2.setPropertyValue("fileNameProperty", value);
-                            break;
-                        case "databaseBlobTimestampProperty":
-                            Annotation databaseBlobAnn3 = existing.ensureAnnotation(DATABASE_BLOB);
+                        break;
+                    case "databaseBlobTimestampProperty":
+                        Annotation databaseBlobAnn3 = existing.ensureAnnotation(DATABASE_BLOB);
                             databaseBlobAnn3.setPropertyValue("timestampProperty", value);
-                            break;
-                        case "highlightLinks":
-                            a = new Annotation(HIGHLIGHT_LINKS);
+                        break;
+                    case "highlightLinks":
+                        a = new Annotation(HIGHLIGHT_LINKS);
                             a.setPropertyValue("value", value);
-                            existing.getAnnotations().add(a);
-                            break;
-                        case "minValue":
-                            if(type == Integer.class || type == Long.class || type == BigInteger.class) {
-                                a = new Annotation(MIN_INT_VALUE);
-                            } else {
-                                a = new Annotation(MIN_DECIMAL_VALUE);
-                            }
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "minValue":
+                        if(type == Integer.class || type == Long.class || type == BigInteger.class) {
+                            a = new Annotation(MIN_INT_VALUE);
+                        } else {
+                            a = new Annotation(MIN_DECIMAL_VALUE);
+                        }
                             a.setPropertyValue("value", value);
-                            existing.getAnnotations().add(a);
-                            break;
-                        case "maxValue":
-                            if(type == Integer.class || type == Long.class || type == BigInteger.class) {
-                                a = new Annotation(MAX_INT_VALUE);
-                            } else {
-                                a = new Annotation(MAX_DECIMAL_VALUE);
-                            }
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "maxValue":
+                        if(type == Integer.class || type == Long.class || type == BigInteger.class) {
+                            a = new Annotation(MAX_INT_VALUE);
+                        } else {
+                            a = new Annotation(MAX_DECIMAL_VALUE);
+                        }
                             a.setPropertyValue("value", value);
                             existing.getAnnotations().add(a);
                             break;
                         case "maxLength":
                             a = new Annotation(MAX_LENGTH);
                             a.setPropertyValue("value", value);
-                            existing.getAnnotations().add(a);
-                            break;
-                        case "regexp":
-                            a = new Annotation(REGEXP);
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "regexp":
+                        a = new Annotation(REGEXP);
                             a.setPropertyValue("value", value);
                             a.setPropertyValue("errorMessage", "elements.error.field.regexp.format"); //Default error message
-                            existing.getAnnotations().add(a);
-                            break;
-                        case "stringFormat":
-                            a = new Annotation(((Map)e.getValue()).get("v").toString());
-                            existing.getAnnotations().add(a);
-                            break;
-                        case "typeOfContent":
-                            a = new Annotation(((Map)e.getValue()).get("v").toString());
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "stringFormat":
+                        a = new Annotation(((Map)e.getValue()).get("v").toString());
+                        existing.getAnnotations().add(a);
+                        break;
+                    case "typeOfContent":
+                        a = new Annotation(((Map)e.getValue()).get("v").toString());
                             a.setPropertyValue("value", "true");
-                            existing.getAnnotations().add(a);
-                            break;
-                        default:
-                            String msg = "Unsupported annotation: " + e.getKey();
-                            logger.error(msg);
-                            RequestMessages.addErrorMessage(msg); //TODO i18n
-                    }
+                        existing.getAnnotations().add(a);
+                        break;
+                    default:
+                        String msg = "Unsupported annotation: " + e.getKey();
+                        logger.error(msg);
+                        RequestMessages.addErrorMessage(msg); //TODO i18n
                 }
             });
             persistence.initModel();
@@ -372,7 +377,7 @@ public class TablesAction extends AbstractResourceAction {
         if(column == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        Class type = getColumnType(column, typeName);
+        Class<?> type = getColumnType(column, typeName);
         MutableClassAccessor classAccessor = getApplicableAnnotations(type);
         JSONStringer jsonStringer = new JSONStringer();
         jsonStringer.object();

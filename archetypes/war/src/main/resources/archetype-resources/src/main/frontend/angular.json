@@ -29,7 +29,7 @@
                 "inject": true
               },
               {
-                "input": "node_modules/material-design-icons/iconfont/material-icons.css",
+                "input": "node_modules/material-icons/iconfont/material-icons.css",
                 "inject": true
               },
               {
@@ -96,7 +96,7 @@
                 "inject": true
               },
               {
-                "input": "node_modules/material-design-icons/iconfont/material-icons.css",
+                "input": "node_modules/material-icons/iconfont/material-icons.css",
                 "inject": true
               },
               {
