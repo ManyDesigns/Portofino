@@ -1,10 +1,9 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {Page, PageChild, PageConfiguration} from "../page";
+import {Page, PageChild, PageConfiguration, PortofinoComponent} from "../page";
 import {Field, Form, FormComponent} from "../form";
 import {Property} from "../class-accessor";
 import {Button} from "../buttons";
 import {Observable, of} from "rxjs";
-import {PortofinoComponent} from "../page.factory";
 import {ConnectionsComponent} from "./connections.component";
 import {WizardComponent} from "./wizard.component";
 import {TablesComponent} from "./tables.component";

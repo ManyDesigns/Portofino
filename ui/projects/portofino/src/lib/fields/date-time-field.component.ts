@@ -1,21 +1,28 @@
-import {Component, Directive, ElementRef, forwardRef, Input, Renderer2} from "@angular/core";
+import {Component, Directive, ElementRef, forwardRef, Host, Input, Optional, Renderer2, SkipSelf} from "@angular/core";
 import {FieldComponent} from "./field.component";
 import {getAnnotation} from "../class-accessor";
 import {
-  AbstractControl,
+  AbstractControl, ControlContainer,
   ControlValueAccessor,
   NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
   ValidationErrors,
   Validator
 } from "@angular/forms";
-import * as moment from 'moment';
+import { DateTime } from "luxon";
+import {PortofinoService} from "../portofino.service";
 
 @Component({
   selector: 'portofino-date-time-field',
   templateUrl: '../../../assets/fields/date-time-field.component.html'
 })
 export class DateTimeFieldComponent extends FieldComponent {
+
+  constructor(
+    @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
+    protected portofino: PortofinoService) {
+    super(controlContainer);
+  }
 
   isDateOnly() {
     const df = getAnnotation(this.property, 'com.manydesigns.elements.annotations.DateFormat');
@@ -35,11 +42,15 @@ export class DateTimeFieldComponent extends FieldComponent {
     return DateTimeFieldComponent.convertDateFormat(df ? df.properties.value as string : null);
   }
 
+  get locale() {
+    return this.portofino.currentLocale.key;
+  }
+
   public static convertDateFormat(format: string) {
     if(!format) {
-      return 'DD/MM/YYYY';
+      return 'dd/MM/yyyy';
     }
-    return format.replace(/y/g, "Y").replace(/d/g, "D");
+    return format.replace(/Y/g, "y").replace(/D/g, "d");
   }
 
 }
@@ -62,10 +73,21 @@ export class DateTimeValueAccessor implements ControlValueAccessor, Validator {
   @Input()
   dateFormat: string;
 
+  @Input()
+  locale: string;
+
   constructor(protected renderer: Renderer2, protected elementRef: ElementRef) {}
 
   writeValue(value: any): void {
-    const formatted = value ? value.format(this.dateFormat) : '';
+    let formatted;
+    if(value) {
+      if(this.locale) {
+        value = value.setLocale(this.locale);
+      }
+      formatted = value.toFormat(this.dateFormat);
+    } else {
+      formatted = "";
+    }
     this.renderer.setProperty(this.elementRef.nativeElement, 'value', formatted);
   }
 
@@ -77,13 +99,13 @@ export class DateTimeValueAccessor implements ControlValueAccessor, Validator {
   }
 
   handleInput(value: any): void {
-    this.onChange(moment(value, this.dateFormat, true));
+    this.onChange(DateTime.fromFormat(value, this.dateFormat));
   }
 
   registerOnValidatorChange(fn: () => void): void {}
 
   validate(control: AbstractControl): ValidationErrors | null {
-    if(control.value && !control.value.isValid()) {
+    if(control.value?.invalidReason) {
       return {
         'date-format': this.dateFormat
       };

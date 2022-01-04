@@ -1,7 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {PortofinoComponent} from "../../page.factory";
 import {FormControl} from "@angular/forms";
-import {Operation, Page, PageConfiguration} from "../../page";
+import {Operation, Page, PageConfiguration, PortofinoComponent} from "../../page";
 import {Button} from "../../buttons";
 
 @Component({

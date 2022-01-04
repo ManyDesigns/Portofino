@@ -6,11 +6,8 @@ import {
   LocalStorageService,
   MatSnackBarNotificationService,
   NAVIGATION_COMPONENT,
-  NOTIFICATION_HANDLERS, Page,
-  PortofinoAppComponent,
-  PortofinoCrudModule,
-  PortofinoModule, PortofinoService,
-  PortofinoUpstairsModule
+  NOTIFICATION_HANDLERS, PortofinoAppComponent,
+  PortofinoModule, PortofinoUpstairsModule
 } from "portofino";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatButtonModule} from "@angular/material/button";
@@ -41,7 +38,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {QuillModule} from "ngx-quill";
 import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
-import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import {MatLuxonDateModule} from "@angular/material-luxon-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
@@ -63,7 +60,7 @@ export class AppComponent {
   constructor(@Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {}
 
   initApiRoot = (app: PortofinoAppComponent) => {
-    app.apiRoot = this.storage.get(API_ROOT_KEY) || "http://localhost:8080/api";
+    app.apiRoot = this.storage.get(API_ROOT_KEY) || "http://localhost:18080/api";
     console.log("API root:", app.apiRoot);
     app.upstairsLink = null;
   };
@@ -82,7 +79,7 @@ export class AppComponent {
     MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
     MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
     MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
-    MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
+    MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatLuxonDateModule, ScrollingModule,
     FileInputAccessorModule, NgxdModule, QuillModule,
     TranslateModule.forRoot()],
   entryComponents: [],

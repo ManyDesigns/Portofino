@@ -97,8 +97,9 @@ export class PortofinoService {
       this.fallbackInit();
       return;
     }
+    //Avoid refreshing the token on startup as this might hit the wrong login action
     const headers = {};
-    headers[NO_REFRESH_TOKEN_HEADER] = true; //Avoid refreshing the token on startup as this might hit the wrong login action
+    headers[NO_REFRESH_TOKEN_HEADER] = true;
     this.http.get<ApiInfo>(this.localApiPath, { headers: headers }).subscribe(response => {
       this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
       this.injector.get(AuthenticationStrategy).init({

@@ -143,41 +143,40 @@ public class NotificationsJob implements Job {
                     subject = "${current[TtUtils.ACTIVITY_SQL_PROJECT_ID]}-${current[TtUtils.ACTIVITY_SQL_TICKET_N]}: ${current[TtUtils.ACTIVITY_SQL_TICKET_TITLE]}";
                 }
 
-                notifyActivity(session, current, subject, htmlBody);
-                Date now = new Date();
-                Object activity = session.load("activity", activityId);
-                activity.notifications_sent = now;
-                session.update("activity", (Object)activity);
-                i++;
+                notifyActivity(session, current, subject, htmlBody)
+                Date now = new Date()
+                Object activity = session.load("activity", activityId)
+                activity.notifications_sent = now
+                session.update("activity", (Object)activity)
+                i++
             }
-            session.getTransaction().commit();
+            session.getTransaction().commit()
         } finally {
-            persistence.closeSessions();
-            ElementsThreadLocals.removeElementsContext();
+            persistence.closeSessions()
+            ElementsThreadLocals.removeElementsContext()
         }
 
     }
 
     void notifyActivity(Session session, Object activity, String subject, String htmlBody) {
-
         def (criteria, cb, root) = QueryUtils.createCriteria(session, 'members')
         criteria.where(cb.equal(root.get("notifications"), true))
         criteria.where(cb.equal(root.get("project"), activity[TtUtils.ACTIVITY_SQL_PROJECT_ID]))
         criteria.where(cb.equal(root.get("user_"), activity[TtUtils.ACTIVITY_SQL_USER_ID]))
         List membersToBeNotified = session.createQuery(criteria).list()
         for (Object current : membersToBeNotified) {
-            Object user = current.fk_member_user;
-            logger.debug("Notifying user {}", user.email);
+            Object user = current.fk_member_user
+            logger.debug("Notifying user {}", user.email)
 
-            Email email = new Email();
+            Email email = new Email()
 
-            email.subject = subject;
-            email.htmlBody = htmlBody;
-            Recipient recipient = new Recipient(Type.TO, user.email);
-            email.recipients.add(recipient);
-            String sender = configuration.getString(MailProperties.MAIL_SMTP_LOGIN);
-            email.from = sender;
-            mailQueue.enqueue(email);
+            email.subject = subject
+            email.htmlBody = htmlBody
+            Recipient recipient = new Recipient(Type.TO, user.email)
+            email.recipients.add(recipient)
+            String sender = configuration.getString(MailProperties.MAIL_SMTP_LOGIN)
+            email.from = sender
+            mailQueue.enqueue(email)
         }
     }
 

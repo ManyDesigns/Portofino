@@ -57,7 +57,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTreeModule } from '@angular/material/tree';
-import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import {MatLuxonDateModule} from "@angular/material-luxon-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {ExtraOptions, RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './pages/crud/search/search.component';
@@ -95,7 +95,7 @@ import {BooleanFieldComponent} from "./fields/boolean-field.component";
 import {NumberFieldComponent} from "./fields/number-field.component";
 import {TextFieldComponent} from "./fields/text-field.component";
 import {SelectFieldComponent} from "./fields/select-field.component";
-import {PageFactoryComponent} from "./page.factory";
+import {PageFactoryComponent, PageSettingsPanelComponent} from "./page";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
@@ -124,7 +124,6 @@ import {VarDirective} from "./var.directive";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatBadgeModule} from "@angular/material/badge";
 import {LocalStorageService} from "./storage/storage.services";
-import {PageSettingsPanelComponent} from "./page-settings-panel.component";
 import {CustomPageComponent} from "./pages/custom/custom.component";
 import {
   CHANGE_PASSWORD_COMPONENT,
@@ -142,7 +141,7 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
   imports: [
     BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatRadioModule, MatSelectModule, FileInputAccessorModule, NgxdModule, QuillModule,
+    MatLuxonDateModule, MatRadioModule, MatSelectModule, FileInputAccessorModule, NgxdModule, QuillModule,
     TranslateModule.forChild()],
   providers: [ FieldFactory ],
   entryComponents: [
@@ -153,7 +152,7 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
     FormComponent,
     MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatRadioModule, MatSelectModule]
+    MatLuxonDateModule, MatRadioModule, MatSelectModule]
 })
 export class PortofinoFormsModule {}
 

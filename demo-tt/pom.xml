@@ -185,6 +185,13 @@
                 <configuration>
                     <filesets>
                         <fileset>
+                            <directory>src/main/frontend/.angular/cache</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
                             <directory>src/main/frontend/node_modules/portofino</directory>
                             <includes>
                                 <include>**</include>
@@ -238,7 +245,7 @@
                     <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>1.12.1</version>
                         <configuration>
                             <workingDirectory>src/main/frontend</workingDirectory>
                         </configuration>
@@ -260,7 +267,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>install</arguments>
+                                    <arguments>install --legacy-peer-deps</arguments>
                                 </configuration>
                             </execution>
 

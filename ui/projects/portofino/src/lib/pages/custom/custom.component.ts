@@ -1,7 +1,6 @@
-import {Page, PageConfiguration, PageSettingsPanel} from "../../page";
+import {Page, PageConfiguration, PageSettingsPanel, PortofinoComponent} from "../../page";
 import {Location} from "@angular/common";
 import {Component, OnDestroy, Optional} from "@angular/core";
-import {PortofinoComponent} from "../../page.factory";
 import {Field} from "../../form";
 import {PortofinoService} from "../../portofino.service";
 import {HttpClient} from "@angular/common/http";

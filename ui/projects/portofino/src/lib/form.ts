@@ -1,19 +1,33 @@
 import {
   ClassAccessor,
-  deriveKind, getAnnotation,
-  getValidators, isBlob, isBooleanProperty, isDateProperty,
+  deriveKind,
+  getAnnotation,
+  getValidators,
+  isBlob,
+  isBooleanProperty,
+  isDateProperty,
   isEnabled,
-  isMultiline, isRichText,
+  isMultiline,
+  isRichText,
   Property
 } from "./class-accessor";
 import {
-  AfterViewInit, ChangeDetectorRef,
+  AfterViewInit,
+  ChangeDetectorRef,
   Component,
-  ComponentFactoryResolver, Directive,
-  EventEmitter, Host,
-  Input, OnDestroy, OnInit, Optional, Output,
-  QueryList, Type,
-  ViewChildren, ViewContainerRef
+  ComponentFactoryResolver,
+  Directive,
+  EventEmitter,
+  Host,
+  Input,
+  OnDestroy,
+  OnInit,
+  Optional,
+  Output,
+  QueryList,
+  Type,
+  ViewChildren,
+  ViewContainerRef
 } from "@angular/core";
 import {
   AbstractFormGroupDirective,
@@ -21,11 +35,12 @@ import {
   FormArray,
   FormControl,
   FormGroup,
-  FormGroupDirective, ValidationErrors, ValidatorFn
+  FormGroupDirective,
+  ValidationErrors,
+  ValidatorFn
 } from "@angular/forms";
 import {FieldFactoryComponent} from "./fields/field.factory";
-import * as moment from 'moment';
-import {BlobFile} from "./pages/crud/crud.common";
+import { DateTime } from "luxon";
 
 export type FormElement =
   Field|FieldSet|{name: string, component: Type<any>, dependencies?: object}|{html: string}|FormList;
@@ -79,6 +94,15 @@ export class Form {
 
 export class FormSetup { object?: any; properties?: string[]; }
 
+export class BlobFile {
+  lastModified: number;
+  lastModifiedDate: Date;
+  name: string;
+  size: number;
+  type: string;
+  code: string;
+}
+
 export class Field {
 
   constructor(property: Property = undefined, initialState = undefined) {
@@ -112,7 +136,7 @@ export class Field {
     if(!value) {
       //value is undefined
     } else if (isDateProperty(property)) {
-      value = moment(value);
+      value = DateTime.fromMillis(value);
     } else if (isBlob(property)) {
       const portofinoBlob = value;
       value = new BlobFile();

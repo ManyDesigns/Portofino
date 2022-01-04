@@ -12,6 +12,32 @@
     "url": "https://github.com/ManyDesigns/Portofino"
   },
   "license": "LGPL-3.0-or-later",
+  "exports": {
+    "./assets/theming": {
+      "sass": "./assets/theming.scss"
+    },
+    "./assets/content.component": {
+      "sass": "./assets/content.component.scss"
+    },
+    "./assets/form.component": {
+      "sass": "./assets/form.component.scss"
+    },
+    "./assets/navigation.component": {
+      "sass": "./assets/navigation.component.scss"
+    },
+    "./assets/page-header.component": {
+      "sass": "./assets/page-header.component.scss"
+    },
+    "./assets/page-layout.component": {
+      "sass": "./assets/page-layout.component.scss"
+    },
+    "./assets/portofino-app.component": {
+      "sass": "./assets/portofino-app.component.scss"
+    },
+    "./assets/toolbar.component": {
+      "sass": "./assets/toolbar.component.scss"
+    }
+  },
   "peerDependencies": {
     "@angular/animations": "^13.0.2",
     "@angular/cdk": "^13.0.2",
@@ -22,7 +48,7 @@
     "@angular/flex-layout": "^13.0.0-beta.36",
     "@angular/forms": "^13.0.2",
     "@angular/material": "^13.0.2",
-    "@angular/material-moment-adapter": "^13.0.2",
+    "@angular/material-luxon-adapter": "^13.0.2",
     "@angular/platform-browser": "^13.0.2",
     "@angular/platform-browser-dynamic": "^13.0.2",
     "@angular/router": "^13.0.2",
@@ -33,13 +59,12 @@
     "jwt-decode": "^3.1.2",
     "lodash": ">=4.17.21",
     "lodash.merge": ">=4.6.2",
+    "luxon": "^2.3.0",
     "material-icons": "^1.10.4",
-    "moment": "^2.29.1",
     "ngx-quill": "^16.0.1",
     "quill": "^1.3.7",
     "roboto-fontface": "^0.10.0",
     "rxjs": "^6.6.6",
-    "tslib": "^2.3.1",
     "zone.js": "~0.11.4"
   },
   "author": {

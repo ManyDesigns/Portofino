@@ -15,11 +15,3 @@ export class SelectionProvider {
   options: SelectionOption[];
 }
 
-export class BlobFile {
-  lastModified: number;
-  lastModifiedDate: Date;
-  name: string;
-  size: number;
-  type: string;
-  code: string;
-}
