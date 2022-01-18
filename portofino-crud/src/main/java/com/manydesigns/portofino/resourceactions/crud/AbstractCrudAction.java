@@ -44,6 +44,8 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.Group;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.annotations.Guard;
 import com.manydesigns.portofino.persistence.IdStrategy;
@@ -53,13 +55,14 @@ import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
+import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
 import com.manydesigns.portofino.rest.PortofinoFilter;
 import com.manydesigns.portofino.rest.Utilities;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import com.vdurmont.semver4j.Semver;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,7 +73,6 @@ import ognl.OgnlContext;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -88,7 +90,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -156,6 +157,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public static final String
             PERMISSION_CREATE = "crud-create",
             PERMISSION_EDIT = "crud-edit",
+            PERMISSION_READ = "crud-read",
             PERMISSION_DELETE = "crud-delete";
 
     public static final Logger logger =
@@ -587,6 +589,49 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         classAccessor = filterAccordingToPermissions(new CrudAccessor(crudConfiguration, innerAccessor));
         idStrategy = getIdStrategy(classAccessor, innerAccessor);
         maxParameters = classAccessor.getKeyProperties().length;
+    }
+
+    private void checkAccessorPermissions(String[] requiredPermissions) {
+        EntityPermissions ep = classAccessor.getAnnotation(EntityPermissions.class);
+        if(ep == null) {
+            return;
+        }
+        Permissions permissions = new Permissions();
+        String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration);
+        configurePermission(permissions, allGroup, PERMISSION_CREATE, ep.create());
+        configurePermission(permissions, allGroup, PERMISSION_DELETE, ep.delete());
+        configurePermission(permissions, allGroup, PERMISSION_EDIT, ep.edit());
+        configurePermission(permissions, allGroup, PERMISSION_READ, ep.read());
+        permissions.init();
+
+        boolean permitted =
+                security.hasPermissions(
+                        getPortofinoConfiguration(), permissions, AccessLevel.VIEW, requiredPermissions);
+        if(!permitted) {
+            logger.warn("CRUD source not permitted: {}", classAccessor.getName());
+            throw new WebApplicationException(
+                    security.isUserAuthenticated() ? Response.Status.FORBIDDEN : Response.Status.UNAUTHORIZED);
+        }
+    }
+
+    private void configurePermission(Permissions permissions, String allGroup, String permission, String[] groups) {
+        for(String groupName : groups) {
+            if(groupName.equals("*")) {
+                groupName = allGroup;
+            }
+            String finalGroup = groupName;
+            Group group = permissions.getGroups().stream()
+                    .filter(g -> g.getName().equals(finalGroup))
+                    .findFirst().orElseGet(() -> {
+                        Group grp = new Group();
+                        grp.setName(finalGroup);
+                        grp.setAccessLevel(AccessLevel.VIEW.name());
+                        return grp;
+                    });
+            if(permission != null) {
+                group.getPermissions().add(permission);
+            }
+        }
     }
 
     protected abstract IdStrategy getIdStrategy(ClassAccessor classAccessor, ClassAccessor innerAccessor);
@@ -1074,6 +1119,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             return Response.status(Response.Status.BAD_REQUEST).
                     entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_READ });
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         BlobManager blobManager = getBlobManager();
@@ -1099,6 +1145,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         setupForm(Mode.EDIT);
         form.readFromObject(object);
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
@@ -1145,6 +1192,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         setupForm(Mode.EDIT);
         form.readFromObject(object);
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
@@ -1318,6 +1366,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @QueryParam("prefix") String prefix,
             @Parameter(description = "Whether the returned values include a default option \"Please choose one\"")
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
+        checkAccessorPermissions(new String[]{ PERMISSION_READ });
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1533,6 +1582,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @QueryParam("newObject") boolean newObject,
             @Parameter(description = "The returned object does not load a displayValue for fields that have selection providers. The client will have to query selection providers by itself. Only valid for create, read, edit.")
             @QueryParam("skipSelectionProviders") boolean skipSelectionProviders) {
+        checkAccessorPermissions(new String[]{ PERMISSION_READ });
         selectionProviderLoadStrategy = skipSelectionProviders ?
                 SelectionProviderLoadStrategy.NONE :
                 SelectionProviderLoadStrategy.ALL;
@@ -1572,6 +1622,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Update not supported, PUT to /objectKey instead").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_CREATE });
         preCreate();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
@@ -1613,6 +1664,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             return Response.status(Response.Status.BAD_REQUEST).entity(
                     "update not supported, PUT to /objectKey instead").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_CREATE });
         preCreate();
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
@@ -1702,6 +1754,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected Response update(String jsonObject) {
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         preEdit();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
@@ -1743,6 +1796,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * @return the IDs of the objects that have NOT been updated (in a JAX-RS Response).
      */
     protected Response bulkUpdate(String jsonObject, List<String> ids, boolean returnUpdated) {
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         List<String> updated = new ArrayList<>();
         setupForm(Mode.BULK_EDIT);
         disableBlobFields();
@@ -1796,6 +1850,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         preEdit();
         List<Blob> blobsBefore = getBlobsFromForm();
         form.readFromRequest(context.getRequest());
@@ -1894,6 +1949,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     protected Response.ResponseBuilder deleteOne(boolean returnIds) {
+        checkAccessorPermissions(new String[]{ PERMISSION_DELETE });
         int deleted = delete(object);
         Response.ResponseBuilder response = Response.ok();
         if(returnIds) {
@@ -1913,6 +1969,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
                     "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_DELETE });
         List<String> deleted = bulkDelete(ids);
         Response.ResponseBuilder response = Response.ok();
         if(returnIds) {

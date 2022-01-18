@@ -119,4 +119,6 @@ export const TRANSLATIONS_ES = {
   "_ not found": "{{what}} no encontrado",
   "_ is required.": "{{label}} es obligatorio.",
   '_: max _.': "{{label}}: max {max}.",
+  '_: max value _.': "{{label}}: max value is {{max}}.",
+  '_: min value _.': "{{label}}: min value is {{min}}.",
 };

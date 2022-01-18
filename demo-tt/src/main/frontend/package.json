@@ -54,7 +54,7 @@
     "@types/jasminewd2": "^2.0.8",
     "@types/node": "^12.19.5",
     "codelyzer": "^6.0.1",
-    "jasmine-core": "~3.6.0",
+    "jasmine-core": "^3.8.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~6.3.4",
     "karma-chrome-launcher": "~3.1.0",

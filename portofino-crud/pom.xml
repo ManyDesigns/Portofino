@@ -10,7 +10,7 @@
     </parent>
     <artifactId>portofino-crud</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -22,7 +22,7 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
