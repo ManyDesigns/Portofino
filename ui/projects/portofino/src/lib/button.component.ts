@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {ButtonInfo, WithButtons} from "./buttons";
-import {isObservable, Observable} from "rxjs";
+import {isObservable} from "rxjs";
 
 @Component({
   selector: 'portofino-button',

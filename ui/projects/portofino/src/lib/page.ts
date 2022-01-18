@@ -1,14 +1,22 @@
-import { AfterViewInit,
-  ChangeDetectorRef, Component, ContentChild, EventEmitter,
-  Injectable, InjectionToken, Input,
-  OnDestroy,
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ContentChild,
+  Directive,
+  EventEmitter,
+  Injectable,
+  InjectionToken,
+  Input,
+  OnDestroy, OnInit,
   Optional,
   TemplateRef,
   Type,
-  ViewChild, Directive } from "@angular/core";
+  ViewChild
+} from "@angular/core";
 import {Annotation, ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
-import {PortofinoService} from "./portofino.service";
+import {PortofinoService, TemplateDescriptor} from "./portofino.service";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Field, FieldSet, Form} from "./form";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -20,7 +28,8 @@ import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {NO_AUTH_HEADER} from "./security/authentication.headers";
 import {ThemePalette} from "@angular/material/core";
-import moment from 'moment-with-locales-es6';
+import * as moment from 'moment';
+import {Location} from "@angular/common";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -84,7 +93,9 @@ export class PageChild {
   path: string;
   title: string;
   icon?: string;
+  // deprecated, use embeddedIn
   embedded?: boolean;
+  embeddedIn?: string;
   showInNavigation?: boolean;
   accessible?: boolean;
 }
@@ -209,7 +220,7 @@ export class PageSettingsPanel {
       return of(null);
     }
     return this.page.http.get<ClassAccessor>(
-      this.page.configurationUrl + '/classAccessor').pipe(loadClassAccessor);
+      this.page.configurationUrl + '/classAccessor').pipe(map(loadClassAccessor));
   }
 
   getActionConfigurationToSave() {
@@ -236,7 +247,7 @@ export class PageSettingsPanel {
 }
 
 @Directive()
-export abstract class Page implements WithButtons, OnDestroy {
+export abstract class Page implements WithButtons, OnDestroy, OnInit {
 
   @Input()
   configuration: PageConfiguration & any;
@@ -261,7 +272,8 @@ export abstract class Page implements WithButtons, OnDestroy {
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
     @Optional() protected route: ActivatedRoute, public authenticationService: AuthenticationService,
-    protected notificationService: NotificationService, public translate: TranslateService) {
+    protected notificationService: NotificationService, public translate: TranslateService,
+    @Optional() protected location: Location) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
@@ -270,6 +282,23 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.subscribe(this.route.params, p => {
           this.returnUrl = p['returnUrl'];
       });
+    }
+  }
+
+  ngOnInit(): void {
+    // This.path is undefined when the page hasn't been created by the page factory and is, therefore, out of the
+    // Portofino application
+    if(this.path === undefined) {
+      // We're using embedded as a way to obtain a behaviour which is more suited to usage outside of Portofino,
+      // but this is incorrect and only a shortcut. Ideally, a dedicated flag should exist.
+      this.embedded = true;
+      this.baseUrl = this.url = this.location?.path() || "";
+      if(this.configuration) {
+        // If the configuration was provided to the component, let's init it.
+        // If we have no configuration now, it will be the responsibility of the application to provide it later
+        // and call initialize().
+        this.initialize();
+      }
     }
   }
 
@@ -295,7 +324,7 @@ export abstract class Page implements WithButtons, OnDestroy {
           Form: Form,
         };
         userFunction(this, forms, moment);
-      }, e => {
+      }, () => {
         this.notificationService.error(this.translate.get("Could not load page script"));
       });
     }
@@ -353,19 +382,20 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   get children(): PageChild[] {
-    return this.configuration[this.childrenProperty] || []
+    return (this.configuration || {})[this.childrenProperty] || []
   }
 
   get childrenProperty(): string {
     return "children";
   }
 
-  get embeddedChildren() {
-    return this.children.filter(c => this.allowEmbeddedComponents && c.embedded && c.accessible);
+  // Note this is actually used in page-layout.component.html
+  getEmbeddedChildren(section = "default") {
+    return this.children.filter(c => this.allowEmbeddedComponents && c.embeddedIn == section && c.accessible);
   }
 
   get title() {
-    let title = this.configuration.title;
+    let title = this.configuration?.title;
     if(!title && this.parent) {
       let pageChild = this.parent.children.find(c => c.path == this.segment);
       if(pageChild) {
@@ -429,21 +459,19 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   noActionForButton(event) {
-    if(console) {
-      console.error("Not implemented", event);
-    }
+    console?.error("Not implemented", event);
   }
   //End buttons
 
-  get template(): TemplateRef<any> {
-    const template = this.configuration.template;
+  get template(): TemplateDescriptor {
+    const template = this.configuration?.template;
     const templateName = (template && template.v) ? template.v : template;
     if(templateName) {
       const template = this.portofino.templates[templateName];
       if(!template) {
-        console.error("Unknown template", templateName);
+        console?.error("Unknown template", templateName);
       }
-      return template.template;
+      return template;
     } else {
       return null; //use the default template
     }
@@ -457,20 +485,31 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   checkAccess(askForLogin: boolean): Observable<any> {
+    return this.doCheckAccess(askForLogin, this.computeSecurityCheckUrl(), true);
+  }
+
+  get accessibleChildren(): Observable<string[]> {
+    return this.doCheckAccess(false, this.computeChildrenSecurityCheckUrl(), []);
+  }
+
+  protected doCheckAccess<T>(askForLogin: boolean, securityCheckUrl: string, defaultResult: T): Observable<T> {
     let headers = new HttpHeaders();
-    if(!askForLogin) {
+    if (!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
-    let securityCheckUrl = this.computeSecurityCheckUrl();
-    if(securityCheckUrl) {
-      return this.http.get(securityCheckUrl,{ headers: headers, observe: "response" });
+    if (securityCheckUrl) {
+      return this.http.get(securityCheckUrl, {headers: headers, observe: "response"}).pipe(map(r => r.body as T));
     } else {
-      return of(true);
+      return of(defaultResult);
     }
   }
 
   protected computeSecurityCheckUrl() {
     return this.computeSourceUrl() + "/:accessible";
+  }
+
+  protected computeChildrenSecurityCheckUrl() {
+    return this.computeSourceUrl() + "/:accessible-children";
   }
 
   computeSourceUrl() {
@@ -549,8 +588,7 @@ export abstract class Page implements WithButtons, OnDestroy {
       }
       saveConfObservable = this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
         params: {
-          actionConfigurationPath: this.configurationUrl,
-          loginPath: this.portofino.loginPath
+          actionConfigurationPath: this.configurationUrl
         }
       });
     } else {
@@ -631,8 +669,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     const path = this.getConfigurationLocation(this.path);
-    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
-      params: { loginPath: this.portofino.loginPath }}).subscribe(
+    this.http.put(`${this.portofino.localApiPath}/${path}`, data).subscribe(
       () => {
         this.configuration = pageConfiguration;
         this.settingsPanel.hide(true);
@@ -712,13 +749,15 @@ export class PageHeader {
   template: `
     <ng-template #defaultTemplate let-content="content" let-page="page">
       <ng-template [ngTemplateOutlet]="content"></ng-template>
-      <portofino-page *ngFor="let child of page.embeddedChildren"
+      <portofino-page *ngFor="let child of page.getEmbeddedChildren()"
                       [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
     </ng-template>
     <ng-template #mainWithTabs let-content="content" let-page="page">
       <ng-template [ngTemplateOutlet]="content"></ng-template>
-      <mat-tab-group *ngIf="page.embeddedChildren && page.embeddedChildren.length > 0">
-        <mat-tab *ngFor="let child of page.embeddedChildren">
+      <portofino-page *ngFor="let child of page.getEmbeddedChildren('top')"
+                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
+      <mat-tab-group *ngIf="page.getEmbeddedChildren() && page.getEmbeddedChildren().length > 0">
+        <mat-tab *ngFor="let child of page.getEmbeddedChildren()">
           <ng-template mat-tab-label>
             <mat-icon *ngIf="child.icon">{{child.icon}}</mat-icon>
             {{child.title|translate}}
@@ -726,11 +765,13 @@ export class PageHeader {
           <portofino-page [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
         </mat-tab>
       </mat-tab-group>
+      <portofino-page *ngFor="let child of page.getEmbeddedChildren('bottom')"
+                      [parent]="page" [embedded]="true" [segment]="child.path"></portofino-page>
     </ng-template>`
 })
 export class TemplatesComponent implements AfterViewInit {
 
-  templates: { [name: string]: { template: TemplateRef<any>, description?: string }} = {};
+  templates: { [name: string]: TemplateDescriptor} = {};
 
   @ViewChild("defaultTemplate", { static: true })
   defaultTemplate: TemplateRef<any>;
@@ -738,8 +779,12 @@ export class TemplatesComponent implements AfterViewInit {
   mainWithTabs: TemplateRef<any>;
 
   ngAfterViewInit(): void {
-    this.templates.defaultTemplate = { template: this.defaultTemplate, description: "The default template" };
-    this.templates.mainWithTabs = { template: this.mainWithTabs, description: "Page with embedded pages as tabs" };
+    this.templates.defaultTemplate = { template: this.defaultTemplate, description: "The default template", sections: ["default"] };
+    this.templates.mainWithTabs = {
+      template: this.mainWithTabs,
+      description: "Page with embedded pages as tabs",
+      sections: ["top", "default", "bottom"]
+    };
   }
 }
 
@@ -764,7 +809,7 @@ export class PageLayout implements AfterViewInit {
 
   ngAfterViewInit(): void {
     const template = this.page.template;
-    this.template = template ? template : this.defaultTemplate;
+    this.template = template ? template.template : this.defaultTemplate;
     this.changeDetector.detectChanges();
   }
 }

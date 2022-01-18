@@ -23,6 +23,7 @@ package com.manydesigns.portofino.persistence;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
+import com.manydesigns.portofino.database.multitenancy.MultiTenant;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -31,6 +32,8 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -49,21 +52,23 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Connection;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -96,6 +101,8 @@ public class Persistence {
     protected final FileObject applicationDirectory;
     protected final Configuration configuration;
     protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
+    @Autowired
+    protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
     public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
 
@@ -116,7 +123,10 @@ public class Persistence {
     // Constructors
     //**************************************************************************
 
-    public Persistence(FileObject applicationDirectory, Configuration configuration, FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile, DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
+    public Persistence(
+            FileObject applicationDirectory, Configuration configuration,
+            FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile,
+            DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
         this.applicationDirectory = applicationDirectory;
         this.configuration = configuration;
         this.configurationFile = configurationFile;
@@ -188,6 +198,15 @@ public class Persistence {
                 }
                 model.getDatabases().removeIf(d -> databaseName.equals(d.getDatabaseName()));
                 model.getDatabases().add(database);
+            }
+
+            FileObject settingsFile = databaseDir.resolveFile("hibernate.properties");
+            if(settingsFile.exists()) {
+                try(InputStream inputStream = settingsFile.getContent().getInputStream()) {
+                    Properties settings = new Properties();
+                    settings.load(inputStream);
+                    database.setSettings(settings);
+                }
             }
         } else {
             database = DatabaseLogic.findDatabaseByName(model, databaseName);
@@ -399,12 +418,14 @@ public class Persistence {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
             connectionProvider.init(databasePlatformsRegistry);
             if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
-                SessionFactoryBuilder builder = new SessionFactoryBuilder(database);
+                MultiTenancyImplementation implementation = getMultiTenancyImplementation(database);
+                SessionFactoryBuilder builder = new SessionFactoryBuilder(database, configuration, implementation);
                 SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
                 HibernateDatabaseSetup setup =
                         new HibernateDatabaseSetup(
                                 database, sessionFactoryAndCodeBase.sessionFactory,
-                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode());
+                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(), configuration,
+                                implementation);
                 String databaseName = database.getDatabaseName();
                 HibernateDatabaseSetup oldSetup = setups.get(databaseName);
                 setups.put(databaseName, setup);
@@ -418,6 +439,27 @@ public class Persistence {
         } catch (Exception e) {
             logger.error("Could not create connection provider for " + database, e);
         }
+    }
+
+    protected MultiTenancyImplementation getMultiTenancyImplementation(Database database) {
+        Optional<MultiTenant> multiTenant = database.getJavaAnnotation(MultiTenant.class);
+        if(multiTenant.isPresent()) {
+            Class<? extends MultiTenancyImplementation> implClass = multiTenant.get().strategy();
+            //TODO injection?
+            if(!MultiTenancyImplementation.class.isAssignableFrom(implClass)) {
+                throw new ClassCastException(implClass + " does not extend " + MultiTenancyImplementation.class);
+            }
+            try {
+                MultiTenancyImplementation implementation = multiTenancyImplementationFactory.make(implClass);
+                MultiTenancyStrategy strategy = implementation.getStrategy();
+                if (strategy.requiresMultiTenantConnectionProvider()) {
+                    return implementation;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Could not instantiate multi tenancy implementation " + implClass + " for " + database, e);
+            }
+        }
+        return null;
     }
 
     public void retryFailedConnections() {
@@ -570,6 +612,8 @@ public class Persistence {
             connectionProvider.shutdown();
         }
         status.onNext(Status.STOPPED);
+        databaseSetupEvents.onComplete();
+        status.onComplete();
     }
 
     //**************************************************************************
@@ -624,4 +668,11 @@ public class Persistence {
         public HibernateDatabaseSetup oldSetup;
     }
 
+    public MultiTenancyImplementationFactory getMultiTenancyImplementationFactory() {
+        return multiTenancyImplementationFactory;
+    }
+
+    public void setMultiTenancyImplementationFactory(MultiTenancyImplementationFactory multiTenancyImplementationFactory) {
+        this.multiTenancyImplementationFactory = multiTenancyImplementationFactory;
+    }
 }

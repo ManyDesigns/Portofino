@@ -13,6 +13,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {TranslateService} from "@ngx-translate/core";
 import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
 import {FormGroup} from "@angular/forms";
+import {Location} from "@angular/common";
 
 @PortofinoComponent({ name: 'user-profile' })
 @Component({
@@ -39,7 +40,7 @@ import {FormGroup} from "@angular/forms";
             <mat-card-content>
               <div fxLayout="column" fxLayoutGap="10px">
                 <span><!-- Divider --></span>
-                <a mat-raised-button color="accent" (click)="authenticationService.showChangePasswordDialog()">
+                <a mat-raised-button color="accent" (click)="authenticationService.goToChangePassword()">
                   Change your password
                 </a>
                 <a mat-raised-button color="primary" (click)="edit()">Edit your data</a>
@@ -61,8 +62,8 @@ export class ProfileComponent extends Page implements OnInit {
   constructor(
     portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
     authenticationService: AuthenticationService, notificationService: NotificationService,
-    translate: TranslateService, private sanitizer: DomSanitizer) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
+    translate: TranslateService, location: Location, private sanitizer: DomSanitizer) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate, location);
     this.photo = sanitizer.bypassSecurityTrustUrl(`data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
     AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
         9TXL0Y4OHwAAAABJRU5ErkJggg=="`);

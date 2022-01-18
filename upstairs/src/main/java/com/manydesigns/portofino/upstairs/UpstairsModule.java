@@ -20,15 +20,19 @@
 
 package com.manydesigns.portofino.upstairs;
 
+import com.manydesigns.portofino.ResourceActionsModule;
+import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
-import com.manydesigns.portofino.rest.PortofinoRoot;
+import com.manydesigns.portofino.upstairs.actions.UpstairsAction;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.VFS;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -40,18 +44,16 @@ import javax.servlet.ServletContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class UpstairsModule implements Module {
+public class UpstairsModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
     @Autowired
     public ServletContext servletContext;
+
+    @Autowired
+    @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
+    public FileObject actionsDirectory;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -73,13 +75,6 @@ public class UpstairsModule implements Module {
 
     @PostConstruct
     public void init() {
-        FileObject fileObject;
-        try {
-            fileObject = VFS.getManager().resolveFile("res:com/manydesigns/portofino/upstairs/actions");
-        } catch (FileSystemException e) {
-            throw new RuntimeException(e);
-        }
-        PortofinoRoot.mount(fileObject, "portofino-upstairs");
         status = ModuleStatus.STARTED;
     }
 
@@ -91,5 +86,14 @@ public class UpstairsModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void onApplicationEvent(@NotNull ContextRefreshedEvent contextRefreshedEvent) {
+        try {
+            ActionLogic.mountPackage(actionsDirectory, "portofino-upstairs", UpstairsAction.class.getPackage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

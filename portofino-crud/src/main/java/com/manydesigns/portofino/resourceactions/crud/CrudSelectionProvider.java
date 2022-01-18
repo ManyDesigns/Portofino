@@ -34,10 +34,12 @@ public class CrudSelectionProvider {
 
     protected final SelectionProvider selectionProvider;
     protected final String[] fieldNames;
+    protected final boolean enforced;
 
-    public CrudSelectionProvider(SelectionProvider selectionProvider, String[] fieldNames) {
+    public CrudSelectionProvider(SelectionProvider selectionProvider, String[] fieldNames, boolean enforced) {
         this.selectionProvider = selectionProvider;
         this.fieldNames = fieldNames;
+        this.enforced = enforced;
     }
 
     public SelectionProvider getSelectionProvider() {
@@ -48,4 +50,7 @@ public class CrudSelectionProvider {
         return fieldNames;
     }
 
+    public boolean isEnforced() {
+        return enforced;
+    }
 }

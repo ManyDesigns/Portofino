@@ -15,6 +15,8 @@ import {ClassAccessor} from "../class-accessor";
 import {BehaviorSubject, merge, Observable, Subscription} from "rxjs";
 import {CollectionViewer, SelectionChange} from "@angular/cdk/collections";
 import {map} from "rxjs/operators";
+import {CdkDragDrop, moveItemInArray} from "@angular/cdk/drag-drop";
+import {Location} from "@angular/common";
 
 @Component({
   templateUrl: '../../../assets/administration/tables.component.html'
@@ -30,8 +32,8 @@ export class TablesComponent extends Page implements OnInit {
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, notificationService: NotificationService,
-              translate: TranslateService) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
+              translate: TranslateService, location: Location) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate, location);
     const tableTreeControl = new FlatTreeControl<TableFlatNode>(this._getLevel, this._isExpandable);
     this.tableTreeDataSource = new TableTreeDataSource(tableTreeControl, http, portofino.apiRoot, notificationService, translate);
   }
@@ -126,6 +128,10 @@ export class TablesComponent extends Page implements OnInit {
   @Button({ list: "column", text: "Cancel" })
   cancelColumn() {
     this.column = null;
+  }
+
+  moveColumn(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.tableInfo.table.columns, event.previousIndex, event.currentIndex);
   }
 
   changeType(column, newType) {

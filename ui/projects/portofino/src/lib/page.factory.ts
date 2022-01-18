@@ -15,6 +15,7 @@ import {Observable, of, throwError} from "rxjs";
 import {map, mergeMap} from "rxjs/operators";
 import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'portofino-page',
@@ -43,8 +44,8 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
               authenticationService: AuthenticationService, notificationService: NotificationService,
               translate: TranslateService,
               protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
-              protected viewContainerRef: ViewContainerRef) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
+              protected viewContainerRef: ViewContainerRef, location: Location) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate, location);
     this.injector = injector;
   }
 
@@ -92,6 +93,19 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
+
+    if(config.children) {
+      //Legacy children with no embedded section
+      config.children.forEach(c => {
+        if(c.embedded) {
+          if(!c.embeddedIn) {
+            c.embeddedIn = "default";
+          }
+          delete c.embedded;
+        }
+      });
+    }
+
     let componentFactory = this.componentFactoryResolver.resolveComponentFactory(componentType.type);
     let componentRef = componentFactory.create(this.injector);
     const component = <Page>componentRef.instance;

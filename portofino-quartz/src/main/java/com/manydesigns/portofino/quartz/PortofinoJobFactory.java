@@ -31,12 +31,17 @@ package com.manydesigns.portofino.quartz;
 
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.persistence.Persistence;
+import org.apache.shiro.util.ThreadContext;
+import org.apache.shiro.web.env.WebEnvironment;
+import org.apache.shiro.web.util.WebUtils;
 import org.quartz.*;
 import org.quartz.simpl.SimpleJobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+
+import javax.servlet.ServletContext;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,10 +54,12 @@ public class PortofinoJobFactory extends SimpleJobFactory {
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoJobFactory.class);
-    private final ApplicationContext applicationContext;
-    private final CodeBase codeBase;
+    protected final ServletContext servletContext;
+    protected final ApplicationContext applicationContext;
+    protected final CodeBase codeBase;
 
-    public PortofinoJobFactory(ApplicationContext applicationContext) {
+    public PortofinoJobFactory(ServletContext servletContext, ApplicationContext applicationContext) {
+        this.servletContext = servletContext;
         this.applicationContext = applicationContext;
         this.codeBase = applicationContext.getBean(CodeBase.class);
     }
@@ -63,16 +70,25 @@ public class PortofinoJobFactory extends SimpleJobFactory {
         applicationContext.getAutowireCapableBeanFactory().autowireBean(job);
         return jobExecutionContext -> {
             try {
+                WebEnvironment env = WebUtils.getWebEnvironment(servletContext);
+                if(env != null) {
+                    ThreadContext.bind(env.getWebSecurityManager());
+                }
                 job.execute(jobExecutionContext);
             } finally {
-                try {
-                    //In a different class to make the database module optional at runtime
-                    SessionCleaner.closeSessions(applicationContext);
-                } catch (NoClassDefFoundError e) {
-                    logger.debug("Database module not available, not closing sessions", e);
-                }
+                cleanup();
             }
         };
+    }
+
+    protected void cleanup() {
+        try {
+            //In a different class to make the database module optional at runtime
+            SessionCleaner.closeSessions(applicationContext);
+        } catch (NoClassDefFoundError e) {
+            logger.debug("Database module not available, not closing sessions", e);
+        }
+        ThreadContext.unbindSecurityManager();
     }
 
     protected Job instantiateJob(TriggerFiredBundle bundle) throws SchedulerException {
@@ -80,7 +96,7 @@ public class PortofinoJobFactory extends SimpleJobFactory {
         Class<?> jobClass = jobDetail.getJobClass();
         //Attempt to reload
         try {
-            Class newClass = codeBase.loadClass(jobClass.getName());
+            Class<?> newClass = codeBase.loadClass(jobClass.getName());
             if(Job.class.isAssignableFrom(newClass)) {
                 jobClass = newClass;
             } else {

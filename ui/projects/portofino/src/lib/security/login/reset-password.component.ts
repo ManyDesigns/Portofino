@@ -12,6 +12,8 @@ import {Component, Inject} from "@angular/core";
 import {NotificationService} from "../../notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import { samePasswordChecker } from '../../form';
+import {HttpClient} from "@angular/common/http";
+import {InAppAuthenticationStrategy} from "./in-app-authentication-strategy";
 
 @Component({
   selector: 'portofino-reset-password',
@@ -56,7 +58,8 @@ export class ResetPasswordComponent {
 
   constructor(protected dialogRef: MatDialogRef<ResetPasswordComponent>, protected authenticationService: AuthenticationService,
               protected formBuilder: FormBuilder, protected notificationService: NotificationService,
-              protected translate: TranslateService, @Inject(MAT_DIALOG_DATA) protected data: any) {
+              protected translate: TranslateService, @Inject(MAT_DIALOG_DATA) protected data: any,
+              protected http: HttpClient) {
     this.form = this.formBuilder.group({
       oldPassword: ['', Validators.required],
       newPassword: ['', Validators.required],
@@ -65,11 +68,17 @@ export class ResetPasswordComponent {
   }
 
   change() {
-    this.authenticationService.resetPassword(this.data.token, this.form.get('newPassword').value).subscribe(
+    this.resetPassword(this.data.token, this.form.get('newPassword').value).subscribe(
       result => {
         this.dialogRef.close(result);
         this.notificationService.info(this.translate.get("Password successfully changed."));
       });
+  }
+
+  resetPassword(newPassword, token) {
+    return this.http.post(`${(this.authenticationService.strategy as InAppAuthenticationStrategy).loginPath}/:reset-password`,{
+      newPassword: newPassword, token: token
+    });
   }
 
 }

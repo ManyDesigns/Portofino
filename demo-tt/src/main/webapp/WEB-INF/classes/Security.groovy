@@ -1,17 +1,14 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.util.RandomUtil
-import com.manydesigns.portofino.model.database.Database
-import com.manydesigns.portofino.model.database.DatabaseLogic
-import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.persistence.QueryUtils
-import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.security.SecurityLogic
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.ExistingUserException
 import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
+import com.manydesigns.portofino.tt.Refresh
 import org.apache.shiro.authc.*
 import org.apache.shiro.crypto.hash.Sha1Hash
 import org.hibernate.Session
@@ -19,6 +16,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
+import javax.annotation.PostConstruct
 import javax.persistence.criteria.CriteriaBuilder
 import javax.persistence.criteria.CriteriaQuery
 import javax.persistence.criteria.Root
@@ -33,6 +31,15 @@ class Security extends AbstractPortofinoRealm {
 
     @Autowired
     Persistence persistence
+
+    //The following is to verify that user-defined beans are accessible in Security.groovy
+    @Autowired
+    Refresh refresh
+
+    @PostConstruct
+    void test() {
+        logger.info("Refresh: " + refresh)
+    }
 
     //--------------------------------------------------------------------------
     // Authentication
@@ -55,7 +62,10 @@ class Security extends AbstractPortofinoRealm {
         String encryptedPassword = encryptPassword(plainTextPassword);
         Session session = persistence.getSession("tt");
 
-        def (criteria, cb, from) = QueryUtils.createCriteria(session, 'users')
+        def cdef = QueryUtils.createCriteria(session, 'users')
+        def criteria = cdef.query
+        def cb = cdef.builder
+        def from = cdef.root
         criteria.where(cb.equal(cb.lower(from.get("email")), login?.toLowerCase()))
 
         Serializable principal = (Serializable) session.createQuery(criteria).uniqueResult()
@@ -148,10 +158,10 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
-    protected Object cleanUserPrincipal(user) {
+    protected Object cleanUserPrincipal(principal) {
         Map cleanUser = new HashMap()
         //user.properties.each { k, v -> //use this for POJO persistence
-        user.each { k, v ->
+        principal.each { k, v ->
             if (v instanceof List || v instanceof Map) {
                 logger.debug("Skipping {}", k)
             } else {
@@ -228,7 +238,7 @@ class Security extends AbstractPortofinoRealm {
         Session session = persistence.getSession("tt");
         def (CriteriaQuery criteria, CriteriaBuilder builder, Root root) =
             QueryUtils.createCriteria(session, "users")
-        criteria.where(builder.equal(builder.upper(root.get('email')), email?.toUpperCase()))
+        criteria.where(builder.equal(builder.upper(root.<String>get('email')), email?.toUpperCase()))
 
         (Serializable) session.createQuery(criteria).uniqueResult()
     }
@@ -254,22 +264,25 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
-    ClassAccessor getSelfRegisteredUserClassAccessor() {
-        Database database = DatabaseLogic.findDatabaseByName(persistence.model, "tt");
-        Table table = DatabaseLogic.findTableByEntityName(database, "users");
-        return new TableAccessor(table);
+    boolean supportsSelfRegistration() {
+        true
     }
 
     @Override
-    String saveSelfRegisteredUser(Object principal) {
-        Session session = persistence.getSession("tt");
-        logger.debug("Check if user already registered. Email: {}", principal.email);
+    ClassAccessor getSelfRegisteredUserClassAccessor() {
+        persistence.getTableAccessor("tt", "users")
+    }
+
+    @Override
+    String[] saveSelfRegisteredUser(Object principal) {
+        Session session = persistence.getSession("tt")
+        logger.debug("Check if user already registered. Email: {}", principal.email)
         Object user2 = getUserByEmail(principal.email)
         if (user2 != null) {
-            throw new ExistingUserException(principal.email);
+            throw new ExistingUserException(principal.email)
         }
 
-        logger.debug("Marking registration ip and date");
+        logger.debug("Marking registration ip and date")
         String token = RandomUtil.createRandomId();
         def now = new Date()
         principal.password = encryptPassword(principal.password);
@@ -283,8 +296,7 @@ class Security extends AbstractPortofinoRealm {
         session.save("users", (Object)principal);
         session.getTransaction().commit();
 
-        return token;
-
+        [token, principal.email]
     }
 
     @Override

@@ -14,7 +14,7 @@
         {{ notification.message }}
       </button>
     </mat-menu>
-    <button mat-icon-button *ngIf="!notifications.notifications || notifications.notifications.length == 0">
+    <button mat-icon-button *ngIf="!notifications.notifications || notifications.notifications.length === 0">
       <mat-icon>notifications_none</mat-icon>
       <span class="cdk-visually-hidden">{{ 'No notifications' | translate }}</span>
     </button>
@@ -54,7 +54,7 @@
     <portofino-language-selector *ngIf="portofino.locales.length > 1"></portofino-language-selector>
     <ng-container *ngIf="authenticationService.currentUser">
       <mat-menu #userMenu="matMenu" [overlapTrigger]="false">
-        <button mat-menu-item (click)="authenticationService.showChangePasswordDialog()">
+        <button mat-menu-item (click)="authenticationService.goToChangePassword()">
           <mat-icon>vpn_key</mat-icon>
           {{ 'Change password' | translate }}
         </button>
@@ -69,7 +69,7 @@
       </button>
     </ng-container>
     <ng-container *ngIf="!authenticationService.currentUser">
-      <button mat-button (click)="authenticationService.showLoginDialog()">{{ 'Sign in' | translate }}</button>
+      <button mat-button (click)="authenticationService.goToAuthentication()">{{ 'Sign in' | translate }}</button>
     </ng-container>
   </div>
 </mat-toolbar>

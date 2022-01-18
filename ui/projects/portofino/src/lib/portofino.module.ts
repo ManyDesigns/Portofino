@@ -26,9 +26,7 @@ import {
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {
   AuthenticationInterceptor,
-  AuthenticationService, CHANGE_PASSWORD_COMPONENT,
-  LOGIN_COMPONENT, RESET_PASSWORD_COMPONENT,
-  TOKEN_STORAGE_SERVICE
+  AuthenticationService, AuthenticationStrategy, TOKEN_STORAGE_SERVICE
 } from "./security/authentication.service";
 import {LoginComponent} from './security/login/login.component';
 import {SearchFieldComponent} from './pages/crud/search/search-field.component';
@@ -102,6 +100,7 @@ import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
 import {
+  GenericCrudComponent,
   MailSettingsComponent,
   PermissionsComponent,
   SettingsComponent,
@@ -127,6 +126,13 @@ import {MatBadgeModule} from "@angular/material/badge";
 import {LocalStorageService} from "./storage/storage.services";
 import {PageSettingsPanelComponent} from "./page-settings-panel.component";
 import {CustomPageComponent} from "./pages/custom/custom.component";
+import {
+  CHANGE_PASSWORD_COMPONENT,
+  LOGIN_COMPONENT,
+  RESET_PASSWORD_COMPONENT,
+  InAppAuthenticationStrategy,
+} from "./security/login/in-app-authentication-strategy";
+import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
   declarations: [
@@ -140,7 +146,7 @@ import {CustomPageComponent} from "./pages/custom/custom.component";
     TranslateModule.forChild()],
   providers: [ FieldFactory ],
   entryComponents: [
-    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent,
+    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent, FormComponent,
     NumberFieldComponent, SelectFieldComponent, TextFieldComponent],
   exports: [
     FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
@@ -210,18 +216,18 @@ export class PortofinoCrudModule {}
 @NgModule({
   declarations: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, CreateActionComponent,
+    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
     ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
     WizardComponent],
   imports: [
-    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
+    BrowserModule, BrowserAnimationsModule, DragDropModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+    HttpClientModule, PortofinoFormsModule, PortofinoCrudModule, PortofinoPagesModule,
     MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
   entryComponents: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, CreateActionComponent,
+    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
     ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
     WizardComponent],
   exports: [UpstairsComponent]
@@ -239,6 +245,7 @@ export class PortofinoUpstairsModule {}
     NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
   ],
   providers: [
+    { provide: AuthenticationStrategy, useClass: InAppAuthenticationStrategy },
     //These are factories to avoid circular dependencies
     { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
     { provide: CHANGE_PASSWORD_COMPONENT, useFactory: PortofinoModule.changePasswordComponent },

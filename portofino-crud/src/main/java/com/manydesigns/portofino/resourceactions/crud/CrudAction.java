@@ -31,9 +31,11 @@ import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.persistence.IdStrategy;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.TableCriteria;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
@@ -44,6 +46,7 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Sel
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
+import com.manydesigns.portofino.util.PkHelper;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -51,19 +54,18 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -79,13 +81,9 @@ import java.util.stream.Collectors;
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(CrudConfiguration.class)
 @ResourceActionName("Crud")
-public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
+public class CrudAction<T> extends AbstractCrudAction<T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    public static final String[][] CRUD_CONFIGURATION_FIELDS =
-                {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-                  "largeResultSet", "rowsPerPage", "columns"}};
 
     public Table baseTable;
 
@@ -141,7 +139,7 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
             logger.debug("Query string {} contains select", queryString);
-            List items = plainSelect.getSelectItems();
+            List<SelectItem> items = plainSelect.getSelectItems();
             if(items.size() != 1) {
                 logger.error("I don't know how to generate a count query for {}", queryString);
                 return null;
@@ -149,7 +147,7 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             SelectExpressionItem item = (SelectExpressionItem) items.get(0);
             Function function = new Function();
             function.setName("count");
-            function.setParameters(new ExpressionList(Arrays.asList(item.getExpression())));
+            function.setParameters(new ExpressionList(Collections.singletonList(item.getExpression())));
             item.setExpression(function);
             plainSelect.setOrderByElements(null);
             return plainSelect.toString();
@@ -300,6 +298,16 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
     // Object loading
     //**************************************************************************
 
+    @NotNull
+    protected IdStrategy getIdStrategy(ClassAccessor classAccessor, ClassAccessor innerAccessor) {
+        Class<? extends IdStrategy> idStrategyClass = ((TableAccessor) innerAccessor).getIdStrategy().getClass();
+        try {
+            return idStrategyClass.getConstructor(ClassAccessor.class).newInstance(classAccessor);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     public List<T> loadObjects() {
         try {
@@ -309,8 +317,9 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
             }
             if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
                 try {
-                    PropertyAccessor orderByProperty = classAccessor.getProperty(sortProperty);
-                    criteria.orderBy(orderByProperty, sortDirection);
+                    PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
+                    if(orderByProperty != null)
+                        criteria.orderBy(orderByProperty, sortDirection);
                 } catch (NoSuchFieldException e) {
                     logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
                 }
@@ -325,6 +334,13 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
     }
 
     /**
+     * @return an PropertyAccessor object
+     */
+    protected PropertyAccessor getOrderByProperty(String sortProperty) throws NoSuchFieldException {
+        return this.classAccessor.getProperty(sortProperty);
+    }
+
+    /**
      * Computes the query underlying the CRUD action. By default, it returns configuration.query i.e. the HQL query
      * stored in configuration.xml. However, you can override this method to insert your own logic, for example to
      * change the query depending on the user's role.
@@ -336,10 +352,10 @@ public class CrudAction<T extends Serializable> extends AbstractCrudAction<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected T loadObjectByPrimaryKey(Serializable pkObject) {
+    protected T loadObjectByPrimaryKey(Object pkObject) {
         return (T) QueryUtils.getObjectByPk(
                 persistence,
-                baseTable, pkObject,
+                baseTable, (Serializable) pkObject,
                 getBaseQuery(), this);
     }
 

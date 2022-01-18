@@ -44,21 +44,25 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.Group;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.annotations.Guard;
+import com.manydesigns.portofino.persistence.IdStrategy;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
+import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
 import com.manydesigns.portofino.rest.PortofinoFilter;
 import com.manydesigns.portofino.rest.Utilities;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import com.vdurmont.semver4j.Semver;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,12 +84,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -134,7 +138,7 @@ import java.util.regex.Pattern;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
-public abstract class AbstractCrudAction<T extends Serializable> extends AbstractResourceAction {
+public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public static final String COPYRIGHT =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -153,6 +157,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     public static final String
             PERMISSION_CREATE = "crud-create",
             PERMISSION_EDIT = "crud-edit",
+            PERMISSION_READ = "crud-read",
             PERMISSION_DELETE = "crud-delete";
 
     public static final Logger logger =
@@ -194,7 +199,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     //--------------------------------------------------------------------------
 
     public ClassAccessor classAccessor;
-    public PkHelper pkHelper;
+    public IdStrategy idStrategy;
 
     public T object;
     public List<T> objects;
@@ -210,6 +215,11 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     public CrudConfiguration crudConfiguration;
     public Form crudConfigurationForm;
     public TableForm selectionProvidersForm;
+    private SelectionProviderLoadStrategy selectionProviderLoadStrategy = SelectionProviderLoadStrategy.ONLY_ENFORCED;
+
+    static enum SelectionProviderLoadStrategy {
+        NONE, ONLY_ENFORCED, ALL
+    }
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -234,7 +244,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
      * The only constraint is that it is serializable.
      * @return the loaded object, or null if it couldn't be found or it didn't satisfy the search criteria.
      */
-    protected abstract T loadObjectByPrimaryKey(Serializable pkObject);
+    protected abstract T loadObjectByPrimaryKey(Object pkObject);
 
     /**
      * Saves a new object to the persistent storage. The actual implementation is left to subclasses.
@@ -258,11 +268,11 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     protected abstract void doDelete(T object);
 
     /**
-     * {@link #loadObjectByPrimaryKey(java.io.Serializable)}
+     * {@link #loadObjectByPrimaryKey(Object)}
      * @param identifier the object identifier in String form
      */
     protected void loadObject(String... identifier) {
-        Serializable pkObject = pkHelper.getPrimaryKey(identifier);
+        Object pkObject = idStrategy.getPrimaryKey(identifier);
         object = loadObjectByPrimaryKey(pkObject);
     }
 
@@ -447,7 +457,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected void deleteOldBlobs(List<Blob> blobsBefore, List<Blob> blobsAfter) {
-        List<Blob> toDelete = new ArrayList<Blob>(blobsBefore);
+        List<Blob> toDelete = new ArrayList<>(blobsBefore);
         toDelete.removeAll(blobsAfter);
         for(Blob blob : toDelete) {
             try {
@@ -577,9 +587,54 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             return;
         }
         classAccessor = filterAccordingToPermissions(new CrudAccessor(crudConfiguration, innerAccessor));
-        pkHelper = new PkHelper(classAccessor);
+        idStrategy = getIdStrategy(classAccessor, innerAccessor);
         maxParameters = classAccessor.getKeyProperties().length;
     }
+
+    private void checkAccessorPermissions(String[] requiredPermissions) {
+        EntityPermissions ep = classAccessor.getAnnotation(EntityPermissions.class);
+        if(ep == null) {
+            return;
+        }
+        Permissions permissions = new Permissions();
+        String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration);
+        configurePermission(permissions, allGroup, PERMISSION_CREATE, ep.create());
+        configurePermission(permissions, allGroup, PERMISSION_DELETE, ep.delete());
+        configurePermission(permissions, allGroup, PERMISSION_EDIT, ep.edit());
+        configurePermission(permissions, allGroup, PERMISSION_READ, ep.read());
+        permissions.init();
+
+        boolean permitted =
+                security.hasPermissions(
+                        getPortofinoConfiguration(), permissions, AccessLevel.VIEW, requiredPermissions);
+        if(!permitted) {
+            logger.warn("CRUD source not permitted: {}", classAccessor.getName());
+            throw new WebApplicationException(
+                    security.isUserAuthenticated() ? Response.Status.FORBIDDEN : Response.Status.UNAUTHORIZED);
+        }
+    }
+
+    private void configurePermission(Permissions permissions, String allGroup, String permission, String[] groups) {
+        for(String groupName : groups) {
+            if(groupName.equals("*")) {
+                groupName = allGroup;
+            }
+            String finalGroup = groupName;
+            Group group = permissions.getGroups().stream()
+                    .filter(g -> g.getName().equals(finalGroup))
+                    .findFirst().orElseGet(() -> {
+                        Group grp = new Group();
+                        grp.setName(finalGroup);
+                        grp.setAccessLevel(AccessLevel.VIEW.name());
+                        return grp;
+                    });
+            if(permission != null) {
+                group.getPermissions().add(permission);
+            }
+        }
+    }
+
+    protected abstract IdStrategy getIdStrategy(ClassAccessor classAccessor, ClassAccessor innerAccessor);
 
     @Override
     public String getParameterName(int index) {
@@ -592,13 +647,13 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     @Override
     public void parametersAcquired() {
         super.parametersAcquired();
-        if(pkHelper == null) {
+        if(idStrategy == null) {
             return;
         }
 
         if(!parameters.isEmpty()) {
             String encoding = getUrlEncoding();
-            pk = parameters.toArray(new String[parameters.size()]);
+            pk = parameters.toArray(new String[0]);
             try {
                 for(int i = 0; i < pk.length; i++) {
                     pk[i] = URLDecoder.decode(pk[i], encoding);
@@ -608,9 +663,9 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             }
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
 
-            Serializable pkObject;
+            Object pkObject;
             try {
-                pkObject = pkHelper.getPrimaryKey(pk);
+                pkObject = idStrategy.getPrimaryKey(pk);
             } catch (Exception e) {
                 logger.warn("Invalid primary key", e);
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -694,7 +749,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected String generateObjectUrl(String baseUrl, Object o) {
-        String[] objPk = pkHelper.generatePkStringArray(o);
+        String[] objPk = idStrategy.generatePkStringArray(o);
         String url = baseUrl + "/" + getPkForUrl(objPk);
         return appendSearchStringParamIfNecessary(url);
     }
@@ -713,7 +768,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
      * Populates the search form from request parameters.
      * <ul>
      *     <li>If <code>searchString</code> is blank, then the form is read from the request
-     *     (by {@link SearchForm#readFromRequest(javax.servlet.http.HttpServletRequest)}) and <code>searchString</code>
+     *     (by {@link SearchForm#readFromRequest(HttpServletRequest)}) and <code>searchString</code>
      *     is generated accordingly.</li>
      *     <li>Else, <code>searchString</code> is interpreted as a query string and the form is populated from it.</li>
      * </ul>
@@ -757,7 +812,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         if(selectionProviderSupport != null) {
             for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
                 SelectionProvider selectionProvider = current.getSelectionProvider();
-                if(selectionProvider == null) {
+                if(selectionProvider == null || !current.isEnforced()) {
                     continue;
                 }
                 String[] fieldNames = current.getFieldNames();
@@ -789,17 +844,16 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
-        if(selectionProviderSupport == null) {
-            return;
-        }
         // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
+        if(selectionProviderSupport != null) {
+            for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+                SelectionProvider selectionProvider = current.getSelectionProvider();
+                if (selectionProvider == null) {
+                    continue;
+                }
+                String[] fieldNames = current.getFieldNames();
+                tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
             }
-            String[] fieldNames = current.getFieldNames();
-            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
     }
 
@@ -873,7 +927,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
 
     public String getLinkToPage(int page) {
         int rowsPerPage = getCrudConfiguration().getRowsPerPage();
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("sortProperty", getSortProperty());
         parameters.put("sortDirection", getSortDirection());
         parameters.put("firstResult", page * rowsPerPage);
@@ -889,7 +943,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
 
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
-        tableForm.setKeyGenerator(pkHelper.createPkGenerator());
+        tableForm.setKeyGenerator(idStrategy.createPkGenerator());
         tableForm.setCondensed(true);
 
         return tableForm;
@@ -933,13 +987,14 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected void configureFormSelectionProviders(FormBuilder formBuilder) {
-        if(selectionProviderSupport == null) {
+        if(selectionProviderSupport == null || selectionProviderLoadStrategy == SelectionProviderLoadStrategy.NONE) {
             return;
         }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
+            if(selectionProvider == null || (
+                    selectionProviderLoadStrategy == SelectionProviderLoadStrategy.ONLY_ENFORCED  && !current.isEnforced())) {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
@@ -1064,6 +1119,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             return Response.status(Response.Status.BAD_REQUEST).
                     entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_READ });
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         BlobManager blobManager = getBlobManager();
@@ -1089,6 +1145,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         setupForm(Mode.EDIT);
         form.readFromObject(object);
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
@@ -1135,6 +1192,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Object can not be null (this method can only be called with /objectKey)").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         setupForm(Mode.EDIT);
         form.readFromObject(object);
         AbstractBlobField field = (AbstractBlobField) form.findFieldByPropertyName(propertyName);
@@ -1172,7 +1230,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<Blob> getBlobsFromObject(T object) {
-        List<Blob> blobs = new ArrayList<Blob>();
+        List<Blob> blobs = new ArrayList<>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             if(property.getAnnotation(FileBlob.class) != null) {
                 String code = (String) property.get(object);
@@ -1185,7 +1243,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<Blob> getBlobsFromForm() {
-        List<Blob> blobs = new ArrayList<Blob>();
+        List<Blob> blobs = new ArrayList<>();
         for(FileBlobField blobField : getBlobFields()) {
             if(blobField.getValue() != null) {
                 blobs.add(blobField.getValue());
@@ -1195,7 +1253,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected List<FileBlobField> getBlobFields() {
-        List<FileBlobField> blobFields = new ArrayList<FileBlobField>();
+        List<FileBlobField> blobFields = new ArrayList<>();
         for(FieldSet fieldSet : form) {
             for(FormElement field : fieldSet) {
                 if(field instanceof FileBlobField) {
@@ -1308,6 +1366,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             @QueryParam("prefix") String prefix,
             @Parameter(description = "Whether the returned values include a default option \"Please choose one\"")
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
+        checkAccessorPermissions(new String[]{ PERMISSION_READ });
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1354,7 +1413,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     @SuppressWarnings("unchecked")
     @Operation(summary = "The list of selection providers supported by this resource")
     public List selectionProviders() {
-        List result = new ArrayList();
+        List<Map<?, ?>> result = new ArrayList<>();
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1389,7 +1448,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     protected String getPkForUrl(String[] pk) {
         String encoding = getUrlEncoding();
         try {
-            return pkHelper.getPkStringForUrl(pk, encoding);
+            return idStrategy.getPkStringForUrl(pk, encoding);
         } catch (UnsupportedEncodingException e) {
             throw new Error(e);
         }
@@ -1406,7 +1465,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         if(!actionPath.endsWith("/")) {
             sb.append("/");
         }
-        sb.append(pkHelper.getFormatString());
+        sb.append(idStrategy.getFormatString());
         appendSearchStringParamIfNecessary(sb);
         return sb.toString();
     }
@@ -1499,6 +1558,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
      * @param searchString the search string
      * @param firstResult pagination: the index of the first result returned by the search
      * @param maxResults pagination: the maximum number of results returned by the search
+     * @param newObject The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.
      * @since 4.2
      * @return search results (/) or single object (/pk) as JSON
      */
@@ -1506,20 +1566,26 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "The contents of this resource: either search results or a single object, depending on path parameters")
     public Response getAsJson(
-            @Parameter(description = "The search string (see http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
+            @Parameter(description = "The search string (see https://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
             @QueryParam("searchString") String searchString,
-            @Parameter(description = "The index of the first search result")
+            @Parameter(description = "The index of the first search result. Only valid for search.")
             @QueryParam("firstResult") Integer firstResult,
-            @Parameter(description = "The maximum number of returned search results")
+            @Parameter(description = "The maximum number of returned search results. Only valid for search.")
             @QueryParam("maxResults") Integer maxResults,
-            @Parameter(description = "The property according to which the search results are sorted")
+            @Parameter(description = "The property according to which the search results are sorted. Only valid for search.")
             @QueryParam("sortProperty") String sortProperty,
-            @Parameter(description = "The direction of the sort (asc or desc)")
+            @Parameter(description = "The direction of the sort (asc or desc). Only valid for search.")
             @QueryParam("sortDirection") String sortDirection,
-            @Parameter(description = "The returned object is pre-populated for being edited (including computed fields)")
+            @Parameter(description = "The returned object is pre-populated for being edited (including computed fields). Only valid for create, read, edit.")
             @QueryParam("forEdit") boolean forEdit,
-            @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields)")
-            @QueryParam("newObject") boolean newObject) {
+            @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.")
+            @QueryParam("newObject") boolean newObject,
+            @Parameter(description = "The returned object does not load a displayValue for fields that have selection providers. The client will have to query selection providers by itself. Only valid for create, read, edit.")
+            @QueryParam("skipSelectionProviders") boolean skipSelectionProviders) {
+        checkAccessorPermissions(new String[]{ PERMISSION_READ });
+        selectionProviderLoadStrategy = skipSelectionProviders ?
+                SelectionProviderLoadStrategy.NONE :
+                SelectionProviderLoadStrategy.ALL;
         if(newObject) {
             return jsonCreateData();
         }
@@ -1556,6 +1622,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Update not supported, PUT to /objectKey instead").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_CREATE });
         preCreate();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
@@ -1597,6 +1664,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             return Response.status(Response.Status.BAD_REQUEST).entity(
                     "update not supported, PUT to /objectKey instead").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_CREATE });
         preCreate();
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
@@ -1686,6 +1754,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected Response update(String jsonObject) {
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         preEdit();
         FormUtil.readFromJson(form, new JSONObject(jsonObject));
         if (form.validate()) {
@@ -1727,6 +1796,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
      * @return the IDs of the objects that have NOT been updated (in a JAX-RS Response).
      */
     protected Response bulkUpdate(String jsonObject, List<String> ids, boolean returnUpdated) {
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         List<String> updated = new ArrayList<>();
         setupForm(Mode.BULK_EDIT);
         disableBlobFields();
@@ -1780,6 +1850,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_EDIT });
         preEdit();
         List<Blob> blobsBefore = getBlobsFromForm();
         form.readFromRequest(context.getRequest());
@@ -1878,11 +1949,12 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
     }
 
     protected Response.ResponseBuilder deleteOne(boolean returnIds) {
+        checkAccessorPermissions(new String[]{ PERMISSION_DELETE });
         int deleted = delete(object);
         Response.ResponseBuilder response = Response.ok();
         if(returnIds) {
             if(deleted == 1) {
-                response.entity(Collections.singletonList(pkHelper.getPkString(object)));
+                response.entity(Collections.singletonList(idStrategy.getPkString(object)));
             } else {
                 response.status(Response.Status.CONFLICT).entity(getDeleteDeniedMessage());
             }
@@ -1897,6 +1969,7 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
                     "DELETE requires either a /objectKey path parameter or a list of id query parameters").build());
         }
+        checkAccessorPermissions(new String[]{ PERMISSION_DELETE });
         List<String> deleted = bulkDelete(ids);
         Response.ResponseBuilder response = Response.ok();
         if(returnIds) {
@@ -1929,12 +2002,12 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         }
     }
 
-    protected List<String> bulkDelete(List<String> ids) throws Exception {
+    protected List<String> bulkDelete(List<String> ids) {
         List<T> objects = new ArrayList<>(ids.size());
         List<String> deleted = new ArrayList<>();
         for (String current : ids) {
             String[] pkArr = current.split("/");
-            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
+            Object pkObject = idStrategy.getPrimaryKey(pkArr);
             T obj = loadObjectByPrimaryKey(pkObject);
             if(obj != null && deleteValidate(obj)) {
                 doDelete(obj);
@@ -1986,12 +2059,12 @@ public abstract class AbstractCrudAction<T extends Serializable> extends Abstrac
         this.classAccessor = classAccessor;
     }
 
-    public PkHelper getPkHelper() {
-        return pkHelper;
+    public IdStrategy getIdStrategy() {
+        return idStrategy;
     }
 
-    public void setPkHelper(PkHelper pkHelper) {
-        this.pkHelper = pkHelper;
+    public void setIdStrategy(IdStrategy idStrategy) {
+        this.idStrategy = idStrategy;
     }
 
     public List<CrudSelectionProvider> getCrudSelectionProviders() {

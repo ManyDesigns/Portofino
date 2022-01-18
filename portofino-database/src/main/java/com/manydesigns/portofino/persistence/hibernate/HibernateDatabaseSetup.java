@@ -22,6 +22,8 @@ package com.manydesigns.portofino.persistence.hibernate;
 
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
+import org.apache.commons.configuration2.Configuration;
 import org.hibernate.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +46,22 @@ public class HibernateDatabaseSetup {
     protected final CodeBase codeBase;
     protected final ThreadLocal<Session> threadSessions;
     protected final EntityMode entityMode;
+    protected final Configuration configuration;
     protected final Map<String, String> jpaEntityNameToClassNameMap = new HashMap<>();
+    protected final MultiTenancyImplementation multiTenancyImplementation;
 
         public static final Logger logger =
             LoggerFactory.getLogger(HibernateDatabaseSetup.class);
 
-    public HibernateDatabaseSetup(Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode) {
+    public HibernateDatabaseSetup(
+            Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode,
+            Configuration configuration, MultiTenancyImplementation multiTenancyImplementation) {
         this.database = database;
         this.sessionFactory = sessionFactory;
         this.codeBase = codeBase;
         this.entityMode = entityMode;
+        this.configuration = configuration;
+        this.multiTenancyImplementation = multiTenancyImplementation;
         threadSessions = new ThreadLocal<>();
         database.getAllTables().forEach(t -> {
             jpaEntityNameToClassNameMap.put(t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode));
@@ -86,7 +94,12 @@ public class HibernateDatabaseSetup {
     }
 
     public Session createSession() {
-        Session session = sessionFactory.openSession();
+        Session session;
+        if(multiTenancyImplementation != null) {
+            session = sessionFactory.withOptions().tenantIdentifier(multiTenancyImplementation.getTenant()).openSession();
+        } else {
+            session = sessionFactory.openSession();
+        }
         return new SessionDelegator(this, session);
     }
 
@@ -119,5 +132,9 @@ public class HibernateDatabaseSetup {
 
     public EntityMode getEntityMode() {
         return entityMode;
+    }
+
+    public MultiTenancyImplementation getMultiTenancyImplementation() {
+        return multiTenancyImplementation;
     }
 }

@@ -1,7 +1,6 @@
 import {ValidatorFn, Validators} from "@angular/forms";
-import {map} from "rxjs/operators";
 
-export const loadClassAccessor = map((c: ClassAccessor) => {
+export const loadClassAccessor = (c: ClassAccessor) => {
   if(!c) {
     return c;
   }
@@ -11,7 +10,7 @@ export const loadClassAccessor = map((c: ClassAccessor) => {
   } else {
     return ClassAccessor.create(c);
   }
-});
+};
 
 export const BOOLEAN_TYPE = "boolean";
 export const DATE_TYPE = "date";
@@ -33,6 +32,15 @@ export class ClassAccessor {
         }
       }
     });
+  }
+
+  static getProperty(self: ClassAccessor, name: string) {
+    for(const p in self.properties) {
+      let property = self.properties[p];
+      if(property.name == name) {
+        return property
+      }
+    }
   }
 
   static create(values: ClassAccessor | any): ClassAccessor {
@@ -94,6 +102,10 @@ export class Property {
 
   static create(values: Property | any): Property {
     return Object.assign(new Property(), values)
+  }
+
+  static get(owner: ClassAccessor, name: string) {
+    return ClassAccessor.getProperty(owner, name);
   }
 
   required(value: boolean = true): Property {
@@ -262,7 +274,7 @@ export function getValidators(property: Property): ValidatorFn[] {
     getAnnotation(property, "com.manydesigns.elements.annotations.MinDecimalValue") ||
     getAnnotation(property, "com.manydesigns.elements.annotations.MinIntValue");
   if (minValue) {
-    validators.push(Validators.max(minValue.properties.value));
+    validators.push(Validators.min(minValue.properties.value));
   }
   return validators;
 }

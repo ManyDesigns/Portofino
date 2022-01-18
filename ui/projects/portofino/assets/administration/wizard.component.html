@@ -26,13 +26,13 @@
                    [disabled]="!!wizard.connectionProvider">
             <mat-hint>{{ 'Logical name of your choosing' | translate}}</mat-hint>
           </mat-form-field>
-          <ng-container *ngIf="wizard.newConnectionType == 'jdbc'">
+          <ng-container *ngIf="wizard.newConnectionType === 'jdbc'">
             <mat-form-field>
               <mat-label>{{'Driver' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.driver" required name="driver"
                           [disabled]="!!wizard.connectionProvider" (selectionChange)="updateConnectionUrl()">
                 <ng-container *ngFor="let d of databasePlatforms">
-                  <mat-option *ngIf="d.status == 'ok'" [value]="d">{{d.description}}</mat-option>
+                  <mat-option *ngIf="d.status === 'ok'" [value]="d">{{d.description}}</mat-option>
                 </ng-container>
                 <mat-option [value]="{}">{{ 'Generic' | translate}}</mat-option>
               </mat-select>
@@ -121,14 +121,6 @@
       <form #userGroupForm="ngForm">
         <fieldset *ngIf="wizard.usersTable">
           <legend>{{'Users and groups tables configuration'|translate}}</legend>
-          <mat-form-field [matTooltip]="'This is the property that uniquely identifies the user. It may or may not be the same as the username.' | translate">
-            <mat-label>{{'User id property' | translate}}</mat-label>
-            <mat-select [(ngModel)]="wizard.userIdProperty" required name="userIdProperty">
-              <mat-option></mat-option>
-              <mat-option *ngFor="let c of wizard.usersTable.table.columns; trackBy: trackByColumnName" [value]="c">{{c.columnName}}</mat-option>
-            </mat-select>
-            <mat-hint>{{ 'Hover for help' | translate }}</mat-hint>
-          </mat-form-field>
           <mat-form-field [matTooltip]="'This is the property against which we\'ll compare the username entered by the user at login.' | translate">
             <mat-label>{{'User name property' | translate}}</mat-label>
             <mat-select [(ngModel)]="wizard.userNameProperty" required name="userNameProperty">
@@ -157,7 +149,7 @@
               <mat-option value="plaintext:plaintext">{{'Plain text'|translate}}</mat-option>
             </mat-select>
           </mat-form-field>
-          <mat-form-field [matTooltip]="'If configured, we\'ll enable password recovery over email and self-registration. You\'ll have the possibility to turn them off for your applciation, in any case.' | translate">
+          <mat-form-field [matTooltip]="'If configured, we\'ll enable password recovery over email and self-registration. You\'ll have the possibility to turn them off for your application, in any case.' | translate">
             <mat-label>{{'Email property' | translate}}</mat-label>
             <mat-select [(ngModel)]="wizard.userEmailProperty" name="userEmailProperty">
               <mat-option></mat-option>
@@ -165,7 +157,7 @@
             </mat-select>
             <mat-hint>{{ 'Hover for help' | translate }}</mat-hint>
           </mat-form-field>
-          <mat-form-field [matTooltip]="'If configured, we\'ll enable password recovery over email and self-registration. You\'ll have the possibility to turn them off for your applciation, in any case.' | translate">
+          <mat-form-field [matTooltip]="'If configured, we\'ll enable password recovery over email and self-registration. You\'ll have the possibility to turn them off for your application, in any case.' | translate">
             <mat-label>{{'Token property' | translate}}</mat-label>
             <mat-select [(ngModel)]="wizard.userTokenProperty" name="userTokenProperty">
               <mat-option></mat-option>
@@ -175,13 +167,6 @@
           </mat-form-field>
           <ng-container *ngIf="wizard.groupsTable && wizard.userGroupTable">
             <mat-divider></mat-divider>
-            <mat-form-field>
-              <mat-label>{{'Group id property' | translate}}</mat-label>
-              <mat-select [(ngModel)]="wizard.groupIdProperty" required name="groupIdProperty">
-                <mat-option></mat-option>
-                <mat-option *ngFor="let c of wizard.groupsTable.table.columns" [value]="c">{{c.columnName}}</mat-option>
-              </mat-select>
-            </mat-form-field>
             <mat-form-field>
               <mat-label>{{'Group name property' | translate}}</mat-label>
               <mat-select [(ngModel)]="wizard.groupNameProperty" required name="groupNameProperty">

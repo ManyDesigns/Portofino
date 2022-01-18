@@ -299,7 +299,7 @@ public class DatabaseSyncer {
                 targetFK.setOnePropertyName(sourceFK.getOnePropertyName());
             }
 
-            logger.debug("FK creation successfull. Adding FK to table.");
+            logger.debug("FK creation successful. Adding FK to table.");
             targetFromTable.getForeignKeys().add(targetFK);
         }
     }
@@ -334,9 +334,7 @@ public class DatabaseSyncer {
 
             Table targetTable = DatabaseLogic.findTableByNameIgnoreCase(targetSchema, pkTableName);
             if (targetTable == null) {
-                logger.error("Coud not find table: {}. Skipping PK.",
-                        pkTableName
-                );
+                logger.error("Could not find table: {}. Skipping PK.", pkTableName);
                 continue;
             }
 

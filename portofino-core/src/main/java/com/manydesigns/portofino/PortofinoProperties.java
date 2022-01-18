@@ -57,8 +57,8 @@ public final class PortofinoProperties {
     public static final String MAIL_FROM = "mail.from";
 
     //Groovy
-    public static final String GROOVY_PRELOAD_PAGES = "groovy.preloadPages";
-    public static final String GROOVY_PRELOAD_CLASSES = "groovy.preloadClasses";
+    public static final String PRELOAD_ACTIONS = "preload.actions";
+    public static final String PRELOAD_CLASSES = "preload.classes";
 
     private PortofinoProperties() {}
 

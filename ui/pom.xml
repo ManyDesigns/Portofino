@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>5.3.0</version>
     </parent>
     <artifactId>portofino-angular-ui</artifactId>
     <packaging>pom</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
 
     <modules>
         <module>support</module>
@@ -39,9 +39,6 @@
 
     <profiles>
         <profile>
-            <id>no-frontend-build</id>
-        </profile>
-        <profile>
             <id>build-frontend</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -63,8 +60,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v12.3.1</nodeVersion>
-                                    <npmVersion>6.11.3</npmVersion>
+                                    <nodeVersion>${nodejs.version}</nodeVersion>
+                                    <npmVersion>${npm.version}</npmVersion>
                                 </configuration>
                             </execution>
 

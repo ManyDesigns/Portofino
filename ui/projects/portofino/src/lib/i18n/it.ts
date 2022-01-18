@@ -70,6 +70,7 @@ export const TRANSLATIONS_IT = {
   "Old password": "Vecchia password",
   "Old password is required.": "Campo obbligatorio",
   "Page not found! Error: _": "Pagina non trovata! Errore: {{error}}",
+  "page type: custom": "Pagina personalizzata (custom)",
   "page type: crud": "Pagina CRUD",
   "page type: manyToMany": "Molti-a-molti",
   "page type: text": "Pagina di testo",
@@ -117,5 +118,7 @@ export const TRANSLATIONS_IT = {
   "Wizard": "Wizard",
   "_ not found": "{{what}} non trovato",
   "_ is required.": "{{label}} è obbligatorio.",
-  '_: max _.': "{{label}}: max {max}.",
+  '_: max _.': "{{label}}: lunghezza max {max}.",
+  '_: max value _.': "{{label}}: valore max {{max}}.",
+  '_: min value _.': "{{label}}: valore min {{min}}.",
 };

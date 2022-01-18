@@ -2,9 +2,9 @@
   "title": "Home",
   "type": "welcome",
   "children": [
-    {"path": "projects", "title": "Projects", "embedded": false, "showInNavigation": true },
-    {"path": "profile", "title": "Profile", "embedded": false, "showInNavigation": true },
-    {"path": "portofino-upstairs", "title": "Upstairs", "embedded": false, "showInNavigation": false }
+    {"path": "projects", "title": "Projects", "showInNavigation": true },
+    {"path": "profile", "title": "Profile", "showInNavigation": true },
+    {"path": "portofino-upstairs", "title": "Upstairs", "showInNavigation": false }
   ],
   "source": "",
   "icon": "home"

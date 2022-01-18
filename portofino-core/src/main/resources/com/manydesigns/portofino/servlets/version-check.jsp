@@ -25,10 +25,7 @@
         response.setHeader("X-Message", "Invalid major version: " + majorVersion);
         return;
     }
-    BufferedReader fileReader = new BufferedReader(new FileReader(versionFile.toFile()));
-    try {
+    try (BufferedReader fileReader = new BufferedReader(new FileReader(versionFile.toFile()))) {
         response.getWriter().write(fileReader.readLine());
-    } finally {
-        fileReader.close();
     }
 %>

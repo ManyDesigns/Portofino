@@ -1,7 +1,7 @@
 div.portofino-wizard {
   padding: 20px;
 
-  form > mat-form-field {
+  form > mat-form-field, fieldset > mat-form-field {
     margin: 0 5px;
   }
 

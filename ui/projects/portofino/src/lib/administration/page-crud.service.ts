@@ -13,6 +13,7 @@ import {mergeMap, tap} from "rxjs/operators";
 import {Router} from "@angular/router";
 import {AuthenticationService} from "../security/authentication.service";
 import {NotificationService} from "../notifications/notification.services";
+import {Location} from "@angular/common";
 
 @Injectable()
 export class PageCrudService {
@@ -23,10 +24,10 @@ export class PageCrudService {
     protected portofino: PortofinoService, protected pageService: PageService, protected http: HttpClient,
     protected dialog: MatDialog, protected router: Router, protected translate: TranslateService,
     authenticationService: AuthenticationService, componentFactoryResolver: ComponentFactoryResolver,
-    injector: Injector, notificationService: NotificationService) {
+    injector: Injector, notificationService: NotificationService, location: Location) {
     this.pageFactory = new PageFactoryComponent(
       portofino, http, router, null, authenticationService, notificationService, translate,
-      componentFactoryResolver, injector, null);
+      componentFactoryResolver, injector, null, location);
   }
 
   showCreatePageDialog() {
@@ -57,8 +58,7 @@ export class PageCrudService {
     const path = parentPage.getConfigurationLocation(`${parentPage.path}/${page.source}`);
     const parameters: any = {
       actionPath: Page.removeDoubleSlashesFromUrl(`${parentPage.computeSourceUrl()}/${page.source}`),
-      childrenProperty: parentPage.childrenProperty,
-      loginPath: this.portofino.loginPath
+      childrenProperty: parentPage.childrenProperty
     };
     const actionClass = PageFactoryComponent.components[page.type].defaultActionClass;
     if(actionClass) {
@@ -77,8 +77,7 @@ export class PageCrudService {
     const path = page.getConfigurationLocation();
     const goUpOnePage = () => this.router.navigateByUrl(parentPage.url);
     const params: any = {
-      childrenProperty: parentPage.childrenProperty,
-      loginPath: this.portofino.loginPath
+      childrenProperty: parentPage.childrenProperty
     };
     if(page.hasSource()) {
       params.actionPath = page.computeSourceUrl();
@@ -101,7 +100,6 @@ export class PageCrudService {
     return this.pageFactory.loadPath(sanitizedDestination).pipe(mergeMap(newParent => {
       let params: any = {
         detail: !!moveInstruction.detail + "",
-        loginPath: this.portofino.loginPath,
         segment: page.segment
       };
 

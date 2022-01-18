@@ -1,9 +1,7 @@
 package com.manydesigns.portofino.dispatcher.security.jwt;
 
 import com.manydesigns.portofino.dispatcher.security.RolesPermission;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.authc.AuthenticationException;
@@ -53,9 +51,9 @@ public class JWTRealm extends AuthorizingRealm {
         String secret = getSecret();
         Key key = new SecretKeySpec(Decoders.BASE64.decode(secret), getSignatureAlgorithm().getJcaName());
         
-        Jwt jwt = Jwts.parser().
+        Jws<Claims> jwt = Jwts.parser().
                 setSigningKey(key).
-                parse((String) token.getPrincipal());
+                parseClaimsJws((String) token.getPrincipal());
         Map<String, Serializable> principal = getPrincipal(jwt);
         return new SimpleAuthenticationInfo(principal, ((String) token.getCredentials()).toCharArray(), getName());
     }
@@ -64,7 +62,7 @@ public class JWTRealm extends AuthorizingRealm {
         return SignatureAlgorithm.HS512;
     }
 
-    protected Map<String, Serializable> getPrincipal(Jwt jwt) {
+    protected Map<String, Serializable> getPrincipal(Jws<Claims> jwt) {
         Map<String, Serializable> principal = new HashMap<>();
         principal.put("jwt", (Serializable) jwt.getBody());
         return principal;

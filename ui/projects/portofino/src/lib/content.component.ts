@@ -10,6 +10,7 @@ import {PageFactoryComponent} from "./page.factory";
 import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {catchError, map, mergeMap} from "rxjs/operators";
+import {Location} from "@angular/common";
 
 @Component({
   selector: 'portofino-content',
@@ -27,10 +28,11 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
               protected route: ActivatedRoute, protected http: HttpClient, protected router: Router,
               protected componentFactoryResolver: ComponentFactoryResolver, injector: Injector,
               public portofino: PortofinoService, protected authenticationService: AuthenticationService,
-              protected notificationService: NotificationService, protected translate: TranslateService) {
+              protected notificationService: NotificationService, protected translate: TranslateService,
+              protected location: Location) {
     this.pageFactory = new PageFactoryComponent(
       portofino, http, router, route, authenticationService, notificationService, translate, componentFactoryResolver,
-      injector, null);
+      injector, null, location);
   }
 
   ngOnInit() {
@@ -88,10 +90,19 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
       page.configure();
     } else if (!page.parent) {
       if (params.hasOwnProperty('resetPassword')) {
-        this.authenticationService.showResetPasswordDialog(params.token);
+        this.authenticationService.goToResetPassword(params.token);
       } else if (params.hasOwnProperty('confirmSignup')) {
         this.authenticationService.confirmSignup(params.token).subscribe(
-          () => this.notificationService.info(this.translate.get("User successfully created."))
+          () => {
+            this.notificationService.info(this.translate.get("User successfully created."));
+            this.router.navigate(
+              [],
+              {
+                relativeTo: this.route,
+                queryParams: { confirmSignup: null },
+                queryParamsHandling: 'merge'
+              });
+          }
         );
       }
     }
@@ -125,7 +136,8 @@ export class ContentComponent implements AfterViewInit, OnInit, OnDestroy {
         computeSecurityCheckUrl = componentType.computeSecurityCheckUrl;
       }
       const dummy = new DummyPage(
-        this.portofino, this.http, this.router, this.route, this.authenticationService, this.notificationService, this.translate,
+        this.portofino, this.http, this.router, this.route, this.authenticationService, this.notificationService,
+        this.translate, this.location,
         computeSecurityCheckUrl(this.portofino.apiRoot, page, config.source));
       dummy.parent = page;
       dummy.configuration = config;
@@ -146,8 +158,8 @@ class DummyPage extends Page {
   constructor(
     portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
     authenticationService: AuthenticationService, notificationService: NotificationService, translate: TranslateService,
-    public securityCheckUrl: string) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
+    location: Location, public securityCheckUrl: string) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate, location);
   }
 
   protected computeSecurityCheckUrl(): any {

@@ -22,19 +22,18 @@ package com.manydesigns.portofino.code;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.tools.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -110,8 +109,9 @@ public class JavaCodeBase extends AbstractCodeBase {
     public Class loadJavaFile(final FileObject fileObject, final String name) throws ClassNotFoundException {
         try {
             JavaFileObject javaFile = new VFSJavaFileObject(JavaFileObject.Kind.SOURCE, fileObject, name);
+            List<String> options = getCompilerOptions();
             JavaCompiler.CompilationTask task =
-                    compiler.getTask(null, fileManager, null, null, null, Collections.singletonList(javaFile));
+                    compiler.getTask(null, fileManager, null, options, null, Collections.singletonList(javaFile));
             if(task.call()) {
                 return sourceClassloader.loadClass(name);
             } else {
@@ -123,7 +123,46 @@ public class JavaCodeBase extends AbstractCodeBase {
             throw new ClassNotFoundException(name, e);
         }
     }
-    
+
+    protected List<String> getCompilerOptions() throws URISyntaxException {
+        StringBuilder classpath = new StringBuilder();
+        String separator = System.getProperty("path.separator");
+        String cp = System.getProperty("java.class.path");
+        String mp = System.getProperty("jdk.module.path");
+
+        if (StringUtils.isNotBlank(cp)) {
+            classpath.append(cp);
+        }
+        if (StringUtils.isNotBlank(mp)) {
+            classpath.append(mp);
+        }
+
+        if (classLoader instanceof URLClassLoader) {
+            for (URL url : ((URLClassLoader) classLoader).getURLs()) {
+                if ("file".equals(url.getProtocol())) {
+                    addToClasspath(classpath, separator, new File(url.toURI()));
+                } else try {
+                    File tempFile = File.createTempFile(url.getFile().replace('!', '_'), ".jar");
+                    try(InputStream input = url.openStream(); OutputStream fos = new FileOutputStream(tempFile))  {
+                        IOUtils.copy(input, fos);
+                    }
+                    addToClasspath(classpath, separator, tempFile);
+                } catch (IOException e) {
+                    logger.debug(e.getMessage(), e);
+                }
+            }
+        }
+
+        return Arrays.asList("-classpath", classpath.toString());
+    }
+
+    private void addToClasspath(StringBuilder classpath, String separator, File file) {
+        if (classpath.length() > 0) {
+            classpath.append(separator);
+        }
+        classpath.append(file.getAbsolutePath());
+    }
+
     protected void listClassFiles(String packageName, Collection<JavaFileObject> list) throws IOException {
         Enumeration<URL> resources = getClassLoader().getResources(packageName.replace('.', '/'));
         while (resources.hasMoreElements()) {
@@ -188,13 +227,12 @@ public class JavaCodeBase extends AbstractCodeBase {
                     FileObject classFile;
                     if (fileObject.getType() == FileType.FILE) {
                         classFile = fileObject;
-                        name = null; //Ignore the name
                     } else {
                         classFile = fileObject.resolveFile(classNameToPath(name) + ".class");
                     }
                     try(InputStream inputStream = classFile.getContent().getInputStream()) {
                         byte[] code = IOUtils.toByteArray(inputStream);
-                        return defineClass(name, code, 0, code.length);
+                        return defineClass(null, code, 0, code.length);
                     }
                 } catch (Exception e) {
                     throw new ClassNotFoundException(name, e);

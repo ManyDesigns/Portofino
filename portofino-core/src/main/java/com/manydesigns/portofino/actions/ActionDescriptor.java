@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,6 +40,7 @@ public class ActionDescriptor {
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     protected Permissions permissions;
+    protected final List<AdditionalChild> additionalChildren = new ArrayList<>();
 
     public ActionDescriptor() {
         permissions = new Permissions();
@@ -58,4 +61,8 @@ public class ActionDescriptor {
         this.permissions = permissions;
     }
 
+    @XmlElement(name = "additional-child", type = AdditionalChild.class)
+    public List<AdditionalChild> getAdditionalChildren() {
+        return additionalChildren;
+    }
 }

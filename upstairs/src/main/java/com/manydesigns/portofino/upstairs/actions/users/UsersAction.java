@@ -3,10 +3,9 @@ package com.manydesigns.portofino.upstairs.actions.users;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.upstairs.actions.UpstairsAction;
 import com.manydesigns.portofino.upstairs.actions.support.WizardInfo;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -36,13 +35,13 @@ public class UsersAction extends AbstractResourceAction {
 
     @GET
     public Map getUsers() {
-        return ShiroUtils.getPortofinoRealm().getUsers();
+        return security.getUsers();
     }
 
     @Path("/groups")
     @GET
     public List<String> getGroups() {
-        ArrayList<String> groups = new ArrayList<>(ShiroUtils.getPortofinoRealm().getGroups());
+        ArrayList<String> groups = new ArrayList<>(security.getGroups());
         groups.sort(Comparator.naturalOrder());
         return groups;
     }

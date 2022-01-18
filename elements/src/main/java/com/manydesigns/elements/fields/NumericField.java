@@ -64,7 +64,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
     public NumericField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
 
-        Class type = accessor.getType();
+        Class<?> type = accessor.getType();
         if (type == Byte.class || type == Byte.TYPE) {
             minValue = new BigDecimal(Byte.MIN_VALUE);
             maxValue = new BigDecimal(Byte.MAX_VALUE);
@@ -167,11 +167,11 @@ public class NumericField extends AbstractTextField<BigDecimal> {
             return false;
         }
         if (minValue != null && decimalValue.compareTo(minValue) < 0) {
-            errors.add(getText("elements.error.field.greater.or.equal", minValue));
+            errors.add(getText("elements.error.field.greater.or.equal", minValue.toString()));
             return false;
         }
         if (maxValue != null && decimalValue.compareTo(maxValue) > 0) {
-            errors.add(getText("elements.error.field.less.or.equal", maxValue));
+            errors.add(getText("elements.error.field.less.or.equal", maxValue.toString()));
             return false;
         }
         return true;
@@ -209,7 +209,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
     }
 
     public void writeToObject(Object obj) {
-        Class type = accessor.getType();
+        Class<?> type = accessor.getType();
         Object value = OgnlUtils.convertValue(decimalValue, type);
         writeToObject(obj, value);
     }

@@ -2,11 +2,8 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.jul.LevelChangePropagator
 import com.manydesigns.portofino.i18n.ResourceBundleManager
 import com.manydesigns.portofino.rest.PortofinoFilter
-import com.manydesigns.portofino.servlets.PortofinoListener
+import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer
 import org.hibernate.c3p0.internal.C3P0ConnectionProvider
-
-import static ch.qos.logback.classic.Level.INFO
-import static ch.qos.logback.classic.Level.WARN
 
 def defaultPattern = "%d %-5level %-40logger{40} %X{userId} %X{req.requestURI} %msg%n";
 def appenders = [];
@@ -32,7 +29,7 @@ logger("org.hibernate", WARN)
 logger(C3P0ConnectionProvider.name, INFO)
 
 logger(ResourceBundleManager.name, WARN)
-logger(PortofinoListener.name, INFO)
+logger(PortofinoDispatcherInitializer.name, INFO)
 logger("com.manydesigns.portofino.tt.TtUtils", INFO)
 logger(PortofinoFilter.ACCESS_LOGGER_NAME, INFO)
 

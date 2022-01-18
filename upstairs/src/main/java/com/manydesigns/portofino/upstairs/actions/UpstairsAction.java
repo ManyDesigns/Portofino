@@ -23,6 +23,7 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Cru
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.SecurityLogic;
+import com.manydesigns.portofino.shiro.*;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.upstairs.ModuleInfo;
 import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
@@ -32,12 +33,9 @@ import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +76,7 @@ public class UpstairsAction extends AbstractResourceAction {
     @Qualifier(ACTIONS_DIRECTORY)
     FileObject actionsDirectory;
 
-    @SuppressWarnings({"RedundantStringConstructorCall"})
+    @SuppressWarnings("StringOperationCanBeSimplified")
     public static final String NO_LINK_TO_PARENT = new String();
     public static final int LARGE_RESULT_SET_THRESHOLD = 10000;
     public static final int MULTILINE_THRESHOLD = 256;
@@ -173,14 +171,12 @@ public class UpstairsAction extends AbstractResourceAction {
         if(database == null) {
             throw new WebApplicationException("The database does not exist: " + databaseName);
         }
-        Table userTable = getTable(persistence.getModel(), wizard.usersTable);
-        if(userTable != null) {
-            try {
-                setupSecurityGroovy(database.getConnectionProvider(), userTable, wizard);
-            } catch (Exception e) {
-                logger.error("Couldn't configure users", e);
-                throw new WebApplicationException(e);
-            }
+
+        try {
+            setupSecurity(wizard);
+        } catch (Exception e) {
+            logger.error("Couldn't configure users", e);
+            throw new WebApplicationException(e);
         }
     }
 
@@ -623,72 +619,47 @@ public class UpstairsAction extends AbstractResourceAction {
         }
     }
 
-    protected void setupSecurityGroovy(ConnectionProvider connectionProvider, Table userTable, WizardInfo wizard) throws Exception {
-        TemplateEngine engine = new SimpleTemplateEngine();
-        Template template = engine.createTemplate(
-                UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/Security.groovy"));
-        Map<String, String> bindings = getSecurityGroovyBindings(connectionProvider, userTable, wizard);
-        FileObject codeBaseRoot = actionsDirectory.getParent().resolveFile("classes");
-        FileObject securityGroovyFile = codeBaseRoot.resolveFile("Security.groovy");
-        if(securityGroovyFile.exists()) {
-            FileObject backupFile = securityGroovyFile.getParent().resolveFile("Security.groovy.backup");
-            backupFile.copyFrom(securityGroovyFile, new AllFileSelector());
+    protected void setupSecurity(WizardInfo wizard)
+            throws Exception {
+        Table userTable = getTable(persistence.getModel(), wizard.usersTable);
+        if(userTable == null) {
+            return;
         }
-        try(Writer fw = new OutputStreamWriter(securityGroovyFile.getContent().getOutputStream())) {
-            template.make(bindings).writeTo(fw);
-            logger.info("Security.groovy written to " + securityGroovyFile.getParent().getName().getPath());
-        }
-    }
 
-    @NotNull
-    protected Map<String, String> getSecurityGroovyBindings(ConnectionProvider connectionProvider, Table userTable, WizardInfo wizard) {
-        Map<String, String> bindings = new HashMap<>();
-        bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
-        bindings.put("userTableEntityName", userTable.getActualEntityName());
-        bindings.put("userIdProperty", getPropertyName(userTable, wizard.userIdProperty));
-        bindings.put("userNameProperty", getPropertyName(userTable, wizard.userNameProperty));
-        bindings.put("passwordProperty", getPropertyName(userTable, wizard.userPasswordProperty));
-        bindings.put("userEmailProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userEmailProperty)));
-        bindings.put("userTokenProperty", StringUtils.defaultString(getPropertyName(userTable, wizard.userTokenProperty)));
+        persistence.getModel().getDatabases().forEach(d -> d.getAllTables().forEach(this::removeSecurityAnnotations));
+
+        DatabaseLogic.findColumnByName(userTable, wizard.userNameProperty.getColumnName())
+                .ensureAnnotation(Username.class);
+        DatabaseLogic.findColumnByName(userTable, wizard.userPasswordProperty.getColumnName())
+                .ensureAnnotation(com.manydesigns.portofino.shiro.Password.class);
+        if(wizard.userEmailProperty != null) {
+            DatabaseLogic.findColumnByName(userTable, wizard.userEmailProperty.getColumnName())
+                    .ensureAnnotation(EmailAddress.class);
+        }
+        if(wizard.userTokenProperty != null) {
+            DatabaseLogic.findColumnByName(userTable, wizard.userTokenProperty.getColumnName())
+                    .ensureAnnotation(EmailToken.class);
+        }
 
         Table groupsTable = getTable(persistence.getModel(), wizard.groupsTable);
-        bindings.put("groupTableEntityName", groupsTable != null ? groupsTable.getActualEntityName() : "");
-        bindings.put("groupIdProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupIdProperty)));
-        bindings.put("groupNameProperty", StringUtils.defaultString(getPropertyName(groupsTable, wizard.groupNameProperty)));
-
-        Table userGroupTable = getTable(persistence.getModel(), wizard.userGroupTable);
-        bindings.put("userGroupTableEntityName",
-                userGroupTable != null ? userGroupTable.getActualEntityName() : "");
-        bindings.put("groupLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.groupLinkProperty)));
-        bindings.put("userLinkProperty", StringUtils.defaultString(getPropertyName(userGroupTable, wizard.userLinkProperty)));
-        bindings.put("adminGroupName", StringUtils.defaultString(wizard.adminGroupName));
-
-        bindings.put("hashIterations", "1");
-        String[] algoAndEncoding = wizard.encryptionAlgorithm.split(":");
-        bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
-        switch (algoAndEncoding[1]) {
-            case "plaintext":
-                bindings.put("hashFormat", "null");
-                break;
-            case "hex":
-                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
-                break;
-            case "base64":
-                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported encoding: " + algoAndEncoding[1]);
+        Table usersGroupsTable = getTable(persistence.getModel(), wizard.userGroupTable);
+        if(groupsTable != null && usersGroupsTable != null) {
+            DatabaseLogic.findColumnByName(groupsTable, wizard.groupNameProperty.getColumnName())
+                    .ensureAnnotation(GroupName.class);
+            DatabaseLogic.findColumnByName(usersGroupsTable, wizard.groupLinkProperty.getColumnName())
+                    .ensureAnnotation(GroupLink.class);
+            DatabaseLogic.findColumnByName(usersGroupsTable, wizard.userLinkProperty.getColumnName())
+                    .ensureAnnotation(UserLink.class);
         }
-        return bindings;
+
+        security.setup(actionsDirectory.getParent(), wizard.adminGroupName, wizard.encryptionAlgorithm);
+        persistence.saveXmlModel();
     }
 
-    protected String getPropertyName(Table table, Column column) {
-        column = getColumn(table, column);
-        if(column == null) {
-            return null;
-        } else {
-            return column.getActualPropertyName();
-        }
+    private void removeSecurityAnnotations(Table table) {
+        table.getColumns().forEach(c -> {
+            c.getAnnotations().removeIf(a -> a.getType().startsWith(Username.class.getPackage().getName()));
+        });
     }
 
 }
