@@ -1,17 +1,17 @@
-@import '~@angular/material/theming';
-@include mat-core();
-$app-primary: mat-palette($mat-indigo);
-$app-accent:  mat-palette($mat-pink);
-$app-warn:    mat-palette($mat-red);
+@use '~@angular/material' as mat;
+@include mat.core();
+$app-primary: mat.define-palette(mat.$indigo-palette);
+$app-accent:  mat.define-palette(mat.$pink-palette);
+$app-warn:    mat.define-palette(mat.$red-palette);
 
 // Custom Sass colors vars (will be available in all the project)
-$primary: mat-color($app-primary);
-$accent: mat-color($app-accent);
-$warn: mat-color($app-warn);
+$primary: mat.get-color-from-palette($app-primary);
+$accent: mat.get-color-from-palette($app-accent);
+$warn: mat.get-color-from-palette($app-warn);
 
-$theme: mat-light-theme($app-primary, $app-accent, $app-warn);
+$theme: mat.define-light-theme($app-primary, $app-accent, $app-warn);
 
-@include angular-material-theme($theme);
+@include mat.all-component-themes($theme);
 
 //TODO find a way to import this
 @mixin portofino-theme($theme) {
@@ -19,12 +19,12 @@ $theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 
   .portofino-navigation {
     .mat-list-item.active {
-      background-color: mat-color($primary, 50);
+      background-color: mat.get-color-from-palette($primary, 50);
     }
     &:hover,
     &:focus {
       .mat-list-item:not(.expanded) {
-        background-color: mat-color($primary, 100) !important;
+        background-color: mat.get-color-from-palette($primary, 100) !important;
       }
     }
   }

@@ -14,7 +14,7 @@
         {{ notification.message }}
       </button>
     </mat-menu>
-    <button mat-icon-button *ngIf="!notifications.notifications || notifications.notifications.length == 0">
+    <button mat-icon-button *ngIf="!notifications.notifications || notifications.notifications.length === 0">
       <mat-icon>notifications_none</mat-icon>
       <span class="cdk-visually-hidden">{{ 'No notifications' | translate }}</span>
     </button>

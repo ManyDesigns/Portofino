@@ -1,7 +1,4 @@
 {
-  "angularCompilerOptions": {
-    "enableIvy": false
-  },
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
@@ -11,7 +8,6 @@
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es2015",
     "typeRoots": [

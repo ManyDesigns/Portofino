@@ -56,7 +56,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     protected String keyPrefix;
 
     //**************************************************************************
-    // Fields (calcuated values)
+    // Fields (calculated values)
     //**************************************************************************
 
     protected String actualUrl;

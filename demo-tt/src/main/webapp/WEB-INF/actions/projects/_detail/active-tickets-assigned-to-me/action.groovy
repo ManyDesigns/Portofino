@@ -30,14 +30,13 @@ class ProjectsActiveTicketsAssignedToMeAction extends CustomAction {
         if (principal == null) {
             Collections.EMPTY_LIST
         } else {
-            def (CriteriaQuery<Object> criteria, CriteriaBuilder cb, Root from) =
-                QueryUtils.createCriteria(session, 'tickets')
-            criteria.where(
-                    cb.equal(from.get("project"), project.id),
-                    cb.equal(from.get("assignee"), principal.id),
-                    cb.equal(from.get("state"), 4L))
-            criteria.orderBy(cb.asc(from.get("n")))
-            def tickets = session.createQuery(criteria).list()
+            def criteria = QueryUtils.createCriteria(session, 'tickets')
+            criteria.query.where(
+                    criteria.builder.equal(criteria.root.get("project"), project.id),
+                    criteria.builder.equal(criteria.root.get("assignee"), principal.id),
+                    criteria.builder.equal(criteria.root.get("state"), 4L))
+            criteria.query.orderBy(criteria.builder.asc(criteria.root.get("n")))
+            def tickets = session.createQuery(criteria.query).list()
             tickets.collect {
                 [ n: it.n, title: it.title, last_updated: it.last_updated?.time ]
             }

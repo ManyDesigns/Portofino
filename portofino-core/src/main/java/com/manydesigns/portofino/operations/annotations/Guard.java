@@ -22,10 +22,7 @@ package com.manydesigns.portofino.operations.annotations;
 
 import com.manydesigns.portofino.operations.GuardType;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Guards a method with a condition. The method cannot be called by a web request if the condition is not met.
@@ -40,6 +37,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
+@Documented
 public @interface Guard {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";

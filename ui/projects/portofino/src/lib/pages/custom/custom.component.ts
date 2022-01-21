@@ -1,4 +1,5 @@
 import {Page, PageConfiguration, PageSettingsPanel} from "../../page";
+import {Location} from "@angular/common";
 import {Component, OnDestroy, Optional} from "@angular/core";
 import {PortofinoComponent} from "../../page.factory";
 import {Field} from "../../form";
@@ -31,8 +32,8 @@ export class CustomPageComponent extends Page implements OnDestroy {
   constructor(
     portofino: PortofinoService, http: HttpClient, router: Router, @Optional() route: ActivatedRoute,
     authenticationService: AuthenticationService, notificationService: NotificationService,
-    translate: TranslateService, protected domSanitizer: DomSanitizer) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
+    translate: TranslateService, location: Location, protected domSanitizer: DomSanitizer) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate, location);
   }
 
   static computeSecurityCheckUrl(apiRoot, parent) {

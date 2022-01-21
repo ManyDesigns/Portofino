@@ -20,10 +20,7 @@
 
 package com.manydesigns.portofino.operations.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Allows to place multiple {@link Guard guards} on a method.
@@ -35,6 +32,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
+@Documented
 public @interface Guards {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";

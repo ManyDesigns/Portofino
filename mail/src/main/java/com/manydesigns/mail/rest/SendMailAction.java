@@ -37,6 +37,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -52,7 +53,6 @@ import java.util.HashSet;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Path("/actions/mail-sender-run")
 public class SendMailAction {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
@@ -65,7 +65,7 @@ public class SendMailAction {
     @Context
     protected HttpServletRequest request;
 
-    @GET
+    @POST
     public Response execute() {
         String clientIP = request.getRemoteAddr();
         try {
@@ -87,7 +87,7 @@ public class SendMailAction {
             return Response.serverError().entity("Mail Sender not active").build();
         }
         logger.debug("Sending pending email messages");
-        HashSet<String> idsToMarkAsSent = new HashSet<String>();
+        HashSet<String> idsToMarkAsSent = new HashSet<>();
         int serverErrors = mailSender.runOnce(idsToMarkAsSent);
         if(serverErrors < 0) {
             logger.warn("Mail sender did not run.");

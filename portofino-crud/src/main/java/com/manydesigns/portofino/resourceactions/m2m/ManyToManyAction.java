@@ -51,13 +51,11 @@ import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.SecurityUtils;
 import org.hibernate.Session;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -571,7 +569,6 @@ public class ManyToManyAction extends AbstractResourceAction {
                 return Response.serverError().entity(e).build();
             }
 
-            PkHelper pkHelper = new PkHelper(manyTableAccessor);
             //TODO chiave multipla
             String onePropertyName = m2mConfiguration.getActualOnePropertyName();
             PropertyAccessor onePropertyAccessor = relationTableAccessor.getProperty(onePropertyName);
@@ -582,7 +579,7 @@ public class ManyToManyAction extends AbstractResourceAction {
             //TODO handle manyKeyProperties.length > 1
             PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
             for(String pkString : selectedPrimaryKeys) {
-                Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
+                Object pkObject = manyTableAccessor.getIdStrategy().getPrimaryKey(pkString.split("/"));
                 Object pk = manyPkAccessor.get(pkObject);
                 if(!isExistingAssociation(manyPropertyAccessor, pk)) {
                     Object newRelation = saveNewRelation(pk, onePropertyAccessor, manyPropertyAccessor);
@@ -594,7 +591,7 @@ public class ManyToManyAction extends AbstractResourceAction {
                 Object o = it.next();
                 //TODO handle manyKeyProperties.length > 1
                 Object pkObject = manyPropertyAccessor.get(o);
-                String pkString = (String) OgnlUtils.convertValue(pkObject, String.class);
+                String pkString = OgnlUtils.convertValue(pkObject, String.class);
                 if(!selectedPrimaryKeys.contains(pkString)) {
                     deleteRelation(o);
                     it.remove();
@@ -618,7 +615,6 @@ public class ManyToManyAction extends AbstractResourceAction {
         if( onePk==null ){
             Map<Object,SelectionModel.Option> map = oneSelectField.getOptions();
             for(Object key : map.keySet()) {
-                //logger.info( map.get(key).label);
                 onePk=map.get(key).value;
                 if(onePk != null) {
                     JSONObject jsonKey = new JSONObject();
@@ -698,9 +694,9 @@ public class ManyToManyAction extends AbstractResourceAction {
             form.put(checkboxes);
         }
 
-        if(!SecurityLogic.hasPermissions(
+        if(!security.hasPermissions(
                 getPortofinoConfiguration(),
-                getActionInstance(), SecurityUtils.getSubject(),
+                getActionInstance(),
                 AccessLevel.VIEW, ManyToManyAction.PERMISSION_UPDATE)) {
             schema.put("readonly",true);
         }

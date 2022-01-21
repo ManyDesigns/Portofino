@@ -2,6 +2,58 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.1] – Unreleased
+
+### Added
+- Support building on Java 17
+- Generic CRUD page upstairs
+- Allow resource-actions to return synthetic resource-actions without any file object
+- Configurable API path with Spring Boot.
+
+### Changed
+- Updated Angular libraries and material icons package
+- Updated several Java libraries to fix vulnerabilities
+
+### Fixed
+- Refreshing the token when the app is starting
+- Validation issues during insertion float/double numbers in Postgres [#471](https://github.com/ManyDesigns/Portofino/issues/471)
+
+## [5.3.0] – 2021-09-13
+
+### Added
+- Microservice deployment options using Spring Boot.
+- Easier Quartz job registration using Spring beans.
+- Email microservice.
+- Quartz scheduler microservice.
+- Possibility to exclude Shiro-based security from the application (and implement security using other
+  libraries).
+- Support for multi-tenancy in Hibernate.
+
+### Changed
+- Authentication/authorization endpoint is now fixed (`/:auth`) and forwards to the login action. This makes life a little easier for clients.
+- Simplify initialization by removing PortofinoListener.
+- URL to trigger mail sender changed from `/actions/mail-sender-run` to `/portofino-send-mail` and HTTP method changed from GET to POST.
+- Mail sender action can be disabled with `mail.sender.action.enabled=false`.
+- Ensured that Java-only microservices without Groovy are possible.
+- Optimized selection providers based on foreign keys on save.
+- Reduce assumptions on persistent entities by CRUD actions allowing more possibilities for custom entities.
+- Liquibase updated to version 4, minor library updates to fix vulnerabilities.
+
+## [5.2.1] – 2020-04-10
+
+### Added
+- Possibility to reorder table columns in the tables section upstairs.
+
+### Changed
+- Render internal links in text pages with no target attribute (that the Quill editor adds by default).
+- The welcome page is now a standard text page.
+- Security.groovy can now have user beans injected with `@Autowired`.
+
+### Fixed
+- Important security vulnerability that may have allowed access with forged tokens.
+- Authentication token refresh after expiration. [#430](https://github.com/ManyDesigns/Portofino/issues/430)
+- Backwards compatibility: revert `T extends Serializable` in CRUD actions, introduced in v5.2.0. [#428](https://github.com/ManyDesigns/Portofino/issues/428)
+
 ## [5.2.0] – 2020-11-30
 
 ### Added

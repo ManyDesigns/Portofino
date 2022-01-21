@@ -7,7 +7,7 @@ button.mat-button {
   padding-right: 0;
 }
 
-@media($mat-xsmall) {
+@media(max-width: 599px) {
   button.mat-button {
     min-width: 0;
   }

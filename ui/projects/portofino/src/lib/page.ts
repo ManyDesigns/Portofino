@@ -8,7 +8,7 @@ import {
   Injectable,
   InjectionToken,
   Input,
-  OnDestroy,
+  OnDestroy, OnInit,
   Optional,
   TemplateRef,
   Type,
@@ -29,6 +29,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {NO_AUTH_HEADER} from "./security/authentication.headers";
 import {ThemePalette} from "@angular/material/core";
 import * as moment from 'moment';
+import {Location} from "@angular/common";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -246,7 +247,7 @@ export class PageSettingsPanel {
 }
 
 @Directive()
-export abstract class Page implements WithButtons, OnDestroy {
+export abstract class Page implements WithButtons, OnDestroy, OnInit {
 
   @Input()
   configuration: PageConfiguration & any;
@@ -271,7 +272,8 @@ export abstract class Page implements WithButtons, OnDestroy {
   constructor(
     public portofino: PortofinoService, public http: HttpClient, protected router: Router,
     @Optional() protected route: ActivatedRoute, public authenticationService: AuthenticationService,
-    protected notificationService: NotificationService, public translate: TranslateService) {
+    protected notificationService: NotificationService, public translate: TranslateService,
+    @Optional() protected location: Location) {
     //Declarative approach does not work for some reason:
     //"Metadata collected contains an error that will be reported at runtime: Lambda not supported."
     //TODO investigate with newer versions
@@ -280,6 +282,23 @@ export abstract class Page implements WithButtons, OnDestroy {
       this.subscribe(this.route.params, p => {
           this.returnUrl = p['returnUrl'];
       });
+    }
+  }
+
+  ngOnInit(): void {
+    // This.path is undefined when the page hasn't been created by the page factory and is, therefore, out of the
+    // Portofino application
+    if(this.path === undefined) {
+      // We're using embedded as a way to obtain a behaviour which is more suited to usage outside of Portofino,
+      // but this is incorrect and only a shortcut. Ideally, a dedicated flag should exist.
+      this.embedded = true;
+      this.baseUrl = this.url = this.location?.path() || "";
+      if(this.configuration) {
+        // If the configuration was provided to the component, let's init it.
+        // If we have no configuration now, it will be the responsibility of the application to provide it later
+        // and call initialize().
+        this.initialize();
+      }
     }
   }
 
@@ -305,7 +324,7 @@ export abstract class Page implements WithButtons, OnDestroy {
           Form: Form,
         };
         userFunction(this, forms, moment);
-      }, e => {
+      }, () => {
         this.notificationService.error(this.translate.get("Could not load page script"));
       });
     }
@@ -363,19 +382,20 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   get children(): PageChild[] {
-    return this.configuration[this.childrenProperty] || []
+    return (this.configuration || {})[this.childrenProperty] || []
   }
 
   get childrenProperty(): string {
     return "children";
   }
 
+  // Note this is actually used in page-layout.component.html
   getEmbeddedChildren(section = "default") {
     return this.children.filter(c => this.allowEmbeddedComponents && c.embeddedIn == section && c.accessible);
   }
 
   get title() {
-    let title = this.configuration.title;
+    let title = this.configuration?.title;
     if(!title && this.parent) {
       let pageChild = this.parent.children.find(c => c.path == this.segment);
       if(pageChild) {
@@ -439,19 +459,17 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   noActionForButton(event) {
-    if(console) {
-      console.error("Not implemented", event);
-    }
+    console?.error("Not implemented", event);
   }
   //End buttons
 
   get template(): TemplateDescriptor {
-    const template = this.configuration.template;
+    const template = this.configuration?.template;
     const templateName = (template && template.v) ? template.v : template;
     if(templateName) {
       const template = this.portofino.templates[templateName];
       if(!template) {
-        console.error("Unknown template", templateName);
+        console?.error("Unknown template", templateName);
       }
       return template;
     } else {
@@ -467,20 +485,31 @@ export abstract class Page implements WithButtons, OnDestroy {
   }
 
   checkAccess(askForLogin: boolean): Observable<any> {
+    return this.doCheckAccess(askForLogin, this.computeSecurityCheckUrl(), true);
+  }
+
+  get accessibleChildren(): Observable<string[]> {
+    return this.doCheckAccess(false, this.computeChildrenSecurityCheckUrl(), []);
+  }
+
+  protected doCheckAccess<T>(askForLogin: boolean, securityCheckUrl: string, defaultResult: T): Observable<T> {
     let headers = new HttpHeaders();
-    if(!askForLogin) {
+    if (!askForLogin) {
       headers = headers.set(NO_AUTH_HEADER, 'true');
     }
-    let securityCheckUrl = this.computeSecurityCheckUrl();
-    if(securityCheckUrl) {
-      return this.http.get(securityCheckUrl,{ headers: headers, observe: "response" });
+    if (securityCheckUrl) {
+      return this.http.get(securityCheckUrl, {headers: headers, observe: "response"}).pipe(map(r => r.body as T));
     } else {
-      return of(true);
+      return of(defaultResult);
     }
   }
 
   protected computeSecurityCheckUrl() {
     return this.computeSourceUrl() + "/:accessible";
+  }
+
+  protected computeChildrenSecurityCheckUrl() {
+    return this.computeSourceUrl() + "/:accessible-children";
   }
 
   computeSourceUrl() {
@@ -559,8 +588,7 @@ export abstract class Page implements WithButtons, OnDestroy {
       }
       saveConfObservable = this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
         params: {
-          actionConfigurationPath: this.configurationUrl,
-          loginPath: this.portofino.loginPath
+          actionConfigurationPath: this.configurationUrl
         }
       });
     } else {
@@ -641,8 +669,7 @@ export abstract class Page implements WithButtons, OnDestroy {
     let data = new FormData();
     data.append("pageConfiguration", JSON.stringify(pageConfiguration));
     const path = this.getConfigurationLocation(this.path);
-    this.http.put(`${this.portofino.localApiPath}/${path}`, data, {
-      params: { loginPath: this.portofino.loginPath }}).subscribe(
+    this.http.put(`${this.portofino.localApiPath}/${path}`, data).subscribe(
       () => {
         this.configuration = pageConfiguration;
         this.settingsPanel.hide(true);

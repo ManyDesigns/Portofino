@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
+import com.manydesigns.portofino.quartz.SchedulerService;
 import org.apache.commons.configuration2.Configuration;
 import org.quartz.*;
 import org.quartz.ee.servlet.QuartzInitializerListener;
@@ -31,6 +32,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -148,6 +150,11 @@ public class QuartzModule implements Module, ApplicationContextAware {
             factory = new StdSchedulerFactory();
         }
         return factory;
+    }
+
+    @Bean
+    public SchedulerService getSchedulerService() {
+        return new SchedulerService(scheduler);
     }
 
     @PreDestroy

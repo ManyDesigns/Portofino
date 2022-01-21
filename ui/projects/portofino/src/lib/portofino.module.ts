@@ -100,6 +100,7 @@ import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
 import {
+  GenericCrudComponent,
   MailSettingsComponent,
   PermissionsComponent,
   SettingsComponent,
@@ -131,6 +132,7 @@ import {
   RESET_PASSWORD_COMPONENT,
   InAppAuthenticationStrategy,
 } from "./security/login/in-app-authentication-strategy";
+import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
   declarations: [
@@ -144,7 +146,7 @@ import {
     TranslateModule.forChild()],
   providers: [ FieldFactory ],
   entryComponents: [
-    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent,
+    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent, FormComponent,
     NumberFieldComponent, SelectFieldComponent, TextFieldComponent],
   exports: [
     FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
@@ -214,18 +216,18 @@ export class PortofinoCrudModule {}
 @NgModule({
   declarations: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, CreateActionComponent,
+    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
     ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
     WizardComponent],
   imports: [
-    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
+    BrowserModule, BrowserAnimationsModule, DragDropModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+    HttpClientModule, PortofinoFormsModule, PortofinoCrudModule, PortofinoPagesModule,
     MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
   ],
   providers: [],
   entryComponents: [
     UpstairsComponent,
-    ActionsComponent, GenericPage, CreateActionComponent,
+    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
     ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
     WizardComponent],
   exports: [UpstairsComponent]

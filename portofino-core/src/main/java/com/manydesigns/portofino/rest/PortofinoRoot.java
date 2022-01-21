@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.dispatcher.Resource;
@@ -34,7 +33,6 @@ import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import ognl.OgnlContext;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
@@ -90,7 +88,7 @@ public class PortofinoRoot extends AbstractResourceAction {
     public Object consumePathSegment(@PathParam("pathSegment") String pathSegment) {
         logger.debug("Publishing securityUtils in OGNL context");
         OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ognlContext.put("securityUtils", new SecurityUtilsBean());
+        ognlContext.put("securityUtils", security.getSecurityUtilsBean());
         logger.debug("Publishing textProvider in OGNL context");
         ognlContext.put("textProvider", new TextProviderBean(ElementsThreadLocals.getTextProvider()));
         return super.consumePathSegment(pathSegment);
@@ -135,15 +133,8 @@ public class PortofinoRoot extends AbstractResourceAction {
         description.put("page", actionInstance.getActionDescriptor());
         description.put("path", getPath());
         description.put("children", getSubResources());
-        description.put("loginPath", portofinoConfiguration.getString(PortofinoProperties.LOGIN_PATH));
+        description.put("loginPath", "/:auth"); //For legacy clients
         return description;
-    }
-
-    @Override
-    @Path(":accessible")
-    @GET
-    public boolean isAccessible() {
-        return true;
     }
 
     @Override

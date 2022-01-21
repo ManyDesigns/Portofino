@@ -67,7 +67,7 @@ export class CrudComponent extends Page {
   error: any;
 
   get rowsPerPage() {
-    return this.configuration.rowsPerPage ? this.configuration.rowsPerPage : 10;
+    return this.configuration?.rowsPerPage ? this.configuration.rowsPerPage : 10;
   }
 
   initialize() {
@@ -99,7 +99,10 @@ export class CrudComponent extends Page {
           this.start();
           super.initialize();
         },
-      () => this.error = this.translate.instant("This page is not configured correctly."));
+      e => {
+          this.error = this.translate.instant("This page is not configured correctly.");
+          console?.log(e);
+      });
   }
 
   protected initOperations(operations: Operation[]) {
@@ -144,6 +147,8 @@ export class CrudComponent extends Page {
           this.showSearch();
         }
       });
+    } else {
+      this.showSearch();
     }
     this.subscribe(this.portofino.localeChange, _ => {
       if(this.view == CrudView.SEARCH) {
@@ -193,6 +198,13 @@ export class CrudComponent extends Page {
     this.id = null;
     this.returnUrl = null;
     this.view = CrudView.SEARCH;
+  }
+
+  reset() {
+    this.allowEmbeddedComponents = true;
+    this.id = null;
+    this.returnUrl = null;
+    this.view = null;
   }
 
   static bulkEditPresent(self: CrudComponent) {
@@ -336,8 +348,12 @@ export class SearchComponentHolder extends SearchComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
-  ngOnDestroy(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
+  ngOnDestroy(): void {
+    //Skip
+  }
 }
 
 @Component({
@@ -349,7 +365,9 @@ export class DetailComponentHolder extends DetailComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
 }
 
 @Component({
@@ -361,7 +379,9 @@ export class CreateComponentHolder extends CreateComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
 }
 
 @Component({
@@ -373,7 +393,9 @@ export class BulkEditComponentHolder extends BulkEditComponent {
   component: Type<any>;
   @Input()
   context = {};
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    //Skip
+  }
 }
 
 export class CrudPageSettingsPanel extends PageSettingsPanel {

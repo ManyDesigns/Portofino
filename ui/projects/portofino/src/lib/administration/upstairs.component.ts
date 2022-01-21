@@ -16,6 +16,10 @@ import {HttpClient} from "@angular/common/http";
 import {TranslateService} from "@ngx-translate/core";
 import {NotificationService} from "../notifications/notification.services";
 import {WebStorageService} from "../storage/storage.services";
+import {Location} from "@angular/common";
+import {CrudComponent} from "../pages/crud/crud.component";
+
+export const API_ROOT_KEY = "portofino.upstairs.apiRoot";
 
 @Component({
   selector: 'portofino-upstairs',
@@ -26,8 +30,9 @@ export class UpstairsComponent extends Page implements OnInit {
 
   constructor(portofino: PortofinoService, http: HttpClient, router: Router, route: ActivatedRoute,
               authenticationService: AuthenticationService, notificationService: NotificationService,
-              translate: TranslateService, @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService) {
-    super(portofino, http, router, route, authenticationService, notificationService, translate);
+              translate: TranslateService, location: Location,
+              @Inject(LOCALE_STORAGE_SERVICE) protected storage: WebStorageService) {
+    super(portofino, http, router, route, authenticationService, notificationService, translate, location);
   }
 
   get children() {
@@ -38,14 +43,16 @@ export class UpstairsComponent extends Page implements OnInit {
       { path: 'wizard', title: 'Wizard', icon: 'web', accessible: true, showInNavigation: true },
       { path: 'tables', title: 'Tables', icon: 'storage', accessible: true, showInNavigation: true },
       { path: 'actions', title: 'Actions', icon: 'build', accessible: true, showInNavigation: true },
-      { path: 'mail', title: 'Mail', icon: 'email', accessible: true, showInNavigation: true }];
+      { path: 'mail', title: 'Mail', icon: 'email', accessible: true, showInNavigation: true },
+      { path: 'crud', title: 'Quick CRUD', icon: 'table_chart', accessible: true, showInNavigation: true }
+    ];
   }
 
   loadChildConfiguration(child: PageChild): Observable<PageConfiguration> {
     const types = {
-      actions: ActionsComponent, connections: ConnectionsComponent, mail: MailSettingsComponent,
-      permissions: PermissionsComponent, settings: SettingsComponent, tables: TablesComponent,
-      wizard: WizardComponent
+      actions: ActionsComponent, connections: ConnectionsComponent, crud: GenericCrudComponent,
+      mail: MailSettingsComponent, permissions: PermissionsComponent, settings: SettingsComponent,
+      tables: TablesComponent, wizard: WizardComponent
     };
     return of({ title: child.title, source: null, children: [], actualType: types[child.path] });
   }
@@ -57,16 +64,9 @@ export class UpstairsComponent extends Page implements OnInit {
     if(!this.portofino.apiRoot.endsWith("/")) {
       this.portofino.apiRoot += "/";
     }
-    this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(response => {
-      if(response.loginPath) {
-        let loginPath = response.loginPath;
-        if(loginPath.startsWith('/')) {
-          loginPath = loginPath.substring(1);
-        }
-        this.portofino.loginPath = loginPath;
-        this.storage.set("portofino.upstairs.apiRoot", this.portofino.apiRoot);
-        this.checkAccess(true);
-      }
+    this.http.get<any>(this.portofino.apiRoot + ':description').subscribe(() => {
+      this.checkAccess(true);
+      this.storage.set(API_ROOT_KEY, this.portofino.apiRoot);
     }, error => {
       console.error(error);
       this.notificationService.error(this.translate.get("Invalid API root (see console for details)"));
@@ -215,6 +215,42 @@ export class MailSettingsComponent extends Page implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.resetSettings();
+  }
+
+}
+
+@Component({
+  selector: 'portofino-upstairs-generic-crud',
+  template: `
+    <mat-card>
+      <mat-card-content>
+        <mat-form-field>
+          <mat-label>{{'Source'|translate}}</mat-label>
+          <input matInput [(ngModel)]="crudConfiguration.source"/>
+        </mat-form-field>
+        <button mat-button (click)="setSource()">{{"Connect"|translate}}</button>
+        <portofino-crud #crud></portofino-crud>
+      </mat-card-content>
+    </mat-card>`
+})
+export class GenericCrudComponent extends Page {
+
+  @ViewChild("crud")
+  crud: CrudComponent;
+
+  crudConfiguration = {
+    title: "Quick CRUD",
+    source: "/",
+    children: [],
+    openDetailInSamePageWhenEmbedded: true
+  };
+
+  setSource() {
+    this.crud.configuration = {...this.crudConfiguration}; //Force creation of a new object for change detection
+    this.crud.reset();
+    setTimeout(() => {
+      this.crud.initialize();
+    });
   }
 
 }

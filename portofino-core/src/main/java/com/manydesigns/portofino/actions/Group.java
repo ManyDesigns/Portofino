@@ -28,12 +28,13 @@ import javax.xml.bind.annotation.*;
 import java.util.HashSet;
 import java.util.Set;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Configuration of a group's permissions.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"accessLevel","name","permissions"})
 public class Group {
@@ -55,7 +56,7 @@ public class Group {
     //**************************************************************************
 
     public Group() {
-        permissions = new HashSet<String>();
+        permissions = new HashSet<>();
     }
 
     public void init() {
