@@ -80,21 +80,28 @@ public class KeyManager {
     }
 
     private void checkOrSaveHash(String path, String key) throws IOException, GeneralSecurityException, InvalidPassphraseException {
-        File checksumFile = new File(path + ".sum");
-
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        digest.update(path.getBytes(StandardCharsets.UTF_8));
-        String checksum = CryptoUtils.getStringChecksum(digest, key);
 
-        if (checksumFile.exists()) {
-            String current = StringUtils.trimToEmpty(CryptoUtils.getKey(checksumFile.getAbsolutePath()));
+        String checksum = System.getenv("PORTOFINO_PASSPHRASE_SUM");
+        if (checksum == null) {
+            digest.update(path.getBytes(StandardCharsets.UTF_8));
+        }
 
-            if (!checksum.equals(current))
-                throw new InvalidPassphraseException("Checksum test failed, passphrase differs from last one used file: " + checksumFile.getAbsolutePath());
-        } else {
-            try (PrintWriter pw = new PrintWriter(checksumFile);) {
-                pw.print(checksum);
+        String calculatedChecksum = CryptoUtils.getStringChecksum(digest, key);
+
+        if (checksum == null) {
+            File checksumFile = new File(path + ".sum");
+            if (checksumFile.exists()) {
+                checksum = StringUtils.trimToEmpty(CryptoUtils.getKey(checksumFile.getAbsolutePath()));
+            } else {
+                try (PrintWriter pw = new PrintWriter(checksumFile);) {
+                    pw.print(calculatedChecksum);
+                }
             }
+        }
+
+        if (!calculatedChecksum.equals(checksum)) {
+            throw new InvalidPassphraseException("Checksum test failed, passphrase differs from last one used");
         }
     }
 
@@ -170,8 +177,16 @@ public class KeyManager {
                 passPhrase.append(line);
             }
         } catch (IOException e) {
-            logger.error("getPassPhrase: " + e.getMessage(), e);
-            throw e;
+            logger.warn("getPassPhrase: " + e.getMessage());
+            logger.info("trying to get passphrase from env variables....");
+
+            String passPhraseEnv = System.getenv("PORTOFINO_PASSPHRASE");
+            if (passPhraseEnv == null) {
+                logger.error("passphrase not found! exiting...");
+                System.exit(1);
+                throw new NullPointerException("passphrase cannot be null");
+            }
+            return passPhraseEnv;
         }
         return passPhrase.toString();
     }
