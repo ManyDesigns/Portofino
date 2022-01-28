@@ -40,14 +40,36 @@ public class MailScheduler {
 
     public static final Logger logger = LoggerFactory.getLogger(MailScheduler.class);
     public static final int DEFAULT_POLL_INTERVAL = 1000;
+    public static final String QUARTZ_GROUP_NAME="portofino-mail";
 
     public static void setupMailScheduler(MailQueueSetup mailQueueSetup) {
-        String group = "portofino-mail";
-        setupMailScheduler(mailQueueSetup, group);
+        Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
+
+        if( mailConfiguration.getBoolean(MailProperties.MAIL_QUARTZ_INVOKE_URL_JOB, false) ){
+            setupMailSchedulerInvokeurlJob(mailConfiguration,mailQueueSetup);
+        }else{
+            setupMailSchedulerJob(mailConfiguration,mailQueueSetup);
+        }
     }
 
-    public static void setupMailScheduler(MailQueueSetup mailQueueSetup, String group) {
-        Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
+    public static void setupMailSchedulerJob(Configuration mailConfiguration,MailQueueSetup mailQueueSetup) {
+
+        if(mailConfiguration != null) {
+            if(mailConfiguration.getBoolean(MailProperties.MAIL_QUARTZ_ENABLED, false)) {
+                logger.info("Scheduling mail sends with Quartz job");
+                try {
+                    logger.info("Scheduling mail sends using internal invocation");
+                    MailSenderJob.schedule(mailQueueSetup.getMailSender(),mailConfiguration,QUARTZ_GROUP_NAME);
+                } catch (Exception e) {
+                    logger.error("Could not schedule mail sender job", e);
+                }
+            } else {
+                logger.info("Mail scheduling using Quartz is disabled");
+            }
+        }
+    }
+
+    public static void setupMailSchedulerInvokeurlJob(Configuration mailConfiguration,MailQueueSetup mailQueueSetup) {
         if(mailConfiguration != null) {
             if(mailConfiguration.getBoolean(MailProperties.MAIL_QUARTZ_ENABLED, false)) {
                 logger.info("Scheduling mail sends with Quartz job");
@@ -58,7 +80,7 @@ public class MailScheduler {
                     Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
                     JobDetail job = JobBuilder
                             .newJob(URLInvokeJob.class)
-                            .withIdentity("mail.sender", group)
+                            .withIdentity("mail.sender.invoker", QUARTZ_GROUP_NAME)
                             .usingJobData(URLInvokeJob.URL_KEY, serverUrl)
                             .build();
 
@@ -66,7 +88,7 @@ public class MailScheduler {
                             MailProperties.MAIL_SENDER_POLL_INTERVAL, DEFAULT_POLL_INTERVAL);
 
                     Trigger trigger = TriggerBuilder.newTrigger()
-                        .withIdentity("mail.sender.trigger", group)
+                        .withIdentity("mail.sender.trigger", QUARTZ_GROUP_NAME)
                         .startNow()
                         .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                                 .withIntervalInMilliseconds(pollInterval)

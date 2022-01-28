@@ -44,4 +44,5 @@ public class MailProperties {
     public static final String MAIL_SENDER_SERVER_URL = "mail.sender.server_url";
     public static final String MAIL_QUARTZ_ENABLED = "mail.quartz.enabled";
 
+    public static final String MAIL_QUARTZ_INVOKE_URL_JOB = "mail.quartz.invoke.url";
 }
