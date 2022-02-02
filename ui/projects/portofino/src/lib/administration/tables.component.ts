@@ -77,6 +77,14 @@ export class TablesComponent extends Page implements OnInit {
         q.isHql = !!q.hql;
       });
     }
+    this.tableInfo.permissions.groups.forEach(g => {
+      if(!g.permissionMap) {
+        g.permissionMap = {};
+        g.permissions.forEach(p => {
+          g.permissionMap[p] = true;
+        });
+      }
+    });
   }
 
   @Button({ list: "table", text: "Save", icon: "save", color: "primary" })
@@ -91,8 +99,22 @@ export class TablesComponent extends Page implements OnInit {
       this.cancelSelectionProvider(q);
       delete q.isHql;
     });
+    const permissions: any = { groups: [] };
+    this.tableInfo.permissions.groups.forEach(g => {
+      const group = {
+        name: g.name,
+        permissions: []
+      };
+      permissions.groups.push(group);
+      for(let p in g.permissionMap) {
+        if(g.permissionMap[p]) {
+          group.permissions.push(p);
+        }
+      }
+    });
+
     const url = `${this.portofino.apiRoot}portofino-upstairs/database/tables/${this.tableInfo.db}/${this.tableInfo.schema}/${table.tableName}`;
-    this.http.put(url, this.tableInfo.table).subscribe(
+    this.http.put(url, { table: this.tableInfo.table, permissions: permissions }).subscribe(
       () => {
         this.prepareTableInfo();
         this.notificationService.info(this.translate.instant("Table saved"));
@@ -102,7 +124,7 @@ export class TablesComponent extends Page implements OnInit {
       });
   }
 
-  @Button({ list: "table", text: "Cancel" })
+  @Button({ list: "table", text: "Cancel", icon: 'arrow_back' })
   cancelTable() {
     this.tableInfo = null;
   }
@@ -217,6 +239,9 @@ export class TablesComponent extends Page implements OnInit {
     );
   }
 
+  get groups() {
+    return this.tableInfo.permissions.groups.sort((g1, g2) => g1.name.localeCompare(g2.name));
+  }
 }
 
 class TableFlatNode {

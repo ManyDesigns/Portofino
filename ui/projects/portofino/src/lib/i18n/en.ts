@@ -8,6 +8,7 @@ export const TRANSLATIONS_EN = {
   "_ not found": "{{what}} not found",
   "Edit _": "Edit {{what}}",
   "permission: crud-create": "Create",
+  "permission: crud-read": "Read",
   "permission: crud-edit": "Edit",
   "permission: crud-delete": "Delete",
   "_ is required.": "{{label}} is required.",

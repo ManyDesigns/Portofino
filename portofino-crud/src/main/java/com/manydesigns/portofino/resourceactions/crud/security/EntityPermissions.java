@@ -12,6 +12,6 @@ public @interface EntityPermissions {
 
     String[] create() default EVERYONE;
     String[] delete() default EVERYONE;
-    String[] edit() default EVERYONE;
     String[] read() default EVERYONE;
+    String[] update() default EVERYONE;
 }

@@ -168,6 +168,25 @@
             </button>
           </fieldset>
         </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            {{'Permissions'|translate}}
+          </ng-template>
+          <table class="mat-table">
+            <tr class="mat-header-row">
+              <th class="mat-header-cell">{{'Group'|translate}}</th>
+              <th colSpan="4" class="mat-header-cell">
+                {{'Permissions'|translate}}
+              </th>
+            </tr>
+            <tr *ngFor="let group of groups" class="mat-row">
+              <td class="mat-cell">{{group.name}}</td>
+              <td *ngFor="let perm of ['crud-create', 'crud-read', 'crud-edit', 'crud-delete']" class="mat-cell">
+                <mat-checkbox [(ngModel)]="group.permissionMap[perm]">{{'permission: ' + perm | translate}}</mat-checkbox>
+              </td>
+            </tr>
+          </table>
+        </mat-tab>
       </mat-tab-group>
       <div><portofino-buttons [component]="this" list="table"></portofino-buttons></div>
     </mat-card-content>
