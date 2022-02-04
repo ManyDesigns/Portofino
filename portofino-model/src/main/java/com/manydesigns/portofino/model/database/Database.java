@@ -41,7 +41,7 @@ import java.util.Properties;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas"})
+@XmlType(propOrder = {"databaseName","trueString","falseString","connectionProvider","schemas","enabled"})
 public class Database implements ModelObject {
     public static final String copyright =
             "Copyright (C) 2005-2019 ManyDesigns srl";
@@ -54,6 +54,7 @@ public class Database implements ModelObject {
 
     protected String databaseName;
 
+    protected Boolean enabled = true;
     protected String trueString = null;
     protected String falseString = null;
 
@@ -65,7 +66,6 @@ public class Database implements ModelObject {
     //**************************************************************************
 
     public static final Logger logger = LoggerFactory.getLogger(Database.class);
-
 
     //**************************************************************************
     // Constructors
@@ -88,6 +88,12 @@ public class Database implements ModelObject {
 
     public void init(Model model, Configuration configuration) {
         assert databaseName != null;
+
+        String keyPrefix = "portofino.database." + databaseName+ ".";
+        Boolean enabledInConf=configuration.getBoolean(keyPrefix+"enabled",enabled);
+        if( enabledInConf!=null ){
+            setEnabled(enabledInConf);
+        }
     }
 
     public void link(Model model, Configuration configuration) {}
@@ -115,6 +121,15 @@ public class Database implements ModelObject {
     @XmlElement(name = "schema", type = Schema.class)
     public List<Schema> getSchemas() {
         return schemas;
+    }
+
+    @XmlAttribute(required = false)
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     //**************************************************************************

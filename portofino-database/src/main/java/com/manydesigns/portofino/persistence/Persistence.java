@@ -311,35 +311,40 @@ public class Persistence {
         setups.clear();
         model.init(configuration);
         for (Database database : model.getDatabases()) {
-            try {
-                ConnectionProvider connectionProvider = database.getConnectionProvider();
-                connectionProvider.init(databasePlatformsRegistry);
-                if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
-                    HibernateConfig builder = new HibernateConfig(connectionProvider, configuration);
-                    String trueString = database.getTrueString();
-                    if (trueString != null) {
-                        builder.setTrueString(
-                                "null".equalsIgnoreCase(trueString) ? null : trueString);
-                    }
-                    String falseString = database.getFalseString();
-                    if (falseString != null) {
-                        builder.setFalseString(
-                                "null".equalsIgnoreCase(falseString) ? null : falseString);
-                    }
-                    Configuration configuration =
-                            builder.buildSessionFactory(database);
-                    StandardServiceRegistryBuilder registryBuilder =
-                            new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
-                    SessionFactory sessionFactory = configuration.buildSessionFactory(registryBuilder.build());
+            if( database.getEnabled() ) {
+                logger.info("Database "+database.getDatabaseName()+" enabled");
+                try {
+                    ConnectionProvider connectionProvider = database.getConnectionProvider();
+                    connectionProvider.init(databasePlatformsRegistry);
+                    if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
+                        HibernateConfig builder = new HibernateConfig(connectionProvider, configuration);
+                        String trueString = database.getTrueString();
+                        if (trueString != null) {
+                            builder.setTrueString(
+                                    "null".equalsIgnoreCase(trueString) ? null : trueString);
+                        }
+                        String falseString = database.getFalseString();
+                        if (falseString != null) {
+                            builder.setFalseString(
+                                    "null".equalsIgnoreCase(falseString) ? null : falseString);
+                        }
+                        Configuration configuration =
+                                builder.buildSessionFactory(database);
+                        StandardServiceRegistryBuilder registryBuilder =
+                                new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+                        SessionFactory sessionFactory = configuration.buildSessionFactory(registryBuilder.build());
 
-                    HibernateDatabaseSetup setup =
-                            new HibernateDatabaseSetup(
-                                    configuration, sessionFactory);
-                    String databaseName = database.getDatabaseName();
-                    setups.put(databaseName, setup);
+                        HibernateDatabaseSetup setup =
+                                new HibernateDatabaseSetup(
+                                        configuration, sessionFactory);
+                        String databaseName = database.getDatabaseName();
+                        setups.put(databaseName, setup);
+                    }
+                } catch (Exception e) {
+                    logger.error("Could not create connection provider for " + database, e);
                 }
-            } catch (Exception e) {
-                logger.error("Could not create connection provider for " + database, e);
+            }else{
+                logger.info("Database "+database.getDatabaseName()+" disabled");
             }
         }
 
@@ -451,7 +456,14 @@ public class Persistence {
     public void start() {
         loadXmlModel();
         for(Database database : model.getDatabases()) {
-            runLiquibase(database);
+            if( database.getEnabled()){
+                logger.info("Database "+database.getDatabaseName()+" enabled");
+                runLiquibase(database);
+            }else{
+                logger.info("Database "+database.getDatabaseName()+" disabled");
+
+            }
+
         }
     }
 
