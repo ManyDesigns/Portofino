@@ -13,7 +13,7 @@
     <url>https://www.manydesigns.com/</url>
     <properties>
         <portofino.application.directory>${serverInfo:realPath}/WEB-INF</portofino.application.directory>
-        <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+        <spring.boot.version>2.4.5</spring.boot.version>
     </properties>
     <dependencies>
         <dependency>
