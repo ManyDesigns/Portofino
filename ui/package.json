@@ -12,7 +12,7 @@
     "build-lib-dev": "ng build portofino --watch",
     "build-lib": "ng build --prod portofino",
     "package-lib": "npm run build-lib && npm run npm-pack",
-    "publish-lib": "npm run build-lib && cd dist && npm publish portofino",
+    "publish-lib": "npm run build-lib && cd dist/portofino && npm publish",
     "build-all": "npm run build-lib && ng build --prod",
     "npm-pack": "cd dist/portofino && npm pack",
     "maven-build": "npm run build-lib && ng build --prod --delete-output-path && npm run npm-pack",
