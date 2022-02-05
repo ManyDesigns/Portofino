@@ -20,15 +20,15 @@
 
 package com.manydesigns.elements.i18n;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Provides internationalized strings for a given {@link java.util.Locale Locale}.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public interface TextProvider {
-    public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     /**
      * Get the localized string according to the key, and replace any placeholders with the arguments.
@@ -37,7 +37,15 @@ public interface TextProvider {
      * @return the localized string corresponding to the key, with placeholders replaced, or the key itself if the
      * resource bundle does not contain the key.
      */
-    public String getText(String key, Object... args);
+    String getText(String key, Object... args);
 
-    public String getTextOrNull(String key, Object... args);
+    /**
+     * Same as {@link #getText(String, Object...) getText}, but returns <code>null</code> if the key has no associated
+     * string in the given locale.
+     * @param key the key in the resource bundle.
+     * @param args arguments to insert where the string contains placeholders.
+     * @return the localized string corresponding to the key, with placeholders replaced, or null if the
+     * resource bundle does not contain the key.
+     */
+    String getTextOrNull(String key, Object... args);
 }
