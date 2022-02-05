@@ -8,7 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Support building on Java 17
 - Generic CRUD page upstairs
 - Allow resource-actions to return synthetic resource-actions without any file object
-- Configurable API path with Spring Boot.
+- Configurable API path with Spring Boot
+- Include sample GitHub action in archetypes.
 
 ### Changed
 - Updated Angular libraries and material icons package

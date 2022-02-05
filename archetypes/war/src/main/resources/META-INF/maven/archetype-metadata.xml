@@ -8,6 +8,14 @@
         <fileSet encoding="UTF-8">
             <directory>src</directory>
         </fileSet>
+        <fileSet encoding="UTF-8">
+            <directory>.github</directory>
+        </fileSet>
+        <fileSet>
+            <includes>
+                <include>.gitignore</include>
+            </includes>
+        </fileSet>
     </fileSets>
     <requiredProperties>
         <requiredProperty key="portofinoVersion">
