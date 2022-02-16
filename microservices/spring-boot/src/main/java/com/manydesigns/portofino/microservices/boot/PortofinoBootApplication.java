@@ -70,7 +70,7 @@ public class PortofinoBootApplication {
 		}
 		FileObject main = VFS.getManager().resolveFile("src").resolveFile("main");
 		if(main.isFolder()) {
-			FileObject appDir = main.resolveFile( "resources").resolveFile("portofino");
+			FileObject appDir = main.resolveFile("resources").resolveFile("portofino");
 			if(appDir.isFolder()) {
 				return appDir.getName().getURI();
 			}

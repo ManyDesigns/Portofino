@@ -1,5 +1,3 @@
-package portofino.classes;
-
 import org.springframework.context.annotation.Bean;
 
 public class SpringConfiguration {
