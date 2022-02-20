@@ -171,23 +171,20 @@ public class KeyManager {
         logger.info("Retrieving passphrase");
         StringBuilder passPhrase = new StringBuilder();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(passphrasePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                passPhrase.append(line);
+        String passPhraseEnv = System.getenv("PORTOFINO_PASSPHRASE");
+        if (passPhraseEnv == null) {
+            try (BufferedReader br = new BufferedReader(new FileReader(passphrasePath))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    passPhrase.append(line);
+                }
+            } catch (IOException e) {
+                logger.error("getPassPhrase: " + e.getMessage(), e);
+                throw e;
             }
-        } catch (IOException e) {
-            logger.warn("getPassPhrase: " + e.getMessage());
-            logger.info("trying to get passphrase from env variables....");
-
-            String passPhraseEnv = System.getenv("PORTOFINO_PASSPHRASE");
-            if (passPhraseEnv == null) {
-                logger.error("passphrase not found! exiting...");
-                System.exit(1);
-                throw new NullPointerException("passphrase cannot be null");
-            }
+            return passPhrase.toString();
+        } else {
             return passPhraseEnv;
         }
-        return passPhrase.toString();
     }
 }
