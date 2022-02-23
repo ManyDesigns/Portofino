@@ -21,16 +21,11 @@
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.elements.blobs.HierarchicalBlobManager;
-import com.manydesigns.elements.blobs.S3BlobManager;
-import com.manydesigns.elements.blobs.SimpleBlobManager;
+import com.manydesigns.elements.blobs.BlobManagerFactory;
+import com.manydesigns.elements.blobs.DefaultBlobManagerFactory;
 import com.manydesigns.elements.crypto.KeyManager;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +34,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 
-import java.io.File;
-
 @org.springframework.context.annotation.Configuration
 public class PortofinoSpringConfiguration implements InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
     public static final String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
+    public static final String DEFAULT_BLOB_MANAGER_FACTORY = "defaultBlobManagerFactory";
     public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
     public final static String PORTOFINO_CONFIGURATION_FILE = "com.manydesigns.portofino.portofinoConfigurationFile";
+    private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
 
     @Autowired
     @Qualifier(PORTOFINO_CONFIGURATION)
@@ -57,43 +51,14 @@ public class PortofinoSpringConfiguration implements InitializingBean {
     @Qualifier(APPLICATION_DIRECTORY)
     FileObject applicationDirectory;
 
+    @Bean(name = DEFAULT_BLOB_MANAGER_FACTORY)
+    public BlobManagerFactory blobManagerFactory() {
+        return new DefaultBlobManagerFactory(configuration, applicationDirectory);
+    }
+
     @Bean(name = DEFAULT_BLOB_MANAGER)
-    public BlobManager getDefaultBlobManager() {
-        if(configuration.getString(PortofinoProperties.BLOB_MANAGER_TYPE, "standard").equalsIgnoreCase( "s3" )){
-            String region = configuration.getString(PortofinoProperties.AWS_REGION);
-            String bucketName = configuration.getString(PortofinoProperties.AWS_S3_BUCKET);
-            String location =   configuration.getString(PortofinoProperties.AWS_S3_LOCATION);
-            logger.info("Using S3 blob manager");
-            if(StringUtils.trimToNull( region )==null){
-                logger.error(PortofinoProperties.AWS_REGION+ " property not found" );
-            }
-            if(StringUtils.trimToNull( bucketName )==null){
-                logger.error( PortofinoProperties.AWS_S3_BUCKET + " property not found" );
-            }
-            if(StringUtils.trimToNull(location) == null)
-                return new S3BlobManager(region, bucketName);
-            else
-                return new S3BlobManager(region, bucketName, location);
-        }
-
-        File appBlobsDir;
-        if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
-            appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
-        } else {
-            appBlobsDir = new File(applicationDirectory.getName().getPath(), "blobs");
-        }
-        logger.info("Blobs directory: " + appBlobsDir.getAbsolutePath());
-
-        String metaFilenamePattern = "blob-{0}.properties";
-        String dataFilenamePattern = "blob-{0}.data";
-        File[] blobs = appBlobsDir.listFiles((dir, name) -> name.startsWith("blob-") && name.endsWith(".properties"));
-        if(blobs == null || blobs.length == 0) { //Null if the directory does not exist yet
-            logger.info("Using hierarchical blob manager");
-            return new HierarchicalBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
-        } else {
-            logger.warn("Blobs found directly under the blobs directory: using old style (pre-4.1.1) flat file blob manager");
-            return new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
-        }
+    public BlobManager getDefaultBlobManager(BlobManagerFactory blobManagerFactory) {
+        return blobManagerFactory.getBlobManager();
     }
 
     @Bean
@@ -103,7 +68,7 @@ public class PortofinoSpringConfiguration implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if(!KeyManager.isActive()) {
+        if (!KeyManager.isActive()) {
             try {
                 logger.info("Initializing KeyManager ");
                 KeyManager.init(configuration);

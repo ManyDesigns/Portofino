@@ -20,12 +20,6 @@
 
 package com.manydesigns.portofino;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-
 /**
  * Keys for configuration properties.
  *
@@ -43,6 +37,7 @@ public final class PortofinoProperties {
     //**************************************************************************
 
     //App properties
+    public static final String BLOBMANAGER_FACTORY_CLASS = "blobmanager.factory";
     public static final String BLOBS_DIR_PATH = "blobs.dir.path";
     public static final String APP_NAME = "app.name";
     public static final String APP_VERSION = "app.version";

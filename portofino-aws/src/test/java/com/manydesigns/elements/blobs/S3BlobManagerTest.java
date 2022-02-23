@@ -22,7 +22,6 @@ package com.manydesigns.elements.blobs;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.util.RandomUtil;
-import org.apache.commons.io.IOUtils;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
