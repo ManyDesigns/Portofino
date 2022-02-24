@@ -11,13 +11,20 @@ import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.actions.Group;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Property;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
+import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
+import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissionsChecks;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.upstairs.actions.database.tables.support.ColumnAndAnnotations;
+import com.manydesigns.portofino.upstairs.actions.support.TableInfo;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
@@ -34,9 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -149,8 +153,16 @@ public class TablesAction extends AbstractResourceAction {
         }
         Map<String, Object> result = new HashMap<>();
         result.put("table", table);
+        result.put("types", getTypeInformation(table));
+        result.put("permissions", getTablePermissions(table));
+
+        return result;
+    }
+
+    @NotNull
+    private List<Map> getTypeInformation(Table table) {
         List<Map> typeInfo = new ArrayList<>();
-        Type[] types = persistence.getConnectionProvider(db).getTypes();
+        Type[] types = persistence.getConnectionProvider(table.getDatabaseName()).getTypes();
         for(Column column : table.getColumns()) {
             Type type = null;
             for (Type candidate : types) {
@@ -203,7 +215,40 @@ public class TablesAction extends AbstractResourceAction {
                 availableTypes.add(describeType(c));
             }
         }
-        result.put("types", typeInfo);
+        return typeInfo;
+    }
+
+    @NotNull
+    private Map<String, Object> getTablePermissions(Table table) {
+        Map<String, Object> result = new HashMap<>();
+        List<Group> groups = new ArrayList<>();
+        Set<String> possibleGroups = security.getGroups();
+        Optional<Permissions> permissions = table.getJavaAnnotation(EntityPermissions.class).map(
+                a -> EntityPermissionsChecks.getPermissions(portofinoConfiguration, a));
+        if(permissions.isPresent()) {
+            permissions.get().getActualPermissions().forEach((name, perms) -> {
+                Group group = new Group();
+                group.setName(name);
+                group.getPermissions().addAll(perms);
+                groups.add(group);
+                possibleGroups.remove(name);
+            });
+        } else {
+            Group group = new Group();
+            group.setName(SecurityLogic.getAllGroup(portofinoConfiguration));
+            group.getPermissions().add(AbstractCrudAction.PERMISSION_CREATE);
+            group.getPermissions().add(AbstractCrudAction.PERMISSION_READ);
+            group.getPermissions().add(AbstractCrudAction.PERMISSION_EDIT);
+            group.getPermissions().add(AbstractCrudAction.PERMISSION_DELETE);
+            groups.add(group);
+            possibleGroups.remove(group.getName());
+        }
+        for(String groupName : possibleGroups) {
+            Group group = new Group();
+            group.setName(groupName);
+            groups.add(group);
+        }
+        result.put("groups", groups);
         return result;
     }
 
@@ -211,7 +256,8 @@ public class TablesAction extends AbstractResourceAction {
     @PUT
     public void saveTable(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
-            Table table) throws Exception {
+            TableInfo tableInfo) throws Exception {
+        Table table = tableInfo.table;
         Table existing = DatabaseLogic.findTableByName(persistence.getModel(), db, schema, tableName);
         if(existing == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -230,10 +276,49 @@ public class TablesAction extends AbstractResourceAction {
         existing.getSelectionProviders().addAll(table.getSelectionProviders());
         existing.getSelectionProviders().forEach(sp -> {
             sp.setFromTable(existing);
-            sp.getReferences().forEach(r -> {
-                r.setOwner(sp);
-            });
+            sp.getReferences().forEach(r -> r.setOwner(sp));
         });
+
+        existing.removeAnnotation(EntityPermissions.class);
+        Permissions permissions = tableInfo.permissions;
+        if(permissions != null) {
+            permissions.init();
+            String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration);
+            List<String> create = new ArrayList<>();
+            List<String> read = new ArrayList<>();
+            List<String> update = new ArrayList<>();
+            List<String> delete = new ArrayList<>();
+            permissions.getActualPermissions().forEach((group, perms) -> {
+                String actualGroup = group.equals(allGroup) ? "*" : group;
+                if(perms.contains(AbstractCrudAction.PERMISSION_CREATE)) {
+                    create.add(actualGroup);
+                }
+                if(perms.contains(AbstractCrudAction.PERMISSION_READ)) {
+                    read.add(actualGroup);
+                }
+                if(perms.contains(AbstractCrudAction.PERMISSION_EDIT)) {
+                    update.add(actualGroup);
+                }
+                if(perms.contains(AbstractCrudAction.PERMISSION_DELETE)) {
+                    delete.add(actualGroup);
+                }
+            });
+            if (create.size() == 1 && create.contains("*") &&
+                read.size() == 1 && read.contains("*") &&
+                update.size() == 1 && update.contains("*") &&
+                delete.size() == 1 && delete.contains("*")) {
+                //Don't add the annotation: permissions have their default values
+            } else {
+                Annotation newAnn = new Annotation(EntityPermissions.class);
+                newAnn.setProperty("create", StringUtils.join(create, ", "));
+                newAnn.setProperty("read", StringUtils.join(read, ", "));
+                newAnn.setProperty("update", StringUtils.join(update, ", "));
+                newAnn.setProperty("delete", StringUtils.join(delete, ", "));
+                existing.addAnnotation(newAnn);
+            }
+
+        }
+
         persistence.initModel();
         persistence.saveXmlModel();
     }

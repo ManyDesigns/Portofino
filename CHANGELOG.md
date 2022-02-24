@@ -8,15 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Support building on Java 17
 - Generic CRUD page upstairs
 - Allow resource-actions to return synthetic resource-actions without any file object
-- Configurable API path with Spring Boot.
+- Configurable API path with Spring Boot
+- Include sample GitHub action in archetypes.
 
 ### Changed
 - Updated Angular libraries and material icons package
-- Updated several Java libraries to fix vulnerabilities
+- Updated several Java libraries to fix vulnerabilities. Note that all the Portofino versions in the last decade (4.x and 5.x) do NOT suffer from log4shell because they don't use Log4j (unless you explicitly replace Logback with Log4j in your project, of course).
 
 ### Fixed
-- Refreshing the token when the app is starting
+- Refreshing the UI's security token when the app is starting
 - Validation issues during insertion float/double numbers in Postgres [#471](https://github.com/ManyDesigns/Portofino/issues/471)
+- Several issues with the Maven archetypes
 
 ## [5.3.0] – 2021-09-13
 
@@ -39,7 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Reduce assumptions on persistent entities by CRUD actions allowing more possibilities for custom entities.
 - Liquibase updated to version 4, minor library updates to fix vulnerabilities.
 
-## [5.2.1] – 2020-04-10
+## [5.2.1] – 2021-04-10
 
 ### Added
 - Possibility to reorder table columns in the tables section upstairs.

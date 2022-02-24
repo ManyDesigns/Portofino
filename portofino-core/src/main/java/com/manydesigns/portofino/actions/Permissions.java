@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.actions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.security.AccessLevel;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -72,8 +73,14 @@ public class Permissions {
     //**************************************************************************
 
     @XmlElement(name = "group", type = Group.class)
+    @JsonProperty("groups")
     public List<Group> getGroups() {
         return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups.clear();
+        this.groups.addAll(groups);
     }
 
     public Map<String, Set<String>> getActualPermissions() {

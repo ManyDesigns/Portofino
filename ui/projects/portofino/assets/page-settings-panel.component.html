@@ -37,7 +37,7 @@
         <td class="mat-cell">
           <mat-select [(ngModel)]="group.level">
             <mat-option value="inherited">
-              {{'Inherited (_)' | translate:{ level: group.actualAccessLevel} }}
+              {{'Inherited (_)' | translate:{ level: group.actualAccessLevel || 'NONE' } }}
             </mat-option>
             <mat-option *ngFor="let level of page.settingsPanel.accessLevels" [value]="level">
               {{level}}

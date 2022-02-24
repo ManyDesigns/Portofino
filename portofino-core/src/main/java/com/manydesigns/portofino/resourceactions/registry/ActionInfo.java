@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.resourceactions.registry;
 
+import com.manydesigns.elements.i18n.TextProvider;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -44,5 +46,13 @@ public class ActionInfo {
         this.scriptTemplate = scriptTemplate;
         this.supportsDetail = supportsDetail;
         this.description = description;
+    }
+
+    public String getActionName(TextProvider textProvider) {
+        return textProvider.getText(actionClass.getName(), actionClass.getSimpleName());
+    }
+
+    public String getActionDescription(TextProvider textProvider) {
+        return textProvider.getTextOrNull(actionClass.getName() + ".description");
     }
 }

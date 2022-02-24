@@ -34,6 +34,11 @@ public interface Annotated {
 
     List<Annotation> getAnnotations();
 
+    default void addAnnotation(Annotation annotation) {
+        getAnnotations().add(annotation);
+        annotation.setParent(this);
+    }
+
     @SuppressWarnings("unchecked")
     default <T extends java.lang.annotation.Annotation> Optional<T> getJavaAnnotation(Class<T> annotationClass) {
         return (Optional<T>) getAnnotations().stream()
@@ -55,7 +60,9 @@ public interface Annotated {
     }
 
     default Optional<Annotation> getAnnotation(Class<? extends java.lang.annotation.Annotation> type) {
-        return getAnnotations().stream().filter(a -> type == a.getJavaAnnotationClass() || a.getType().equals(type.getName())).findFirst();
+        return getAnnotations().stream().filter(
+                a -> type.isAssignableFrom(a.getJavaAnnotationClass()) || a.getType().equals(type.getName()))
+                .findFirst();
     }
 
     default Annotation ensureAnnotation(final Class<? extends java.lang.annotation.Annotation> type) {
@@ -64,5 +71,9 @@ public interface Annotated {
             getAnnotations().add(annotation);
             return annotation;
         });
+    }
+
+    default <T extends java.lang.annotation.Annotation> boolean removeAnnotation(Class<T> annotationClass) {
+        return getAnnotation(annotationClass).map(a -> getAnnotations().remove(a)).orElse(false);
     }
 }

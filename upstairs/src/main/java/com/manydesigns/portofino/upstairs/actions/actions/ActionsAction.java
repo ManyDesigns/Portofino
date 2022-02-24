@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.upstairs.actions.actions;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
@@ -66,12 +67,13 @@ public class ActionsAction extends AbstractResourceAction {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, ActionTypeInfo> getResourceActionTypes() {
         Map<String, ActionTypeInfo> result = new HashMap<>();
+        TextProvider textProvider = ElementsThreadLocals.getTextProvider();
         actionRegistry.iterator().forEachRemaining(a -> {
             String className = a.actionClass.getName();
             result.put(a.description, new ActionTypeInfo(
                     className,
-                    ElementsThreadLocals.getTextProvider().getText(className),
-                    ElementsThreadLocals.getTextProvider().getTextOrNull(className + ".description"),
+                    a.getActionName(textProvider),
+                    textProvider.getTextOrNull(className + ".description"),
                     a.supportsDetail));
         });
         return result;

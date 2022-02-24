@@ -44,8 +44,6 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.annotations.Guard;
 import com.manydesigns.portofino.persistence.IdStrategy;
@@ -56,12 +54,10 @@ import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
+import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissionsChecks;
 import com.manydesigns.portofino.rest.PortofinoFilter;
 import com.manydesigns.portofino.rest.Utilities;
-import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.security.SupportsPermissions;
+import com.manydesigns.portofino.security.*;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import com.vdurmont.semver4j.Semver;
@@ -593,44 +589,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     private void checkAccessorPermissions(String[] requiredPermissions) {
         EntityPermissions ep = classAccessor.getAnnotation(EntityPermissions.class);
-        if(ep == null) {
-            return;
-        }
-        Permissions permissions = new Permissions();
-        String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration);
-        configurePermission(permissions, allGroup, PERMISSION_CREATE, ep.create());
-        configurePermission(permissions, allGroup, PERMISSION_DELETE, ep.delete());
-        configurePermission(permissions, allGroup, PERMISSION_EDIT, ep.edit());
-        configurePermission(permissions, allGroup, PERMISSION_READ, ep.read());
-        permissions.init();
-
-        boolean permitted =
-                security.hasPermissions(
-                        getPortofinoConfiguration(), permissions, AccessLevel.VIEW, requiredPermissions);
-        if(!permitted) {
+        if(!EntityPermissionsChecks.isPermitted(portofinoConfiguration, security, requiredPermissions, ep)) {
             logger.warn("CRUD source not permitted: {}", classAccessor.getName());
             throw new WebApplicationException(
                     security.isUserAuthenticated() ? Response.Status.FORBIDDEN : Response.Status.UNAUTHORIZED);
-        }
-    }
-
-    private void configurePermission(Permissions permissions, String allGroup, String permission, String[] groups) {
-        for(String groupName : groups) {
-            if(groupName.equals("*")) {
-                groupName = allGroup;
-            }
-            String finalGroup = groupName;
-            Group group = permissions.getGroups().stream()
-                    .filter(g -> g.getName().equals(finalGroup))
-                    .findFirst().orElseGet(() -> {
-                        Group grp = new Group();
-                        grp.setName(finalGroup);
-                        grp.setAccessLevel(AccessLevel.VIEW.name());
-                        return grp;
-                    });
-            if(permission != null) {
-                group.getPermissions().add(permission);
-            }
         }
     }
 

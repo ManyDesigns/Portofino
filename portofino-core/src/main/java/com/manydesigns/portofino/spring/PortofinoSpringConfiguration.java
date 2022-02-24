@@ -80,13 +80,9 @@ public class PortofinoSpringConfiguration implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (!KeyManager.isActive()) {
-            try {
-                logger.info("Initializing KeyManager ");
-                KeyManager.init(configuration);
-            } catch (Exception e) {
-                logger.error("Could not initialize KeyManager", e);
-            }
+        if(!KeyManager.isActive()) {
+            logger.info("Initializing KeyManager ");
+            KeyManager.init(configuration);
         }
     }
 }

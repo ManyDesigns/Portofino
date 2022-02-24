@@ -1,5 +1,3 @@
-package portofino.classes;
-
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm;
 import org.apache.shiro.authc.*;
