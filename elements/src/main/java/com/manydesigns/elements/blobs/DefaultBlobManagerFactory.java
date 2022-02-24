@@ -42,4 +42,9 @@ public class DefaultBlobManagerFactory implements BlobManagerFactory {
             return new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         }
     }
+
+    @Override
+    public boolean accept(String type) {
+        return "standard".equals(type);
+    }
 }
