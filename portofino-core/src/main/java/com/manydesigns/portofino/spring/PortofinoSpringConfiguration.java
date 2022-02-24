@@ -24,6 +24,7 @@ import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobManagerFactory;
 import com.manydesigns.elements.blobs.DefaultBlobManagerFactory;
 import com.manydesigns.elements.crypto.KeyManager;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
@@ -33,6 +34,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+
+import java.util.List;
 
 @org.springframework.context.annotation.Configuration
 public class PortofinoSpringConfiguration implements InitializingBean {
@@ -51,14 +54,23 @@ public class PortofinoSpringConfiguration implements InitializingBean {
     @Qualifier(APPLICATION_DIRECTORY)
     FileObject applicationDirectory;
 
-    @Bean(name = DEFAULT_BLOB_MANAGER_FACTORY)
-    public BlobManagerFactory blobManagerFactory() {
-        return new DefaultBlobManagerFactory(configuration, applicationDirectory);
-    }
+    @Autowired
+    List<BlobManagerFactory> factories;
 
     @Bean(name = DEFAULT_BLOB_MANAGER)
-    public BlobManager getDefaultBlobManager(BlobManagerFactory blobManagerFactory) {
-        return blobManagerFactory.getBlobManager();
+    public BlobManager getDefaultBlobManager() {
+        String type = configuration.getString(PortofinoProperties.BLOB_MANAGER_TYPE, "standard");
+        return factories.stream()
+                .filter(f -> f.accept(type))
+                .findFirst()
+                .map(BlobManagerFactory::getBlobManager)
+                .orElseGet(() -> {
+                    if ("standard".equals(type)) {
+                        return new DefaultBlobManagerFactory(configuration, applicationDirectory).getBlobManager();
+                    } else {
+                        throw new RuntimeException(PortofinoProperties.BLOB_MANAGER_TYPE + " not found in configuration");
+                    }
+                });
     }
 
     @Bean
