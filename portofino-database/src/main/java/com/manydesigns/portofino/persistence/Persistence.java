@@ -26,6 +26,7 @@ import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.database.multitenancy.MultiTenant;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.annotations.Enabled;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.modules.DatabaseModule;
@@ -401,11 +402,16 @@ public class Persistence {
             }
             databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, setup));
         }
-        //TODO it would perhaps be preferable if we generated REPLACED events here rather than REMOVED followed by ADDED
+        //TODO it would perhaps be preferable that we generated REPLACED events here rather than REMOVED followed by ADDED
         setups.clear();
         model.init(configuration);
         for (Database database : model.getDatabases()) {
-            initConnectionProvider(database);
+            Boolean enabled = database.getJavaAnnotation(Enabled.class).map(Enabled::value).orElse(true);
+            if(enabled) {
+                initConnectionProvider(database);
+            } else {
+                logger.info("Skipping disabled database " + database.getQualifiedName());
+            }
         }
         if(cacheResetListenerRegistry != null) {
             cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
@@ -532,6 +538,7 @@ public class Persistence {
     protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
         HibernateDatabaseSetup setup = getDatabaseSetup(databaseName);
         if (setup == null) {
+            //TODO use proper exception
             throw new Error("No setup exists for database: " + databaseName);
         }
         return setup;

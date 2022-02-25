@@ -9,8 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Generic CRUD page upstairs
 - Allow resource-actions to return synthetic resource-actions without any file object
 - Configurable API path with Spring Boot
-- Include sample GitHub action in archetypes.
-- AWS S3 blob manager.
+- Include sample GitHub action in archetypes
+- AWS S3 blob manager
+- Ability to disable a database connection with an annotation (adapted from Portofino 4 which uses a configuration property instead)
 
 ### Changed
 - Updated Angular libraries and material icons package
