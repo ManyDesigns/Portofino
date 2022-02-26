@@ -1,17 +1,17 @@
 <mat-form-field *ngIf="isRichText()" [formGroup]="form" class="rich-text">
-  <mat-label>{{property.label}}</mat-label>
+  <mat-label>{{property.label | translate}}</mat-label>
   <portofino-rich-text [formControlName]="property.name" [required]="required" [enabled]="enabled"></portofino-rich-text>
 </mat-form-field>
 <mat-form-field *ngIf="!isRichText() && !isPasswordConfirmationRequired()" [formGroup]="form" [ngClass]="{ multiline: isMultiline() }">
-  <mat-label>{{property.label}}</mat-label>
+  <mat-label>{{property.label | translate}}</mat-label>
   <input matInput *ngIf="!isMultiline()"
          [formControlName]="property.name" [required]="required" [type]="isPassword() ? 'password' : 'text'" />
   <textarea matInput [formControlName]="property.name" [required]="required" *ngIf="isMultiline()"></textarea>
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
-    {{ '_ is required.' | translate:{ label: property.label } }}
+    {{ '_ is required.' | translate:{ label: property.label | translate } }}
   </mat-error>
   <mat-error *ngIf="control.hasError('maxlength')" class="alert alert-danger">
-    {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxlength').message } }}
+    {{ '_: max _.' | translate:{ label: property.label | translate, max: control.getError('maxlength').message } }}
   </mat-error>
   <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
     <ng-container *ngFor="let error of control.getError('server-side')">
@@ -22,13 +22,13 @@
 </mat-form-field>
 <ng-container *ngIf="isPasswordConfirmationRequired()" [formGroup]="form">
   <mat-form-field [formGroupName]="property.name">
-    <mat-label>{{property.label}}</mat-label>
+    <mat-label>{{property.label | translate}}</mat-label>
     <input matInput formControlName="password" [required]="required" type="password" />
     <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
-      {{ '_ is required.' | translate:{ label: property.label } }}
+      {{ '_ is required.' | translate:{ label: property.label | translate } }}
     </mat-error>
     <mat-error *ngIf="control.hasError('maxlength')" class="alert alert-danger">
-      {{ '_: max _.' | translate:{ label: property.label, max: control.getError('maxlength').message } }}
+      {{ '_: max _.' | translate:{ label: property.label | translate, max: control.getError('maxlength').message } }}
     </mat-error>
     <mat-error *ngIf="control.hasError('server-side')" class="alert alert-danger">
       <ng-container *ngFor="let error of control.getError('server-side')">
@@ -37,7 +37,7 @@
     </mat-error>
   </mat-form-field>
   <mat-form-field [formGroupName]="property.name">
-    <mat-label>{{'Confirm' | translate}} {{property.label}}</mat-label> <!--TODO label as parameter-->
+    <mat-label>{{'Confirm' | translate}} {{property.label | translate}}</mat-label> <!--TODO label as parameter-->
     <input matInput formControlName="confirmPassword" [required]="false" type="password"
            [errorStateMatcher]="crossFieldErrorMatcher" />
     <mat-error *ngIf="control.hasError('passwordsDontMatch')" class="cross-validation-error-message alert alert-danger">
