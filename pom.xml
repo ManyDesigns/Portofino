@@ -105,7 +105,13 @@
         <jsoup.version>1.14.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>4.4.0</liquibase.version>
-        <logback.version>1.2.10</logback.version>
+        <!--
+        According to CVE-2021-42550 (https://nvd.nist.gov/vuln/detail/CVE-2021-42550), we need >1.2.7.
+        However, Logback mentions 1.2.9 as the CVE fix version (https://logback.qos.ch/news.html), but 1.2.9
+        dropped Groovy support (https://jira.qos.ch/browse/LOGBACK-1606). So we're stuck with 1.2.8 for
+        the time being. The vulnerability requires access to the config file, though, so it's not that critical.
+        -->
+        <logback.version>1.2.8</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.6.1.Final</resteasy.version>

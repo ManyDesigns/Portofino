@@ -20,6 +20,9 @@
 
 package com.manydesigns.portofino.resourceactions;
 
+import com.manydesigns.elements.ElementsContext;
+import com.manydesigns.elements.ElementsThreadLocals;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +40,7 @@ public class ActionContext {
     protected HttpServletResponse response;
     protected ServletContext servletContext;
     protected String actionPath;
+    protected ElementsContext elementsContext = ElementsThreadLocals.getElementsContext();
 
     public HttpServletRequest getRequest() {
         return request;
@@ -68,5 +72,29 @@ public class ActionContext {
 
     public void setActionPath(String actionPath) {
         this.actionPath = actionPath;
+    }
+
+    public ElementsContext getElementsContext() {
+        return elementsContext;
+    }
+
+    public void setElementsContext(ElementsContext elementsContext) {
+        this.elementsContext = elementsContext;
+    }
+
+    //I18n
+
+    /**
+     * @see com.manydesigns.elements.i18n.TextProvider#getText(String, Object...)
+     */
+    String getText(String key, Object... args) {
+        return elementsContext.getTextProvider().getText(key, args);
+    }
+
+    /**
+     * @see com.manydesigns.elements.i18n.TextProvider#getTextOrNull(String, Object...)
+     */
+    String getTextOrNull(String key, Object... args) {
+        return elementsContext.getTextProvider().getTextOrNull(key, args);
     }
 }

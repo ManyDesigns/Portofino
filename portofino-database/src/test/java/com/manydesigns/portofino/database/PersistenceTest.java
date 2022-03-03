@@ -613,4 +613,17 @@ public class PersistenceTest {
         }
     }
 
+    public void testDisabledDatabasesAreSkipped() {
+        assertNotNull(DatabaseLogic.findDatabaseByName(persistence.getModel(), "disabled"));
+        Error error = null;
+        try {
+            persistence.getSession("disabled");
+        } catch (Error e) {
+            error = e;
+        }
+        if(error == null) {
+            fail("Was expecting an exception");
+        }
+    }
+
 }
