@@ -20,7 +20,7 @@
 
 package com.manydesigns.elements.blobs;
 
-import com.manydesigns.elements.AbstractElementsTest;
+import com.manydesigns.elements.test.ElementsTestSupport;
 import com.manydesigns.elements.util.RandomUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,7 +36,7 @@ import static org.testng.Assert.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @Test(enabled = false) // FIXME: disable because require a valid AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY to access a s3 bucket
-public class S3BlobManagerTest extends AbstractElementsTest {
+public class S3BlobManagerTest extends ElementsTestSupport {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
