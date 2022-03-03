@@ -6,8 +6,8 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>5.3.0</version>
-        <relativePath>..</relativePath>
+        <version>5.3.1</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>portofino-code</artifactId>
     <packaging>jar</packaging>

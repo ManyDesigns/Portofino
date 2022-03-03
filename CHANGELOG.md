@@ -2,7 +2,7 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.3.1] – Unreleased
+## [5.3.1] – 2022-03-04
 
 ### Added
 - Support building on Java 17
