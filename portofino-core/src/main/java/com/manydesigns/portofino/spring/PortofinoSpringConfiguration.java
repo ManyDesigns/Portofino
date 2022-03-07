@@ -42,7 +42,6 @@ public class PortofinoSpringConfiguration implements InitializingBean {
 
     public static final String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
-    public static final String DEFAULT_BLOB_MANAGER_FACTORY = "defaultBlobManagerFactory";
     public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
     public final static String PORTOFINO_CONFIGURATION_FILE = "com.manydesigns.portofino.portofinoConfigurationFile";
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
@@ -54,23 +53,20 @@ public class PortofinoSpringConfiguration implements InitializingBean {
     @Qualifier(APPLICATION_DIRECTORY)
     FileObject applicationDirectory;
 
-    @Autowired
-    List<BlobManagerFactory> factories;
+    @Bean
+    public DefaultBlobManagerFactory getStandardBlobManagerFactory() {
+        return new DefaultBlobManagerFactory(configuration, applicationDirectory);
+    }
 
     @Bean(name = DEFAULT_BLOB_MANAGER)
-    public BlobManager getDefaultBlobManager() {
+    public BlobManager getDefaultBlobManager(@Autowired List<BlobManagerFactory> factories) {
         String type = configuration.getString(PortofinoProperties.BLOB_MANAGER_TYPE, "standard");
         return factories.stream()
                 .filter(f -> f.accept(type))
                 .findFirst()
                 .map(BlobManagerFactory::getBlobManager)
-                .orElseGet(() -> {
-                    if ("standard".equals(type)) {
-                        return new DefaultBlobManagerFactory(configuration, applicationDirectory).getBlobManager();
-                    } else {
-                        throw new RuntimeException(PortofinoProperties.BLOB_MANAGER_TYPE + " not found in configuration");
-                    }
-                });
+                .orElseThrow(() ->
+                        new RuntimeException(PortofinoProperties.BLOB_MANAGER_TYPE + " not found in configuration"));
     }
 
     @Bean

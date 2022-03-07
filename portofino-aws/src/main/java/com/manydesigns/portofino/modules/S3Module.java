@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.elements.blobs.BlobManagerFactory;
 import com.manydesigns.elements.blobs.S3BlobManagerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +17,7 @@ public class S3Module implements Module {
     org.apache.commons.configuration2.Configuration configuration;
 
     @Bean
-    public BlobManagerFactory s3BlobManagerFactory() {
+    public S3BlobManagerFactory getS3BlobManagerFactory() {
         return new S3BlobManagerFactory(configuration);
     }
 
