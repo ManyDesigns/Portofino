@@ -1,6 +1,5 @@
-import {Page, PageConfiguration, PageSettingsPanel} from "../../page";
+import {Page, PageConfiguration, PageSettingsPanel, PortofinoComponent} from "../../page";
 import {Component} from "@angular/core";
-import {PortofinoComponent} from "../../page.factory";
 import {Field} from "../../form";
 import {Annotation, RICH_TEXT_ANNOTATION} from "../../class-accessor";
 

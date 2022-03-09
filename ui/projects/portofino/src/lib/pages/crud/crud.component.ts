@@ -1,8 +1,7 @@
 import {Component, EventEmitter, Input, Output, Type} from '@angular/core';
 import {HttpParams} from '@angular/common/http';
 import {ClassAccessor, loadClassAccessor, SelectionProvider as Selection} from "../../class-accessor";
-import {PortofinoComponent} from "../../page.factory";
-import {Operation, Page, PageConfiguration, PageSettingsPanel} from "../../page";
+import {Operation, Page, PageConfiguration, PageSettingsPanel, PortofinoComponent} from "../../page";
 import {Configuration, SelectionProvider} from "./crud.common";
 import {Button} from "../../buttons";
 import {SelectionModel} from "@angular/cdk/collections";

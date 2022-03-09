@@ -69,7 +69,7 @@ import {
   DefaultNavigationComponent,
   PageLayout,
   NAVIGATION_COMPONENT,
-  PageHeader, PageService, TemplatesComponent
+  PageHeader, PageService, TemplatesComponent, PageFactoryComponent, PageSettingsPanelComponent
 } from './page';
 import {BulkEditComponent} from "./pages/crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";
@@ -95,7 +95,6 @@ import {BooleanFieldComponent} from "./fields/boolean-field.component";
 import {NumberFieldComponent} from "./fields/number-field.component";
 import {TextFieldComponent} from "./fields/text-field.component";
 import {SelectFieldComponent} from "./fields/select-field.component";
-import {PageFactoryComponent} from "./page.factory";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";
@@ -124,7 +123,6 @@ import {VarDirective} from "./var.directive";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatBadgeModule} from "@angular/material/badge";
 import {LocalStorageService} from "./storage/storage.services";
-import {PageSettingsPanelComponent} from "./page-settings-panel.component";
 import {CustomPageComponent} from "./pages/custom/custom.component";
 import {
   CHANGE_PASSWORD_COMPONENT,

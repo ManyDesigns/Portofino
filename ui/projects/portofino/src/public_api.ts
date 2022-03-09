@@ -29,7 +29,6 @@ export * from './lib/i18n/language.interceptor';
 export * from './lib/i18n/language.selector.component';
 export * from './lib/notifications/notification.services';
 export * from './lib/page';
-export * from './lib/page.factory';
 export * from './lib/pages/custom/custom.component';
 export * from './lib/pages/crud/crud.component';
 export * from './lib/pages/crud/common.component';
