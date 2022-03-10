@@ -24,3 +24,5 @@ jobs:
             ${{ runner.os }}-m2-
       - name: Build with Maven
         run: mvn --batch-mode install
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
