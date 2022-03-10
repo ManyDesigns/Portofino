@@ -76,18 +76,7 @@
                             </execution>
 
                             <execution>
-                                <id>build-lib</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run-script build-lib</arguments>
-                                </configuration>
-                                <phase>generate-resources</phase>
-                            </execution>
-
-                            <execution>
-                                <id>build-app</id>
+                                <id>build</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>
