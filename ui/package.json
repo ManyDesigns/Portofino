@@ -16,7 +16,7 @@
     "publish-lib": "npm run build-lib && cd dist/portofino && npm publish",
     "build-all": "npm run build-lib && ng build --configuration production",
     "npm-pack": "cd dist/portofino && npm pack",
-    "maven-build": "npm run build-lib && ng build --configuration production --delete-output-path && npm run npm-pack",
+    "maven-build": "npm run build-lib && node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng build --configuration production --delete-output-path && npm run npm-pack",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect -d"
   },
