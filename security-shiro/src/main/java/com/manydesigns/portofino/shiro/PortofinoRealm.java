@@ -93,6 +93,7 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     /**
      * Returns whether this realm supports users self-registration.
      * @since 5.2
+     * @return <code>true</code> if self-registration is supported, false otherwise.
      */
     boolean supportsSelfRegistration();
 
