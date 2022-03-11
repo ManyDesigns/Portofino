@@ -13,7 +13,7 @@
     <url>https://www.manydesigns.com/</url>
     <properties>
         <portofino.application.directory>${serverInfo:realPath}/WEB-INF</portofino.application.directory>
-        <spring.boot.version>2.3.0.RELEASE</spring.boot.version>
+        <spring.boot.version>2.4.5</spring.boot.version>
     </properties>
     <dependencies>
         <dependency>
@@ -129,7 +129,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.14</version>
+            <version>42.3.3</version>
             <scope>provided</scope>
         </dependency>
         <!-- This is for building an executable war. -->
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.48</version>
+            <version>9.0.58</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

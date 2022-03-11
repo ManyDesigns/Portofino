@@ -21,8 +21,8 @@
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.elements.blobs.HierarchicalBlobManager;
-import com.manydesigns.elements.blobs.SimpleBlobManager;
+import com.manydesigns.elements.blobs.BlobManagerFactory;
+import com.manydesigns.elements.blobs.DefaultBlobManagerFactory;
 import com.manydesigns.elements.crypto.KeyManager;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
@@ -35,16 +35,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 
-import java.io.File;
+import java.util.List;
 
 @org.springframework.context.annotation.Configuration
 public class PortofinoSpringConfiguration implements InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
     public static final String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
     public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
     public final static String PORTOFINO_CONFIGURATION_FILE = "com.manydesigns.portofino.portofinoConfigurationFile";
+    private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
 
     @Autowired
     @Qualifier(PORTOFINO_CONFIGURATION)
@@ -53,26 +53,20 @@ public class PortofinoSpringConfiguration implements InitializingBean {
     @Qualifier(APPLICATION_DIRECTORY)
     FileObject applicationDirectory;
 
-    @Bean(name = DEFAULT_BLOB_MANAGER)
-    public BlobManager getDefaultBlobManager() {
-        File appBlobsDir;
-        if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
-            appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
-        } else {
-            appBlobsDir = new File(applicationDirectory.getName().getPath(), "blobs");
-        }
-        logger.info("Blobs directory: " + appBlobsDir.getAbsolutePath());
+    @Bean
+    public DefaultBlobManagerFactory getStandardBlobManagerFactory() {
+        return new DefaultBlobManagerFactory(configuration, applicationDirectory);
+    }
 
-        String metaFilenamePattern = "blob-{0}.properties";
-        String dataFilenamePattern = "blob-{0}.data";
-        File[] blobs = appBlobsDir.listFiles((dir, name) -> name.startsWith("blob-") && name.endsWith(".properties"));
-        if(blobs == null || blobs.length == 0) { //Null if the directory does not exist yet
-            logger.info("Using hierarchical blob manager");
-            return new HierarchicalBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
-        } else {
-            logger.warn("Blobs found directly under the blobs directory: using old style (pre-4.1.1) flat file blob manager");
-            return new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
-        }
+    @Bean(name = DEFAULT_BLOB_MANAGER)
+    public BlobManager getDefaultBlobManager(@Autowired List<BlobManagerFactory> factories) {
+        String type = configuration.getString(PortofinoProperties.BLOB_MANAGER_TYPE, "standard");
+        return factories.stream()
+                .filter(f -> f.accept(type))
+                .findFirst()
+                .map(BlobManagerFactory::getBlobManager)
+                .orElseThrow(() ->
+                        new RuntimeException(PortofinoProperties.BLOB_MANAGER_TYPE + " not found in configuration"));
     }
 
     @Bean
@@ -83,12 +77,8 @@ public class PortofinoSpringConfiguration implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         if(!KeyManager.isActive()) {
-            try {
-                logger.info("Initializing KeyManager ");
-                KeyManager.init(configuration);
-            } catch (Exception e) {
-                logger.error("Could not initialize KeyManager", e);
-            }
+            logger.info("Initializing KeyManager ");
+            KeyManager.init(configuration);
         }
     }
 }

@@ -1,6 +1,6 @@
 <span [formGroup]="form">
   <mat-checkbox [formControlName]="property.name">
-    {{property.label}}
+    {{property.label | translate}}
   </mat-checkbox>
   <mat-error *ngIf="control.hasError('server-side')">
     <ng-container *ngFor="let error of control.getError('server-side')">

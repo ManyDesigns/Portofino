@@ -15,7 +15,7 @@
         <antlr.version>4.9.2</antlr.version>
     </properties>
 
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>

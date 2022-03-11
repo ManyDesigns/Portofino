@@ -250,10 +250,10 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      * <p>This default implementation returns the built-in groups
      * (all, anonymous, registered, administrators).
      * You can override it to add custom groups for your application.</p>
-     * @return
+     * @return the built-in groups.
      */
     public Set<String> getGroups() {
-        Set<String> groups = new LinkedHashSet<String>();
+        Set<String> groups = new LinkedHashSet<>();
         groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
         groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
         groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));

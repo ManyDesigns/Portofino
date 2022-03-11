@@ -1,10 +1,10 @@
 <mat-form-field [formGroup]="form" *ngIf="isDateOnly()">
-  <mat-label>{{property.label}}</mat-label>
+  <mat-label>{{property.label | translate}}</mat-label>
   <input matInput [formControlName]="property.name" [required]="required" [matDatepicker]="datepicker">
   <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
   <mat-datepicker #datepicker></mat-datepicker>
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
-    {{ '_ is required.' | translate:{ label: property.label } }}
+    {{ '_ is required.' | translate:{ label: property.label | translate } }}
   </mat-error>
   <mat-error *ngIf="control.hasError('date-format')" class="alert alert-danger">
     {{ 'Invalid date, _ expected.' | translate:{ dateFormat: control.getError('date-format') } }}
@@ -17,7 +17,7 @@
   <mat-checkbox *ngIf="selectable && enabled" [formControl]="selector" matPrefix></mat-checkbox>
 </mat-form-field>
 <mat-form-field [formGroup]="form" *ngIf="!isDateOnly()">
-  <mat-label>{{property.label}}</mat-label>
+  <mat-label>{{property.label | translate}}</mat-label>
   <!-- bare input field -->
   <input matInput [formControlName]="property.name" [required]="required"
          dateTimeField [dateFormat]="dateFormat" [locale]="locale">
@@ -27,7 +27,7 @@
   <input matInput [formControlName]="property.name" [required]="required" [matDatetimepicker]="datetimepicker">
   -->
   <mat-error *ngIf="control.hasError('required')" class="alert alert-danger">
-    {{ '_ is required.' | translate:{ label: property.label } }}
+    {{ '_ is required.' | translate:{ label: property.label | translate } }}
   </mat-error>
   <mat-error *ngIf="control.hasError('date-format')" class="alert alert-danger">
     {{ 'Invalid date, _ expected.' | translate:{ dateFormat: control.getError('date-format') } }}

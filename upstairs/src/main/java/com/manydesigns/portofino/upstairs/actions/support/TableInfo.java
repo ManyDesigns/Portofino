@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.upstairs.actions.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.database.Reference;
 import com.manydesigns.portofino.model.database.Table;
 
@@ -12,6 +13,7 @@ public class TableInfo {
     public String database;
     public String schema;
     public Table table;
+    public Permissions permissions;
     public boolean root = true;
     public boolean selected = false;
     public final List<Reference> children = new ArrayList<>();

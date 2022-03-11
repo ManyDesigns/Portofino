@@ -121,6 +121,11 @@ public abstract class SecurityFacade {
 
     public abstract Object getUserId();
 
+    /**
+     * Returns the list of groups known to the system. This is used by the framework when presenting a list of
+     * possible groups, e.g. when configuring permissions for a page.
+     * @return the set of known groups.
+     */
     public abstract Set<String> getGroups();
 
     public abstract void setup(FileObject appDirectory, String adminGroupName, String encryptionAlgorithm) throws IOException;

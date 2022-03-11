@@ -69,7 +69,7 @@ import {
   DefaultNavigationComponent,
   PageLayout,
   NAVIGATION_COMPONENT,
-  PageHeader, PageService, TemplatesComponent
+  PageHeader, PageService, TemplatesComponent, PageFactoryComponent, PageSettingsPanelComponent
 } from './page';
 import {BulkEditComponent} from "./pages/crud/bulk/bulk-edit.component";
 import {BlobFieldComponent} from "./fields/blob-field.component";

@@ -80,21 +80,28 @@ public class KeyManager {
     }
 
     private void checkOrSaveHash(String path, String key) throws IOException, GeneralSecurityException, InvalidPassphraseException {
-        File checksumFile = new File(path + ".sum");
-
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        digest.update(path.getBytes(StandardCharsets.UTF_8));
-        String checksum = CryptoUtils.getStringChecksum(digest, key);
 
-        if (checksumFile.exists()) {
-            String current = StringUtils.trimToEmpty(CryptoUtils.getKey(checksumFile.getAbsolutePath()));
+        String checksum = System.getenv("PORTOFINO_PASSPHRASE_SUM");
+        if (checksum == null) {
+            digest.update(path.getBytes(StandardCharsets.UTF_8));
+        }
 
-            if (!checksum.equals(current))
-                throw new InvalidPassphraseException("Checksum test failed, passphrase differs from last one used file: " + checksumFile.getAbsolutePath());
-        } else {
-            try (PrintWriter pw = new PrintWriter(checksumFile);) {
-                pw.print(checksum);
+        String calculatedChecksum = CryptoUtils.getStringChecksum(digest, key);
+
+        if (checksum == null) {
+            File checksumFile = new File(path + ".sum");
+            if (checksumFile.exists()) {
+                checksum = StringUtils.trimToEmpty(CryptoUtils.getKey(checksumFile.getAbsolutePath()));
+            } else {
+                try (PrintWriter pw = new PrintWriter(checksumFile);) {
+                    pw.print(calculatedChecksum);
+                }
             }
+        }
+
+        if (!calculatedChecksum.equals(checksum)) {
+            throw new InvalidPassphraseException("Checksum test failed, passphrase differs from last one used");
         }
     }
 
@@ -164,15 +171,20 @@ public class KeyManager {
         logger.info("Retrieving passphrase");
         StringBuilder passPhrase = new StringBuilder();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(passphrasePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                passPhrase.append(line);
+        String passPhraseEnv = System.getenv("PORTOFINO_PASSPHRASE");
+        if (passPhraseEnv == null) {
+            try (BufferedReader br = new BufferedReader(new FileReader(passphrasePath))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    passPhrase.append(line);
+                }
+            } catch (IOException e) {
+                logger.error("getPassPhrase: " + e.getMessage(), e);
+                throw e;
             }
-        } catch (IOException e) {
-            logger.error("getPassPhrase: " + e.getMessage(), e);
-            throw e;
+            return passPhrase.toString();
+        } else {
+            return passPhraseEnv;
         }
-        return passPhrase.toString();
     }
 }

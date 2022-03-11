@@ -34,12 +34,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Thread-local store of common Elements services.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public final class ElementsThreadLocals {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
@@ -48,12 +49,7 @@ public final class ElementsThreadLocals {
     // Static
     //**************************************************************************
     private static ThreadLocal<ElementsContext> threadLocalElementsContext =
-            new ThreadLocal<ElementsContext>() {
-                @Override
-                protected ElementsContext initialValue() {
-                    return new ElementsContext();
-                }
-            };
+            ThreadLocal.withInitial(ElementsContext::new);
 
     //**************************************************************************
     // Static cleanup

@@ -642,4 +642,17 @@ public class PersistenceTest {
         assertEquals("from table1", dbsp.getHql());
     }
 
+    public void testDisabledDatabasesAreSkipped() {
+        assertNotNull(DatabaseLogic.findDatabaseByName(persistence.getModel(), "disabled"));
+        Error error = null;
+        try {
+            persistence.getSession("disabled");
+        } catch (Error e) {
+            error = e;
+        }
+        if(error == null) {
+            fail("Was expecting an exception");
+        }
+    }
+
 }

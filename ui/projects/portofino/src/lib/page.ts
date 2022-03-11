@@ -7,8 +7,8 @@ import {
   EventEmitter,
   Injectable,
   InjectionToken, Injector,
-  Input, OnChanges,
-  OnDestroy, OnInit,
+  Injector,Input, OnChanges,
+  OnChanges,OnDestroy, OnInit,
   Optional, Output, SimpleChanges,
   TemplateRef,
   Type,
@@ -162,17 +162,8 @@ export class PageSettingsPanel {
       return;
     }
     const permissionsUrl = this.page.computeSourceUrl() + this.page.permissionsPath;
-    this.page.http.get<Permissions>(permissionsUrl).subscribe(p => {
+    this.page.loadPermissions(permissionsUrl).subscribe(p => {
       this.permissions = p;
-      this.permissions.groups.forEach(g => {
-        if (!g.level) {
-          g.level = "inherited";
-        }
-        g.permissionMap = {};
-        g.permissions.forEach(p => {
-          g.permissionMap[p] = true;
-        });
-      });
     });
   }
 
@@ -617,7 +608,6 @@ export abstract class Page implements WithButtons, OnDestroy, OnInit {
     this.settingsPanel.hide(false);
   }
 
-
   get configurationUrl() {
     return this.computeSourceUrl() + this.configurationPath;
   }
@@ -732,6 +722,21 @@ export abstract class Page implements WithButtons, OnDestroy, OnInit {
       }
     });
     return this.navigationMenu = menu;
+  }
+
+  loadPermissions(permissionsUrl: string): Observable<Permissions> {
+    return this.http.get<Permissions>(permissionsUrl).pipe(map(p => {
+      p.groups.forEach(g => {
+        if (!g.level) {
+          g.level = "inherited";
+        }
+        g.permissionMap = {};
+        g.permissions.forEach(p => {
+          g.permissionMap[p] = true;
+        });
+      });
+      return p;
+    }));
   }
 }
 

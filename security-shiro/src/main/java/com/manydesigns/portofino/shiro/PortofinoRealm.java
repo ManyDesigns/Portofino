@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.portofino.security.SecurityFacade;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.cache.CacheManagerAware;
@@ -41,8 +42,7 @@ import java.util.Set;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
-    public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+    String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // User workflow
@@ -93,6 +93,7 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     /**
      * Returns whether this realm supports users self-registration.
      * @since 5.2
+     * @return <code>true</code> if self-registration is supported, false otherwise.
      */
     boolean supportsSelfRegistration();
 
@@ -176,7 +177,8 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     /**
      * Returns the list of groups known to the system. This is used by the framework when presenting a list of
      * possible groups, e.g. when configuring permissions for a page.
-     * @return a set of groups.
+     * @return the set of known groups.
+     * @see SecurityFacade#getGroups()
      */
     Set<String> getGroups();
 

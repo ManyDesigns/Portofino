@@ -7,11 +7,11 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <version>6.0.0-SNAPSHOT</version>
-    <relativePath>../../</relativePath>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
   <artifactId>portofino-angular-ui-support</artifactId>
   <packaging>jar</packaging>
-  <url>http://www.manydesigns.com/</url>
+  <url>https://www.manydesigns.com/</url>
 
   <dependencies>
     <dependency>

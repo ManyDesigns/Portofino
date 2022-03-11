@@ -23,6 +23,7 @@ package com.manydesigns.portofino.dispatcher;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,9 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
         try {
             element = super.consumePathSegment(pathSegment);
         } catch (WebApplicationException e) {
+            if(e.getResponse().getStatus() != Response.Status.NOT_FOUND.getStatusCode()) {
+                throw e;
+            }
             logger.debug("Invalid subresource: " + pathSegment, e);
             if(parameters.size() < maxParameters) {
                 consumeParameter(pathSegment);

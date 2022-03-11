@@ -78,6 +78,7 @@ export const TRANSLATIONS_ES = {
   "Passwords don't match.": "La contraseña no coincide.",
   "permission: crud-create": "Creación",
   "permission: crud-edit": "Modificación",
+  "permission: crud-read": "Read",
   "permission: crud-delete": "Eliminación",
   "Permissions": "Permisos",
   "Previous": "Anterior",
