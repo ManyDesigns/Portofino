@@ -309,6 +309,9 @@ public class DefaultModelIO implements ModelIO {
     }
 
     private void addImport(EClassifier type, Map<String, String> imports) {
+        if(type == null) {
+            return;
+        }
         String fullTypeName = type.getName();
         if(type.getEPackage() != null) {
             if(type.getEPackage() == EcorePackage.eINSTANCE) {
@@ -356,7 +359,7 @@ public class DefaultModelIO implements ModelIO {
         writeAnnotations(property, writer, indent);
         writer.write(indent + property.getName());
         EClassifier type = property.getEType();
-        if(!type.equals(EcorePackage.eINSTANCE.getEString())) {
+        if(type != null) {
             String name = type.getName();
             String alias = EntityModelBaseVisitor.getDefaultTypeAliases().inverse().get(name);
             writer.write(": " + (alias != null ? alias : name));

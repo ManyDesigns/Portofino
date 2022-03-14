@@ -69,7 +69,6 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     //**************************************************************************
 
     protected String propertyName;
-    protected Class<?> actualJavaType;
 
     public static final Logger logger = LoggerFactory.getLogger(Column.class);
 
@@ -114,9 +113,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         setTable((Table) parent);
     }
 
-    public void reset() {
-        actualJavaType = null;
-    }
+    public void reset() {}
 
     public void init(Model model, Configuration configuration) {
         assert table != null;
@@ -136,18 +133,12 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         setColumnName(getColumnName());
 
         if(javaType != null) {
-            actualJavaType = ReflectionUtil.loadClass(javaType);
-            if (actualJavaType != null) {
-                property.setEType(ensureType(actualJavaType));
-            } else {
-                logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), javaType);
-                property.setEType(EcorePackage.eINSTANCE.getEString());
-            }
+            property.setEType(ensureType(javaType));
         } else if(property.getEType() == null) {
             if(getColumnType() == null) {
-                throw new IllegalStateException("columnType must not be null when property type is null");
+                throw new IllegalStateException(getQualifiedName() + ": columnType must not be null when property type is null");
             }
-            actualJavaType = Type.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
+            Class<?> actualJavaType = Type.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
             if (actualJavaType != null) {
                 property.setEType(ensureType(actualJavaType));
             } else {
@@ -156,11 +147,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
                         getColumnName(),
                         getJdbcType(),
                         javaType);
-                property.setEType(EcorePackage.eINSTANCE.getEString());
             }
         } else {
-            actualJavaType = property.getEType().getInstanceClass();
-            if (actualJavaType == null) {
+            if (getActualJavaType() == null) {
                 logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), property.getEType().getName());
             }
         }
@@ -287,7 +276,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public Class<?> getActualJavaType() {
-        return actualJavaType;
+        return property.getEType() != null ? property.getEType().getInstanceClass() : null;
     }
 
     @XmlAttribute()
@@ -323,8 +312,8 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         return MessageFormat.format("column {0} {1}({2},{3}){4}",
                 getQualifiedName(),
                 getColumnType(),
-                Integer.toString(getLength()),
-                Integer.toString(getScale()),
+                String.valueOf(getLength()),
+                String.valueOf(getScale()),
                 isNullable() ? "" : " NOT NULL");
     }
 

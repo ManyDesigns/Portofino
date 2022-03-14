@@ -1,32 +1,32 @@
-import javax.persistence.Column;
+import com.manydesigns.portofino.model.database.annotations.Column;
 import javax.persistence.Table;
 
 @Table(name = "ACCOUNT")
 entity account {
 	id {
-		@Column(name = "USERID")
+		@Column(name = "USERID", jdbcType = 12, columnType = "VARCHAR", length = 80)
 		userid
 	}
 	@Column(name = "EMAIL")
-	email
+	email: string
 	@Column(name = "FIRSTNAME")
-	firstname
+	firstname: string
 	@Column(name = "LASTNAME")
-	lastname
+	lastname: string
 	@Column(name = "STATUS")
-	status
+	status: string
 	@Column(name = "ADDR1")
-	addr1
+	addr1: string
 	@Column(name = "ADDR2")
-	addr2
+	addr2: string
 	@Column(name = "CITY")
-	city
+	city: string
 	@Column(name = "STATE")
-	state
+	state: string
 	@Column(name = "ZIP")
-	zip
+	zip: string
 	@Column(name = "COUNTRY")
-	country
+	country: string
 	@Column(name = "PHONE")
-	phone
+	phone: string
 }

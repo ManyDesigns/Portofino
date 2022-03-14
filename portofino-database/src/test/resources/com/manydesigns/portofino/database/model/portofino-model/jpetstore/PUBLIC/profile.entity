@@ -5,12 +5,12 @@ import javax.persistence.Table;
 entity profile {
 	id {
 		@Column(name = "USERID")
-		userid
+		userid: string
 	}
 	@Column(name = "LANGPREF")
-	langpref
+	langpref: string
 	@Column(name = "FAVCATEGORY")
-	favcategory
+	favcategory: string
 	@Column(name = "MYLISTOPT")
 	mylistopt: boolean
 	@Column(name = "BANNEROPT")

@@ -5,7 +5,7 @@ import javax.persistence.Table;
 entity sequence {
 	id {
 		@Column(name = "NAME")
-		name
+		name: string
 	}
 	@Column(name = "NEXTID")
 	nextid: EBigInteger

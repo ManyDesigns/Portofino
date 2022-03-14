@@ -5,8 +5,8 @@ import javax.persistence.Table;
 entity bannerdata {
 	id {
 		@Column(name = "FAVCATEGORY")
-		favcategory
+		favcategory: string
 	}
 	@Column(name = "BANNERNAME")
-	bannername
+	bannername: string
 }

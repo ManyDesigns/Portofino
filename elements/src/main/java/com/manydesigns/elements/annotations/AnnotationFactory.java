@@ -35,7 +35,7 @@ public class AnnotationFactory {
         getAnnotationMethods(annotationClass).forEach(m -> {
             if(m.getDefaultValue() == null && !values.containsKey(m.getName())) {
                 throw new IllegalArgumentException(
-                        m.getName() + " has no default and is missing from values for " + annotationClass);
+                        m.getName() + " has no default and is missing from values for " + annotationClass + ": " + values);
             }
         });
         return (T) Proxy.newProxyInstance(classLoader, new Class[] { annotationClass },

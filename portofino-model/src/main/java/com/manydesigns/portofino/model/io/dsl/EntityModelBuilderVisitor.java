@@ -138,14 +138,12 @@ public class EntityModelBuilderVisitor extends EntityModelBaseVisitor {
         if(entity == null) {
             throw new IllegalStateException("Property without an entity: " + propertyName);
         }
-        EDataType type;
+        EDataType type = null;
         boolean nullable = ctx.NOT_NULLABLE() == null;
         if(ctx.type() != null) {
             String typeName = ctx.type().name.getText();
             //TODO should we be using the CodeBase for this?
             type = PortofinoPackage.ensureType(resolveType(typeName, nullable));
-        } else {
-            type = EcorePackage.eINSTANCE.getEString();
         }
 
         EStructuralFeature property = entity.getEStructuralFeatures().stream().filter(a -> propertyName.equals(a.getName()))

@@ -5,7 +5,7 @@ import javax.persistence.Table;
 entity inventory {
 	id {
 		@Column(name = "ITEMID")
-		itemid
+		itemid: string
 	}
 	@Column(name = "QTY")
 	qty: EBigInteger

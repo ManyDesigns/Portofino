@@ -1,3 +1,4 @@
+import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.Table;
 
@@ -8,51 +9,51 @@ entity orders {
 		orderid: EBigInteger
 	}
 	@Column(name = "USERID")
-	userid
+	userid: string
 	@Column(name = "ORDERDATE")
-	orderdate: java.sql.Date
+	orderdate: Date
 	@Column(name = "SHIPADDR1")
-	shipaddr1
+	shipaddr1: string
 	@Column(name = "SHIPADDR2")
-	shipaddr2
+	shipaddr2: string
 	@Column(name = "SHIPCITY")
-	shipcity
+	shipcity: string
 	@Column(name = "SHIPSTATE")
-	shipstate
+	shipstate: string
 	@Column(name = "SHIPZIP")
-	shipzip
+	shipzip: string
 	@Column(name = "SHIPCOUNTRY")
-	shipcountry
+	shipcountry: string
 	@Column(name = "BILLADDR1")
-	billaddr1
+	billaddr1: string
 	@Column(name = "BILLADDR2")
-	billaddr2
+	billaddr2: string
 	@Column(name = "BILLCITY")
-	billcity
+	billcity: string
 	@Column(name = "BILLSTATE")
-	billstate
+	billstate: string
 	@Column(name = "BILLZIP")
-	billzip
+	billzip: string
 	@Column(name = "BILLCOUNTRY")
-	billcountry
+	billcountry: string
 	@Column(name = "COURIER")
-	courier
+	courier: string
 	@Column(name = "TOTALPRICE")
 	totalprice: EBigDecimal
 	@Column(name = "BILLTOFIRSTNAME")
-	billtofirstname
+	billtofirstname: string
 	@Column(name = "BILLTOLASTNAME")
-	billtolastname
+	billtolastname: string
 	@Column(name = "SHIPTOFIRSTNAME")
-	shiptofirstname
+	shiptofirstname: string
 	@Column(name = "SHIPTOLASTNAME")
-	shiptolastname
+	shiptolastname: string
 	@Column(name = "CREDITCARD")
-	creditcard
+	creditcard: string
 	@Column(name = "EXPRDATE")
-	exprdate
+	exprdate: string
 	@Column(name = "CARDTYPE")
-	cardtype
+	cardtype: string
 	@Column(name = "LOCALE")
-	locale
+	locale: string
 }

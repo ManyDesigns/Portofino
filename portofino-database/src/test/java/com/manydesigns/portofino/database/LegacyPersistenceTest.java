@@ -3,6 +3,7 @@ package com.manydesigns.portofino.database;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 @Test
@@ -14,4 +15,7 @@ public class LegacyPersistenceTest extends PersistenceTest {
         setup(appDir);
     }
 
+    @Override
+    @Ignore
+    public void testDisabledDatabasesAreSkipped() {}
 }

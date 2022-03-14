@@ -4,6 +4,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.hibernate.EntityMode;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 @Test
@@ -20,5 +21,8 @@ public class POJOLegacyPersistenceTest extends POJOPersistenceTest {
         persistence.initModel();
     }
 
+    @Override
+    @Ignore
+    public void testDisabledDatabasesAreSkipped() {}
 
 }

@@ -5,10 +5,10 @@ import javax.persistence.Table;
 entity category {
 	id {
 		@Column(name = "CATID")
-		catid
+		catid: string
 	}
 	@Column(name = "NAME")
-	name
+	name: string
 	@Column(name = "DESCN")
-	descn
+	descn: string
 }

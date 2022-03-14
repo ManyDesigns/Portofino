@@ -115,6 +115,9 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
+        for (Annotation annotation : annotations) {
+            visitor.visit(annotation);
+        }
         for (Schema schema : schemas) {
             visitor.visit(schema);
         }

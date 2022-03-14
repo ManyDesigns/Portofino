@@ -5,10 +5,10 @@ import javax.persistence.Table;
 entity item {
 	id {
 		@Column(name = "ITEMID")
-		itemid
+		itemid: string
 	}
 	@Column(name = "PRODUCTID")
-	productid
+	productid: string
 	@Column(name = "LISTPRICE")
 	listprice: EBigDecimal
 	@Column(name = "UNITCOST")
@@ -16,17 +16,17 @@ entity item {
 	@Column(name = "SUPPLIER")
 	supplier: EBigInteger
 	@Column(name = "STATUS")
-	status
+	status: string
 	@Column(name = "ATTR1")
-	attr1
+	attr1: string
 	@Column(name = "ATTR2")
-	attr2
+	attr2: string
 	@Column(name = "ATTR3")
-	attr3
+	attr3: string
 	@Column(name = "ATTR4")
-	attr4
+	attr4: string
 	@Column(name = "ATTR5")
-	attr5
+	attr5: string
 	FK_ITEM_2 --> supplier(suppid=supplier)
 	FK_ITEM_1 --> product(productid=productid)
 }

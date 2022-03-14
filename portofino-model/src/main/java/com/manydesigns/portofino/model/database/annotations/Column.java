@@ -23,7 +23,7 @@ package com.manydesigns.portofino.model.database.annotations;
 public @interface Column {
     String name() default "";
     int jdbcType() default Integer.MIN_VALUE;
-    String columnType();
+    String columnType() default "";
     boolean autoincrement() default false;
     boolean nullable() default false;
     int length() default -1;

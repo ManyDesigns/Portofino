@@ -24,6 +24,7 @@ public class EntityModelBaseVisitor extends ModelBaseVisitor<EModelElement> {
         defaults.put("long", "ELongObject");
         defaults.put("int!", "EInt");
         defaults.put("int", "EIntObject");
+        defaults.put("string", "EString");
         return defaults.build();
     }
 

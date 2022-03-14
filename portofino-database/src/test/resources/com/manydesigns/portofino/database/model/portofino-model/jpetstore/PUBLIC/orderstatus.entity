@@ -12,5 +12,5 @@ entity orderstatus {
 	@Column(name = "TIMESTAMP")
 	timestamp: java.sql.Date
 	@Column(name = "STATUS")
-	status
+	status: string
 }

@@ -68,7 +68,8 @@ public interface Annotated {
 
     default Optional<Annotation> getAnnotation(Class<? extends java.lang.annotation.Annotation> type) {
         return getAnnotations().stream().filter(
-                a -> type.isAssignableFrom(a.getJavaAnnotationClass()) || a.getType().equals(type.getName()))
+                a -> (a.getJavaAnnotationClass() != null && type.isAssignableFrom(a.getJavaAnnotationClass())) ||
+                        a.getType().equals(type.getName()))
                 .findFirst();
     }
 

@@ -10,7 +10,7 @@ entity lineitem {
 		linenum: EBigInteger
 	}
 	@Column(name = "ITEMID")
-	itemid
+	itemid: string
 	@Column(name = "QUANTITY")
 	quantity: EBigInteger
 	@Column(name = "UNITPRICE")

@@ -5,13 +5,13 @@ import javax.persistence.Table;
 entity product {
 	id {
 		@Column(name = "PRODUCTID")
-		productid
+		productid: string
 	}
 	@Column(name = "CATEGORY")
-	category
+	category: string
 	@Column(name = "NAME")
-	name
+	name: string
 	@Column(name = "DESCN")
-	descn
+	descn: string
 	FK_PRODUCT_1 --> category(catid=category)
 }

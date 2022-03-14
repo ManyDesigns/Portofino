@@ -8,19 +8,19 @@ entity supplier {
 		suppid: EBigInteger
 	}
 	@Column(name = "NAME")
-	name
+	name: string
 	@Column(name = "STATUS")
-	status
+	status: string
 	@Column(name = "ADDR1")
-	addr1
+	addr1: string
 	@Column(name = "ADDR2")
-	addr2
+	addr2: string
 	@Column(name = "CITY")
-	city
+	city: string
 	@Column(name = "STATE")
-	state
+	state: string
 	@Column(name = "ZIP")
-	zip
+	zip: string
 	@Column(name = "PHONE")
-	phone
+	phone: string
 }

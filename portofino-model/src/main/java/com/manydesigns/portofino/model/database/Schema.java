@@ -122,6 +122,10 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         assert database != null;
         this.configuration = configuration;
         key = "portofino.database." + getDatabase().getDatabaseName() + ".schemas." + getSchemaName();
+    }
+
+    public void link(Model model, Configuration configuration) {
+        // We need annotations to be initialized
         if(actualSchemaName == null) {
             actualSchemaName = configuration.getString(key);
             ePackage.getEAnnotations().removeIf(a -> a.getSource().equals(com.manydesigns.portofino.model.database.annotations.Schema.class.getName()));
@@ -133,8 +137,6 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
             actualSchemaName = getSchemaName();
         }
     }
-
-    public void link(Model model, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         for (Table table : tables) {

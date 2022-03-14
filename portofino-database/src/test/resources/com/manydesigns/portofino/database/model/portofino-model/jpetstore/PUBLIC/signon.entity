@@ -5,8 +5,8 @@ import javax.persistence.Table;
 entity signon {
 	id {
 		@Column(name = "USERNAME")
-		username
+		username: string
 	}
 	@Column(name = "PASSWORD")
-	password
+	password: string
 }
