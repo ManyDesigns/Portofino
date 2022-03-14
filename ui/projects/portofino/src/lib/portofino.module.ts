@@ -95,7 +95,6 @@ import {BooleanFieldComponent} from "./fields/boolean-field.component";
 import {NumberFieldComponent} from "./fields/number-field.component";
 import {TextFieldComponent} from "./fields/text-field.component";
 import {SelectFieldComponent} from "./fields/select-field.component";
-import {PageFactoryComponent, PageSettingsPanelComponent} from "./page";
 import {LanguageSelectorComponent} from "./i18n/language.selector.component";
 import {LanguageInterceptor} from "./i18n/language.interceptor";
 import {CreatePageComponent, DeletePageComponent, MovePageComponent, PageCrudService} from "./administration/page-crud.service";

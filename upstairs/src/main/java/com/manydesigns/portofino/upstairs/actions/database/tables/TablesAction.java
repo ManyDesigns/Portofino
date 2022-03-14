@@ -310,10 +310,10 @@ public class TablesAction extends AbstractResourceAction {
                 //Don't add the annotation: permissions have their default values
             } else {
                 Annotation newAnn = new Annotation(EntityPermissions.class);
-                newAnn.setProperty("create", StringUtils.join(create, ", "));
-                newAnn.setProperty("read", StringUtils.join(read, ", "));
-                newAnn.setProperty("update", StringUtils.join(update, ", "));
-                newAnn.setProperty("delete", StringUtils.join(delete, ", "));
+                newAnn.setPropertyValue("create", StringUtils.join(create, ", "));
+                newAnn.setPropertyValue("read", StringUtils.join(read, ", "));
+                newAnn.setPropertyValue("update", StringUtils.join(update, ", "));
+                newAnn.setPropertyValue("delete", StringUtils.join(delete, ", "));
                 existing.addAnnotation(newAnn);
             }
 
