@@ -571,7 +571,16 @@ public class SessionFactoryBuilder {
         Annotation annotation;
         for(Column column : table.getColumns()) {
             String propertyName = column.getActualPropertyName();
-            CtField field = new CtField(classPool.get(column.getActualJavaType().getName()), propertyName, cc);
+            Class<?> javaType = column.getActualJavaType();
+            if(javaType == null) {
+                logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
+                        table.getTableName(),
+                        column.getColumnName(),
+                        column.getJdbcType(),
+                        column.getJavaType());
+                continue;
+            }
+            CtField field = new CtField(classPool.get(javaType.getName()), propertyName, cc);
             AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
             annotation = new Annotation(javax.persistence.Column.class.getName(), constPool);
             annotation.addMemberValue("name", new StringMemberValue(jpaEscape(column.getColumnName()), constPool));

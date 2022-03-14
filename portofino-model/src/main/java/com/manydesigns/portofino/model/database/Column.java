@@ -134,24 +134,11 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
 
         if(javaType != null) {
             property.setEType(ensureType(javaType));
-        } else if(property.getEType() == null) {
+        } else {
             if(getColumnType() == null) {
                 throw new IllegalStateException(getQualifiedName() + ": columnType must not be null when property type is null");
             }
-            Class<?> actualJavaType = Type.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
-            if (actualJavaType != null) {
-                property.setEType(ensureType(actualJavaType));
-            } else {
-                logger.error("Cannot determine default Java type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
-                        table.getTableName(),
-                        getColumnName(),
-                        getJdbcType(),
-                        javaType);
-            }
-        } else {
-            if (getActualJavaType() == null) {
-                logger.warn("Cannot load column {} of java type: {}", getQualifiedName(), property.getEType().getName());
-            }
+            property.setEType(null);
         }
     }
 
@@ -276,7 +263,11 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public Class<?> getActualJavaType() {
-        return property.getEType() != null ? property.getEType().getInstanceClass() : null;
+        if (property.getEType() != null) {
+            return property.getEType().getInstanceClass();
+        } else {
+            return Type.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
+        }
     }
 
     @XmlAttribute()
