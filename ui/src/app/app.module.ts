@@ -60,30 +60,30 @@ export class AppComponent {
   constructor(@Inject(LOCALE_STORAGE_SERVICE) protected storage: LocalStorageService) {}
 
   initApiRoot = (app: PortofinoAppComponent) => {
-    app.apiRoot = this.storage.get(API_ROOT_KEY) || "http://localhost:18080/api";
+    app.apiRoot = this.storage.get(API_ROOT_KEY) || "http://localhost:8080/api";
     console.log("API root:", app.apiRoot);
     app.upstairsLink = null;
   };
 }
 
 @NgModule({
-  declarations: [AppComponent],
-  providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
-    { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
-  ],
-  imports: [
-    RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()),
-    PortofinoModule, PortofinoUpstairsModule,
-    BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
-    MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
-    MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
-    MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatLuxonDateModule, ScrollingModule,
-    FileInputAccessorModule, NgxdModule, QuillModule,
-    TranslateModule.forRoot()],
-  entryComponents: [],
-  bootstrap: [AppComponent]
+    declarations: [AppComponent],
+    providers: [
+        { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
+        { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
+    ],
+    imports: [
+        RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()),
+        PortofinoModule, PortofinoUpstairsModule,
+        BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
+        MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
+        MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
+        MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
+        MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatLuxonDateModule, ScrollingModule,
+        FileInputAccessorModule, NgxdModule, QuillModule,
+        TranslateModule.forRoot()
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
   static navigation(): new(...args) => DefaultNavigationComponent {
