@@ -1,0 +1,44 @@
+import com.manydesigns.elements.annotations.Email;
+import com.manydesigns.elements.annotations.FileBlob;
+import com.manydesigns.elements.annotations.Password;
+import com.manydesigns.portofino.model.database.annotations.Column;
+import com.manydesigns.portofino.model.database.annotations.Table;
+import tt.members;
+import tt.tickets;
+
+@Table(shortName = "%{first_name} %{last_name}", name = "users")
+entity users {
+	id {
+		@Column(columnType = "INT", autoincrement = true, nullable = false, jdbcType = 4, length = 10, scale = 0)
+		id
+	}
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	@Email
+	email
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 255, scale = 0)
+	@Password(confirmationRequired = true)
+	password
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	first_name
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	last_name
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = false, jdbcType = 93, length = 19, scale = 0)
+	registration
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	registration_ip
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = true, jdbcType = 93, length = 19, scale = 0)
+	last_access
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 255, scale = 0)
+	last_access_ip
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = true, jdbcType = 93, length = 19, scale = 0)
+	validated
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 255, scale = 0)
+	token
+	@Column(columnType = "BIT", autoincrement = false, nullable = false, jdbcType = -7, length = 0, scale = 0)
+	admin
+	@Column(columnType = "BIT", autoincrement = false, nullable = false, jdbcType = -7, length = 0, scale = 0)
+	project_manager
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 255, scale = 0)
+	@FileBlob
+	avatar
+}

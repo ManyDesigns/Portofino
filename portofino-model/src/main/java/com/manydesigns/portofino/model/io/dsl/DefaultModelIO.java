@@ -9,6 +9,7 @@ import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -175,8 +176,9 @@ public class DefaultModelIO implements ModelIO {
             domainDefFile.delete();
         } else {
             try(OutputStreamWriter os = fileWriter(domainDefFile)) {
-                writeImports(domain, os);
-                writeAnnotations(domain, os, "");
+                Map<String, String> imports = writeImports(domain, os);
+                Map<String, String> typeAliases = MapUtils.invertMap(imports);
+                writeAnnotations(domain, os, typeAliases,"");
                 os.write("domain " + domain.getName() + ";");
             }
         }
@@ -221,9 +223,9 @@ public class DefaultModelIO implements ModelIO {
     protected void saveEntity(EClass entity, FileObject domainDir) throws IOException {
         FileObject entityFile = domainDir.resolveFile(entity.getName() + ".entity");
         try(OutputStreamWriter os = fileWriter(entityFile)) {
-            writeImports(entity, os);
-
-            writeAnnotations(entity, os, "");
+            Map<String, String> imports = writeImports(entity, os);
+            Map<String, String> typeAliases = MapUtils.invertMap(imports);
+            writeAnnotations(entity, os, typeAliases, "");
             os.write("entity " + entity.getName() + " {" + System.lineSeparator());
             List<EStructuralFeature> id = entity.getEStructuralFeatures().stream()
                     .filter(a -> a instanceof EAttribute && a.getEAnnotation(Id.class.getName()) != null)
@@ -234,7 +236,7 @@ public class DefaultModelIO implements ModelIO {
                     EAnnotation ann = property.getEAnnotation(Id.class.getName());
                     try {
                         property.getEAnnotations().remove(ann);
-                        writeProperty((EAttribute) property, os, "\t\t");
+                        writeProperty((EAttribute) property, os, typeAliases, "\t\t");
                     } finally {
                         property.getEAnnotations().add(ann);
                     }
@@ -244,10 +246,10 @@ public class DefaultModelIO implements ModelIO {
             for(EStructuralFeature property : entity.getEStructuralFeatures()) {
                 if(property instanceof EAttribute) {
                     if(!id.contains(property)) {
-                        writeProperty((EAttribute) property, os, "\t");
+                        writeProperty((EAttribute) property, os, typeAliases, "\t");
                     }
                 } else if(property instanceof EReference && !property.isDerived()) {
-                    writeReference((EReference) property, os, "\t");
+                    writeReference((EReference) property, os, typeAliases, "\t");
                 }
             }
             os.write("}");
@@ -355,8 +357,9 @@ public class DefaultModelIO implements ModelIO {
         });
     }
 
-    protected void writeProperty(EAttribute property, Writer writer, String indent) throws IOException {
-        writeAnnotations(property, writer, indent);
+    protected void writeProperty(
+            EAttribute property, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
+        writeAnnotations(property, writer, typeAliases, indent);
         writer.write(indent + property.getName());
         EClassifier type = property.getEType();
         if(type != null) {
@@ -367,13 +370,13 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    protected void writeReference(EReference reference, Writer writer, String indent) throws IOException {
+    protected void writeReference(EReference reference, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
         EAnnotation mappings = reference.getEAnnotation(KeyMappings.class.getName());
         try {
             if(mappings != null) {
                 reference.getEAnnotations().remove(mappings);
             }
-            writeAnnotations(reference, writer, indent);
+            writeAnnotations(reference, writer, typeAliases, indent);
         } finally {
             if(mappings != null) {
                 reference.getEAnnotations().add(mappings);
@@ -405,14 +408,16 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    public static void writeAnnotations(EModelElement annotated, Writer writer, String indent) throws IOException {
+    public static void writeAnnotations(
+            EModelElement annotated, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
         for(EAnnotation annotation : annotated.getEAnnotations()) {
-            writeAnnotation(annotation, writer, indent);
+            writeAnnotation(annotation, writer, typeAliases, indent);
         }
     }
 
-    public static void writeAnnotation(EAnnotation annotation, Writer writer, String indent) throws IOException {
-        writer.write(indent + "@" + annotation.getSource());
+    public static void writeAnnotation(
+            EAnnotation annotation, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
+        writer.write(indent + "@" + typeAliases.getOrDefault(annotation.getSource(), annotation.getSource()));
         if(!annotation.getDetails().isEmpty()) {
             writer.write("(");
             if(annotation.getDetails().size() == 1 && annotation.getDetails().containsKey("value")) {

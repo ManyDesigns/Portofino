@@ -1,0 +1,4 @@
+import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
+
+@JDBCConnection(driver = "org.postgresql.Driver")
+domain tt;

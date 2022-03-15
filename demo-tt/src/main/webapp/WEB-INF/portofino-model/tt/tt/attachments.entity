@@ -1,0 +1,22 @@
+import com.manydesigns.elements.annotations.FileBlob;
+import com.manydesigns.portofino.model.database.annotations.Column;
+import com.manydesigns.portofino.model.database.annotations.Table;
+import tt.tickets;
+
+@Table(name = "attachments")
+entity attachments {
+	id {
+		@Column(columnType = "INT", autoincrement = true, nullable = false, jdbcType = 4, length = 10, scale = 0)
+		id
+	}
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	title
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	@FileBlob
+	file
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 10, scale = 0)
+	project
+	@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+	n
+	fk_attachment_ticket --> tickets(project=project, n=n)
+}

@@ -1,0 +1,34 @@
+import com.manydesigns.elements.annotations.RegExp;
+import com.manydesigns.elements.annotations.RichText;
+import com.manydesigns.portofino.model.database.annotations.Column;
+import com.manydesigns.portofino.model.database.annotations.Table;
+import tt.components;
+import tt.members;
+import tt.tickets;
+import tt.versions;
+
+@Table(shortName = "%{id} - %{title}", name = "projects")
+entity projects {
+	id {
+		@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 10, scale = 0)
+		@RegExp(value = "[a-zA-Z0-9]+", errorMessage = "only.simple.letters.or.numbers.allowed")
+		id
+	}
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	title
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 4000, scale = 0)
+	@RichText(true)
+	description
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 255, scale = 0)
+	url
+	@Column(columnType = "BIT", autoincrement = false, nullable = false, jdbcType = -7, length = 0, scale = 0)
+	public_
+	@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+	last_ticket
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = false, jdbcType = 93, length = 19, scale = 0)
+	created
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = false, jdbcType = 93, length = 19, scale = 0)
+	last_updated
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 255, scale = 0)
+	logo
+}

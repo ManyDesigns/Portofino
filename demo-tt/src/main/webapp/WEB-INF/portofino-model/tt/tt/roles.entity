@@ -1,0 +1,13 @@
+import com.manydesigns.portofino.model.database.annotations.Column;
+import com.manydesigns.portofino.model.database.annotations.Table;
+import tt.members;
+
+@Table(shortName = "%{role}", name = "roles")
+entity roles {
+	id {
+		@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+		id
+	}
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	role
+}
