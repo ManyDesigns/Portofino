@@ -31,6 +31,7 @@ import com.manydesigns.portofino.model.annotations.Enabled;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.Schema;
+import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.model.database.annotations.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
@@ -254,13 +255,6 @@ public class Persistence {
         table.setSchema(schema);
         schema.getTables().add(table);
         PrimaryKey pk = new PrimaryKey(table);
-        EAnnotation tableAnn = entity.getEAnnotation(javax.persistence.Table.class.getName());
-        if(tableAnn != null) {
-            table.setTableName(tableAnn.getDetails().get("name"));
-        }
-        if(StringUtils.isBlank(table.getTableName())) {
-            table.setTableName(entity.getName());
-        }
         entity.getEAttributes().forEach(property -> setupColumn(table, pk, property));
         if(!pk.getColumns().isEmpty()) {
             pk.getColumns().sort(Comparator.comparingInt(c ->
@@ -302,9 +296,6 @@ public class Persistence {
         Column column = new Column(property);
         column.setTable(table);
         table.getColumns().add(column);
-        if(StringUtils.isBlank(column.getColumnName())) {
-            column.setColumnName(property.getName());
-        }
         //TODO column type
         if(property.getEAnnotation(Id.class.getName()) != null) {
             pk.add(column);

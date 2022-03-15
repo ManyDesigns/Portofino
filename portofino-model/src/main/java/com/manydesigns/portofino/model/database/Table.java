@@ -61,25 +61,16 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     protected List<Annotation> annotations = new ArrayList<>();
 
     protected Schema schema;
-    protected String tableName;
-
-    protected String javaClass;
-    protected String idStrategy;
-
-    protected String shortName;
-
-    protected PrimaryKey primaryKey;
-
     protected EClass eClass;
+    protected PrimaryKey primaryKey;
+    protected Annotation tableInfo;
 
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
 
     protected final List<ForeignKey> oneToManyRelationships;
-    protected Class<?> actualJavaClass;
-    protected Class actualIdStrategy;
-    protected String entityName;
+    protected Class<?> actualIdStrategy;
 
     //**************************************************************************
     // Logging
@@ -94,11 +85,13 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     public Table(EClass eClass) {
         this.eClass = eClass;
-        initAnnotations(eClass);
         columns = new ArrayList<>();
         foreignKeys = new ArrayList<>();
         oneToManyRelationships = new ArrayList<>();
         selectionProviders = new ArrayList<>();
+        initAnnotations(eClass);
+        tableInfo = ensureAnnotation(
+                com.manydesigns.portofino.model.database.annotations.Table.class);
     }
 
     public Table() {
@@ -117,9 +110,9 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getQualifiedName() {
         if(schema == null || schema.getQualifiedName() == null) {
-            return tableName;
+            return getTableName();
         }
-        return MessageFormat.format("{0}.{1}", schema.getQualifiedName(), tableName);
+        return MessageFormat.format("{0}.{1}", schema.getQualifiedName(), getTableName());
     }
 
     @Override
@@ -136,30 +129,23 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public void reset() {
-        actualJavaClass = null;
         actualIdStrategy = null;
         oneToManyRelationships.clear();
     }
 
     public void init(Model model, Configuration configuration) {
         assert schema != null;
-        if(tableName == null) {
-            throw new IllegalStateException("Table name must not be null");
-        }
-        
+
         // wire up javaClass
-        actualJavaClass = ReflectionUtil.loadClass(javaClass);
-        if(!StringUtils.isBlank(idStrategy)) {
-            actualIdStrategy = ReflectionUtil.loadClass(idStrategy);
+        Class<?> actualJavaClass = ReflectionUtil.loadClass(getJavaClass());
+        eClass.setInstanceClassName(getJavaClass());
+        eClass.setInstanceClass(actualJavaClass);
+        if(!StringUtils.isBlank(getIdStrategy())) {
+            actualIdStrategy = ReflectionUtil.loadClass(getIdStrategy());
         }
 
-        String baseEntityName;
-        if (StringUtils.isEmpty(entityName)) {
-            baseEntityName = DatabaseLogic.normalizeName(getTableName());
-        } else {
-            baseEntityName = DatabaseLogic.normalizeName(entityName);
-        }
-
+        String baseEntityName = DatabaseLogic.normalizeName(
+                StringUtils.defaultIfBlank(getEntityName(), getTableName()));
         String calculatedEntityName = baseEntityName;
 
         int i = 2;
@@ -173,7 +159,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
             calculatedEntityName = baseEntityName + "_" + (i++);
         }
 
-        eClass.setName(calculatedEntityName);
+        setEntityName(calculatedEntityName);
     }
 
     public void link(Model model, Configuration configuration) {}
@@ -230,29 +216,30 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     @Required
     @XmlAttribute(required = true)
     public String getTableName() {
-        return tableName;
+        return tableInfo.getPropertyValue("name");
     }
 
     public void setTableName(String tableName) {
-        this.tableName = tableName;
+        tableInfo.setPropertyValue("name", tableName);
     }
 
     @XmlAttribute(required = false)
     public String getJavaClass() {
-        return javaClass;
+        return tableInfo.getPropertyValue("javaClass");
     }
 
     public void setJavaClass(String javaClass) {
-        this.javaClass = javaClass;
+        tableInfo.setPropertyValue("javaClass", javaClass);
+        eClass.setInstanceClassName(getJavaClass());
     }
 
     @XmlAttribute
     public String getIdStrategy() {
-        return idStrategy;
+        return tableInfo.getPropertyValue("idStrategy");
     }
 
     public void setIdStrategy(String idStrategy) {
-        this.idStrategy = idStrategy;
+        tableInfo.setPropertyValue("idStrategy", idStrategy);
     }
 
     @XmlElementWrapper(name="columns")
@@ -272,18 +259,18 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         this.primaryKey = primaryKey;
     }
 
-    public Class getActualJavaClass() {
-        return actualJavaClass;
+    public Class<?> getActualJavaClass() {
+        return eClass.getInstanceClass();
     }
 
-    public Class getActualIdStrategy() {
+    public Class<?> getActualIdStrategy() {
         return actualIdStrategy;
     }
 
-    public void setActualJavaClass(Class actualJavaClass) {
-        this.actualJavaClass = actualJavaClass;
-        if(this.javaClass != null) {
-            this.javaClass = actualJavaClass.getName();
+    public void setActualJavaClass(Class<?> actualJavaClass) {
+        eClass.setInstanceClass(actualJavaClass);
+        if(this.getJavaClass() != null) {
+            setJavaClass(actualJavaClass.getName());
         }
     }
 
@@ -296,11 +283,11 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     @XmlAttribute()
     public String getEntityName() {
-        return entityName;
+        return eClass.getName();
     }
 
     public void setEntityName(String entityName) {
-        this.entityName = entityName;
+        eClass.setName(entityName);
     }
 
     public String getActualEntityName() {
@@ -326,11 +313,11 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
 
     @XmlAttribute(required = false)
     public String getShortName() {
-        return shortName;
+        return tableInfo.getPropertyValue("shortName");
     }
 
     public void setShortName(String shortName) {
-        this.shortName = shortName;
+        tableInfo.setPropertyValue("shortName", shortName);
     }
 
     //**************************************************************************

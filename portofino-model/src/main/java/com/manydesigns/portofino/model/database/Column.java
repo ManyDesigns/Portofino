@@ -59,7 +59,7 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     // Fields (logical)
     //**************************************************************************
 
-    protected String javaType;
+    protected String javaType; // Legacy XML-only property
     protected EAttribute property;
     protected Annotation columnInfo;
     protected List<Annotation> annotations = new ArrayList<>();
@@ -135,10 +135,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         if(javaType != null) {
             property.setEType(ensureType(javaType));
         } else {
-            if(getColumnType() == null) {
-                throw new IllegalStateException(getQualifiedName() + ": columnType must not be null when property type is null");
+            if(getColumnType() != null) {
+                property.setEType(null);
             }
-            property.setEType(null);
         }
     }
 

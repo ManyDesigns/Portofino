@@ -1,5 +1,5 @@
 import com.manydesigns.portofino.model.database.annotations.Column;
-import javax.persistence.Table;
+import com.manydesigns.portofino.model.database.annotations.Table;
 
 @Table(name = "ACCOUNT")
 entity account {
