@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.model.issues.Issue;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -49,6 +50,7 @@ public class Model {
     protected final LinkedList<Database> databases;
     protected final List<EPackage> domains = new ArrayList<>();
     protected final Map<EPackage, Map<String, EObject>> objects = new HashMap<>();
+    protected final List<Issue> issues = new ArrayList<>();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -65,6 +67,7 @@ public class Model {
     //**************************************************************************
 
     public void init(Configuration configuration) {
+        issues.clear();
         for (Database database : databases) {
             init(database, configuration);
         }
@@ -76,22 +79,8 @@ public class Model {
         new LinkVisitor(this, configuration).visit(rootObject);
     }
 
-    public EPackage ensureDomain(String name) {
-        return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
-            EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
-            ePackage.setName(name);
-            getDomains().add(ePackage);
-            return ePackage;
-        });
-    }
-
-    //**************************************************************************
-    // Getters/setter
-    //**************************************************************************
-
     @XmlElementWrapper(name="databases")
-    @XmlElement(name = "database",
-            type = Database.class)
+    @XmlElement(name = "database", type = Database.class)
     public List<Database> getDatabases() {
         return databases;
     }
@@ -134,11 +123,24 @@ public class Model {
         return result;
     }
 
+    public EPackage ensureDomain(String name) {
+        return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
+            EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
+            ePackage.setName(name);
+            getDomains().add(ePackage);
+            return ePackage;
+        });
+    }
+
     public void addObject(EPackage domain, String name, EObject object) {
         Map<String, EObject> objects = this.objects.getOrDefault(domain, new HashMap<>());
         if(objects.putIfAbsent(name, object) != null) {
             throw new RuntimeException("Object already present: " + name + " in domain " + domain);
         }
         this.objects.put(domain, objects);
+    }
+
+    public List<Issue> getIssues() {
+        return issues;
     }
 }

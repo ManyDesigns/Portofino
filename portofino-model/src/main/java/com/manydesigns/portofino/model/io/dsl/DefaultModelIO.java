@@ -89,9 +89,9 @@ public class DefaultModelIO implements ModelIO {
             String baseName = child.getName().getBaseName();
             if(child.isFile() && !baseName.endsWith(".changelog.xml") && !baseName.endsWith(".properties")) {
                 if(baseName.endsWith(".domain")) {
-                    loadDomainFile(domain, child);
+                    loadDomainFile(model, domain, child);
                 } else if(baseName.endsWith(".entity")) {
-                    loadEntity(domain, child);
+                    loadEntity(model, domain, child);
                 } else if(baseName.endsWith(".object")) {
                     loadObject(model, domain, child);
                 } else {
@@ -103,10 +103,9 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    private void loadDomainFile(EPackage domain, FileObject file) throws IOException {
+    private void loadDomainFile(Model model, EPackage domain, FileObject file) throws IOException {
         try (InputStream inputStream = file.getContent().getInputStream()) {
-            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
-            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+            ModelParser parser = getParser(model, domain, inputStream);
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
@@ -129,10 +128,9 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadEntity(EPackage domain, FileObject file) throws IOException {
+    protected void loadEntity(Model model, EPackage domain, FileObject file) throws IOException {
         try(InputStream inputStream = file.getContent().getInputStream()) {
-            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
-            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+            ModelParser parser = getParser(model, domain, inputStream);
             ModelParser.StandaloneEntityContext parseTree = parser.standaloneEntity();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
@@ -152,8 +150,7 @@ public class DefaultModelIO implements ModelIO {
 
     protected void loadObject(Model model, EPackage domain, FileObject file) throws IOException {
         try(InputStream inputStream = file.getContent().getInputStream()) {
-            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
-            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+            ModelParser parser = getParser(model, domain, inputStream);
             ModelParser.StandaloneObjectContext parseTree = parser.standaloneObject();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 ModelParser.ObjectContext objectContext = parseTree.object();
@@ -165,6 +162,15 @@ public class DefaultModelIO implements ModelIO {
         } catch (IOException e) {
             logger.error("Could not load resource: " + file.getName().getURI(), e);
         }
+    }
+
+    @NotNull
+    private ModelParser getParser(Model model, EObject parentObject, InputStream inputStream) throws IOException {
+        ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
+        ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+        parser.removeErrorListeners();
+        parser.addErrorListener(new ModelIssueErrorListener(model, parentObject));
+        return parser;
     }
 
     @Override
