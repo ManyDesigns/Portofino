@@ -1,18 +1,24 @@
 grammar Model;
 
-standaloneDomain: importDeclaration* domain;
+standaloneDomain: importDeclaration* domain EOF;
 domain: annotation* DOMAIN name=simpleIdentifier (';' | '{' (domain | entity | relationship)* '}')?;
 
-standaloneEntity: importDeclaration* entity;
+standaloneEntity: importDeclaration* entity EOF;
 entity: annotation* ENTITY name=simpleIdentifier '{'
   (ID '{' idProperties+=property+ '}')?
   properties+=property*
   relationshipProperty*
 '}';
 
+standaloneObject: object EOF;
+object: OBJECT name=simpleIdentifier ':' className=identifier '{'
+  properties+=propertyAssignment*
+'}';
+
 importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)? ';'?;
 
 property: annotation* name=simpleIdentifier (':' type)? (NOT_NULLABLE)?;
+propertyAssignment: name=simpleIdentifier '=' literal;
 
 relationship: annotation* name=identifier ':' a=type '-->' b=type;
 
@@ -40,6 +46,7 @@ STRING: '"' ('\\'('"'|'\\')|.)*? '"';
 NOT_NULLABLE: '!';
 
 SCHEMA: 'schema';
+OBJECT: 'object';
 IMPORT: 'import';
 ID: 'id';
 ENTITY: 'entity';

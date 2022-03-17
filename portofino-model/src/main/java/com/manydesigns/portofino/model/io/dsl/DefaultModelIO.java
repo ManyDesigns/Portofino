@@ -92,6 +92,8 @@ public class DefaultModelIO implements ModelIO {
                     loadDomainFile(domain, child);
                 } else if(baseName.endsWith(".entity")) {
                     loadEntity(domain, child);
+                } else if(baseName.endsWith(".object")) {
+                    loadObject(model, domain, child);
                 } else {
                     logger.warn("Unknown file ignored when loading model: " + child.getName().getPath());
                 }
@@ -142,6 +144,23 @@ public class DefaultModelIO implements ModelIO {
                 }
             } else {
                 throw new IOException("Could not parse entity definition " + file.getName().getPath()); //TODO properly report errors
+            }
+        } catch (IOException e) {
+            logger.error("Could not load resource: " + file.getName().getURI(), e);
+        }
+    }
+
+    protected void loadObject(Model model, EPackage domain, FileObject file) throws IOException {
+        try(InputStream inputStream = file.getContent().getInputStream()) {
+            ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
+            ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
+            ModelParser.StandaloneObjectContext parseTree = parser.standaloneObject();
+            if (parser.getNumberOfSyntaxErrors() == 0) {
+                ModelParser.ObjectContext objectContext = parseTree.object();
+                EObject object = new ModelObjectBuilderVisitor(model, domain).visitObject(objectContext);
+                model.addObject(domain, objectContext.name.getText(), object);
+            } else {
+                throw new IOException("Could not parse object definition " + file.getName().getPath()); //TODO properly report errors
             }
         } catch (IOException e) {
             logger.error("Could not load resource: " + file.getName().getURI(), e);
@@ -370,7 +389,8 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    protected void writeReference(EReference reference, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
+    protected void writeReference(
+            EReference reference, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
         EAnnotation mappings = reference.getEAnnotation(KeyMappings.class.getName());
         try {
             if(mappings != null) {

@@ -22,14 +22,13 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.database.Database;
 import org.apache.commons.configuration2.Configuration;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,6 +48,7 @@ public class Model {
 
     protected final LinkedList<Database> databases;
     protected final List<EPackage> domains = new ArrayList<>();
+    protected final Map<EPackage, Map<String, EObject>> objects = new HashMap<>();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -98,5 +98,47 @@ public class Model {
 
     public List<EPackage> getDomains() {
         return domains;
+    }
+
+    public synchronized void removeDatabase(Database database) {
+        databases.remove(database);
+        EPackage pkg = database.getModelElement();
+        getDomains().remove(pkg);
+        List<EPackage> toRemove = new ArrayList<>();
+        toRemove.add(pkg);
+        while(!toRemove.isEmpty()) {
+            pkg = toRemove.remove(0);
+            objects.remove(pkg);
+            toRemove.addAll(pkg.getESubpackages());
+        }
+    }
+
+    public void addDatabase(Database database) {
+        databases.add(database);
+        domains.add(database.getModelElement());
+    }
+
+    public EPackage getDomain(String name) {
+        String[] components = name.split("[.]");
+        List<EPackage> domains = this.domains;
+        EPackage result = null;
+        for(String s : components) {
+            Optional<EPackage> ePackage = domains.stream().filter(p -> s.equals(p.getName())).findFirst();
+            if(ePackage.isPresent()) {
+                result = ePackage.get();
+                domains = result.getESubpackages();
+            } else {
+                throw new RuntimeException("Domain " + name + " not known");
+            }
+        }
+        return result;
+    }
+
+    public void addObject(EPackage domain, String name, EObject object) {
+        Map<String, EObject> objects = this.objects.getOrDefault(domain, new HashMap<>());
+        if(objects.putIfAbsent(name, object) != null) {
+            throw new RuntimeException("Object already present: " + name + " in domain " + domain);
+        }
+        this.objects.put(domain, objects);
     }
 }
