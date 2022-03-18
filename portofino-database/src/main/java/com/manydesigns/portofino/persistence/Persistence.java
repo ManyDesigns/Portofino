@@ -153,9 +153,7 @@ public class Persistence {
         if(!loadLegacyModel()) {
             try {
                 loadModel(new DefaultModelIO(getModelDirectory()));
-                model.getDomains().forEach(domain -> {
-                    setupDatabase(model, domain);
-                });
+                model.getDomains().forEach(domain -> setupDatabase(model, domain));
                 initModel();
             } catch (Exception e) {
                 logger.error("Cannot load/parse model", e);
@@ -178,59 +176,66 @@ public class Persistence {
     }
 
     protected void annotateDatabases(Collection<Database> databases) {
-        databases.forEach(db -> {
-            ConnectionProvider connectionProvider = db.getConnectionProvider();
-            if(connectionProvider instanceof JdbcConnectionProvider) {
-                db.removeAnnotation(JNDIConnection.class);
-                Annotation annotation = db.ensureAnnotation(JDBCConnection.class);
-                annotation.setPropertyValue("url", ((JdbcConnectionProvider) connectionProvider).getUrl());
-                annotation.setPropertyValue("driver", ((JdbcConnectionProvider) connectionProvider).getDriver());
-                annotation.setPropertyValue("username", ((JdbcConnectionProvider) connectionProvider).getUsername());
-                annotation.setPropertyValue("password", ((JdbcConnectionProvider) connectionProvider).getPassword());
-            } else {
-                db.removeAnnotation(JDBCConnection.class);
-                Annotation annotation = db.ensureAnnotation(JNDIConnection.class);
-                annotation.setPropertyValue("name", ((JndiConnectionProvider) connectionProvider).getJndiResource());
-            }
+        databases.forEach(this::annotateDatabase);
+    }
 
-            db.getAllTables().forEach(table -> {
-                if(!table.getTableName().equals(table.getActualEntityName())) {
-                    Annotation tableAnn = table.ensureAnnotation(javax.persistence.Table.class);
-                    tableAnn.setPropertyValue("name", table.getTableName());
-                }
-            });
+    private void annotateDatabase(Database db) {
+        ConnectionProvider connectionProvider = db.getConnectionProvider();
+        if(connectionProvider instanceof JdbcConnectionProvider) {
+            db.removeAnnotation(JNDIConnection.class);
+            Annotation annotation = db.ensureAnnotation(JDBCConnection.class);
+            annotation.setPropertyValue("url", ((JdbcConnectionProvider) connectionProvider).getUrl());
+            annotation.setPropertyValue("driver", ((JdbcConnectionProvider) connectionProvider).getDriver());
+            annotation.setPropertyValue("username", ((JdbcConnectionProvider) connectionProvider).getUsername());
+            annotation.setPropertyValue("password", ((JdbcConnectionProvider) connectionProvider).getPassword());
+        } else {
+            db.removeAnnotation(JDBCConnection.class);
+            Annotation annotation = db.ensureAnnotation(JNDIConnection.class);
+            annotation.setPropertyValue("name", ((JndiConnectionProvider) connectionProvider).getJndiResource());
+        }
+
+        db.getAllTables().forEach(table -> {
+            if(!table.getTableName().equals(table.getActualEntityName())) {
+                Annotation tableAnn = table.ensureAnnotation(javax.persistence.Table.class);
+                tableAnn.setPropertyValue("name", table.getTableName());
+            }
         });
     }
 
     protected Database setupDatabase(Model model, EPackage domain) {
         //Can't use getJavaAnnotation as they've not yet been resolved
         EAnnotation ann = domain.getEAnnotation(JDBCConnection.class.getName());
+        ConnectionProvider connectionProvider = null;
         if(ann != null) {
-            Database database = new Database(domain);
-            model.getDatabases().add(database);
             JdbcConnectionProvider cp = new JdbcConnectionProvider();
-            cp.setDatabase(database);
             cp.setUrl(ann.getDetails().get("url"));
             cp.setDriver(ann.getDetails().get("driver"));
             cp.setUsername(ann.getDetails().get("username"));
             cp.setPassword(ann.getDetails().get("password"));
-            database.setConnectionProvider(cp);
-            domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
-            return database;
+            connectionProvider = cp;
         } else {
             ann = domain.getEAnnotation(JNDIConnection.class.getName());
             if(ann != null) {
-                Database database = new Database(domain);
-                model.getDatabases().add(database);
                 JndiConnectionProvider cp = new JndiConnectionProvider();
-                cp.setDatabase(database);
                 cp.setJndiResource(ann.getDetails().get("name"));
-                database.setConnectionProvider(cp);
-                domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
-                return database;
+                connectionProvider = cp;
             }
         }
-        return null;
+        if(connectionProvider != null) {
+            Database database = new Database(domain);
+            Database existing = DatabaseLogic.findDatabaseByName(model, database.getName());
+            if (existing != null) {
+                logger.debug("Database " + database.getName() + " already exists");
+                return existing;
+            }
+            model.getDatabases().add(database);
+            connectionProvider.setDatabase(database);
+            database.setConnectionProvider(connectionProvider);
+            domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
+            return database;
+        } else {
+            return null;
+        }
     }
 
     protected Schema setupSchema(Database database, EPackage domain) {
@@ -379,16 +384,22 @@ public class Persistence {
         setups.clear();
         model.init(configuration);
         for (Database database : model.getDatabases()) {
-            Boolean enabled = database.getJavaAnnotation(Enabled.class).map(Enabled::value).orElse(true);
-            if(enabled) {
-                initConnectionProvider(database);
-            } else {
-                logger.info("Skipping disabled database " + database.getQualifiedName());
-            }
+            initDatabase(database);
         }
         annotateDatabases(model.getDatabases());
         if(cacheResetListenerRegistry != null) {
             cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
+        }
+    }
+
+    protected boolean initDatabase(Database database) {
+        Boolean enabled = database.getJavaAnnotation(Enabled.class).map(Enabled::value).orElse(true);
+        if(enabled) {
+            initConnectionProvider(database);
+            return true;
+        } else {
+            logger.info("Skipping disabled database " + database.getQualifiedName());
+            return false;
         }
     }
 

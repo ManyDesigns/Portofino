@@ -143,4 +143,8 @@ public class Model {
     public List<Issue> getIssues() {
         return issues;
     }
+
+    public Map<EPackage, Map<String, EObject>> getObjects() {
+        return objects;
+    }
 }
