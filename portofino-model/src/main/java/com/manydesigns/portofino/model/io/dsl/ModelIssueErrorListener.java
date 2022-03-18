@@ -11,14 +11,16 @@ public class ModelIssueErrorListener extends BaseErrorListener {
 
     private final Model model;
     private final EObject object;
+    private final String path;
 
-    public ModelIssueErrorListener(Model model, EObject object) {
+    public ModelIssueErrorListener(Model model, EObject object, String path) {
         this.model = model;
         this.object = object;
+        this.path = path;
     }
 
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-        model.getIssues().add(new Issue(Issue.Severity.ERROR, object, msg, "TODO", line, charPositionInLine));
+        model.getIssues().add(new Issue(Issue.Severity.ERROR, object, msg, path, line, charPositionInLine));
     }
 }

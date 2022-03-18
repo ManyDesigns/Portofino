@@ -38,7 +38,7 @@ public class DefaultModelIOTest {
         ElementsThreadLocals.setupDefaultElementsContext();
         DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
-        assertEquals(model.getDomains().size(), 1);
+        assertEquals(model.getDomains().size(), 2);
         FileObject outDir = VFS.getManager().resolveFile("ram://portofino/test-model-1");
         io = new DefaultModelIO(outDir);
         io.save(model);
@@ -63,6 +63,15 @@ public class DefaultModelIOTest {
                 "}");
         Model model2 = io.load();
         assertEquals(model2.getDomains().size(), 1);
+    }
+
+    @Test
+    public void testModelWithErrors() throws IOException {
+        ElementsThreadLocals.setupDefaultElementsContext();
+        DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
+        Model model = io.load();
+        assertEquals(model.getDomains().size(), 2);
+        assertEquals(model.getIssues().size(), 4);
     }
 
 }

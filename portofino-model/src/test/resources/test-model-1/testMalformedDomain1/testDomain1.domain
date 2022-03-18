@@ -1,0 +1,6 @@
+domain testDomain1 {
+    garbage
+    entity Person {
+        -->
+    }
+}

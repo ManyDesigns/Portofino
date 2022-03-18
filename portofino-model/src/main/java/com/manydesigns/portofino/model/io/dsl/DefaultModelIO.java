@@ -4,6 +4,7 @@ import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.database.annotations.KeyMappings;
 import com.manydesigns.portofino.model.database.annotations.Id;
 import com.manydesigns.portofino.model.io.ModelIO;
+import com.manydesigns.portofino.model.issues.Issue;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -105,7 +106,8 @@ public class DefaultModelIO implements ModelIO {
 
     private void loadDomainFile(Model model, EPackage domain, FileObject file) throws IOException {
         try (InputStream inputStream = file.getContent().getInputStream()) {
-            ModelParser parser = getParser(model, domain, inputStream);
+            String path = getQualifiedName(domain);
+            ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
@@ -117,20 +119,36 @@ public class DefaultModelIO implements ModelIO {
                         domain.getESubpackages().addAll(pkg.getESubpackages());
                         toLinkQueue.add(new ToLink(parseTree, domain));
                     } else {
-                        logger.error("Invalid domain, expected " + domain.getName() + ", got " + pkg.getName() + " in " + file.getName().getPath());
+                        String msg = "Invalid domain, expected " + domain.getName() + ", got " + pkg.getName() + " in " + file.getName().getPath();
+                        model.getIssues().add(new Issue(
+                                Issue.Severity.ERROR, domain, msg, path, null, null));
+                        logger.error(msg);
                     }
                 } else {
-                    logger.error("Not a domain: " + candidate + " in " + file.getName().getPath());
+                    String msg = "Not a domain: " + candidate + " in " + file.getName().getPath();
+                    model.getIssues().add(new Issue(Issue.Severity.ERROR, domain, msg, path, null, null));
+                    logger.error(msg);
                 }
-            } else {
-                throw new IOException("Could not parse domain definition " + file.getName().getPath()); //TODO properly report errors
             }
+        }
+    }
+
+    public static String getQualifiedName(EPackage domain) {
+        if (domain == null) {
+            return null;
+        }
+        String superQName = getQualifiedName(domain.getESuperPackage());
+        if (superQName != null) {
+            return superQName + "." + domain.getName();
+        } else {
+            return domain.getName();
         }
     }
 
     protected void loadEntity(Model model, EPackage domain, FileObject file) throws IOException {
         try(InputStream inputStream = file.getContent().getInputStream()) {
-            ModelParser parser = getParser(model, domain, inputStream);
+            String path = getQualifiedName(domain);
+            ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneEntityContext parseTree = parser.standaloneEntity();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
@@ -138,10 +156,10 @@ public class DefaultModelIO implements ModelIO {
                     domain.getEClassifiers().add((EClassifier) candidate);
                     toLinkQueue.add(new ToLink(parseTree, domain));
                 } else {
-                    logger.error("Not an entity: " + candidate + " in " + file.getName().getPath());
+                    String msg = "Not an entity: " + candidate + " in " + file.getName().getPath();
+                    model.getIssues().add(new Issue(Issue.Severity.ERROR, domain, msg, path, null, null));
+                    logger.error(msg);
                 }
-            } else {
-                throw new IOException("Could not parse entity definition " + file.getName().getPath()); //TODO properly report errors
             }
         } catch (IOException e) {
             logger.error("Could not load resource: " + file.getName().getURI(), e);
@@ -149,27 +167,30 @@ public class DefaultModelIO implements ModelIO {
     }
 
     protected void loadObject(Model model, EPackage domain, FileObject file) throws IOException {
+        String path = getQualifiedName(domain);
         try(InputStream inputStream = file.getContent().getInputStream()) {
-            ModelParser parser = getParser(model, domain, inputStream);
+            ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneObjectContext parseTree = parser.standaloneObject();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 ModelParser.ObjectContext objectContext = parseTree.object();
                 EObject object = new ModelObjectBuilderVisitor(model, domain).visitObject(objectContext);
                 model.addObject(domain, objectContext.name.getText(), object);
-            } else {
-                throw new IOException("Could not parse object definition " + file.getName().getPath()); //TODO properly report errors
             }
         } catch (IOException e) {
-            logger.error("Could not load resource: " + file.getName().getURI(), e);
+            String msg = "Could not load resource: " + file.getName().getURI();
+            model.getIssues().add(new Issue(
+                    Issue.Severity.ERROR, domain, msg + " – " + e, path, null, null));
+            logger.error(msg, e);
         }
     }
 
     @NotNull
-    private ModelParser getParser(Model model, EObject parentObject, InputStream inputStream) throws IOException {
+    private ModelParser getParser(
+            Model model, EObject parentObject, String path, InputStream inputStream) throws IOException {
         ModelLexer lexer = new ModelLexer(CharStreams.fromStream(inputStream));
         ModelParser parser = new ModelParser(new CommonTokenStream(lexer));
         parser.removeErrorListeners();
-        parser.addErrorListener(new ModelIssueErrorListener(model, parentObject));
+        parser.addErrorListener(new ModelIssueErrorListener(model, parentObject, path));
         return parser;
     }
 

@@ -174,7 +174,8 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         }
 
         if (primaryKey == null) {
-            logger.warn("Table {} has no primary key", toString());
+            // TODO add issue to the model
+            logger.warn("Table {} has no primary key", this);
         } else {
             visitor.visit(primaryKey);
         }
