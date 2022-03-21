@@ -28,19 +28,17 @@ import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Enabled;
-import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.Schema;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.annotations.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
-import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
-import com.manydesigns.portofino.model.io.ModelIO;
-import com.manydesigns.portofino.model.io.xml.XMLModel;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -54,10 +52,6 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -71,7 +65,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.util.*;
 
@@ -89,7 +82,6 @@ public class Persistence {
     // Constants
     //**************************************************************************
 
-    public static final String APP_MODEL_DIRECTORY = "portofino-model";
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
 
@@ -98,12 +90,10 @@ public class Persistence {
     //**************************************************************************
 
     protected final DatabasePlatformsRegistry databasePlatformsRegistry;
-    protected Model model;
     protected final Map<String, HibernateDatabaseSetup> setups;
 
-    protected final FileObject applicationDirectory;
     protected final Configuration configuration;
-    protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
+    protected ModelService modelService;
     @Autowired
     protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
@@ -127,53 +117,22 @@ public class Persistence {
     //**************************************************************************
 
     public Persistence(
-            FileObject applicationDirectory, Configuration configuration,
-            FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile,
-            DatabasePlatformsRegistry databasePlatformsRegistry) throws FileSystemException {
-        this.applicationDirectory = applicationDirectory;
+            ModelService modelService, Configuration configuration, DatabasePlatformsRegistry databasePlatformsRegistry)
+            throws FileSystemException {
+        this.modelService = modelService;
         this.configuration = configuration;
-        this.configurationFile = configurationFile;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
         setups = new HashMap<>();
+        modelService.modelEvents.subscribe(evt -> {
+            if(evt == ModelService.EventType.LOADED) {
+                initModel();
+            }
+        });
     }
 
     //**************************************************************************
-    // Model loading
+    // Model initialization
     //**************************************************************************
-
-    public synchronized Model loadModel(ModelIO modelIO) throws IOException {
-        Model loaded = modelIO.load();
-        if(loaded != null) {
-            model = loaded;
-        }
-        return model;
-    }
-
-    public synchronized void loadModel() {
-        if(!loadLegacyModel()) {
-            try {
-                loadModel(new DefaultModelIO(getModelDirectory()));
-                model.getDomains().forEach(domain -> setupDatabase(model, domain));
-                initModel();
-            } catch (Exception e) {
-                logger.error("Cannot load/parse model", e);
-            }
-        }
-    }
-
-    protected boolean loadLegacyModel() {
-        try {
-            Model model = loadModel(new XMLModel(getModelDirectory()));
-            if(model != null) {
-                logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
-                initModel();
-                return true;
-            }
-        } catch (Exception e) {
-            logger.error("Cannot load/parse XML model", e);
-        }
-        return false;
-    }
 
     protected void annotateDatabases(Collection<Database> databases) {
         databases.forEach(this::annotateDatabase);
@@ -323,13 +282,10 @@ public class Persistence {
         table.getForeignKeys().add(fk);
     }
 
-    public FileObject getModelDirectory() throws FileSystemException {
-        return applicationDirectory.resolveFile(APP_MODEL_DIRECTORY);
-    }
-
     public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
-        ResourceAccessor resourceAccessor = new VFSResourceAccessor(applicationDirectory);
+        FileObject appDir = modelService.getApplicationDirectory();
+        ResourceAccessor resourceAccessor = new VFSResourceAccessor(appDir);
         ConnectionProvider connectionProvider = database.getConnectionProvider();
         for(Schema schema : database.getSchemas()) {
             String schemaName = schema.getSchemaName();
@@ -344,7 +300,7 @@ public class Persistence {
                 liquibase.database.Database lqDatabase =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                 lqDatabase.setDefaultSchemaName(schema.getActualSchemaName());
-                String relativeChangelogPath = applicationDirectory.getName().getRelativeName(changelogFile.getName());
+                String relativeChangelogPath = appDir.getName().getRelativeName(changelogFile.getName());
                 Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase);
 
                 String[] contexts = configuration.getStringArray(LIQUIBASE_CONTEXT);
@@ -356,17 +312,8 @@ public class Persistence {
         }
     }
 
-    public synchronized void saveModel() throws IOException, ConfigurationException {
-        initModel();
-        new XMLModel(getModelDirectory()).delete();
-        new DefaultModelIO(getModelDirectory()).save(model);
-        if (configurationFile != null) {
-            configurationFile.save();
-            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
-        }
-    }
-
     public synchronized void initModel() {
+        getModel().getDomains().forEach(domain -> setupDatabase(getModel(), domain));
         logger.info("Cleaning up old setups");
         closeSessions();
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
@@ -382,11 +329,11 @@ public class Persistence {
         }
         //TODO it would perhaps be preferable that we generated REPLACED events here rather than REMOVED followed by ADDED
         setups.clear();
-        model.init(configuration);
-        for (Database database : model.getDatabases()) {
+        modelService.getModel().init(configuration);
+        for (Database database : modelService.getModel().getDatabases()) {
             initDatabase(database);
         }
-        annotateDatabases(model.getDatabases());
+        annotateDatabases(modelService.getModel().getDatabases());
         if(cacheResetListenerRegistry != null) {
             cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
         }
@@ -458,7 +405,7 @@ public class Persistence {
         if(currentStatus != Status.STARTED) {
             throw new IllegalStateException("Persistence not started: " + currentStatus);
         }
-        for (Database database : model.getDatabases()) {
+        for (Database database : modelService.getModel().getDatabases()) {
             if (!ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 logger.info("Retrying failed connection to database " + database.getDatabaseName());
                 initConnectionProvider(database);
@@ -471,7 +418,7 @@ public class Persistence {
     //**************************************************************************
 
     public ConnectionProvider getConnectionProvider(String databaseName) {
-        for (Database database : model.getDatabases()) {
+        for (Database database : modelService.getModel().getDatabases()) {
             if (database.getDatabaseName().equals(databaseName)) {
                 return database.getConnectionProvider();
             }
@@ -492,11 +439,11 @@ public class Persistence {
     //**************************************************************************
 
     public Model getModel() {
-        return model;
+        return modelService.getModel();
     }
 
     public synchronized void syncDataModel(String databaseName) throws Exception {
-        Database sourceDatabase = DatabaseLogic.findDatabaseByName(model, databaseName);
+        Database sourceDatabase = DatabaseLogic.findDatabaseByName(getModel(), databaseName);
         if(sourceDatabase == null) {
             throw new IllegalArgumentException("Database " + databaseName + " does not exist");
         }
@@ -507,9 +454,9 @@ public class Persistence {
         }
         ConnectionProvider connectionProvider = sourceDatabase.getConnectionProvider();
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
-        Database targetDatabase = dbSyncer.syncDatabase(model);
-        model.removeDatabase(sourceDatabase);
-        model.addDatabase(targetDatabase);
+        Database targetDatabase = dbSyncer.syncDatabase(getModel());
+        modelService.getModel().removeDatabase(sourceDatabase);
+        modelService.getModel().addDatabase(targetDatabase);
     }
 
     //**************************************************************************
@@ -560,7 +507,7 @@ public class Persistence {
     }
 
     public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
-        Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
+        Database database = DatabaseLogic.findDatabaseByName(getModel(), databaseName);
         if(database == null) {
             throw new IllegalArgumentException("Database " + databaseName + " does not exist");
         }
@@ -582,8 +529,8 @@ public class Persistence {
 
     public void start() {
         status.onNext(Status.STARTING);
-        loadModel();
-        for(Database database : model.getDatabases()) {
+        initModel();
+        for(Database database : modelService.getModel().getDatabases()) {
             if(ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 runLiquibase(database);
             }
@@ -592,13 +539,12 @@ public class Persistence {
     }
 
     public void stop() {
-        //TODO complete subscriptions?
         status.onNext(Status.STOPPING);
         closeSessions();
         for(HibernateDatabaseSetup setup : setups.values()) {
             setup.dispose();
         }
-        for (Database database : model.getDatabases()) {
+        for (Database database : modelService.getModel().getDatabases()) {
             ConnectionProvider connectionProvider =
                     database.getConnectionProvider();
             connectionProvider.shutdown();
@@ -620,13 +566,9 @@ public class Persistence {
         if(schema == null) {
             return null;
         }
-        FileObject dbDir = getModelDirectory().resolveFile(schema.getDatabaseName());
+        FileObject dbDir = modelService.getModelDirectory().resolveFile(schema.getDatabaseName());
         FileObject schemaDir = dbDir.resolveFile(schema.getSchemaName());
         return schemaDir.resolveFile(changelogFileNameTemplate);
-    }
-
-    public FileObject getApplicationDirectory() {
-        return applicationDirectory;
     }
 
     public static class DatabaseSetupEvent {

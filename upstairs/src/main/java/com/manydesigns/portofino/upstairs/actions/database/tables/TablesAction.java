@@ -16,6 +16,7 @@ import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.AnnotationProperty;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
@@ -94,6 +95,8 @@ public class TablesAction extends AbstractResourceAction {
             MIN_DECIMAL_VALUE, MIN_INT_VALUE, MAX_DECIMAL_VALUE, MAX_INT_VALUE,
             DECIMAL_FORMAT, DATE_FORMAT, ENCRYPTED);
 
+    @Autowired
+    protected ModelService modelService;
     @Autowired
     protected Persistence persistence;
 
@@ -320,7 +323,7 @@ public class TablesAction extends AbstractResourceAction {
         }
 
         persistence.initModel();
-        persistence.saveModel();
+        modelService.saveModel();
     }
 
     @Path("{db}/{schema}/{table}/{column}")
@@ -450,7 +453,7 @@ public class TablesAction extends AbstractResourceAction {
                 }
             });
             persistence.initModel();
-            persistence.saveModel();
+            modelService.saveModel();
         } else {
             throw new WebApplicationException(Response.serverError().entity(annotationsForm).build());
         }

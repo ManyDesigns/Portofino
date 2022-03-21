@@ -12,6 +12,7 @@ import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.AnnotationProperty;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
@@ -48,6 +49,7 @@ public class PersistenceTest {
 
     DatabaseModule databaseModule;
     Persistence persistence;
+    ModelService modelService;
 
     @BeforeClass
     public void setupElements() {
@@ -80,7 +82,9 @@ public class PersistenceTest {
         };
         databaseModule.applicationDirectory = appDir;
         databaseModule.configuration = configuration;
-        persistence = databaseModule.getPersistence(databasePlatformsRegistry, new CacheResetListenerRegistry());
+        modelService = new ModelService(appDir, configuration, null);
+        modelService.loadModel();
+        persistence = databaseModule.getPersistence(modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
         databaseModule.init();
         persistence.start();
         setupJPetStore();
@@ -96,7 +100,7 @@ public class PersistenceTest {
                 s.getModelElement().getEClassifiers().clear();
             });
         });
-        persistence.saveModel();
+        modelService.saveModel();
         persistence.stop();
         databaseModule.destroy();
     }
@@ -613,7 +617,7 @@ public class PersistenceTest {
             hibernatetest.setDatabaseName("test");
             FileObject file;
             file = appDir.resolveFile("portofino-model").resolveFile("test");
-            persistence.saveModel();
+            modelService.saveModel();
             assertTrue(file.exists());
             //Old directory is deleted
             assertFalse(appDir.resolveFile("portofino-model").resolveFile("hibernatetest").exists());
@@ -632,7 +636,7 @@ public class PersistenceTest {
         ref.setFromColumn("ID");
         sp.getReferences().add(ref);
         table1.getSelectionProviders().add(sp);
-        persistence.saveModel();
+        modelService.saveModel();
         persistence.stop();
         persistence.start();
         table1 = persistence.getTableAccessor("hibernatetest", "table1").getTable();

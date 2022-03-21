@@ -45,10 +45,12 @@ import java.nio.charset.StandardCharsets;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public interface Module {
-    public static final String copyright =
+    String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    //Utilities
+    /**
+     * @return the current version of Portofino.
+     */
     static String getPortofinoVersion() {
         try {
             return IOUtils.toString(Module.class.getResourceAsStream("/portofino.version"), StandardCharsets.UTF_8);

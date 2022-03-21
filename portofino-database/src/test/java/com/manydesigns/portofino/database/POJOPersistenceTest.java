@@ -31,7 +31,7 @@ public class POJOPersistenceTest extends PersistenceTest {
 
     @Test
     public void testGeneratedClasses() throws FileSystemException {
-        FileObject genClassesDir = persistence.getApplicationDirectory().resolveFile(DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
+        FileObject genClassesDir = modelService.getApplicationDirectory().resolveFile(DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
         assertTrue(genClassesDir.exists());
         FileObject jpetstoreDir = genClassesDir.resolveFile("jpetstore");
         assertTrue(jpetstoreDir.exists());

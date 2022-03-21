@@ -62,7 +62,7 @@ public class DefaultModelIOTest {
                 "\tfather_rel --> Person(name=father)\n" +
                 "}");
         Model model2 = io.load();
-        assertEquals(model2.getDomains().size(), 1);
+        assertEquals(model2.getDomains().size(), 2);
     }
 
     @Test

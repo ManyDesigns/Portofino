@@ -14,8 +14,8 @@ import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
-import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
@@ -70,7 +70,7 @@ public class UpstairsAction extends AbstractResourceAction {
     ConfigurableApplicationContext applicationContext;
 
     @Autowired
-    Persistence persistence;
+    ModelService modelService;
 
     @Autowired
     @Qualifier(ACTIONS_DIRECTORY)
@@ -120,21 +120,21 @@ public class UpstairsAction extends AbstractResourceAction {
             case "manual":
                 String databaseName = (String) (wizard.connectionProvider).get("name");
                 List<TableInfo> tables = wizard.tables;
-                Database database = DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+                Database database = DatabaseLogic.findDatabaseByName(modelService.getModel(), databaseName);
                 if(database == null) {
                     throw new WebApplicationException("The database does not exist: " + databaseName);
                 }
                 TemplateEngine engine = new SimpleTemplateEngine();
                 Template template = engine.createTemplate(
                         UpstairsAction.class.getResource("/com/manydesigns/portofino/upstairs/wizard/CrudAction.groovy"));
-                Table userTable = getTable(persistence.getModel(), wizard.usersTable);
+                Table userTable = getTable(modelService.getModel(), wizard.usersTable);
                 Column userPasswordColumn = getColumn(userTable, wizard.userPasswordProperty);
                 boolean userCrudCreated = false;
                 for(TableInfo tableInfo : tables) {
                     if(tableInfo.selected) {
                         Table tableRef = tableInfo.table;
                         String tableName = tableRef.getTableName();
-                        Table table = DatabaseLogic.findTableByName(persistence.getModel(), databaseName, tableInfo.schema, tableName);
+                        Table table = DatabaseLogic.findTableByName(modelService.getModel(), databaseName, tableInfo.schema, tableName);
                         if(table == null) {
                             logger.warn("Table not found: {}", tableRef.getQualifiedName());
                             RequestMessages.addErrorMessage("Table not found: " + tableRef.getQualifiedName());
@@ -167,7 +167,7 @@ public class UpstairsAction extends AbstractResourceAction {
     @Path("application/security")
     public void createSecurityGrooyv(WizardInfo wizard) {
         String databaseName = (String) (wizard.connectionProvider).get("name");
-        Database database = DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+        Database database = DatabaseLogic.findDatabaseByName(modelService.getModel(), databaseName);
         if(database == null) {
             throw new WebApplicationException("The database does not exist: " + databaseName);
         }
@@ -621,12 +621,12 @@ public class UpstairsAction extends AbstractResourceAction {
 
     protected void setupSecurity(WizardInfo wizard)
             throws Exception {
-        Table userTable = getTable(persistence.getModel(), wizard.usersTable);
+        Table userTable = getTable(modelService.getModel(), wizard.usersTable);
         if(userTable == null) {
             return;
         }
 
-        persistence.getModel().getDatabases().forEach(d -> d.getAllTables().forEach(this::removeSecurityAnnotations));
+        modelService.getModel().getDatabases().forEach(d -> d.getAllTables().forEach(this::removeSecurityAnnotations));
 
         DatabaseLogic.findColumnByName(userTable, wizard.userNameProperty.getColumnName())
                 .ensureAnnotation(Username.class);
@@ -641,8 +641,8 @@ public class UpstairsAction extends AbstractResourceAction {
                     .ensureAnnotation(EmailToken.class);
         }
 
-        Table groupsTable = getTable(persistence.getModel(), wizard.groupsTable);
-        Table usersGroupsTable = getTable(persistence.getModel(), wizard.userGroupTable);
+        Table groupsTable = getTable(modelService.getModel(), wizard.groupsTable);
+        Table usersGroupsTable = getTable(modelService.getModel(), wizard.userGroupTable);
         if(groupsTable != null && usersGroupsTable != null) {
             DatabaseLogic.findColumnByName(groupsTable, wizard.groupNameProperty.getColumnName())
                     .ensureAnnotation(GroupName.class);
@@ -653,7 +653,7 @@ public class UpstairsAction extends AbstractResourceAction {
         }
 
         security.setup(actionsDirectory.getParent(), wizard.adminGroupName, wizard.encryptionAlgorithm);
-        persistence.saveModel();
+        modelService.saveModel();
     }
 
     private void removeSecurityAnnotations(Table table) {
