@@ -269,7 +269,7 @@ public class Persistence {
     protected void setupForeignKey(Table table, EReference reference) {
         ForeignKey fk = new ForeignKey(table);
         fk.setName(reference.getName());
-        fk.setToTableName(reference.getEType().getName());
+        fk.setToEntityName(reference.getEType().getName());
         EAnnotation mappings = reference.getEAnnotation(KeyMappings.class.getName());
         if(mappings != null) {
             mappings.getDetails().forEach(e -> {

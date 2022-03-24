@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -77,8 +78,10 @@ public class ModelModule implements Module {
     }
 
     @Bean
-    public ModelService getModelService() {
-        return new ModelService(applicationDirectory, configuration, configurationFile);
+    public ModelService getModelService() throws IOException {
+        ModelService modelService = new ModelService(applicationDirectory, configuration, configurationFile);
+        modelService.loadModel();
+        return modelService;
     }
 
     @Override

@@ -35,7 +35,8 @@
   </mat-form-field>
   <ng-container *ngIf="property.selectionProvider.displayMode === 'CHECKBOX'" [formGroup]="form">
     <ng-container [formArrayName]="property.name">
-      <mat-checkbox *ngFor="let option of property.selectionProvider.options; let i = index" [formControlName]="i">
+      <mat-checkbox *ngFor="let option of property.selectionProvider.options; let i = index" [formControlName]="i"
+      style="margin-right: 1em;">
         {{option.l}}
       </mat-checkbox>
     </ng-container>

@@ -84,7 +84,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 DatabaseSelectionProvider dsp = (DatabaseSelectionProvider) ref.getSelectionProvider();
                 added = setupSelectionProvider(ref, dsp, configuredSPs);
             } else {
-                logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
+                logger.error("Unsupported selection provider: " + ref.getSelectionProviderName() + " (" + ref.getSelectionProvider() + ")");
                 continue;
             }
             if(ref.isEnabled() && !added) {

@@ -41,6 +41,7 @@ import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.IncrementGenerator;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.ActionContext;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
@@ -98,7 +99,8 @@ public class CrudActionTest extends JerseyTest {
         Configuration configuration = new PropertiesConfiguration();
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
-        persistence = new Persistence(appDir, configuration, null, databasePlatformsRegistry);
+        ModelService modelService = new ModelService(appDir, configuration, null);
+        persistence = new Persistence(modelService, configuration, databasePlatformsRegistry);
         persistence.start();
         setupJPetStore();
         persistence.initModel();

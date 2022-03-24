@@ -753,11 +753,13 @@ public class SessionFactoryBuilder {
         fieldAnnotations.addAnnotation(annotation);
         List<MemberValue> joinColumnsValue = new ArrayList<>();
         for(Reference reference : foreignKey.getReferences()) {
+            String fromColumn = reference.getActualFromColumn().getColumnName();
+            String toColumn = reference.getActualToColumn().getColumnName();
             annotation = new Annotation(JoinColumn.class.getName(), constPool);
             annotation.addMemberValue("insertable", new BooleanMemberValue(false, constPool));
             annotation.addMemberValue("updatable", new BooleanMemberValue(false, constPool));
-            annotation.addMemberValue("name", new StringMemberValue(jpaEscape(reference.getFromColumn()), constPool));
-            annotation.addMemberValue("referencedColumnName", new StringMemberValue(jpaEscape(reference.getToColumn()), constPool));
+            annotation.addMemberValue("name", new StringMemberValue(jpaEscape(fromColumn), constPool));
+            annotation.addMemberValue("referencedColumnName", new StringMemberValue(jpaEscape(toColumn), constPool));
             joinColumnsValue.add(new AnnotationMemberValue(annotation, constPool));
         }
         annotation = new Annotation(JoinColumns.class.getName(), constPool);

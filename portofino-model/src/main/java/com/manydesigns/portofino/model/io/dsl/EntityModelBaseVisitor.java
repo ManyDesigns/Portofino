@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EcoreFactory;
@@ -66,12 +67,9 @@ public class EntityModelBaseVisitor extends ModelBaseVisitor<EModelElement> {
             throw new IllegalStateException("Annotation without an element: " + annotationType);
         }
         String source = resolveType(annotationType, false);
-        EAnnotation annotation = annotated.getEAnnotation(source);
-        if (annotation == null) {
-            annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-            annotation.setSource(source);
-            annotated.getEAnnotations().add(annotation);
-        }
+        EAnnotation annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+        annotation.setSource(source);
+        annotated.getEAnnotations().add(annotation);
         ModelParser.AnnotationParamsContext params = ctx.annotationParams();
         if (params != null) {
             visitAnnotationParams(annotation, params);
@@ -94,6 +92,7 @@ public class EntityModelBaseVisitor extends ModelBaseVisitor<EModelElement> {
         if (value.STRING() != null) {
             text = text.substring(1, text.length() - 1);
         }
+        text = StringEscapeUtils.unescapeJava(text);
         return text;
     }
 }
