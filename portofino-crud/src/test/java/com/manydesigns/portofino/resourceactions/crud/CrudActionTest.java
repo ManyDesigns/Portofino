@@ -71,6 +71,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction.PORTOFINO_API_VERSION_5_2;
 import static org.testng.Assert.*;
 
 @SuppressWarnings({"JpaQlInspection"})
@@ -100,6 +101,7 @@ public class CrudActionTest extends JerseyTest {
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
         ModelService modelService = new ModelService(appDir, configuration, null);
+        modelService.loadModel();
         persistence = new Persistence(modelService, configuration, databasePlatformsRegistry);
         persistence.start();
         setupJPetStore();
@@ -155,7 +157,7 @@ public class CrudActionTest extends JerseyTest {
         CrudAction crudAction = new CrudAction() {
             public void commitTransaction() {
                 super.commitTransaction();
-                session.beginTransaction();
+                collection.getSession().beginTransaction();
             }
 
             @NotNull
@@ -336,7 +338,7 @@ public class CrudActionTest extends JerseyTest {
         session.clear();
         session.beginTransaction();
         crudAction.parametersAcquired(); //Force reload
-        crudAction.httpDelete(Collections.emptyList());
+        crudAction.httpDelete(Collections.emptyList(), PORTOFINO_API_VERSION_5_2.toString());
         try {
             crudAction.blobManager.loadMetadata(new Blob(newBlobCode));
             fail("The blob " + newBlobCode + " should have been deleted");

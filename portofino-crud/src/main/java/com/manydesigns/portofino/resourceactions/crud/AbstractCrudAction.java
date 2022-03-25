@@ -24,10 +24,13 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FileBlob;
+import com.manydesigns.elements.annotations.Insertable;
+import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.fields.*;
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.options.DisplayMode;
@@ -74,6 +77,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -213,7 +217,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public TableForm selectionProvidersForm;
     private SelectionProviderLoadStrategy selectionProviderLoadStrategy = SelectionProviderLoadStrategy.ONLY_ENFORCED;
 
-    static enum SelectionProviderLoadStrategy {
+    enum SelectionProviderLoadStrategy {
         NONE, ONLY_ENFORCED, ALL
     }
 
@@ -233,6 +237,31 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * the result to the <code>objects</code> field.
      */
     public abstract List<T> loadObjects();
+
+    /**
+     * Configures the given criteria to take into account the requested sorting.
+     * @param criteria the criteria to apply sorting to. Will be modified.
+     */
+    protected void applySorting(Criteria criteria) {
+        if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
+            try {
+                PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
+                if(orderByProperty != null) {
+                    criteria.orderBy(orderByProperty, sortDirection);
+                }
+            } catch (NoSuchFieldException e) {
+                CrudAction.logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
+            }
+        }
+    }
+
+    /**
+     * Obtains the PropertyAccessor that represents the property used for sorting the results.
+     * @return a PropertyAccessor object
+     */
+    protected PropertyAccessor getOrderByProperty(String sortProperty) throws NoSuchFieldException {
+        return this.classAccessor.getProperty(sortProperty);
+    }
 
     /**
      * Loads an object by its identifier and returns it. The object must satisfy the current search criteria.
@@ -412,7 +441,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             String stringValue = (String) propertyAccessor.get(object);
             String cleanText;
             try {
-                Whitelist whitelist = getWhitelist();
+                Safelist whitelist = getWhitelist();
                 cleanText = Jsoup.clean(stringValue, whitelist);
             } catch (Throwable t) {
                 logger.error("Could not clean HTML, falling back to escaped text", t);
@@ -424,12 +453,13 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     /**
      * Returns the JSoup whitelist used to clean user-provided HTML in rich-text fields.
-     * @return the default implementation returns the "basic" whitelist ({@link Whitelist#basic()}).
+     * @return the default implementation returns the "basic" whitelist ({@link Safelist#basic()}).
      */
-    protected Whitelist getWhitelist() {
-        return Whitelist.basic();
+    protected Safelist getWhitelist() {
+        return Safelist.basic();
     }
 
+    @SuppressWarnings({"unchecked"})
     protected void preCreate() {
         setupForm(Mode.CREATE);
         object = (T) classAccessor.newInstance();
@@ -483,7 +513,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     //**************************************************************************
 
     public boolean isCreateEnabled() {
-        return true;
+        return classAccessor != null &&
+                (classAccessor.getAnnotation(Insertable.class) == null ||
+                 classAccessor.getAnnotation(Insertable.class).value());
     }
     
     /**
@@ -516,7 +548,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected void commitTransaction() {}
 
     public boolean isEditEnabled() {
-        return true;
+        return classAccessor != null &&
+                (classAccessor.getAnnotation(Updatable.class) == null ||
+                 classAccessor.getAnnotation(Updatable.class).value());
     }
     
     /**
@@ -543,7 +577,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected void editPostProcess(T object) {}
 
     public boolean isDeleteEnabled() {
-        return true;
+        return classAccessor != null &&
+                (classAccessor.getAnnotation(Updatable.class) == null ||
+                 classAccessor.getAnnotation(Updatable.class).value());
     }
     
     /**

@@ -21,20 +21,13 @@
 package com.manydesigns.portofino.resourceactions.crud;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.annotations.Insertable;
-import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.persistence.IdStrategy;
-import com.manydesigns.portofino.persistence.Persistence;
-import com.manydesigns.portofino.persistence.QueryUtils;
-import com.manydesigns.portofino.persistence.TableCriteria;
+import com.manydesigns.portofino.persistence.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
@@ -46,16 +39,6 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Sel
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import com.manydesigns.portofino.util.PkHelper;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
@@ -63,8 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.Serializable;
-import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,98 +66,27 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public Table baseTable;
-
-    //--------------------------------------------------------------------------
-    // Data objects
-    //--------------------------------------------------------------------------
-
-    public Session session;
-
     @Autowired
     public Persistence persistence;
 
-    protected long totalSearchRecords = -1;
+    protected SingleTableQueryCollection collection;
 
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(CrudAction.class);
+    public static final Logger logger = LoggerFactory.getLogger(CrudAction.class);
 
     @Override
     public long getTotalSearchRecords() {
-        if(totalSearchRecords < 0) {
-            calculateTotalSearchRecords();
-        }
-        return totalSearchRecords;
-    }
-
-    protected long calculateTotalSearchRecords() {
-        TableCriteria criteria = new TableCriteria(baseTable);
-        if(searchForm != null) {
-            searchForm.configureCriteria(criteria);
-        }
-        QueryStringWithParameters query =
-                QueryUtils.mergeQuery(getBaseQuery(), criteria, this);
-
-        String queryString = query.getQueryString();
-        String totalRecordsQueryString;
-        try {
-            totalRecordsQueryString = generateCountQuery(queryString);
-        } catch (JSQLParserException e) {
-            throw new Error(e);
-        }
-        //TODO gestire count non disponibile (totalRecordsQueryString == null)
-        List<Object> result = QueryUtils.runHqlQuery(session, totalRecordsQueryString, query.getParameters());
-        return totalSearchRecords = ((Number) result.get(0)).longValue();
-    }
-
-    protected String generateCountQuery(String queryString) throws JSQLParserException {
-        CCJSqlParserManager parserManager = new CCJSqlParserManager();
-        try {
-            PlainSelect plainSelect =
-                (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
-            logger.debug("Query string {} contains select", queryString);
-            List<SelectItem> items = plainSelect.getSelectItems();
-            if(items.size() != 1) {
-                logger.error("I don't know how to generate a count query for {}", queryString);
-                return null;
-            }
-            SelectExpressionItem item = (SelectExpressionItem) items.get(0);
-            Function function = new Function();
-            function.setName("count");
-            function.setParameters(new ExpressionList(Collections.singletonList(item.getExpression())));
-            item.setExpression(function);
-            plainSelect.setOrderByElements(null);
-            return plainSelect.toString();
-        } catch(Exception e) {
-            logger.debug("Query string " + queryString + " does not contain select", e);
-            queryString = "SELECT count(*) " + queryString;
-            PlainSelect plainSelect =
-                (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
-            plainSelect.setOrderByElements(null);
-            return plainSelect.toString();
-        }
+        return collection.count(this);
     }
 
     @Override
     protected void commitTransaction() {
-        session.getTransaction().commit();
-    }
-
-    @Override
-    public boolean isCreateEnabled() {
-        return classAccessor != null &&
-               (classAccessor.getAnnotation(Insertable.class) == null ||
-                classAccessor.getAnnotation(Insertable.class).value());
+        collection.getSession().getTransaction().commit();
     }
 
     @Override
     protected void doSave(T object) {
         try {
-            session.save(baseTable.getActualEntityName(), object);
+            collection.save(object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in save", e);
             throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
@@ -184,16 +94,9 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @Override
-    public boolean isEditEnabled() {
-        return classAccessor != null &&
-               (classAccessor.getAnnotation(Updatable.class) == null ||
-                classAccessor.getAnnotation(Updatable.class).value());
-    }
-
-    @Override
     protected void doUpdate(T object) {
         try {
-            session.update(baseTable.getActualEntityName(), object);
+            collection.update(object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in update", e);
             throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
@@ -201,15 +104,8 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @Override
-    public boolean isDeleteEnabled() {
-        return classAccessor != null &&
-                (classAccessor.getAnnotation(Updatable.class) == null ||
-                 classAccessor.getAnnotation(Updatable.class).value());
-    }
-
-    @Override
     protected void doDelete(T object) {
-        session.delete(baseTable.getActualEntityName(), object);
+        collection.delete(object);
     }
 
     //**************************************************************************
@@ -270,7 +166,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
             return null;
         }
 
-        baseTable = getCrudConfiguration().getActualTable();
+        Table baseTable = getCrudConfiguration().getActualTable();
         if (baseTable == null) {
             String message =
                     "Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
@@ -279,19 +175,27 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
             RequestMessages.addErrorMessage(message);
             return null;
         }
+        collection = getCollection(baseTable);
+        return collection.getClassAccessor();
+    }
 
-        return persistence.getTableAccessor(baseTable);
+    @NotNull
+    protected SingleTableQueryCollection getCollection(Table baseTable) {
+        return new SingleTableQueryCollection(persistence, baseTable, getBaseQuery());
     }
 
     @Override
     public CrudAction<T> init() {
         super.init();
         if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
-            session = persistence.getSession(getCrudConfiguration().getDatabase());
             selectionProviderSupport = createSelectionProviderSupport();
             selectionProviderSupport.setup();
         }
         return this;
+    }
+
+    public CrudConfiguration getCrudConfiguration() {
+        return (CrudConfiguration) crudConfiguration;
     }
 
     //**************************************************************************
@@ -308,23 +212,12 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"unchecked"})
     public List<T> loadObjects() {
         try {
-            TableCriteria criteria = new TableCriteria(baseTable);
-            if(searchForm != null) {
-                searchForm.configureCriteria(criteria);
-            }
-            if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
-                try {
-                    PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
-                    if(orderByProperty != null)
-                        criteria.orderBy(orderByProperty, sortDirection);
-                } catch (NoSuchFieldException e) {
-                    logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
-                }
-            }
-            objects = (List) QueryUtils.getObjects(session, getBaseQuery(), criteria, this, firstResult, maxResults);
+            TableCriteria criteria = setupCriteria();
+            collection = collection.where(criteria);
+            objects = (List<T>) collection.load(firstResult, maxResults, this);
         } catch (ClassCastException e) {
             objects = new ArrayList<>();
             logger.warn("Incorrect Field Type", e);
@@ -333,11 +226,14 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
         return objects;
     }
 
-    /**
-     * @return an PropertyAccessor object
-     */
-    protected PropertyAccessor getOrderByProperty(String sortProperty) throws NoSuchFieldException {
-        return this.classAccessor.getProperty(sortProperty);
+    @NotNull
+    protected TableCriteria setupCriteria() {
+        TableCriteria criteria = new TableCriteria(collection.getTable());
+        if(searchForm != null) {
+            searchForm.configureCriteria(criteria);
+        }
+        applySorting(criteria);
+        return criteria;
     }
 
     /**
@@ -353,26 +249,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @Override
     @SuppressWarnings("unchecked")
     protected T loadObjectByPrimaryKey(Object pkObject) {
-        return (T) QueryUtils.getObjectByPk(
-                persistence,
-                baseTable, (Serializable) pkObject,
-                getBaseQuery(), this);
-    }
-
-    //--------------------------------------------------------------------------
-    // Accessors
-    //--------------------------------------------------------------------------
-
-    public Table getBaseTable() {
-        return baseTable;
-    }
-
-    public void setBaseTable(Table baseTable) {
-        this.baseTable = baseTable;
-    }
-
-    public CrudConfiguration getCrudConfiguration() {
-        return (CrudConfiguration) crudConfiguration;
+        return (T) collection.load(pkObject, this);
     }
 
 }
