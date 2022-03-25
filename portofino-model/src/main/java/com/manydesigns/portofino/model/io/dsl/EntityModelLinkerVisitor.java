@@ -87,7 +87,7 @@ public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
     public EClass visitEntity(ModelParser.EntityContext ctx) {
         String entityName = ctx.name.getText();
         EClass previous = entity;
-        EClass entity = (EClass) parentDomain.getEClassifier(entityName);;
+        EClass entity = (EClass) parentDomain.getEClassifier(entityName);
         annotated = entity;
         this.entity = entity;
         visitChildren(ctx);
@@ -98,6 +98,11 @@ public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
 
     @Override
     public EModelElement visitProperty(ModelParser.PropertyContext ctx) {
+        return null;
+    }
+
+    @Override
+    public EAnnotation visitAnnotation(ModelParser.AnnotationContext ctx) {
         return null;
     }
 

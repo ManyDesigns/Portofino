@@ -61,6 +61,7 @@ import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +99,7 @@ public class Persistence {
     protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
     public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
+    protected Subscription modelSubscription = null;
 
     public enum Status {
         STARTING, STARTED, STOPPING, STOPPED
@@ -152,13 +154,6 @@ public class Persistence {
             Annotation annotation = db.ensureAnnotation(JNDIConnection.class);
             annotation.setPropertyValue("name", ((JndiConnectionProvider) connectionProvider).getJndiResource());
         }
-
-        db.getAllTables().forEach(table -> {
-            if(!table.getTableName().equals(table.getActualEntityName())) {
-                Annotation tableAnn = table.ensureAnnotation(javax.persistence.Table.class);
-                tableAnn.setPropertyValue("name", table.getTableName());
-            }
-        });
     }
 
     protected Database setupDatabase(Model model, EPackage domain) {
