@@ -89,7 +89,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
             collection.save(object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in save", e);
-            throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
+            throw new RuntimeException(violatedConstraintMessage(e));
         }
     }
 
@@ -99,8 +99,12 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
             collection.update(object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in update", e);
-            throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
+            throw new RuntimeException(violatedConstraintMessage(e));
         }
+    }
+
+    protected String violatedConstraintMessage(ConstraintViolationException e) {
+        return ElementsThreadLocals.getText("save.failed.because.constraint.violated", e.getConstraintName());
     }
 
     @Override
