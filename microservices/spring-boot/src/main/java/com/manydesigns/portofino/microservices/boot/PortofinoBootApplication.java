@@ -68,15 +68,21 @@ public class PortofinoBootApplication {
 				initAppDirectory(applicationDirectory);
 			return applicationDirectory.getName().getURI();
 		}
-		FileObject main = VFS.getManager().resolveFile("src").resolveFile("main");
-		if(main.isFolder()) {
-			FileObject appDir = main.resolveFile("resources").resolveFile("portofino");
-			if(appDir.isFolder()) {
-				return appDir.getName().getURI();
-			}
-			appDir = main.resolveFile("webapp").resolveFile("WEB-INF");
-			if(appDir.isFolder()) {
-				return appDir.getName().getURI();
+		if(applicationArguments.containsOption("dev")) {
+			FileObject main = VFS.getManager().resolveFile("src").resolveFile("main");
+			if (main.isFolder()) {
+				FileObject javaDir = main.resolveFile("java").resolveFile("portofino").resolveFile("actions");
+				if(!javaDir.isFolder()) {
+					// This method does not work with Java actions since the compiled version is in the build directory
+					FileObject appDir = main.resolveFile("resources").resolveFile("portofino");
+					if (appDir.isFolder()) {
+						return appDir.getName().getURI();
+					}
+					appDir = main.resolveFile("webapp").resolveFile("WEB-INF");
+					if (appDir.isFolder()) {
+						return appDir.getName().getURI();
+					}
+				}
 			}
 		}
 		if(new File("portofino.properties").isFile()) {
