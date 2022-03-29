@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>html5shiv</artifactId>
-            <version>3.7.2</version>
+            <version>3.7.3</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -45,45 +45,45 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
-            <version>1.12.4</version>
+            <version>3.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery-ui</artifactId>
-            <version>1.12.0</version>
+            <version>1.13.0</version>
         </dependency>
         <!-- Bootstrap -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>3.3.7</version>
+            <version>3.4.1</version>
         </dependency>
         <!-- Twitter Typeahead -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>typeaheadjs</artifactId>
-            <version>0.10.5</version>
+            <version>0.11.1</version>
         </dependency>
         <!-- Bootstrap-datetimepicker -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>momentjs</artifactId>
-            <version>2.11.1</version>
+            <version>2.29.1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>moment-timezone</artifactId>
-            <version>0.3.0</version>
+            <version>0.5.5</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
-            <version>4.17.37</version>
+            <version>4.17.49</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>bootstrap-fileinput</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.7</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.webjars.bower</groupId>
