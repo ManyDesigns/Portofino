@@ -23,9 +23,9 @@ package com.manydesigns.portofino.resourceactions.crud.configuration.database;
 import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.Database;
+import com.manydesigns.portofino.database.model.DatabaseLogic;
+import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
@@ -100,12 +100,12 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
     //**************************************************************************
 
     public void init() {
-        actualDatabase = DatabaseLogic.findDatabaseByName(persistence.getModel(), database);
+        actualDatabase = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), database);
         if(actualDatabase != null && query != null) { //Query can be null if the user hasn't got permission to see it
             actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
         }
         for (CrudProperty property : properties) {
-            property.init(persistence.getModel(), persistence.getConfiguration());
+            property.init(persistence);
         }
         if(actualTable != null) {
             for (SelectionProviderReference ref : selectionProviders) {

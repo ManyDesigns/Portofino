@@ -23,7 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.GoogleCloudSQLDatabasePlatform;
 import com.manydesigns.portofino.liquibase.databases.GoogleCloudSQLDatabase;
 import com.manydesigns.portofino.liquibase.sqlgenerators.GoogleCloudSQLLockDatabaseChangeLogGenerator;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import liquibase.database.DatabaseFactory;
 import liquibase.sqlgenerator.SqlGeneratorFactory;
 import org.apache.commons.configuration2.Configuration;

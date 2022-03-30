@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.persistence.hibernate;
 
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.database.model.Database;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
 import org.apache.commons.configuration2.Configuration;
 import org.hibernate.*;

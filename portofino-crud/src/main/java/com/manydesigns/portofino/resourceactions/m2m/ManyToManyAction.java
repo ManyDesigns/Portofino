@@ -38,7 +38,7 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
@@ -68,7 +68,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -217,7 +216,7 @@ public class ManyToManyAction extends AbstractResourceAction {
     public DefaultSelectionProvider createSelectionProviderFromHql
             (String name, String databaseName,
              String hql, DisplayMode dm, SearchDisplayMode sdm) {
-        Database database = DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+        Database database = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
         Table table = QueryUtils.getTableFromQueryString(database, hql);
         String entityName = table.getActualEntityName();
         Session session = persistence.getSession(databaseName);
@@ -386,7 +385,7 @@ public class ManyToManyAction extends AbstractResourceAction {
         SelectionProvider databaseSelectionProvider =
                 SelectionProviderLogic.createSelectionProvider(
                         "database",
-                        persistence.getModel().getDatabases(),
+                        persistence.getDatabases(),
                         Database.class,
                         null,
                         new String[]{ "databaseName" });

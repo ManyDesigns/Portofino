@@ -22,7 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.database.platforms.PostgreSQLDatabasePlatform;
 import com.manydesigns.portofino.liquibase.databases.PortofinoPostgresDatabase;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import liquibase.database.DatabaseFactory;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;

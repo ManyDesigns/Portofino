@@ -1,5 +1,5 @@
-import com.manydesigns.portofino.model.database.annotations.Column;
-import com.manydesigns.portofino.model.database.annotations.Table;
+import com.manydesigns.portofino.database.model.annotations.Column;
+import com.manydesigns.portofino.database.model.annotations.Table;
 import tt.tickets;
 
 @Table(shortName = "%{state}", name = "ticket_states")

@@ -2,8 +2,8 @@ package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.database.annotations.Id;
-import com.manydesigns.portofino.model.database.annotations.KeyMappings;
+import com.manydesigns.portofino.model.annotations.Id;
+import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.issues.Issue;
 import com.manydesigns.portofino.model.language.ModelLexer;

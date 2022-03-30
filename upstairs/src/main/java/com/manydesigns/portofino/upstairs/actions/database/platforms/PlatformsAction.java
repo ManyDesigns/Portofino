@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.upstairs.actions.database.platforms;
 
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;

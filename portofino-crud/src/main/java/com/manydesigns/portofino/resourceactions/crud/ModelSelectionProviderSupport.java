@@ -33,7 +33,7 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Sel
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.lang.StringUtils;
@@ -296,7 +296,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     protected OptionProvider createHQLOptionProvider(
             DatabaseSelectionProvider selectionProvider, String name, String databaseName, String hql) {
         Database database =
-                DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+                DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
         Table table = QueryUtils.getTableFromQueryString(database, hql);
         if(table == null) {
             logger.error("Selection provider {} has a HQL query that " +

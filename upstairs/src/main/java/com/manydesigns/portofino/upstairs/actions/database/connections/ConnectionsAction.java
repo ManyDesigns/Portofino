@@ -28,7 +28,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.util.FormUtil;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
@@ -42,7 +42,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.hibernate.EntityMode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -78,7 +77,7 @@ public class ConnectionsAction extends AbstractResourceAction {
     @Produces(MediaType.APPLICATION_JSON)
     public List<ConnectionProviderSummary> list() {
         List<ConnectionProviderSummary> list = new ArrayList<>();
-        modelService.getModel().getDatabases().forEach(database -> {
+        persistence.getDatabases().forEach(database -> {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
             list.add(new ConnectionProviderSummary(
                     database.getDatabaseName(), connectionProvider.getDescription(), connectionProvider.getStatus()));
@@ -109,7 +108,8 @@ public class ConnectionsAction extends AbstractResourceAction {
             js.key("schema").value(schema.schema);
             js.key("selected").value(schema.selected);
 
-            Schema dbSchema = DatabaseLogic.findSchemaByName(persistence.getModel(), databaseName, schema.schemaName);
+            Schema dbSchema = DatabaseLogic.findSchemaByName(
+                    persistence.getDatabases(), databaseName, schema.schemaName);
             FileObject changelogFile = persistence.getLiquibaseChangelogFile(dbSchema);
             js.key("liquibase").value(changelogFile != null && changelogFile.getType() == FileType.FILE);
             js.endObject();
@@ -147,7 +147,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         if(persistence.getConnectionProvider(databaseName) != null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
-        persistence.getModel().getDatabases().add(connectionProvider.getDatabase());
+        persistence.getDatabases().add(connectionProvider.getDatabase());
         persistence.initModel();
         try {
             String connectionsWithSchemas =
@@ -155,7 +155,7 @@ public class ConnectionsAction extends AbstractResourceAction {
             modelService.saveModel();
             return Response.created(new URI(getActionPath() + "/" + databaseName)).entity(connectionsWithSchemas).build();
         } catch (Exception e) {
-            persistence.getModel().getDatabases().remove(connectionProvider.getDatabase());
+            persistence.getDatabases().remove(connectionProvider.getDatabase());
             persistence.initModel();
             try {
                 modelService.saveModel();
@@ -373,11 +373,11 @@ public class ConnectionsAction extends AbstractResourceAction {
     @Produces(MediaType.APPLICATION_JSON)
     public void deleteConnection(@PathParam("databaseName") String databaseName) throws Exception {
         Database database =
-                DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
+                DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
         if (database == null) {
             throw new WebApplicationException("Delete failed. Connection provider not found: " + databaseName);
         } else {
-            persistence.getModel().getDatabases().remove(database);
+            persistence.getDatabases().remove(database);
             persistence.initModel();
             modelService.saveModel();
             logger.info("Database {} deleted", databaseName);
@@ -387,7 +387,7 @@ public class ConnectionsAction extends AbstractResourceAction {
     @POST
     @Path("{databaseName}/:synchronize")
     public void synchronize(@PathParam("databaseName") String databaseName) throws Exception {
-        if(DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName) == null) {
+        if(DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName) == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         persistence.syncDataModel(databaseName);

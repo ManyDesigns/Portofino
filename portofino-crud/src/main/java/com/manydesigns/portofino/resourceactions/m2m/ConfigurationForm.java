@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.resourceactions.m2m;
 
-import com.manydesigns.portofino.model.database.ForeignKey;
-import com.manydesigns.portofino.model.database.ModelSelectionProvider;
+import com.manydesigns.portofino.database.model.ForeignKey;
+import com.manydesigns.portofino.database.model.ModelSelectionProvider;
 import com.manydesigns.portofino.resourceactions.m2m.configuration.ManyToManyConfiguration;
 import com.manydesigns.portofino.resourceactions.m2m.configuration.SelectionProviderReference;
 import org.apache.commons.lang.StringUtils;

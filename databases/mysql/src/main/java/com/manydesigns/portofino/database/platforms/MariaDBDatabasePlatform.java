@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.portofino.model.database.ConnectionProvider;
+import com.manydesigns.portofino.database.model.ConnectionProvider;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

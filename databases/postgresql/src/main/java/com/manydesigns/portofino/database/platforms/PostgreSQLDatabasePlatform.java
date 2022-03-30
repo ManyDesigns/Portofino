@@ -20,16 +20,15 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
+import com.manydesigns.portofino.database.model.Column;
+import com.manydesigns.portofino.database.model.ConnectionProvider;
+import com.manydesigns.portofino.database.model.platforms.AbstractDatabasePlatform;
 import com.manydesigns.portofino.persistence.hibernate.ColumnParameterType;
 import org.hibernate.dialect.PostgreSQL82Dialect;
 import org.hibernate.usertype.DynamicParameterizedType;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;

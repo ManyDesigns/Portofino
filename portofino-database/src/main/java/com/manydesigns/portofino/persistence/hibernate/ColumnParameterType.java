@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.persistence.hibernate;
 
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.database.model.Column;
+import com.manydesigns.portofino.database.model.DatabaseLogic;
 import org.hibernate.usertype.DynamicParameterizedType;
 
 import java.lang.annotation.Annotation;
@@ -34,7 +34,7 @@ import java.lang.annotation.Annotation;
  */
 public class ColumnParameterType implements DynamicParameterizedType.ParameterType {
 
-    protected final com.manydesigns.portofino.model.database.Column column;
+    protected final com.manydesigns.portofino.database.model.Column column;
     protected final Class returnedClass;
 
     public ColumnParameterType(Column column) {

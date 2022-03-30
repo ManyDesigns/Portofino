@@ -1,8 +1,8 @@
 package com.manydesigns.portofino.upstairs.actions.support;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.Column;
+import com.manydesigns.portofino.database.model.Table;
 
 import java.util.List;
 import java.util.Map;

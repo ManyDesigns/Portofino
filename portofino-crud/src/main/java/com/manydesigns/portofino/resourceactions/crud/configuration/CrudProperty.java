@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.persistence.Persistence;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.slf4j.Logger;
@@ -80,12 +81,12 @@ public class CrudProperty implements Annotated {
     // Configuration implementation
     //**************************************************************************
 
-    public void init(Model model, Configuration configuration) {
+    public void init(Persistence persistence) {
         assert name != null;
         for(Annotation annotation : annotations) {
             annotation.reset();
-            annotation.init(model, configuration);
-            annotation.link(model, configuration);
+            annotation.init(persistence.getDatabases(), persistence.getConfiguration());
+            annotation.link(persistence.getDatabases(), persistence.getConfiguration());
         }
     }
 

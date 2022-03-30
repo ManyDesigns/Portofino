@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.issues.Issue;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EObject;
@@ -47,64 +46,18 @@ public class Model {
     // Fields
     //**************************************************************************
 
-    protected final LinkedList<Database> databases;
     protected final List<EPackage> domains = new ArrayList<>();
     protected final Map<EPackage, Map<String, EObject>> objects = new HashMap<>();
     protected final List<Issue> issues = new ArrayList<>();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
-    //**************************************************************************
-    // Constructors and init
-    //**************************************************************************
-
-    public Model() {
-        this.databases = new LinkedList<>();
-    }
-
-    //**************************************************************************
-    // Reset / init
-    //**************************************************************************
-
-    public void init(Configuration configuration) {
+    public void init() {
         issues.clear();
-        for (Database database : databases) {
-            init(database, configuration);
-        }
-    }
-
-    public void init(ModelObject rootObject, Configuration configuration) {
-        new ResetVisitor().visit(rootObject);
-        new InitVisitor(this, configuration).visit(rootObject);
-        new LinkVisitor(this, configuration).visit(rootObject);
-    }
-
-    @XmlElementWrapper(name="databases")
-    @XmlElement(name = "database", type = Database.class)
-    public List<Database> getDatabases() {
-        return databases;
     }
 
     public List<EPackage> getDomains() {
         return domains;
-    }
-
-    public synchronized void removeDatabase(Database database) {
-        databases.remove(database);
-        EPackage pkg = database.getModelElement();
-        getDomains().remove(pkg);
-        List<EPackage> toRemove = new ArrayList<>();
-        toRemove.add(pkg);
-        while(!toRemove.isEmpty()) {
-            pkg = toRemove.remove(0);
-            objects.remove(pkg);
-            toRemove.addAll(pkg.getESubpackages());
-        }
-    }
-
-    public void addDatabase(Database database) {
-        databases.add(database);
-        domains.add(database.getModelElement());
     }
 
     public EPackage getDomain(String name) {

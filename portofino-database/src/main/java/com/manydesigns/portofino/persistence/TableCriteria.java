@@ -23,7 +23,7 @@ package com.manydesigns.portofino.persistence;
 import com.manydesigns.elements.fields.search.BaseCriteria;
 import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.Table;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

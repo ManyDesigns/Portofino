@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.model.database.annotations.Schema;
+import com.manydesigns.portofino.database.model.annotations.Schema;
 
 @Schema(name = "PUBLIC")
 domain PUBLIC;

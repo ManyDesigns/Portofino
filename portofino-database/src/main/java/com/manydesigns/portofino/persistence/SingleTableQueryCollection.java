@@ -2,7 +2,7 @@ package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Function;

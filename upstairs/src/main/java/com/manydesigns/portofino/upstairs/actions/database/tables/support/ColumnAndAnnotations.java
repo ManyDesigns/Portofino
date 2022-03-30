@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.upstairs.actions.database.tables.support;
 
-import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.database.model.Column;
 
 import java.util.HashMap;
 import java.util.Map;

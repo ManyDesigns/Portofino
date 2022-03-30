@@ -86,10 +86,10 @@ public class AnnotationProperty implements ModelObject {
     public void reset() {}
 
     @Override
-    public void init(Model model, Configuration configuration) {}
+    public void init(Object context, Configuration configuration) {}
 
     @Override
-    public void link(Model model, Configuration configuration) {}
+    public void link(Object context, Configuration configuration) {}
 
     @Override
     public void visitChildren(ModelObjectVisitor visitor) {}

@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.configuration2.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 

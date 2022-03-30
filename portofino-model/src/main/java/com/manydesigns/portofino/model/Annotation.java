@@ -131,7 +131,7 @@ public class Annotation implements ModelObject, Unmarshallable {
         javaAnnotationClass = null;
     }
 
-    public void init(Model model, Configuration configuration) {
+    public void init(Object context, Configuration configuration) {
         javaAnnotationClass = ReflectionUtil.loadClass(getType());
         if (javaAnnotationClass == null) {
             logger.error("Cannot load annotation class: {}", getType());
@@ -244,7 +244,7 @@ public class Annotation implements ModelObject, Unmarshallable {
         return null;
     }
 
-    public void link(Model model, Configuration configuration) {}
+    public void link(Object context, Configuration configuration) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
         properties.forEach(visitor::visit);

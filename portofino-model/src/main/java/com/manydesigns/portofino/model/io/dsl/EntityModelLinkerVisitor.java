@@ -21,8 +21,7 @@
 package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.PortofinoPackage;
-import com.manydesigns.portofino.model.database.annotations.KeyMappings;
-import com.manydesigns.portofino.model.language.ModelBaseVisitor;
+import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;

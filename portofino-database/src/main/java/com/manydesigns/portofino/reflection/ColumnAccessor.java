@@ -23,7 +23,7 @@ package com.manydesigns.portofino.reflection;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.annotations.impl.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.database.model.Column;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

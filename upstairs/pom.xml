@@ -51,6 +51,12 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-common</artifactId>
+            <version>2.32</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <resources>

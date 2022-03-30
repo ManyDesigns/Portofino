@@ -15,7 +15,7 @@ public class POJOLegacyPersistenceTest extends POJOPersistenceTest {
     public void setup() throws Exception {
         FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/database/model/legacy");
         setup(appDir);
-        persistence.getModel().getDatabases().forEach(d -> {
+        persistence.getDatabases().forEach(d -> {
             d.setEntityMode(EntityMode.POJO.getExternalName());
         });
         persistence.initModel();

@@ -2,8 +2,8 @@ package com.manydesigns.portofino.upstairs.actions.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.actions.Permissions;
-import com.manydesigns.portofino.model.database.Reference;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.Reference;
+import com.manydesigns.portofino.database.model.Table;
 
 import java.util.ArrayList;
 import java.util.List;

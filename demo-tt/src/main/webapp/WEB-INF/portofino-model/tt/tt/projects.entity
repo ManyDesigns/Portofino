@@ -1,7 +1,7 @@
 import com.manydesigns.elements.annotations.RegExp;
 import com.manydesigns.elements.annotations.RichText;
-import com.manydesigns.portofino.model.database.annotations.Column;
-import com.manydesigns.portofino.model.database.annotations.Table;
+import com.manydesigns.portofino.database.model.annotations.Column;
+import com.manydesigns.portofino.database.model.annotations.Table;
 import tt.components;
 import tt.members;
 import tt.tickets;

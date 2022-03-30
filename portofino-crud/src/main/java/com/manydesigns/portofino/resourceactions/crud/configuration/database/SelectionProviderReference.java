@@ -22,10 +22,10 @@ package com.manydesigns.portofino.resourceactions.crud.configuration.database;
 
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SearchDisplayMode;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.model.database.ForeignKey;
-import com.manydesigns.portofino.model.database.ModelSelectionProvider;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.DatabaseLogic;
+import com.manydesigns.portofino.database.model.ForeignKey;
+import com.manydesigns.portofino.database.model.ModelSelectionProvider;
+import com.manydesigns.portofino.database.model.Table;
 import org.apache.commons.lang.StringUtils;
 
 import javax.xml.bind.annotation.XmlAccessType;

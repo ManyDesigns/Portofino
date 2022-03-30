@@ -30,21 +30,21 @@ import org.apache.commons.configuration2.Configuration;
 */
 public class LinkVisitor extends ModelObjectVisitor {
 
-    private final Model model;
+    private final Object context;
     private final Configuration configuration;
 
-    public LinkVisitor(Model model, Configuration configuration) {
-        this.model = model;
+    public LinkVisitor(Object context, Configuration configuration) {
+        this.context = context;
         this.configuration = configuration;
     }
 
     @Override
     public void visitNodeBeforeChildren(ModelObject node) {
-        node.link(model, configuration);
+        node.link(context, configuration);
     }
 
     @Override
     public void visitNodeAfterChildren(ModelObject node) {
-        node.afterLink(model, configuration);
+        node.afterLink(context, configuration);
     }
 }

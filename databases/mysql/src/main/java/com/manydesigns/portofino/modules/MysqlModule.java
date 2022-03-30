@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.liquibase.databases.PortofinoMariaDBDatabase;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.MariaDBDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.MySql5DatabasePlatform;
 import liquibase.database.DatabaseFactory;

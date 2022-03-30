@@ -3,11 +3,11 @@ package com.manydesigns.portofino.upstairs.actions.database.connections.support;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.manydesigns.elements.annotations.*;
-import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
-import com.manydesigns.portofino.model.database.JndiConnectionProvider;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.database.model.ConnectionProvider;
+import com.manydesigns.portofino.database.model.Database;
+import com.manydesigns.portofino.database.model.JdbcConnectionProvider;
+import com.manydesigns.portofino.database.model.JndiConnectionProvider;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.EntityMode;
 

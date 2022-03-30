@@ -3,7 +3,6 @@ package com.manydesigns.portofino.model.service;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
-import com.manydesigns.portofino.model.io.xml.XMLModel;
 import io.reactivex.subjects.PublishSubject;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -44,7 +43,7 @@ public class ModelService {
         Model loaded = modelIO.load();
         if(loaded != null) {
             model = loaded;
-            model.init(configuration);
+            model.init();
             modelEvents.onNext(EventType.LOADED);
             return model;
         } else {
@@ -53,22 +52,7 @@ public class ModelService {
     }
 
     public synchronized void loadModel() throws IOException {
-        if(!loadLegacyModel()) {
-            loadModel(new DefaultModelIO(getModelDirectory()));
-        }
-    }
-
-    protected boolean loadLegacyModel() {
-        try {
-            Model model = loadModel(new XMLModel(getModelDirectory()));
-            if(model != null) {
-                logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
-                return true;
-            }
-        } catch (Exception e) {
-            logger.error("Cannot load/parse XML model", e);
-        }
-        return false;
+        loadModel(new DefaultModelIO(getModelDirectory()));
     }
 
     public FileObject getModelDirectory() throws FileSystemException {
@@ -80,8 +64,7 @@ public class ModelService {
     }
 
     public synchronized void saveModel() throws IOException, ConfigurationException {
-        model.init(configuration);
-        new XMLModel(getModelDirectory()).delete();
+        model.init();
         new DefaultModelIO(getModelDirectory()).save(model);
         if (configurationFile != null) {
             configurationFile.save();

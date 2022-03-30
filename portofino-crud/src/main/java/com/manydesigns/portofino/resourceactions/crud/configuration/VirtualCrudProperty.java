@@ -22,6 +22,7 @@ package com.manydesigns.portofino.resourceactions.crud.configuration;
 
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.persistence.Persistence;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +64,8 @@ public class VirtualCrudProperty extends CrudProperty {
     // Configuration implementation
     //**************************************************************************
 
-    public void init(Model model, Configuration configuration) {
-        super.init(model, configuration);
+    public void init(Persistence persistence) {
+        super.init(persistence);
         type = ReflectionUtil.loadClass(typeName);
     }
 

@@ -21,11 +21,10 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.model.database.Type;
+import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.database.*;
 import liquibase.CatalogAndSchema;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
@@ -35,23 +34,13 @@ import liquibase.snapshot.SnapshotControl;
 import liquibase.snapshot.SnapshotGeneratorFactory;
 import liquibase.structure.core.ForeignKeyConstraintType;
 import liquibase.structure.core.Relation;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.parser.JSqlParser;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Types;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -74,7 +63,7 @@ public class DatabaseSyncer {
         this.connectionProvider = connectionProvider;
     }
 
-    public Database syncDatabase(Model sourceModel) throws Exception {
+    public Database syncDatabase(List<Database> existingDatabases) throws Exception {
         String databaseName = connectionProvider.getDatabase().getDatabaseName();
         Database targetDatabase = new Database();
         targetDatabase.setDatabaseName(databaseName);
@@ -86,7 +75,7 @@ public class DatabaseSyncer {
 
             logger.debug("Retrieving source database");
             Database sourceDatabase =
-                    DatabaseLogic.findDatabaseByName(sourceModel, databaseName);
+                    DatabaseLogic.findDatabaseByName(existingDatabases, databaseName);
             if (sourceDatabase == null) {
                 logger.debug("Source database not found. Creating an empty one.");
                 sourceDatabase = new Database();

@@ -13,7 +13,6 @@ import com.manydesigns.portofino.actions.Group;
 import com.manydesigns.portofino.actions.Permissions;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;

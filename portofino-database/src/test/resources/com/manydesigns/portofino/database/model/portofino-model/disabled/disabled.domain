@@ -1,5 +1,5 @@
 import com.manydesigns.portofino.model.annotations.Enabled;
-import com.manydesigns.portofino.model.database.annotations.JDBCConnection;
+import com.manydesigns.portofino.database.model.annotations.JDBCConnection;
 
 @JDBCConnection(password = "manydesigns", driver = "org.h2.Driver", username = "manydesigns", url = "jdbc:h2:mem:hibernatetest;DB_CLOSE_DELAY=-1")
 @Enabled(false)

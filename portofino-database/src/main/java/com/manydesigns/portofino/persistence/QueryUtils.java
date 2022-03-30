@@ -28,7 +28,7 @@ import com.manydesigns.elements.text.OgnlHqlFormat;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Alias;
@@ -794,9 +794,8 @@ public class QueryUtils {
     public static List<Object> getRelatedObjects(
             Persistence persistence, String databaseName, String entityName,
             Object obj, String oneToManyRelationshipName) {
-        Model model = persistence.getModel();
         ForeignKey relationship =
-                DatabaseLogic.findOneToManyRelationship(model, databaseName,
+                DatabaseLogic.findOneToManyRelationship(persistence.getDatabases(), databaseName,
                         entityName, oneToManyRelationshipName);
         if(relationship == null) {
             throw new IllegalArgumentException("Relationship not defined: " + oneToManyRelationshipName);

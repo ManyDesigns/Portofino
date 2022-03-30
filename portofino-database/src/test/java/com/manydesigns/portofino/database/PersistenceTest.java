@@ -10,8 +10,8 @@ import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.AnnotationProperty;
-import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.*;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -94,13 +94,12 @@ public class PersistenceTest {
 
     @AfterMethod
     public void teardown() throws ConfigurationException, IOException {
-        persistence.getModel().getDatabases().forEach(d -> {
+        persistence.getDatabases().forEach(d -> {
             d.getSchemas().forEach(s -> {
                 s.getTables().clear();
                 s.getModelElement().getEClassifiers().clear();
             });
         });
-        modelService.saveModel();
         persistence.stop();
         databaseModule.destroy();
     }
@@ -124,7 +123,7 @@ public class PersistenceTest {
         persistence.syncDataModel("jpetstore");
         //Table ordersTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "ORDERS");
         //ordersTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new TableGenerator());
-        Table supplierTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "SUPPLIER");
+        Table supplierTable = DatabaseLogic.findTableByName(persistence.getDatabases(), "jpetstore", "PUBLIC", "SUPPLIER");
         supplierTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new IncrementGenerator());
         //Table testTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "TEST");
         //testTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new SequenceGenerator());
@@ -182,7 +181,7 @@ public class PersistenceTest {
         List resultProd = new ArrayList(session.createQuery(criteria).list());
 
         Table table = DatabaseLogic.findTableByName(
-                persistence.getModel(), "jpetstore", "PUBLIC", "CATEGORY");
+                persistence.getDatabases(), "jpetstore", "PUBLIC", "CATEGORY");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
         findCategory(tableAccessor, tableCriteria);
@@ -212,7 +211,7 @@ public class PersistenceTest {
 
     public void testSearchAndUpdateCategorie() {
         Table table = DatabaseLogic.findTableByName(
-                persistence.getModel(), "jpetstore", "PUBLIC", "CATEGORY");
+                persistence.getDatabases(), "jpetstore", "PUBLIC", "CATEGORY");
         assertNotNull(table);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
@@ -456,7 +455,7 @@ public class PersistenceTest {
         session.save("supplier", supplier);
         session.getTransaction().commit();
         Table table = DatabaseLogic.findTableByName(
-                persistence.getModel(), "jpetstore", "PUBLIC", "SUPPLIER");
+                persistence.getDatabases(), "jpetstore", "PUBLIC", "SUPPLIER");
         assertNotNull(table);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
@@ -544,7 +543,7 @@ public class PersistenceTest {
 
     public void testViews() {
         Table table = DatabaseLogic.findTableByName(
-                persistence.getModel(), "hibernatetest", "PUBLIC", "TEST_VIEW_1");
+                persistence.getDatabases(), "hibernatetest", "PUBLIC", "TEST_VIEW_1");
         assertNotNull(table);
         assertTrue(table instanceof View);
         View view = (View) table;
@@ -572,7 +571,7 @@ public class PersistenceTest {
 
     public void testAnnotations() {
         Table table = DatabaseLogic.findTableByName(
-                persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
+                persistence.getDatabases(), "hibernatetest", "PUBLIC", "DOMANDA");
         Session session = persistence.getSession("hibernatetest");
         try {
             session.createNamedQuery("all_questions", Map.class).list();
@@ -590,7 +589,7 @@ public class PersistenceTest {
     }
 
     public void testDateAndTimeAPIMapping() {
-        Table table = DatabaseLogic.findTableByName(persistence.getModel(), "hibernatetest", "PUBLIC", "DOMANDA");
+        Table table = DatabaseLogic.findTableByName(persistence.getDatabases(), "hibernatetest", "PUBLIC", "DOMANDA");
         assertNotNull(table);
         Column column = DatabaseLogic.findColumnByName(table, "DATA");
         assertNotNull(column);
@@ -613,7 +612,7 @@ public class PersistenceTest {
         try {
             appDir.copyFrom(modelSource, new AllFileSelector());
             setup(appDir);
-            Database hibernatetest = DatabaseLogic.findDatabaseByName(persistence.getModel(), "hibernatetest");
+            Database hibernatetest = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "hibernatetest");
             hibernatetest.setDatabaseName("test");
             FileObject file;
             file = appDir.resolveFile("portofino-model").resolveFile("test");
@@ -636,9 +635,10 @@ public class PersistenceTest {
         ref.setFromColumn("ID");
         sp.getReferences().add(ref);
         table1.getSelectionProviders().add(sp);
-        modelService.saveModel();
-        persistence.stop();
-        persistence.start();
+        // TODO save model in memory like the previous test
+        //modelService.saveModel();
+        //persistence.stop();
+        //persistence.start();
         table1 = persistence.getTableAccessor("hibernatetest", "table1").getTable();
         assertEquals(1, table1.getSelectionProviders().size());
         DatabaseSelectionProvider dbsp = (DatabaseSelectionProvider) table1.getSelectionProviders().get(0);
@@ -647,7 +647,7 @@ public class PersistenceTest {
     }
 
     public void testDisabledDatabasesAreSkipped() {
-        assertNotNull(DatabaseLogic.findDatabaseByName(persistence.getModel(), "disabled"));
+        assertNotNull(DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "disabled"));
         Error error = null;
         try {
             persistence.getSession("disabled");

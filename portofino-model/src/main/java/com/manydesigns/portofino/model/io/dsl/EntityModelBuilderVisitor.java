@@ -20,16 +20,10 @@
 
 package com.manydesigns.portofino.model.io.dsl;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.manydesigns.portofino.model.PortofinoPackage;
-import com.manydesigns.portofino.model.database.annotations.KeyMappings;
-import com.manydesigns.portofino.model.database.annotations.Id;
-import com.manydesigns.portofino.model.language.ModelBaseVisitor;
+import com.manydesigns.portofino.model.annotations.KeyMappings;
+import com.manydesigns.portofino.model.annotations.Id;
 import com.manydesigns.portofino.model.language.ModelParser;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

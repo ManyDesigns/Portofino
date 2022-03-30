@@ -2,14 +2,20 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.text.QueryStringWithParameters;
+import com.manydesigns.portofino.model.InitVisitor;
+import com.manydesigns.portofino.model.LinkVisitor;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.database.model.*;
+import com.manydesigns.portofino.model.ResetVisitor;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -26,7 +32,8 @@ public class QueryUtilsTest {
 
         Database database = new Database();
         database.setDatabaseName("db");
-        model.getDatabases().add(database);
+        List<Database> databases = new ArrayList<>();
+        databases.add(database);
 
         Schema schema = new Schema(database);
         schema.setSchemaName("schema");
@@ -49,7 +56,7 @@ public class QueryUtilsTest {
         pkColumn.setColumnName("column1");
         table.setPrimaryKey(primaryKey);
 
-        model.init(new PropertiesConfiguration());
+        initDatabase(database, databases);
 
         TableAccessor tableAccessor = new TableAccessor(table);
 
@@ -106,6 +113,12 @@ public class QueryUtilsTest {
         queryStringWithParameters =
                 QueryUtils.mergeQuery("select t, u from test_table t, other x where t.foo = x.bar", criteria, null);
         assertEquals("SELECT t, u FROM test_table t, other x WHERE (t.foo = x.bar) AND t.column1 = :p1", queryStringWithParameters.getQueryString());
+    }
+
+    private void initDatabase(Database database, List<Database> databases) {
+        new ResetVisitor().visit(database);
+        new InitVisitor(databases, new PropertiesConfiguration()).visit(database);
+        new LinkVisitor(databases, new PropertiesConfiguration()).visit(database);
     }
 
 }

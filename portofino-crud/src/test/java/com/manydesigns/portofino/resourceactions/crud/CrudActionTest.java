@@ -35,12 +35,11 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.AnnotationProperty;
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.model.database.IncrementGenerator;
-import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.Column;
+import com.manydesigns.portofino.database.model.DatabaseLogic;
+import com.manydesigns.portofino.database.model.IncrementGenerator;
+import com.manydesigns.portofino.database.model.Table;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.ActionContext;
@@ -137,7 +136,8 @@ public class CrudActionTest extends JerseyTest {
         persistence.syncDataModel("jpetstore");
         //Table ordersTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "ORDERS");
         //ordersTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new TableGenerator());
-        Table supplierTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "SUPPLIER");
+        Table supplierTable = DatabaseLogic.findTableByName(
+                persistence.getDatabases(), "jpetstore", "PUBLIC", "SUPPLIER");
         supplierTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new IncrementGenerator());
         //Table testTable = DatabaseLogic.findTableByName(persistence.getModel(), "jpetstore", "PUBLIC", "TEST");
         //testTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new SequenceGenerator());
@@ -149,7 +149,8 @@ public class CrudActionTest extends JerseyTest {
         req.getServletContext().setInitParameter("portofino.api.root", "http://fake");
         req.makeMultipart();
 
-        Column column = DatabaseLogic.findColumnByName(persistence.getModel(), "jpetstore", "PUBLIC", "PRODUCT", "DESCN");
+        Column column = DatabaseLogic.findColumnByName(
+                persistence.getDatabases(), "jpetstore", "PUBLIC", "PRODUCT", "DESCN");
         Annotation ann = new Annotation(column, FileBlob.class.getName());
         column.getAnnotations().add(ann);
 

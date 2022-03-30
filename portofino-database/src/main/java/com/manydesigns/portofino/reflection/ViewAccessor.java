@@ -4,7 +4,7 @@ import com.manydesigns.elements.annotations.Insertable;
 import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.elements.annotations.impl.InsertableImpl;
 import com.manydesigns.elements.annotations.impl.UpdatableImpl;
-import com.manydesigns.portofino.model.database.View;
+import com.manydesigns.portofino.database.model.View;
 import org.jetbrains.annotations.NotNull;
 
 public class ViewAccessor extends TableAccessor {

@@ -22,7 +22,7 @@ package com.manydesigns.portofino.resourceactions.m2m.configuration;
 
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
@@ -103,7 +103,7 @@ public class ManyToManyConfiguration implements ResourceActionConfiguration {
         }
 
         if(database != null && query != null) {
-            actualRelationDatabase = DatabaseLogic.findDatabaseByName(persistence.getModel(), database);
+            actualRelationDatabase = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), database);
             if(actualRelationDatabase != null) {
                 actualRelationTable = QueryUtils.getTableFromQueryString(actualRelationDatabase, query);
 
@@ -111,10 +111,11 @@ public class ManyToManyConfiguration implements ResourceActionConfiguration {
                     if(manySelectionProvider != null) {
                         manySelectionProvider.init(actualRelationTable);
                         if(manySelectionProvider.getActualSelectionProvider() != null) {
-                            ModelSelectionProvider actualSelectionProvider = manySelectionProvider.getActualSelectionProvider();
+                            ModelSelectionProvider actualSelectionProvider =
+                                    manySelectionProvider.getActualSelectionProvider();
                             String manyDatabaseName = actualSelectionProvider.getToDatabase();
                             actualManyDatabase =
-                                DatabaseLogic.findDatabaseByName(persistence.getModel(), manyDatabaseName);
+                                DatabaseLogic.findDatabaseByName(persistence.getDatabases(), manyDatabaseName);
                             actualManyTable = actualSelectionProvider.getToTable();
                             if(actualManyTable == null && actualSelectionProvider instanceof DatabaseSelectionProvider) {
                                 logger.debug("Trying to determine the many table from the selection provider query");
@@ -137,7 +138,7 @@ public class ManyToManyConfiguration implements ResourceActionConfiguration {
                         oneSelectionProvider.init(actualRelationTable);
                         String oneDatabaseName = oneSelectionProvider.getActualSelectionProvider().getToDatabase();
                         actualOneDatabase =
-                            DatabaseLogic.findDatabaseByName(persistence.getModel(), oneDatabaseName);
+                            DatabaseLogic.findDatabaseByName(persistence.getDatabases(), oneDatabaseName);
                     }
                 } else {
                     logger.error("Table not found");

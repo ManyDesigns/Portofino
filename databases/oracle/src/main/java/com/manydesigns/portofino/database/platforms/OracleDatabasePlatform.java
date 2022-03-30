@@ -20,13 +20,12 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.model.database.platforms.AbstractDatabasePlatform;
+import com.manydesigns.portofino.database.model.ConnectionProvider;
+import com.manydesigns.portofino.database.model.platforms.AbstractDatabasePlatform;
 import org.hibernate.dialect.Oracle9iDialect;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
 /*

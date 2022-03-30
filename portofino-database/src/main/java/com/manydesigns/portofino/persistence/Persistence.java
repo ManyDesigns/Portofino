@@ -23,17 +23,19 @@ package com.manydesigns.portofino.persistence;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
+import com.manydesigns.portofino.database.model.ForeignKey;
+import com.manydesigns.portofino.database.model.PrimaryKey;
+import com.manydesigns.portofino.database.model.annotations.JDBCConnection;
+import com.manydesigns.portofino.database.model.annotations.JNDIConnection;
+import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
 import com.manydesigns.portofino.database.multitenancy.MultiTenant;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
-import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.*;
 import com.manydesigns.portofino.model.annotations.Enabled;
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.Schema;
-import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.model.database.annotations.*;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.*;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.annotations.Id;
+import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
@@ -44,6 +46,7 @@ import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancy
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import liquibase.Contexts;
@@ -61,13 +64,13 @@ import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
-import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Connection;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -92,6 +95,7 @@ public class Persistence {
 
     protected final DatabasePlatformsRegistry databasePlatformsRegistry;
     protected final Map<String, HibernateDatabaseSetup> setups;
+    protected final LinkedList<Database> databases = new LinkedList<>();
 
     protected final Configuration configuration;
     protected ModelService modelService;
@@ -99,24 +103,14 @@ public class Persistence {
     protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
     public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
-    protected Subscription modelSubscription = null;
+    protected Disposable modelEventsSubscription;
 
     public enum Status {
         STARTING, STARTED, STOPPING, STOPPED
     }
 
     public CacheResetListenerRegistry cacheResetListenerRegistry;
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(Persistence.class);
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
+    public static final Logger logger = LoggerFactory.getLogger(Persistence.class);
 
     public Persistence(
             ModelService modelService, Configuration configuration, DatabasePlatformsRegistry databasePlatformsRegistry)
@@ -125,19 +119,32 @@ public class Persistence {
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
         setups = new HashMap<>();
-        modelService.modelEvents.subscribe(evt -> {
-            if(evt == ModelService.EventType.LOADED) {
-                initModel();
-            }
-        });
     }
 
     //**************************************************************************
     // Model initialization
     //**************************************************************************
 
-    protected void annotateDatabases(Collection<Database> databases) {
-        databases.forEach(this::annotateDatabase);
+    protected boolean tryLoadingLegacyModel() {
+        try {
+            XMLModel modelIO = new XMLModel(modelService.getModelDirectory(), this);
+            Model model = modelService.loadModel(modelIO);
+            if(model != null) {
+                modelIO.getDatabases().forEach(
+                        newDb -> {
+                            String databaseName = newDb.getDatabaseName();
+                            databases.removeIf(oldDb -> oldDb.getDatabaseName().equals(databaseName));
+                            getModel().getDomains().removeIf(d -> d.getName().equals(databaseName));
+                            databases.add(newDb);
+                            getModel().getDomains().add(newDb.getModelElement());
+                        });
+                logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
+                return true;
+            }
+        } catch (Exception e) {
+            logger.error("Cannot load/parse XML model", e);
+        }
+        return false;
     }
 
     private void annotateDatabase(Database db) {
@@ -156,7 +163,7 @@ public class Persistence {
         }
     }
 
-    protected Database setupDatabase(Model model, EPackage domain) {
+    protected Database setupDatabase(EPackage domain) {
         //Can't use getJavaAnnotation as they've not yet been resolved
         EAnnotation ann = domain.getEAnnotation(JDBCConnection.class.getName());
         ConnectionProvider connectionProvider = null;
@@ -177,12 +184,12 @@ public class Persistence {
         }
         if(connectionProvider != null) {
             Database database = new Database(domain);
-            Database existing = DatabaseLogic.findDatabaseByName(model, database.getName());
+            Database existing = DatabaseLogic.findDatabaseByName(databases, database.getName());
             if (existing != null) {
                 logger.debug("Database " + database.getName() + " already exists");
                 return existing;
             }
-            model.getDatabases().add(database);
+            databases.add(database);
             connectionProvider.setDatabase(database);
             database.setConnectionProvider(connectionProvider);
             domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
@@ -197,7 +204,7 @@ public class Persistence {
         schema.setDatabase(database);
         database.getSchemas().add(schema);
         EAnnotation schemaAnn =
-                domain.getEAnnotation(com.manydesigns.portofino.model.database.annotations.Schema.class.getName());
+                domain.getEAnnotation(com.manydesigns.portofino.database.model.annotations.Schema.class.getName());
         if(schemaAnn != null) {
             schema.setActualSchemaName(schemaAnn.getDetails().get("name"));
         }
@@ -308,7 +315,6 @@ public class Persistence {
     }
 
     public synchronized void initModel() {
-        getModel().getDomains().forEach(domain -> setupDatabase(getModel(), domain));
         logger.info("Cleaning up old setups");
         closeSessions();
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
@@ -324,17 +330,31 @@ public class Persistence {
         }
         //TODO it would perhaps be preferable that we generated REPLACED events here rather than REMOVED followed by ADDED
         setups.clear();
-        modelService.getModel().init(configuration);
-        for (Database database : modelService.getModel().getDatabases()) {
+        modelService.getModel().init();
+        for (Database database : databases) {
             initDatabase(database);
         }
-        annotateDatabases(modelService.getModel().getDatabases());
+        databases.forEach(this::annotateDatabase);
         if(cacheResetListenerRegistry != null) {
             cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
         }
     }
 
+    public synchronized void removeDatabase(Database database) {
+        databases.remove(database);
+        EPackage pkg = database.getModelElement();
+        getModel().getDomains().remove(pkg);
+    }
+
+    public void addDatabase(Database database) {
+        databases.add(database);
+        getModel().getDomains().add(database.getModelElement());
+    }
+
     protected boolean initDatabase(Database database) {
+        new ResetVisitor().visit(database);
+        new InitVisitor(databases, configuration).visit(database);
+        new LinkVisitor(databases, configuration).visit(database);
         Boolean enabled = database.getJavaAnnotation(Enabled.class).map(Enabled::value).orElse(true);
         if(enabled) {
             initConnectionProvider(database);
@@ -400,7 +420,7 @@ public class Persistence {
         if(currentStatus != Status.STARTED) {
             throw new IllegalStateException("Persistence not started: " + currentStatus);
         }
-        for (Database database : modelService.getModel().getDatabases()) {
+        for (Database database : databases) {
             if (!ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 logger.info("Retrying failed connection to database " + database.getDatabaseName());
                 initConnectionProvider(database);
@@ -413,7 +433,7 @@ public class Persistence {
     //**************************************************************************
 
     public ConnectionProvider getConnectionProvider(String databaseName) {
-        for (Database database : modelService.getModel().getDatabases()) {
+        for (Database database : databases) {
             if (database.getDatabaseName().equals(databaseName)) {
                 return database.getConnectionProvider();
             }
@@ -438,7 +458,7 @@ public class Persistence {
     }
 
     public synchronized void syncDataModel(String databaseName) throws Exception {
-        Database sourceDatabase = DatabaseLogic.findDatabaseByName(getModel(), databaseName);
+        Database sourceDatabase = DatabaseLogic.findDatabaseByName(databases, databaseName);
         if(sourceDatabase == null) {
             throw new IllegalArgumentException("Database " + databaseName + " does not exist");
         }
@@ -449,9 +469,9 @@ public class Persistence {
         }
         ConnectionProvider connectionProvider = sourceDatabase.getConnectionProvider();
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
-        Database targetDatabase = dbSyncer.syncDatabase(getModel());
-        modelService.getModel().removeDatabase(sourceDatabase);
-        modelService.getModel().addDatabase(targetDatabase);
+        Database targetDatabase = dbSyncer.syncDatabase(databases);
+        removeDatabase(sourceDatabase);
+        addDatabase(targetDatabase);
     }
 
     //**************************************************************************
@@ -502,7 +522,7 @@ public class Persistence {
     }
 
     public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
-        Database database = DatabaseLogic.findDatabaseByName(getModel(), databaseName);
+        Database database = DatabaseLogic.findDatabaseByName(databases, databaseName);
         if(database == null) {
             throw new IllegalArgumentException("Database " + databaseName + " does not exist");
         }
@@ -518,14 +538,23 @@ public class Persistence {
         return table instanceof View ? new ViewAccessor((View) table) : new TableAccessor(table);
     }
 
-    //**************************************************************************
-    // User
-    //**************************************************************************
-
     public void start() {
         status.onNext(Status.STARTING);
-        initModel();
-        for(Database database : modelService.getModel().getDatabases()) {
+        loadModel();
+        AtomicBoolean loading = new AtomicBoolean(false);
+        modelEventsSubscription = modelService.modelEvents.subscribe(evt -> {
+            if(evt == ModelService.EventType.LOADED) {
+                if(!loading.get()) try {
+                    loading.set(true);
+                    loadModel();
+                } finally {
+                    loading.set(false);
+                }
+            } else if (evt == ModelService.EventType.SAVED) {
+                new XMLModel(modelService.getModelDirectory(), this).delete();
+            }
+        });
+        for(Database database : databases) {
             if(ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 runLiquibase(database);
             }
@@ -533,15 +562,24 @@ public class Persistence {
         status.onNext(Status.STARTED);
     }
 
+    public void loadModel() {
+        if (!tryLoadingLegacyModel()) {
+            getModel().getDomains().forEach(this::setupDatabase);
+        }
+        initModel();
+    }
+
     public void stop() {
         status.onNext(Status.STOPPING);
         closeSessions();
+        if (modelEventsSubscription != null) {
+            modelEventsSubscription.dispose();
+        }
         for(HibernateDatabaseSetup setup : setups.values()) {
             setup.dispose();
         }
-        for (Database database : modelService.getModel().getDatabases()) {
-            ConnectionProvider connectionProvider =
-                    database.getConnectionProvider();
+        for (Database database : databases) {
+            ConnectionProvider connectionProvider = database.getConnectionProvider();
             connectionProvider.shutdown();
         }
         status.onNext(Status.STOPPED);
@@ -594,5 +632,9 @@ public class Persistence {
 
     public void setMultiTenancyImplementationFactory(MultiTenancyImplementationFactory multiTenancyImplementationFactory) {
         this.multiTenancyImplementationFactory = multiTenancyImplementationFactory;
+    }
+
+    public List<Database> getDatabases() {
+        return databases;
     }
 }

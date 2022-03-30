@@ -1,14 +1,13 @@
 package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.Column;
+import com.manydesigns.portofino.database.model.DatabaseLogic;
+import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.persistence.CriteriaDefinition;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.util.PkHelper;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
@@ -59,7 +58,7 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
         if(persistence.status.getValue() != Persistence.Status.STARTED) {
             throw new IllegalStateException("Persistence is not yet started");
         }
-        persistence.getModel().getDatabases().forEach(d -> {
+        persistence.getDatabases().forEach(d -> {
             d.getAllTables().forEach(t -> {
                 t.getColumns().forEach(c -> {
                     if(c.getAnnotation(Username.class).isPresent()) {

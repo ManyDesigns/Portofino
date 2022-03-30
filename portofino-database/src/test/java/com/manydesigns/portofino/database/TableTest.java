@@ -21,13 +21,19 @@
 package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.model.InitVisitor;
+import com.manydesigns.portofino.model.LinkVisitor;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.database.model.*;
+import com.manydesigns.portofino.model.ResetVisitor;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertEquals;
@@ -53,8 +59,8 @@ public class TableTest {
     }
 
     public void testActualEntityNames(){
-        Model model = new Model();
         Database db = new Database();
+        List<Database> databases = new ArrayList<>();
         db.setDatabaseName("portofino");
         Schema schema = new Schema();
         schema.setDatabase(db);
@@ -62,8 +68,8 @@ public class TableTest {
         Table table = new Table();
         table.setSchema(schema);
         table.setTableName(" ab!!!..acus$%/()");
-        model.getDatabases().add(db);
-        table.init(model, null);
+        databases.add(db);
+        table.init(databases, null);
 
         assertNotNull(table.getActualEntityName());
         assertEquals("_ab_____acus$____", table.getActualEntityName());
@@ -72,7 +78,7 @@ public class TableTest {
         table = new Table();
         table.setSchema(schema);
         table.setTableName("0DPrpt");
-        table.init(model, null);
+        table.init(databases, null);
         assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
@@ -85,7 +91,7 @@ public class TableTest {
         table = new Table();
         table.setSchema(schema);
         table.setTableName("0DPrpt");
-        table.init(model, null);
+        table.init(databases, null);
         assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
@@ -97,33 +103,33 @@ public class TableTest {
         table = new Table();
         table.setSchema(schema);
         table.setTableName("0DPrpt");
-        table.init(model, null);
+        table.init(databases, null);
         assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         db = new Database();
         db.setDatabaseName(".portofino");
         table.setTableName("0DPrpt");
-        table.init(model, null);
+        table.init(databases, null);
         assertEquals("_0dprpt", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         table.setEntityName(null);
         table.setTableName("XYZéèçò°àùì");
-        table.init(model, null);
+        table.init(databases, null);
         assertEquals("xyzéèçò_àùì", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
 
         table.setEntityName(null);
         table.setTableName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
-        table.init(model, null);
+        table.init(databases, null);
         assertEquals("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", table.getActualEntityName());
         System.out.println(table.getActualEntityName());
     }
 
     public void testActualColumnNames() {
-        Model model = new Model();
         Database db = new Database();
+        List<Database> databases = new ArrayList<>();
         db.setConnectionProvider(new JdbcConnectionProvider());
         db.setDatabaseName("portofino");
         Schema schema = new Schema();
@@ -141,8 +147,8 @@ public class TableTest {
         column.setLength(0);
         column.setScale(0);
         table.getColumns().add(column);
-        model.getDatabases().add(db);
-        model.init(new PropertiesConfiguration());
+        databases.add(db);
+        initDatabase(db, databases);
 
         assertNotNull(column.getActualPropertyName());
         assertEquals("_ab_____acus$____", column.getActualPropertyName());
@@ -159,21 +165,28 @@ public class TableTest {
         table.getColumns().add(column);
         schema.getTables().clear();
         schema.getTables().add(table);
-        model.init(null);
+        initDatabase(db, databases);
         assertEquals("_0dprpt", column.getActualPropertyName());
 
         
         column.setColumnName("XYZéèçò°àùì");
-        model.init(null);
+        initDatabase(db, databases);
         assertEquals("xyzéèçò_àùì", column.getActualPropertyName());
 
         column.setColumnName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
-        model.init(null);
+        initDatabase(db, databases);
         assertEquals("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", column.getActualPropertyName());
+    }
+
+    private void initDatabase(Database database, List<Database> databases) {
+        new ResetVisitor().visit(database);
+        new InitVisitor(databases, new PropertiesConfiguration()).visit(database);
+        new LinkVisitor(databases, new PropertiesConfiguration()).visit(database);
     }
 
     public void testDuplicatePropertyNames() {
         Model model = new Model();
+        List<Database> databases = new ArrayList<>();
         Database db = new Database();
         db.setDatabaseName("portofino");
         db.setConnectionProvider(new JdbcConnectionProvider());
@@ -203,8 +216,8 @@ public class TableTest {
         column2.setScale(0);
         table.getColumns().add(column2);
 
-        model.getDatabases().add(db);
-        model.init(new PropertiesConfiguration());
+        databases.add(db);
+        initDatabase(db, databases);
 
         assertFalse(StringUtils.equals(column.getActualPropertyName(), column2.getActualPropertyName()));
 
@@ -232,14 +245,14 @@ public class TableTest {
         fk.getReferences().add(ref);
         table.getForeignKeys().add(fk);
 
-        model.init(null);
+        initDatabase(db, databases);
 
         assertFalse(StringUtils.equals(column.getActualPropertyName(), column2.getActualPropertyName()));
         assertFalse(StringUtils.equals(column.getActualPropertyName(), fk.getActualOnePropertyName()));
         assertFalse(StringUtils.equals(column3.getActualPropertyName(), fk.getActualManyPropertyName()));
 
         fk.setName("dup_2");
-        model.init(null);
+        initDatabase(db, databases);
 
         assertFalse(StringUtils.equals(column.getActualPropertyName(), column2.getActualPropertyName()));
         assertFalse(StringUtils.equals(column.getActualPropertyName(), fk.getActualOnePropertyName()));

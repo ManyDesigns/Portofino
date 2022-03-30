@@ -30,16 +30,16 @@ import org.apache.commons.configuration2.Configuration;
 */
 public class InitVisitor extends ModelObjectVisitor {
 
-    private final Model model;
+    private final Object context;
     private final Configuration configuration;
 
-    public InitVisitor(Model model, Configuration configuration) {
-        this.model = model;
+    public InitVisitor(Object context, Configuration configuration) {
+        this.context = context;
         this.configuration = configuration;
     }
 
     @Override
     public void visitNodeBeforeChildren(ModelObject node) {
-        node.init(model, configuration);
+        node.init(context, configuration);
     }
 }

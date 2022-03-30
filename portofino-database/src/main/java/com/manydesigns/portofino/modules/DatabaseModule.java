@@ -23,7 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;

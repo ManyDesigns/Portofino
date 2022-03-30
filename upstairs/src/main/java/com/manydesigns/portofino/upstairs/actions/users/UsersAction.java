@@ -1,8 +1,8 @@
 package com.manydesigns.portofino.upstairs.actions.users;
 
 import com.manydesigns.elements.messages.RequestMessages;
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.database.model.Column;
+import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;

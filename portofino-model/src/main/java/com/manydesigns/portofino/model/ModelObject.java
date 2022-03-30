@@ -35,9 +35,9 @@ public interface ModelObject {
     void setParent(Object parent);
 
     void reset();
-    void init(Model model, Configuration configuration);
-    void link(Model model, Configuration configuration);
-    default void afterLink(Model model, Configuration configuration) {}
+    void init(Object context, Configuration configuration);
+    void link(Object context, Configuration configuration);
+    default void afterLink(Object context, Configuration configuration) {}
 
     void visitChildren(ModelObjectVisitor visitor);
 
