@@ -6,7 +6,7 @@ import com.manydesigns.elements.messages.*
 import com.manydesigns.elements.reflection.*
 import com.manydesigns.portofino.*
 import com.manydesigns.portofino.dispatcher.*
-import com.manydesigns.portofino.model.database.*
+import com.manydesigns.portofino.database.model.*
 import com.manydesigns.portofino.resourceactions.*
 import com.manydesigns.portofino.security.*
 import com.manydesigns.portofino.shiro.*

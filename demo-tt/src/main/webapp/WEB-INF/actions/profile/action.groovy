@@ -4,9 +4,9 @@ import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.fields.FileBlobField
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.forms.FormBuilder
-import com.manydesigns.portofino.model.database.Database
-import com.manydesigns.portofino.model.database.DatabaseLogic
-import com.manydesigns.portofino.model.database.Table
+import com.manydesigns.portofino.database.model.Database
+import com.manydesigns.portofino.database.model.DatabaseLogic
+import com.manydesigns.portofino.database.model.Table
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.resourceactions.custom.CustomAction
