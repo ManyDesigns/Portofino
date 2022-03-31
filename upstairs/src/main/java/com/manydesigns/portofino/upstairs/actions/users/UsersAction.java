@@ -48,8 +48,8 @@ public class UsersAction extends AbstractResourceAction {
 
     @Path("/check-wizard")
     @POST
-    public boolean createApplication(WizardInfo wizard) throws Exception {
-        Table userTable = UpstairsAction.getTable(persistence.getModel(), wizard.usersTable);
+    public boolean createApplication(WizardInfo wizard) {
+        Table userTable = UpstairsAction.getTable(persistence, wizard.usersTable);
         if(userTable == null) {
             return true;
         }

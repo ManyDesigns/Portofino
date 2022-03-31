@@ -102,7 +102,7 @@ public class TablesAction extends AbstractResourceAction {
     @Path("{db}/{schema}")
     @GET
     public List<Map> getTables(@PathParam("db") String db, @PathParam("schema") String schema) {
-        Schema schemaObj = DatabaseLogic.findSchemaByName(persistence.getModel(), db, schema);
+        Schema schemaObj = DatabaseLogic.findSchemaByName(persistence.getDatabases(), db, schema);
         List<Map> tables = new ArrayList<>();
         if(schemaObj == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -149,7 +149,7 @@ public class TablesAction extends AbstractResourceAction {
     @GET
     public Map getTableInfo(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName) {
-        Table table = DatabaseLogic.findTableByName(persistence.getModel(), db, schema, tableName);
+        Table table = DatabaseLogic.findTableByName(persistence.getDatabases(), db, schema, tableName);
         if(table == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
@@ -260,7 +260,7 @@ public class TablesAction extends AbstractResourceAction {
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
             TableInfo tableInfo) throws Exception {
         Table table = tableInfo.table;
-        Table existing = DatabaseLogic.findTableByName(persistence.getModel(), db, schema, tableName);
+        Table existing = DatabaseLogic.findTableByName(persistence.getDatabases(), db, schema, tableName);
         if(existing == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
@@ -331,7 +331,7 @@ public class TablesAction extends AbstractResourceAction {
     public void saveColumn(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
             @PathParam("column") String columnName, ColumnAndAnnotations column) throws Exception {
-        Column existing = DatabaseLogic.findColumnByName(persistence.getModel(), db, schema, tableName, columnName);
+        Column existing = DatabaseLogic.findColumnByName(persistence.getDatabases(), db, schema, tableName, columnName);
         if(existing == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
@@ -463,7 +463,7 @@ public class TablesAction extends AbstractResourceAction {
     public String getAnnotations(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName,
             @PathParam("column") String columnName, @PathParam("typeName") String typeName) throws ClassNotFoundException {
-        Column column = DatabaseLogic.findColumnByName(persistence.getModel(), db, schema, tableName, columnName);
+        Column column = DatabaseLogic.findColumnByName(persistence.getDatabases(), db, schema, tableName, columnName);
         if(column == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
@@ -642,7 +642,7 @@ public class TablesAction extends AbstractResourceAction {
     }
 
     public List<Table> getAllTables() {
-        List<Table> tables = DatabaseLogic.getAllTables(persistence.getModel());
+        List<Table> tables = DatabaseLogic.getAllTables(persistence.getDatabases());
         Collections.sort(tables, (o1, o2) -> {
             int dbComp = o1.getDatabaseName().compareToIgnoreCase(o2.getDatabaseName());
             if(dbComp == 0) {
