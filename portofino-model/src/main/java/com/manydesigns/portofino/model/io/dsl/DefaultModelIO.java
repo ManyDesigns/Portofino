@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.Annotation;
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.annotations.Id;
 import com.manydesigns.portofino.model.annotations.KeyMappings;
@@ -74,15 +75,15 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadDomainDirectory(Model model, EPackage parent, FileObject domainDir) throws IOException {
+    protected void loadDomainDirectory(Model model, Domain parent, FileObject domainDir) throws IOException {
         String domainName = domainDir.getName().getBaseName();
-        EPackage domain;
+        Domain domain;
         if(parent != null) {
-            domain = parent.getESubpackages().stream().filter(p -> p.getName().equals(domainName)).findFirst().orElseGet(() -> {
-                EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
-                ePackage.setName(domainName);
-                parent.getESubpackages().add(ePackage);
-                return ePackage;
+            domain = parent.getSubdomains().stream().filter(p -> p.getName().equals(domainName)).findFirst().orElseGet(() -> {
+                Domain newDomain = new Domain();
+                newDomain.setName(domainName);
+                parent.getSubdomains().add(newDomain);
+                return newDomain;
             });
         } else {
             domain = model.ensureDomain(domainName);
@@ -167,7 +168,7 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadObject(Model model, EPackage domain, FileObject file) throws IOException {
+    protected void loadObject(Model model, Domain domain, FileObject file) throws IOException {
         String path = getQualifiedName(domain);
         try(InputStream inputStream = file.getContent().getInputStream()) {
             ModelParser parser = getParser(model, domain, path, inputStream);
@@ -204,7 +205,7 @@ public class DefaultModelIO implements ModelIO {
         if(!modelDirectory.getType().equals(FileType.FOLDER)) {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
-        for(EPackage domain : model.getDomains()) {
+        for(Domain domain : model.getDomains()) {
             saveDomain(domain, modelDirectory);
         }
         deleteUnusedDomainDirectories(modelDirectory, model.getDomains());
@@ -215,7 +216,7 @@ public class DefaultModelIO implements ModelIO {
         return new OutputStreamWriter(file.getContent().getOutputStream(), StandardCharsets.UTF_8);
     }
 
-    protected void saveDomain(EPackage domain, FileObject directory) throws IOException {
+    protected void saveDomain(Domain domain, FileObject directory) throws IOException {
         FileObject domainDir = directory.resolveFile(domain.getName());
         domainDir.createFolder();
         FileObject domainDefFile = domainDir.resolveFile(domain.getName() + ".domain");
@@ -235,10 +236,10 @@ public class DefaultModelIO implements ModelIO {
         }
         deleteUnusedEntityFiles(domainDir, domain.getEClassifiers());
         //TODO imports
-        for(EPackage subdomain : domain.getESubpackages()) {
+        for(Domain subdomain : domain.getSubdomains()) {
             saveDomain(subdomain, domainDir);
         }
-        deleteUnusedDomainDirectories(domainDir, domain.getESubpackages());
+        deleteUnusedDomainDirectories(domainDir, domain.getSubdomains());
     }
 
     /**
@@ -246,7 +247,7 @@ public class DefaultModelIO implements ModelIO {
      *
      * @throws FileSystemException if the subdomain directories cannot be listed.
      */
-    protected void deleteUnusedDomainDirectories(FileObject baseDir, List<EPackage> domains) throws FileSystemException {
+    protected void deleteUnusedDomainDirectories(FileObject baseDir, List<Domain> domains) throws FileSystemException {
         Arrays.stream(baseDir.getChildren()).forEach(dir -> {
             String dirPath = dir.getName().getPath();
             try {

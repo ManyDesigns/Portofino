@@ -1,17 +1,21 @@
 package com.manydesigns.portofino.model;
 
-import org.eclipse.emf.ecore.*;
+import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.emf.ecore.EcorePackage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PortofinoPackage {
+public class PortofinoPackage extends Domain {
 
-    public static final EPackage eINSTANCE;
+    public static final PortofinoPackage eINSTANCE = new PortofinoPackage();
     private static final Logger logger = LoggerFactory.getLogger(PortofinoPackage.class);
 
-    static {
-        eINSTANCE = EcoreFactory.eINSTANCE.createEPackage();
-        eINSTANCE.setName("portofino");
+    protected PortofinoPackage() {
+        super();
+        setName("portofino");
+        setNsURI("https://portofino.manydesigns.com/emf/portofino");
+        getEClassifiers().add(Domain.CLASS);
     }
 
     public static EDataType ensureType(Class<?> javaType) {

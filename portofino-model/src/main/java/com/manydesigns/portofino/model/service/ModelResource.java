@@ -29,7 +29,6 @@ public class ModelResource extends ResourceImpl {
         if (!isLoaded) {
             model = io.load();
             model.getDomains().forEach(d -> getContents().add(d));
-            model.getObjects().forEach((pkg, objs) -> objs.forEach((name, obj) -> getContents().add(obj)));
             Map<?, ?> response = options == null ? null : (Map<?, ?>) options.get(URIConverter.OPTION_RESPONSE);
             if (response == null) {
                 response = new HashMap<>();

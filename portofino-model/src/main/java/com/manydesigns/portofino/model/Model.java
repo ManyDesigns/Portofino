@@ -46,8 +46,7 @@ public class Model {
     // Fields
     //**************************************************************************
 
-    protected final List<EPackage> domains = new ArrayList<>();
-    protected final Map<EPackage, Map<String, EObject>> objects = new HashMap<>();
+    protected final List<Domain> domains = new ArrayList<>();
     protected final List<Issue> issues = new ArrayList<>();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
@@ -56,19 +55,19 @@ public class Model {
         issues.clear();
     }
 
-    public List<EPackage> getDomains() {
+    public List<Domain> getDomains() {
         return domains;
     }
 
-    public EPackage getDomain(String name) {
+    public Domain getDomain(String name) {
         String[] components = name.split("[.]");
-        List<EPackage> domains = this.domains;
-        EPackage result = null;
+        List<Domain> domains = this.domains;
+        Domain result = null;
         for(String s : components) {
-            Optional<EPackage> ePackage = domains.stream().filter(p -> s.equals(p.getName())).findFirst();
-            if(ePackage.isPresent()) {
-                result = ePackage.get();
-                domains = result.getESubpackages();
+            Optional<Domain> domain = domains.stream().filter(p -> s.equals(p.getName())).findFirst();
+            if(domain.isPresent()) {
+                result = domain.get();
+                domains = result.getSubdomains();
             } else {
                 throw new RuntimeException("Domain " + name + " not known");
             }
@@ -76,28 +75,24 @@ public class Model {
         return result;
     }
 
-    public EPackage ensureDomain(String name) {
+    public Domain ensureDomain(String name) {
         return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
-            EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
-            ePackage.setName(name);
-            getDomains().add(ePackage);
-            return ePackage;
+            Domain domain = new Domain();
+            domain.setName(name);
+            getDomains().add(domain);
+            return domain;
         });
     }
 
-    public void addObject(EPackage domain, String name, EObject object) {
-        Map<String, EObject> objects = this.objects.getOrDefault(domain, new HashMap<>());
-        if(objects.putIfAbsent(name, object) != null) {
+    public void addObject(Domain domain, String name, EObject object) {
+        if(domain.getObjects().containsKey(name)) {
             throw new RuntimeException("Object already present: " + name + " in domain " + domain);
         }
-        this.objects.put(domain, objects);
+        domain.getObjects().put(name, object);
     }
 
     public List<Issue> getIssues() {
         return issues;
     }
 
-    public Map<EPackage, Map<String, EObject>> getObjects() {
-        return objects;
-    }
 }

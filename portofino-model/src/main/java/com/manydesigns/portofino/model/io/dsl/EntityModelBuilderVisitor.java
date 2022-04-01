@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model.io.dsl;
 
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.annotations.Id;
@@ -32,15 +33,14 @@ import java.util.*;
 
 public class EntityModelBuilderVisitor extends EntityModelBaseVisitor {
 
-    protected EPackage parentDomain;
+    protected Domain parentDomain;
     protected EClass entity;
-    private static final Logger logger = LoggerFactory.getLogger(EntityModelBuilderVisitor.class);
 
     public EntityModelBuilderVisitor() {
         this(null);
     }
 
-    public EntityModelBuilderVisitor(EPackage parentDomain) {
+    public EntityModelBuilderVisitor(Domain parentDomain) {
         this.parentDomain = parentDomain;
     }
 
@@ -52,19 +52,19 @@ public class EntityModelBuilderVisitor extends EntityModelBaseVisitor {
     }
 
     @Override
-    public EPackage visitDomain(ModelParser.DomainContext ctx) {
-        EPackage previous = parentDomain;
+    public Domain visitDomain(ModelParser.DomainContext ctx) {
+        Domain previous = parentDomain;
         String name = ctx.name.getText();
-        EPackage domain;
+        Domain domain;
         if(parentDomain != null) {
-            domain = parentDomain.getESubpackages().stream().filter(p -> name.equals(p.getName())).findFirst().orElseGet(() -> {
-                EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
-                ePackage.setName(name);
-                parentDomain.getESubpackages().add(ePackage);
-                return ePackage;
+            domain = parentDomain.getSubdomains().stream().filter(p -> name.equals(p.getName())).findFirst().orElseGet(() -> {
+                Domain newDomain = new Domain();
+                newDomain.setName(name);
+                parentDomain.getSubdomains().add(newDomain);
+                return newDomain;
             });
         } else {
-            domain = EcoreFactory.eINSTANCE.createEPackage();
+            domain = new Domain();
             domain.setName(name);
         }
         parentDomain = domain;
