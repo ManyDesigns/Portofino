@@ -5,8 +5,24 @@
         xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+            <directory>src/main/java</directory>
+            <excludes>
+                <exclude>Security.java</exclude>
+                <exclude>portofino/**</exclude>
+            </excludes>
+        </fileSet>
         <fileSet encoding="UTF-8">
-            <directory>src</directory>
+            <directory>src/main/java/portofino</directory>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+            <directory>src/main/java</directory>
+            <includes>
+                <include>Security.java</include>
+            </includes>
+        </fileSet>
+        <fileSet encoding="UTF-8">
+            <directory>src/main/resources</directory>
         </fileSet>
         <fileSet encoding="UTF-8">
             <directory>.github</directory>
