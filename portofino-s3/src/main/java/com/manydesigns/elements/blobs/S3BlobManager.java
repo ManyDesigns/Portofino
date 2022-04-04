@@ -108,7 +108,6 @@ public class S3BlobManager implements BlobManager{
         }
     }
 
-    @Override
     public void loadMetadata(Blob blob) throws IOException {
         ensureValidCode(blob.getCode());
         blob.setMetaProperties(loadMetaProperties(blob.getCode()));
@@ -133,7 +132,6 @@ public class S3BlobManager implements BlobManager{
         return metaProperties;
     }
 
-    @Override
     public InputStream openStream(Blob blob) throws IOException {
         ensureValidCode(blob.getCode());
         blob.setInputStream(getDataFile(blob.getCode()));
@@ -150,7 +148,6 @@ public class S3BlobManager implements BlobManager{
 
     }
 
-    @Override
     public void save(Blob blob) throws IOException {
         ensureValidCode(blob.getCode());
         try {
@@ -189,7 +186,6 @@ public class S3BlobManager implements BlobManager{
         blob.dispose();
     }
 
-    @Override
     public boolean delete(Blob blob) {
         String code = blob.getCode();
         ensureValidCode(code);
