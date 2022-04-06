@@ -185,8 +185,6 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
         }
     }
 
-
-
     protected void checkResourceActionInvocation(ContainerRequestContext requestContext, ResourceAction resourceAction) {
         Method handler = resourceInfo.getResourceMethod();
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();

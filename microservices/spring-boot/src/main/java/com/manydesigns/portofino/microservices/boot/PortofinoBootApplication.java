@@ -1,9 +1,6 @@
 package com.manydesigns.portofino.microservices.boot;
 
-import org.apache.commons.vfs2.AllFileSelector;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.List;
+import java.util.Properties;
 
 @SpringBootApplication(exclude = {
 		DispatcherServletAutoConfiguration.class, ErrorMvcAutoConfiguration.class,
@@ -36,23 +35,39 @@ public class PortofinoBootApplication {
 		installCommonsVfsBootSupport();
 		SpringApplication application = new SpringApplication(applicationClass);
 		ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
-		application.setApplicationContextFactory(webApplicationType -> {
-			try {
-				switch (webApplicationType) {
-					case SERVLET:
-						return new PortofinoAnnotationConfigServletWebServerApplicationContext(
-								getApplicationDirectoryPath(applicationArguments));
-					case REACTIVE:
-						return new AnnotationConfigServletWebServerApplicationContext();
-					default:
-						return ApplicationContextFactory.DEFAULT.create(webApplicationType);
+		FileObject appDir;
+		try {
+			appDir = getApplicationDirectory(applicationArguments);
+		} catch (IOException e) {
+			logger.error("Could not create application", e);
+			System.exit(1);
+			return;
+		}
+		if (applicationArguments.containsOption("dump-application-to")) {
+			List<String> values = applicationArguments.getOptionValues("dump-application-to");
+			FileSystemManager manager = VFS.getManager();
+			values.forEach(v -> {
+				try {
+					dumpBundledApplication(manager.resolveFile(v));
+				} catch (FileSystemException e) {
+					logger.error("Could not dump the bundled application to " + v, e);
 				}
-			} catch (IOException e) {
-				logger.error("Could not create application", e);
-				System.exit(1);
-				return null;
+			});
+		}
+		application.setApplicationContextFactory(webApplicationType -> {
+			switch (webApplicationType) {
+				case SERVLET:
+					return new PortofinoAnnotationConfigServletWebServerApplicationContext(appDir);
+				case REACTIVE:
+					return new AnnotationConfigServletWebServerApplicationContext();
+				default:
+					return ApplicationContextFactory.DEFAULT.create(webApplicationType);
 			}
 		});
+		Properties defaultProperties = new Properties();
+		defaultProperties.put("spring.jersey.application-path", "/api/");
+		defaultProperties.put("spring.resteasy.application-path", "/api/");
+		application.setDefaultProperties(defaultProperties);
 		application.run(args);
 	}
 
@@ -61,12 +76,12 @@ public class PortofinoBootApplication {
 		((DefaultFileSystemManager) VFS.getManager()).addProvider("res", new SpringBootResourceFileProvider());
 	}
 
-	public static String getApplicationDirectoryPath(ApplicationArguments applicationArguments) throws IOException {
+	public static FileObject getApplicationDirectory(ApplicationArguments applicationArguments) throws IOException {
 		((DefaultFileSystemManager) VFS.getManager()).setBaseFile(new File(""));
 		if(applicationArguments.containsOption("app-dir")) {
 			FileObject applicationDirectory = VFS.getManager().resolveFile(applicationArguments.getOptionValues("app-dir").get(0));
 				initAppDirectory(applicationDirectory);
-			return applicationDirectory.getName().getURI();
+			return applicationDirectory;
 		}
 		if(applicationArguments.containsOption("dev")) {
 			FileObject main = VFS.getManager().resolveFile("src").resolveFile("main");
@@ -76,36 +91,33 @@ public class PortofinoBootApplication {
 					// This method does not work with Java actions since the compiled version is in the build directory
 					FileObject appDir = main.resolveFile("resources").resolveFile("portofino");
 					if (appDir.isFolder()) {
-						return appDir.getName().getURI();
+						return appDir;
 					}
 					appDir = main.resolveFile("webapp").resolveFile("WEB-INF");
 					if (appDir.isFolder()) {
-						return appDir.getName().getURI();
+						return appDir;
 					}
 				}
 			}
 		}
 		if(new File("portofino.properties").isFile()) {
-			return new File("").getAbsolutePath();
+			return VFS.getManager().toFileObject(new File(""));
 		}
 		if(new File("portofino-application").isDirectory()) {
-			return new File("portofino-application").getAbsolutePath();
+			return VFS.getManager().toFileObject(new File("portofino-application"));
+		}
+		FileObject bundledApplication = VFS.getManager().resolveFile("res:portofino");
+		if (bundledApplication.isFolder() && bundledApplication.getChildren().length > 0) {
+			return bundledApplication;
 		}
 		FileObject applicationDirectory = VFS.getManager().resolveFile("portofino-application");
 		initAppDirectory(applicationDirectory);
-		return applicationDirectory.getName().getURI();
+		return applicationDirectory;
 	}
 
 	protected static void initAppDirectory(FileObject applicationDirectory) throws IOException {
 		if(!applicationDirectory.exists()) {
 			applicationDirectory.createFolder();
-			if(PortofinoBootApplication.class.getClassLoader().getResource("portofino") != null) try {
-				FileObject bundledApplication = VFS.getManager().resolveFile("res:portofino");
-				applicationDirectory.copyFrom(bundledApplication, new AllFileSelector());
-			} catch (IOException e) {
-				applicationDirectory.deleteAll();
-				throw e;
-			}
 		}
 
 		FileObject actions = applicationDirectory.resolveFile("actions");
@@ -119,6 +131,21 @@ public class PortofinoBootApplication {
 			}
 		}
 		applicationDirectory.resolveFile("portofino.properties").createFile();
+	}
+
+	private static void dumpBundledApplication(FileObject applicationDirectory) throws FileSystemException {
+		if(PortofinoBootApplication.class.getClassLoader().getResource("portofino") != null) try {
+			FileObject bundledApplication = VFS.getManager().resolveFile("res:portofino");
+			if(bundledApplication.isFolder()) {
+				logger.info("Dumping bundled application to " + applicationDirectory.getName().getPath());
+				applicationDirectory.copyFrom(bundledApplication, new AllFileSelector());
+			} else {
+				logger.warn("No bundled application to dump");
+			}
+		} catch (IOException e) {
+			applicationDirectory.deleteAll();
+			throw e;
+		}
 	}
 
 }
