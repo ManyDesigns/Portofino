@@ -6,6 +6,7 @@ import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.spring.PortofinoWebSpringConfiguration;
+import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -20,11 +21,11 @@ import java.util.Set;
 
 public class PortofinoAnnotationConfigServletWebServerApplicationContext extends AnnotationConfigServletWebServerApplicationContext {
 
-    protected final String applicationDirectoryPath;
+    protected final FileObject applicationDirectory;
     private static final Logger logger = LoggerFactory.getLogger(PortofinoAnnotationConfigServletWebServerApplicationContext.class);
 
-    public PortofinoAnnotationConfigServletWebServerApplicationContext(String applicationDirectoryPath) {
-        this.applicationDirectoryPath = applicationDirectoryPath;
+    public PortofinoAnnotationConfigServletWebServerApplicationContext(FileObject applicationDirectory) {
+        this.applicationDirectory = applicationDirectory;
     }
 
     @Override
@@ -35,7 +36,7 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         PortofinoDispatcherInitializer initializer = new PortofinoDispatcherInitializer() {
             @Override
             protected String getApplicationDirectoryPath() {
-                return applicationDirectoryPath;
+                return applicationDirectory.getName().getURI();
             }
         };
         initializer.initWithServletContext(servletContext);

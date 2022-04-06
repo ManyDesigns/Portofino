@@ -106,6 +106,10 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
         return ElementsThreadLocals.getText("save.failed.because.constraint.violated", e.getConstraintName());
     }
 
+    protected String violatedConstraintMessage(ConstraintViolationException e) {
+        return ElementsThreadLocals.getText("save.failed.because.constraint.violated", e.getConstraintName());
+    }
+
     @Override
     protected void doDelete(T object) {
         collection.delete(object);

@@ -40,18 +40,14 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>com.manydesigns</groupId>
+			<artifactId>portofino-resteasy</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-undertow</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<!-- JAXB for Java 11+ -->
 		<dependency>
