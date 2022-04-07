@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.persistence.hibernate.multitenancy;
 
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.jdbc.connections.spi.AbstractMultiTenantConnectionProvider;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
@@ -43,7 +42,7 @@ public abstract class MultiTenancyImplementation extends AbstractMultiTenantConn
     }
 
     public MultiTenancyStrategy getStrategy() {
-        return MultiTenancyStrategy.DATABASE;
+        return MultiTenancyStrategy.SEPARATE_DATABASE;
     }
 
     @Override

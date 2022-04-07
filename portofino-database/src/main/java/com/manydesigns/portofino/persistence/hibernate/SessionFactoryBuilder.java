@@ -11,6 +11,7 @@ import com.manydesigns.portofino.database.model.TableGenerator;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyStrategy;
 import javassist.*;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
@@ -22,12 +23,8 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
-import org.hibernate.EntityMode;
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
@@ -47,7 +44,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -287,7 +284,6 @@ public class SessionFactoryBuilder {
 
         settings.put(MultiTenancyImplementation.CONNECTION_PROVIDER_CLASS, connectionProviderClass);
         settings.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenancyImplementation.getClass());
-        settings.put(AvailableSettings.MULTI_TENANT, multiTenancyImplementation.getStrategy());
     }
 
     protected void setupSingleTenantConnection(ConnectionProvider connectionProvider, Map<String, Object> settings) {
@@ -400,24 +396,6 @@ public class SessionFactoryBuilder {
 
         annotation = new javassist.bytecode.annotation.Annotation(MappedSuperclass.class.getName(), constPool);
         classAnnotations.addAnnotation(annotation);
-
-        Annotation stringBooleanType = new Annotation(TypeDef.class.getName(), constPool);
-        stringBooleanType.addMemberValue("name", new StringMemberValue(StringBooleanType.class.getName(), constPool));
-        stringBooleanType.addMemberValue("typeClass", new ClassMemberValue(StringBooleanType.class.getName(), constPool));
-        ArrayMemberValue parameters = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
-        parameters.setValue(new AnnotationMemberValue[] {
-                new AnnotationMemberValue(makeParameterAnnotation("trueString", trueString, constPool), constPool),
-                new AnnotationMemberValue(makeParameterAnnotation("falseString", falseString, constPool), constPool)
-        });
-        stringBooleanType.addMemberValue("parameters", parameters);
-
-        annotation = new javassist.bytecode.annotation.Annotation(TypeDefs.class.getName(), constPool);
-        ArrayMemberValue typeDefs = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
-        typeDefs.setValue(new AnnotationMemberValue[] {
-                new AnnotationMemberValue(stringBooleanType, constPool)
-        });
-        annotation.addMemberValue("value", typeDefs);
-        classAnnotations.addAnnotation(annotation);
         return cc;
     }
 
@@ -485,9 +463,10 @@ public class SessionFactoryBuilder {
     protected void configureAnnotations(Table table, ConstPool constPool, AnnotationsAttribute classAnnotations) {
         Annotation annotation;
 
-        annotation = new Annotation(javax.persistence.Table.class.getName(), constPool);
+        annotation = new Annotation(jakarta.persistence.Table.class.getName(), constPool);
         annotation.addMemberValue("name", new StringMemberValue(jpaEscape(table.getTableName()), constPool));
-        if(multiTenancyImplementation == null || multiTenancyImplementation.getStrategy() != MultiTenancyStrategy.SCHEMA) {
+        if(multiTenancyImplementation == null ||
+                multiTenancyImplementation.getStrategy() != MultiTenancyStrategy.SEPARATE_SCHEMA) {
             //Don't configure the schema name if we're using schema-based multitenancy
             String schemaName = table.getSchema().getActualSchemaName();
             annotation.addMemberValue("schema", new StringMemberValue(jpaEscape(schemaName), constPool));
@@ -500,7 +479,7 @@ public class SessionFactoryBuilder {
 
         table.getAnnotations().forEach(ann -> {
             Class annotationClass = ann.getJavaAnnotationClass();
-            if(javax.persistence.Table.class.equals(annotationClass) || Entity.class.equals(annotationClass)) {
+            if(jakarta.persistence.Table.class.equals(annotationClass) || Entity.class.equals(annotationClass)) {
                 logger.debug("@Table or @Entity specified on table {}, skipping annotation {}", table.getQualifiedName(), annotationClass);
                 return;
             }
@@ -582,7 +561,7 @@ public class SessionFactoryBuilder {
             }
             CtField field = new CtField(classPool.get(javaType.getName()), propertyName, cc);
             AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-            annotation = new Annotation(javax.persistence.Column.class.getName(), constPool);
+            annotation = new Annotation(jakarta.persistence.Column.class.getName(), constPool);
             annotation.addMemberValue("name", new StringMemberValue(jpaEscape(column.getColumnName()), constPool));
             annotation.addMemberValue("nullable", new BooleanMemberValue(column.isNullable(), constPool));
             if(column.getLength() != null) {
@@ -613,7 +592,7 @@ public class SessionFactoryBuilder {
 
             column.getAnnotations().forEach(ann -> {
                 Class<?> annotationClass = ann.getJavaAnnotationClass();
-                if(javax.persistence.Column.class.equals(annotationClass) ||
+                if(jakarta.persistence.Column.class.equals(annotationClass) ||
                    Id.class.equals(annotationClass) ||
                    org.hibernate.annotations.Type.class.equals(annotationClass)) {
                     logger.debug("@Column or @Id or @Type specified on column {}, ignoring annotation {}", column.getQualifiedName(), annotationClass);
@@ -656,14 +635,14 @@ public class SessionFactoryBuilder {
             fieldAnnotations.addAnnotation(annotation);
         } else if (generator instanceof SequenceGenerator) {
             addGeneratedValueAnnotation(GenerationType.SEQUENCE, generatorName, fieldAnnotations, constPool);
-            Annotation annotation = new Annotation(javax.persistence.SequenceGenerator.class.getName(), constPool);
+            Annotation annotation = new Annotation(jakarta.persistence.SequenceGenerator.class.getName(), constPool);
             annotation.addMemberValue("name", new StringMemberValue(generatorName, constPool));
             annotation.addMemberValue("sequenceName", new StringMemberValue(((SequenceGenerator) generator).getName(), constPool));
             fieldAnnotations.addAnnotation(annotation);
         } else if (generator instanceof TableGenerator) {
             TableGenerator tableGenerator = (TableGenerator) generator;
             addGeneratedValueAnnotation(GenerationType.TABLE, generatorName, fieldAnnotations, constPool);
-            Annotation annotation = new Annotation(javax.persistence.TableGenerator.class.getName(), constPool);
+            Annotation annotation = new Annotation(jakarta.persistence.TableGenerator.class.getName(), constPool);
             annotation.addMemberValue("name", new StringMemberValue(generatorName, constPool));
             annotation.addMemberValue("schema", new StringMemberValue(table.getSchema().getActualSchemaName(), constPool));
             annotation.addMemberValue("table", new StringMemberValue(tableGenerator.getTable(), constPool));
@@ -697,9 +676,15 @@ public class SessionFactoryBuilder {
         Annotation annotation;
         if(Boolean.class.equals(column.getActualJavaType())) {
             if(column.getJdbcType() == Types.CHAR || column.getJdbcType() == Types.VARCHAR) {
-                annotation = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);
-                annotation.addMemberValue("type", new StringMemberValue(StringBooleanType.class.getName(), constPool));
-                fieldAnnotations.addAnnotation(annotation);
+                Annotation stringBooleanType = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);
+                stringBooleanType.addMemberValue("value", new ClassMemberValue(StringBooleanType.class.getName(), constPool));
+                ArrayMemberValue parameters = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
+                parameters.setValue(new AnnotationMemberValue[] {
+                        new AnnotationMemberValue(makeParameterAnnotation("trueString", trueString, constPool), constPool),
+                        new AnnotationMemberValue(makeParameterAnnotation("falseString", falseString, constPool), constPool)
+                });
+                stringBooleanType.addMemberValue("parameters", parameters);
+                fieldAnnotations.addAnnotation(stringBooleanType);
             }
         } else if(DateTime.class.isAssignableFrom(column.getActualJavaType())) {
             annotation = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);

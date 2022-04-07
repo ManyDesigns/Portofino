@@ -1,6 +1,5 @@
 package com.manydesigns.portofino.persistence.hibernate.multitenancy;
 
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +11,7 @@ public abstract class SchemaBasedMultiTenancy extends MultiTenancyImplementation
 
     @Override
     public MultiTenancyStrategy getStrategy() {
-        return MultiTenancyStrategy.SCHEMA;
+        return MultiTenancyStrategy.SEPARATE_SCHEMA;
     }
 
     @NotNull

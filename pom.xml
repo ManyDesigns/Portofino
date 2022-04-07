@@ -91,10 +91,10 @@
         <fop.version>2.6</fop.version>
         <groovy.version>3.0.8</groovy.version>
         <guava.version>31.0.1-jre</guava.version>
-        <hibernate.version>5.5.3.Final</hibernate.version>
+        <hibernate.version>6.0.0.Final</hibernate.version>
         <jackson.version>2.13.2</jackson.version>
         <jackson.databind.version>2.13.2.1</jackson.databind.version>
-        <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
+        <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depended on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.32</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->

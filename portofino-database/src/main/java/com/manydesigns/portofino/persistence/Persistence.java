@@ -43,6 +43,7 @@ import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyStrategy;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -60,7 +61,6 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.eclipse.emf.ecore.*;
-import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;

@@ -45,6 +45,7 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
+    // StringBuilder is to avoid interning the string
     public static final String NULL = new StringBuilder("null").toString();
 
     private String trueString = "T";
@@ -52,6 +53,11 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
 
     public int[] sqlTypes() {
         return new int[] { Types.CHAR, Types.VARCHAR };
+    }
+
+    @Override
+    public int getSqlType() {
+        return 0;
     }
 
     public Class returnedClass() {
@@ -67,32 +73,11 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
     }
 
     @Override
-    public Object nullSafeGet(ResultSet resultSet, String[] names, SharedSessionContractImplementor session, Object owner)
-            throws HibernateException, SQLException {
-        String value = resultSet.getString(names[0]);
-        return parseBoolean(value);
-    }
-
-    protected Object parseBoolean(String value) {
-        if(value != null) {
-            if(value.trim().equalsIgnoreCase(trueString)) {
-                return Boolean.TRUE;
-            } else if(value.trim().equalsIgnoreCase(falseString)) {
-                return Boolean.FALSE;
-            } else {
-                throw new HibernateException(
-                        "Invalid boolean value: " + value + "; possible values are " + trueString + ", " +
-                        falseString + ", null");
-            }
-        } else {
-            if(trueString == null) {
-                return true;
-            } else if(falseString == null) {
-                return false;
-            } else {
-                return null;
-            }
-        }
+    public Object nullSafeGet(
+            ResultSet resultSet, int position, SharedSessionContractImplementor session, Object owner)
+            throws SQLException {
+        String value = resultSet.getString(position);
+        return fromStringValue(value);
     }
 
     @Override
@@ -153,7 +138,8 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
         }
     }
 
-    public String objectToSQLString(Object value) {
+    @Override
+    public String toSqlLiteral(Object value) {
         if((Boolean) value) {
             return '\'' + trueString + '\'';
         } else {
@@ -161,7 +147,8 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
         }
     }
 
-    public String toXMLString(Object value) {
+    @Override
+    public String toString(Object value) throws HibernateException {
         if((Boolean) value) {
             return trueString;
         } else {
@@ -169,7 +156,26 @@ public class StringBooleanType implements EnhancedUserType, ParameterizedType {
         }
     }
 
-    public Object fromXMLString(String xmlValue) {
-        return parseBoolean(xmlValue);
+    @Override
+    public Object fromStringValue(CharSequence value) throws HibernateException {
+        if(value != null) {
+            if(value.toString().trim().equalsIgnoreCase(trueString)) {
+                return Boolean.TRUE;
+            } else if(value.toString().trim().equalsIgnoreCase(falseString)) {
+                return Boolean.FALSE;
+            } else {
+                throw new HibernateException(
+                        "Invalid boolean value: " + value + "; possible values are " + trueString + ", " +
+                                falseString + ", null");
+            }
+        } else {
+            if(trueString == null) {
+                return true;
+            } else if(falseString == null) {
+                return false;
+            } else {
+                return null;
+            }
+        }
     }
 }
