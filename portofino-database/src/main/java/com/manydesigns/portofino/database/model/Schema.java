@@ -56,7 +56,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     @Deprecated
     protected final List<Table> immediateTables;
 
-    protected EPackage ePackage;
+    protected Domain domain;
     protected String actualSchemaName;
     protected String catalog;
 
@@ -75,12 +75,12 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     // Constructors and init
     //**************************************************************************
     public Schema() {
-        this(EcoreFactory.eINSTANCE.createEPackage());
+        this(new Domain());
     }
 
-    public Schema(EPackage ePackage) {
-        this.ePackage = ePackage;
-        initAnnotations(ePackage);
+    public Schema(Domain domain) {
+        this.domain = domain;
+        initAnnotations(domain);
         immediateTables = new ArrayList<>();
     }
 
@@ -128,7 +128,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         // We need annotations to be initialized
         if(actualSchemaName == null) {
             actualSchemaName = configuration.getString(key);
-            ePackage.getEAnnotations().removeIf(
+            domain.getEAnnotations().removeIf(
                     a -> a.getSource().equals(com.manydesigns.portofino.database.model.annotations.Schema.class.getName()));
         } else {
             Annotation annotation = ensureAnnotation(com.manydesigns.portofino.database.model.annotations.Schema.class);
@@ -159,7 +159,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     public void setDatabase(Database database) {
         this.database = database;
         if(this.database != null) {
-            database.getModelElement().getESubpackages().add(this.ePackage);
+            database.getModelElement().getESubpackages().add(this.domain);
         }
     }
 
@@ -169,11 +169,11 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
 
     @XmlAttribute(required = true)
     public String getSchemaName() {
-        return ePackage.getName();
+        return domain.getName();
     }
 
     public void setSchemaName(String schemaName) {
-        ePackage.setName(schemaName);
+        domain.setName(schemaName);
     }
 
     public String getActualSchemaName() {
@@ -281,7 +281,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public EPackage getModelElement() {
-        return ePackage;
+        return domain;
     }
 
 }

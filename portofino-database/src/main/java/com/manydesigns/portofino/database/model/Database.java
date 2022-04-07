@@ -55,7 +55,7 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     protected final List<Schema> schemas;
     protected final List<Annotation> annotations;
 
-    protected EPackage ePackage;
+    protected Domain domain;
 
     protected String trueString = null;
     protected String falseString = null;
@@ -73,15 +73,15 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public Database(EPackage ePackage) {
-        this.ePackage = ePackage;
+    public Database(Domain domain) {
+        this.domain = domain;
         this.schemas = new ArrayList<>();
         this.annotations = new ArrayList<>();
-        initAnnotations(ePackage);
+        initAnnotations(domain);
     }
 
     public Database() {
-        this(EcoreFactory.eINSTANCE.createEPackage());
+        this(new Domain());
     }
 
     //**************************************************************************
@@ -98,17 +98,17 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     }
 
     public String getQualifiedName() {
-        return ePackage.getName();
+        return domain.getName();
     }
 
     public void reset() {}
 
     public void init(Object context, Configuration configuration) {
-        if(ePackage.getName() == null) {
+        if(domain.getName() == null) {
             throw new IllegalStateException("Database name is null");
         }
-        if(ePackage.getName().contains("/") || ePackage.getName().contains("\\")) {
-            throw new IllegalStateException("Database name contains slashes or backslashes: " + ePackage.getName());
+        if(domain.getName().contains("/") || domain.getName().contains("\\")) {
+            throw new IllegalStateException("Database name contains slashes or backslashes: " + domain.getName());
         }
     }
 
@@ -129,11 +129,11 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
 
     @XmlAttribute(required = true)
     public String getDatabaseName() {
-        return ePackage.getName();
+        return domain.getName();
     }
 
     public void setDatabaseName(String databaseName) {
-        ePackage.setName(databaseName);
+        domain.setName(databaseName);
     }
 
     @XmlElementWrapper(name="schemas")
@@ -218,8 +218,8 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
         this.entityMode = entityMode;
     }
 
-    public EPackage getModelElement() {
-        return ePackage;
+    public Domain getModelElement() {
+        return domain;
     }
 
     @Override
