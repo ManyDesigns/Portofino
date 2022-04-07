@@ -98,7 +98,11 @@ public class DefaultModelIO implements ModelIO {
                 } else if(baseName.endsWith(".object")) {
                     loadObject(model, domain, child);
                 } else {
-                    logger.warn("Unknown file ignored when loading model: " + child.getName().getPath());
+                    if (child.getName().getBaseName().equalsIgnoreCase("database.xml")) {
+                        logger.debug("Ignoring legacy database.xml file");
+                    } else {
+                        logger.warn("Unknown file ignored when loading model: " + child.getName().getPath());
+                    }
                 }
             } else if(child.isFolder()) {
                 loadDomainDirectory(model, domain, child);

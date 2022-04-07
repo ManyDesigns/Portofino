@@ -31,9 +31,7 @@ public class Domain extends EPackageImpl {
 
     private final EMap<String, EObject> objects = new BasicEMap<>();
 
-    public Domain() {
-        super();
-    }
+    public Domain() {}
 
     @Override
     protected EClass eStaticClass() {

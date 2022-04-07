@@ -163,7 +163,7 @@ public class Persistence {
         }
     }
 
-    protected Database setupDatabase(EPackage domain) {
+    protected Database setupDatabase(Domain domain) {
         //Can't use getJavaAnnotation as they've not yet been resolved
         EAnnotation ann = domain.getEAnnotation(JDBCConnection.class.getName());
         ConnectionProvider connectionProvider = null;
@@ -192,14 +192,14 @@ public class Persistence {
             databases.add(database);
             connectionProvider.setDatabase(database);
             database.setConnectionProvider(connectionProvider);
-            domain.getESubpackages().forEach(subd -> setupSchema(database, subd));
+            domain.getSubdomains().forEach(subd -> setupSchema(database, subd));
             return database;
         } else {
             return null;
         }
     }
 
-    protected Schema setupSchema(Database database, EPackage domain) {
+    protected Schema setupSchema(Database database, Domain domain) {
         Schema schema = new Schema(domain);
         schema.setDatabase(database);
         database.getSchemas().add(schema);
