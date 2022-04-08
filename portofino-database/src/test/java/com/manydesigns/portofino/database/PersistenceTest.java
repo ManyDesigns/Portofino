@@ -30,7 +30,7 @@ import org.hibernate.UnknownEntityTypeException;
 import org.hibernate.jdbc.Work;
 import org.testng.annotations.*;
 
-import javax.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.CriteriaQuery;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -144,7 +144,7 @@ public class PersistenceTest {
         persistence.syncDataModel("hibernatetest");
     }
 
-    protected Serializable makeEntity(String className, Map<String, Object> data) {
+    protected Object makeEntity(String className, Map<String, Object> data) {
         return new HashMap<>(data);
     }
 
@@ -578,7 +578,7 @@ public class PersistenceTest {
             fail("Exception expected");
         } catch (Exception e) {}
         assertNotNull(table);
-        Annotation nq = table.ensureAnnotation("javax.persistence.NamedQuery");
+        Annotation nq = table.ensureAnnotation("jakarta.persistence.NamedQuery");
         nq.setProperties(Arrays.asList(
                 new AnnotationProperty(nq, "name", "all_questions"),
                 new AnnotationProperty(nq, "query", "from domanda")));

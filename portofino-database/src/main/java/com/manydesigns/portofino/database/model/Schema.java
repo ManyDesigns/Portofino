@@ -112,8 +112,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         if(getDatabaseName() == null) {
             return name;
         }
-        return MessageFormat.format("{0}.{1}", getDatabaseName(),
-                name);
+        return MessageFormat.format("{0}.{1}", getDatabaseName(), name);
     }
 
     public void reset() {}

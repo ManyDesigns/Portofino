@@ -35,19 +35,19 @@ import java.lang.annotation.Annotation;
 public class ColumnParameterType implements DynamicParameterizedType.ParameterType {
 
     protected final com.manydesigns.portofino.database.model.Column column;
-    protected final Class returnedClass;
+    protected final Class<?> returnedClass;
 
     public ColumnParameterType(Column column) {
         this(column, column.getActualJavaType());
     }
     
-    public ColumnParameterType(Column column, Class returnedClass) {
+    public ColumnParameterType(Column column, Class<?> returnedClass) {
         this.column = column;
         this.returnedClass = returnedClass;
     }
 
     @Override
-    public Class getReturnedClass() {
+    public Class<?> getReturnedClass() {
         return returnedClass;
     }
 
@@ -79,5 +79,10 @@ public class ColumnParameterType implements DynamicParameterizedType.ParameterTy
     @Override
     public String[] getColumns() {
         return new String[]{column.getColumnName()};
+    }
+
+    @Override
+    public Long[] getColumnLengths() {
+        return new Long[]{column.getLength() != null ? column.getLength().longValue() : null};
     }
 }

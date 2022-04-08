@@ -23,6 +23,7 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
+import org.hibernate.MappingException;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.boot.Metadata;
@@ -37,10 +38,8 @@ import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
-import org.jadira.usertype.dateandtime.joda.PersistentDateTime;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,15 +120,9 @@ public class SessionFactoryBuilder {
         Thread.currentThread().setContextClassLoader(scratchClassLoader);
 
         try {
-            CtClass baseClass = generateBaseClass();
             FileObject databaseDir = root.resolveFile(database.getDatabaseName());
             databaseDir.deleteAll();
             databaseDir.createFolder();
-            FileObject baseClassFile = databaseDir.resolveFile("BaseEntity.class");
-            try(OutputStream outputStream = baseClassFile.getContent().getOutputStream()) {
-                outputStream.write(baseClass.toBytecode());
-            }
-
             for (Table table : mappableTables) {
                 generateClass(table);
             }
@@ -208,7 +201,7 @@ public class SessionFactoryBuilder {
         List<String> externallyMappedClasses = new ArrayList<>();
         try {
             for (Table table : tablesToMap) {
-                Class persistentClass = getPersistentClass(table, codeBase);
+                Class<?> persistentClass = getPersistentClass(table, codeBase);
                 sources.addAnnotatedClass(persistentClass);
                 classLoaderService.classes.put(persistentClass.getName(), persistentClass);
                 if(entityMode == EntityMode.POJO) {
@@ -230,8 +223,9 @@ public class SessionFactoryBuilder {
                     c.setClassName(null);
                     if (c.getIdentifier() instanceof Component) {
                         Component component = (Component) c.getIdentifier();
-                        component.setComponentClassName(null);
                         component.setDynamic(true);
+                        component.setKey(true);
+                        component.setRoleName(component.getComponentClassName() + ".<id>");
                     }
                 }
             });
@@ -311,12 +305,12 @@ public class SessionFactoryBuilder {
     }
 
     protected FileObject getEntityLocation(FileObject root, Table table) throws FileSystemException {
-        return root.resolveFile(entityNameToFileName(table));
+        return root.resolveFile(entityNameToFileName(getMappedClassName(table)));
     }
 
     @NotNull
-    protected String entityNameToFileName(Table table) {
-        return getMappedClassName(table).replace('.', FileName.SEPARATOR_CHAR) + ".class";
+    protected String entityNameToFileName(String entityName) {
+        return entityName.replace('.', FileName.SEPARATOR_CHAR) + ".class";
     }
 
     @NotNull
@@ -334,19 +328,11 @@ public class SessionFactoryBuilder {
     @NotNull
     public static String deriveMappedClassName(Table table, EntityMode entityMode) {
         String packageName = table.getSchema().getQualifiedName().toLowerCase();
-        String className = table.getActualEntityName();
-        if(entityMode == EntityMode.POJO) {
-            className = toJavaLikeName(className);
-        } else {
-            className = className.replaceAll("-|\\h", "");
-        }
+        String className = toJavaLikeName(table.getActualEntityName());
         if(Character.isDigit(className.charAt(0))) {
             className = "_" + className;
         }
-        String fullName = packageName + "." + className;
-        if(entityMode == EntityMode.POJO) {
-            fullName = ensureValidJavaName(fullName);
-        }
+        String fullName = ensureValidJavaName(packageName + "." + className);
         for(Table other : table.getSchema().getDatabase().getAllTables()) {
             if(other != table && other.getActualJavaClass() != null && other.getActualJavaClass().getName().equals(fullName)) {
                 fullName += "_1";
@@ -385,20 +371,6 @@ public class SessionFactoryBuilder {
         return getMappedClass(table).toBytecode();
     }
 
-    public CtClass generateBaseClass() throws NotFoundException {
-        CtClass cc = classPool.makeClass(getBaseEntityName());
-        cc.addInterface(classPool.get(Serializable.class.getName()));
-        ClassFile ccFile = cc.getClassFile();
-        ConstPool constPool = ccFile.getConstPool();
-        AnnotationsAttribute classAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-        ccFile.addAttribute(classAnnotations);
-        javassist.bytecode.annotation.Annotation annotation;
-
-        annotation = new javassist.bytecode.annotation.Annotation(MappedSuperclass.class.getName(), constPool);
-        classAnnotations.addAnnotation(annotation);
-        return cc;
-    }
-
     protected Annotation makeParameterAnnotation(String name, String value, ConstPool constPool) {
         Annotation annotation = new Annotation(org.hibernate.annotations.Parameter.class.getName(), constPool);
         annotation.addMemberValue("name", new StringMemberValue(name, constPool));
@@ -406,14 +378,8 @@ public class SessionFactoryBuilder {
         return annotation;
     }
 
-    @NotNull
-    public String getBaseEntityName() {
-        return database.getDatabaseName() + ".BaseEntity";
-    }
-
     public CtClass generateClass(Table table) throws CannotCompileException, NotFoundException {
         CtClass cc = classPool.makeClass(getMappedClassName(table));
-        cc.setSuperclass(classPool.get(getBaseEntityName()));
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
         AnnotationsAttribute classAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
@@ -460,7 +426,7 @@ public class SessionFactoryBuilder {
         cc.addMethod(CtNewMethod.make(hashCodeMethod, cc));
     }
 
-    protected void configureAnnotations(Table table, ConstPool constPool, AnnotationsAttribute classAnnotations) {
+    protected void configureAnnotations(Table table, ConstPool constPool, AnnotationsAttribute classAnnotations) throws NotFoundException, CannotCompileException {
         Annotation annotation;
 
         annotation = new Annotation(jakarta.persistence.Table.class.getName(), constPool);
@@ -478,9 +444,10 @@ public class SessionFactoryBuilder {
         classAnnotations.addAnnotation(annotation);
 
         table.getAnnotations().forEach(ann -> {
-            Class annotationClass = ann.getJavaAnnotationClass();
+            Class<?> annotationClass = ann.getJavaAnnotationClass();
             if(jakarta.persistence.Table.class.equals(annotationClass) || Entity.class.equals(annotationClass)) {
-                logger.debug("@Table or @Entity specified on table {}, skipping annotation {}", table.getQualifiedName(), annotationClass);
+                logger.debug("@Table or @Entity specified on table {}, skipping annotation {}",
+                        table.getQualifiedName(), annotationClass);
                 return;
             }
             Annotation classAnn = convertAnnotation(constPool, ann);
@@ -595,7 +562,8 @@ public class SessionFactoryBuilder {
                 if(jakarta.persistence.Column.class.equals(annotationClass) ||
                    Id.class.equals(annotationClass) ||
                    org.hibernate.annotations.Type.class.equals(annotationClass)) {
-                    logger.debug("@Column or @Id or @Type specified on column {}, ignoring annotation {}", column.getQualifiedName(), annotationClass);
+                    logger.debug("@Column or @Id or @Type specified on column {}, ignoring annotation {}",
+                            column.getQualifiedName(), annotationClass);
                     return;
                 }
                 Annotation fieldAnn = convertAnnotation(constPool, ann);
@@ -686,15 +654,6 @@ public class SessionFactoryBuilder {
                 stringBooleanType.addMemberValue("parameters", parameters);
                 fieldAnnotations.addAnnotation(stringBooleanType);
             }
-        } else if(DateTime.class.isAssignableFrom(column.getActualJavaType())) {
-            annotation = new Annotation(org.hibernate.annotations.Type.class.getName(), constPool);
-            annotation.addMemberValue("type", new StringMemberValue(PersistentDateTime.class.getName(), constPool));
-            ArrayMemberValue parameters = new ArrayMemberValue(new AnnotationMemberValue(constPool), constPool);
-            parameters.setValue(new AnnotationMemberValue[] {
-                    new AnnotationMemberValue(makeParameterAnnotation("databaseZone", "jvm", constPool), constPool)
-            });
-            annotation.addMemberValue("parameters", parameters);
-            fieldAnnotations.addAnnotation(annotation);
         } else {
             DatabasePlatform.TypeDescriptor databaseSpecificType =
                     database.getConnectionProvider().getDatabasePlatform().getDatabaseSpecificType(column);

@@ -49,12 +49,12 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.ManagedType;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.EntityType;
+import jakarta.persistence.metamodel.ManagedType;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.*;
@@ -579,7 +579,7 @@ public class QueryUtils {
             @Nullable Integer firstResult,
             @Nullable Integer maxResults) {
 
-        Query query = session.createQuery(queryString);
+        Query query = session.createQuery(queryString, null);
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
                 if (parameters[i] instanceof Collection) {
@@ -619,7 +619,7 @@ public class QueryUtils {
      * @return the loaded object, or null if an object with that key does not exist.
      */
     public static Object getObjectByPk(
-            Persistence persistence, String database, String entityName, Serializable pk) {
+            Persistence persistence, String database, String entityName, Object pk) {
         Session session = persistence.getSession(database);
         TableAccessor table = persistence.getTableAccessor(database, entityName);
         return getObjectByPk(session, table, pk);
@@ -633,7 +633,7 @@ public class QueryUtils {
      * keys, or a composite object for multi-column primary keys.
      * @return the loaded object, or null if an object with that key does not exist.
      */
-    public static Object getObjectByPk(Session session, TableAccessor table, Serializable pk) {
+    public static Object getObjectByPk(Session session, TableAccessor table, Object pk) {
         String actualEntityName = table.getTable().getActualEntityName();
         Object result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();

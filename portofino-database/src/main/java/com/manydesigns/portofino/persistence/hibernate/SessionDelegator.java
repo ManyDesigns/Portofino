@@ -21,27 +21,27 @@ public class SessionDelegator extends SessionDelegatorBaseImpl {
     }
 
     @Override
-    public Object get(String entityName, Serializable id) {
+    public Object get(String entityName, Object id) {
         return super.get(setup.translateEntityNameFromJpaToHibernate(entityName), id);
     }
 
     @Override
-    public Object get(String entityName, Serializable id, LockMode lockMode) {
+    public Object get(String entityName, Object id, LockMode lockMode) {
         return super.get(setup.translateEntityNameFromJpaToHibernate(entityName), id, lockMode);
     }
 
     @Override
-    public Object get(String entityName, Serializable id, LockOptions lockOptions) {
+    public Object get(String entityName, Object id, LockOptions lockOptions) {
         return super.get(setup.translateEntityNameFromJpaToHibernate(entityName), id, lockOptions);
     }
 
     @Override
-    public Object load(String entityName, Serializable id, LockOptions lockOptions) {
+    public Object load(String entityName, Object id, LockOptions lockOptions) {
         return super.load(setup.translateEntityNameFromJpaToHibernate(entityName), id, lockOptions);
     }
 
     @Override
-    public Object load(String entityName, Serializable id) {
+    public Object load(String entityName, Object id) {
         return super.load(setup.translateEntityNameFromJpaToHibernate(entityName), id);
     }
 
@@ -51,7 +51,7 @@ public class SessionDelegator extends SessionDelegatorBaseImpl {
     }
 
     @Override
-    public Serializable save(String entityName, Object object) {
+    public Object save(String entityName, Object object) {
         return super.save(setup.translateEntityNameFromJpaToHibernate(entityName), object);
     }
 
@@ -95,13 +95,4 @@ public class SessionDelegator extends SessionDelegatorBaseImpl {
         super.refresh(setup.translateEntityNameFromJpaToHibernate(entityName), object, lockOptions);
     }
 
-    @Override
-    public Criteria createCriteria(String entityName) {
-        return super.createCriteria(setup.translateEntityNameFromJpaToHibernate(entityName));
-    }
-
-    @Override
-    public Criteria createCriteria(String entityName, String alias) {
-        return super.createCriteria(setup.translateEntityNameFromJpaToHibernate(entityName), alias);
-    }
 }

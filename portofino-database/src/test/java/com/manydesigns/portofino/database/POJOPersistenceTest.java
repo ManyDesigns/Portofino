@@ -2,10 +2,10 @@ package com.manydesigns.portofino.database;
 
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
+import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
-import org.hibernate.EntityMode;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -24,7 +24,7 @@ public class POJOPersistenceTest extends PersistenceTest {
     public void setup() throws Exception {
         super.setup();
         persistence.getDatabases().forEach(d -> {
-            d.setEntityMode(EntityMode.POJO.getExternalName());
+            d.setEntityMode(EntityMode.POJO.name());
         });
         persistence.initModel();
     }
@@ -36,17 +36,17 @@ public class POJOPersistenceTest extends PersistenceTest {
         FileObject jpetstoreDir = genClassesDir.resolveFile("jpetstore");
         assertTrue(jpetstoreDir.exists());
         DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore")
-                .setEntityMode(EntityMode.MAP.getExternalName());
+                .setEntityMode(EntityMode.MAP.name());
         persistence.initModel();
         assertFalse(jpetstoreDir.exists());
         DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore")
-                .setEntityMode(EntityMode.POJO.getExternalName());
+                .setEntityMode(EntityMode.POJO.name());
         persistence.initModel();
         assertTrue(jpetstoreDir.exists());
     }
 
     @Override
-    protected Serializable makeEntity(String className, Map<String, Object> data) {
+    protected Object makeEntity(String className, Map<String, Object> data) {
         Object entity;
         try {
             String databaseName = className.substring(0, className.indexOf('.'));
@@ -61,7 +61,7 @@ public class POJOPersistenceTest extends PersistenceTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return (Serializable) entity;
+        return entity;
     }
 
     @Override
