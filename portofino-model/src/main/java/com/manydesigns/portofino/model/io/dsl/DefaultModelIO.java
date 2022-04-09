@@ -40,9 +40,9 @@ public class DefaultModelIO implements ModelIO {
 
     private static class ToLink {
         final ParseTree parseTree;
-        final EPackage domain;
+        final Domain domain;
 
-        private ToLink(ParseTree parseTree, EPackage domain) {
+        private ToLink(ParseTree parseTree, Domain domain) {
             this.parseTree = parseTree;
             this.domain = domain;
         }
@@ -110,22 +110,22 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    private void loadDomainFile(Model model, EPackage domain, FileObject file) throws IOException {
+    private void loadDomainFile(Model model, Domain domain, FileObject file) throws IOException {
         try (InputStream inputStream = file.getContent().getInputStream()) {
             String path = getQualifiedName(domain);
             ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
-                if(candidate instanceof EPackage) {
-                    EPackage pkg = (EPackage) candidate;
-                    if(pkg.getName().equals(domain.getName())) {
-                        domain.getEClassifiers().addAll(pkg.getEClassifiers());
-                        domain.getEAnnotations().addAll(pkg.getEAnnotations());
-                        domain.getESubpackages().addAll(pkg.getESubpackages());
+                if(candidate instanceof Domain) {
+                    Domain subd = (Domain) candidate;
+                    if(subd.getName().equals(domain.getName())) {
+                        domain.getEClassifiers().addAll(subd.getEClassifiers());
+                        domain.getEAnnotations().addAll(subd.getEAnnotations());
+                        domain.getESubpackages().addAll(subd.getESubpackages());
                         toLinkQueue.add(new ToLink(parseTree, domain));
                     } else {
-                        String msg = "Invalid domain, expected " + domain.getName() + ", got " + pkg.getName() + " in " + file.getName().getPath();
+                        String msg = "Invalid domain, expected " + domain.getName() + ", got " + subd.getName() + " in " + file.getName().getPath();
                         model.getIssues().add(new Issue(
                                 Issue.Severity.ERROR, domain, msg, path, null, null));
                         logger.error(msg);
@@ -151,7 +151,7 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    protected void loadEntity(Model model, EPackage domain, FileObject file) throws IOException {
+    protected void loadEntity(Model model, Domain domain, FileObject file) throws IOException {
         try(InputStream inputStream = file.getContent().getInputStream()) {
             String path = getQualifiedName(domain);
             ModelParser parser = getParser(model, domain, path, inputStream);
@@ -308,7 +308,7 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    private Map<String, String> writeImports(EPackage domain, Writer writer) throws IOException {
+    private Map<String, String> writeImports(Domain domain, Writer writer) throws IOException {
         Map<String, String> imports = collectImports(domain);
         writeImports(imports, writer);
         return imports;

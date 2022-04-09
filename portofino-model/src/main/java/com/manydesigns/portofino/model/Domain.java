@@ -54,4 +54,13 @@ public class Domain extends EPackageImpl {
             return super.eGet(featureID, resolve, coreType);
         }
     }
+
+    @Override
+    public boolean eIsSet(int featureID) {
+        if (featureID == OBJECTS_ATTRIBUTE.getFeatureID()) {
+            return objects != null;
+        } else {
+            return super.eIsSet(featureID);
+        }
+    }
 }

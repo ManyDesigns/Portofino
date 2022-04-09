@@ -25,6 +25,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.*;
@@ -76,10 +77,16 @@ public class Model {
     }
 
     public Domain ensureDomain(String name) {
-        return getDomains().stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
+        List<Domain> domains = getDomains();
+        return ensureDomain(name, domains);
+    }
+
+    @NotNull
+    public static Domain ensureDomain(String name, List<Domain> domains) {
+        return domains.stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
             Domain domain = new Domain();
             domain.setName(name);
-            getDomains().add(domain);
+            domains.add(domain);
             return domain;
         });
     }
