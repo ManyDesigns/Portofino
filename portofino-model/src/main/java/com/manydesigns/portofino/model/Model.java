@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.*;
 import java.util.*;
+import java.util.function.Consumer;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -81,12 +82,19 @@ public class Model {
         return ensureDomain(name, domains);
     }
 
-    @NotNull
     public static Domain ensureDomain(String name, List<Domain> domains) {
+        return ensureDomain(name, domains, null);
+    }
+
+    @NotNull
+    public static Domain ensureDomain(String name, List<Domain> domains, Consumer<Domain> initializer) {
         return domains.stream().filter(d -> d.getName().equals(name)).findFirst().orElseGet(() -> {
             Domain domain = new Domain();
             domain.setName(name);
             domains.add(domain);
+            if(initializer != null) {
+                initializer.accept(domain);
+            }
             return domain;
         });
     }

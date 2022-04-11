@@ -59,6 +59,7 @@ public class ModelModule implements Module {
     public FileObject applicationDirectory;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
+    protected ModelService modelService;
 
     public static final Logger logger = LoggerFactory.getLogger(ModelModule.class);
 

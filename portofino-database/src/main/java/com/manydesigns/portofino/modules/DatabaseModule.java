@@ -24,12 +24,14 @@ import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.reactivex.disposables.Disposable;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -49,6 +51,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
+import java.io.IOException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,13 +63,13 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
     public static final String GENERATED_CLASSES_DIRECTORY_NAME = "classes-generated";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
+    public static final String DATABASES_DOMAIN_NAME = "databases";
 
     @Autowired
     public ServletContext servletContext;
+
+    @Autowired
+    public ModelService modelService;
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
@@ -138,8 +141,10 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public Persistence getPersistence(
             @Autowired ModelService modelService,
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
-            @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
-        Persistence persistence = new Persistence(modelService, configuration, databasePlatformsRegistry);
+            @Autowired CacheResetListenerRegistry cacheResetListenerRegistry)
+            throws IOException, ConfigurationException {
+        Domain databasesDomain = modelService.addBuiltInDomain(DATABASES_DOMAIN_NAME, true);
+        Persistence persistence = new Persistence(modelService, databasesDomain, configuration, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         if(applicationContext != null) { //We may want it to be null when testing
             applicationContext.getAutowireCapableBeanFactory().autowireBean(persistence);

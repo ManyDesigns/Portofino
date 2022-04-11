@@ -50,9 +50,7 @@ public class CloseSessionsFilter implements Filter {
             WebApplicationContext applicationContext =
                     WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
             Persistence persistence = applicationContext.getBean(Persistence.class);
-            if (persistence.getModel() != null) {
-                persistence.closeSessions();
-            }
+            persistence.closeSessions();
         }
     }
 

@@ -33,6 +33,10 @@ public class Domain extends EPackageImpl {
 
     public Domain() {}
 
+    public Domain(String name) {
+        setName(name);
+    }
+
     @Override
     protected EClass eStaticClass() {
         return CLASS;

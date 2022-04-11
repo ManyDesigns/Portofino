@@ -615,11 +615,12 @@ public class PersistenceTest {
             Database hibernatetest = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "hibernatetest");
             hibernatetest.setDatabaseName("test");
             FileObject file;
-            file = appDir.resolveFile("portofino-model").resolveFile("test");
+            FileObject dbsDir = appDir.resolveFile("portofino-model").resolveFile(DatabaseModule.DATABASES_DOMAIN_NAME);
+            file = dbsDir.resolveFile("test");
             modelService.saveModel();
             assertTrue(file.exists());
             //Old directory is deleted
-            assertFalse(appDir.resolveFile("portofino-model").resolveFile("hibernatetest").exists());
+            assertFalse(dbsDir.resolveFile("hibernatetest").exists());
             assertTrue(file.resolveFile("PUBLIC").exists());
         } finally {
             appDir.deleteAll();

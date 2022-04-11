@@ -227,7 +227,7 @@ public class Profile extends CustomAction {
     }
 
     protected Database getDatabase() {
-        return persistence.getModel().getDatabases().find { d -> d.databaseName.equals("tt") };
+        return persistence.getDatabases().find { d -> d.databaseName.equals("tt") };
     }
 
     public Form getForm() {
