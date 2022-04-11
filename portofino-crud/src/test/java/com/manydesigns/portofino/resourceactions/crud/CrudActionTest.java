@@ -103,7 +103,7 @@ public class CrudActionTest extends JerseyTest {
         ModelService modelService = new ModelService(appDir, configuration, null);
         modelService.loadModel();
         persistence = new Persistence(
-                modelService, modelService.getModel().getDomain(DatabaseModule.DATABASES_DOMAIN_NAME),
+                modelService, modelService.getModel().ensureDomain(DatabaseModule.DATABASES_DOMAIN_NAME),
                 configuration, databasePlatformsRegistry);
         persistence.start();
         setupJPetStore();
