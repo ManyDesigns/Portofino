@@ -11,6 +11,8 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,5 +109,23 @@ public class ModelService {
             transientDomains.add(domain);
         }
         return domain;
+    }
+
+    public EClass addBuiltInClass(Class<?> javaClass) throws ConfigurationException, IOException {
+        String[] packageName = javaClass.getPackageName().split("[.]");
+        Domain pkg = addBuiltInDomain(packageName[0], false);
+        for (int i = 1; i < packageName.length; i++) {
+            pkg = Model.ensureDomain(packageName[i], pkg.getSubdomains());
+        }
+        String className = javaClass.getSimpleName();
+        if (pkg.getEClassifier(className) != null) {
+            throw new IllegalStateException("The model already contains a definition for " + javaClass);
+        }
+        EClass eClass = EcoreFactory.eINSTANCE.createEClass();
+        eClass.setName(className);
+        eClass.setInstanceClass(javaClass);
+        // TODO properties
+        pkg.getEClassifiers().add(eClass);
+        return eClass;
     }
 }
