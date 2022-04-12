@@ -13,7 +13,7 @@ import static org.testng.Assert.assertEquals;
 public class ModelServiceTest {
 
     @Test
-    public void testAddBuiltInClass() throws IOException, ConfigurationException {
+    public void testAddBuiltInClass() throws IOException {
         ModelService modelService = new ModelService(
                 VFS.getManager().resolveFile("ram://test"), new PropertiesConfiguration(), null);
         EClass eClass = modelService.addBuiltInClass(ModelServiceTest.class);

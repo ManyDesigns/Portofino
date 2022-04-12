@@ -111,9 +111,15 @@ public class ModelService {
         return domain;
     }
 
-    public EClass addBuiltInClass(Class<?> javaClass) throws ConfigurationException, IOException {
+    public EClass addBuiltInClass(Class<?> javaClass) {
         String[] packageName = javaClass.getPackageName().split("[.]");
-        Domain pkg = addBuiltInDomain(packageName[0], false);
+        Domain pkg;
+        try {
+            pkg = addBuiltInDomain(packageName[0], false);
+        } catch (IOException | ConfigurationException e) {
+            assert false;
+            pkg = null;
+        }
         for (int i = 1; i < packageName.length; i++) {
             pkg = Model.ensureDomain(packageName[i], pkg.getSubdomains());
         }
