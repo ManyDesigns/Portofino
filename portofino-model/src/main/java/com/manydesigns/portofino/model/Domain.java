@@ -10,6 +10,7 @@ import org.eclipse.emf.ecore.util.EcoreEList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Domain extends EPackageImpl {
@@ -66,5 +67,9 @@ public class Domain extends EPackageImpl {
         } else {
             return super.eIsSet(featureID);
         }
+    }
+
+    public Optional<Domain> getSubdomain(String name) {
+        return getSubdomains().stream().filter(d -> d.getName().equals(name)).findFirst();
     }
 }

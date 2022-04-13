@@ -22,13 +22,14 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.model.issues.Issue;
 import org.apache.commons.configuration2.Configuration;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EcoreFactory;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.ecore.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -71,7 +72,7 @@ public class Model {
                 result = domain.get();
                 domains = result.getSubdomains();
             } else {
-                throw new RuntimeException("Domain " + name + " not known");
+                throw new IllegalArgumentException("Domain " + name + " not known");
             }
         }
         return result;
@@ -104,6 +105,34 @@ public class Model {
             throw new RuntimeException("Object already present: " + name + " in domain " + domain);
         }
         domain.getObjects().put(name, object);
+    }
+
+    public EObject putObject(Domain domain, String name, Object javaObject) {
+        EClass eClass = findClass(javaObject.getClass());
+        EObject object = EcoreFactory.eINSTANCE.create(eClass);
+        //TODO copy properties
+        domain.getObjects().put(name, object);
+        return object;
+    }
+
+    public EClass findClass(Class<?> aClass) {
+        String className = aClass.getSimpleName();
+        String[] packageName = aClass.getPackageName().split("[.]");
+        Domain pkg = getDomain(packageName[0]);
+        int i;
+        for (i = 1; pkg != null && i < packageName.length; i++) {
+            pkg = pkg.getSubdomain(packageName[i]).orElse(null);
+        }
+        if (pkg == null) {
+            throw new IllegalArgumentException(
+                    "Package " + StringUtils.join(packageName, '.', 0, i) + " not found");
+        }
+        EClassifier eClassifier = pkg.getEClassifier(className);
+        if (eClassifier instanceof EClass) {
+            return (EClass) eClassifier;
+        } else {
+            throw new IllegalArgumentException("Not a modeled class: " + aClass.getName());
+        }
     }
 
     public List<Issue> getIssues() {
