@@ -4,16 +4,22 @@ import com.manydesigns.portofino.model.Domain;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.vfs2.VFS;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
 import org.testng.annotations.Test;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.testng.Assert.*;
 
 public class ModelServiceTest {
 
+    private String test1;
+    private ModelServiceTest test2;
+
     @Test
-    public void testAddBuiltInClass() throws IOException {
+    public void testAddBuiltInClass() throws IOException, IntrospectionException {
         ModelService modelService = new ModelService(
                 VFS.getManager().resolveFile("ram://test"), new PropertiesConfiguration(), null);
         EClass eClass = modelService.addBuiltInClass(ModelServiceTest.class);
@@ -24,7 +30,7 @@ public class ModelServiceTest {
     }
 
     @Test
-    public void testPutObject() throws IOException {
+    public void testPutObject() throws Exception {
         ModelService modelService = new ModelService(
                 VFS.getManager().resolveFile("ram://test"), new PropertiesConfiguration(), null);
         Domain domain = modelService.getModel().ensureDomain("domain");
@@ -35,8 +41,31 @@ public class ModelServiceTest {
             //OK
         }
         modelService.addBuiltInClass(ModelServiceTest.class);
+        test1 = "foo";
+        test2 = new ModelServiceTest();
+        test2.test1 = "bar";
         modelService.getModel().putObject(domain, "object", this);
         assertEquals(domain.getObjects().size(), 1);
-        assertNotNull(domain.getObjects().get("object"));
+        ModelServiceTest object = (ModelServiceTest) domain.getJavaObject("object");
+        assertNotNull(object);
+        assertEquals(test1, object.test1);
+        assertNotNull(object.test2);
+        assertEquals(test2.test1, object.test2.test1);
+    }
+
+    public String getTest1() {
+        return test1;
+    }
+
+    public void setTest1(String test1) {
+        this.test1 = test1;
+    }
+
+    public ModelServiceTest getTest2() {
+        return test2;
+    }
+
+    public void setTest2(ModelServiceTest test2) {
+        this.test2 = test2;
     }
 }

@@ -9,16 +9,14 @@ entity: annotation* ENTITY name=simpleIdentifier '{'
   properties+=property*
   relationshipProperty*
 '}';
+property: annotation* name=simpleIdentifier (':' type)? (NOT_NULLABLE)?;
 
 standaloneObject: object EOF;
-object: OBJECT name=simpleIdentifier ':' className=identifier '{'
-  properties+=propertyAssignment*
-'}';
+object: OBJECT name=simpleIdentifier ':' objectBody;
+objectBody: className=identifier '{' properties+=propertyAssignment* '}';
+propertyAssignment: name=simpleIdentifier '=' (literal | objectBody);
 
 importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)? ';'?;
-
-property: annotation* name=simpleIdentifier (':' type)? (NOT_NULLABLE)?;
-propertyAssignment: name=simpleIdentifier '=' literal;
 
 relationship: annotation* name=identifier ':' a=type '-->' b=type;
 

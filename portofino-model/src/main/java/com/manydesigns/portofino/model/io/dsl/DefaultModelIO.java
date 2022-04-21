@@ -179,7 +179,8 @@ public class DefaultModelIO implements ModelIO {
             ModelParser.StandaloneObjectContext parseTree = parser.standaloneObject();
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 ModelParser.ObjectContext objectContext = parseTree.object();
-                EObject object = new ModelObjectBuilderVisitor(model, domain).visitObject(objectContext);
+                EObject object =
+                        new ModelObjectBuilderVisitor(model, domain).visitObjectBody(objectContext.objectBody());
                 model.addObject(domain, objectContext.name.getText(), object);
             }
         } catch (IOException e) {

@@ -18,7 +18,7 @@ public class ModelObjectBuilderVisitor extends ModelBaseVisitor<EObject> {
     }
 
     @Override
-    public EObject visitObject(ModelParser.ObjectContext ctx) {
+    public EObject visitObjectBody(ModelParser.ObjectBodyContext ctx) {
         String fullEntityName = ctx.className.getText();
         EClass eClass;
         if(fullEntityName.indexOf('.') >= 0) {
@@ -28,12 +28,19 @@ public class ModelObjectBuilderVisitor extends ModelBaseVisitor<EObject> {
         } else {
             eClass = (EClass) ownerPackage.getEClassifier(fullEntityName);
         }
+        if (eClass == null) {
+            throw new RuntimeException("Entity " + fullEntityName + " not found");
+        }
         EObject eObject = EcoreUtil.create(eClass);
         for (ModelParser.PropertyAssignmentContext propertyAss : ctx.properties) {
             String featureName = propertyAss.name.getText();
             EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
             if(feature != null) {
-                eObject.eSet(feature, propertyAss.literal().getText()); //TODO type conversion
+                if (propertyAss.literal() != null) {
+                    eObject.eSet(feature, propertyAss.literal().getText()); //TODO type conversion
+                } else {
+                    eObject.eSet(feature, visitObjectBody(propertyAss.objectBody()));
+                }
             } else {
                 throw new RuntimeException("Property " + featureName + " not found in " + fullEntityName);
             }

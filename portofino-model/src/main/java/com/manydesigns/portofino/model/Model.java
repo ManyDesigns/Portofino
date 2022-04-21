@@ -29,7 +29,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.xml.bind.annotation.*;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -107,10 +111,18 @@ public class Model {
         domain.getObjects().put(name, object);
     }
 
-    public EObject putObject(Domain domain, String name, Object javaObject) {
-        EClass eClass = findClass(javaObject.getClass());
-        EObject object = EcoreFactory.eINSTANCE.create(eClass);
-        //TODO copy properties
+    public EObject putObject(Domain domain, String name, Object javaObject)
+            throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        Class<?> javaClass = javaObject.getClass();
+        EClass eClass = findClass(javaClass);
+        EObject object = eClass.getEPackage().getEFactoryInstance().create(eClass);
+        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
+        for (PropertyDescriptor prop : props) {
+            if (prop.getReadMethod() != null && prop.getWriteMethod() != null) {
+                //TODO type conversion
+                object.eSet(eClass.getEStructuralFeature(prop.getName()), prop.getReadMethod().invoke(javaObject));
+            }
+        }
         domain.getObjects().put(name, object);
         return object;
     }

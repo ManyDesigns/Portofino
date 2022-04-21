@@ -2,6 +2,7 @@ package com.manydesigns.portofino.model.service;
 
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
 import io.reactivex.subjects.PublishSubject;
@@ -11,11 +12,13 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -87,18 +90,20 @@ public class ModelService {
         modelEvents.onNext(EventType.SAVED);
     }
 
-    public Domain addBuiltInDomain(String name, boolean persist) throws ConfigurationException, IOException {
+    public Domain ensureTopLevelDomain(String name, boolean persist) throws ConfigurationException, IOException {
         Optional<Domain> any = model.getDomains().stream()
                 .filter(d -> d.getName().equals(name)).findAny();
         Domain domain;
         if (any.isPresent()) {
+            logger.debug("Not adding domain " + name + " because it's already present");
+            Domain existing = any.get();
             if (persist) {
                 // TODO merge domains?
-                logger.debug("Not adding domain " + name + " because it's already present");
-                return any.get();
-            } else {
-                throw new IllegalStateException(name + " already refers to " + any.get());
+                if(transientDomains.remove(existing)) {
+                    saveModel();
+                }
             }
+            return existing;
         } else {
             domain = new Domain(name);
             model.getDomains().add(domain);
@@ -111,18 +116,8 @@ public class ModelService {
         return domain;
     }
 
-    public EClass addBuiltInClass(Class<?> javaClass) {
-        String[] packageName = javaClass.getPackageName().split("[.]");
-        Domain pkg;
-        try {
-            pkg = addBuiltInDomain(packageName[0], false);
-        } catch (IOException | ConfigurationException e) {
-            assert false;
-            pkg = null;
-        }
-        for (int i = 1; i < packageName.length; i++) {
-            pkg = Model.ensureDomain(packageName[i], pkg.getSubdomains());
-        }
+    public EClass addBuiltInClass(Class<?> javaClass) throws IntrospectionException {
+        Domain pkg = ensureDomain(javaClass);
         String className = javaClass.getSimpleName();
         if (pkg.getEClassifier(className) != null) {
             throw new IllegalStateException("The model already contains a definition for " + javaClass);
@@ -130,8 +125,46 @@ public class ModelService {
         EClass eClass = EcoreFactory.eINSTANCE.createEClass();
         eClass.setName(className);
         eClass.setInstanceClass(javaClass);
-        // TODO properties
+        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
+        for (PropertyDescriptor prop : props) {
+            if (prop.getWriteMethod() != null && prop.getReadMethod() != null) {
+                EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
+                attribute.setName(prop.getName());
+                Class<?> type = prop.getPropertyType();
+                attribute.setEType(ensureType(type));
+                eClass.getEStructuralFeatures().add(attribute);
+            }
+        }
         pkg.getEClassifiers().add(eClass);
         return eClass;
+    }
+
+    public EClassifier ensureType(Class<?> type) {
+        try {
+            Domain pkg = model.getDomain(type.getPackageName());
+            String className = type.getSimpleName();
+            EClassifier eClassifier = pkg.getEClassifier(className);
+            if (eClassifier != null) {
+                return eClassifier;
+            }
+        } catch (IllegalArgumentException e) {
+            logger.debug("Domain not found", e);
+        }
+        return PortofinoPackage.ensureType(type);
+    }
+
+    public Domain ensureDomain(Class<?> javaClass) {
+        String[] packageName = javaClass.getPackageName().split("[.]");
+        Domain pkg;
+        try {
+            pkg = ensureTopLevelDomain(packageName[0], false);
+        } catch (IOException | ConfigurationException e) {
+            assert false;
+            pkg = null;
+        }
+        for (int i = 1; i < packageName.length; i++) {
+            pkg = Model.ensureDomain(packageName[i], pkg.getSubdomains());
+        }
+        return pkg;
     }
 }

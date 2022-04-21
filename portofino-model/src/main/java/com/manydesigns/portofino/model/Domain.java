@@ -10,6 +10,11 @@ import org.eclipse.emf.ecore.util.EcoreEList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,6 +50,29 @@ public class Domain extends EPackageImpl {
 
     public EMap<String, EObject> getObjects() {
         return objects;
+    }
+
+    public Object getJavaObject(String name)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
+            IntrospectionException, NoSuchFieldException {
+        EObject eObject = objects.get(name);
+        if (eObject == null) {
+            return null;
+        }
+        EClass eClass = eObject.eClass();
+        if (eClass == null || eClass.getInstanceClass() == null) {
+            return null;
+        }
+        Class<?> javaClass = eClass.getInstanceClass();
+        Object object = javaClass.getConstructor().newInstance();
+        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
+        for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
+            Optional<PropertyDescriptor> pd =
+                    Arrays.stream(props).filter(p -> p.getName().equals(feature.getName())).findFirst();
+            PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
+            propertyDescriptor.getWriteMethod().invoke(object, eObject.eGet(feature));
+        }
+        return object;
     }
 
     public EList<Domain> getSubdomains() {

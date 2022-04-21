@@ -34,7 +34,6 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.hibernate.EntityMode;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -143,7 +142,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry)
             throws IOException, ConfigurationException {
-        Domain databasesDomain = modelService.addBuiltInDomain(DATABASES_DOMAIN_NAME, true);
+        Domain databasesDomain = modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, true);
         Persistence persistence = new Persistence(modelService, databasesDomain, configuration, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         if(applicationContext != null) { //We may want it to be null when testing
