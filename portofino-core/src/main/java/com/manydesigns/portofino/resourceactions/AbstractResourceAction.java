@@ -33,6 +33,7 @@ import com.manydesigns.portofino.actions.*;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
@@ -93,9 +94,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Autowired
     protected CodeBase codeBase;
     @Autowired
-    protected ActionRegistry actionRegistry;
-    @Autowired
     protected ApplicationContext applicationContext;
+    @Autowired
+    protected ModelService modelService;
     @Autowired(required = false)
     protected SecurityFacade security = NoSecurity.AT_ALL;
     @Context

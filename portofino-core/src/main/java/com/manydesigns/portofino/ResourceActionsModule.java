@@ -26,6 +26,8 @@ import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
+import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.resourceactions.custom.CustomAction;
@@ -38,6 +40,7 @@ import com.manydesigns.portofino.security.noop.login.NoOpLoginAction;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -52,6 +55,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
+import java.io.IOException;
+
+import static com.manydesigns.portofino.model.service.ModelModule.PORTOFINO_DOMAIN;
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION;
 
@@ -64,11 +70,9 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORT
 public class ResourceActionsModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
-    public static final String ACTIONS_DIRECTORY = "actionsDirectory";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
+    public static final String ACTIONS_DIRECTORY = "actionsDirectory";
+    public static final String ACTIONS_DOMAIN = "actionsDomain";
 
     @Autowired
     public ServletContext servletContext;
@@ -157,6 +161,11 @@ public class ResourceActionsModule implements Module {
             @Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject applicationDirectory) throws FileSystemException {
         String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
         return applicationDirectory.resolveFile(actionsDirectory);
+    }
+
+    @Bean(name = ACTIONS_DOMAIN)
+    public Domain getActionsDomain(@Autowired @Qualifier(PORTOFINO_DOMAIN) Domain portofino) {
+        return portofino.ensureDomain("resourceactions");
     }
 
     protected void preloadResourceActions(FileObject directory, ResourceResolver resourceResolver) throws FileSystemException {

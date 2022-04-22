@@ -11,6 +11,11 @@
     <artifactId>portofino-core</artifactId>
     <packaging>jar</packaging>
     <url>https://www.manydesigns.com/</url>
+
+    <properties>
+        <antlr.version>4.9.3</antlr.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -34,6 +39,22 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <!-- Model -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>${antlr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.emfjson</groupId>
+            <artifactId>emfjson-jackson</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.emf</groupId>
+            <artifactId>ecore-xmi</artifactId>
+            <version>2.2.3</version>
         </dependency>
         <!-- javax.annotation for Java 11+ -->
         <dependency>
@@ -113,47 +134,10 @@
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <!-- Email -->
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
-            <version>${commons.email.version}</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <!-- Utilities -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>${commons.fileupload.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Quartz integration (optional) -->
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>${quartz.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>c3p0</groupId>
-                    <artifactId>c3p0</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
     <build>
@@ -163,5 +147,22 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>${antlr.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                        <configuration>
+                            <visitor>true</visitor>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

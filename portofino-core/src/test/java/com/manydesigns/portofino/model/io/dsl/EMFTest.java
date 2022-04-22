@@ -56,7 +56,7 @@ public class EMFTest {
         DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 2);
-        model.addObject(model.getDomain("testDomain1"), "someObject", EcoreFactory.eINSTANCE.createEObject());
+        model.getDomain("testDomain1").addObject("someObject", EcoreFactory.eINSTANCE.createEObject());
         XMIResource resource = new XMIResourceImpl();
         resource.getContents().addAll(model.getDomains());
         StringWriter writer = new StringWriter();

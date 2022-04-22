@@ -98,7 +98,7 @@
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.32</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
-        <jjwt.version>0.10.7</jjwt.version>
+        <jjwt.version>0.11.2</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.7</jsqlparser.version>
@@ -149,7 +149,6 @@
         <module>security-shiro</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
-        <module>portofino-model</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
         <module>databases/db2</module>

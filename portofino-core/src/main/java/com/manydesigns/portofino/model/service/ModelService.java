@@ -90,7 +90,7 @@ public class ModelService {
         modelEvents.onNext(EventType.SAVED);
     }
 
-    public Domain ensureTopLevelDomain(String name, boolean persist) throws ConfigurationException, IOException {
+    public Domain ensureTopLevelDomain(String name, boolean persist) {
         Optional<Domain> any = model.getDomains().stream()
                 .filter(d -> d.getName().equals(name)).findAny();
         Domain domain;
@@ -99,18 +99,14 @@ public class ModelService {
             Domain existing = any.get();
             if (persist) {
                 // TODO merge domains?
-                if(transientDomains.remove(existing)) {
-                    saveModel();
-                }
+                transientDomains.remove(existing);
             }
             return existing;
         } else {
             domain = new Domain(name);
             model.getDomains().add(domain);
         }
-        if (persist) {
-            saveModel();
-        } else {
+        if (!persist) {
             transientDomains.add(domain);
         }
         return domain;
@@ -119,8 +115,13 @@ public class ModelService {
     public EClass addBuiltInClass(Class<?> javaClass) throws IntrospectionException {
         Domain pkg = ensureDomain(javaClass);
         String className = javaClass.getSimpleName();
-        if (pkg.getEClassifier(className) != null) {
-            throw new IllegalStateException("The model already contains a definition for " + javaClass);
+        EClassifier existing = pkg.getEClassifier(className);
+        if (existing != null) {
+            if (existing.getInstanceClass() == javaClass) {
+                return (EClass) existing;
+            } else {
+                throw new IllegalStateException("The model already contains a definition for " + javaClass);
+            }
         }
         EClass eClass = EcoreFactory.eINSTANCE.createEClass();
         eClass.setName(className);
@@ -141,7 +142,7 @@ public class ModelService {
 
     public EClassifier ensureType(Class<?> type) {
         try {
-            Domain pkg = model.getDomain(type.getPackageName());
+            Domain pkg = getClassesDomain().resolveDomain(type.getPackageName());
             String className = type.getSimpleName();
             EClassifier eClassifier = pkg.getEClassifier(className);
             if (eClassifier != null) {
@@ -155,16 +156,19 @@ public class ModelService {
 
     public Domain ensureDomain(Class<?> javaClass) {
         String[] packageName = javaClass.getPackageName().split("[.]");
-        Domain pkg;
-        try {
-            pkg = ensureTopLevelDomain(packageName[0], false);
-        } catch (IOException | ConfigurationException e) {
-            assert false;
-            pkg = null;
-        }
-        for (int i = 1; i < packageName.length; i++) {
-            pkg = Model.ensureDomain(packageName[i], pkg.getSubdomains());
+        Domain pkg = getClassesDomain();
+        for (String s : packageName) {
+            pkg = Domain.ensureDomain(s, pkg.getSubdomains());
         }
         return pkg;
     }
+
+    public Domain getClassesDomain() {
+        return getPortofinoDomain().ensureDomain("classes");
+    }
+
+    public Domain getPortofinoDomain() {
+        return ensureTopLevelDomain("portofino", false);
+    }
+
 }

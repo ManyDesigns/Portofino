@@ -181,7 +181,7 @@ public class DefaultModelIO implements ModelIO {
                 ModelParser.ObjectContext objectContext = parseTree.object();
                 EObject object =
                         new ModelObjectBuilderVisitor(model, domain).visitObjectBody(objectContext.objectBody());
-                model.addObject(domain, objectContext.name.getText(), object);
+                domain.addObject(objectContext.name.getText(), object);
             }
         } catch (IOException e) {
             String msg = "Could not load resource: " + file.getName().getURI();
@@ -342,8 +342,8 @@ public class DefaultModelIO implements ModelIO {
 
     private Map<String, String> collectImports(EClass entity) {
         Map<String, String> imports = collectImports((EModelElement) entity);
-        entity.getESuperTypes().forEach(t -> addImport(t, imports));
-        entity.getEStructuralFeatures().forEach(f -> imports.putAll(collectImports(f)));
+        entity.getESuperTypes().forEach(t -> addImport(t, entity.getEPackage(), imports));
+        entity.getEStructuralFeatures().forEach(f -> imports.putAll(collectImports(f, entity.getEPackage())));
         String fullEntityName = entity.getName();
         if(entity.getEPackage() != null) {
             fullEntityName = entity.getEPackage().getName() + "." + fullEntityName;
@@ -352,10 +352,10 @@ public class DefaultModelIO implements ModelIO {
         return imports;
     }
 
-    private Map<String, String> collectImports(EStructuralFeature feature) {
-        Map<String, String> imports = collectImports((EModelElement) feature);
+    private Map<String, String> collectImports(EStructuralFeature feature, EPackage domain) {
+        Map<String, String> imports = collectImports(feature);
         EClassifier type = feature.getEType();
-        addImport(type, imports);
+        addImport(type, domain, imports);
         return imports;
     }
 
@@ -363,16 +363,17 @@ public class DefaultModelIO implements ModelIO {
         return !Id.class.getName().equals(a.getSource()) && !KeyMappings.class.getName().equals(a.getSource());
     }
 
-    private void addImport(EClassifier type, Map<String, String> imports) {
+    private void addImport(EClassifier type, EPackage domain, Map<String, String> imports) {
         if(type == null) {
             return;
         }
         String fullTypeName = type.getName();
-        if(type.getEPackage() != null) {
-            if(type.getEPackage() == EcorePackage.eINSTANCE) {
+        EPackage ePackage = type.getEPackage();
+        if(ePackage != null) {
+            if(ePackage == EcorePackage.eINSTANCE || ePackage == domain) {
                 return;
             }
-            fullTypeName = type.getEPackage().getName() + "." + fullTypeName;
+            fullTypeName = getQualifiedName(ePackage) + "." + fullTypeName;
         }
         addImport(fullTypeName, imports);
     }

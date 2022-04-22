@@ -20,12 +20,14 @@
 
 package com.manydesigns.portofino.model.service;
 
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +47,9 @@ import java.io.IOException;
 public class ModelModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
+
+    public static final String PORTOFINO_DOMAIN =
+            "com.manydesigns.portofino.model.service.ModelModule.portofinoDomain";
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
@@ -83,6 +88,11 @@ public class ModelModule implements Module {
         ModelService modelService = new ModelService(applicationDirectory, configuration, configurationFile);
         modelService.loadModel();
         return modelService;
+    }
+
+    @Bean(name = PORTOFINO_DOMAIN)
+    public Domain getPortofinoDomain(@Autowired ModelService modelService) {
+        return modelService.getPortofinoDomain();
     }
 
     @Override

@@ -37,7 +37,7 @@ public class ModelObjectBuilderVisitor extends ModelBaseVisitor<EObject> {
             EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
             if(feature != null) {
                 if (propertyAss.literal() != null) {
-                    eObject.eSet(feature, propertyAss.literal().getText()); //TODO type conversion
+                    eObject.eSet(feature, propertyAss.literal().getText());
                 } else {
                     eObject.eSet(feature, visitObjectBody(propertyAss.objectBody()));
                 }
