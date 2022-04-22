@@ -1,6 +1,5 @@
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.members;
 
 @Table(shortName = "%{role}", name = "roles")
 entity roles {

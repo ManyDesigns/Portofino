@@ -136,7 +136,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
         };
     }
 
-    @Bean
+    @Bean(name = "databasePersistence")
     public Persistence getPersistence(
             @Autowired ModelService modelService,
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,

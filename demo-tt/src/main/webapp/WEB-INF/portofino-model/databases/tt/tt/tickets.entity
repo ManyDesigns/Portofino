@@ -5,15 +5,6 @@ import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.affected_components;
-import tt.attachments;
-import tt.projects;
-import tt.ticket_priorities;
-import tt.ticket_resolutions;
-import tt.ticket_states;
-import tt.ticket_types;
-import tt.users;
-import tt.versions;
 
 @Table(shortName = "%{project}-%{n}", name = "tickets")
 @SelectionProvider(database = "tt", properties = "type", query = "from ticket_types order by id", language = "HQL", name = "ticket_types")

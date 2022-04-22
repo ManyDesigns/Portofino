@@ -67,7 +67,7 @@ public class DefaultModelIO implements ModelIO {
                 }
             }
             for (ToLink toLink : toLinkQueue) {
-                new EntityModelLinkerVisitor(toLink.domain).visit(toLink.parseTree);
+                new EntityModelLinkerVisitor(model, toLink.domain).visit(toLink.parseTree);
             }
             return model;
         } finally {
@@ -367,6 +367,7 @@ public class DefaultModelIO implements ModelIO {
         if(type == null) {
             return;
         }
+        //TODO handle homonyms
         String fullTypeName = type.getName();
         EPackage ePackage = type.getEPackage();
         if(ePackage != null) {

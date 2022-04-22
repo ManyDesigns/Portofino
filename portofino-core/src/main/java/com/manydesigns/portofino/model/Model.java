@@ -75,4 +75,17 @@ public class Model {
         return issues;
     }
 
+    public EClassifier resolveType(String typeName) {
+        int nameSep = typeName.lastIndexOf('.');
+        if (nameSep > 0) {
+            Domain domain = getDomain(typeName.substring(0, nameSep));
+            if (domain != null) {
+                return domain.getEClassifier(typeName.substring(nameSep + 1));
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
 }

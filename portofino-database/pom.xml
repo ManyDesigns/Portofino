@@ -20,15 +20,14 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-model</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>1.7</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>

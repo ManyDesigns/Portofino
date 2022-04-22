@@ -1,6 +1,5 @@
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.tickets;
 
 @Table(shortName = "%{resolution}", name = "ticket_resolutions")
 entity ticket_resolutions {

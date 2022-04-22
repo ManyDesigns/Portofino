@@ -3,8 +3,6 @@ import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.members;
-import tt.tickets;
 
 @Table(shortName = "%{first_name} %{last_name}", name = "users")
 entity users {

@@ -1,9 +1,6 @@
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.projects;
-import tt.roles;
-import tt.users;
 
 @Table(name = "members")
 @SelectionProvider(database = "tt", properties = "user_", query = "select u.id, concat(u.first_name, ' ', u.last_name), m.id is null\r\nfrom users u\r\nleft join members m on m.user_ = u.id and m.project = %{#project.id}", language = "SQL", name = "available_members")

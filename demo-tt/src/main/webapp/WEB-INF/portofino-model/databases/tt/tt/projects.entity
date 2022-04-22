@@ -2,12 +2,8 @@ import com.manydesigns.elements.annotations.RegExp;
 import com.manydesigns.elements.annotations.RichText;
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.components;
-import tt.members;
-import tt.tickets;
-import tt.versions;
 
-@Table(shortName = "%{id} - %{title}", name = "projects")
+@Table(shortName = "%{id} - %{title}")
 entity projects {
 	id {
 		@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 10, scale = 0)

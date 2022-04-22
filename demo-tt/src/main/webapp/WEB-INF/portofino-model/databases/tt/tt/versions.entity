@@ -3,11 +3,8 @@ import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.projects;
-import tt.tickets;
-import tt.version_states;
 
-@Table(shortName = "%{title}", name = "versions")
+@Table(shortName = "%{title}")
 @SelectionProvider(database = "tt", properties = "state", query = "from version_states order by id", language = "HQL", name = "version_state")
 entity versions {
 	id {

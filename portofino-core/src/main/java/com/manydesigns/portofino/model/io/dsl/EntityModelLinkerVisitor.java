@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model.io.dsl;
 
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.language.ModelParser;
@@ -34,16 +35,18 @@ import java.util.List;
 
 public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
 
+    protected final Model model;
     protected EPackage parentDomain;
     protected EPackage initialDomain;
     protected EClass entity;
     private static final Logger logger = LoggerFactory.getLogger(EntityModelLinkerVisitor.class);
 
-    public EntityModelLinkerVisitor() {
-        this(null);
+    public EntityModelLinkerVisitor(Model model) {
+        this(model, null);
     }
 
-    public EntityModelLinkerVisitor(EPackage parentDomain) {
+    public EntityModelLinkerVisitor(Model model, EPackage parentDomain) {
+        this.model = model;
         this.parentDomain = parentDomain;
     }
 
@@ -111,13 +114,17 @@ public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
         if(entity == null) {
             throw new IllegalStateException("Relationship without an entity: " + propertyName);
         }
-        String typeName = ctx.type().name.getText();
-        //TODO should we be using the CodeBase for this?
+        String typeName = resolveType(ctx.type().name.getText());
         EClassifier type = null;
-        if(parentDomain != null) {
-            type = parentDomain.getEClassifier(typeName);
+        if (typeName.contains(".")) {
+            type = model.resolveType(typeName);
+        } else {
+            if (parentDomain != null) {
+                type = parentDomain.getEClassifier(typeName);
+            }
         }
         if(type == null) {
+            //TODO should we be using the CodeBase for this?
             type = PortofinoPackage.ensureType(resolveType(typeName, false));
         }
         EReference reference = ensureReference(entity, propertyName, false);
@@ -172,6 +179,11 @@ public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
         }
 
         return reference;
+    }
+
+    private String resolveType(String typeName) {
+        typeName = typeAliases.getOrDefault(typeName, typeName);
+        return typeName;
     }
 
     protected EReference ensureReference(EClass entity, String propertyName, boolean derived) {

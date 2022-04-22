@@ -1,4 +1,4 @@
 import com.manydesigns.portofino.database.model.annotations.Schema;
 
-@Schema(name = "tt")
+@Schema
 domain tt;

@@ -43,6 +43,7 @@ public class Permissions {
     // Fields
     //**************************************************************************
 
+    @JsonProperty("groups")
     protected final List<Group> groups;
 
     protected final Map<String, AccessLevel> actualLevels;
@@ -73,7 +74,6 @@ public class Permissions {
     //**************************************************************************
 
     @XmlElement(name = "group", type = Group.class)
-    @JsonProperty("groups")
     public List<Group> getGroups() {
         return groups;
     }

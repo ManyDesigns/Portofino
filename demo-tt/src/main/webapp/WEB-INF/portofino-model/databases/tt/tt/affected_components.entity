@@ -1,8 +1,6 @@
 import com.manydesigns.portofino.database.model.annotations.Column;
 import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
 import com.manydesigns.portofino.database.model.annotations.Table;
-import tt.components;
-import tt.tickets;
 
 @Table(name = "affected_components")
 @SelectionProvider(database = "tt", properties = "component", query = "select c.id, c.title, ac.id is null\r\nfrom components c\r\nleft join affected_components ac on ac.component = c.id and ac.project = %{#ticket.project} and n=%{#ticket.n} where c.project = %{#ticket.project}", language = "SQL", name = "available_components")
