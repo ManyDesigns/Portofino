@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.portofino.model.annotations.Transient;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
@@ -12,7 +13,10 @@ import org.jetbrains.annotations.Nullable;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -87,11 +91,8 @@ public class Domain extends EPackageImpl {
         Class<?> javaClass = javaObject.getClass();
         EClass eClass = domain.findClass(javaClass);
         EObject object = eClass.getEPackage().getEFactoryInstance().create(eClass);
-        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
-        for (PropertyDescriptor prop : props) {
-            if (prop.getReadMethod() != null && prop.getWriteMethod() != null) {
-                object.eSet(eClass.getEStructuralFeature(prop.getName()), prop.getReadMethod().invoke(javaObject));
-            }
+        for (PropertyDescriptor prop : getPersistentProperties(javaClass)) {
+            object.eSet(eClass.getEStructuralFeature(prop.getName()), prop.getReadMethod().invoke(javaObject));
         }
         getObjects().put(name, object);
         return object;
@@ -173,5 +174,48 @@ public class Domain extends EPackageImpl {
             }
             return domain;
         });
+    }
+
+    public static List<PropertyDescriptor> getPersistentProperties(Class<?> javaClass) throws IntrospectionException {
+        PropertyDescriptor[] propertyDescriptors = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
+        List<PropertyDescriptor> result = new ArrayList<>();
+        for (PropertyDescriptor prop : propertyDescriptors) {
+            if (prop.getWriteMethod() != null && prop.getReadMethod() != null) {
+                if (getAnnotation(prop, Transient.class) == null) {
+                    result.add(prop);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static <T extends Annotation> T getAnnotation(PropertyDescriptor prop, Class<T> annClass) {
+        Class<?> declaringClass = null;
+        if (prop.getReadMethod() != null) {
+            T annotation = prop.getReadMethod().getAnnotation(annClass);
+            if (annotation != null) {
+                return annotation;
+            } else {
+                declaringClass = prop.getReadMethod().getDeclaringClass();
+            }
+        }
+        if (prop.getWriteMethod() != null) {
+            T annotation = prop.getReadMethod().getAnnotation(annClass);
+            if (annotation != null) {
+                return annotation;
+            } else {
+                declaringClass = prop.getWriteMethod().getDeclaringClass();
+            }
+        }
+        if (declaringClass != null) {
+            try {
+                Field field = declaringClass.getDeclaredField(prop.getName());
+                return field.getAnnotation(annClass);
+            } catch (NoSuchFieldException e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

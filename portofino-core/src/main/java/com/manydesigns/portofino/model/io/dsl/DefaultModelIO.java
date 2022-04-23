@@ -235,12 +235,15 @@ public class DefaultModelIO implements ModelIO {
                 os.write("domain " + domain.getName() + ";");
             }
         }
-        for(EClassifier entity :
+        for (EClassifier entity :
                 domain.getEClassifiers().stream().filter(c -> c instanceof EClass).collect(Collectors.toList())) {
             saveEntity((EClass) entity, domainDir);
         }
         deleteUnusedEntityFiles(domainDir, domain.getEClassifiers());
-        //TODO imports
+        for (Map.Entry<String, EObject> entry : domain.getObjects()) {
+            saveObject(entry.getKey(), entry.getValue(), domain, domainDir);
+        }
+        deleteUnusedObjectFiles(domainDir, domain.getObjects().keySet());
         for(Domain subdomain : domain.getSubdomains()) {
             saveDomain(subdomain, domainDir);
         }
@@ -309,6 +312,28 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
+    protected void saveObject(String name, EObject object, Domain domain, FileObject domainDir)
+            throws IOException {
+        FileObject objectFile = domainDir.resolveFile(name + ".object");
+        try(OutputStreamWriter os = fileWriter(objectFile)) {
+            Map<String, String> imports = new HashMap<>();
+            EClassifier type = object.eClass();
+            addImport(type, domain, imports);
+            writeImports(imports, os);
+            os.write("object " + name + " : " + object.eClass().getName());
+            os.write(" {" + System.lineSeparator());
+            for(EStructuralFeature property : object.eClass().getEAllStructuralFeatures()) {
+                Object value = object.eGet(property);
+                if (value != null) {
+                    os.write("\t" + property.getName() + " = ");
+                    writePropertyValue(os, value);
+                    os.write(System.lineSeparator());
+                }
+            }
+            os.write("}");
+        }
+    }
+
     private Map<String, String> writeImports(Domain domain, Writer writer) throws IOException {
         Map<String, String> imports = collectImports(domain);
         writeImports(imports, writer);
@@ -335,7 +360,7 @@ public class DefaultModelIO implements ModelIO {
     private Map<String, String> collectImports(EModelElement element) {
         Map<String, String> imports = new HashMap<>();
         element.getEAnnotations().stream()
-                .filter(this::isNotTransient)
+                .filter(DefaultModelIO::isNotTransient)
                 .forEach(ann -> addImport(ann.getSource(), imports));
         return imports;
     }
@@ -359,7 +384,7 @@ public class DefaultModelIO implements ModelIO {
         return imports;
     }
 
-    private boolean isNotTransient(EAnnotation a) {
+    private static boolean isNotTransient(EAnnotation a) {
         return !Id.class.getName().equals(a.getSource()) && !KeyMappings.class.getName().equals(a.getSource());
     }
 
@@ -387,9 +412,9 @@ public class DefaultModelIO implements ModelIO {
     }
 
     /**
-     * Delete the directories of the domains that are no longer present in the model
+     * Deletes the files of the entities that are no longer present in the model
      *
-     * @throws FileSystemException if the subdomain directories cannot be listed.
+     * @throws FileSystemException if the entity files cannot be listed.
      */
     protected void deleteUnusedEntityFiles(FileObject baseDir, List<EClassifier> entities) throws FileSystemException {
         Arrays.stream(baseDir.getChildren()).forEach(file -> {
@@ -411,6 +436,33 @@ public class DefaultModelIO implements ModelIO {
             }
         });
     }
+
+    /**
+     * Delete the files of the objects that are no longer present in the model
+     *
+     * @throws FileSystemException if the object files cannot be listed.
+     */
+    protected void deleteUnusedObjectFiles(FileObject baseDir, Collection<String> names) throws FileSystemException {
+        Arrays.stream(baseDir.getChildren()).forEach(file -> {
+            String filePath = file.getName().getPath();
+            try {
+                String fileName = file.getName().getBaseName();
+                if(file.getType() == FileType.FILE && fileName.endsWith(".object")) {
+                    if (names.stream().noneMatch(n -> (n + ".object").equals(fileName))) {
+                        logger.info("Deleting unused object file {}", filePath);
+                        try {
+                            file.deleteAll();
+                        } catch (FileSystemException e) {
+                            logger.warn("Could not delete unused object file " + filePath, e);
+                        }
+                    }
+                }
+            } catch (FileSystemException e) {
+                logger.error("Unexpected filesystem error when trying to delete object file " + filePath, e);
+            }
+        });
+    }
+
 
     protected void writeProperty(
             EAttribute property, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
@@ -467,7 +519,9 @@ public class DefaultModelIO implements ModelIO {
     public static void writeAnnotations(
             EModelElement annotated, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
         for(EAnnotation annotation : annotated.getEAnnotations()) {
-            writeAnnotation(annotation, writer, typeAliases, indent);
+            if (isNotTransient(annotation)) {
+                writeAnnotation(annotation, writer, typeAliases, indent);
+            }
         }
     }
 
@@ -504,21 +558,31 @@ public class DefaultModelIO implements ModelIO {
             if(type.isArray()) {
                 Class<?> componentType = type.getComponentType();
                 for (String v : value.split(",")) {
-                    writeSingleAnnotationPropertyValue(writer, v.trim(), componentType);
+                    writePropertyValue(writer, v.trim(), componentType);
                 }
             } else {
-                writeSingleAnnotationPropertyValue(writer, value, type);
+                writePropertyValue(writer, value, type);
             }
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Invalid annotation " + annotation, e); //TODO
         }
     }
 
-    private static void writeSingleAnnotationPropertyValue(Writer writer, String value, Class<?> type) throws IOException {
+    protected static void writePropertyValue(Writer writer, String value, Class<?> type) throws IOException {
         if(type == String.class || type == Class.class || Enum.class.isAssignableFrom(type)) {
-            value = "\"" + StringEscapeUtils.escapeJava(value) + "\"";
+            value = "\"" + value.replace("\"", "\\\"") + "\"";
         }
         writer.write(value);
+    }
+
+    protected static void writePropertyValue(Writer writer, Object value) throws IOException {
+        String printed;
+        if (value instanceof String) {
+            printed = "\"" + value.toString().replace("\"", "\\\"") + "\"";
+        } else {
+            printed = value.toString();
+        }
+        writer.write(printed);
     }
 
     @Override

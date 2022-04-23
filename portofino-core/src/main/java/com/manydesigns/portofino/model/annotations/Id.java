@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
- * http://www.manydesigns.com/
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
+ * https://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -18,11 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+
 package com.manydesigns.portofino.model.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Marks a property as part of the primary key.
  */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Id {
 
     /**

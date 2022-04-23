@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.util.List;
@@ -126,15 +125,12 @@ public class ModelService {
         EClass eClass = EcoreFactory.eINSTANCE.createEClass();
         eClass.setName(className);
         eClass.setInstanceClass(javaClass);
-        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
-        for (PropertyDescriptor prop : props) {
-            if (prop.getWriteMethod() != null && prop.getReadMethod() != null) {
-                EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
-                attribute.setName(prop.getName());
-                Class<?> type = prop.getPropertyType();
-                attribute.setEType(ensureType(type));
-                eClass.getEStructuralFeatures().add(attribute);
-            }
+        for (PropertyDescriptor prop : Domain.getPersistentProperties(javaClass)) {
+            EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
+            attribute.setName(prop.getName());
+            Class<?> type = prop.getPropertyType();
+            attribute.setEType(ensureType(type));
+            eClass.getEStructuralFeatures().add(attribute);
         }
         pkg.getEClassifiers().add(eClass);
         return eClass;

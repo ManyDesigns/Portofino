@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -94,6 +95,9 @@ public class ResourceActionsModule implements Module {
 
     @Autowired
     public CacheResetListenerRegistry cacheResetListenerRegistry;
+
+    @Autowired
+    public ModelService modelService;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -164,8 +168,9 @@ public class ResourceActionsModule implements Module {
     }
 
     @Bean(name = ACTIONS_DOMAIN)
-    public Domain getActionsDomain(@Autowired @Qualifier(PORTOFINO_DOMAIN) Domain portofino) {
-        return portofino.ensureDomain("resourceactions");
+    @Scope("prototype")
+    public Domain getActionsDomain() {
+        return modelService.ensureTopLevelDomain("resourceactions", true);
     }
 
     protected void preloadResourceActions(FileObject directory, ResourceResolver resourceResolver) throws FileSystemException {

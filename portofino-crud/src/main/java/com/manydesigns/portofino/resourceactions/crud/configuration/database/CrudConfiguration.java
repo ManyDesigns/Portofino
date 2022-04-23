@@ -20,12 +20,14 @@
 
 package com.manydesigns.portofino.resourceactions.crud.configuration.database;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.database.model.Database;
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.database.model.Table;
+import com.manydesigns.portofino.model.annotations.Transient;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
@@ -45,8 +47,9 @@ import java.util.List;
 */
 
 @XmlRootElement(name = "configuration")
-@XmlType(name = "databaseConfiguration",propOrder = {"database","query","selectionProviders"})
+@XmlType(name = "databaseConfiguration", propOrder = {"database","query","selectionProviders"})
 @XmlAccessorType(value = XmlAccessType.NONE)
+@JsonIgnoreProperties({"persistence", "actualTable", "actualDatabase"})
 public class CrudConfiguration extends com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
@@ -62,6 +65,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
 
     @Autowired
     @Enabled(false)
+    @Transient
     public Persistence persistence;
 
     //**************************************************************************
@@ -69,8 +73,10 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
     //**************************************************************************
 
     @Enabled(false)
+    @Transient
     protected Table actualTable;
     @Enabled(false)
+    @Transient
     protected Database actualDatabase;
 
     //**************************************************************************

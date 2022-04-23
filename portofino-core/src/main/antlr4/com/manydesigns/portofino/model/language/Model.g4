@@ -14,7 +14,9 @@ property: annotation* name=simpleIdentifier (':' type)? (NOT_NULLABLE)?;
 standaloneObject: object EOF;
 object: OBJECT name=simpleIdentifier ':' objectBody;
 objectBody: className=identifier '{' properties+=propertyAssignment* '}';
-propertyAssignment: name=simpleIdentifier '=' (literal | objectBody);
+propertyAssignment: name=simpleIdentifier '=' propertyValue;
+propertyValue: literal | objectBody | propertyListValue;
+propertyListValue: '[' (propertyValue (',' propertyValue)*)? ']';
 
 importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)? ';'?;
 
@@ -29,6 +31,7 @@ type: name=identifier;
 annotation: '@' type annotationParams?;
 
 annotationParams: '(' (literal | (simpleIdentifier '=' literal (',' simpleIdentifier '=' literal)*)) ')';
+annotationParamValue: literal | '[' (annotationParamValue (',' annotationParamValue)*)? ']';
 
 literal: BOOLEAN | UNSIGNED_INTEGER | SIGNED_INTEGER | REAL | STRING;
 

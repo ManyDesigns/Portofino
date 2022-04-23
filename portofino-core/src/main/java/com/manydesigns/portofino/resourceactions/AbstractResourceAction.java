@@ -29,10 +29,12 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.actions.*;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.Operation;
@@ -53,6 +55,7 @@ import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 
 import javax.servlet.ServletContext;
@@ -97,6 +100,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected ApplicationContext applicationContext;
     @Autowired
     protected ModelService modelService;
+    @Autowired
+    @Qualifier(ResourceActionsModule.ACTIONS_DOMAIN)
+    protected Domain actionsDomain;
     @Autowired(required = false)
     protected SecurityFacade security = NoSecurity.AT_ALL;
     @Context
@@ -505,6 +511,13 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         try {
             FileObject confFile = ActionLogic.saveConfiguration(actionInstance.getDirectory(), configuration);
             logger.info("Configuration saved to " + confFile.getName().getPath());
+            String domainName = actionInstance.getPath().replace('/', '.');
+            if (domainName.startsWith(".")) {
+                domainName = domainName.substring(0);
+            }
+            actionsDomain.ensureDomain(domainName).putObject(
+                    "configuration", configuration, modelService.getClassesDomain());
+            modelService.saveModel();
             return true;
         } catch (Exception e) {
             logger.error("Couldn't save configuration", e);

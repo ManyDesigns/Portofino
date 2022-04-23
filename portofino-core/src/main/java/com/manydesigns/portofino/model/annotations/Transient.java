@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+
 package com.manydesigns.portofino.model.annotations;
 
 import java.lang.annotation.ElementType;
@@ -26,11 +27,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Controls whether a model object is "enabled" or not. If it's not enabled, the application should ignore it as if it
- * wasn't there, but it should keep it in the model.
+ * Marks a property as <em>transient</em>, that is, not saved in the model.
+ * As such, this annotation only makes sense on Java classes: adding it to
+ * a property in the model would remove the property the next time the model
+ * is saved.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PACKAGE)
-public @interface Enabled {
-    boolean value() default true;
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface Transient {
+
+    /**
+     * The index of this property in the primary key: 0 is the first property, 1 is the second and so on.
+     */
+    int order() default 0;
+
 }

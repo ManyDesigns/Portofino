@@ -4,6 +4,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.language.ModelBaseVisitor;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.*;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
@@ -36,15 +37,39 @@ public class ModelObjectBuilderVisitor extends ModelBaseVisitor<EObject> {
             String featureName = propertyAss.name.getText();
             EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
             if(feature != null) {
-                if (propertyAss.literal() != null) {
-                    eObject.eSet(feature, propertyAss.literal().getText());
+                ModelParser.PropertyValueContext valueCtx = propertyAss.propertyValue();
+                if (valueCtx.literal() != null) {
+                    Object value = EcoreFactory.eINSTANCE.createFromString(
+                            (EDataType) feature.getEType(), getLiteral(valueCtx.literal()));
+                    eObject.eSet(feature, value);
+                } else if (valueCtx.objectBody() != null) {
+                    eObject.eSet(feature, visitObjectBody(valueCtx.objectBody()));
                 } else {
-                    eObject.eSet(feature, visitObjectBody(propertyAss.objectBody()));
+                    ModelParser.PropertyListValueContext listCtx = valueCtx.propertyListValue();
+                    EList list = (EList) eObject.eGet(feature);
+                    listCtx.propertyValue().forEach(pv -> {
+                        if (pv.literal() != null) {
+                            //TODO type conversion
+                            list.add(getLiteral(valueCtx.literal()));
+                        } else if (pv.objectBody() != null) {
+                            list.add(visitObjectBody(pv.objectBody()));
+                        } else {
+                            throw new RuntimeException("Nested lists not supported");
+                        }
+                    });
                 }
             } else {
                 throw new RuntimeException("Property " + featureName + " not found in " + fullEntityName);
             }
         }
         return eObject;
+    }
+
+    public static String getLiteral(ModelParser.LiteralContext lit) {
+        if (lit.STRING() != null) {
+            return lit.getText().substring(1, lit.getText().length() - 1);
+        } else {
+            return lit.getText();
+        }
     }
 }
