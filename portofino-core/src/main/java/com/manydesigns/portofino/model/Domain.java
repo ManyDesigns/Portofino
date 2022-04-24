@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.annotations.Transient;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEMap;
@@ -7,6 +8,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.*;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,29 +58,6 @@ public class Domain extends EPackageImpl {
         return objects;
     }
 
-    public Object getJavaObject(String name)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
-            IntrospectionException, NoSuchFieldException {
-        EObject eObject = objects.get(name);
-        if (eObject == null) {
-            return null;
-        }
-        EClass eClass = eObject.eClass();
-        if (eClass == null || eClass.getInstanceClass() == null) {
-            return null;
-        }
-        Class<?> javaClass = eClass.getInstanceClass();
-        Object object = javaClass.getConstructor().newInstance();
-        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
-        for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
-            Optional<PropertyDescriptor> pd =
-                    Arrays.stream(props).filter(p -> p.getName().equals(feature.getName())).findFirst();
-            PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
-            propertyDescriptor.getWriteMethod().invoke(object, eObject.eGet(feature));
-        }
-        return object;
-    }
-
     public void addObject(String name, EObject object) {
         if(getObjects().containsKey(name)) {
             throw new RuntimeException("Object already present: " + name + " in domain " + getName());
@@ -88,13 +67,32 @@ public class Domain extends EPackageImpl {
 
     public EObject putObject(String name, Object javaObject, Domain domain)
             throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        EObject object = toEObject(javaObject, domain);
+        getObjects().put(name, object);
+        return object;
+    }
+
+    public static EObject toEObject(Object javaObject, Domain domain)
+            throws IntrospectionException, IllegalAccessException, InvocationTargetException {
         Class<?> javaClass = javaObject.getClass();
         EClass eClass = domain.findClass(javaClass);
-        EObject object = eClass.getEPackage().getEFactoryInstance().create(eClass);
+        EObject object = EcoreUtil.create(eClass);
         for (PropertyDescriptor prop : getPersistentProperties(javaClass)) {
-            object.eSet(eClass.getEStructuralFeature(prop.getName()), prop.getReadMethod().invoke(javaObject));
+            EStructuralFeature eStructuralFeature = eClass.getEStructuralFeature(prop.getName());
+            Object value = prop.getReadMethod().invoke(javaObject);
+            if(eStructuralFeature.isMany()) {
+                if (value != null) {
+                    EList list = (EList) object.eGet(eStructuralFeature);
+                    for (Object elem : (Iterable) value) {
+                        list.add(toEObject(elem, domain));
+                    }
+                }
+            } else if(eStructuralFeature instanceof EAttribute || value == null) {
+                object.eSet(eStructuralFeature, value);
+            } else {
+                object.eSet(eStructuralFeature, toEObject(value, domain));
+            }
         }
-        getObjects().put(name, object);
         return object;
     }
 

@@ -33,6 +33,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
+import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.database.model.Column;
@@ -100,7 +101,7 @@ public class CrudActionTest extends JerseyTest {
         Configuration configuration = new PropertiesConfiguration();
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
-        ModelService modelService = new ModelService(appDir, configuration, null);
+        ModelService modelService = new ModelService(appDir, configuration, null, new JavaCodeBase(appDir));
         modelService.loadModel();
         persistence = new Persistence(
                 modelService, modelService.getModel().ensureDomain(DatabaseModule.DATABASES_DOMAIN_NAME),

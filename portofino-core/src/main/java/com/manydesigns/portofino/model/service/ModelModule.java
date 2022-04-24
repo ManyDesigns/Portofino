@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.model.service;
 
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
@@ -27,7 +28,6 @@ import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +63,9 @@ public class ModelModule implements Module {
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
     public FileObject applicationDirectory;
 
+    @Autowired
+    public CodeBase codeBase;
+
     protected ModuleStatus status = ModuleStatus.CREATED;
     protected ModelService modelService;
 
@@ -85,7 +88,7 @@ public class ModelModule implements Module {
 
     @Bean
     public ModelService getModelService() throws IOException {
-        ModelService modelService = new ModelService(applicationDirectory, configuration, configurationFile);
+        ModelService modelService = new ModelService(applicationDirectory, configuration, configurationFile, codeBase);
         modelService.loadModel();
         return modelService;
     }

@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model.service;
 
+import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
@@ -13,12 +14,18 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.eclipse.emf.ecore.*;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,14 +39,16 @@ public class ModelService {
     protected final Configuration configuration;
     protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
     protected final List<Domain> transientDomains = new CopyOnWriteArrayList<>();
+    protected final CodeBase codeBase;
     private static final Logger logger = LoggerFactory.getLogger(ModelService.class);
 
     public ModelService(
             FileObject applicationDirectory, Configuration configuration,
-            FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile) {
+            FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile, CodeBase codeBase) {
         this.applicationDirectory = applicationDirectory;
         this.configuration = configuration;
         this.configurationFile = configurationFile;
+        this.codeBase = codeBase;
     }
 
     public enum EventType {
@@ -116,24 +125,85 @@ public class ModelService {
         String className = javaClass.getSimpleName();
         EClassifier existing = pkg.getEClassifier(className);
         if (existing != null) {
-            if (existing.getInstanceClass() == javaClass) {
-                return (EClass) existing;
-            } else {
-                throw new IllegalStateException("The model already contains a definition for " + javaClass);
-            }
+            // TODO check they model the same class?
+            return (EClass) existing;
         }
         EClass eClass = EcoreFactory.eINSTANCE.createEClass();
         eClass.setName(className);
-        eClass.setInstanceClass(javaClass);
+        pkg.getEClassifiers().add(eClass); // We must add it early to break recursion when properties refer to itself
         for (PropertyDescriptor prop : Domain.getPersistentProperties(javaClass)) {
-            EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
-            attribute.setName(prop.getName());
             Class<?> type = prop.getPropertyType();
-            attribute.setEType(ensureType(type));
-            eClass.getEStructuralFeatures().add(attribute);
+            if (Iterable.class.isAssignableFrom(type)) {
+                Type returnType = prop.getReadMethod().getGenericReturnType();
+                EReference reference = EcoreFactory.eINSTANCE.createEReference();
+                if (returnType instanceof ParameterizedType) {
+                    Type typeArgument = ((ParameterizedType) returnType).getActualTypeArguments()[0];
+                    if (typeArgument instanceof Class) {
+                        reference.setEType(addBuiltInClass((Class<?>) typeArgument));
+                    }
+                }
+                reference.setName(prop.getName());
+                reference.setUpperBound(-1);
+                eClass.getEStructuralFeatures().add(reference);
+            } else {
+                Optional<EClassifier> builtin =
+                        EcorePackage.eINSTANCE.getEClassifiers().stream().filter(t -> type.equals(t.getInstanceClass())).findFirst();
+                EStructuralFeature feature = builtin.map(t -> {
+                    EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
+                    attribute.setEType(t);
+                    return (EStructuralFeature) attribute;
+                }).orElseGet(() -> {
+                    try {
+                        EReference reference = EcoreFactory.eINSTANCE.createEReference();
+                        reference.setEType(addBuiltInClass(type));
+                        return reference;
+                    } catch (IntrospectionException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                feature.setName(prop.getName());
+                eClass.getEStructuralFeatures().add(feature);
+            }
         }
-        pkg.getEClassifiers().add(eClass);
         return eClass;
+    }
+
+    public Object getJavaObject(Domain domain, String name)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
+            IntrospectionException, NoSuchFieldException, IOException, ClassNotFoundException {
+        EObject eObject = domain.getObjects().get(name);
+        return toJavaObject(eObject);
+    }
+
+    @Nullable
+    public Object toJavaObject(EObject eObject) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IntrospectionException, NoSuchFieldException {
+        if (eObject == null) {
+            return null;
+        }
+        EClass eClass = eObject.eClass();
+        if (eClass == null) {
+            return null;
+        }
+        String javaClassName = eClass.getName();
+        EPackage pkg = eClass.getEPackage();
+        while (pkg != null && pkg != getClassesDomain()) {
+            javaClassName = pkg.getName() + "." + javaClassName;
+            pkg = pkg.getESuperPackage();
+        }
+        Class<?> javaClass = codeBase.loadClass(javaClassName);
+        Object object = javaClass.getConstructor().newInstance();
+        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
+        for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
+            Optional<PropertyDescriptor> pd =
+                    Arrays.stream(props).filter(p -> p.getName().equals(feature.getName())).findFirst();
+            PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
+            Object value = eObject.eGet(feature);
+            if (value instanceof EObject) {
+                value = toJavaObject((EObject) value);
+            }
+            propertyDescriptor.getWriteMethod().invoke(object, value);
+        }
+        return object;
     }
 
     public EClassifier ensureType(Class<?> type) {

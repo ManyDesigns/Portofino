@@ -513,7 +513,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             logger.info("Configuration saved to " + confFile.getName().getPath());
             String domainName = actionInstance.getPath().replace('/', '.');
             if (domainName.startsWith(".")) {
-                domainName = domainName.substring(0);
+                domainName = domainName.substring(1);
             }
             actionsDomain.ensureDomain(domainName).putObject(
                     "configuration", configuration, modelService.getClassesDomain());

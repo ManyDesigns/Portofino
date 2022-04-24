@@ -13,7 +13,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -320,18 +319,23 @@ public class DefaultModelIO implements ModelIO {
             EClassifier type = object.eClass();
             addImport(type, domain, imports);
             writeImports(imports, os);
-            os.write("object " + name + " : " + object.eClass().getName());
-            os.write(" {" + System.lineSeparator());
-            for(EStructuralFeature property : object.eClass().getEAllStructuralFeatures()) {
-                Object value = object.eGet(property);
-                if (value != null) {
-                    os.write("\t" + property.getName() + " = ");
-                    writePropertyValue(os, value);
-                    os.write(System.lineSeparator());
-                }
-            }
-            os.write("}");
+            os.write("object " + name + " : ");
+            writeObjectBody(object, os, "");
         }
+    }
+
+    protected void writeObjectBody(EObject object, Writer writer, String indent) throws IOException {
+        writer.write(object.eClass().getName());
+        writer.write(" {" + System.lineSeparator());
+        for(EStructuralFeature property : object.eClass().getEAllStructuralFeatures()) {
+            Object value = object.eGet(property);
+            if (value != null) {
+                writer.write(indent + "\t" + property.getName() + " = ");
+                writePropertyValue(value, writer, indent + "\t");
+                writer.write(System.lineSeparator());
+            }
+        }
+        writer.write(indent + "}");
     }
 
     private Map<String, String> writeImports(Domain domain, Writer writer) throws IOException {
@@ -516,7 +520,7 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    public static void writeAnnotations(
+    public void writeAnnotations(
             EModelElement annotated, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
         for(EAnnotation annotation : annotated.getEAnnotations()) {
             if (isNotTransient(annotation)) {
@@ -525,7 +529,7 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    public static void writeAnnotation(
+    public void writeAnnotation(
             EAnnotation annotation, Writer writer, Map<String, String> typeAliases, String indent) throws IOException {
         writer.write(indent + "@" + typeAliases.getOrDefault(annotation.getSource(), annotation.getSource()));
         if(!annotation.getDetails().isEmpty()) {
@@ -549,7 +553,7 @@ public class DefaultModelIO implements ModelIO {
         writer.write(System.lineSeparator());
     }
 
-    public static void writeAnnotationPropertyValue(EAnnotation annotation, String name, Writer writer) throws IOException {
+    public void writeAnnotationPropertyValue(EAnnotation annotation, String name, Writer writer) throws IOException {
         String value = annotation.getDetails().get(name);
         try {
             Annotation ann = new Annotation(annotation);
@@ -558,31 +562,48 @@ public class DefaultModelIO implements ModelIO {
             if(type.isArray()) {
                 Class<?> componentType = type.getComponentType();
                 for (String v : value.split(",")) {
-                    writePropertyValue(writer, v.trim(), componentType);
+                    writePropertyValue(v.trim(), componentType, writer);
                 }
             } else {
-                writePropertyValue(writer, value, type);
+                writePropertyValue(value, type, writer);
             }
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Invalid annotation " + annotation, e); //TODO
         }
     }
 
-    protected static void writePropertyValue(Writer writer, String value, Class<?> type) throws IOException {
+    protected void writePropertyValue(String value, Class<?> type, Writer writer) throws IOException {
         if(type == String.class || type == Class.class || Enum.class.isAssignableFrom(type)) {
             value = "\"" + value.replace("\"", "\\\"") + "\"";
         }
         writer.write(value);
     }
 
-    protected static void writePropertyValue(Writer writer, Object value) throws IOException {
-        String printed;
+    protected void writePropertyValue(Object value, Writer writer, String indent) throws IOException {
         if (value instanceof String) {
-            printed = "\"" + value.toString().replace("\"", "\\\"") + "\"";
+            writer.write("\"" + value.toString().replace("\"", "\\\"") + "\"");
+        } else if (value instanceof EObject) {
+            writeObjectBody((EObject) value, writer, indent);
+        } else if (value instanceof Iterable) {
+            writer.write("[");
+            boolean first = true;
+            for (Object elem : (Iterable) value) {
+                if (!first) {
+                    writer.write(",");
+                }
+                writer.write(System.lineSeparator());
+                writer.write(indent + "\t");
+                writePropertyValue(elem, writer, indent + "\t");
+                first = false;
+            }
+            if(!first) {
+                writer.write(System.lineSeparator());
+                writer.write(indent);
+            }
+            writer.write("]");
         } else {
-            printed = value.toString();
+            writer.write(value.toString());
         }
-        writer.write(printed);
     }
 
     @Override

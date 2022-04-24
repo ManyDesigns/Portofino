@@ -26,6 +26,7 @@ import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.model.annotations.Transient;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EcoreFactory;
@@ -60,8 +61,10 @@ public class Annotation implements ModelObject, Unmarshallable {
     // Fields
     //**************************************************************************
 
+    @Transient
     protected Annotated parent;
     @Deprecated
+    @Transient
     protected List<String> values = new ArrayList<>();
     protected List<AnnotationProperty> properties = new ArrayList<>();
 

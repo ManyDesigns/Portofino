@@ -13,6 +13,7 @@ import org.apache.commons.vfs2.VFS;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -76,7 +77,7 @@ public class DefaultModelIOTest {
         assertEquals(model.getDomains().size(), 2);
         Domain testDomain1 = model.getDomain("testDomain1");
         EClass Person = (EClass) testDomain1.getEClassifier("Person");
-        EObject person = testDomain1.getEFactoryInstance().create(Person);
+        EObject person = EcoreUtil.create(Person);
         person.eSet(Person.getEStructuralFeature("name"), "Alessio");
         testDomain1.getObjects().put("alessio", person);
         FileObject outDir = VFS.getManager().resolveFile("ram://portofino/test-model-1");
