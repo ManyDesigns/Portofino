@@ -25,6 +25,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.blobs.HierarchicalBlobManager;
 import com.manydesigns.elements.fields.AbstractBlobField;
 import com.manydesigns.elements.fields.Field;
@@ -317,7 +318,9 @@ public class CrudActionTest extends JerseyTest {
         //Force loading the object from the DB
         crudAction.getParameters().add(id.toString());
         crudAction.parametersAcquired();
-        crudAction.jsonReadData();
+        crudAction.setupForm(Mode.VIEW);
+        crudAction.form.readFromObject(crudAction.object);
+        BlobUtils.loadBlobs(crudAction.form, crudAction.getBlobManager(), false);
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
         assertNotNull(blobField.getBlobError());
