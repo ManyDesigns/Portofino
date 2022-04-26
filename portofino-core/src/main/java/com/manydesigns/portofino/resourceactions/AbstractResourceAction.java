@@ -46,6 +46,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
@@ -65,7 +66,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.beans.IntrospectionException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
@@ -151,7 +154,23 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             ActionInstance actionInstance = new ActionInstance(
                     parentActionInstance, resourceAction.getLocation(), action, resourceAction.getClass());
             actionInstance.setActionBean(resourceAction);
-            ActionLogic.configureResourceAction(resourceAction, actionInstance);
+            resourceAction.setActionInstance(actionInstance);
+            try {
+                actionInstance.setConfiguration(resourceAction.loadConfiguration());
+                if (actionInstance.getConfiguration() == null) {
+                    // Try loading legacy configuration.xml
+                    ActionLogic.configureResourceAction(resourceAction, actionInstance);
+                    resourceAction.configured();
+                    if (actionInstance.getConfiguration() != null) {
+                        resourceAction.saveConfiguration();
+                        // TODO delete legacy conf
+                    }
+                } else {
+                    resourceAction.configured();
+                }
+            } catch (Exception e) {
+                logger.error("Could not load configuration for " + resourceAction.getPath(), e);
+            }
         }
 
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
@@ -272,6 +291,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     public void setActionInstance(ActionInstance actionInstance) {
         this.actionInstance = actionInstance;
     }
+
+    @Override
+    public void configured() {}
 
     public ActionDescriptor getActionDescriptor() {
         return getActionInstance().getActionDescriptor();
@@ -493,37 +515,47 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":configuration")
     public void setConfiguration(
             @RequestBody(description = "The configuration object in JSON format.")
-            String configurationString) throws IOException {
+            String configurationString) throws Exception {
         Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(getClass());
         if(configurationClass == null) {
             throw new WebApplicationException("This resource does not support configuration");
         }
         Object configuration = new ObjectMapper().readValue(configurationString, configurationClass);
-        saveConfiguration(configuration);
+        actionInstance.setConfiguration(configuration);
+        saveConfiguration();
     }
 
     /**
-     * Utility method to save the configuration object to a file in this action's directory.
-     * @param configuration the object to save. It must be in a state that will produce a valid XML document.
-     * @return true if the object was correctly saved, false otherwise.
+     * Utility method to save the configuration object to the model.
+     * It must be in a state that will produce a valid XML document.
      */
-    protected boolean saveConfiguration(Object configuration) {
-        try {
-            FileObject confFile = ActionLogic.saveConfiguration(actionInstance.getDirectory(), configuration);
-            logger.info("Configuration saved to " + confFile.getName().getPath());
-            String domainName = actionInstance.getPath().replace('/', '.');
-            if (domainName.startsWith(".")) {
-                domainName = domainName.substring(1);
-            }
-            actionsDomain.ensureDomain(domainName).putObject(
-                    "configuration", configuration, modelService.getClassesDomain());
-            modelService.saveModel();
-            return true;
-        } catch (Exception e) {
-            logger.error("Couldn't save configuration", e);
-            RequestMessages.addErrorMessage("error saving conf");
-            return false;
+    public void saveConfiguration()
+            throws IntrospectionException, InvocationTargetException, IllegalAccessException, ConfigurationException,
+            IOException {
+        getConfigurationDomain().putObject(
+                "configuration", getConfiguration(), modelService.getClassesDomain());
+        modelService.saveModel();
+    }
+
+    protected Domain getConfigurationDomain() {
+        String domainName = actionInstance.getPath().replace('/', '.');
+        if (domainName.startsWith(".")) {
+            domainName = domainName.substring(1);
         }
+        return actionsDomain.ensureDomain(domainName);
+    }
+
+    public Object loadConfiguration()
+            throws IntrospectionException, IOException, NoSuchFieldException, ClassNotFoundException,
+            InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        Object configuration = modelService.getJavaObject(getConfigurationDomain(), "configuration");
+        if (configuration != null) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
+            if (configuration instanceof ResourceActionConfiguration) {
+                ((ResourceActionConfiguration) configuration).init();
+            }
+        }
+        return configuration;
     }
 
     @io.swagger.v3.oas.annotations.Operation(

@@ -2,7 +2,6 @@ package com.manydesigns.portofino.model;
 
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.annotations.Transient;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
@@ -15,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -185,6 +185,59 @@ public class Domain extends EPackageImpl {
             }
         }
         return result;
+    }
+
+    public static Object toJavaObject(EObject eObject, Domain classesDomain, CodeBase codeBase)
+            throws IOException, ClassNotFoundException, NoSuchMethodException, IntrospectionException,
+            InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+        if (eObject == null) {
+            return null;
+        }
+        EClass eClass = eObject.eClass();
+        if (eClass == null) {
+            return null;
+        }
+        String javaClassName = eClass.getName();
+        EPackage pkg = eClass.getEPackage();
+        while (pkg != null && pkg != classesDomain) {
+            javaClassName = pkg.getName() + "." + javaClassName;
+            pkg = pkg.getESuperPackage();
+        }
+        Class<?> javaClass = codeBase.loadClass(javaClassName);
+        Object object = javaClass.getConstructor().newInstance();
+        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
+        for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
+            Optional<PropertyDescriptor> pd =
+                    Arrays.stream(props).filter(p -> p.getName().equals(feature.getName())).findFirst();
+            PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
+            if (feature.isMany()) {
+                List<EObject> values = (List) eObject.eGet(feature);
+                List list;
+                if (propertyDescriptor.getWriteMethod() != null) {
+                    list = new ArrayList();
+                    propertyDescriptor.getWriteMethod().invoke(object, list);
+                } else {
+                    list = (List) propertyDescriptor.getReadMethod().invoke(object);
+                    list.clear();
+                }
+                for (EObject value : values) {
+                    list.add(toJavaObject(value, classesDomain, codeBase));
+                }
+            } else {
+                Object value = eObject.eGet(feature);
+                if (value instanceof EObject) {
+                    value = toJavaObject((EObject) value, classesDomain, codeBase);
+                }
+                propertyDescriptor.getWriteMethod().invoke(object, value);
+            }
+        }
+        return object;
+    }
+
+    public Object getJavaObject(String name, Domain classesDomain, CodeBase codeBase)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
+            IntrospectionException, NoSuchFieldException, IOException, ClassNotFoundException {
+        return toJavaObject(getObjects().get(name), classesDomain, codeBase);
     }
 
     public static <T extends Annotation> T getAnnotation(PropertyDescriptor prop, Class<T> annClass) {

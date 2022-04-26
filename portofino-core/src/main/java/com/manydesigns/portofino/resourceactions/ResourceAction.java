@@ -80,4 +80,8 @@ public interface ResourceAction extends SecureResource {
      * Returns the list of accessible children (according to {@link #isAccessible()}).
      */
     List<String> getAccessibleChildren();
+
+    Object loadConfiguration() throws Exception;
+    void saveConfiguration() throws Exception;
+    void configured();
 }

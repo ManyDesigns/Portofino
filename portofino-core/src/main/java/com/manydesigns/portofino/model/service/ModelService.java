@@ -19,13 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -177,33 +175,7 @@ public class ModelService {
 
     @Nullable
     public Object toJavaObject(EObject eObject) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IntrospectionException, NoSuchFieldException {
-        if (eObject == null) {
-            return null;
-        }
-        EClass eClass = eObject.eClass();
-        if (eClass == null) {
-            return null;
-        }
-        String javaClassName = eClass.getName();
-        EPackage pkg = eClass.getEPackage();
-        while (pkg != null && pkg != getClassesDomain()) {
-            javaClassName = pkg.getName() + "." + javaClassName;
-            pkg = pkg.getESuperPackage();
-        }
-        Class<?> javaClass = codeBase.loadClass(javaClassName);
-        Object object = javaClass.getConstructor().newInstance();
-        PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
-        for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
-            Optional<PropertyDescriptor> pd =
-                    Arrays.stream(props).filter(p -> p.getName().equals(feature.getName())).findFirst();
-            PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
-            Object value = eObject.eGet(feature);
-            if (value instanceof EObject) {
-                value = toJavaObject((EObject) value);
-            }
-            propertyDescriptor.getWriteMethod().invoke(object, value);
-        }
-        return object;
+        return Domain.toJavaObject(eObject, getClassesDomain(), codeBase);
     }
 
     public EClassifier ensureType(Class<?> type) {
