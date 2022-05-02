@@ -22,6 +22,7 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
@@ -94,6 +95,8 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
         servletContext.setAttribute(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, applicationRoot);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, configurationFile);
+        servletContext.setAttribute(PortofinoSpringConfiguration.CONFIGURATION_SOURCE,
+                new ConfigurationSource(configuration, configurationFile));
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {

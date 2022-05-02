@@ -23,6 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
@@ -70,12 +71,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public ServletContext servletContext;
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
-    public FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
+    public ConfigurationSource configuration;
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
@@ -124,7 +120,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @Bean
     public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
-        return new DatabasePlatformsRegistry(configuration);
+        return new DatabasePlatformsRegistry(configuration.getProperties());
     }
 
     @Bean
@@ -143,8 +139,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public Persistence getPersistence(
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry) throws FileSystemException {
-        Persistence persistence = new Persistence(
-                applicationDirectory, configuration, configurationFile, databasePlatformsRegistry);
+        Persistence persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         if(applicationContext != null) { //We may want it to be null when testing
             applicationContext.getAutowireCapableBeanFactory().autowireBean(persistence);

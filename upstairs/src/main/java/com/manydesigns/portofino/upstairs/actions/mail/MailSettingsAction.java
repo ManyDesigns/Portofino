@@ -26,6 +26,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.mail.setup.MailProperties;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -54,39 +55,26 @@ import javax.ws.rs.core.Response;
 @RequiresAdministrator
 public class MailSettingsAction extends AbstractResourceAction {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
-    public FileBasedConfigurationBuilder configurationFile;
-
-    //--------------------------------------------------------------------------
-    // Logging
-    //--------------------------------------------------------------------------
+    public ConfigurationSource configuration;
 
     private final static Logger logger =
             LoggerFactory.getLogger(MailSettingsAction.class);
 
-    //--------------------------------------------------------------------------
-    // Action events
-    //--------------------------------------------------------------------------
-
     protected Form setupFormAndBean() {
         Form form = new FormBuilder(MailSettings.class).build();
         MailSettings settings = new MailSettings();
-        settings.mailEnabled = configuration.getBoolean(MailProperties.MAIL_ENABLED, false);
-        settings.keepSent = configuration.getBoolean(MailProperties.MAIL_KEEP_SENT, false);
-        settings.smtpHost = configuration.getString(MailProperties.MAIL_SMTP_HOST);
-        settings.smtpPort = configuration.getInteger(MailProperties.MAIL_SMTP_PORT, null);
-        settings.smtpSSL = configuration.getBoolean(MailProperties.MAIL_SMTP_SSL_ENABLED, false);
-        settings.smtpTLS = configuration.getBoolean(MailProperties.MAIL_SMTP_TLS_ENABLED, false);
-        settings.smtpLogin = configuration.getString(MailProperties.MAIL_SMTP_LOGIN);
-        settings.smtpPassword = configuration.getString(MailProperties.MAIL_SMTP_PASSWORD);
-        settings.queueLocation = configuration.getProperty(MailProperties.MAIL_QUEUE_LOCATION) + "";
+        settings.mailEnabled = configuration.getProperties().getBoolean(MailProperties.MAIL_ENABLED, false);
+        settings.keepSent = configuration.getProperties().getBoolean(MailProperties.MAIL_KEEP_SENT, false);
+        settings.smtpHost = configuration.getProperties().getString(MailProperties.MAIL_SMTP_HOST);
+        settings.smtpPort = configuration.getProperties().getInteger(MailProperties.MAIL_SMTP_PORT, null);
+        settings.smtpSSL = configuration.getProperties().getBoolean(MailProperties.MAIL_SMTP_SSL_ENABLED, false);
+        settings.smtpTLS = configuration.getProperties().getBoolean(MailProperties.MAIL_SMTP_TLS_ENABLED, false);
+        settings.smtpLogin = configuration.getProperties().getString(MailProperties.MAIL_SMTP_LOGIN);
+        settings.smtpPassword = configuration.getProperties().getString(MailProperties.MAIL_SMTP_PASSWORD);
+        settings.queueLocation = configuration.getProperties().getProperty(MailProperties.MAIL_QUEUE_LOCATION) + "";
 
         form.readFromObject(settings);
         return form;
@@ -118,17 +106,16 @@ public class MailSettingsAction extends AbstractResourceAction {
             try {
                 MailSettings settings = new MailSettings();
                 form.writeToObject(settings);
-                configuration.setProperty(MailProperties.MAIL_ENABLED, settings.mailEnabled);
-                configuration.setProperty(MailProperties.MAIL_KEEP_SENT, settings.keepSent);
-                configuration.setProperty(MailProperties.MAIL_QUEUE_LOCATION, settings.queueLocation);
-                configuration.setProperty(MailProperties.MAIL_SMTP_HOST, settings.smtpHost);
-                configuration.setProperty(MailProperties.MAIL_SMTP_PORT, settings.smtpPort);
-                configuration.setProperty(MailProperties.MAIL_SMTP_SSL_ENABLED, settings.smtpSSL);
-                configuration.setProperty(MailProperties.MAIL_SMTP_TLS_ENABLED, settings.smtpTLS);
-                configuration.setProperty(MailProperties.MAIL_SMTP_LOGIN, settings.smtpLogin);
-                configuration.setProperty(MailProperties.MAIL_SMTP_PASSWORD, settings.smtpPassword);
-                configurationFile.save();
-                logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+                configuration.getProperties().setProperty(MailProperties.MAIL_ENABLED, settings.mailEnabled);
+                configuration.getProperties().setProperty(MailProperties.MAIL_KEEP_SENT, settings.keepSent);
+                configuration.getProperties().setProperty(MailProperties.MAIL_QUEUE_LOCATION, settings.queueLocation);
+                configuration.getProperties().setProperty(MailProperties.MAIL_SMTP_HOST, settings.smtpHost);
+                configuration.getProperties().setProperty(MailProperties.MAIL_SMTP_PORT, settings.smtpPort);
+                configuration.getProperties().setProperty(MailProperties.MAIL_SMTP_SSL_ENABLED, settings.smtpSSL);
+                configuration.getProperties().setProperty(MailProperties.MAIL_SMTP_TLS_ENABLED, settings.smtpTLS);
+                configuration.getProperties().setProperty(MailProperties.MAIL_SMTP_LOGIN, settings.smtpLogin);
+                configuration.getProperties().setProperty(MailProperties.MAIL_SMTP_PASSWORD, settings.smtpPassword);
+                configuration.save();
                 return form;
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);

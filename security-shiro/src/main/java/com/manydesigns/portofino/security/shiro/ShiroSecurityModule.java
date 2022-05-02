@@ -20,10 +20,9 @@
 
 package com.manydesigns.portofino.security.shiro;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.ResourceActionsModule;
-import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
@@ -32,10 +31,7 @@ import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.shiro.ShiroSecurity;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
-import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.jsonwebtoken.io.Encoders;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -57,8 +53,6 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.util.UUID;
 
-import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION;
-
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -77,12 +71,7 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
     public ServletContext servletContext;
 
     @Autowired
-    @Qualifier(PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
-    public FileBasedConfigurationBuilder<?> configurationFile;
+    public ConfigurationSource configuration;
 
     @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
@@ -115,13 +104,12 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
 
     @PostConstruct
     public void init() throws Exception {
-        if(!configuration.containsKey("jwt.secret")) {
+        if(!configuration.getProperties().containsKey("jwt.secret")) {
             String jwtSecret = Encoders.BASE64.encode((UUID.randomUUID() + UUID.randomUUID().toString()).getBytes());
             logger.warn("No jwt.secret property was set, so we generated one: {}.", jwtSecret);
-            configuration.setProperty("jwt.secret", jwtSecret);
+            configuration.getProperties().setProperty("jwt.secret", jwtSecret);
             try {
-                configurationFile.save();
-                logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+                configuration.save();
             } catch (ConfigurationException e) {
                 logger.warn("Configuration could not be saved", e);
             }
@@ -144,7 +132,7 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         logger.debug("Creating SecurityClassRealm");
         realm = new SecurityClassRealm(codeBase, "Security");
         rsm.setRealm(realm);
-        SecurityLogic.installLogin(actionsDirectory, configuration, DefaultLoginAction.class);
+        SecurityLogic.installLogin(actionsDirectory, configuration.getProperties(), DefaultLoginAction.class);
         status = ModuleStatus.STARTED;
     }
 

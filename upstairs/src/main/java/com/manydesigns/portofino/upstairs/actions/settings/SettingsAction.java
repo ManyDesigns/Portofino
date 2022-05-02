@@ -26,6 +26,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
@@ -55,34 +56,21 @@ import javax.ws.rs.core.Response;
 @RequiresAdministrator
 public class SettingsAction extends AbstractResourceAction {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
-    public FileBasedConfigurationBuilder configurationFile;
-
-    //--------------------------------------------------------------------------
-    // Logging
-    //--------------------------------------------------------------------------
+    public ConfigurationSource configuration;
 
     private final static Logger logger =
             LoggerFactory.getLogger(SettingsAction.class);
 
-    //--------------------------------------------------------------------------
-    // Action events
-    //--------------------------------------------------------------------------
-
     protected Form setupFormAndBean() {
         Settings settings = new Settings();
-        settings.appName = configuration.getString(PortofinoProperties.APP_NAME);
-        settings.appVersion = configuration.getString(PortofinoProperties.APP_VERSION);
-        settings.loginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
-        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false);
-        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.PRELOAD_CLASSES, false);
+        settings.appName = configuration.getProperties().getString(PortofinoProperties.APP_NAME);
+        settings.appVersion = configuration.getProperties().getString(PortofinoProperties.APP_VERSION);
+        settings.loginPath = configuration.getProperties().getString(PortofinoProperties.LOGIN_PATH);
+        settings.preloadGroovyPages = configuration.getProperties().getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false);
+        settings.preloadGroovyClasses = configuration.getProperties().getBoolean(PortofinoProperties.PRELOAD_CLASSES, false);
         Form form = new FormBuilder(Settings.class).build();
         form.readFromObject(settings);
         return form;
@@ -123,19 +111,18 @@ public class SettingsAction extends AbstractResourceAction {
                     }
                     action = (ResourceAction) subResource;
                 }
-                configuration.setProperty(PortofinoProperties.APP_NAME, settings.appName);
-                configuration.setProperty(PortofinoProperties.APP_VERSION, settings.appVersion);
-                configuration.setProperty(PortofinoProperties.LOGIN_PATH, settings.loginPath);
+                configuration.getProperties().setProperty(PortofinoProperties.APP_NAME, settings.appName);
+                configuration.getProperties().setProperty(PortofinoProperties.APP_VERSION, settings.appVersion);
+                configuration.getProperties().setProperty(PortofinoProperties.LOGIN_PATH, settings.loginPath);
                 if(!settings.preloadGroovyPages ||
-                   configuration.getProperty(PortofinoProperties.PRELOAD_ACTIONS) != null) {
-                    configuration.setProperty(PortofinoProperties.PRELOAD_ACTIONS, settings.preloadGroovyPages);
+                   configuration.getProperties().getProperty(PortofinoProperties.PRELOAD_ACTIONS) != null) {
+                    configuration.getProperties().setProperty(PortofinoProperties.PRELOAD_ACTIONS, settings.preloadGroovyPages);
                 }
                 if(!settings.preloadGroovyClasses ||
-                   configuration.getProperty(PortofinoProperties.PRELOAD_CLASSES) != null) {
-                    configuration.setProperty(PortofinoProperties.PRELOAD_CLASSES, settings.preloadGroovyClasses);
+                   configuration.getProperties().getProperty(PortofinoProperties.PRELOAD_CLASSES) != null) {
+                    configuration.getProperties().setProperty(PortofinoProperties.PRELOAD_CLASSES, settings.preloadGroovyClasses);
                 }
-                configurationFile.save();
-                logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+                configuration.save();
                 return form;
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
