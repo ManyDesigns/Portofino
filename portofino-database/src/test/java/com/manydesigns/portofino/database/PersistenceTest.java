@@ -7,6 +7,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Property;
@@ -77,7 +78,7 @@ public class PersistenceTest {
             }
         };
         databaseModule.applicationDirectory = appDir;
-        databaseModule.configuration = configuration;
+        databaseModule.configuration = new ConfigurationSource(configuration, null);
         persistence = databaseModule.getPersistence(databasePlatformsRegistry, new CacheResetListenerRegistry());
         databaseModule.init();
         persistence.start();
