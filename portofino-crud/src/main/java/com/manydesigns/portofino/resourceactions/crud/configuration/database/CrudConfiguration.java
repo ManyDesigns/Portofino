@@ -105,7 +105,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
             actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
         }
         for (CrudProperty property : properties) {
-            property.init(persistence.getModel(), persistence.getConfiguration());
+            property.init(persistence.getModel(), persistence.getConfiguration().getProperties());
         }
         if(actualTable != null) {
             for (SelectionProviderReference ref : selectionProviders) {
