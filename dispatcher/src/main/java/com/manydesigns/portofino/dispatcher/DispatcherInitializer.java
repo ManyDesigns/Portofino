@@ -27,6 +27,7 @@ import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
 import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -43,7 +44,7 @@ import java.lang.reflect.Constructor;
 
 public abstract class DispatcherInitializer {
     protected FileObject applicationRoot;
-    protected Configuration configuration;
+    protected CompositeConfiguration configuration;
     protected CodeBase codeBase;
 
     private static final Logger logger = LoggerFactory.getLogger(DispatcherInitializer.class);
@@ -52,7 +53,7 @@ public abstract class DispatcherInitializer {
         return applicationRoot;
     }
 
-    public Configuration getConfiguration() {
+    public CompositeConfiguration getConfiguration() {
         return configuration;
     }
 
@@ -98,7 +99,7 @@ public abstract class DispatcherInitializer {
     protected void loadConfiguration()
             throws FileSystemException, ConfigurationException {
         FileObject configurationFile = applicationRoot.getChild("portofino.properties");
-        CombinedConfiguration compositeConfiguration = new CombinedConfiguration();
+        CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
         if(configurationFile != null) {
             Configurations configurations = new Configurations();
             PropertiesConfiguration configuration = configurations.properties(configurationFile.getURL());
@@ -110,11 +111,11 @@ public abstract class DispatcherInitializer {
                 compositeConfiguration.addConfiguration(localConfiguration);
             }
             compositeConfiguration.addConfiguration(configuration);
-            this.configuration = compositeConfiguration;
         } else {
-            this.configuration = new PropertiesConfiguration();
-            logger.warn("portofino.properties file not found in " + applicationRoot);
+            this.configuration.addConfiguration(new PropertiesConfiguration());
+            logger.debug("portofino.properties file not found in " + applicationRoot);
         }
+        this.configuration = compositeConfiguration;
     }
 
     protected CodeBase initApplicationRoot(String actionsDirectoryName) {

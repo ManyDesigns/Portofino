@@ -42,13 +42,16 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         initializer.initWithServletContext(servletContext);
 
         ApplicationContext grandParent = PortofinoContextLoaderListener.setupGrandParentContext(initializer);
+        initializer.getConfiguration().addConfiguration(
+                new SpringEnvironmentConfiguration(grandParent.getEnvironment()));
 
         AnnotationConfigWebApplicationContext parent = new AnnotationConfigWebApplicationContext();
         parent.setParent(grandParent);
         parent.setServletContext(servletContext);
 
         //Modules
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
+        ClassPathScanningCandidateComponentProvider scanner =
+                new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
         scanner.addIncludeFilter(new AssignableTypeFilter(Module.class));
         Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("");
         candidateComponents.forEach(c -> {
