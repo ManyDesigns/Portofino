@@ -22,9 +22,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Properties;
 
-@SpringBootApplication(exclude = {
-		DispatcherServletAutoConfiguration.class, ErrorMvcAutoConfiguration.class,
-		GroovyTemplateAutoConfiguration.class })
+@SpringBootApplication(exclude = { ErrorMvcAutoConfiguration.class, GroovyTemplateAutoConfiguration.class })
 public class PortofinoBootApplication {
 	private static final Logger logger = LoggerFactory.getLogger(PortofinoBootApplication.class);
 

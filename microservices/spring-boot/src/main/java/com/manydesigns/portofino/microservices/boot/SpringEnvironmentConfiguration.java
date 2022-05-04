@@ -24,7 +24,9 @@ public class SpringEnvironmentConfiguration extends AbstractConfiguration {
 
     @Override
     protected void clearPropertyDirect(String key) {
-        throw new UnsupportedOperationException("This configuration is read-only.");
+        if (environment.containsProperty(key)) {
+            throw new UnsupportedOperationException("This configuration is read-only.");
+        }
     }
 
     @Override
