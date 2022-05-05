@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.microservices.boot;
+package com.manydesigns.portofino.spring;
 
 import org.apache.commons.configuration2.AbstractConfiguration;
 import org.springframework.core.env.Environment;

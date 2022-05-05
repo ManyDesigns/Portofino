@@ -24,6 +24,7 @@ public class PortofinoDispatcherAutoConfiguration {
         bean.setFilter(new ElementsFilter());
         bean.addUrlPatterns("/*");
         bean.setDispatcherTypes(DispatcherType.REQUEST);
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
     }
 

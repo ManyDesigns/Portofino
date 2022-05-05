@@ -226,6 +226,8 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
                 new ConfigurationSource(initializer.getConfiguration(), initializer.getConfigurationFile());
         grandParent.getBeanFactory().registerSingleton(
                 PortofinoSpringConfiguration.CONFIGURATION_SOURCE, configSource);
+        initializer.getConfiguration().addConfiguration(
+                new SpringEnvironmentConfiguration(grandParent.getEnvironment()));
         return grandParent;
     }
 

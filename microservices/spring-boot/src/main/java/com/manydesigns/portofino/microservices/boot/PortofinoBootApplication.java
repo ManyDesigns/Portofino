@@ -64,7 +64,8 @@ public class PortofinoBootApplication {
 			}
 		});
 		Properties defaultProperties = new Properties();
-		defaultProperties.put("spring.jersey.application-path", "/api/");
+		defaultProperties.put("spring.jersey.type", "filter");
+		defaultProperties.put("spring.jersey.application-path", "/");
 		defaultProperties.put("spring.resteasy.application-path", "/api/");
 		application.setDefaultProperties(defaultProperties);
 		return application.run(args);

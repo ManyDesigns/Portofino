@@ -42,8 +42,6 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         initializer.initWithServletContext(servletContext);
 
         ApplicationContext grandParent = PortofinoContextLoaderListener.setupGrandParentContext(initializer);
-        initializer.getConfiguration().addConfiguration(
-                new SpringEnvironmentConfiguration(grandParent.getEnvironment()));
 
         AnnotationConfigWebApplicationContext parent = new AnnotationConfigWebApplicationContext();
         parent.setParent(grandParent);
