@@ -22,16 +22,13 @@ package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.PortofinoPackage;
-import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.annotations.Id;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.eclipse.emf.ecore.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class EntityModelBuilderVisitor extends EntityModelBaseVisitor {
+public class EntityModelBuilderVisitor extends ModelObjectBaseVisitor {
 
     protected Domain parentDomain;
     protected EClass entity;

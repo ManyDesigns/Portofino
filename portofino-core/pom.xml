@@ -47,9 +47,9 @@
             <version>${antlr.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.emfjson</groupId>
+            <groupId>org.eclipse.emfcloud</groupId>
             <artifactId>emfjson-jackson</artifactId>
-            <version>1.3.0</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.emf</groupId>

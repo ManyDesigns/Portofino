@@ -15,7 +15,7 @@ standaloneObject: object EOF;
 object: OBJECT name=simpleIdentifier ':' objectBody;
 objectBody: className=identifier '{' properties+=propertyAssignment* '}';
 propertyAssignment: name=simpleIdentifier '=' propertyValue;
-propertyValue: literal | objectBody | propertyListValue;
+propertyValue: literal | objectBody | owner=identifier '.' field=identifier | propertyListValue;
 propertyListValue: '[' (propertyValue (',' propertyValue)*)? ']';
 
 importDeclaration: IMPORT name=identifier (AS alias=simpleIdentifier)? ';'?;

@@ -7,13 +7,14 @@ import com.manydesigns.portofino.model.language.ModelParser;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcoreFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EntityModelBaseVisitor extends ModelBaseVisitor<EModelElement> {
+public class ModelObjectBaseVisitor extends ModelBaseVisitor<EObject> {
     protected final Map<String, String> typeAliases = new HashMap<>();
     protected EModelElement annotated;
 
@@ -31,7 +32,7 @@ public class EntityModelBaseVisitor extends ModelBaseVisitor<EModelElement> {
 
     protected void initTypeAliases(List<ModelParser.ImportDeclarationContext> importDeclarations) {
         typeAliases.clear();
-        typeAliases.putAll(EntityModelBaseVisitor.getDefaultTypeAliases());
+        typeAliases.putAll(ModelObjectBaseVisitor.getDefaultTypeAliases());
         importDeclarations.forEach(i -> {
             String alias;
             String typeName = i.name.getText();

@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class EntityModelLinkerVisitor extends EntityModelBaseVisitor {
+public class EntityModelLinkerVisitor extends ModelObjectBaseVisitor {
 
     protected final Model model;
     protected EPackage parentDomain;

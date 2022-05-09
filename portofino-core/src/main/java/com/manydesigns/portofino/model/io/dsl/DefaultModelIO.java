@@ -316,7 +316,11 @@ public class DefaultModelIO implements ModelIO {
         FileObject objectFile = domainDir.resolveFile(name + ".object");
         try(OutputStreamWriter os = fileWriter(objectFile)) {
             Map<String, String> imports = new HashMap<>();
-            EClassifier type = object.eClass();
+            EClass type = object.eClass();
+            type.getEStructuralFeatures().forEach(feature -> {
+                EClassifier fType = feature.getEType();
+                addImport(fType, domain, imports);
+            });
             addImport(type, domain, imports);
             writeImports(imports, os);
             os.write("object " + name + " : ");
@@ -475,7 +479,7 @@ public class DefaultModelIO implements ModelIO {
         EClassifier type = property.getEType();
         if(type != null) {
             String name = type.getName();
-            String alias = EntityModelBaseVisitor.getDefaultTypeAliases().inverse().get(name);
+            String alias = ModelObjectBaseVisitor.getDefaultTypeAliases().inverse().get(name);
             writer.write(": " + (alias != null ? alias : name));
         }
         writer.write(System.lineSeparator());
