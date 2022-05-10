@@ -45,10 +45,11 @@ public class Group {
     // Fields
     //**************************************************************************
 
+    @JsonProperty("permissions")
     protected final Set<String> permissions;
     protected String accessLevel;
     protected String name;
-
+    @JsonProperty
     protected AccessLevel actualAccessLevel;
 
     //**************************************************************************
@@ -71,7 +72,6 @@ public class Group {
     //**************************************************************************
 
     @XmlElement(name = "permission", type = String.class)
-    @JsonProperty("permissions")
     public Set<String> getPermissions() {
         return permissions;
     }
@@ -94,7 +94,6 @@ public class Group {
         this.accessLevel = accessLevel;
     }
 
-    @JsonProperty
     public AccessLevel getActualAccessLevel() {
         return actualAccessLevel;
     }

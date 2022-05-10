@@ -1,0 +1,13 @@
+domain testDomain1 {
+    entity Person {
+        id { name: string }
+        @Email
+        email: string
+        age: int!
+        registrationDate: EDate
+        mother: string
+        father: string
+        mother_rel --> Person(name=mother)
+        father_rel --> Person(name=father)
+    }
+}

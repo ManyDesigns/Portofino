@@ -1,0 +1,12 @@
+import com.manydesigns.portofino.database.model.annotations.Column;
+import com.manydesigns.portofino.database.model.annotations.Table;
+
+@Table(shortName = "%{resolution}", name = "ticket_resolutions")
+entity ticket_resolutions {
+	id {
+		@Column(columnType = "INT", autoincrement = true, nullable = false, jdbcType = 4, length = 10, scale = 0)
+		id
+	}
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	resolution
+}

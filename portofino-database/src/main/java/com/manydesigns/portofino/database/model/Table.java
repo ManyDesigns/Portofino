@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
@@ -55,6 +57,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     // Fields
     //**************************************************************************
 
+    @JsonProperty("columns")
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<ModelSelectionProvider> selectionProviders;
@@ -160,6 +163,8 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         }
 
         setEntityName(calculatedEntityName);
+        // Re-set the table name so that if it's equal to the property name it's not saved in the annotation
+        setTableName(getTableName());
     }
 
     public void link(Object context, Configuration configuration) {}
@@ -217,11 +222,16 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     @Required
     @XmlAttribute(required = true)
     public String getTableName() {
-        return tableInfo.getPropertyValue("name");
+        String name = tableInfo.getPropertyValue("name");
+        return StringUtils.defaultIfEmpty(name, getActualEntityName());
     }
 
     public void setTableName(String tableName) {
-        tableInfo.setPropertyValue("name", tableName);
+        if (tableName.equals(getActualEntityName())) {
+            tableInfo.removePropertyValue("name");
+        } else {
+            tableInfo.setPropertyValue("name", tableName);
+        }
     }
 
     @XmlAttribute(required = false)
@@ -244,9 +254,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     @XmlElementWrapper(name="columns")
-    @XmlElement(name = "column",
-            type = Column.class)
-    @JsonProperty("columns")
+    @XmlElement(name = "column", type = Column.class)
     public List<Column> getColumns() {
         return columns;
     }

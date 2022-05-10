@@ -39,12 +39,16 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Sel
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -120,8 +124,10 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @Override
-    protected boolean saveConfiguration(Object configuration) {
-        CrudConfiguration crudConfiguration = (CrudConfiguration) configuration;
+    public void saveConfiguration()
+            throws ConfigurationException, IntrospectionException, IOException, InvocationTargetException,
+            IllegalAccessException {
+        CrudConfiguration crudConfiguration = (CrudConfiguration) getConfiguration();
         List<SelectionProviderReference> sps = new ArrayList<>(crudConfiguration.getSelectionProviders());
         crudConfiguration.getSelectionProviders().clear();
         crudConfiguration.persistence = persistence;
@@ -153,7 +159,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
             return p2;
         }).collect(Collectors.toList());
         crudConfiguration.setProperties(newProperties);
-        return super.saveConfiguration(crudConfiguration);
+        super.saveConfiguration();
     }
 
     @Override

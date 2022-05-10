@@ -1,0 +1,64 @@
+import com.manydesigns.elements.annotations.DateFormat;
+import com.manydesigns.elements.annotations.FieldSet;
+import com.manydesigns.elements.annotations.MaxLength;
+import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.portofino.database.model.annotations.Column;
+import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
+import com.manydesigns.portofino.database.model.annotations.Table;
+
+@Table(shortName = "%{project}-%{n}", name = "tickets")
+@SelectionProvider(database = "tt", properties = "type", query = "from ticket_types order by id", language = "HQL", name = "ticket_types")
+@SelectionProvider(database = "tt", properties = "priority", query = "from ticket_priorities order by id", language = "HQL", name = "ticket_priorities")
+@SelectionProvider(database = "tt", properties = "state", query = "from ticket_states order by id", language = "HQL", name = "ticket_states")
+@SelectionProvider(database = "tt", properties = "assignee", query = "select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null\r\nfrom users u\r\nleft join members m on m.user_ = u.id\r\nwhere m.project = %{#project.id}\r\norder by u.first_name, u.last_name", language = "SQL", name = "ticket_assignee")
+@SelectionProvider(database = "tt", properties = "fix_version", query = "from versions\r\nwhere project = %{#project.id}\r\norder by state, release_date desc, planned_date desc, id desc", language = "HQL", name = "ticket_fix_version")
+@SelectionProvider(database = "tt", properties = "affected_version", query = "from versions\r\nwhere project = %{#project.id}\r\norder by state, release_date desc, planned_date desc, id desc", language = "HQL", name = "ticket_affected_version")
+@SelectionProvider(database = "tt", properties = "created_by", query = "select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null\r\nfrom users u\r\nleft join members m on m.user_ = u.id\r\nwhere m.project = %{#project.id}\r\norder by u.first_name, u.last_name", language = "SQL", name = "ticket_created_by")
+entity tickets {
+	id {
+		@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 10, scale = 0)
+		@MaxLength(10)
+		project
+		@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+		n
+	}
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	@MaxLength(255)
+	title
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 4000, scale = 0)
+	@MaxLength(4000)
+	@Multiline(true)
+	description
+	@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+	type
+	@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+	priority
+	@Column(columnType = "INT", autoincrement = false, nullable = true, jdbcType = 4, length = 10, scale = 0)
+	affected_version
+	@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+	@FieldSet("Workflow")
+	created_by
+	@Column(columnType = "INT", autoincrement = false, nullable = false, jdbcType = 4, length = 10, scale = 0)
+	state
+	@Column(columnType = "INT", autoincrement = false, nullable = true, jdbcType = 4, length = 10, scale = 0)
+	assignee
+	@Column(columnType = "INT", autoincrement = false, nullable = true, jdbcType = 4, length = 10, scale = 0)
+	fix_version
+	@Column(columnType = "INT", autoincrement = false, nullable = true, jdbcType = 4, length = 10, scale = 0)
+	resolution
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = false, jdbcType = 93, length = 19, scale = 0)
+	@DateFormat("dd/MM/yyyy")
+	created
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = false, jdbcType = 93, length = 19, scale = 0)
+	@DateFormat("dd/MM/yyyy HH:mm")
+	last_updated
+	fk_ticket_fix_version --> versions(id=fix_version)
+	fk_ticket_assignee --> users(id=assignee)
+	fk_ticket_resolution --> ticket_resolutions(id=resolution)
+	fk_ticket_state --> ticket_states(id=state)
+	fk_ticket_project --> projects(id=project)
+	fk_ticket_type --> ticket_types(id=type)
+	fk_ticket_priority --> ticket_priorities(id=priority)
+	fk_ticket_affected_version --> versions(id=affected_version)
+	fk_ticket_created_by --> users(id=created_by)
+}

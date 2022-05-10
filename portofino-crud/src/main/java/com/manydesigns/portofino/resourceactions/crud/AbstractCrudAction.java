@@ -604,9 +604,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     // Setup
     //--------------------------------------------------------------------------
 
+
     @Override
-    public void setActionInstance(ActionInstance actionInstance) {
-        super.setActionInstance(actionInstance);
+    public void configured() {
         this.crudConfiguration = (CrudConfiguration) actionInstance.getConfiguration();
 
         if (crudConfiguration == null) {

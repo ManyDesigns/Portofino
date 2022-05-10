@@ -60,6 +60,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -98,7 +99,8 @@ public class Persistence {
     protected final LinkedList<Database> databases = new LinkedList<>();
 
     protected final Configuration configuration;
-    protected ModelService modelService;
+    protected final ModelService modelService;
+    protected final Domain databasesDomain;
     @Autowired
     protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
@@ -113,11 +115,13 @@ public class Persistence {
     public static final Logger logger = LoggerFactory.getLogger(Persistence.class);
 
     public Persistence(
-            ModelService modelService, Configuration configuration, DatabasePlatformsRegistry databasePlatformsRegistry)
+            ModelService modelService, Domain databasesDomain, Configuration configuration,
+            DatabasePlatformsRegistry databasePlatformsRegistry)
             throws FileSystemException {
         this.modelService = modelService;
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
+        this.databasesDomain = databasesDomain;
         setups = new HashMap<>();
     }
 
@@ -126,25 +130,33 @@ public class Persistence {
     //**************************************************************************
 
     protected boolean tryLoadingLegacyModel() {
-        try {
-            XMLModel modelIO = new XMLModel(modelService.getModelDirectory(), this);
-            Model model = modelService.loadModel(modelIO);
-            if(model != null) {
-                modelIO.getDatabases().forEach(
-                        newDb -> {
-                            String databaseName = newDb.getDatabaseName();
-                            databases.removeIf(oldDb -> oldDb.getDatabaseName().equals(databaseName));
-                            getModel().getDomains().removeIf(d -> d.getName().equals(databaseName));
-                            databases.add(newDb);
-                            getModel().getDomains().add(newDb.getModelElement());
-                        });
-                logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
-                return true;
+        synchronized (modelService) {
+            try {
+                XMLModel modelIO = new XMLModel(modelService.getModelDirectory(), this);
+                Model model = modelService.loadModel(modelIO);
+                if(model != null) {
+                    modelIO.getDatabases().forEach(
+                            newDb -> {
+                                String databaseName = newDb.getDatabaseName();
+                                databases.removeIf(oldDb -> oldDb.getDatabaseName().equals(databaseName));
+                                getDatabaseDomains().removeIf(d -> d.getName().equals(databaseName));
+                                databases.add(newDb);
+                                getDatabaseDomains().add(newDb.getModelElement());
+                            });
+                    model.getDomains().clear();
+                    model.getDomains().add(databasesDomain);
+                    logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
+                    return true;
+                }
+            } catch (Exception e) {
+                logger.error("Cannot load/parse XML model", e);
             }
-        } catch (Exception e) {
-            logger.error("Cannot load/parse XML model", e);
         }
         return false;
+    }
+
+    private EList<Domain> getDatabaseDomains() {
+        return databasesDomain.getSubdomains();
     }
 
     private void annotateDatabase(Database db) {
@@ -343,12 +355,12 @@ public class Persistence {
     public synchronized void removeDatabase(Database database) {
         databases.remove(database);
         EPackage pkg = database.getModelElement();
-        getModel().getDomains().remove(pkg);
+        getDatabaseDomains().remove(pkg);
     }
 
     public void addDatabase(Database database) {
         databases.add(database);
-        getModel().getDomains().add(database.getModelElement());
+        getDatabaseDomains().add(database.getModelElement());
     }
 
     protected boolean initDatabase(Database database) {
@@ -452,10 +464,6 @@ public class Persistence {
     //**************************************************************************
     // Model access
     //**************************************************************************
-
-    public Model getModel() {
-        return modelService.getModel();
-    }
 
     public synchronized void syncDataModel(String databaseName) throws Exception {
         Database sourceDatabase = DatabaseLogic.findDatabaseByName(databases, databaseName);
@@ -564,7 +572,7 @@ public class Persistence {
 
     public void loadModel() {
         if (!tryLoadingLegacyModel()) {
-            getModel().getDomains().forEach(this::setupDatabase);
+            getDatabaseDomains().forEach(this::setupDatabase);
         }
         initModel();
     }

@@ -1,0 +1,23 @@
+import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.portofino.database.model.annotations.Column;
+import com.manydesigns.portofino.database.model.annotations.Table;
+
+@Table(shortName = "%{title}", name = "components")
+entity components {
+	id {
+		@Column(columnType = "INT", autoincrement = true, nullable = false, jdbcType = 4, length = 10, scale = 0)
+		id
+	}
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 255, scale = 0)
+	title
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = true, jdbcType = 12, length = 4000, scale = 0)
+	@Multiline(true)
+	description
+	@Column(columnType = "VARCHAR", autoincrement = false, nullable = false, jdbcType = 12, length = 10, scale = 0)
+	project
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = false, jdbcType = 93, length = 19, scale = 0)
+	created
+	@Column(columnType = "TIMESTAMP", autoincrement = false, nullable = false, jdbcType = 93, length = 19, scale = 0)
+	last_updated
+	fk_component_project --> projects(id=project)
+}

@@ -20,8 +20,11 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.resourceactions.crud.CrudAction;
+import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.resourceactions.m2m.ManyToManyAction;
+import com.manydesigns.portofino.resourceactions.m2m.configuration.ManyToManyConfiguration;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
@@ -30,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.beans.IntrospectionException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,6 +55,9 @@ public class CrudModule implements Module {
     @Autowired
     public ActionRegistry actionRegistry;
 
+    @Autowired
+    public ModelService modelService;
+
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
@@ -71,7 +78,11 @@ public class CrudModule implements Module {
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws IntrospectionException {
+        modelService.addBuiltInClass(CrudConfiguration.class);
+        modelService.addBuiltInClass(
+                com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration.class);
+        modelService.addBuiltInClass(ManyToManyConfiguration.class);
         actionRegistry.register(CrudAction.class);
         actionRegistry.register(ManyToManyAction.class);
         status = ModuleStatus.STARTED;

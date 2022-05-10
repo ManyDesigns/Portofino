@@ -98,7 +98,7 @@
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
         <jersey.version>2.32</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
-        <jjwt.version>0.10.7</jjwt.version>
+        <jjwt.version>0.11.2</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.7</jsqlparser.version>
@@ -119,7 +119,7 @@
         <servlet.api.version>4.0.1</servlet.api.version>
         <shiro.version>1.8.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
-        <spring.version>5.3.18</spring.version>
+        <spring.version>5.3.13</spring.version> <!-- Same as Spring Boot 2.6.0 -->
         <aws.version>1.11.967</aws.version>
 
         <nodejs.version>v16.13.0</nodejs.version>
@@ -149,7 +149,6 @@
         <module>security-shiro</module>
         <module>portofino-jersey</module>
         <module>portofino-resteasy</module>
-        <module>portofino-model</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
         <module>databases/db2</module>
@@ -247,6 +246,21 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-jaxb-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-parameter-names</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jdk8</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
