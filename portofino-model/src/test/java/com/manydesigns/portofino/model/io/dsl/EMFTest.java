@@ -71,7 +71,8 @@ public class EMFTest {
         Resource resource2 = resourceSet.createResource(URI.createFileURI("test-model-1.xmi"));
         resource2.load(new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8)), new HashMap<>());
         assertEquals(resource2.getContents().size(), 2);
-        assertEquals("testDomain1", ((EPackage) resource2.getContents().get(1)).getName());
+        assertNotNull(resource2.getContents().stream().filter(
+                o -> ((EPackage) o).getName().equals("testDomain1")).findFirst().orElse(null));
     }
 
 }
