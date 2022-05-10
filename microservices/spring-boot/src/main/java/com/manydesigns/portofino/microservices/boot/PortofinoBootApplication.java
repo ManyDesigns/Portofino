@@ -98,8 +98,6 @@ public class PortofinoBootApplication {
 						return appDir;
 					}
 				}
-					}
-				}
 			}
 		}
 		if(new File("portofino.properties").isFile()) {
