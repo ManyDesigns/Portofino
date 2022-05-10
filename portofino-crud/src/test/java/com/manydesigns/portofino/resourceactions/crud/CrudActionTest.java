@@ -311,7 +311,7 @@ public class CrudActionTest extends JerseyTest {
         session.flush();
         Object id = ((Map) crudAction.object).get("productid");
         int qres = session.
-                createSQLQuery("update product set descn = 'illegal' where productid = :id").
+                createNativeQuery("update product set descn = 'illegal' where productid = :id", Void.class).
                 setParameter("id", id).
                 executeUpdate();
         assertEquals(1, qres);
@@ -329,7 +329,7 @@ public class CrudActionTest extends JerseyTest {
         assertNull(blobField.getValue().getFilename());
 
         qres = session.
-                createSQLQuery("update product set descn = :blobCode where productid = :id").
+                createNativeQuery("update product set descn = :blobCode where productid = :id", Void.class).
                 setParameter("id", id).
                 setParameter("blobCode", newBlobCode).
                 executeUpdate();
