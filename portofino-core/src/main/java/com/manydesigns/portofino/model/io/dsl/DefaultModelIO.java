@@ -115,7 +115,7 @@ public class DefaultModelIO implements ModelIO {
             ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
+                EObject candidate = new EntityModelBuilderVisitor().visit(parseTree);
                 if(candidate instanceof Domain) {
                     Domain subd = (Domain) candidate;
                     if(subd.getName().equals(domain.getName())) {
@@ -156,7 +156,7 @@ public class DefaultModelIO implements ModelIO {
             ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneEntityContext parseTree = parser.standaloneEntity();
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                EModelElement candidate = new EntityModelBuilderVisitor().visit(parseTree);
+                EObject candidate = new EntityModelBuilderVisitor().visit(parseTree);
                 if(candidate instanceof EClass) {
                     domain.getEClassifiers().add((EClassifier) candidate);
                     toLinkQueue.add(new ToLink(parseTree, domain));
