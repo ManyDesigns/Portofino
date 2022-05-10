@@ -13,7 +13,7 @@
     <url>https://www.manydesigns.com/</url>
 
     <properties>
-        <antlr.version>4.9.3</antlr.version>
+        <antlr.version>4.10.1</antlr.version> <!-- Hibernate uses 4.10 -->
     </properties>
 
     <dependencies>
