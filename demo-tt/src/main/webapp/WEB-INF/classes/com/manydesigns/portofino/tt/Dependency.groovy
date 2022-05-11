@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 
-import javax.annotation.PostConstruct
+import jakarta.annotation.PostConstruct
 
 /**
  * Sample class showcasing Spring context reload support.

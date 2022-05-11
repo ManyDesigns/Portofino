@@ -63,10 +63,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
-        <!-- javax.annotation for Java 11+ -->
+        <!-- jakarta.annotation for Java 11+ -->
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
             <version>1.3.2</version>
         </dependency>
         <!-- JAX-RS annotations -->

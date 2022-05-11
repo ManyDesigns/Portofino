@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.apache.commons.lang.StringUtils;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.HashSet;
 import java.util.Set;
 

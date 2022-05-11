@@ -23,9 +23,9 @@ package com.manydesigns.portofino.model;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EModelElement;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
 
 /**
  * A property of an {@link Annotation annotation} on a model object.
