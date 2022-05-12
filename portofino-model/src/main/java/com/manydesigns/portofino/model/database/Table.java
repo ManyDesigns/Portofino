@@ -229,8 +229,7 @@ public class Table implements ModelObject, Annotated {
     }
 
     @XmlElementWrapper(name="columns")
-    @XmlElement(name = "column",
-            type = Column.class)
+    @XmlElement(name = "column", type = Column.class)
     @JsonProperty("columns")
     public List<Column> getColumns() {
         return columns;
@@ -261,8 +260,7 @@ public class Table implements ModelObject, Annotated {
     }
 
     @XmlElementWrapper(name="foreignKeys")
-    @XmlElement(name = "foreignKey",
-            type = ForeignKey.class)
+    @XmlElement(name = "foreignKey", type = ForeignKey.class)
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }
