@@ -61,10 +61,10 @@
             <artifactId>ecore-xmi</artifactId>
             <version>2.2.3</version>
         </dependency>
-        <!-- jakarta.annotation for Java 11+ -->
+        <!-- javax.annotation for Java 11+ -->
         <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
             <version>1.3.2</version>
         </dependency>
         <!-- JAX-RS annotations -->

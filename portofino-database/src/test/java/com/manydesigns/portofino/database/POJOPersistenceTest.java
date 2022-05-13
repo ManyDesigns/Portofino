@@ -23,7 +23,9 @@ public class POJOPersistenceTest extends PersistenceTest {
     @Override
     public void setup() throws Exception {
         super.setup();
-        persistence.getDatabases().forEach(d -> d.setEntityMode(EntityMode.POJO.name()));
+        persistence.getDatabases().forEach(d -> {
+            d.setEntityMode(EntityMode.POJO.name());
+        });
         persistence.initModel();
     }
 

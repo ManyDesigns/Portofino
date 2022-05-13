@@ -5,7 +5,7 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.resourceactions.ConfigurationWithDefaults;
 import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 

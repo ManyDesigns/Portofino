@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.model;
 
-import jakarta.xml.bind.Unmarshaller;
+import javax.xml.bind.Unmarshaller;
 
 public interface Unmarshallable {
 

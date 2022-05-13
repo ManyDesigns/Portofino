@@ -27,9 +27,9 @@ import com.manydesigns.portofino.model.Unmarshallable;
 import org.apache.commons.configuration2.Configuration;
 import org.eclipse.emf.ecore.EModelElement;
 
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /**
  * Configures a generator for a primary key column.

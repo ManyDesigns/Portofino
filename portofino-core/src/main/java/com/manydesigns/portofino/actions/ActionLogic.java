@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import jakarta.xml.bind.*;
+import javax.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -87,7 +87,7 @@ public class ActionLogic {
     public static FileObject saveActionDescriptor(FileObject directory, ActionDescriptor actionDescriptor) throws Exception {
         FileObject file = getActionDescriptorFile(directory);
         Marshaller marshaller = JAXB_CONTEXT.createMarshaller();
-        marshaller.setProperty(jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         if(!file.exists()) {
             file.createFile();
         }
@@ -339,7 +339,7 @@ public class ActionLogic {
         String configurationPackage = configuration.getClass().getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         FileObject configurationFile = directory.resolveFile("configuration.xml");
         if(!configurationFile.exists()) {
             configurationFile.createFile();

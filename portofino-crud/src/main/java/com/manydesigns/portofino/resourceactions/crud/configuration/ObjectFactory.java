@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.resourceactions.crud.configuration;
 
-import jakarta.xml.bind.annotation.XmlRegistry;
+import javax.xml.bind.annotation.XmlRegistry;
 
 @XmlRegistry
 public class ObjectFactory {
