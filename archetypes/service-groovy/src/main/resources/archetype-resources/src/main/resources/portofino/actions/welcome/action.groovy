@@ -6,7 +6,7 @@ import com.manydesigns.portofino.resourceactions.*
 import com.manydesigns.portofino.resourceactions.custom.*
 import com.manydesigns.portofino.security.*
 
-import javax.ws.rs.*
+import jakarta.ws.rs.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class Welcome extends CustomAction {

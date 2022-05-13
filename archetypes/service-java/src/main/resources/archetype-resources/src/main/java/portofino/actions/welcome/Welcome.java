@@ -4,7 +4,7 @@ import com.manydesigns.portofino.resourceactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 
-import javax.ws.rs.GET;
+import jakarta.ws.rs.GET;
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class Welcome extends CustomAction {

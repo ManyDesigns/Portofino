@@ -32,9 +32,9 @@ package com.manydesigns.portofino.security.noop.login;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.Map;
 

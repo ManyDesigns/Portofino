@@ -32,7 +32,7 @@ public class PortofinoResteasyAutoConfiguration {
         ServletRegistrationBean<HttpServletDispatcher> bean = new ServletRegistrationBean<>();
         bean.setServlet(new HttpServletDispatcher());
         bean.addUrlMappings(basePath + "*");
-        bean.addInitParameter("javax.ws.rs.Application", PortofinoApplication.class.getName());
+        bean.addInitParameter("jakarta.ws.rs.Application", PortofinoApplication.class.getName());
         bean.setLoadOnStartup(1);
         return bean;
     }

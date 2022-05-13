@@ -12,7 +12,7 @@ import org.apache.commons.vfs2.FileObject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;

@@ -43,7 +43,7 @@
             <param-value>/api</param-value>
         </init-param>
         <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
+            <param-name>jakarta.ws.rs.Application</param-name>
             <param-value>com.manydesigns.portofino.resteasy.PortofinoApplication</param-value>
         </init-param>
     </servlet>

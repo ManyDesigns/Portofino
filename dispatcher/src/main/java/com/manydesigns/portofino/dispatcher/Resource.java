@@ -22,8 +22,8 @@ package com.manydesigns.portofino.dispatcher;
 
 import org.apache.commons.vfs2.FileObject;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.container.ResourceContext;
 import java.util.Collection;
 
 /**

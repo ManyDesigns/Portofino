@@ -96,8 +96,8 @@
         <jackson.databind.version>2.13.2.1</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depended on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
-        <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
-        <jersey.version>2.32</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
+        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
+        <jersey.version>3.0.4</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
         <jjwt.version>0.11.2</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
@@ -224,9 +224,9 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>${javax.ws.rs.api.version}</version>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${jakarta.ws.rs-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -343,7 +343,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- JAXB for Java 11+ -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
@@ -360,9 +359,9 @@
             <version>2.1.0</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>3.0.2</version>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- Test dependencies -->

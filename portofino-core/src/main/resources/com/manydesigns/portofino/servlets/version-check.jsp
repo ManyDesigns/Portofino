@@ -1,4 +1,4 @@
-<%@ page import="javax.ws.rs.core.Response"
+<%@ page import="jakarta.ws.rs.core.Response"
 %><%@ page import="java.io.BufferedReader"
 %><%@ page import="java.io.FileReader"
 %><%@ page import="java.nio.file.Files"

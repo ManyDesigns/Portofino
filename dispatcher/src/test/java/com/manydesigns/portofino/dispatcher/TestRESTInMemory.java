@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import jakarta.annotation.PostConstruct;
-import javax.ws.rs.*;
-import javax.ws.rs.container.ResourceContext;
-import javax.ws.rs.core.Context;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.core.Context;
 import java.util.List;
 import java.util.Map;
 

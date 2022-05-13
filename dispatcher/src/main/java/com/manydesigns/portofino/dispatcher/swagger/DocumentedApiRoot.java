@@ -14,7 +14,7 @@ import io.swagger.v3.oas.models.parameters.PathParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.container.ResourceContext;
+import jakarta.ws.rs.container.ResourceContext;
 import java.util.ArrayList;
 import java.util.HashSet;
 

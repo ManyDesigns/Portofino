@@ -3,8 +3,8 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 
-import javax.ws.rs.GET
-import javax.ws.rs.core.Response
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.core.Response
 
 @RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)

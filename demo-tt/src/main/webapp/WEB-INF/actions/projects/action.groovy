@@ -12,8 +12,8 @@ import com.manydesigns.portofino.tt.TtUtils
 import org.apache.shiro.SecurityUtils
 import org.springframework.beans.factory.annotation.Autowired
 
-import javax.ws.rs.GET
-import javax.ws.rs.Path
+import jakarta.ws.rs.GET
+import jakarta.ws.rs.Path
 import java.sql.Timestamp
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])

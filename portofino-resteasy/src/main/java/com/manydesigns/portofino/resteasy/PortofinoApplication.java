@@ -6,7 +6,7 @@ import com.manydesigns.portofino.rest.messagebodywriters.FormMessageBodyWriter;
 import com.manydesigns.portofino.rest.messagebodywriters.XhtmlFragmentMessageBodyWriter;
 import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 

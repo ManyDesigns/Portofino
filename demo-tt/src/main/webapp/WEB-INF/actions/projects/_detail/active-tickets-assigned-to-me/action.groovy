@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import jakarta.persistence.criteria.CriteriaQuery
 import jakarta.persistence.criteria.CriteriaBuilder
 import jakarta.persistence.criteria.Root
-import javax.ws.rs.GET
+import jakarta.ws.rs.GET
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectsActiveTicketsAssignedToMeAction extends CustomAction {

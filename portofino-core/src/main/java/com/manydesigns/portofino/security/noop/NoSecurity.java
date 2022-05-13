@@ -38,7 +38,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestContext;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;

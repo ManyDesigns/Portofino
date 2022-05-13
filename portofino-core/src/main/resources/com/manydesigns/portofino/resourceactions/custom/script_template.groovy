@@ -17,7 +17,7 @@ import org.hibernate.criterion.*
 
 import com.manydesigns.portofino.resourceactions.custom.*
 
-import javax.ws.rs.GET
+import jakarta.ws.rs.GET
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class %{#generatedClassName} extends CustomAction {

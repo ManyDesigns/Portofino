@@ -45,8 +45,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.*;

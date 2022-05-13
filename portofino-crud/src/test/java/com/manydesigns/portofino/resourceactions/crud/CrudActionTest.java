@@ -62,7 +62,7 @@ import org.hibernate.jdbc.Work;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.*;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;

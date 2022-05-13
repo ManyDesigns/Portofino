@@ -1,8 +1,8 @@
 import com.manydesigns.portofino.dispatcher.AbstractResource;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 
 public class B extends AbstractResource {
     public String string = new Inner().string;

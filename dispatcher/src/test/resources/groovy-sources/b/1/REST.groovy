@@ -1,7 +1,7 @@
 import com.manydesigns.portofino.dispatcher.AbstractResource;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 
 public class REST extends AbstractResource {
     @GET

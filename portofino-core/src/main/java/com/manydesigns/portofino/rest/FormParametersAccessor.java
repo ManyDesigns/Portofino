@@ -2,7 +2,7 @@ package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.KeyValueAccessor;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.Objects;
 
 public class FormParametersAccessor implements KeyValueAccessor {
