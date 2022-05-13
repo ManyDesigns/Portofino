@@ -231,6 +231,7 @@ public class CrudActionTest extends JerseyTest {
         crudAction.persistence = persistence;
         crudAction.setContext(actionContext);
         crudAction.setActionInstance(actionInstance);
+        crudAction.configured();
         crudAction.init();
         crudAction.setupForm(Mode.CREATE);
 
@@ -315,7 +316,7 @@ public class CrudActionTest extends JerseyTest {
         session.flush();
         Object id = ((Map) crudAction.object).get("productid");
         int qres = session.
-                createNativeQuery("update product set descn = 'illegal' where productid = :id", Void.class).
+                createNativeQuery("update product set descn = 'illegal' where productid = :id", Object.class).
                 setParameter("id", id).
                 executeUpdate();
         assertEquals(1, qres);
@@ -333,7 +334,7 @@ public class CrudActionTest extends JerseyTest {
         assertNull(blobField.getValue().getFilename());
 
         qres = session.
-                createNativeQuery("update product set descn = :blobCode where productid = :id", Void.class).
+                createNativeQuery("update product set descn = :blobCode where productid = :id", Object.class).
                 setParameter("id", id).
                 setParameter("blobCode", newBlobCode).
                 executeUpdate();

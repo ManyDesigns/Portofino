@@ -8,8 +8,8 @@ import com.manydesigns.portofino.database.model.Database;
 import com.manydesigns.portofino.database.model.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.model.JndiConnectionProvider;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
+import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.EntityMode;
 
 import java.util.Date;
 
@@ -196,7 +196,7 @@ public class ConnectionProviderDetail {
     }
 
     public void setEntityMode(String mode) {
-        database.setEntityMode(mode != null ? mode : EntityMode.MAP.getExternalName());
+        database.setEntityMode(mode != null ? mode : EntityMode.MAP.toString());
     }
 
 }
