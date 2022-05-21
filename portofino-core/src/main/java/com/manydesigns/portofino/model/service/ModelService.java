@@ -14,6 +14,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.eclipse.emf.ecore.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,14 +119,35 @@ public class ModelService {
         return domain;
     }
 
-    public EClass addBuiltInClass(Class<?> javaClass) throws IntrospectionException {
+    public EClassifier addBuiltInClass(Class<?> javaClass) throws IntrospectionException {
         Domain pkg = ensureDomain(javaClass);
         String className = javaClass.getSimpleName();
         EClassifier existing = pkg.getEClassifier(className);
         if (existing != null) {
             // TODO check they model the same class?
-            return (EClass) existing;
+            return existing;
         }
+        if (javaClass.isEnum()) {
+            return addEnum(javaClass, pkg, className);
+        } else {
+            return addClass(javaClass, pkg, className);
+        }
+    }
+
+    protected EEnum addEnum(Class<?> javaClass, Domain pkg, String className) {
+        EEnum eEnum = EcoreFactory.eINSTANCE.createEEnum();
+        eEnum.setName(className);
+        for (Object constant : javaClass.getEnumConstants()) {
+            EEnumLiteral literal = EcoreFactory.eINSTANCE.createEEnumLiteral();
+            literal.setLiteral(((Enum<?>) constant).name());
+            eEnum.getELiterals().add(literal);
+        }
+        pkg.getEClassifiers().add(eEnum);
+        return eEnum;
+    }
+
+    @NotNull
+    protected EClass addClass(Class<?> javaClass, Domain pkg, String className) throws IntrospectionException {
         EClass eClass = EcoreFactory.eINSTANCE.createEClass();
         eClass.setName(className);
         pkg.getEClassifiers().add(eClass); // We must add it early to break recursion when properties refer to itself

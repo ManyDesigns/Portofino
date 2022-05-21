@@ -2,7 +2,6 @@ package com.manydesigns.portofino.model.io.dsl;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.language.ModelParser;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.*;
@@ -41,8 +40,7 @@ public class ModelObjectBuilderVisitor extends ModelObjectBaseVisitor {
             EStructuralFeature feature = eClass.getEStructuralFeature(featureName);
             if(feature != null) {
                 ModelParser.PropertyValueContext valueCtx = propertyAss.propertyValue();
-                EClassifier featureEType = feature.getEType();
-                Object value = translate(valueCtx, featureEType);
+                Object value = translate(feature, valueCtx);
                 if (feature.isMany()) {
                     EList list = (EList) eObject.eGet(feature);
                     list.addAll((List) value);
@@ -56,16 +54,21 @@ public class ModelObjectBuilderVisitor extends ModelObjectBaseVisitor {
         return eObject;
     }
 
-    protected Object translate(ModelParser.PropertyValueContext valueCtx, EClassifier type) {
+    protected Object translate(EStructuralFeature feature, ModelParser.PropertyValueContext valueCtx) {
+        EClassifier type = feature.getEType();
         if (valueCtx.literal() != null) {
             return EcoreFactory.eINSTANCE.createFromString((EDataType) type, getLiteral(valueCtx.literal()));
         } else if (valueCtx.objectBody() != null) {
             return visitObjectBody(valueCtx.objectBody());
-        } else if (valueCtx.identifier().size() > 0) {
-            throw new NotImplementedException("TODO enums");
+        } else if (valueCtx.enumValue != null) {
+            if (type instanceof EEnum) {
+                return ((EEnum) type).getEEnumLiteral(valueCtx.enumValue.getText());
+            } else {
+                throw new RuntimeException(feature + ": enum expected, but type is " + type);
+            }
         } else if (valueCtx.propertyListValue() != null) {
             return valueCtx.propertyListValue().propertyValue().stream()
-                    .map(pv -> translate(pv, type))
+                    .map(pv -> translate(feature, pv))
                     .collect(Collectors.toList());
         } else {
             return null;

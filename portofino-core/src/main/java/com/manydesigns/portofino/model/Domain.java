@@ -73,17 +73,33 @@ public class Domain extends EPackageImpl {
     }
 
     public static EObject toEObject(Object javaObject, Domain domain)
-            throws IntrospectionException, IllegalAccessException, InvocationTargetException {
+            throws IntrospectionException, IllegalAccessException, InvocationTargetException, IllegalArgumentException {
+        if (javaObject == null) {
+            return null;
+        }
         Class<?> javaClass = javaObject.getClass();
-        EClass eClass = domain.findClass(javaClass);
+        EClassifier eClassifier = domain.findClass(javaClass);
+        if (eClassifier instanceof EClass) {
+            return toEObject(javaObject, domain, javaClass, (EClass) eClassifier);
+        } else if (eClassifier instanceof EEnum) {
+            EEnum eEnum = (EEnum) eClassifier;
+            return eEnum.getEEnumLiteralByLiteral(((Enum<?>) javaObject).name());
+        }
+        throw new IllegalArgumentException(
+                "We don't know how to convert " + javaObject + " in the domain " + domain.getName());
+    }
+
+    protected static EObject toEObject(
+            Object javaObject, Domain domain, Class<?> javaClass, EClass eClass
+    ) throws IntrospectionException, IllegalAccessException, InvocationTargetException {
         EObject object = EcoreUtil.create(eClass);
         for (PropertyDescriptor prop : getPersistentProperties(javaClass)) {
             EStructuralFeature eStructuralFeature = eClass.getEStructuralFeature(prop.getName());
             Object value = prop.getReadMethod().invoke(javaObject);
             if(eStructuralFeature.isMany()) {
                 if (value != null) {
-                    EList list = (EList) object.eGet(eStructuralFeature);
-                    for (Object elem : (Iterable) value) {
+                    EList list = (EList<?>) object.eGet(eStructuralFeature);
+                    for (Object elem : (Iterable<?>) value) {
                         list.add(toEObject(elem, domain));
                     }
                 }
@@ -96,12 +112,12 @@ public class Domain extends EPackageImpl {
         return object;
     }
 
-    public EClass findClass(Class<?> aClass) {
+    public EClassifier findClass(Class<?> aClass) {
         String className = aClass.getSimpleName();
         Domain pkg = resolveDomain(aClass.getPackageName());
         EClassifier eClassifier = pkg.getEClassifier(className);
-        if (eClassifier instanceof EClass) {
-            return (EClass) eClassifier;
+        if (eClassifier instanceof EClass || eClassifier instanceof EEnum) {
+            return eClassifier;
         } else {
             throw new IllegalArgumentException("Not a modeled class: " + aClass.getName());
         }

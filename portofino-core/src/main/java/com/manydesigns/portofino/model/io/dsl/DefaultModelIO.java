@@ -586,6 +586,8 @@ public class DefaultModelIO implements ModelIO {
     protected void writePropertyValue(Object value, Writer writer, String indent) throws IOException {
         if (value instanceof String) {
             writer.write("\"" + value.toString().replace("\"", "\\\"") + "\"");
+        } else if (value instanceof EEnumLiteral) {
+            writer.write(((EEnumLiteral) value).getLiteral());
         } else if (value instanceof EObject) {
             writeObjectBody((EObject) value, writer, indent);
         } else if (value instanceof Iterable) {

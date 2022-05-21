@@ -40,6 +40,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -84,6 +85,14 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @Override
     protected void commitTransaction() {
         collection.getSession().getTransaction().commit();
+    }
+
+    /**
+     * Returns the Hibernate session of the underlying {@link #collection}, for convenience and backward compatibility.
+     * @return <code>collection.getSession()</code>
+     */
+    protected Session getSession() {
+        return collection.getSession();
     }
 
     @Override

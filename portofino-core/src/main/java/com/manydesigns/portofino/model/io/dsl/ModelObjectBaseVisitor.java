@@ -79,11 +79,11 @@ public class ModelObjectBaseVisitor extends ModelBaseVisitor<EObject> {
     }
 
     public void visitAnnotationParams(EAnnotation annotation, ModelParser.AnnotationParamsContext params) {
-        if (params.simpleIdentifier().isEmpty()) {
+        if (params.identifier().isEmpty()) {
             annotation.getDetails().put("value", getText(params.literal(0)));
         } else {
-            for (int i = 0; i < params.simpleIdentifier().size(); i++) {
-                annotation.getDetails().put(params.simpleIdentifier(i).getText(), getText(params.literal(i)));
+            for (int i = 0; i < params.identifier().size(); i++) {
+                annotation.getDetails().put(params.identifier(i).getText(), getText(params.literal(i)));
             }
         }
     }

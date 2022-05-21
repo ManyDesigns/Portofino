@@ -7,6 +7,8 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EEnum;
 import org.testng.annotations.Test;
 
 import java.beans.IntrospectionException;
@@ -31,10 +33,27 @@ public class ModelServiceTest {
         ModelService modelService = new ModelService(
                 applicationDirectory, new PropertiesConfiguration(), null,
                 new JavaCodeBase(applicationDirectory));
-        EClass eClass = modelService.addBuiltInClass(ModelServiceTest.class);
+        EClassifier eClass = modelService.addBuiltInClass(ModelServiceTest.class);
+        assertTrue(eClass instanceof EClass);
         assertEquals(modelService.getModel().getDomains().size(), 1);
         assertEquals(eClass.getName(), ModelServiceTest.class.getSimpleName());
         assertEquals(eClass, modelService.getClassesDomain().findClass(ModelServiceTest.class));
+    }
+
+    @Test
+    public void testAddBuiltInEnum() throws IOException, IntrospectionException {
+        FileObject applicationDirectory = VFS.getManager().resolveFile("ram://test");
+        ModelService modelService = new ModelService(
+                applicationDirectory, new PropertiesConfiguration(), null,
+                new JavaCodeBase(applicationDirectory));
+        EClassifier eEnum = modelService.addBuiltInClass(ModelService.EventType.class);
+        assertTrue(eEnum instanceof EEnum);
+        assertEquals(modelService.getModel().getDomains().size(), 1);
+        assertEquals(eEnum.getName(), ModelService.EventType.class.getSimpleName());
+        assertEquals(eEnum, modelService.getClassesDomain().findClass(ModelService.EventType.class));
+        assertEquals(2, ((EEnum) eEnum).getELiterals().size());
+        assertEquals(ModelService.EventType.LOADED.name(), ((EEnum) eEnum).getELiterals().get(0).getLiteral());
+        assertEquals(ModelService.EventType.SAVED.name(), ((EEnum) eEnum).getELiterals().get(1).getLiteral());
     }
 
     @Test
