@@ -85,7 +85,9 @@ public class PersistenceTest {
         databaseModule.configuration = configuration;
         modelService = new ModelService(appDir, configuration, null, new JavaCodeBase(appDir));
         modelService.loadModel();
-        persistence = databaseModule.getPersistence(modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
+        assertEquals("There are issues with the model", 0, modelService.getModel().getIssues().size());
+        persistence = databaseModule.getPersistence(
+                modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
         databaseModule.init();
         persistence.start();
         setupJPetStore();

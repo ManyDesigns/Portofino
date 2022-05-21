@@ -217,7 +217,7 @@ class ProjectsCrudAction extends CrudAction {
     List<ActivityItem> getProjectActivity() {
         Locale locale = context.request.locale
         List items =
-                session.createSQLQuery(PROJECT_ACTIVTY_SQL)
+                session.createNativeQuery(PROJECT_ACTIVTY_SQL)
                 .setParameter("project_id", object.id)
                 .setMaxResults(30).list()
 

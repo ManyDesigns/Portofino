@@ -43,9 +43,7 @@ import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
 import org.apache.commons.configuration2.Configuration
-import org.hibernate.Criteria
 import org.hibernate.Session
-import org.hibernate.criterion.Restrictions
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.Job
 import org.quartz.JobExecutionContext
@@ -54,12 +52,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import jakarta.persistence.criteria.CriteriaBuilder
-import jakarta.persistence.criteria.CriteriaQuery
-import jakarta.persistence.criteria.Root
 import javax.servlet.RequestDispatcher
 import javax.servlet.ServletContext
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -107,7 +101,7 @@ public class NotificationsJob implements Job {
             Session session = persistence.getSession("tt");
 
             logger.debug("Find project activities to be notified");
-            List items = session.createSQLQuery(PROJECT_ACTIVTY_SQL).list();
+            List items = session.createNativeQuery(PROJECT_ACTIVTY_SQL).list();
             String keyPrefix = "system.";
             Locale locale = Locale.getDefault();
 

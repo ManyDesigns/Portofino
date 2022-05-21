@@ -33,7 +33,7 @@ class MyActivityStreamAction extends ActivityStreamAction {
     public void populateActivityItems() {
         Locale locale = context.request.locale;
         Session session = persistence.getSession("tt");
-        List items = session.createSQLQuery(SYSTEM_ACTIVTY_SQL).setMaxResults(30).list();
+        List items = session.createNativeQuery(SYSTEM_ACTIVTY_SQL).setMaxResults(30).list();
 
         String keyPrefix = "system.";
 

@@ -7,9 +7,9 @@ import com.manydesigns.portofino.tt.TicketGroup
 import net.sourceforge.stripes.action.DefaultHandler
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
-import org.hibernate.SQLQuery
+import org.hibernate.query.NativeQuery
 import org.hibernate.Session
-import org.hibernate.transform.ResultTransformer
+import org.hibernate.query.TupleTransformer
 import org.springframework.beans.factory.annotation.Autowired
 
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -33,8 +33,8 @@ class ActiveTicketsByPriorityAction extends CustomAction {
         Object project = ElementsThreadLocals.getOgnlContext().get("project");
 
         Session session = persistence.getSession("tt");
-        SQLQuery query = session.createSQLQuery(SQL);
-        query.setResultTransformer(new ResultTransformer() {
+        NativeQuery query = session.createNativeQuery(SQL)
+        query.setTupleTransformer(new TupleTransformer<Object>() {
             Object transformTuple(Object[] tuple, String[] aliases) {
                 int groupId = tuple[0];
                 String groupName = tuple[1];

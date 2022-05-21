@@ -3,13 +3,12 @@ package com.manydesigns.portofino.database;
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.EntityMode;
+import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
 
