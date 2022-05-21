@@ -468,8 +468,8 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":configuration")
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
-    public Object getConfiguration() {
-        Object configuration = actionInstance.getConfiguration();
+    public Object getSerializedConfiguration() {
+        Object configuration = getConfiguration();
         if(getConfigurationClass() == null) {
             return configuration;
         }
@@ -483,6 +483,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         }
         filtered.init();
         return filtered;
+    }
+
+    protected Object getConfiguration() {
+        return actionInstance.getConfiguration();
     }
 
     @NotNull

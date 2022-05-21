@@ -228,16 +228,18 @@ public class Domain extends EPackageImpl {
             PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
             if (feature.isMany()) {
                 List<EObject> values = (List) eObject.eGet(feature);
-                List list;
+                List<Object> list;
                 if (propertyDescriptor.getWriteMethod() != null) {
-                    list = new ArrayList();
-                    propertyDescriptor.getWriteMethod().invoke(object, list);
+                    list = new ArrayList<>();
                 } else {
                     list = (List) propertyDescriptor.getReadMethod().invoke(object);
                     list.clear();
                 }
                 for (EObject value : values) {
                     list.add(toJavaObject(value, classesDomain, codeBase));
+                }
+                if (propertyDescriptor.getWriteMethod() != null) {
+                    propertyDescriptor.getWriteMethod().invoke(object, list);
                 }
             } else {
                 Object value = eObject.eGet(feature);
