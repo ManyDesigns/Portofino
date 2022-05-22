@@ -106,6 +106,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DOMAIN)
     protected Domain actionsDomain;
+    @Autowired
+    @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
+    protected FileObject actionsDirectory;
     @Autowired(required = false)
     protected SecurityFacade security = NoSecurity.AT_ALL;
     @Context
@@ -163,7 +166,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
                     resourceAction.configured();
                     if (actionInstance.getConfiguration() != null) {
                         resourceAction.saveConfiguration();
-                        // TODO delete legacy conf
+                        FileObject oldConf = actionInstance.getDirectory().resolveFile("configuration.xml");
+                        logger.info("Migrated configuration from " + oldConf.getName().getPath() + ", deleting");
+                        oldConf.delete();
                     }
                 } else {
                     resourceAction.configured();
@@ -542,7 +547,14 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     protected Domain getConfigurationDomain() {
-        String domainName = actionInstance.getPath().replace('/', '.');
+        String domainName;
+        try {
+            domainName =
+                    actionsDirectory.getName().getRelativeName(actionInstance.getChildrenDirectory().getName())
+                            .replace('/', '.');
+        } catch (FileSystemException e) {
+            throw new RuntimeException(e);
+        }
         if (domainName.startsWith(".")) {
             domainName = domainName.substring(1);
         }

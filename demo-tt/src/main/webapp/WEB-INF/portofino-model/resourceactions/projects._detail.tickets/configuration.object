@@ -1,0 +1,238 @@
+import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
+import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
+import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
+
+object configuration : CrudConfiguration {
+	createTitle = ""
+	database = "tt"
+	editTitle = ""
+	largeResultSet = true
+	name = "Tickets"
+	properties = [
+		CrudProperty {
+			annotations = []
+			enabled = false
+			inSummary = false
+			insertable = false
+			name = "project"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = false
+			label = ""
+			name = "n"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "title"
+			searchable = true
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = false
+			insertable = true
+			label = ""
+			name = "description"
+			searchable = true
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "type"
+			searchable = true
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "priority"
+			searchable = true
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "affected_version"
+			searchable = true
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = false
+			label = ""
+			name = "created_by"
+			searchable = true
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = false
+			label = ""
+			name = "state"
+			searchable = true
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = false
+			label = ""
+			name = "assignee"
+			searchable = true
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = false
+			label = ""
+			name = "fix_version"
+			searchable = true
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = false
+			insertable = false
+			label = ""
+			name = "resolution"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = false
+			insertable = false
+			label = ""
+			name = "created"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = false
+			insertable = false
+			label = ""
+			name = "last_updated"
+			searchable = false
+			updatable = false
+		}
+	]
+	query = "from tickets where project = %{#project.id} order by n desc"
+	readTitle = ""
+	rowsPerPage = 10
+	searchTitle = ""
+	selectionProviders = [
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			searchDisplayMode = DROPDOWN
+			searchDisplayModeName = "DROPDOWN"
+			selectionProviderName = "ticket_fix_version"
+		},
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			searchDisplayMode = DROPDOWN
+			searchDisplayModeName = "DROPDOWN"
+			selectionProviderName = "ticket_created_by"
+		},
+		SelectionProviderReference {
+			displayMode = DROPDOWN
+			enabled = false
+			foreignKeyName = "fk_ticket_project"
+			searchDisplayMode = DROPDOWN
+		},
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			searchDisplayMode = DROPDOWN
+			searchDisplayModeName = "DROPDOWN"
+			selectionProviderName = "ticket_affected_version"
+		},
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			searchDisplayMode = DROPDOWN
+			searchDisplayModeName = "DROPDOWN"
+			selectionProviderName = "ticket_priorities"
+		},
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			searchDisplayMode = DROPDOWN
+			searchDisplayModeName = "DROPDOWN"
+			selectionProviderName = "ticket_types"
+		},
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			foreignKeyName = "fk_ticket_resolution"
+			searchDisplayMode = DROPDOWN
+			searchDisplayModeName = "DROPDOWN"
+		},
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			searchDisplayMode = DROPDOWN
+			searchDisplayModeName = "DROPDOWN"
+			selectionProviderName = "ticket_assignee"
+		},
+		SelectionProviderReference {
+			createNewValueText = ""
+			displayMode = DROPDOWN
+			displayModeName = "DROPDOWN"
+			enabled = true
+			searchDisplayMode = CHECKBOX
+			searchDisplayModeName = "CHECKBOX"
+			selectionProviderName = "ticket_states"
+		}
+	]
+	useLocalOrder = false
+	variable = "ticket"
+}
