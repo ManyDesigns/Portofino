@@ -45,7 +45,10 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
-import com.manydesigns.portofino.security.SecurityLogic;
+import com.manydesigns.portofino.resourceactions.login.support.ConfirmUserRequest;
+import com.manydesigns.portofino.resourceactions.login.support.LoginData;
+import com.manydesigns.portofino.resourceactions.login.support.ResetPasswordEmailRequest;
+import com.manydesigns.portofino.resourceactions.login.support.ResetPasswordRequest;
 import com.manydesigns.portofino.shiro.*;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.io.IOUtils;
@@ -80,7 +83,7 @@ import java.util.Map;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@ScriptTemplate("script_template.groovy")
+@ScriptTemplate("script_template.groovy.txt")
 @ResourceActionName("Login")
 public class DefaultLoginAction extends AbstractResourceAction {
     public static final String copyright =
@@ -107,11 +110,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
     public Response login(@FormParam("username") String username, @FormParam("password") String password)
             throws AuthenticationException {
         return Response.ok(doLogin(username, password)).build();
-    }
-
-    public static class LoginData {
-        public String username;
-        public String password;
     }
 
     @POST
@@ -202,12 +200,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
         return stringer.toString();
     }
 
-    public static class ResetPasswordEmailRequest {
-        public String email;
-        public String siteNameOrAddress;
-        public String loginPageUrl;
-    }
-
     @Path(":send-reset-password-email")
     @POST
     public void sendResetPasswordEmail(ResetPasswordEmailRequest req) {
@@ -256,11 +248,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
             String template = IOUtils.toString(stream, StandardCharsets.UTF_8);
             return template.replace("$link", confirmSignUpLink).replace("$site", site);
         }
-    }
-
-    public static class ResetPasswordRequest {
-        public String token;
-        public String newPassword;
     }
 
     @Path(":reset-password")
@@ -430,10 +417,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
             logger.error("Error during sign-up", e);
             throw new WebApplicationException(e);
         }
-    }
-
-    public static class ConfirmUserRequest {
-        public String token;
     }
 
     @Path("user/:confirm")

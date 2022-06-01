@@ -9,6 +9,4 @@ class %{#generatedClassName} extends DefaultLoginAction {
     // Extension hooks
     //**************************************************************************
 
-
-
 }

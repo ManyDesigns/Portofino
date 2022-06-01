@@ -2,6 +2,12 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.3] – Unreleased
+
+### Fixed
+- Wrong links in the war archetype [#556](https://github.com/ManyDesigns/Portofino/issues/556)
+- Omitting the login.path property results in a malfunctioning application [#557](https://github.com/ManyDesigns/Portofino/issues/557)
+
 ## [5.3.2] – 2022-05-12
 
 ### Added
