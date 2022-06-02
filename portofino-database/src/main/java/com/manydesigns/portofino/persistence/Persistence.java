@@ -133,7 +133,7 @@ public class Persistence {
         synchronized (modelService) {
             try {
                 XMLModel modelIO = new XMLModel(modelService.getModelDirectory(), this);
-                Model model = modelService.loadModel(modelIO);
+                Model model = modelIO.load();
                 if(model != null) {
                     modelIO.getDatabases().forEach(
                             newDb -> {
@@ -327,6 +327,9 @@ public class Persistence {
     }
 
     public synchronized void initModel() {
+        if (!tryLoadingLegacyModel()) {
+            getDatabaseDomains().forEach(this::setupDatabase);
+        }
         logger.info("Cleaning up old setups");
         closeSessions();
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
@@ -342,7 +345,6 @@ public class Persistence {
         }
         //TODO it would perhaps be preferable that we generated REPLACED events here rather than REMOVED followed by ADDED
         setups.clear();
-        modelService.getModel().init();
         for (Database database : databases) {
             initDatabase(database);
         }
@@ -548,16 +550,9 @@ public class Persistence {
 
     public void start() {
         status.onNext(Status.STARTING);
-        loadModel();
-        AtomicBoolean loading = new AtomicBoolean(false);
         modelEventsSubscription = modelService.modelEvents.subscribe(evt -> {
             if(evt == ModelService.EventType.LOADED) {
-                if(!loading.get()) try {
-                    loading.set(true);
-                    loadModel();
-                } finally {
-                    loading.set(false);
-                }
+                initModel();
             } else if (evt == ModelService.EventType.SAVED) {
                 new XMLModel(modelService.getModelDirectory(), this).delete();
             }
@@ -568,13 +563,6 @@ public class Persistence {
             }
         }
         status.onNext(Status.STARTED);
-    }
-
-    public void loadModel() {
-        if (!tryLoadingLegacyModel()) {
-            getDatabaseDomains().forEach(this::setupDatabase);
-        }
-        initModel();
     }
 
     public void stop() {

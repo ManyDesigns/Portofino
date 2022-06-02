@@ -21,8 +21,15 @@ public class ModelObjectBuilderVisitor extends ModelObjectBaseVisitor {
     }
 
     @Override
+    public EObject visitStandaloneObject(ModelParser.StandaloneObjectContext ctx) {
+        List<ModelParser.ImportDeclarationContext> importDeclarations = ctx.importDeclaration();
+        initTypeAliases(importDeclarations);
+        return visitObjectBody(ctx.object().objectBody());
+    }
+
+    @Override
     public EObject visitObjectBody(ModelParser.ObjectBodyContext ctx) {
-        String fullEntityName = ctx.className.getText();
+        String fullEntityName = resolveType(ctx.className.getText(), true);
         EClass eClass;
         if(fullEntityName.indexOf('.') >= 0) {
             String entityName = StringUtils.substringAfterLast(fullEntityName, ".");

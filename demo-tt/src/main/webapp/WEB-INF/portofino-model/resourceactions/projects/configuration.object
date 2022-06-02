@@ -1,6 +1,8 @@
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
+import portofino.classes.com.manydesigns.portofino.model.Annotation;
+import portofino.classes.com.manydesigns.portofino.model.AnnotationProperty;
 
 object configuration : CrudConfiguration {
 	createTitle = ""

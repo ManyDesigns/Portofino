@@ -36,6 +36,7 @@ public class DefaultModelIO implements ModelIO {
 
     private final FileObject modelDirectory;
     private final List<ToLink> toLinkQueue = new ArrayList<>();
+    private final List<Domain> transientDomains;
 
     private static class ToLink {
         final ParseTree parseTree;
@@ -47,14 +48,20 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    public DefaultModelIO(FileObject modelDirectory) {
+    public DefaultModelIO(FileObject modelDirectory, List<Domain> transientDomains) {
         this.modelDirectory = modelDirectory;
+        this.transientDomains = transientDomains;
+    }
+
+    public DefaultModelIO(FileObject modelDirectory) {
+        this(modelDirectory, Collections.emptyList());
     }
 
     @Override
-    public Model load() throws IOException {
+    public synchronized Model load() throws IOException {
         logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
         Model model = new Model();
+        model.getDomains().addAll(transientDomains);
         FileObject modelDir = getModelDirectory();
         if(!modelDirectory.exists() || !modelDirectory.getType().equals(FileType.FOLDER)) {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
@@ -86,6 +93,10 @@ public class DefaultModelIO implements ModelIO {
             });
         } else {
             domain = model.ensureDomain(domainName);
+            if (transientDomains.contains(domain)) {
+                logger.warn("Skipping domain " + domainDir.getPath() + " because it's transient");
+                return;
+            }
         }
         for (FileObject child : domainDir.getChildren()) {
             String baseName = child.getName().getBaseName();
@@ -111,7 +122,7 @@ public class DefaultModelIO implements ModelIO {
 
     private void loadDomainFile(Model model, Domain domain, FileObject file) throws IOException {
         try (InputStream inputStream = file.getContent().getInputStream()) {
-            String path = getQualifiedName(domain);
+            String path = Domain.getQualifiedName(domain);
             ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneDomainContext parseTree = parser.standaloneDomain();
             if (parser.getNumberOfSyntaxErrors() == 0) {
@@ -138,21 +149,9 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    public static String getQualifiedName(EPackage domain) {
-        if (domain == null) {
-            return null;
-        }
-        String superQName = getQualifiedName(domain.getESuperPackage());
-        if (superQName != null) {
-            return superQName + "." + domain.getName();
-        } else {
-            return domain.getName();
-        }
-    }
-
     protected void loadEntity(Model model, Domain domain, FileObject file) throws IOException {
+        String path = Domain.getQualifiedName(domain) + "." + file.getName().getBaseName();
         try(InputStream inputStream = file.getContent().getInputStream()) {
-            String path = getQualifiedName(domain);
             ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneEntityContext parseTree = parser.standaloneEntity();
             if (parser.getNumberOfSyntaxErrors() == 0) {
@@ -166,23 +165,25 @@ public class DefaultModelIO implements ModelIO {
                     logger.error(msg);
                 }
             }
-        } catch (IOException e) {
-            logger.error("Could not load resource: " + file.getName().getURI(), e);
+        } catch (Exception e) {
+            String msg = "Could not load resource: " + file.getName().getURI();
+            model.getIssues().add(new Issue(
+                    Issue.Severity.ERROR, domain, msg + " – " + e, path, null, null));
+            logger.error(msg, e);
         }
     }
 
     protected void loadObject(Model model, Domain domain, FileObject file) throws IOException {
-        String path = getQualifiedName(domain);
+        String path = Domain.getQualifiedName(domain);
         try(InputStream inputStream = file.getContent().getInputStream()) {
             ModelParser parser = getParser(model, domain, path, inputStream);
             ModelParser.StandaloneObjectContext parseTree = parser.standaloneObject();
             if (parser.getNumberOfSyntaxErrors() == 0) {
-                ModelParser.ObjectContext objectContext = parseTree.object();
                 EObject object =
-                        new ModelObjectBuilderVisitor(model, domain).visitObjectBody(objectContext.objectBody());
-                domain.addObject(objectContext.name.getText(), object);
+                        new ModelObjectBuilderVisitor(model, domain).visitStandaloneObject(parseTree);
+                domain.addObject(parseTree.object().name.getText(), object);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             String msg = "Could not load resource: " + file.getName().getURI();
             model.getIssues().add(new Issue(
                     Issue.Severity.ERROR, domain, msg + " – " + e, path, null, null));
@@ -317,15 +318,21 @@ public class DefaultModelIO implements ModelIO {
         try(OutputStreamWriter os = fileWriter(objectFile)) {
             Map<String, String> imports = new HashMap<>();
             EClass type = object.eClass();
-            type.getEStructuralFeatures().forEach(feature -> {
-                EClassifier fType = feature.getEType();
-                addImport(fType, domain, imports);
-            });
+            collectImports(type, domain, imports);
             addImport(type, domain, imports);
             writeImports(imports, os);
             os.write("object " + name + " : ");
             writeObjectBody(object, os, "");
         }
+    }
+
+    private void collectImports(EClass type, Domain domain, Map<String, String> imports) {
+        type.getEStructuralFeatures().forEach(feature -> {
+            EClassifier fType = feature.getEType();
+            if (addImport(fType, domain, imports)) {
+                collectImports(type, domain, imports);
+            }
+        });
     }
 
     protected void writeObjectBody(EObject object, Writer writer, String indent) throws IOException {
@@ -396,26 +403,29 @@ public class DefaultModelIO implements ModelIO {
         return !Id.class.getName().equals(a.getSource()) && !KeyMappings.class.getName().equals(a.getSource());
     }
 
-    private void addImport(EClassifier type, EPackage domain, Map<String, String> imports) {
+    private boolean addImport(EClassifier type, EPackage domain, Map<String, String> imports) {
         if(type == null) {
-            return;
+            return false;
         }
         //TODO handle homonyms
         String fullTypeName = type.getName();
         EPackage ePackage = type.getEPackage();
         if(ePackage != null) {
             if(ePackage == EcorePackage.eINSTANCE || ePackage == domain) {
-                return;
+                return false;
             }
-            fullTypeName = getQualifiedName(ePackage) + "." + fullTypeName;
+            fullTypeName = Domain.getQualifiedName(ePackage) + "." + fullTypeName;
         }
-        addImport(fullTypeName, imports);
+        return addImport(fullTypeName, imports);
     }
 
-    private void addImport(String name, Map<String, String> imports) {
+    private boolean addImport(String name, Map<String, String> imports) {
         String shortName = name.substring(name.lastIndexOf('.') + 1);
         if(!shortName.equals(name)) {
-            imports.putIfAbsent(shortName, name);
+            // putIfAbsent returns null when the previous value was null1
+            return imports.putIfAbsent(shortName, name) == null;
+        } else {
+            return false;
         }
     }
 

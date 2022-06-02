@@ -53,10 +53,6 @@ public class Model {
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
-    public void init() {
-        issues.clear();
-    }
-
     public List<Domain> getDomains() {
         return domains;
     }

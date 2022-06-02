@@ -13,7 +13,7 @@ property: annotation* name=identifier (':' type)? (NOT_NULLABLE)?;
 
 enum: ENUM name=identifier '{' values+=identifier+ '}';
 
-standaloneObject: object EOF;
+standaloneObject: importDeclaration* object EOF;
 object: OBJECT name=identifier ':' objectBody;
 objectBody: className=identifier '{' properties+=propertyAssignment* '}';
 propertyAssignment: name=identifier ('=' propertyValue | '-->' referredObject=fqn);
@@ -28,7 +28,7 @@ relationshipProperty: annotation* name=identifier '-->' type relationshipMapping
 relationshipMappings: '(' (relationshipMapping (',' relationshipMapping)*) ')';
 relationshipMapping: otherName=identifier '=' ownName=identifier;
 
-type: name=identifier;
+type: name=fqn;
 
 annotation: '@' type annotationParams?;
 

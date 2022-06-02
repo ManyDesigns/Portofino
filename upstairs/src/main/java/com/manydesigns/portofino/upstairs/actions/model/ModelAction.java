@@ -1,9 +1,10 @@
 package com.manydesigns.portofino.upstairs.actions.model;
 
+import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.issues.Issue;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
-import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
@@ -39,6 +40,16 @@ public class ModelAction extends AbstractResourceAction {
     public void reloadModel() {
         try {
             modelService.loadModel();
+            for (Issue issue : modelService.getModel().getIssues()) {
+                switch (issue.severity) {
+                    case ERROR:
+                        RequestMessages.addErrorMessage(issue.message + " (path: " + issue.path + ")");
+                    case WARNING:
+                        RequestMessages.addWarningMessage(issue.message + " (path: " + issue.path + ")");
+                    case INFO:
+                        RequestMessages.addInfoMessage(issue.message + " (path: " + issue.path + ")");
+                }
+            }
         } catch (IOException e) {
             throw new WebApplicationException("Could not load model", e, Response.Status.INTERNAL_SERVER_ERROR);
         }

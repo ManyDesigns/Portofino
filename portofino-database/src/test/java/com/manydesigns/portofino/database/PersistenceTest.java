@@ -85,10 +85,12 @@ public class PersistenceTest {
         databaseModule.configuration = configuration;
         modelService = new ModelService(appDir, configuration, null, new JavaCodeBase(appDir));
         modelService.loadModel();
+        modelService.getModel().getIssues().forEach(i -> {
+            System.err.println(i.message + " " + i.path + "@" + i.line+ ":" + i.column);
+        });
         assertEquals("There are issues with the model", 0, modelService.getModel().getIssues().size());
         persistence = databaseModule.getPersistence(
                 modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
-        databaseModule.init();
         persistence.start();
         setupJPetStore();
         setupHibernateTest();

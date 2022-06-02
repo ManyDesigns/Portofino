@@ -209,17 +209,18 @@ public class Domain extends EPackageImpl {
         if (eObject == null) {
             return null;
         }
+        if (eObject instanceof EEnumLiteral) {
+            Class javaClass = getJavaClass(classesDomain, codeBase, ((EEnumLiteral) eObject).getEEnum());
+            if (!Enum.class.isAssignableFrom(javaClass)) {
+                throw new RuntimeException("Not an enum: " + javaClass);
+            }
+            return Enum.valueOf(javaClass, ((EEnumLiteral) eObject).getLiteral());
+        }
         EClass eClass = eObject.eClass();
         if (eClass == null) {
             return null;
         }
-        String javaClassName = eClass.getName();
-        EPackage pkg = eClass.getEPackage();
-        while (pkg != null && pkg != classesDomain) {
-            javaClassName = pkg.getName() + "." + javaClassName;
-            pkg = pkg.getESuperPackage();
-        }
-        Class<?> javaClass = codeBase.loadClass(javaClassName);
+        Class<?> javaClass = getJavaClass(classesDomain, codeBase, eClass);
         Object object = javaClass.getConstructor().newInstance();
         PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
         for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
@@ -250,6 +251,18 @@ public class Domain extends EPackageImpl {
             }
         }
         return object;
+    }
+
+    private static Class<?> getJavaClass(
+            Domain classesDomain, CodeBase codeBase, EClassifier type
+    ) throws IOException, ClassNotFoundException {
+        String javaClassName = type.getName();
+        EPackage pkg = type.getEPackage();
+        while (pkg != null && pkg != classesDomain) {
+            javaClassName = pkg.getName() + "." + javaClassName;
+            pkg = pkg.getESuperPackage();
+        }
+        return (Class<?>) codeBase.loadClass(javaClassName);
     }
 
     public Object getJavaObject(String name, Domain classesDomain, CodeBase codeBase)
@@ -286,5 +299,21 @@ public class Domain extends EPackageImpl {
         } else {
             return null;
         }
+    }
+
+    public static String getQualifiedName(EPackage domain) {
+        if (domain == null) {
+            return null;
+        }
+        String superQName = getQualifiedName(domain.getESuperPackage());
+        if (superQName != null) {
+            return superQName + "." + domain.getName();
+        } else {
+            return domain.getName();
+        }
+    }
+
+    public String getQualifiedName() {
+        return getQualifiedName(this);
     }
 }

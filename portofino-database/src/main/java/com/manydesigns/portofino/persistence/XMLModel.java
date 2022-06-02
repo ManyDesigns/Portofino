@@ -1,9 +1,9 @@
 package com.manydesigns.portofino.persistence;
 
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.model.io.ModelIO;
-import com.manydesigns.portofino.model.io.ModelParseException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -48,7 +48,6 @@ public class XMLModel implements ModelIO {
                 logger.error("Loading legacy xml model from single file not supported: {}", appModelFile.getName().getPath());
                 return null;
             } else {
-                logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
                 model = new Model();
             }
             FileObject modelDir = getModelDirectory();

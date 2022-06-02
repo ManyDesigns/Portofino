@@ -6,6 +6,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -32,7 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ModelService {
 
     protected Model model = new Model();
-    public final PublishSubject<EventType> modelEvents = PublishSubject.create();
+    public final BehaviorSubject<EventType> modelEvents = BehaviorSubject.create();
     public static final String APP_MODEL_DIRECTORY = "portofino-model";
     protected final FileObject applicationDirectory;
     protected final Configuration configuration;
@@ -61,9 +62,6 @@ public class ModelService {
     public synchronized Model loadModel(ModelIO modelIO) throws IOException {
         Model loaded = modelIO.load();
         if(loaded != null) {
-            loaded.getDomains().removeIf(d -> transientDomains.stream().anyMatch(t -> t.getName().equals(d.getName())));
-            loaded.getDomains().addAll(transientDomains);
-            loaded.init();
             model = loaded;
             modelEvents.onNext(EventType.LOADED);
             return model;
@@ -73,7 +71,7 @@ public class ModelService {
     }
 
     public synchronized void loadModel() throws IOException {
-        loadModel(new DefaultModelIO(getModelDirectory()));
+        loadModel(new DefaultModelIO(getModelDirectory(), transientDomains));
     }
 
     public FileObject getModelDirectory() throws FileSystemException {
@@ -85,11 +83,10 @@ public class ModelService {
     }
 
     public synchronized void saveModel() throws IOException, ConfigurationException {
-        model.init();
         Model toSave = new Model();
         toSave.getDomains().addAll(model.getDomains());
         toSave.getDomains().removeAll(transientDomains);
-        new DefaultModelIO(getModelDirectory()).save(toSave);
+        new DefaultModelIO(getModelDirectory(), transientDomains).save(toSave);
         if (configurationFile != null) {
             configurationFile.save();
             logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());

@@ -29,11 +29,14 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.vfs2.FileObject;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -44,7 +47,7 @@ import java.io.IOException;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ModelModule implements Module {
+public class ModelModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -88,9 +91,7 @@ public class ModelModule implements Module {
 
     @Bean
     public ModelService getModelService() throws IOException {
-        ModelService modelService = new ModelService(applicationDirectory, configuration, configurationFile, codeBase);
-        modelService.loadModel();
-        return modelService;
+        return modelService = new ModelService(applicationDirectory, configuration, configurationFile, codeBase);
     }
 
     @Bean(name = PORTOFINO_DOMAIN)
@@ -101,6 +102,15 @@ public class ModelModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
+        try {
+            modelService.loadModel();
+        } catch (IOException e) {
+            logger.error("Could not load model", e);
+        }
     }
 
 }

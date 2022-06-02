@@ -1,13 +1,9 @@
 package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.portofino.model.Model;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 
 public interface ModelIO {
