@@ -2,6 +2,30 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.3] – Unreleased
+
+### Fixed
+- Wrong links in the war archetype [#556](https://github.com/ManyDesigns/Portofino/issues/556)
+- Omitting the login.path property results in a malfunctioning application [#557](https://github.com/ManyDesigns/Portofino/issues/557)
+
+## [5.3.2] – 2022-05-12
+
+### Added
+- Pluggable exporters for CRUD.
+- Configuration abstraction, integrated with Spring's *Environment* (which includes `application.properties` in Spring Boot).  
+
+### Changed
+- Refactored the CRUD's JSON output logic into a separate exporter class. **This is a breaking API change**
+  for CRUD extensions overriding `jsonXYZData` methods.
+- In Spring Boot applications, when using Jersey (the default), allow Portofino actions to coexist with Boot services 
+  such as actuators.
+
+### Fixed
+- Multiple issues with the Spring Boot-based archetypes, including but not limited to:
+  - Application generated from Java service archetype searches for action classes in `src/main/resources/portofino`
+  - Unsupported CORS with service archetypes. By default, archetypes will use an embedded Tomcat instead of Undertow for the time being (startup is slower)
+  - Misleading Java service archetype `SpringConfiguration.java`
+
 ## [5.3.1] – 2022-03-10
 
 ### Added

@@ -8,6 +8,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.JavaCodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.AnnotationProperty;
@@ -82,7 +83,7 @@ public class PersistenceTest {
             }
         };
         databaseModule.applicationDirectory = appDir;
-        databaseModule.configuration = configuration;
+        databaseModule.configuration = new ConfigurationSource(configuration, null);
         modelService = new ModelService(appDir, configuration, null, new JavaCodeBase(appDir));
         modelService.loadModel();
         modelService.getModel().getIssues().forEach(i -> {

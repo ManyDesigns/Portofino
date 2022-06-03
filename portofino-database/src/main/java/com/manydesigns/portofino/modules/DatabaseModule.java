@@ -23,6 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
@@ -72,9 +73,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public ModelService modelService;
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
+    public ConfigurationSource configuration;
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
     public FileObject applicationDirectory;
@@ -122,7 +121,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @Bean
     public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
-        return new DatabasePlatformsRegistry(configuration);
+        return new DatabasePlatformsRegistry(configuration.getProperties());
     }
 
     @Bean

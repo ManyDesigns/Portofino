@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class PortofinoBootApplicationTests {
 
 	@Test
-	void contextLoads() {
-	}
+	void contextLoads() {}
 
 }

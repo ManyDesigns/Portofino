@@ -48,7 +48,8 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         parent.setServletContext(servletContext);
 
         //Modules
-        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
+        ClassPathScanningCandidateComponentProvider scanner =
+                new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
         scanner.addIncludeFilter(new AssignableTypeFilter(Module.class));
         Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("");
         candidateComponents.forEach(c -> {

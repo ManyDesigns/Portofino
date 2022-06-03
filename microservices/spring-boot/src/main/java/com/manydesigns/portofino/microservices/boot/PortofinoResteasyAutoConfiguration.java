@@ -21,7 +21,7 @@ import javax.servlet.DispatcherType;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(value = PortofinoApplication.class)
-@AutoConfigureAfter(ServletWebServerFactoryAutoConfiguration.class)
+@AutoConfigureAfter(PortofinoDispatcherAutoConfiguration.class)
 public class PortofinoResteasyAutoConfiguration {
 
     private String basePath;

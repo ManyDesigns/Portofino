@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -52,7 +52,7 @@ public class ResourceBundleManager {
 
     protected LinkedList<String> searchPaths = new LinkedList<>();
     protected final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
-            new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
+            new ConcurrentHashMap<>();
 
     public static final Logger logger = LoggerFactory.getLogger(ResourceBundleManager.class);
 

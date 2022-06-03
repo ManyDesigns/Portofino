@@ -1,8 +1,8 @@
 package com.manydesigns.portofino.microservices.boot;
 
-import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.portofino.jersey.PortofinoApplication;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,17 +10,15 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.DispatcherType;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass(value = PortofinoApplication.class)
-@AutoConfigureAfter(ServletWebServerFactoryAutoConfiguration.class)
+@AutoConfigureAfter(PortofinoDispatcherAutoConfiguration.class)
 public class PortofinoJerseyAutoConfiguration {
 
     private String basePath;
@@ -28,7 +26,7 @@ public class PortofinoJerseyAutoConfiguration {
 
     @Bean
     public ResourceConfig getJerseyApplication() {
-        return new PortofinoApplication();
+        return new PortofinoApplication().property(ServletProperties.FILTER_FORWARD_ON_404, true);
     }
 
     @Value("${spring.jersey.application-path}")

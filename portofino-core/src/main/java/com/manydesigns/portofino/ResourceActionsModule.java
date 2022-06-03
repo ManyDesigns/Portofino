@@ -25,6 +25,7 @@ import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
@@ -60,7 +61,6 @@ import java.io.IOException;
 
 import static com.manydesigns.portofino.model.service.ModelModule.PORTOFINO_DOMAIN;
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
-import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -79,12 +79,7 @@ public class ResourceActionsModule implements Module {
     public ServletContext servletContext;
 
     @Autowired
-    @Qualifier(PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
-    public FileBasedConfigurationBuilder configurationFile;
+    public ConfigurationSource configuration;
 
     @Autowired
     @Qualifier(APPLICATION_DIRECTORY)
@@ -121,14 +116,14 @@ public class ResourceActionsModule implements Module {
     @PostConstruct
     public void init() throws Exception {
         logger.debug("Initializing dispatcher");
-        ActionLogic.init(configuration);
+        ActionLogic.init(configuration.getProperties());
 
         //noinspection SpringConfigurationProxyMethods - @PostConstruct init() is a lifecycle method, it cannot have arguments
         FileObject actionsDirectory = getActionsDirectory(configuration, applicationDirectory);
         logger.info("Actions directory: " + actionsDirectory);
         //TODO ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
 
-        if(configuration.getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false)) {
+        if(configuration.getProperties().getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false)) {
             logger.info("Preloading actions");
             try {
                 ResourceResolver resourceResolver =
@@ -138,14 +133,14 @@ public class ResourceActionsModule implements Module {
                 logger.warn("Could not preload actions", e);
             }
         }
-        if(configuration.getBoolean(PortofinoProperties.PRELOAD_CLASSES, false)) {
+        if(configuration.getProperties().getBoolean(PortofinoProperties.PRELOAD_CLASSES, false)) {
             logger.info("Preloading Groovy classes");
             preloadClasses(codeBase.getRoot());
         }
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
 
-        SecurityLogic.installLogin(actionsDirectory, configuration, NoOpLoginAction.class);
+        SecurityLogic.installLogin(actionsDirectory, configuration.getProperties(), NoOpLoginAction.class);
         status = ModuleStatus.STARTED;
     }
 
@@ -161,9 +156,9 @@ public class ResourceActionsModule implements Module {
 
     @Bean(name = ACTIONS_DIRECTORY)
     public FileObject getActionsDirectory(
-            @Autowired @Qualifier(PORTOFINO_CONFIGURATION) Configuration configuration,
+            @Autowired ConfigurationSource configuration,
             @Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject applicationDirectory) throws FileSystemException {
-        String actionsDirectory = configuration.getString("portofino.actions.path", "actions");
+        String actionsDirectory = configuration.getProperties().getString("portofino.actions.path", "actions");
         return applicationDirectory.resolveFile(actionsDirectory);
     }
 

@@ -22,6 +22,7 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
@@ -29,6 +30,7 @@ import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -94,6 +96,8 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
         servletContext.setAttribute(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, applicationRoot);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
         servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, configurationFile);
+        servletContext.setAttribute(PortofinoSpringConfiguration.CONFIGURATION_SOURCE,
+                new ConfigurationSource(configuration, configurationFile));
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
@@ -143,11 +147,15 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
                         .properties()
                         .setPrefixLookups(getConfigurationLookups())
                         .setListDelimiterHandler(new DefaultListDelimiterHandler(','));
-        String path = configurationFile.getName().getURI();
-        parameters.setFileName(path);
-        this.configurationFile = new Configurations().propertiesBuilder(path).configure(parameters);
-        configuration =  this.configurationFile.getConfiguration();
-        servletContext.setAttribute(PortofinoApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, configuration);
+        Configuration baseConf;
+        if (configurationFile.exists()) {
+            String path = configurationFile.getName().getURI();
+            parameters.setFileName(path);
+            this.configurationFile = new Configurations().propertiesBuilder(path).configure(parameters);
+            baseConf = this.configurationFile.getConfiguration();
+        } else {
+            baseConf = new Configurations().propertiesBuilder(parameters).getConfiguration();
+        }
 
         String localConfigurationPath = null;
         try {
@@ -161,27 +169,32 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
             localConfigurationPath = localConfigurationFromDeploymentDescriptor;
         }
         if(localConfigurationPath == null) {
-            localConfigurationPath = configuration.getString(
+            localConfigurationPath = baseConf.getString(
                     "portofino-local.properties",
                     applicationRoot.resolveFile("portofino-local.properties").getName().getURI());
         }
+
+        CompositeConfiguration configuration = new CompositeConfiguration();
+
         FileObject localConfigurationFile = VFS.getManager().resolveFile(localConfigurationPath);
         if (localConfigurationFile.exists()) {
             logger.info("Local configuration file: {}", localConfigurationFile);
             parameters.setFileName(localConfigurationPath);
-            this.configurationFile = new Configurations().propertiesBuilder(localConfigurationPath).configure(parameters);
+            this.configurationFile =
+                    new Configurations().propertiesBuilder(localConfigurationPath).configure(parameters);
             PropertiesConfiguration localConfiguration = this.configurationFile.getConfiguration();
-            CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
-            compositeConfiguration.setPrefixLookups(getConfigurationLookups());
-            compositeConfiguration.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
+
+            configuration.setPrefixLookups(getConfigurationLookups());
+            configuration.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
             //Note: order is important. The localConfiguration must be added here, and not in the constructor,
             //otherwise it is consulted last and not first.
-            compositeConfiguration.addConfiguration(localConfiguration, true);
-            compositeConfiguration.addConfiguration(configuration);
-            configuration = compositeConfiguration;
+            configuration.addConfiguration(localConfiguration, true);
         } else {
             logger.info("No local configuration found at {}", localConfigurationPath);
         }
+        configuration.addConfiguration(baseConf);
+        servletContext.setAttribute(PortofinoApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, configuration);
+        this.configuration = configuration;
     }
 
     public Map<String, Lookup> getConfigurationLookups() {

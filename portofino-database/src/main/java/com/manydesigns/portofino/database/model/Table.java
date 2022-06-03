@@ -284,8 +284,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     @XmlElementWrapper(name="foreignKeys")
-    @XmlElement(name = "foreignKey",
-            type = ForeignKey.class)
+    @XmlElement(name = "foreignKey", type = ForeignKey.class)
     public List<ForeignKey> getForeignKeys() {
         return foreignKeys;
     }

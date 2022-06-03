@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.i18n.I18nUtils;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.ServerInfo;
@@ -73,9 +74,8 @@ public class PortofinoWebSpringConfiguration implements InitializingBean {
     }
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
+    public void setConfiguration(ConfigurationSource configuration) {
+        this.configuration = configuration.getProperties();
     }
 
     @Override

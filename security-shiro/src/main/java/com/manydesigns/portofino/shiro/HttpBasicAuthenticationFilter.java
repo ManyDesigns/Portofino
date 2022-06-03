@@ -1,6 +1,27 @@
+/*
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -14,6 +35,7 @@ import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -62,8 +84,11 @@ public class HttpBasicAuthenticationFilter extends PathMatchingFilter {
                     logger.warn("Failed HTTP basic authentication to " + httpRequest.getRequestURL(), e);
                     HttpServletResponse httpResponse = WebUtils.toHttp(response);
                     httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    Configuration config = (Configuration) request.getServletContext().getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
-                    String authcHeader = HttpServletRequest.BASIC_AUTH + " realm=\"" + config.getString(PortofinoProperties.APP_NAME) + "\"";
+                    ServletContext ctx = request.getServletContext();
+                    ConfigurationSource config =
+                            (ConfigurationSource) ctx.getAttribute(PortofinoSpringConfiguration.CONFIGURATION_SOURCE);
+                    String authcHeader = HttpServletRequest.BASIC_AUTH + " realm=\"" +
+                            config.getProperties().getString(PortofinoProperties.APP_NAME) + "\"";
                     httpResponse.setHeader("WWW-Authenticate", authcHeader);
                     return false;
                 }

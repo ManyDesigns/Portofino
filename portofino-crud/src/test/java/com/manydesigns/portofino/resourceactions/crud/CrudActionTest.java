@@ -25,6 +25,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobUtils;
 import com.manydesigns.elements.blobs.HierarchicalBlobManager;
 import com.manydesigns.elements.fields.AbstractBlobField;
 import com.manydesigns.elements.fields.Field;
@@ -34,6 +35,7 @@ import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.code.JavaCodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.database.model.Column;
@@ -101,7 +103,7 @@ public class CrudActionTest extends JerseyTest {
         Configuration configuration = new PropertiesConfiguration();
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
-        ModelService modelService = new ModelService(appDir, configuration, null, new JavaCodeBase(appDir));
+        ModelService modelService = new ModelService(appDir, new ConfigurationSource(configuration, null), new JavaCodeBase(appDir));
         modelService.loadModel();
         persistence = new Persistence(
                 modelService, modelService.getModel().ensureDomain(DatabaseModule.DATABASES_DOMAIN_NAME),
@@ -327,7 +329,9 @@ public class CrudActionTest extends JerseyTest {
         //Force loading the object from the DB
         crudAction.getParameters().add(id.toString());
         crudAction.parametersAcquired();
-        crudAction.jsonReadData();
+        crudAction.setupForm(Mode.VIEW);
+        crudAction.form.readFromObject(crudAction.object);
+        BlobUtils.loadBlobs(crudAction.form, crudAction.getBlobManager(), false);
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
         assertNotNull(blobField.getBlobError());

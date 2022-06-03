@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAuto
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +22,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Properties;
 
-@SpringBootApplication(exclude = {
-		DispatcherServletAutoConfiguration.class, ErrorMvcAutoConfiguration.class,
-		GroovyTemplateAutoConfiguration.class })
+@SpringBootApplication(exclude = { ErrorMvcAutoConfiguration.class, GroovyTemplateAutoConfiguration.class })
 public class PortofinoBootApplication {
 	private static final Logger logger = LoggerFactory.getLogger(PortofinoBootApplication.class);
 
@@ -31,7 +30,7 @@ public class PortofinoBootApplication {
 		run(PortofinoBootApplication.class, args);
 	}
 
-	public static void run(Class<?> applicationClass, String[] args) throws FileSystemException {
+	public static ConfigurableApplicationContext run(Class<?> applicationClass, String... args) throws FileSystemException {
 		installCommonsVfsBootSupport();
 		SpringApplication application = new SpringApplication(applicationClass);
 		ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
@@ -41,7 +40,7 @@ public class PortofinoBootApplication {
 		} catch (IOException e) {
 			logger.error("Could not create application", e);
 			System.exit(1);
-			return;
+			return null;
 		}
 		if (applicationArguments.containsOption("dump-application-to")) {
 			List<String> values = applicationArguments.getOptionValues("dump-application-to");
@@ -65,10 +64,11 @@ public class PortofinoBootApplication {
 			}
 		});
 		Properties defaultProperties = new Properties();
-		defaultProperties.put("spring.jersey.application-path", "/api/");
+		defaultProperties.put("spring.jersey.type", "filter");
+		defaultProperties.put("spring.jersey.application-path", "/");
 		defaultProperties.put("spring.resteasy.application-path", "/api/");
 		application.setDefaultProperties(defaultProperties);
-		application.run(args);
+		return application.run(args);
 	}
 
 	public static void installCommonsVfsBootSupport() throws FileSystemException {

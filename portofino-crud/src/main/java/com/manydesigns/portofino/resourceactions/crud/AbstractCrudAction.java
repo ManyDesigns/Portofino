@@ -55,6 +55,8 @@ import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.resourceactions.crud.export.CrudExporter;
+import com.manydesigns.portofino.resourceactions.crud.export.CrudExporterRegistry;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissionsChecks;
@@ -208,6 +210,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
+    @Autowired
+    protected CrudExporterRegistry crudExporterRegistry;
+
     //--------------------------------------------------------------------------
     // Configuration
     //--------------------------------------------------------------------------
@@ -316,56 +321,6 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
     }
 
-    public Response jsonSearchData() throws JSONException {
-        executeSearch();
-        final long totalRecords = getTotalSearchRecords();
-
-        JSONStringer js = new JSONStringer();
-        js.object()
-                .key("recordsReturned")
-                .value(objects.size())
-                .key("totalRecords")
-                .value(totalRecords)
-                .key("startIndex")
-                .value(firstResult == null ? 0 : firstResult)
-                .key("records")
-                .array();
-        for (TableForm.Row row : tableForm.getRows()) {
-            js.object()
-                    .key("__rowKey")
-                    .value(row.getKey());
-            FormUtil.fieldsToJson(js, row);
-            js.endObject();
-        }
-        js.endArray();
-        js.endObject();
-        String jsonText = js.toString();
-        Response.ResponseBuilder builder = Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8");
-        Integer rowsPerPage = getCrudConfiguration().getRowsPerPage();
-        if(rowsPerPage != null && totalRecords > rowsPerPage) {
-            int firstResult = getFirstResult() != null ? getFirstResult() : 1;
-            int currentPage = firstResult / rowsPerPage;
-            int lastPage = (int) (totalRecords / rowsPerPage);
-            if(totalRecords % rowsPerPage == 0) {
-                lastPage--;
-            }
-            StringBuilder sb = new StringBuilder();
-            if(currentPage > 0) {
-                sb.append("<").append(getLinkToPage(0)).append(">; rel=\"first\", ");
-                sb.append("<").append(getLinkToPage(currentPage - 1)).append(">; rel=\"prev\"");
-            }
-            if(currentPage != lastPage) {
-                if(currentPage > 0) {
-                    sb.append(", ");
-                }
-                sb.append("<").append(getLinkToPage(currentPage + 1)).append(">; rel=\"next\", ");
-                sb.append("<").append(getLinkToPage(lastPage)).append(">; rel=\"last\"");
-            }
-            builder.header("Link", sb.toString());
-        }
-        return builder.build();
-    }
-
     /**
      * Returns the number of objects matching the current search criteria, not considering set limits
      * (first and max results).
@@ -373,39 +328,19 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     public abstract long getTotalSearchRecords();
 
+    protected Response exportSearchResults(CrudExporter exporter) {
+        return exporter.exportSearchResults(this).build();
+    }
+
     //**************************************************************************
     // Read
     //**************************************************************************
 
-    public Response jsonReadData() throws JSONException {
-        if(object == null) {
-            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
-        }
-        setupForm(Mode.VIEW);
-        form.readFromObject(object);
-        return jsonFormData();
-    }
-
-    public Response jsonEditData() throws JSONException {
-        if(object == null) {
-            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
-        }
-        preEdit();
-        return jsonFormData();
-    }
-
-    public Response jsonCreateData() throws JSONException {
-        preCreate();
-        return jsonFormData();
-    }
-
-    public Response jsonFormData() {
+    public Response exportObject(CrudExporter exporter) {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
-        String jsonText = FormUtil.writeToJson(form);
         String prettyName = safeGetPrettyName();
-        return Response.ok(jsonText)
-                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+        return exporter.exportObject(this)
                 .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
                 .build();
     }
@@ -1561,9 +1496,8 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * @return search results (/) or single object (/pk) as JSON
      */
     @GET
-    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "The contents of this resource: either search results or a single object, depending on path parameters")
-    public Response getAsJson(
+    public Response get(
             @Parameter(description = "The search string (see https://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
             @QueryParam("searchString") String searchString,
             @Parameter(description = "The index of the first search result. Only valid for search.")
@@ -1579,13 +1513,19 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.")
             @QueryParam("newObject") boolean newObject,
             @Parameter(description = "The returned object does not load a displayValue for fields that have selection providers. The client will have to query selection providers by itself. Only valid for create, read, edit.")
-            @QueryParam("skipSelectionProviders") boolean skipSelectionProviders) {
+            @QueryParam("skipSelectionProviders") boolean skipSelectionProviders,
+            @HeaderParam("Accept") String acceptedFormats) {
         checkAccessorPermissions(new String[]{ PERMISSION_READ });
         selectionProviderLoadStrategy = skipSelectionProviders ?
                 SelectionProviderLoadStrategy.NONE :
                 SelectionProviderLoadStrategy.ALL;
+        List<org.springframework.http.MediaType> mediaTypes =
+                org.springframework.http.MediaType.parseMediaTypes(acceptedFormats);
+        org.springframework.http.MediaType.sortBySpecificityAndQuality(mediaTypes);
+        CrudExporter exporter = crudExporterRegistry.get(mediaTypes);
         if(newObject) {
-            return jsonCreateData();
+            preCreate();
+            return exportObject(exporter);
         }
         if(object == null) {
             this.searchString = searchString;
@@ -1593,11 +1533,16 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             this.maxResults = maxResults;
             this.sortProperty = sortProperty;
             this.sortDirection = sortDirection;
-            return jsonSearchData();
-        } else if(forEdit) {
-            return jsonEditData();
+            executeSearch();
+            return exportSearchResults(exporter);
         } else {
-            return jsonReadData();
+            if(forEdit) {
+                preEdit();
+            } else {
+                setupForm(Mode.VIEW);
+                form.readFromObject(object);
+            }
+            return exportObject(exporter);
         }
     }
 

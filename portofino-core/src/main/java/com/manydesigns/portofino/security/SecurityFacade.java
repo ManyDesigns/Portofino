@@ -2,6 +2,7 @@ package com.manydesigns.portofino.security;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
@@ -86,19 +87,20 @@ public abstract class SecurityFacade {
         boolean isNotAdmin = !isAdministrator(request);
         if (isNotAdmin) {
             ServletContext servletContext = request.getServletContext();
-            Configuration configuration = (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
+            ConfigurationSource configuration =
+                    (ConfigurationSource) servletContext.getAttribute(PortofinoSpringConfiguration.CONFIGURATION_SOURCE);
             Permissions permissions;
             String resource;
             boolean allowed;
             if(actionInstance != null) {
                 logger.debug("The protected resource is a actionDescriptor action");
                 resource = actionInstance.getPath();
-                allowed = hasPermissions(configuration, actionInstance, handler);
+                allowed = hasPermissions(configuration.getProperties(), actionInstance, handler);
             } else {
                 logger.debug("The protected resource is a regular JAX-RS resource");
                 resource = request.getRequestURI();
                 permissions = new Permissions();
-                allowed = hasPermissions(configuration, permissions, handler, resourceAction.getClass());
+                allowed = hasPermissions(configuration.getProperties(), permissions, handler, resourceAction.getClass());
             }
             if(!allowed) {
                 logger.info("Access to {} is forbidden", resource);
@@ -110,9 +112,9 @@ public abstract class SecurityFacade {
 
     public boolean isAdministrator(ServletRequest request) {
         ServletContext servletContext = ElementsThreadLocals.getServletContext();
-        Configuration conf =
-                (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
-        return isAdministrator(conf);
+        ConfigurationSource conf =
+                (ConfigurationSource) servletContext.getAttribute(PortofinoSpringConfiguration.CONFIGURATION_SOURCE);
+        return isAdministrator(conf.getProperties());
     }
 
     public abstract boolean isAdministrator(Configuration conf);

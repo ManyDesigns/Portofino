@@ -23,6 +23,8 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.resourceactions.crud.CrudAction;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.resourceactions.crud.export.CrudExporterRegistry;
+import com.manydesigns.portofino.resourceactions.crud.export.JSONExporter;
 import com.manydesigns.portofino.resourceactions.m2m.ManyToManyAction;
 import com.manydesigns.portofino.resourceactions.m2m.configuration.ManyToManyConfiguration;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
@@ -30,6 +32,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -75,6 +78,13 @@ public class CrudModule implements Module {
     @Override
     public String getName() {
         return "CRUD";
+    }
+
+    @Bean
+    public CrudExporterRegistry getCrudExporterRegistry() {
+        CrudExporterRegistry registry = new CrudExporterRegistry();
+        registry.register(new JSONExporter());
+        return registry;
     }
 
     @PostConstruct

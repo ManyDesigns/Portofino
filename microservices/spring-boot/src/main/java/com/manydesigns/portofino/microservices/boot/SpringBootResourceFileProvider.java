@@ -1,10 +1,12 @@
 package com.manydesigns.portofino.microservices.boot;
 
-import org.apache.commons.vfs2.FileName;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemOptions;
+import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.provider.AbstractFileName;
+import org.apache.commons.vfs2.provider.AbstractFileObject;
 import org.apache.commons.vfs2.provider.VfsComponentContext;
+import org.apache.commons.vfs2.provider.local.LocalFileName;
+import org.apache.commons.vfs2.provider.local.LocalFileSystem;
+import org.apache.commons.vfs2.provider.ram.RamFileSystem;
 import org.apache.commons.vfs2.provider.res.ResourceFileNameParser;
 import org.apache.commons.vfs2.provider.res.ResourceFileProvider;
 import org.apache.commons.vfs2.provider.res.ResourceFileSystemConfigBuilder;
@@ -34,9 +36,41 @@ public class SpringBootResourceFileProvider extends ResourceFileProvider {
         FileSystemException.requireNonNull(classLoader, "vfs.provider.url/badly-formed-uri.error", uri);
         final URL url = classLoader.getResource(resourceName);
 
-        FileSystemException.requireNonNull(url, "vfs.provider.url/badly-formed-uri.error", uri);
+        if (url != null) {
+            return getContext().getFileSystemManager().resolveFile(fixNestedURI(url.toExternalForm()));
+        } else {
+            return noFile(resourceName);
+        }
+    }
 
-        return getContext().getFileSystemManager().resolveFile(fixNestedURI(url.toExternalForm()));
+    private FileObject noFile(String name) {
+        AbstractFileName fileName = new AbstractFileName("res", name, FileType.IMAGINARY) {
+            @Override
+            public FileName createName(String absolutePath, FileType fileType) {
+                return null;
+            }
+
+            @Override
+            protected void appendRootUri(StringBuilder buffer, boolean addPassword) {
+
+            }
+        };
+        return new AbstractFileObject<RamFileSystem>(fileName, new RamFileSystem(fileName, new FileSystemOptions()) {}) {
+            @Override
+            protected long doGetContentSize() throws Exception {
+                return 0;
+            }
+
+            @Override
+            protected FileType doGetType() throws Exception {
+                return FileType.IMAGINARY;
+            }
+
+            @Override
+            protected String[] doListChildren() throws Exception {
+                return new String[0];
+            }
+        };
     }
 
     //See https://github.com/bedatadriven/renjin/blob/cac412d232ad66d4ee8e37cfc8cb70a45e676e19/core/src/main/java/org/renjin/util/ClasspathFileProvider.java#L88-L126

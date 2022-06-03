@@ -28,6 +28,7 @@ import com.manydesigns.portofino.database.model.PrimaryKey;
 import com.manydesigns.portofino.database.model.annotations.JDBCConnection;
 import com.manydesigns.portofino.database.model.annotations.JNDIConnection;
 import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.multitenancy.MultiTenant;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.*;
@@ -56,6 +57,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -98,7 +100,7 @@ public class Persistence {
     protected final Map<String, HibernateDatabaseSetup> setups;
     protected final LinkedList<Database> databases = new LinkedList<>();
 
-    protected final Configuration configuration;
+    protected final ConfigurationSource configuration;
     protected final ModelService modelService;
     protected final Domain databasesDomain;
     @Autowired
@@ -115,7 +117,7 @@ public class Persistence {
     public static final Logger logger = LoggerFactory.getLogger(Persistence.class);
 
     public Persistence(
-            ModelService modelService, Domain databasesDomain, Configuration configuration,
+            ModelService modelService, Domain databasesDomain, ConfigurationSource configuration,
             DatabasePlatformsRegistry databasePlatformsRegistry)
             throws FileSystemException {
         this.modelService = modelService;
@@ -317,7 +319,7 @@ public class Persistence {
                 String relativeChangelogPath = appDir.getName().getRelativeName(changelogFile.getName());
                 Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase);
 
-                String[] contexts = configuration.getStringArray(LIQUIBASE_CONTEXT);
+                String[] contexts = configuration.getProperties().getStringArray(LIQUIBASE_CONTEXT);
                 logger.info("Using context {}", Arrays.toString(contexts));
                 lq.update(new Contexts(contexts));
             } catch (Exception e) {
@@ -386,12 +388,13 @@ public class Persistence {
             connectionProvider.init(databasePlatformsRegistry);
             if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
                 MultiTenancyImplementation implementation = getMultiTenancyImplementation(database);
-                SessionFactoryBuilder builder = new SessionFactoryBuilder(database, configuration, implementation);
+                SessionFactoryBuilder builder =
+                        new SessionFactoryBuilder(database, configuration.getProperties(), implementation);
                 SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
                 HibernateDatabaseSetup setup =
                         new HibernateDatabaseSetup(
                                 database, sessionFactoryAndCodeBase.sessionFactory,
-                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(), configuration,
+                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(), configuration.getProperties(),
                                 implementation);
                 String databaseName = database.getDatabaseName();
                 HibernateDatabaseSetup oldSetup = setups.get(databaseName);
@@ -455,7 +458,7 @@ public class Persistence {
         return null;
     }
 
-    public Configuration getConfiguration() {
+    public ConfigurationSource getConfiguration() {
         return configuration;
     }
 
@@ -472,7 +475,7 @@ public class Persistence {
         if(sourceDatabase == null) {
             throw new IllegalArgumentException("Database " + databaseName + " does not exist");
         }
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+        if(configuration.getProperties().getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
             runLiquibase(sourceDatabase);
         } else {
             logger.debug("syncDataModel called, but Liquibase is not enabled");
@@ -587,8 +590,9 @@ public class Persistence {
     // App directories and files
     //**************************************************************************
 
+    @Deprecated
     public String getName() {
-        return getConfiguration().getString(PortofinoProperties.APP_NAME);
+        return configuration.getProperties().getString(PortofinoProperties.APP_NAME);
     }
 
     public FileObject getLiquibaseChangelogFile(Schema schema) throws FileSystemException {
