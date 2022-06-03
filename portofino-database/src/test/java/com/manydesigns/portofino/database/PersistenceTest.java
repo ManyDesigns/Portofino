@@ -92,10 +92,15 @@ public class PersistenceTest {
         assertEquals("There are issues with the model", 0, modelService.getModel().getIssues().size());
         persistence = databaseModule.getPersistence(
                 modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
+        configure(persistence);
         persistence.start();
         setupJPetStore();
         setupHibernateTest();
         persistence.initModel();
+    }
+
+    protected void configure(Persistence persistence) {
+        persistence.setConvertLegacyModel(true);
     }
 
     @AfterMethod
@@ -231,7 +236,7 @@ public class PersistenceTest {
         Object categoria0 = findCategory(tableAccessor, tableCriteria);
         assertEquals("Fish", get(categoria0, "name"));
         set(categoria0, "name", "Pesciu");
-        session.update("category", categoria0);
+        session.merge("category", categoria0);
         session.getTransaction().commit();
         persistence.closeSessions();
 
@@ -241,7 +246,7 @@ public class PersistenceTest {
         assertEquals("Pesciu", get(categoria0, "name"));
         set(categoria0, "name", "Fish");
         session = persistence.getSession("jpetstore");
-        session.update("category", categoria0);
+        session.merge("category", categoria0);
         session.getTransaction().commit();
         persistence.closeSessions();
     }
@@ -301,7 +306,7 @@ public class PersistenceTest {
         session.save("category", wormsEntity);
         session.getTransaction().commit();
         session.beginTransaction();
-        session.delete("category", wormsEntity);
+        session.remove(wormsEntity);
         session.getTransaction().commit();
     }
 
@@ -417,7 +422,7 @@ public class PersistenceTest {
         dateField.readFromRequest(request);
         assertTrue(dateField.validate());
         dateField.writeToObject(order);
-        session.update("orders", order);
+        session.merge("orders", order);
         session.flush();
         session.clear(); //Forget about order
         order = (Map) session.get("orders", new BigInteger("1"));

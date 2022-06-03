@@ -108,6 +108,7 @@ public class Persistence {
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
     public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
     protected Disposable modelEventsSubscription;
+    protected boolean convertLegacyModel = true; // If false (during testing), don't delete the legacy model
 
     public enum Status {
         STARTING, STARTED, STOPPING, STOPPED
@@ -135,7 +136,7 @@ public class Persistence {
         synchronized (modelService) {
             try {
                 XMLModel modelIO = new XMLModel(modelService.getModelDirectory(), this);
-                Model model = modelIO.load();
+                Model model = modelService.loadModel(modelIO);
                 if(model != null) {
                     modelIO.getDatabases().forEach(
                             newDb -> {
@@ -147,7 +148,13 @@ public class Persistence {
                             });
                     model.getDomains().clear();
                     model.getDomains().add(databasesDomain);
-                    logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
+                    logger.info("Loaded legacy XML model");
+                    initModel();
+                    if (convertLegacyModel) {
+                        modelService.saveModel();
+                        modelIO.delete();
+                        logger.info("Converted legacy XML model to the new format");
+                    }
                     return true;
                 }
             } catch (Exception e) {
@@ -329,9 +336,7 @@ public class Persistence {
     }
 
     public synchronized void initModel() {
-        if (!tryLoadingLegacyModel()) {
-            getDatabaseDomains().forEach(this::setupDatabase);
-        }
+        getDatabaseDomains().forEach(this::setupDatabase);
         logger.info("Cleaning up old setups");
         closeSessions();
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
@@ -369,8 +374,8 @@ public class Persistence {
 
     protected boolean initDatabase(Database database) {
         new ResetVisitor().visit(database);
-        new InitVisitor(databases, configuration).visit(database);
-        new LinkVisitor(databases, configuration).visit(database);
+        new InitVisitor(databases, configuration.getProperties()).visit(database);
+        new LinkVisitor(databases, configuration.getProperties()).visit(database);
         Boolean enabled = database.getJavaAnnotation(Enabled.class).map(Enabled::value).orElse(true);
         if(enabled) {
             initConnectionProvider(database);
@@ -553,11 +558,10 @@ public class Persistence {
 
     public void start() {
         status.onNext(Status.STARTING);
+        tryLoadingLegacyModel();
         modelEventsSubscription = modelService.modelEvents.subscribe(evt -> {
             if(evt == ModelService.EventType.LOADED) {
                 initModel();
-            } else if (evt == ModelService.EventType.SAVED) {
-                new XMLModel(modelService.getModelDirectory(), this).delete();
             }
         });
         for(Database database : databases) {
@@ -636,5 +640,13 @@ public class Persistence {
 
     public List<Database> getDatabases() {
         return databases;
+    }
+
+    public boolean isConvertLegacyModel() {
+        return convertLegacyModel;
+    }
+
+    public void setConvertLegacyModel(boolean convertLegacyModel) {
+        this.convertLegacyModel = convertLegacyModel;
     }
 }

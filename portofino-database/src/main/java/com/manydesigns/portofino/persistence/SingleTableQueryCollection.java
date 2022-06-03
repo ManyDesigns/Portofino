@@ -103,15 +103,15 @@ public class SingleTableQueryCollection {
     }
 
     public void save(Object object) {
-        getSession().save(table.getActualEntityName(), object);
+        getSession().persist(table.getActualEntityName(), object);
     }
 
     public void update(Object object) {
-        getSession().update(table.getActualEntityName(), object);
+        getSession().merge(table.getActualEntityName(), object);
     }
     
     public void delete(Object object) {
-        getSession().delete(table.getActualEntityName(), object);
+        getSession().remove(object);
     }
 
     public Session getSession() {
