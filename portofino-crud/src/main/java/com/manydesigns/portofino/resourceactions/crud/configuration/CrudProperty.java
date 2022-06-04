@@ -85,8 +85,8 @@ public class CrudProperty implements Annotated {
         assert name != null;
         for(Annotation annotation : annotations) {
             annotation.reset();
-            annotation.init(persistence.getDatabases(), persistence.getConfiguration());
-            annotation.link(persistence.getDatabases(), persistence.getConfiguration());
+            annotation.init(persistence.getDatabases(), persistence.getConfiguration().getProperties());
+            annotation.link(persistence.getDatabases(), persistence.getConfiguration().getProperties());
         }
     }
 
