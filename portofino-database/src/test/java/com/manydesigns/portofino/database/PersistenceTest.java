@@ -84,7 +84,7 @@ public class PersistenceTest {
         };
         databaseModule.applicationDirectory = appDir;
         databaseModule.configuration = new ConfigurationSource(configuration, null);
-        modelService = new ModelService(appDir, configuration, null, new JavaCodeBase(appDir));
+        modelService = new ModelService(appDir, new ConfigurationSource(configuration, null), new JavaCodeBase(appDir));
         modelService.loadModel();
         modelService.getModel().getIssues().forEach(i -> {
             System.err.println(i.message + " " + i.path + "@" + i.line+ ":" + i.column);

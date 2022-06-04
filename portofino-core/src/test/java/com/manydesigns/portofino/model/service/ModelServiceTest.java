@@ -2,6 +2,7 @@ package com.manydesigns.portofino.model.service;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.code.JavaCodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.Domain;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.vfs2.FileObject;
@@ -31,7 +32,7 @@ public class ModelServiceTest {
     public void testAddBuiltInClass() throws IOException, IntrospectionException {
         FileObject applicationDirectory = VFS.getManager().resolveFile("ram://test");
         ModelService modelService = new ModelService(
-                applicationDirectory, new PropertiesConfiguration(), null,
+                applicationDirectory, new ConfigurationSource(new PropertiesConfiguration(), null),
                 new JavaCodeBase(applicationDirectory));
         EClassifier eClass = modelService.addBuiltInClass(ModelServiceTest.class);
         assertTrue(eClass instanceof EClass);
@@ -44,7 +45,7 @@ public class ModelServiceTest {
     public void testAddBuiltInEnum() throws IOException, IntrospectionException {
         FileObject applicationDirectory = VFS.getManager().resolveFile("ram://test");
         ModelService modelService = new ModelService(
-                applicationDirectory, new PropertiesConfiguration(), null,
+                applicationDirectory, new ConfigurationSource(new PropertiesConfiguration(), null),
                 new JavaCodeBase(applicationDirectory));
         EClassifier eEnum = modelService.addBuiltInClass(ModelService.EventType.class);
         assertTrue(eEnum instanceof EEnum);
@@ -60,7 +61,7 @@ public class ModelServiceTest {
     public void testPutObject() throws Exception {
         FileObject applicationDirectory = VFS.getManager().resolveFile("ram://test");
         ModelService modelService = new ModelService(
-                applicationDirectory, new PropertiesConfiguration(), null,
+                applicationDirectory, new ConfigurationSource(new PropertiesConfiguration(), null),
                 new JavaCodeBase(applicationDirectory));
         Domain domain = modelService.getModel().ensureDomain("domain");
         try {

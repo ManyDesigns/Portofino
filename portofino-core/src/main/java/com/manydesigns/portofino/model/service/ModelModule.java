@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.model.service;
 
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
@@ -55,12 +56,8 @@ public class ModelModule implements Module, ApplicationListener<ContextRefreshed
             "com.manydesigns.portofino.model.service.ModelModule.portofinoDomain";
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE)
-    public FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
+    @Qualifier(PortofinoSpringConfiguration.CONFIGURATION_SOURCE)
+    public ConfigurationSource configuration;
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
@@ -91,7 +88,7 @@ public class ModelModule implements Module, ApplicationListener<ContextRefreshed
 
     @Bean
     public ModelService getModelService() throws IOException {
-        return modelService = new ModelService(applicationDirectory, configuration, configurationFile, codeBase);
+        return modelService = new ModelService(applicationDirectory, configuration, codeBase);
     }
 
     @Bean(name = PORTOFINO_DOMAIN)

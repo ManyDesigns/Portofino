@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.model.service;
 
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
@@ -36,18 +37,15 @@ public class ModelService {
     public final BehaviorSubject<EventType> modelEvents = BehaviorSubject.create();
     public static final String APP_MODEL_DIRECTORY = "portofino-model";
     protected final FileObject applicationDirectory;
-    protected final Configuration configuration;
-    protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
+    protected final ConfigurationSource configuration;
     protected final List<Domain> transientDomains = new CopyOnWriteArrayList<>();
     protected final CodeBase codeBase;
     private static final Logger logger = LoggerFactory.getLogger(ModelService.class);
 
     public ModelService(
-            FileObject applicationDirectory, Configuration configuration,
-            FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile, CodeBase codeBase) {
+            FileObject applicationDirectory, ConfigurationSource configuration, CodeBase codeBase) {
         this.applicationDirectory = applicationDirectory;
         this.configuration = configuration;
-        this.configurationFile = configurationFile;
         this.codeBase = codeBase;
     }
 
@@ -87,9 +85,8 @@ public class ModelService {
         toSave.getDomains().addAll(model.getDomains());
         toSave.getDomains().removeAll(transientDomains);
         new DefaultModelIO(getModelDirectory(), transientDomains).save(toSave);
-        if (configurationFile != null) {
-            configurationFile.save();
-            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+        if (configuration.isWritable()) {
+            configuration.save();
         }
         modelEvents.onNext(EventType.SAVED);
     }
