@@ -89,7 +89,7 @@
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.8.0</commons.vfs.version>
         <fop.version>2.6</fop.version>
-        <groovy.version>3.0.8</groovy.version>
+        <groovy.version>4.0.3</groovy.version>
         <guava.version>31.0.1-jre</guava.version>
         <hibernate.version>6.0.1.Final</hibernate.version>
         <jackson.version>2.13.2</jackson.version>
@@ -328,7 +328,7 @@
             </dependency>
             <!-- Groovy -->
             <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy</artifactId>
                 <version>${groovy.version}</version>
             </dependency>

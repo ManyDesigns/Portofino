@@ -94,18 +94,18 @@
         </dependency>
         <!-- Groovy -->
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-json</artifactId>
             <version>${groovy.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-templates</artifactId>
             <version>${groovy.version}</version>
             <scope>provided</scope>
