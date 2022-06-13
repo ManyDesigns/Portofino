@@ -29,10 +29,6 @@ public class POJOPersistenceTest extends PersistenceTest {
         persistence.initModel();
     }
 
-    protected void configure(Persistence persistence) {
-        persistence.setConvertLegacyModel(false);
-    }
-
     @Test
     public void testGeneratedClasses() throws FileSystemException {
         FileObject genClassesDir = modelService.getApplicationDirectory().resolveFile(DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
