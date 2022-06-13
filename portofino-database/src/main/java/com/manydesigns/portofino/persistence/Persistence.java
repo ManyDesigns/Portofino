@@ -56,8 +56,6 @@ import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ResourceAccessor;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -73,7 +71,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Connection;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -91,6 +88,7 @@ public class Persistence {
 
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
+    public static final String DATABASES_DOMAIN_NAME = "databases";
 
     //**************************************************************************
     // Fields
@@ -102,7 +100,6 @@ public class Persistence {
 
     protected final ConfigurationSource configuration;
     protected final ModelService modelService;
-    protected final Domain databasesDomain;
     @Autowired
     protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
@@ -118,13 +115,12 @@ public class Persistence {
     public static final Logger logger = LoggerFactory.getLogger(Persistence.class);
 
     public Persistence(
-            ModelService modelService, Domain databasesDomain, ConfigurationSource configuration,
+            ModelService modelService, ConfigurationSource configuration,
             DatabasePlatformsRegistry databasePlatformsRegistry)
             throws FileSystemException {
         this.modelService = modelService;
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
-        this.databasesDomain = databasesDomain;
         setups = new HashMap<>();
     }
 
@@ -147,7 +143,7 @@ public class Persistence {
                                 getDatabaseDomains().add(newDb.getModelElement());
                             });
                     model.getDomains().clear();
-                    model.getDomains().add(databasesDomain);
+                    model.getDomains().add(getDatabaseDomain());
                     logger.info("Loaded legacy XML model");
                     initModel();
                     if (convertLegacyModel) {
@@ -164,8 +160,12 @@ public class Persistence {
         return false;
     }
 
-    private EList<Domain> getDatabaseDomains() {
-        return databasesDomain.getSubdomains();
+    protected Domain getDatabaseDomain() {
+        return modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, true);
+    }
+
+    protected EList<Domain> getDatabaseDomains() {
+        return getDatabaseDomain().getSubdomains();
     }
 
     private void annotateDatabase(Database db) {

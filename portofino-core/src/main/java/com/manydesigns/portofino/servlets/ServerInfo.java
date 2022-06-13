@@ -80,7 +80,7 @@ public class ServerInfo {
         try {
             Method method =
                     servletContext.getClass().getMethod("getContextPath");
-            tmp = (String)method.invoke(servletContext);
+            tmp = (String) method.invoke(servletContext);
         } catch (NoSuchMethodException e) {
             logger.debug("Cannot invoke getContextPath(). Required Servlet API >= 2.5");
         } catch (Exception e) {

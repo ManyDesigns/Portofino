@@ -68,8 +68,8 @@ public class ModelService {
         }
     }
 
-    public synchronized void loadModel() throws IOException {
-        loadModel(new DefaultModelIO(getModelDirectory(), transientDomains));
+    public void loadModel() throws IOException {
+        loadModel(getDefaultModelIO());
     }
 
     public FileObject getModelDirectory() throws FileSystemException {
@@ -84,11 +84,40 @@ public class ModelService {
         Model toSave = new Model();
         toSave.getDomains().addAll(model.getDomains());
         toSave.getDomains().removeAll(transientDomains);
-        new DefaultModelIO(getModelDirectory(), transientDomains).save(toSave);
+        getDefaultModelIO().save(toSave);
         if (configuration.isWritable()) {
             configuration.save();
         }
         modelEvents.onNext(EventType.SAVED);
+    }
+
+    @NotNull
+    public DefaultModelIO getDefaultModelIO() throws FileSystemException {
+        return new DefaultModelIO(getModelDirectory(), transientDomains);
+    }
+
+    public synchronized void saveDomain(Domain domain) throws IOException {
+        if (isTransient(domain)) {
+            throw new UnsupportedOperationException(domain.getQualifiedName() + " is transient");
+        }
+        getDefaultModelIO().save(domain);
+    }
+
+    public synchronized void saveEntity(EClass entity) throws IOException {
+        EObject pkg = entity.eContainer();
+        if (!(pkg instanceof Domain)) {
+            throw new UnsupportedOperationException(entity + " does not belong to a domain");
+        }
+        Domain domain = (Domain) pkg;
+        if (isTransient(domain)) {
+            throw new UnsupportedOperationException(domain.getQualifiedName() + " is transient");
+        }
+        getDefaultModelIO().save(entity);
+    }
+
+    public boolean isTransient(Domain domain) {
+        return transientDomains.contains(domain) ||
+                (domain.eContainer() instanceof Domain && isTransient((Domain) domain.eContainer()));
     }
 
     public Domain ensureTopLevelDomain(String name, boolean persist) {

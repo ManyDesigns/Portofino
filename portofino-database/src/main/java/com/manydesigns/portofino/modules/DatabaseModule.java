@@ -25,18 +25,15 @@ import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
-import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.reactivex.disposables.Disposable;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +61,6 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
     public static final String GENERATED_CLASSES_DIRECTORY_NAME = "classes-generated";
-    public static final String DATABASES_DOMAIN_NAME = "databases";
 
     @Autowired
     public ServletContext servletContext;
@@ -142,8 +138,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry)
             throws IOException, ConfigurationException {
-        Domain databasesDomain = modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, true);
-        Persistence persistence = new Persistence(modelService, databasesDomain, configuration, databasePlatformsRegistry);
+        Persistence persistence = new Persistence(modelService, configuration, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         if(applicationContext != null) { //We may want it to be null when testing
             applicationContext.getAutowireCapableBeanFactory().autowireBean(persistence);

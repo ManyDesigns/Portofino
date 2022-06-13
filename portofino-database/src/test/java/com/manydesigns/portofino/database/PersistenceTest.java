@@ -35,7 +35,6 @@ import org.testng.annotations.*;
 import jakarta.persistence.criteria.CriteriaQuery;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -626,7 +625,7 @@ public class PersistenceTest {
             Database hibernatetest = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "hibernatetest");
             hibernatetest.setDatabaseName("test");
             FileObject file;
-            FileObject dbsDir = appDir.resolveFile("portofino-model").resolveFile(DatabaseModule.DATABASES_DOMAIN_NAME);
+            FileObject dbsDir = appDir.resolveFile("portofino-model").resolveFile(Persistence.DATABASES_DOMAIN_NAME);
             file = dbsDir.resolveFile("test");
             modelService.saveModel();
             assertTrue(file.exists());

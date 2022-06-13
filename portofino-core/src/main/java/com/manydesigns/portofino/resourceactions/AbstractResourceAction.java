@@ -538,12 +538,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
      * Utility method to save the configuration object to the model.
      * It must be in a state that will produce a valid XML document.
      */
-    public void saveConfiguration()
-            throws IntrospectionException, InvocationTargetException, IllegalAccessException, ConfigurationException,
-            IOException {
-        getConfigurationDomain().putObject(
-                "configuration", getConfiguration(), modelService.getClassesDomain());
-        modelService.saveModel();
+    public void saveConfiguration() throws Exception {
+        Domain domain = getConfigurationDomain();
+        domain.putObject("configuration", getConfiguration(), modelService.getClassesDomain());
+        modelService.saveDomain(domain);
     }
 
     protected Domain getConfigurationDomain() {

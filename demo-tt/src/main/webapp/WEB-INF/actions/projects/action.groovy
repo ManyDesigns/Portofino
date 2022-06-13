@@ -20,7 +20,8 @@ import java.sql.Timestamp
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectsCrudAction extends CrudAction {
 
-    @Autowired
+    // TODO This stopped working with Groovy 4
+    //@Autowired
     Refresh refresh
 
     Object old

@@ -211,9 +211,30 @@ public class DefaultModelIO implements ModelIO {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
         for(Domain domain : model.getDomains()) {
-            saveDomain(domain, modelDirectory);
+            save(domain);
         }
         deleteUnusedDomainDirectories(modelDirectory, model.getDomains());
+    }
+
+
+    public void save(Domain domain) throws IOException {
+        saveDomain(domain, getDomainDirectory(domain));
+    }
+
+    public void save(EClass entity) throws IOException {
+        EObject pkg = entity.eContainer();
+        if (!(pkg instanceof Domain)) {
+            throw new UnsupportedOperationException(entity + " does not belong to a domain");
+        }
+        saveEntity(entity, getDomainDirectory((Domain) pkg));
+    }
+
+    public FileObject getDomainDirectory(Domain domain) throws FileSystemException {
+        if (domain.eContainer() instanceof Domain) {
+            return getDomainDirectory((Domain) domain.eContainer()).resolveFile(domain.getName());
+        } else {
+            return modelDirectory;
+        }
     }
 
     @NotNull

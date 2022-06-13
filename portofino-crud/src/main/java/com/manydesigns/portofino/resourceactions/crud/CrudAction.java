@@ -133,9 +133,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @Override
-    public void saveConfiguration()
-            throws ConfigurationException, IntrospectionException, IOException, InvocationTargetException,
-            IllegalAccessException {
+    public void saveConfiguration() throws Exception {
         CrudConfiguration crudConfiguration = (CrudConfiguration) getConfiguration();
         List<SelectionProviderReference> sps = new ArrayList<>(crudConfiguration.getSelectionProviders());
         crudConfiguration.getSelectionProviders().clear();
