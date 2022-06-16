@@ -19,6 +19,7 @@ import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.crud.CrudAction;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -247,7 +248,10 @@ public class UpstairsAction extends AbstractResourceAction {
                 summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, isPassword);
             }
 
-            ActionLogic.saveConfiguration(dir, configuration);
+            CrudAction<Object> crudAction = new CrudAction<>();
+            autowire(crudAction);
+            crudAction.crudConfiguration = configuration;
+            crudAction.saveConfiguration();
             ActionDescriptor action = new ActionDescriptor();
             ActionLogic.saveActionDescriptor(dir, action);
             FileObject actionFile = dir.resolveFile("action.groovy");

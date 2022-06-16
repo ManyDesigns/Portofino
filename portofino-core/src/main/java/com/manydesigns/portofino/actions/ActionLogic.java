@@ -101,8 +101,6 @@ public class ActionLogic {
     //Cache configuration properties
     public static final String ACTION_DESCRIPTOR_CACHE_SIZE = "actionDescriptor.cache.size";
     public static final String ACTION_DESCRIPTOR_CACHE_CHECK_FREQUENCY = "actionDescriptor.cache.check.frequency";
-    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
-    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
     public static void init(Configuration portofinoConfiguration) {
         int maxSize, refreshCheckFrequency;
@@ -110,10 +108,6 @@ public class ActionLogic {
         refreshCheckFrequency =
                 portofinoConfiguration.getInt(ACTION_DESCRIPTOR_CACHE_CHECK_FREQUENCY, 5);
         initActionDescriptorCache(maxSize, refreshCheckFrequency);
-        maxSize = portofinoConfiguration.getInt(CONFIGURATION_CACHE_SIZE, 1000);
-        refreshCheckFrequency =
-                portofinoConfiguration.getInt(CONFIGURATION_CACHE_CHECK_FREQUENCY, 5);
-        initConfigurationCache(maxSize, refreshCheckFrequency);
     }
 
     public static void mount(FileObject actionDirectory, String segment, String path) throws Exception {
@@ -233,76 +227,6 @@ public class ActionLogic {
                         });
     }
 
-    protected static LoadingCache<FileObject, ConfigurationCacheEntry> configurationCache;
-
-    public static void initConfigurationCache(int maxSize, int refreshCheckFrequency) {
-        configurationCache =
-                CacheBuilder.newBuilder()
-                        .maximumSize(maxSize)
-                        .refreshAfterWrite(refreshCheckFrequency, TimeUnit.SECONDS)
-                        .build(new CacheLoader<FileObject, ConfigurationCacheEntry>() {
-
-                            @Override
-                            public ConfigurationCacheEntry load(FileObject key) {
-                                throw new UnsupportedOperationException();
-                            }
-
-                            @Override
-                            public ListenableFuture<ConfigurationCacheEntry> reload(
-                                    final FileObject key, ConfigurationCacheEntry oldValue)
-                                    throws Exception {
-                                if(!key.exists()) {
-                                    //Se la conf. non esiste più, la marco come errata;
-                                    //il metodo getConfiguration provvederà a rimuoverla (contrariamente
-                                    //alla actionDescriptor, non è possibile lasciare l'oggetto in stato errato nella
-                                    //cache perché in generale potrebbero mancare le informazioni per ricaricarlo
-                                    //correttamente... TODO da verificare meglio!!!)
-                                    return Futures.immediateFuture(
-                                            new ConfigurationCacheEntry(null, null, 0, true));
-                                } else if (key.getContent().getLastModifiedTime() > oldValue.lastModified) {
-                                    //TODO se oldValue.error non dovrei ricaricare (informazioni incomplete) - ?
-                                    //TODO async?
-                                    try {
-                                        Object newConf = loadConfiguration(
-                                                key, oldValue.configurationClass);
-                                        return Futures.immediateFuture(
-                                                new ConfigurationCacheEntry(
-                                                        newConf, newConf.getClass(), key.getContent().getLastModifiedTime(),
-                                                        false));
-                                    } catch (Throwable t) {
-                                        logger.error(
-                                                "Could not reload cached configuration from " + key.getName().getPath() +
-                                                ", removing from cache", t);
-                                        return Futures.immediateFuture(
-                                            new ConfigurationCacheEntry(null, null, 0, true));
-                                    }
-                                } else {
-                                    return Futures.immediateFuture(oldValue);
-                                }
-                            }
-
-                        });
-    }
-
-    public static void clearConfigurationCache() {
-        configurationCache.invalidateAll();
-    }
-
-    /**
-     * Clears the cache from entries whose class matches exactly with the one passed as a parameter.
-     * @param configurationClass the class of the entries to remove.
-     */
-    public static void clearConfigurationCache(Class configurationClass) {
-        Set<Map.Entry<FileObject, ConfigurationCacheEntry>> entries = configurationCache.asMap().entrySet();
-        List<FileObject> keysToInvalidate = new ArrayList<>();
-        for(Map.Entry<FileObject, ConfigurationCacheEntry> entry : entries) {
-            if(entry.getValue().configurationClass == configurationClass) {
-                keysToInvalidate.add(entry.getKey());
-            }
-        }
-        configurationCache.invalidateAll(keysToInvalidate);
-    }
-
     protected static FileObject getActionDescriptorFile(FileObject directory) throws FileSystemException {
         return directory.resolveFile("action.xml");
     }
@@ -335,57 +259,29 @@ public class ActionLogic {
         }
     }
 
-    public static FileObject saveConfiguration(FileObject directory, Object configuration) throws Exception {
-        String configurationPackage = configuration.getClass().getPackage().getName();
-        JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        FileObject configurationFile = directory.resolveFile("configuration.xml");
-        if(!configurationFile.exists()) {
-            configurationFile.createFile();
-        }
-        try(OutputStream outputStream = configurationFile.getContent().getOutputStream()) {
-            marshaller.marshal(configuration, outputStream);
-            configurationCache.invalidate(configurationFile);
-        }
-        return configurationFile;
-    }
-
-    public static <T> T getConfiguration(FileObject configurationFile, Class<? extends T> configurationClass)
-            throws Exception {
+    public static <T> T getLegacyConfiguration(
+            FileObject configurationFile, Class<? extends T> configurationClass
+    ) throws Exception {
         if (configurationClass == null) {
             return null;
         }
-        ConfigurationCacheEntry entry = configurationCache.getIfPresent(configurationFile);
-        if(entry == null || !configurationClass.isInstance(entry.object) || entry.error) {
-            if(entry != null && entry.error) {
-                logger.warn("Cached configuration for {} is in error state, forcing a reload",
-                            configurationFile.getName().getPath());
-            } else if(entry != null && !configurationClass.isInstance(entry.object)) {
-                logger.warn("Cached configuration for {} is an instance of the wrong class, forcing a reload",
-                            configurationFile.getName().getPath());
-            }
-            T configuration = loadConfiguration(configurationFile, configurationClass);
-            entry = new ConfigurationCacheEntry(
-                    configuration, configurationClass, configurationFile.getContent().getLastModifiedTime(), false);
-            configurationCache.put(configurationFile, entry);
-        }
-        return (T) entry.object;
+        return loadLegacyConfiguration(configurationFile, configurationClass);
     }
 
-    public static <T> T loadConfiguration(
-            FileObject configurationFile, Class<? extends T> configurationClass) throws Exception {
+    public static <T> T loadLegacyConfiguration(
+            FileObject configurationFile, Class<? extends T> configurationClass
+    ) throws Exception {
         if (configurationClass == null) {
             return null;
         }
         try(InputStream inputStream = configurationFile.getContent().getInputStream()) {
-            return loadConfiguration(inputStream, configurationClass);
+            return loadLegacyConfiguration(inputStream, configurationClass);
         }
     }
 
-    public static <T> T loadConfiguration
-            (InputStream inputStream, Class<? extends T> configurationClass)
-            throws Exception {
+    public static <T> T loadLegacyConfiguration(
+            InputStream inputStream, Class<? extends T> configurationClass
+    ) throws Exception {
         if (configurationClass == null) {
             return null;
         }
@@ -420,7 +316,7 @@ public class ActionLogic {
         }
         Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(resourceAction.getClass());
         try {
-            Object configuration = getConfiguration(configurationFile, configurationClass);
+            Object configuration = getLegacyConfiguration(configurationFile, configurationClass);
             actionInstance.setConfiguration(configuration);
         } catch (Throwable t) {
             logger.error("Couldn't load configuration from " + configurationFile.getName().getPath(), t);

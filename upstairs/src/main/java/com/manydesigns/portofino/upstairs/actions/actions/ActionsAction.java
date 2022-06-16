@@ -137,7 +137,12 @@ public class ActionsAction extends AbstractResourceAction {
         logger.debug("Creating the new child actionDescriptor in directory: {}", directory);
         ActionLogic.saveActionDescriptor(directory, action);
         if(configuration != null) {
-            ActionLogic.saveConfiguration(directory, configuration);
+            ResourceAction theAction = (ResourceAction) actionClass.getConstructor().newInstance();
+            autowire(theAction);
+            ActionInstance actionInstance = new ActionInstance(null, directory, action, actionClass);
+            actionInstance.setConfiguration(configuration);
+            theAction.setActionInstance(actionInstance);
+            theAction.saveConfiguration();
         }
         FileObject groovyScriptFile = directory.resolveFile("action.groovy");
         groovyScriptFile.createFile();

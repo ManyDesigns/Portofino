@@ -138,8 +138,6 @@ public class ResourceActionsModule implements Module {
             preloadClasses(codeBase.getRoot());
         }
 
-        cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
-
         SecurityLogic.installLogin(actionsDirectory, configuration.getProperties(), NoOpLoginAction.class);
         status = ModuleStatus.STARTED;
     }
@@ -219,12 +217,5 @@ public class ResourceActionsModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
-    }
-
-    private static class ConfigurationCacheResetListener implements CacheResetListener {
-        @Override
-        public void handleReset(CacheResetEvent e) {
-            ActionLogic.clearConfigurationCache();
-        }
     }
 }
