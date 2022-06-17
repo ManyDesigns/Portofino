@@ -21,13 +21,14 @@
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
-import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
+import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import io.reactivex.disposables.Disposable;
-import org.apache.commons.configuration2.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -83,16 +85,30 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
     protected ServletContext servletContext;
     protected ConfigurableWebApplicationContext parentContext;
-    protected PortofinoDispatcherInitializer initializer = new PortofinoDispatcherInitializer();
+    protected PortofinoDispatcherInitializer initializer;
     protected final ConfigurableWebApplicationContext bridgeContext = new AnnotationConfigWebApplicationContext();
 
-    public PortofinoContextLoaderListener(Set<Class<?>> candidateModuleClasses) {
+    public PortofinoContextLoaderListener(
+            Set<Class<?>> candidateModuleClasses, Set<Class<?>> codebaseClasses, Set<Class<?>> resourceResolverClasses
+    ) {
+        this.moduleClasses.addAll(getImplementations(Module.class, candidateModuleClasses));
+        initializer = new PortofinoDispatcherInitializer(
+                getImplementations(CodeBase.class, codebaseClasses),
+                getImplementations(ResourceResolver.class, resourceResolverClasses));
+    }
+
+    @NotNull
+    public static <T> Set<Class<? extends T>> getImplementations(
+            Class<T> target, Set<Class<?>> candidateModuleClasses
+    ) {
+        Set<Class<? extends T>> concreteClasses = new LinkedHashSet<>();
         for(Class<?> candidate: candidateModuleClasses) {
             if(!candidate.isInterface() && !Modifier.isAbstract(candidate.getModifiers()) &&
-                    Module.class.isAssignableFrom(candidate)) {
-                moduleClasses.add(candidate.asSubclass(Module.class));
+                    target.isAssignableFrom(candidate)) {
+                concreteClasses.add(candidate.asSubclass(target));
             }
         }
+        return concreteClasses;
     }
 
     @Override

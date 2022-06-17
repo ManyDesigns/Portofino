@@ -21,12 +21,10 @@
 package com.manydesigns.portofino.dispatcher.main;
 
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.code.GroovyCodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.resolvers.CachingResourceResolver;
-import com.manydesigns.portofino.dispatcher.resolvers.GroovyResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
@@ -72,10 +70,8 @@ public class GrizzlyMain {
                     getParent().getParent().getParent().getParent().getParent().getParent();
         }
         CodeBase codeBase = new JavaCodeBase(codeBaseRoot);
-        codeBase = new GroovyCodeBase(codeBaseRoot, codeBase);
         ResourceResolvers resourceResolver = new ResourceResolvers();
         resourceResolver.resourceResolvers.add(new JavaResourceResolver(codeBase));
-        resourceResolver.resourceResolvers.add(new GroovyResourceResolver(codeBase));
         FileObject root = manager.resolveFile(rootPath);
         logger.info("Codebase rootFactory: " + codeBaseRoot.getURL());
         logger.info("Root path: " + root.getURL());

@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.code;
+package com.manydesigns.portofino.groovy;
 
+import com.manydesigns.portofino.code.AbstractCodeBase;
+import com.manydesigns.portofino.code.CodeBase;
 import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;

@@ -18,34 +18,34 @@
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-groovy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-postgresql</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-upstairs</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-crud</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Jersey JAX-RS. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jersey</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- RestEasy JAX-RS. Enable instead of Jersey. -->
         <!--
@@ -53,7 +53,6 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-resteasy</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         -->
         <!-- Security -->
@@ -61,33 +60,28 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-security-shiro</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Keycloak support -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-keycloak</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Quartz support. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <!-- Email support -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
-            <scope>compile</scope>
         </dependency>
         <!-- Angular UI support -->
         <dependency>
@@ -99,7 +93,7 @@
         <dependency>
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
-            <version>4.0.3</version>
+            <version>4.0.4</version>
         </dependency>
         <!-- Servlet API. -->
         <dependency>

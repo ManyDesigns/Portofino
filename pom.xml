@@ -158,8 +158,10 @@
         <module>databases/mysql</module>
         <module>databases/oracle</module>
         <module>databases/postgresql</module>
-        <!-- Pages -->
+        <!-- Resource-actions -->
         <module>portofino-crud</module>
+        <!-- Languages -->
+        <module>portofino-groovy</module>
         <!-- Optional services and integrations -->
         <module>portofino-quartz</module>
         <module>keycloak</module>

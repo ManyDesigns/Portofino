@@ -123,11 +123,11 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-spring-boot</artifactId>
             <version>${portofino.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy</artifactId>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-groovy</artifactId>
+            <version>${portofino.version}</version>
         </dependency>
         <!-- Support for database connectivity. -->
         <dependency>

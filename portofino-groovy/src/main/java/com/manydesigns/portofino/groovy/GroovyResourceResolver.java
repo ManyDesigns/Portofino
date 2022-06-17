@@ -18,24 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.dispatcher.resolvers;
+package com.manydesigns.portofino.groovy;
 
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.code.GroovyCodeBase;
-import com.manydesigns.portofino.dispatcher.ResourceResolver;
-import groovy.util.GroovyScriptEngine;
+import com.manydesigns.portofino.dispatcher.resolvers.AbstractResourceResolver;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.VFS;
-import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -61,8 +53,9 @@ public class GroovyResourceResolver extends AbstractResourceResolver {
         }
         
     protected static GroovyCodeBase getGroovyCodeBase(CodeBase codeBase) {
-        if(codeBase instanceof GroovyCodeBase) {
-            return (GroovyCodeBase) codeBase;
+        GroovyCodeBase gcb = getGroovyCodeBaseInHierarchy(codeBase);
+        if (gcb != null) {
+            return gcb;
         }
         try {
             return new GroovyCodeBase(
@@ -70,6 +63,16 @@ public class GroovyResourceResolver extends AbstractResourceResolver {
                     codeBase);
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private static GroovyCodeBase getGroovyCodeBaseInHierarchy(CodeBase codeBase) {
+        if (codeBase == null) {
+            return null;
+        } else if(codeBase instanceof GroovyCodeBase) {
+            return (GroovyCodeBase) codeBase;
+        } else {
+            return getGroovyCodeBaseInHierarchy(codeBase.getParent());
         }
     }
 

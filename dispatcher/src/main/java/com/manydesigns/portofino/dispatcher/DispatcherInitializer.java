@@ -26,9 +26,7 @@ import com.manydesigns.portofino.dispatcher.resolvers.CachingResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
-import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -41,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public abstract class DispatcherInitializer {
     protected FileObject applicationRoot;
@@ -136,19 +135,8 @@ public abstract class DispatcherInitializer {
     }
 
     protected CodeBase createCodeBase() throws IOException {
-        //TODO auto discovery?
         FileObject codeBaseRoot = getCodeBaseRoot();
-        JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot, null, getClass().getClassLoader());
-        CodeBase codeBase = javaCodeBase;
-        try {
-            Class<?> gcb = Class.forName("com.manydesigns.portofino.code.GroovyCodeBase");
-            Constructor<?> gcbConstructor = gcb.getConstructor(FileObject.class, CodeBase.class);
-            codeBase = (CodeBase) gcbConstructor.newInstance(codeBaseRoot, javaCodeBase);
-            logger.info("Groovy is available");
-        } catch (Exception e) {
-            logger.debug("Groovy not available", e);
-        }
-        return codeBase;
+        return new JavaCodeBase(codeBaseRoot, null, getClass().getClassLoader());
     }
 
     protected FileObject getCodeBaseRoot() throws FileSystemException {
@@ -157,7 +145,6 @@ public abstract class DispatcherInitializer {
 
     protected void configureResourceResolvers(ResourceResolvers resourceResolver, CodeBase codeBase) {
         resourceResolver.resourceResolvers.add(new JavaResourceResolver(codeBase));
-        addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.GroovyResourceResolver", codeBase, false);
         addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver", codeBase, true);
     }
 
@@ -168,21 +155,27 @@ public abstract class DispatcherInitializer {
     protected void addResourceResolver(ResourceResolvers resourceResolver, String className, CodeBase codeBase, boolean caching) {
         try {
             Class<?> resClass = Class.forName(className);
-            ResourceResolver resolver;
-            try {
-                Constructor<?> resClassConstructor = resClass.getConstructor(CodeBase.class);
-                resolver = (ResourceResolver) resClassConstructor.newInstance(codeBase);
-            } catch (Exception e) {
-                logger.debug("Constructor from CodeBase not available", e);
-                resolver = (ResourceResolver) resClass.getConstructor().newInstance();
-            }
-            if(caching) {
-                resolver = new CachingResourceResolver(resolver);
-            }
-            resourceResolver.resourceResolvers.add(resolver);
+            addResourceResolver(resourceResolver, resClass, codeBase, caching);
         } catch (Exception e) {
             logger.debug(className + " not available", e);
         }
+    }
+
+    protected void addResourceResolver(
+            ResourceResolvers resourceResolver, Class<?> resClass, CodeBase codeBase, boolean caching
+    ) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        ResourceResolver resolver;
+        try {
+            Constructor<?> resClassConstructor = resClass.getConstructor(CodeBase.class);
+            resolver = (ResourceResolver) resClassConstructor.newInstance(codeBase);
+        } catch (Exception e) {
+            logger.debug("Constructor from CodeBase not available", e);
+            resolver = (ResourceResolver) resClass.getConstructor().newInstance();
+        }
+        if(caching) {
+            resolver = new CachingResourceResolver(resolver);
+        }
+        resourceResolver.resourceResolvers.add(resolver);
     }
 
     protected void initializationFailed(Exception e) {

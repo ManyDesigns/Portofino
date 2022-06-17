@@ -22,7 +22,12 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.code.AggregateCodeBase;
+import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.dispatcher.ResourceResolver;
+import com.manydesigns.portofino.dispatcher.resolvers.CachingResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
@@ -50,8 +55,11 @@ import org.slf4j.MDC;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -69,19 +77,20 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
 
     public static final String PORTOFINO_CONFIGURATION_FILE_PROPERTY = "portofino.configuration.file";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
     protected FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
     protected ServerInfo serverInfo;
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
+    protected final Set<Class<? extends CodeBase>> codeBaseClasses;
+    protected final Set<Class<? extends ResourceResolver>> resourceResolverClasses;
 
     public static final Logger logger =
             LoggerFactory.getLogger(PortofinoDispatcherInitializer.class);
+
+    public PortofinoDispatcherInitializer(
+            Set<Class<? extends CodeBase>> codeBaseClasses,
+            Set<Class<? extends ResourceResolver>> resourceResolverClasses) {
+        this.codeBaseClasses = codeBaseClasses;
+        this.resourceResolverClasses = resourceResolverClasses;
+    }
 
     //**************************************************************************
     // ServletContextListener implementation
@@ -125,6 +134,38 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
         logger.info("Initializing codebase with classpath: " + classpath);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(new File(classpath));
         return codeBaseRoot;
+    }
+
+    @Override
+    protected CodeBase createCodeBase() throws IOException {
+        CodeBase codeBase = super.createCodeBase();
+        for (Class<? extends CodeBase> c : codeBaseClasses) {
+            if (c == JavaCodeBase.class || c == AggregateCodeBase.class) {
+                continue;
+            }
+            try {
+                Constructor<?> constructor = c.getConstructor(FileObject.class, CodeBase.class);
+                codeBase = (CodeBase) constructor.newInstance(codeBase.getRoot(), codeBase);
+                logger.info("Installed codebase " + c);
+            } catch (Exception e) {
+                logger.error("Could not install codebase " + c, e);
+            }
+        }
+        return codeBase;
+    }
+
+    @Override
+    protected void configureResourceResolvers(ResourceResolvers resourceResolver, CodeBase codeBase) {
+        for (Class<?> c : resourceResolverClasses) {
+            if (c == ResourceResolvers.class || c == CachingResourceResolver.class) {
+                continue;
+            }
+            try {
+                addResourceResolver(resourceResolver, c, codeBase, false);
+            } catch (Exception e) {
+                logger.error("Could not add resource resolver " + c);
+            }
+        }
     }
 
     @Override
