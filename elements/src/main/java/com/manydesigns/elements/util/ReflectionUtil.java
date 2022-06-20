@@ -70,15 +70,14 @@ public class ReflectionUtil {
         }
     }
 
-    public static Constructor getConstructor(String className,
+    public static Constructor<?> getConstructor(String className,
                                              Class... argClasses) {
         return getConstructor(loadClass(className), argClasses);
     }
 
-    public static Constructor getConstructor(Class aClass,
-                                             Class... argClasses) {
+    public static <T> Constructor<T> getConstructor(Class<T> aClass, Class... argClasses) {
         try {
-            Constructor constructor = aClass.getConstructor(argClasses);
+            Constructor<T> constructor = aClass.getConstructor(argClasses);
             logger.debug("Found constructor: {}", constructor);
             return constructor;
         } catch (Throwable e) {
@@ -112,12 +111,12 @@ public class ReflectionUtil {
         return newInstance(loadClass(className));
     }
 
-    public static Object newInstance(Class aClass) {
-        Constructor constructor = getConstructor(aClass);
+    public static <T> T newInstance(Class<T> aClass) {
+        Constructor<T> constructor = getConstructor(aClass);
         return newInstance(constructor);
     }
 
-    public static Object newInstance(Constructor constructor, Object... args) {
+    public static <T> T newInstance(Constructor<T> constructor, Object... args) {
         try {
             return constructor.newInstance(args);
         } catch (Throwable e) {

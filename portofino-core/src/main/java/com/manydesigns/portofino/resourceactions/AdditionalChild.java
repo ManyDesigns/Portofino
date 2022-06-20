@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.resourceactions;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

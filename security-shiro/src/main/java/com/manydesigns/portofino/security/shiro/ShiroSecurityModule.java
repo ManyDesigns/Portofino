@@ -25,6 +25,7 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
+import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
 import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
@@ -47,6 +48,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -59,35 +61,30 @@ import java.util.UUID;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@Order(ShiroSecurityModule.SECURITY_MODULE)
 public class ShiroSecurityModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
+    public static final int SECURITY_MODULE = ResourceActionsModule.NO_OP_LOGIN + 100;
 
     @Autowired
     public ServletContext servletContext;
 
     @Autowired
     public ConfigurationSource configuration;
-
     @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
     public FileObject actionsDirectory;
-
     @Autowired
     public CodeBase codeBase;
+    @Autowired
+    public ResourceActionSupport resourceActionSupport;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
     protected SecurityClassRealm realm;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
 
     public static final Logger logger =
             LoggerFactory.getLogger(ShiroSecurityModule.class);
@@ -132,7 +129,6 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         logger.debug("Creating SecurityClassRealm");
         realm = new SecurityClassRealm(codeBase, "Security");
         rsm.setRealm(realm);
-        SecurityLogic.installLogin(actionsDirectory, configuration.getProperties(), DefaultLoginAction.class);
         status = ModuleStatus.STARTED;
     }
 
@@ -150,13 +146,20 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
 
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
+        try {
+            SecurityLogic.installLogin(
+                    resourceActionSupport, actionsDirectory, configuration.getProperties(), DefaultLoginAction.class);
+        } catch (Exception e) {
+            logger.error("Could not install login action", e);
+        }
         ApplicationContext applicationContext = event.getApplicationContext();
         if(PortofinoContextLoaderListener.BRIDGE_CONTEXT.equals(applicationContext.getId())) {
             realm.setApplicationContext(applicationContext);
             try {
                 LifecycleUtils.init(realm);
             } catch (Exception e) {
-                logger.warn("Security class not found or invalid or initialization failed. We will reload and/or initialize it on next use.", e);
+                logger.warn("Security class not found or invalid or initialization failed. " +
+                        "We will reload and/or initialize it on next use.", e);
             }
         }
     }

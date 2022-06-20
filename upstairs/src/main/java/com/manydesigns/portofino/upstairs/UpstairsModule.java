@@ -21,9 +21,9 @@
 package com.manydesigns.portofino.upstairs;
 
 import com.manydesigns.portofino.ResourceActionsModule;
-import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
+import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
 import com.manydesigns.portofino.upstairs.actions.UpstairsAction;
 import org.apache.commons.vfs2.FileObject;
 import org.jetbrains.annotations.NotNull;
@@ -50,16 +50,13 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
 
     @Autowired
     public ServletContext servletContext;
-
     @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
     public FileObject actionsDirectory;
+    @Autowired
+    public ResourceActionSupport resourceActionSupport;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
 
     public static final Logger logger = LoggerFactory.getLogger(UpstairsModule.class);
 
@@ -91,9 +88,10 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent contextRefreshedEvent) {
         try {
-            ActionLogic.mountPackage(actionsDirectory, "portofino-upstairs", UpstairsAction.class.getPackage());
+            resourceActionSupport.mountPackage(
+                    actionsDirectory, "portofino-upstairs", UpstairsAction.class.getPackage());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error("Could not install upstairs actions", e);
         }
     }
 }

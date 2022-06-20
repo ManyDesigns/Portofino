@@ -106,6 +106,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
     //**************************************************************************
 
     public void init() {
+        super.init();
         actualDatabase = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), database);
         if(actualDatabase != null && query != null) { //Query can be null if the user hasn't got permission to see it
             actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);

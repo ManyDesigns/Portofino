@@ -21,16 +21,12 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.i18n.TextProviderBean;
-import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
-import com.manydesigns.portofino.resourceactions.ActionContext;
-import com.manydesigns.portofino.resourceactions.ActionInstance;
-import com.manydesigns.portofino.resourceactions.ResourceAction;
+import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.resourceactions.*;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import ognl.OgnlContext;
@@ -49,6 +45,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.beans.IntrospectionException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -96,19 +95,21 @@ public class PortofinoRoot extends AbstractResourceAction {
 
     @Override
     public PortofinoRoot init() {
-        super.init();
-        ActionDescriptor rootActionDescriptor = ActionLogic.getActionDescriptor(location);
-        ActionInstance actionInstance = new ActionInstance(null, location, rootActionDescriptor, getClass());
+        applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        autowire(this);
+        ActionInstance actionInstance = new ActionInstance(null, location, getClass());
         setActionInstance(actionInstance);
         ActionContext context = new ActionContext();
         context.setServletContext(servletContext);
         context.setRequest(request);
         context.setResponse(response);
         context.setActionPath("/");
+        try {
+            loadConfiguration();
+        } catch (Exception e) {
+            throw new RuntimeException("Initialization failed", e);
+        }
         setContext(context);
-
-        applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        autowire(this);
         return this;
     }
 
@@ -130,11 +131,15 @@ public class PortofinoRoot extends AbstractResourceAction {
         Map<String, Object> description = new HashMap<>();
         description.put("superclass", getClass().getSuperclass().getName());
         description.put("class", getClass().getName());
-        description.put("page", actionInstance.getActionDescriptor());
         description.put("path", getPath());
         description.put("children", getSubResources());
         description.put("loginPath", "/:auth"); //For legacy clients
         return description;
+    }
+
+    @Override
+    protected Domain getConfigurationDomain() {
+        return actionsDomain;
     }
 
     @Override

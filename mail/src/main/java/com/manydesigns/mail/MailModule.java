@@ -27,41 +27,40 @@ import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ResourceActionsModule;
-import com.manydesigns.portofino.actions.ActionLogic;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
+import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
-/*
+/**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MailModule implements Module {
+public class MailModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
     @Autowired
     public ServletContext servletContext;
-
     @Autowired
     public Configuration configuration;
-
+    @Autowired
+    public ResourceActionSupport resourceActionSupport;
     @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
     public FileObject actionsDirectory;
@@ -99,10 +98,6 @@ public class MailModule implements Module {
             logger.debug(e.getMessage(), e);
             logger.info("Quartz is not available, mail scheduler not started");
         }
-        if(configuration.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
-            String segment = configuration.getString(MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
-            ActionLogic.mount(actionsDirectory, segment, SendMailAction.class);
-        }
         status = ModuleStatus.STARTED;
     }
 
@@ -126,4 +121,16 @@ public class MailModule implements Module {
         return status;
     }
 
+    @Override
+    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
+        if(configuration.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
+            String segment = configuration.getString(
+                    MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
+            try {
+                resourceActionSupport.mount(actionsDirectory, segment, SendMailAction.class);
+            } catch (Exception e) {
+                logger.error("Could not install send mail action", e);
+            }
+        }
+    }
 }

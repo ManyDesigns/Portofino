@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.resourceactions.crud.security;
 
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.Group;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.SecurityFacade;

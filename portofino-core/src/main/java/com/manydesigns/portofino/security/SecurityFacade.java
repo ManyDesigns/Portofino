@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.security;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.resourceactions.ActionInstance;

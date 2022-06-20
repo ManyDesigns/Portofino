@@ -5,8 +5,7 @@ import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
+import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
@@ -106,7 +105,6 @@ public class ActionsAction extends AbstractResourceAction {
         Class actionClass = codeBase.loadClass(actionClassName);
         ActionInfo info = actionRegistry.getInfo(actionClass);
         String scriptTemplate = info.scriptTemplate;
-        Class<?> configurationClass = info.configurationClass;
         boolean supportsDetail = info.supportsDetail;
 
         String className = actionClass.getSimpleName() + "_" + RandomUtil.createRandomId();
@@ -115,13 +113,15 @@ public class ActionsAction extends AbstractResourceAction {
         ognlContext.put("actionClassName", actionClassName);
         String script = OgnlTextFormat.format(scriptTemplate, parent);
 
-        ActionDescriptor action = new ActionDescriptor();
-        Object configuration = null;
-        if(configurationClass != null) {
-            configuration = ReflectionUtil.newInstance(configurationClass);
+        ResourceActionConfiguration action = new ResourceActionConfiguration();
+        ResourceActionConfiguration configuration;
+        if(info.configurationClass != null) {
+            configuration = ReflectionUtil.newInstance(info.configurationClass);
             if(configuration instanceof ConfigurationWithDefaults) {
                 ((ConfigurationWithDefaults) configuration).setupDefaults();
             }
+        } else {
+            configuration = new ResourceActionConfiguration();
         }
         action.init();
 
@@ -135,15 +135,12 @@ public class ActionsAction extends AbstractResourceAction {
         }
         directory.createFolder();
         logger.debug("Creating the new child actionDescriptor in directory: {}", directory);
-        ActionLogic.saveActionDescriptor(directory, action);
-        if(configuration != null) {
-            ResourceAction theAction = (ResourceAction) actionClass.getConstructor().newInstance();
-            autowire(theAction);
-            ActionInstance actionInstance = new ActionInstance(null, directory, action, actionClass);
-            actionInstance.setConfiguration(configuration);
-            theAction.setActionInstance(actionInstance);
-            theAction.saveConfiguration();
-        }
+        ResourceAction theAction = (ResourceAction) actionClass.getConstructor().newInstance();
+        autowire(theAction);
+        ActionInstance actionInstance = new ActionInstance(null, directory, actionClass);
+        actionInstance.setConfiguration(configuration);
+        theAction.setActionInstance(actionInstance);
+        theAction.saveConfiguration();
         FileObject groovyScriptFile = directory.resolveFile("action.groovy");
         groovyScriptFile.createFile();
         try(Writer w = new OutputStreamWriter(groovyScriptFile.getContent().getOutputStream())) {

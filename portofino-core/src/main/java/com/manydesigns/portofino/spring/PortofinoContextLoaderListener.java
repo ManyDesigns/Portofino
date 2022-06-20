@@ -21,9 +21,7 @@
 package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.modules.Module;
@@ -85,7 +83,7 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
     protected ServletContext servletContext;
     protected ConfigurableWebApplicationContext parentContext;
-    protected PortofinoDispatcherInitializer initializer;
+    protected final PortofinoDispatcherInitializer initializer;
     protected final ConfigurableWebApplicationContext bridgeContext = new AnnotationConfigWebApplicationContext();
 
     public PortofinoContextLoaderListener(
@@ -234,14 +232,10 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
                 PortofinoSpringConfiguration.APPLICATION_DIRECTORY, initializer.getApplicationRoot());
         grandParent.getBeanFactory().registerSingleton(
                 PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, initializer.getConfiguration());
-        if (initializer.getConfigurationFile() != null) {
-            grandParent.getBeanFactory().registerSingleton(
-                    PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, initializer.getConfigurationFile());
-        }
         ConfigurationSource configSource =
                 new ConfigurationSource(initializer.getConfiguration(), initializer.getConfigurationFile());
-        grandParent.getBeanFactory().registerSingleton(
-                PortofinoSpringConfiguration.CONFIGURATION_SOURCE, configSource);
+        grandParent.getBeanFactory().registerSingleton(PortofinoSpringConfiguration.CONFIGURATION_SOURCE, configSource);
+        grandParent.getBeanFactory().registerSingleton(PortofinoSpringConfiguration.DISPATCHER, initializer);
         initializer.getConfiguration().addConfiguration(
                 new SpringEnvironmentConfiguration(grandParent.getEnvironment()));
         return grandParent;

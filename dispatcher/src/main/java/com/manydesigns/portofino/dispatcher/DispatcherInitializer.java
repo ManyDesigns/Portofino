@@ -45,6 +45,7 @@ public abstract class DispatcherInitializer {
     protected FileObject applicationRoot;
     protected CompositeConfiguration configuration;
     protected CodeBase codeBase;
+    protected ResourceResolver resourceResolver;
 
     private static final Logger logger = LoggerFactory.getLogger(DispatcherInitializer.class);
 
@@ -58,6 +59,10 @@ public abstract class DispatcherInitializer {
 
     public CodeBase getCodeBase() {
         return codeBase;
+    }
+
+    public ResourceResolver getResourceResolver() {
+        return resourceResolver;
     }
 
     public void initialize() {
@@ -87,7 +92,7 @@ public abstract class DispatcherInitializer {
         }
 
         String actionsDirectory = getConfiguration().getString("portofino.actions.path", "actions");
-        codeBase = initApplicationRoot(actionsDirectory);
+        initApplicationRoot(actionsDirectory);
         logger.info("Application initialized.");
     }
 
@@ -117,7 +122,7 @@ public abstract class DispatcherInitializer {
         this.configuration = compositeConfiguration;
     }
 
-    protected CodeBase initApplicationRoot(String actionsDirectoryName) {
+    protected void initApplicationRoot(String actionsDirectoryName) {
         try {
             FileObject actionsDirectory = applicationRoot.getChild(actionsDirectoryName);
             if(actionsDirectory == null || actionsDirectory.getType() != FileType.FOLDER) {
@@ -127,10 +132,10 @@ public abstract class DispatcherInitializer {
             ResourceResolvers resourceResolver = new ResourceResolvers();
             configureResourceResolvers(resourceResolver, codeBase);
             DocumentedApiRoot.setRootFactory(() -> getRoot(actionsDirectory, resourceResolver));
-            return codeBase;
+            this.codeBase = codeBase;
+            this.resourceResolver = resourceResolver;
         } catch (Exception e) {
             initializationFailed(e);
-            return null;
         }
     }
 

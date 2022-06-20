@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.resourceactions.registry;
 
 import com.manydesigns.elements.i18n.TextProvider;
+import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -33,13 +34,13 @@ public class ActionInfo {
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public final Class<?> actionClass;
-    public final Class<?> configurationClass;
+    public final Class<? extends ResourceActionConfiguration> configurationClass;
     public final String scriptTemplate;
     public final boolean supportsDetail;
     public final String description;
 
     public ActionInfo
-            (Class<?> actionClass, Class<?> configurationClass, String scriptTemplate,
+            (Class<?> actionClass, Class<? extends ResourceActionConfiguration> configurationClass, String scriptTemplate,
              boolean supportsDetail, String description) {
         this.actionClass = actionClass;
         this.configurationClass = configurationClass;

@@ -44,10 +44,9 @@ public class PortofinoSpringConfiguration implements InitializingBean {
     public static final String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
     public final static String CONFIGURATION_SOURCE = "com.manydesigns.portofino.configuration";
+    public final static String DISPATCHER = "com.manydesigns.portofino.dispatcher";
     @Deprecated
     public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
-    @Deprecated
-    public final static String PORTOFINO_CONFIGURATION_FILE = "com.manydesigns.portofino.portofinoConfigurationFile";
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
 
     @Autowired

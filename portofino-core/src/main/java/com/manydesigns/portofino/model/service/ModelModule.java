@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -48,12 +49,15 @@ import java.io.IOException;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@Order(ModelModule.MODEL_LOAD)
 public class ModelModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final String PORTOFINO_DOMAIN =
             "com.manydesigns.portofino.model.service.ModelModule.portofinoDomain";
+
+    public static final int MODEL_LOAD = 100;
 
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.CONFIGURATION_SOURCE)

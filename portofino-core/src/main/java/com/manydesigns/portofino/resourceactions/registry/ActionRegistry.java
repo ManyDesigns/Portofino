@@ -21,7 +21,8 @@
 package com.manydesigns.portofino.resourceactions.registry;
 
 import com.manydesigns.portofino.resourceactions.ResourceAction;
-import com.manydesigns.portofino.resourceactions.ResourceActionLogic;
+import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
+import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
 
 import java.util.Iterator;
 import java.util.List;
@@ -40,10 +41,11 @@ public class ActionRegistry implements Iterable<ActionInfo> {
     protected final List<ActionInfo> registry = new CopyOnWriteArrayList<>();
 
     public ActionInfo register(Class<?> actionClass) {
-        String descriptionKey = ResourceActionLogic.getDescriptionKey(actionClass);
-        Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(actionClass);
-        String scriptTemplate = ResourceActionLogic.getScriptTemplate(actionClass);
-        boolean supportsDetail = ResourceActionLogic.supportsDetail(actionClass);
+        String descriptionKey = ResourceActionSupport.getDescriptionKey(actionClass);
+        Class<? extends ResourceActionConfiguration> configurationClass =
+                ResourceActionSupport.getConfigurationClass(actionClass);
+        String scriptTemplate = ResourceActionSupport.getScriptTemplate(actionClass);
+        boolean supportsDetail = ResourceActionSupport.supportsDetail(actionClass);
         ActionInfo info = new ActionInfo(
                 actionClass, configurationClass, scriptTemplate, supportsDetail, descriptionKey);
         registry.add(info);

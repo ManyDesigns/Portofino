@@ -20,8 +20,6 @@
 
 package com.manydesigns.portofino.resourceactions;
 
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.Permissions;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
@@ -45,12 +43,11 @@ public class ActionInstance {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    protected final ActionDescriptor actionDescriptor;
     protected final FileObject directory;
     protected final List<String> parameters;
     protected final ActionInstance parent;
     protected final Class<? extends ResourceAction> actionClass;
-    protected Object configuration;
+    protected ResourceActionConfiguration configuration;
     protected ResourceAction actionBean;
     protected boolean prepared;
 
@@ -62,26 +59,20 @@ public class ActionInstance {
 
     public static final Logger logger = LoggerFactory.getLogger(ActionInstance.class);
 
-    public ActionInstance(ActionInstance parent, FileObject directory,
-                          ActionDescriptor actionDescriptor, Class<? extends ResourceAction> actionClass) {
+    public ActionInstance(ActionInstance parent, FileObject directory, Class<? extends ResourceAction> actionClass) {
         this.parent = parent;
         this.directory = directory;
-        this.actionDescriptor = actionDescriptor;
         this.actionClass = actionClass;
         parameters = new ArrayList<>();
     }
 
     public ActionInstance copy() {
-        ActionInstance actionInstance = new ActionInstance(parent, directory, actionDescriptor, actionClass);
+        ActionInstance actionInstance = new ActionInstance(parent, directory, actionClass);
         actionInstance.prepared = false;
         actionInstance.parameters.addAll(parameters);
         actionInstance.configuration = configuration;
         actionInstance.actionBean = actionBean;
         return actionInstance;
-    }
-
-    public ActionDescriptor getActionDescriptor() {
-        return actionDescriptor;
     }
 
     //**************************************************************************
@@ -128,11 +119,11 @@ public class ActionInstance {
     /**
      * Returns the configuration object for this action.
      */
-    public Object getConfiguration() {
+    public ResourceActionConfiguration getConfiguration() {
         return configuration;
     }
 
-    public void setConfiguration(Object configuration) {
+    public void setConfiguration(ResourceActionConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -163,7 +154,7 @@ public class ActionInstance {
     }
 
     public Permissions getPermissions() {
-        return actionDescriptor.getPermissions();
+        return configuration.getPermissions();
     }
 
     public FileObject getChildPageDirectory(String name) {

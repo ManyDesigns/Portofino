@@ -22,7 +22,6 @@ package com.manydesigns.portofino.resourceactions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.FilteredClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -30,7 +29,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ResourceActionsModule;
-import com.manydesigns.portofino.actions.*;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
@@ -39,14 +37,12 @@ import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.operations.GuardType;
 import com.manydesigns.portofino.operations.Operation;
 import com.manydesigns.portofino.operations.Operations;
-import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.security.*;
 import com.manydesigns.portofino.security.noop.NoSecurity;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
@@ -124,7 +120,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             LoggerFactory.getLogger(AbstractResourceAction.class);
 
     protected AbstractResourceAction() {
-        maxParameters = ResourceActionLogic.supportsDetail(getClass()) ? Integer.MAX_VALUE : 0;
+        maxParameters = ResourceActionSupport.supportsDetail(getClass()) ? Integer.MAX_VALUE : 0;
     }
 
     @Override
@@ -144,33 +140,15 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         applicationContext.getAutowireCapableBeanFactory().autowireBean(bean);
     }
 
-    public static void initResourceAction(ResourceAction resourceAction, ActionInstance parentActionInstance, UriInfo uriInfo) {
+    public static void initResourceAction(
+            ResourceAction resourceAction, ActionInstance parentActionInstance, UriInfo uriInfo) {
         if(resourceAction.getActionInstance() == null) {
-            ActionDescriptor action;
-            try {
-                action = ActionLogic.getActionDescriptor(resourceAction.getLocation());
-            } catch (ActionNotActiveException e) {
-                logger.debug("action.xml not found or not valid", e);
-                action = new ActionDescriptor();
-                action.init();
-            }
             ActionInstance actionInstance = new ActionInstance(
-                    parentActionInstance, resourceAction.getLocation(), action, resourceAction.getClass());
+                    parentActionInstance, resourceAction.getLocation(), resourceAction.getClass());
             actionInstance.setActionBean(resourceAction);
             resourceAction.setActionInstance(actionInstance);
             try {
-                actionInstance.setConfiguration(resourceAction.loadConfiguration());
-                if (actionInstance.getConfiguration() == null) {
-                    // Try loading legacy configuration.xml
-                    ActionLogic.configureResourceAction(resourceAction, actionInstance);
-                    resourceAction.configured();
-                    if (actionInstance.getConfiguration() != null) {
-                        resourceAction.saveConfiguration();
-                        FileObject oldConf = actionInstance.getDirectory().resolveFile("configuration.xml");
-                        logger.info("Migrated configuration from " + oldConf.getName().getPath() + ", deleting");
-                        oldConf.delete();
-                    }
-                } else {
+                if (resourceAction.loadConfiguration() != null) {
                     resourceAction.configured();
                 }
             } catch (Exception e) {
@@ -214,7 +192,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
 
     @NotNull
     protected Optional<AdditionalChild> getAdditionalChild(String pathSegment) {
-        return getActionDescriptor().getAdditionalChildren().stream()
+        return getConfiguration().getAdditionalChildren().stream()
                 .filter(c -> c.getSegment().equals(pathSegment))
                 .findFirst();
     }
@@ -222,7 +200,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Override
     public Collection<String> getSubResources() {
         Collection<String> subResources = super.getSubResources();
-        getActionDescriptor().getAdditionalChildren().forEach(c -> {
+        getConfiguration().getAdditionalChildren().forEach(c -> {
             if(!subResources.contains(c.getSegment())) {
                 subResources.add(c.getSegment());
             }
@@ -299,10 +277,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
 
     @Override
     public void configured() {}
-
-    public ActionDescriptor getActionDescriptor() {
-        return getActionInstance().getActionDescriptor();
-    }
 
     public Map getOgnlContext() {
         return ElementsThreadLocals.getOgnlContext();
@@ -381,8 +355,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Override
     public Map<String, Object> describe() {
         Map<String, Object> description = super.describe();
-        description.put("page", actionInstance.getActionDescriptor());
-        if(ResourceActionLogic.supportsDetail(getClass())) {
+        if(ResourceActionSupport.supportsDetail(getClass())) {
             parameters.add("");
             description.put("detailChildren", getSubResources());
             parameters.remove(parameters.size() - 1);
@@ -449,8 +422,8 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     ////////////////
 
     @Nullable
-    protected Class<?> getConfigurationClass() {
-        return ResourceActionLogic.getConfigurationClass(getClass());
+    protected Class<? extends ResourceActionConfiguration> getConfigurationClass() {
+        return ResourceActionSupport.getConfigurationClass(getClass());
     }
 
     protected ClassAccessor getConfigurationClassAccessor() {
@@ -490,10 +463,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return filtered;
     }
 
-    protected Object getConfiguration() {
-        return actionInstance.getConfiguration();
-    }
-
     @NotNull
     protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
         Permissions permissions = SecurityLogic.calculateActualPermissions(actionInstance);
@@ -525,11 +494,13 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     public void setConfiguration(
             @RequestBody(description = "The configuration object in JSON format.")
             String configurationString) throws Exception {
-        Class<?> configurationClass = ResourceActionLogic.getConfigurationClass(getClass());
+        Class<? extends ResourceActionConfiguration> configurationClass =
+                ResourceActionSupport.getConfigurationClass(getClass());
         if(configurationClass == null) {
             throw new WebApplicationException("This resource does not support configuration");
         }
-        Object configuration = new ObjectMapper().readValue(configurationString, configurationClass);
+        ResourceActionConfiguration configuration =
+                new ObjectMapper().readValue(configurationString, configurationClass);
         actionInstance.setConfiguration(configuration);
         saveConfiguration();
     }
@@ -559,17 +530,42 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return actionsDomain.ensureDomain(domainName);
     }
 
-    public Object loadConfiguration()
+    public ResourceActionConfiguration loadConfiguration()
             throws IntrospectionException, IOException, NoSuchFieldException, ClassNotFoundException,
             InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         Object configuration = modelService.getJavaObject(getConfigurationDomain(), "configuration");
         if (configuration != null) {
-            applicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
-            if (configuration instanceof ResourceActionConfiguration) {
-                ((ResourceActionConfiguration) configuration).init();
+            if (!(configuration instanceof ResourceActionConfiguration)) {
+                throw new RuntimeException("Action configuration for " + this + " is not of the right type: " + configuration);
+            }
+            actionInstance.setConfiguration((ResourceActionConfiguration) configuration);
+            if (applicationContext != null) {
+                applicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
+            }
+            ((ResourceActionConfiguration) configuration).init();
+        } else {
+            // Try loading legacy action.xml and configuration.xml
+            ResourceActionSupport.configureResourceAction(this, actionInstance);
+            if (getConfiguration() != null) {
+                FileObject oldActionXml = actionInstance.getDirectory().resolveFile("legacy.xml");
+                FileObject oldConf = actionInstance.getDirectory().resolveFile("configuration.xml");
+                try {
+                    saveConfiguration();
+                    logger.info("Migrated configuration from " + oldConf.getName().getPath() + " and action.xml, deleting");
+                    oldConf.delete();
+                    oldActionXml.delete();
+                } catch (Exception e) {
+                    logger.error("Could not migrate configuration from " + oldConf.getName().getPath() + " and action.xml");
+                }
             }
         }
-        return configuration;
+        if (configuration == null) {
+            ResourceActionConfiguration actionConfiguration = new ResourceActionConfiguration();
+            actionConfiguration.init();
+            configuration = actionConfiguration;
+            actionInstance.setConfiguration(actionConfiguration);
+        }
+        return (ResourceActionConfiguration) configuration;
     }
 
     @io.swagger.v3.oas.annotations.Operation(
@@ -600,7 +596,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Path(":permissions")
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Map<String, Object> getActionPermissions() {
-        List<Group> allGroups = new ArrayList<>(getActionDescriptor().getPermissions().getGroups());
+        List<Group> allGroups = new ArrayList<>(getConfiguration().getPermissions().getGroups());
         Set<String> possibleGroups = security.getGroups();
         for(String group : possibleGroups) {
             if(allGroups.stream().noneMatch(g -> group.equals(g.getName()))) {
@@ -636,11 +632,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             @RequestBody(description = "An array of permissions, one for each user group. Each element of the array " +
                     "has a group name, a desired access level (null means inherited) and a list of action-specific permissions.")
             List<Group> groups) throws Exception {
-        List<Group> existingGroups = getActionDescriptor().getPermissions().getGroups();
+        List<Group> existingGroups = getConfiguration().getPermissions().getGroups();
         existingGroups.clear();
         existingGroups.addAll(groups);
-        FileObject saved = ActionLogic.saveActionDescriptor(actionInstance);
-        logger.info("Saved permissions to " + saved.getName().getPath());
+        saveConfiguration();
     }
 
     public String[] getSupportedPermissions() {

@@ -21,11 +21,7 @@
 package com.manydesigns.portofino.security;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
-import com.manydesigns.portofino.actions.Permissions;
-import com.manydesigns.portofino.resourceactions.ActionInstance;
-import com.manydesigns.portofino.resourceactions.ResourceAction;
+import com.manydesigns.portofino.resourceactions.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
@@ -63,20 +59,21 @@ public class SecurityLogic {
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
 
     public static Permissions calculateActualPermissions(ActionInstance instance) {
-        List<ActionDescriptor> actionDescriptors = new ArrayList<>();
+        List<ResourceActionConfiguration> actionDescriptors = new ArrayList<>();
         while (instance != null) {
-            actionDescriptors.add(0, instance.getActionDescriptor());
+            actionDescriptors.add(0, instance.getConfiguration());
             instance = instance.getParent();
         }
 
         return calculateActualPermissions(new Permissions(), actionDescriptors);
     }
 
-    public static Permissions calculateActualPermissions(Permissions basePermissions, List<ActionDescriptor> actionDescriptors) {
+    public static Permissions calculateActualPermissions(
+            Permissions basePermissions, List<ResourceActionConfiguration> actionDescriptors) {
         Permissions result = new Permissions();
         Map<String, AccessLevel> resultLevels = result.getActualLevels();
         resultLevels.putAll(basePermissions.getActualLevels());
-        for (ActionDescriptor current : actionDescriptors) {
+        for (ResourceActionConfiguration current : actionDescriptors) {
             Permissions currentPerms = current.getPermissions();
 
             Map<String, AccessLevel> currentLevels = currentPerms.getActualLevels();
@@ -92,7 +89,7 @@ public class SecurityLogic {
         }
 
         if (actionDescriptors.size() > 0) {
-            ActionDescriptor lastAction = actionDescriptors.get(actionDescriptors.size() - 1);
+            ResourceActionConfiguration lastAction = actionDescriptors.get(actionDescriptors.size() - 1);
             Map<String, Set<String>> lastPermissions =
                     lastAction.getPermissions().getActualPermissions();
             result.getActualPermissions().putAll(lastPermissions);
@@ -161,7 +158,9 @@ public class SecurityLogic {
     }
 
     public static void installLogin(
-            FileObject actionsDirectory, Configuration configuration, Class<? extends ResourceAction> fallbackLoginClass)
+            ResourceActionSupport support,
+            FileObject actionsDirectory, Configuration configuration,
+            Class<? extends ResourceAction> fallbackLoginClass)
             throws Exception {
         String relLoginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
         String loginPath;
@@ -170,7 +169,7 @@ public class SecurityLogic {
         } else {
             loginPath = "res:" + fallbackLoginClass.getPackage().getName().replace('.', '/');
         }
-        ActionLogic.unmount(actionsDirectory, ":auth");
-        ActionLogic.mount(actionsDirectory, ":auth", loginPath);
+        support.unmount(actionsDirectory, ":auth");
+        support.mount(actionsDirectory, ":auth", loginPath);
     }
 }

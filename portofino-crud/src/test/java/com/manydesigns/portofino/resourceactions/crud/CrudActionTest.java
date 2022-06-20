@@ -33,16 +33,15 @@ import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.ActionDescriptor;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
-import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
-import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.database.model.IncrementGenerator;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
+import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.ActionContext;
@@ -60,6 +59,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
+import org.hibernate.query.Query;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.*;
 
@@ -102,7 +102,8 @@ public class CrudActionTest extends JerseyTest {
         Configuration configuration = new PropertiesConfiguration();
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
-        ModelService modelService = new ModelService(appDir, new ConfigurationSource(configuration, null), new JavaCodeBase(appDir));
+        ModelService modelService = new ModelService(
+                appDir, new ConfigurationSource(configuration, null), new JavaCodeBase(appDir));
         modelService.loadModel();
         persistence = new Persistence(
                 modelService,
@@ -218,7 +219,7 @@ public class CrudActionTest extends JerseyTest {
         configuration.persistence = persistence;
         configuration.init();
 
-        ActionInstance actionInstance = new ActionInstance(null, null, new ActionDescriptor(), CrudAction.class);
+        ActionInstance actionInstance = new ActionInstance(null, null, CrudAction.class);
         actionInstance.setConfiguration(configuration);
         actionInstance.getParameters().add("1");
         ActionContext actionContext = new ActionContext();
@@ -227,7 +228,8 @@ public class CrudActionTest extends JerseyTest {
         actionContext.setServletContext(req.getServletContext());
 
         req.setParameter("productid", "1");
-        Map category = (Map) persistence.getSession("jpetstore").createQuery("from category").list().get(0);
+        Query<Map> query = persistence.getSession("jpetstore").createQuery("from category", Map.class);
+        Map category = query.list().get(0);
         req.setParameter("category", (String) category.get("catid"));
         crudAction.persistence = persistence;
         crudAction.setContext(actionContext);

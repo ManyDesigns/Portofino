@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.apache.shiro.authz.Permission;
 

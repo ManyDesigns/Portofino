@@ -1,6 +1,13 @@
+import portofino.classes.com.manydesigns.elements.options.DisplayMode;
+import portofino.classes.com.manydesigns.elements.options.SearchDisplayMode;
+import portofino.classes.com.manydesigns.portofino.model.Annotation;
+import portofino.classes.com.manydesigns.portofino.model.AnnotationProperty;
+import portofino.classes.com.manydesigns.portofino.resourceactions.Group;
+import portofino.classes.com.manydesigns.portofino.resourceactions.Permissions;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
+import portofino.classes.com.manydesigns.portofino.security.AccessLevel;
 
 object configuration : CrudConfiguration {
 	createTitle = ""

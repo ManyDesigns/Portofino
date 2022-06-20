@@ -20,20 +20,59 @@
 
 package com.manydesigns.portofino.resourceactions;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Optional interface that configuration objects can implement to participate in a simple lifecycle.
- *
+ * {@link com.manydesigns.portofino.resourceactions.ResourceAction} configuration
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface ResourceActionConfiguration {
-    String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
+@XmlRootElement(name = "action")
+@XmlAccessorType(value = XmlAccessType.NONE)
+public class ResourceActionConfiguration {
+    public static final String copyright =
+            "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    /**
-     * Initializes the configuration.
-     */
-    void init();
+    protected Permissions permissions;
+    protected final List<AdditionalChild> additionalChildren = new ArrayList<>();
 
+    public ResourceActionConfiguration() {
+        permissions = new Permissions();
+    }
+
+    public void init() {
+        if(permissions != null) {
+            permissions.init();
+        }
+    }
+
+    @XmlElement()
+    public Permissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Permissions permissions) {
+        if (permissions == null) {
+            permissions = new Permissions();
+            permissions.init();
+        }
+        this.permissions = permissions;
+    }
+
+    @XmlElement(name = "additional-child", type = AdditionalChild.class)
+    public List<AdditionalChild> getAdditionalChildren() {
+        return additionalChildren;
+    }
+
+    public void setAdditionalChildren(List<AdditionalChild> children) {
+        additionalChildren.clear();
+        additionalChildren.addAll(children);
+    }
 }

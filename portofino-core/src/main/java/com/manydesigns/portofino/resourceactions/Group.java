@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.resourceactions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.security.AccessLevel;

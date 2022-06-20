@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.resourceactions;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
 @XmlRegistry
 public class ObjectFactory {
-    public ActionDescriptor createActionDescriptor() { return new ActionDescriptor(); }
+    public ResourceActionConfiguration createActionDescriptor() { return new ResourceActionConfiguration(); }
 }

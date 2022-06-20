@@ -20,17 +20,17 @@
 
 package com.manydesigns.portofino;
 
-import com.manydesigns.portofino.actions.ActionLogic;
-import com.manydesigns.portofino.cache.CacheResetEvent;
-import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.model.service.ModelModule;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
+import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
+import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
 import com.manydesigns.portofino.resourceactions.custom.CustomAction;
 import com.manydesigns.portofino.resourceactions.form.FormAction;
 import com.manydesigns.portofino.resourceactions.form.TableFormAction;
@@ -38,61 +38,62 @@ import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.noop.login.NoOpLoginAction;
-import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
-import java.io.IOException;
-
-import static com.manydesigns.portofino.model.service.ModelModule.PORTOFINO_DOMAIN;
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 
-/*
+/**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ResourceActionsModule implements Module {
+@Order(ResourceActionsModule.NO_OP_LOGIN)
+public class ResourceActionsModule implements Module, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
     public static final String ACTIONS_DIRECTORY = "actionsDirectory";
     public static final String ACTIONS_DOMAIN = "actionsDomain";
+    public static final int NO_OP_LOGIN = ModelModule.MODEL_LOAD + 100;
 
     @Autowired
     public ServletContext servletContext;
-
     @Autowired
     public ConfigurationSource configuration;
-
     @Autowired
     @Qualifier(APPLICATION_DIRECTORY)
     public FileObject applicationDirectory;
-
     @Autowired
     public CodeBase codeBase;
-
     @Autowired
     public CacheResetListenerRegistry cacheResetListenerRegistry;
-
     @Autowired
     public ModelService modelService;
+    @Autowired
+    public PortofinoDispatcherInitializer dispatcherInitializer;
+
+    protected ApplicationContext applicationContext;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -115,16 +116,13 @@ public class ResourceActionsModule implements Module {
 
     @PostConstruct
     public void init() throws Exception {
-        logger.debug("Initializing dispatcher");
-        ActionLogic.init(configuration.getProperties());
-
         //noinspection SpringConfigurationProxyMethods - @PostConstruct init() is a lifecycle method, it cannot have arguments
         FileObject actionsDirectory = getActionsDirectory(configuration, applicationDirectory);
         logger.info("Actions directory: " + actionsDirectory);
         //TODO ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
 
         if(configuration.getProperties().getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false)) {
-            logger.info("Preloading actions");
+            logger.info("Preloading resource-actions");
             try {
                 ResourceResolver resourceResolver =
                         PortofinoApplicationRoot.getRootFactory().createRoot().getResourceResolver();
@@ -134,12 +132,19 @@ public class ResourceActionsModule implements Module {
             }
         }
         if(configuration.getProperties().getBoolean(PortofinoProperties.PRELOAD_CLASSES, false)) {
-            logger.info("Preloading Groovy classes");
+            logger.info("Preloading shared classes");
             preloadClasses(codeBase.getRoot());
         }
 
-        SecurityLogic.installLogin(actionsDirectory, configuration.getProperties(), NoOpLoginAction.class);
+        modelService.addBuiltInClass(ResourceActionConfiguration.class);
         status = ModuleStatus.STARTED;
+    }
+
+    @Bean
+    public ResourceActionSupport getResourceActionSupport() throws FileSystemException {
+        //noinspection SpringConfigurationProxyMethods
+        return new ResourceActionSupport(
+                dispatcherInitializer, getActionsDirectory(configuration, applicationDirectory));
     }
 
     @Bean
@@ -217,5 +222,21 @@ public class ResourceActionsModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        ResourceActionSupport support = applicationContext.getBean(ResourceActionSupport.class);
+        FileObject actionsDirectory = applicationContext.getBean(ACTIONS_DIRECTORY, FileObject.class);
+        try {
+            SecurityLogic.installLogin(support, actionsDirectory, configuration.getProperties(), NoOpLoginAction.class);
+        } catch (Exception e) {
+            logger.error("Could not install login class", e);
+        }
     }
 }

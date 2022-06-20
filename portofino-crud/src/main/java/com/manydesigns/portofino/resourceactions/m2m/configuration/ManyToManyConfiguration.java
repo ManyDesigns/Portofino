@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"database","oneExpression","onePropertyName", "viewType", "query" , "oneSelectionProvider" , "manySelectionProvider"})
-public class ManyToManyConfiguration implements ResourceActionConfiguration {
+public class ManyToManyConfiguration extends ResourceActionConfiguration {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -93,6 +93,7 @@ public class ManyToManyConfiguration implements ResourceActionConfiguration {
     //**************************************************************************
 
     public void init() {
+        super.init();
         try {
             actualViewType = ViewType.valueOf(viewType);
         } catch (Exception e) {

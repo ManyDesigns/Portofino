@@ -185,6 +185,7 @@ public class Persistence {
     }
 
     protected Database setupDatabase(Domain domain) {
+        logger.info("Setting up database " + domain.getQualifiedName());
         //Can't use getJavaAnnotation as they've not yet been resolved
         EAnnotation ann = domain.getEAnnotation(JDBCConnection.class.getName());
         ConnectionProvider connectionProvider = null;
@@ -337,7 +338,6 @@ public class Persistence {
 
     public synchronized void initModel() {
         getDatabaseDomains().forEach(this::setupDatabase);
-        logger.info("Cleaning up old setups");
         closeSessions();
         for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
             String databaseName = current.getKey();

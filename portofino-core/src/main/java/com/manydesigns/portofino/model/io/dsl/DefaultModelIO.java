@@ -350,8 +350,8 @@ public class DefaultModelIO implements ModelIO {
     private void collectImports(EClass type, Domain domain, Map<String, String> imports) {
         type.getEStructuralFeatures().forEach(feature -> {
             EClassifier fType = feature.getEType();
-            if (addImport(fType, domain, imports)) {
-                collectImports(type, domain, imports);
+            if (addImport(fType, domain, imports) && fType instanceof EClass) {
+                collectImports((EClass) fType, domain, imports);
             }
         });
     }

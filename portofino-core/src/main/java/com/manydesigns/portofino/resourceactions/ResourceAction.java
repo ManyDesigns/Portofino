@@ -21,7 +21,9 @@
 package com.manydesigns.portofino.resourceactions;
 
 import com.manydesigns.portofino.dispatcher.security.SecureResource;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.security.SecurityFacade;
+import org.apache.commons.vfs2.FileObject;
 
 import java.util.List;
 
@@ -55,6 +57,10 @@ public interface ResourceAction extends SecureResource {
      */
     ActionInstance getActionInstance();
 
+    default ResourceActionConfiguration getConfiguration() {
+        return getActionInstance().getConfiguration();
+    }
+
     /**
      * Sets the ActionInstance of this element. Invoked automatically by the framework.
      * @param actionInstance the new {@link ActionInstance}.
@@ -81,7 +87,7 @@ public interface ResourceAction extends SecureResource {
      */
     List<String> getAccessibleChildren();
 
-    Object loadConfiguration() throws Exception;
+    ResourceActionConfiguration loadConfiguration() throws Exception;
     void saveConfiguration() throws Exception;
     void configured();
 }
