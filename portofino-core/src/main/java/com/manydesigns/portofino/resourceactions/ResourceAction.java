@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.resourceactions;
 
 import com.manydesigns.portofino.dispatcher.security.SecureResource;
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.security.SecurityFacade;
 import org.apache.commons.vfs2.FileObject;
@@ -87,7 +88,9 @@ public interface ResourceAction extends SecureResource {
      */
     List<String> getAccessibleChildren();
 
+    Domain getConfigurationDomain();
     ResourceActionConfiguration loadConfiguration() throws Exception;
     void saveConfiguration() throws Exception;
     void configured();
+
 }

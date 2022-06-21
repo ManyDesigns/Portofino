@@ -230,11 +230,13 @@ public class DefaultModelIO implements ModelIO {
     }
 
     public FileObject getDomainDirectory(Domain domain) throws FileSystemException {
+        FileObject parent;
         if (domain.eContainer() instanceof Domain) {
-            return getDomainDirectory((Domain) domain.eContainer()).resolveFile(domain.getName());
+            parent = getDomainDirectory((Domain) domain.eContainer());
         } else {
-            return modelDirectory;
+            parent = modelDirectory;
         }
+        return parent.resolveFile(domain.getName());
     }
 
     @NotNull

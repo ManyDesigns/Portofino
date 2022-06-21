@@ -138,7 +138,7 @@ public class PortofinoRoot extends AbstractResourceAction {
     }
 
     @Override
-    protected Domain getConfigurationDomain() {
+    public Domain getConfigurationDomain() {
         return actionsDomain;
     }
 

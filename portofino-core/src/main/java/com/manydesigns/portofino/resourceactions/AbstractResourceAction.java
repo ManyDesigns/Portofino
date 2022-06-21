@@ -515,19 +515,18 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         modelService.saveObject(domain, "configuration");
     }
 
-    protected Domain getConfigurationDomain() {
-        String domainName;
-        try {
-            domainName =
-                    actionsDirectory.getName().getRelativeName(actionInstance.getChildrenDirectory().getName())
-                            .replace('/', '.');
-        } catch (FileSystemException e) {
-            throw new RuntimeException(e);
+    public Domain getConfigurationDomain() {
+        Domain parentDomain;
+        if (parent instanceof ResourceAction) {
+            ResourceAction parentAction = (ResourceAction) parent;
+            parentDomain = parentAction.getConfigurationDomain();
+            if (!parentAction.getActionInstance().getParameters().isEmpty()) {
+                parentDomain = parentDomain.ensureDomain(ActionInstance.DETAIL);
+            }
+        } else {
+            parentDomain = actionsDomain;
         }
-        if (domainName.startsWith(".")) {
-            domainName = domainName.substring(1);
-        }
-        return actionsDomain.ensureDomain(domainName);
+        return parentDomain.ensureDomain(actionInstance.getDirectory().getName().getBaseName());
     }
 
     public ResourceActionConfiguration loadConfiguration() throws Exception {
