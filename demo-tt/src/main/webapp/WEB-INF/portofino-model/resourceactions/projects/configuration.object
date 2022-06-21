@@ -1,10 +1,28 @@
+import portofino.classes.com.manydesigns.elements.options.DisplayMode;
+import portofino.classes.com.manydesigns.elements.options.SearchDisplayMode;
+import portofino.classes.com.manydesigns.portofino.model.Annotation;
+import portofino.classes.com.manydesigns.portofino.model.AnnotationProperty;
+import portofino.classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
+import portofino.classes.com.manydesigns.portofino.resourceactions.Group;
+import portofino.classes.com.manydesigns.portofino.resourceactions.Permissions;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
-import portofino.classes.com.manydesigns.portofino.model.Annotation;
-import portofino.classes.com.manydesigns.portofino.model.AnnotationProperty;
+import portofino.classes.com.manydesigns.portofino.security.AccessLevel;
 
 object configuration : CrudConfiguration {
+    permissions = Permissions {
+		groups = [
+		    Group {
+		        name = "project-manager"
+		        permissions = ["crud-create", "crud-edit", "crud-delete"]
+		    },
+		    Group {
+		        name = "all"
+		        accessLevel = VIEW
+		    }
+		]
+	}
 	createTitle = ""
 	database = "tt"
 	editTitle = ""

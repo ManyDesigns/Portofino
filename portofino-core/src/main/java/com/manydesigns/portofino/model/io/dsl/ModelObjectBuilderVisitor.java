@@ -64,6 +64,9 @@ public class ModelObjectBuilderVisitor extends ModelObjectBaseVisitor {
     protected Object translate(EStructuralFeature feature, ModelParser.PropertyValueContext valueCtx) {
         EClassifier type = feature.getEType();
         if (valueCtx.literal() != null) {
+            if (!(type instanceof EDataType)) {
+                throw new RuntimeException("Type expected for feature " + feature + ", got" + type);
+            }
             return EcoreFactory.eINSTANCE.createFromString((EDataType) type, getLiteral(valueCtx.literal()));
         } else if (valueCtx.objectBody() != null) {
             return visitObjectBody(valueCtx.objectBody());

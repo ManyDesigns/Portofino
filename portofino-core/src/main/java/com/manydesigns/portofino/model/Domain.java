@@ -18,10 +18,8 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.lang.reflect.Modifier;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Domain extends EPackageImpl {
@@ -203,9 +201,7 @@ public class Domain extends EPackageImpl {
         return result;
     }
 
-    public static Object toJavaObject(EObject eObject, Domain classesDomain, CodeBase codeBase)
-            throws IOException, ClassNotFoundException, NoSuchMethodException, IntrospectionException,
-            InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+    public static Object toJavaObject(EObject eObject, Domain classesDomain, CodeBase codeBase) throws Exception {
         if (eObject == null) {
             return null;
         }
@@ -228,20 +224,7 @@ public class Domain extends EPackageImpl {
                     Arrays.stream(props).filter(p -> p.getName().equals(feature.getName())).findFirst();
             PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
             if (feature.isMany()) {
-                List<EObject> values = (List) eObject.eGet(feature);
-                List<Object> list;
-                if (propertyDescriptor.getWriteMethod() != null) {
-                    list = new ArrayList<>();
-                } else {
-                    list = (List) propertyDescriptor.getReadMethod().invoke(object);
-                    list.clear();
-                }
-                for (EObject value : values) {
-                    list.add(toJavaObject(value, classesDomain, codeBase));
-                }
-                if (propertyDescriptor.getWriteMethod() != null) {
-                    propertyDescriptor.getWriteMethod().invoke(object, list);
-                }
+                setCollection(eObject, classesDomain, codeBase, object, feature, propertyDescriptor);
             } else {
                 Object value = eObject.eGet(feature);
                 if (value instanceof EObject) {
@@ -251,6 +234,47 @@ public class Domain extends EPackageImpl {
             }
         }
         return object;
+    }
+
+    protected static void setCollection(
+            EObject eObject, Domain classesDomain, CodeBase codeBase, Object object, EStructuralFeature feature,
+            PropertyDescriptor propertyDescriptor
+    ) throws Exception {
+        Collection<Object> values = (Collection) eObject.eGet(feature);
+        Collection<Object> coll;
+        if (propertyDescriptor.getWriteMethod() != null) {
+            Class<?> collType = propertyDescriptor.getReadMethod().getReturnType();
+            if (Modifier.isAbstract(collType.getModifiers())) {
+                if (List.class.isAssignableFrom(collType)) {
+                    if (!collType.isAssignableFrom(ArrayList.class)) {
+                        throw new RuntimeException("Unsupported list type: " + collType);
+                    }
+                    coll = new ArrayList<>();
+                } else if (Set.class.isAssignableFrom(collType)) {
+                    if (!collType.isAssignableFrom(HashSet.class)) {
+                        throw new RuntimeException("Unsupported set type: " + collType);
+                    }
+                    coll = new HashSet<>();
+                } else {
+                    throw new RuntimeException("Unsupported collection type: " + collType);
+                }
+            } else {
+                coll = (Collection<Object>) collType.getConstructor().newInstance();
+            }
+        } else {
+            coll = (Collection) propertyDescriptor.getReadMethod().invoke(object);
+            coll.clear();
+        }
+        for (Object value : values) {
+            if (value instanceof EObject) {
+                coll.add(toJavaObject((EObject) value, classesDomain, codeBase));
+            } else {
+                coll.add(value);
+            }
+        }
+        if (propertyDescriptor.getWriteMethod() != null) {
+            propertyDescriptor.getWriteMethod().invoke(object, coll);
+        }
     }
 
     private static Class<?> getJavaClass(
@@ -265,9 +289,7 @@ public class Domain extends EPackageImpl {
         return (Class<?>) codeBase.loadClass(javaClassName);
     }
 
-    public Object getJavaObject(String name, Domain classesDomain, CodeBase codeBase)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
-            IntrospectionException, NoSuchFieldException, IOException, ClassNotFoundException {
+    public Object getJavaObject(String name, Domain classesDomain, CodeBase codeBase) throws Exception {
         return toJavaObject(getObjects().get(name), classesDomain, codeBase);
     }
 

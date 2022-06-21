@@ -512,7 +512,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     public void saveConfiguration() throws Exception {
         Domain domain = getConfigurationDomain();
         domain.putObject("configuration", getConfiguration(), modelService.getClassesDomain());
-        modelService.saveDomain(domain);
+        modelService.saveObject(domain, "configuration");
     }
 
     protected Domain getConfigurationDomain() {
@@ -530,13 +530,12 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return actionsDomain.ensureDomain(domainName);
     }
 
-    public ResourceActionConfiguration loadConfiguration()
-            throws IntrospectionException, IOException, NoSuchFieldException, ClassNotFoundException,
-            InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public ResourceActionConfiguration loadConfiguration() throws Exception {
         Object configuration = modelService.getJavaObject(getConfigurationDomain(), "configuration");
         if (configuration != null) {
             if (!(configuration instanceof ResourceActionConfiguration)) {
-                throw new RuntimeException("Action configuration for " + this + " is not of the right type: " + configuration);
+                throw new RuntimeException(
+                        "Action configuration for " + this + " is not of the right type: " + configuration);
             }
             actionInstance.setConfiguration((ResourceActionConfiguration) configuration);
             if (applicationContext != null) {
@@ -547,7 +546,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             // Try loading legacy action.xml and configuration.xml
             ResourceActionSupport.configureResourceAction(this, actionInstance);
             if (getConfiguration() != null) {
-                FileObject oldActionXml = actionInstance.getDirectory().resolveFile("legacy.xml");
+                FileObject oldActionXml = actionInstance.getDirectory().resolveFile("action.xml");
                 FileObject oldConf = actionInstance.getDirectory().resolveFile("configuration.xml");
                 try {
                     saveConfiguration();
@@ -557,6 +556,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
                 } catch (Exception e) {
                     logger.error("Could not migrate configuration from " + oldConf.getName().getPath() + " and action.xml");
                 }
+                return getConfiguration();
             }
         }
         if (configuration == null) {
@@ -607,11 +607,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         }
         ActionInstance parentActionInstance = getActionInstance().getParent();
         allGroups.forEach(g -> {
-            if(g.getAccessLevel() == null) {
+            if(g.getAccessLevelName() == null) {
                 if(parentActionInstance != null) {
                     Permissions parentPermissions =
                             SecurityLogic.calculateActualPermissions(parentActionInstance);
-                    g.setActualAccessLevel(parentPermissions.getActualLevels().get(g.getName()));
+                    g.setAccessLevel(parentPermissions.getActualLevels().get(g.getName()));
                 }
             }
         });

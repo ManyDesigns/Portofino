@@ -203,7 +203,7 @@ public class ResourceActionSupport implements ApplicationContextAware {
         }
     }
 
-    protected static FileObject getActionDescriptorFile(FileObject directory) throws FileSystemException {
+    protected static FileObject getLegacyActionDescriptorFile(FileObject directory) throws FileSystemException {
         return directory.resolveFile("action.xml");
     }
 
@@ -233,6 +233,9 @@ public class ResourceActionSupport implements ApplicationContextAware {
             FileObject configurationFile, Class<? extends T> configurationClass
     ) throws Exception {
         if (configurationClass == null) {
+            return null;
+        }
+        if (!configurationFile.exists()) {
             return null;
         }
         try(InputStream inputStream = configurationFile.getContent().getInputStream()) {
@@ -272,7 +275,7 @@ public class ResourceActionSupport implements ApplicationContextAware {
 
         ResourceActionConfiguration action;
         try {
-            action = loadLegacyActionDescriptor(resourceAction.getLocation());
+            action = loadLegacyActionDescriptor(getLegacyActionDescriptorFile(resourceAction.getLocation()));
         } catch (Exception e) {
             logger.debug("action.xml not found or not valid", e);
             action = new ResourceActionConfiguration();
@@ -285,12 +288,15 @@ public class ResourceActionSupport implements ApplicationContextAware {
         } catch (FileSystemException e) {
             throw new RuntimeException(e);
         }
-        Class configurationClass = getConfigurationClass(resourceAction.getClass());
+        Class<? extends ResourceActionConfiguration> configurationClass =
+                getConfigurationClass(resourceAction.getClass());
         try {
             ResourceActionConfiguration configuration = getLegacyConfiguration(configurationFile, configurationClass);
             if (configuration != null) {
                 configuration.permissions = action.permissions;
                 configuration.additionalChildren.addAll(action.additionalChildren);
+            } else {
+                configuration = action;
             }
             actionInstance.setConfiguration(configuration);
         } catch (Throwable t) {

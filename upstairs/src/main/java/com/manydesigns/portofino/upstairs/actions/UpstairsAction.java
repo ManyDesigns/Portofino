@@ -13,7 +13,6 @@ import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.persistence.Persistence;
-import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
 import com.manydesigns.portofino.resourceactions.crud.CrudAction;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
@@ -613,7 +612,7 @@ public class UpstairsAction extends AbstractResourceAction {
                 if(action != null) {
                     Group group = new Group();
                     group.setName(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
-                    group.setAccessLevel(AccessLevel.DENY.name());
+                    group.setAccessLevelName(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);
                     action.getActionInstance().getConfiguration().setPermissions(permissions);

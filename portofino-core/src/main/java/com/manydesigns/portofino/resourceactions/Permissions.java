@@ -64,7 +64,7 @@ public class Permissions {
     public void init() {
         for(Group group : groups) {
             group.init();
-            actualLevels.put(group.getName(), group.getActualAccessLevel());
+            actualLevels.put(group.getName(), group.getAccessLevel());
             actualPermissions.put(group.getName(), group.getPermissions());
         }
     }

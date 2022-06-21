@@ -333,6 +333,10 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
+    public void saveObject(Domain domain, String name) throws IOException {
+        saveObject(name, domain.getObjects().get(name), domain, getDomainDirectory(domain));
+    }
+
     protected void saveObject(String name, EObject object, Domain domain, FileObject domainDir)
             throws IOException {
         FileObject objectFile = domainDir.resolveFile(name + ".object");

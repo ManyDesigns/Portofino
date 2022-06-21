@@ -36,7 +36,7 @@ import java.util.Set;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlType(propOrder = {"accessLevel","name","permissions"})
+@XmlType(propOrder = {"accessLevelName","name","permissions"})
 public class Group {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
@@ -47,10 +47,10 @@ public class Group {
 
     @JsonProperty("permissions")
     protected final Set<String> permissions;
-    protected String accessLevel;
+    protected String accessLevelName;
     protected String name;
     @JsonProperty
-    protected AccessLevel actualAccessLevel;
+    protected AccessLevel accessLevel;
 
     //**************************************************************************
     // Construction and initialization
@@ -61,9 +61,9 @@ public class Group {
     }
 
     public void init() {
-        actualAccessLevel = null;
-        if(!StringUtils.isEmpty(accessLevel)) {
-            actualAccessLevel = AccessLevel.valueOf(accessLevel);
+        accessLevel = null;
+        if(!StringUtils.isEmpty(accessLevelName)) {
+            accessLevel = AccessLevel.valueOf(accessLevelName);
         }
     }
 
@@ -76,6 +76,11 @@ public class Group {
         return permissions;
     }
 
+    public void setPermissions(Set<String> permissions) {
+        this.permissions.clear();
+        this.permissions.addAll(permissions);
+    }
+
     @XmlAttribute
     public String getName() {
         return name;
@@ -86,19 +91,19 @@ public class Group {
     }
 
     @XmlAttribute(name = "level")
-    public String getAccessLevel() {
+    public String getAccessLevelName() {
+        return accessLevelName;
+    }
+
+    public void setAccessLevelName(String accessLevelName) {
+        this.accessLevelName = accessLevelName;
+    }
+
+    public AccessLevel getAccessLevel() {
         return accessLevel;
     }
 
-    public void setAccessLevel(String accessLevel) {
+    public void setAccessLevel(AccessLevel accessLevel) {
         this.accessLevel = accessLevel;
-    }
-
-    public AccessLevel getActualAccessLevel() {
-        return actualAccessLevel;
-    }
-
-    public void setActualAccessLevel(AccessLevel actualAccessLevel) {
-        this.actualAccessLevel = actualAccessLevel;
     }
 }

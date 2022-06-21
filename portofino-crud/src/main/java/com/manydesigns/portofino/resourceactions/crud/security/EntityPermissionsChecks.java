@@ -45,7 +45,7 @@ public abstract class EntityPermissionsChecks {
                     .findFirst().orElseGet(() -> {
                         Group grp = new Group();
                         grp.setName(finalGroup);
-                        grp.setAccessLevel(AccessLevel.VIEW.name());
+                        grp.setAccessLevelName(AccessLevel.VIEW.name());
                         permissions.getGroups().add(grp);
                         return grp;
                     });

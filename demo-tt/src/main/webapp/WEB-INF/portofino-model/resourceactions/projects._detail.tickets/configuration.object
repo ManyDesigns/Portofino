@@ -10,6 +10,14 @@ import portofino.classes.com.manydesigns.portofino.resourceactions.crud.configur
 import portofino.classes.com.manydesigns.portofino.security.AccessLevel;
 
 object configuration : CrudConfiguration {
+    permissions = Permissions {
+		groups = [
+		    Group {
+		        name = "registered"
+		        permissions = ["crud-create", "crud-edit"]
+		    }
+		]
+	}
 	createTitle = ""
 	database = "tt"
 	editTitle = ""

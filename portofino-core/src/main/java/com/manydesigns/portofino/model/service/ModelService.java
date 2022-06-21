@@ -115,6 +115,13 @@ public class ModelService {
         getDefaultModelIO().save(entity);
     }
 
+    public synchronized void saveObject(Domain domain, String name) throws IOException {
+        if (isTransient(domain)) {
+            throw new UnsupportedOperationException(domain.getQualifiedName() + " is transient");
+        }
+        getDefaultModelIO().saveObject(domain, name);
+    }
+
     public boolean isTransient(Domain domain) {
         return transientDomains.contains(domain) ||
                 (domain.eContainer() instanceof Domain && isTransient((Domain) domain.eContainer()));
@@ -182,15 +189,19 @@ public class ModelService {
                 if (returnType instanceof ParameterizedType) {
                     Type typeArgument = ((ParameterizedType) returnType).getActualTypeArguments()[0];
                     if (typeArgument instanceof Class) {
-                        reference.setEType(addBuiltInClass((Class<?>) typeArgument));
+                        Optional<EClassifier> dataType = getDataType((Class<?>) typeArgument);
+                        if (dataType.isPresent()) {
+                            reference.setEType(dataType.get());
+                        } else {
+                            reference.setEType(addBuiltInClass((Class<?>) typeArgument));
+                        }
                     }
                 }
                 reference.setName(prop.getName());
                 reference.setUpperBound(-1);
                 eClass.getEStructuralFeatures().add(reference);
             } else {
-                Optional<EClassifier> builtin =
-                        EcorePackage.eINSTANCE.getEClassifiers().stream().filter(t -> type.equals(t.getInstanceClass())).findFirst();
+                Optional<EClassifier> builtin = getDataType(type);
                 EStructuralFeature feature = builtin.map(t -> {
                     EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
                     attribute.setEType(t);
@@ -211,15 +222,20 @@ public class ModelService {
         return eClass;
     }
 
-    public Object getJavaObject(Domain domain, String name)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
-            IntrospectionException, NoSuchFieldException, IOException, ClassNotFoundException {
+    @NotNull
+    private Optional<EClassifier> getDataType(Class<?> type) {
+        Optional<EClassifier> builtin =
+                EcorePackage.eINSTANCE.getEClassifiers().stream().filter(t -> type.equals(t.getInstanceClass())).findFirst();
+        return builtin;
+    }
+
+    public Object getJavaObject(Domain domain, String name) throws Exception {
         EObject eObject = domain.getObjects().get(name);
         return toJavaObject(eObject);
     }
 
     @Nullable
-    public Object toJavaObject(EObject eObject) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IntrospectionException, NoSuchFieldException {
+    public Object toJavaObject(EObject eObject) throws Exception {
         return Domain.toJavaObject(eObject, getClassesDomain(), codeBase);
     }
 
