@@ -216,9 +216,33 @@ public class DefaultModelIO implements ModelIO {
         deleteUnusedDomainDirectories(modelDirectory, model.getDomains());
     }
 
-
     public void save(Domain domain) throws IOException {
-        saveDomain(domain, getDomainDirectory(domain));
+        FileObject domainDir = getDomainDirectory(domain);
+        domainDir.createFolder();
+        FileObject domainDefFile = domainDir.resolveFile(domain.getName() + ".domain");
+        if(domain.getEAnnotations().isEmpty()) {
+            domainDefFile.delete();
+        } else {
+            try(OutputStreamWriter os = fileWriter(domainDefFile)) {
+                Map<String, String> imports = writeImports(domain, os);
+                Map<String, String> typeAliases = MapUtils.invertMap(imports);
+                writeAnnotations(domain, os, typeAliases,"");
+                os.write("domain " + domain.getName() + ";");
+            }
+        }
+        for (EClassifier entity :
+                domain.getEClassifiers().stream().filter(c -> c instanceof EClass).collect(Collectors.toList())) {
+            saveEntity((EClass) entity, domainDir);
+        }
+        deleteUnusedEntityFiles(domainDir, domain.getEClassifiers());
+        for (Map.Entry<String, EObject> entry : domain.getObjects()) {
+            saveObject(entry.getKey(), entry.getValue(), domain, domainDir);
+        }
+        deleteUnusedObjectFiles(domainDir, domain.getObjects().keySet());
+        for(Domain subdomain : domain.getSubdomains()) {
+            save(subdomain);
+        }
+        deleteUnusedDomainDirectories(domainDir, domain.getSubdomains());
     }
 
     public void save(EClass entity) throws IOException {
@@ -242,35 +266,6 @@ public class DefaultModelIO implements ModelIO {
     @NotNull
     protected OutputStreamWriter fileWriter(FileObject file) throws FileSystemException {
         return new OutputStreamWriter(file.getContent().getOutputStream(), StandardCharsets.UTF_8);
-    }
-
-    protected void saveDomain(Domain domain, FileObject directory) throws IOException {
-        FileObject domainDir = directory.resolveFile(domain.getName());
-        domainDir.createFolder();
-        FileObject domainDefFile = domainDir.resolveFile(domain.getName() + ".domain");
-        if(domain.getEAnnotations().isEmpty()) {
-            domainDefFile.delete();
-        } else {
-            try(OutputStreamWriter os = fileWriter(domainDefFile)) {
-                Map<String, String> imports = writeImports(domain, os);
-                Map<String, String> typeAliases = MapUtils.invertMap(imports);
-                writeAnnotations(domain, os, typeAliases,"");
-                os.write("domain " + domain.getName() + ";");
-            }
-        }
-        for (EClassifier entity :
-                domain.getEClassifiers().stream().filter(c -> c instanceof EClass).collect(Collectors.toList())) {
-            saveEntity((EClass) entity, domainDir);
-        }
-        deleteUnusedEntityFiles(domainDir, domain.getEClassifiers());
-        for (Map.Entry<String, EObject> entry : domain.getObjects()) {
-            saveObject(entry.getKey(), entry.getValue(), domain, domainDir);
-        }
-        deleteUnusedObjectFiles(domainDir, domain.getObjects().keySet());
-        for(Domain subdomain : domain.getSubdomains()) {
-            saveDomain(subdomain, domainDir);
-        }
-        deleteUnusedDomainDirectories(domainDir, domain.getSubdomains());
     }
 
     /**
