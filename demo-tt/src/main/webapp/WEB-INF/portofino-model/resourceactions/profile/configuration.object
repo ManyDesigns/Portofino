@@ -1,0 +1,25 @@
+import portofino.classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
+import portofino.classes.com.manydesigns.portofino.resourceactions.Group;
+import portofino.classes.com.manydesigns.portofino.resourceactions.Permissions;
+import portofino.classes.com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
+import portofino.classes.com.manydesigns.portofino.security.AccessLevel;
+
+object configuration : ResourceActionConfiguration {
+	additionalChildren = []
+	permissions = Permissions {
+		groups = [
+			Group {
+				accessLevel = NONE
+				accessLevelName = "NONE"
+				name = "all"
+				permissions = []
+			},
+			Group {
+				accessLevel = VIEW
+				accessLevelName = "VIEW"
+				name = "registered"
+				permissions = []
+			}
+		]
+	}
+}
