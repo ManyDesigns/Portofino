@@ -1,26 +1,18 @@
 import {
   AfterViewInit,
   ChangeDetectorRef,
-  Component,
-  ComponentFactoryResolver,
-  ComponentRef,
+  Component, ComponentFactoryResolver, ComponentRef,
   ContentChild,
   Directive,
   EventEmitter,
   Injectable,
-  InjectionToken,
-  Injector,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Optional,
-  Output,
-  SimpleChanges,
+  InjectionToken, Injector,
+  Input, OnChanges,
+  OnDestroy, OnInit,
+  Optional, Output, SimpleChanges,
   TemplateRef,
   Type,
-  ViewChild,
-  ViewContainerRef
+  ViewChild, ViewContainerRef
 } from "@angular/core";
 import {Annotation, ClassAccessor, loadClassAccessor, Property} from "./class-accessor";
 import {FormGroup} from "@angular/forms";
@@ -36,9 +28,9 @@ import {NotificationService} from "./notifications/notification.services";
 import {TranslateService} from "@ngx-translate/core";
 import {NO_AUTH_HEADER} from "./security/authentication.headers";
 import {ThemePalette} from "@angular/material/core";
-import * as moment from 'moment';
 import {Location} from "@angular/common";
 import {MatTableDataSource} from "@angular/material/table";
+import { DateTime } from "luxon";
 
 export const NAVIGATION_COMPONENT = new InjectionToken('Navigation Component');
 
@@ -67,6 +59,7 @@ export class PageService {
   notifyError(error) {
     this.error = error;
     this.pageLoadError.emit(error);
+    console.error(error);
   }
 }
 
@@ -313,7 +306,7 @@ export abstract class Page implements WithButtons, OnDestroy, OnInit {
       this.http.get(Page.removeDoubleSlashesFromUrl(`pages${this.path}/${config.script}`), {
         responseType: "text"
       }).subscribe(s => {
-        let factory = new Function(`return function(page, forms, moment) { ${s} }`);
+        let factory = new Function(`return function(page, forms, DateTime) { ${s} }`);
         let userFunction = factory();
         const forms = {
           ClassAccessor: ClassAccessor,
@@ -323,7 +316,7 @@ export abstract class Page implements WithButtons, OnDestroy, OnInit {
           FieldSet: FieldSet,
           Form: Form,
         };
-        userFunction(this, forms, moment);
+        userFunction(this, forms, DateTime);
       }, () => {
         this.notificationService.error(this.translate.get("Could not load page script"));
       });
@@ -943,7 +936,7 @@ export class PageFactoryComponent extends Page implements OnInit, OnChanges {
   }
 
   create(config: PageConfiguration, path: string, parent: Page): Observable<ComponentRef<any>> {
-    const componentType = config.actualType ? {type: config.actualType} : PageFactoryComponent.components[config.type];
+    const componentType = config.actualType ? { type: config.actualType } : PageFactoryComponent.components[config.type];
     if (!componentType) {
       return throwError(`Unknown component type '${config.type}' for path '${path}'`);
     }
@@ -1030,7 +1023,7 @@ export function PortofinoComponent(info: PortofinoComponentDefinition) {
     if (console && console.debug) {
       console.debug("Registering Portofino component " + info.name, info, target);
     }
-    PageFactoryComponent.components[info.name] = Object.assign({type: target}, info);
+    PageFactoryComponent.components[info.name] = Object.assign({ type: target }, info);
   };
 }
 
@@ -1047,6 +1040,6 @@ export class PageSettingsPanelComponent {
   emptyDataSource = new MatTableDataSource([]);
 
   get template() {
-    return this.page.template || {sections: ["default"]};
+    return this.page.template || { sections: ["default"] };
   }
 }

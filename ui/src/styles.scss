@@ -1,4 +1,4 @@
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 @include mat.core();
 $app-primary: mat.define-palette(mat.$indigo-palette);
 $app-accent:  mat.define-palette(mat.$pink-palette);

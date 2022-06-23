@@ -19,7 +19,8 @@
 <mat-form-field [formGroup]="form" *ngIf="!isDateOnly()">
   <mat-label>{{property.label | translate}}</mat-label>
   <!-- bare input field -->
-  <input matInput [formControlName]="property.name" [required]="required" dateTimeField [dateFormat]="dateFormat">
+  <input matInput [formControlName]="property.name" [required]="required"
+         dateTimeField [dateFormat]="dateFormat" [locale]="locale">
   <!-- mat datetime picker -->
   <!--<mat-datetimepicker-toggle matSuffix [for]="datetimepicker"></mat-datetimepicker-toggle>
   <mat-datetimepicker #datetimepicker type="datetime" openOnFocus="true"></mat-datetimepicker>

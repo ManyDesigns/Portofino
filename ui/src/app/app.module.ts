@@ -6,11 +6,8 @@ import {
   LocalStorageService,
   MatSnackBarNotificationService,
   NAVIGATION_COMPONENT,
-  NOTIFICATION_HANDLERS, Page,
-  PortofinoAppComponent,
-  PortofinoCrudModule,
-  PortofinoModule, PortofinoService,
-  PortofinoUpstairsModule
+  NOTIFICATION_HANDLERS, PortofinoAppComponent,
+  PortofinoModule, PortofinoUpstairsModule
 } from "portofino";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatButtonModule} from "@angular/material/button";
@@ -41,7 +38,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {QuillModule} from "ngx-quill";
 import {HttpClientModule} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
-import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import {MatLuxonDateModule} from "@angular/material-luxon-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule} from "@ngx-translate/core";
 import {ScrollingModule} from "@angular/cdk/scrolling";
@@ -70,23 +67,23 @@ export class AppComponent {
 }
 
 @NgModule({
-  declarations: [AppComponent],
-  providers: [
-    { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
-    { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
-  ],
-  imports: [
-    RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()),
-    PortofinoModule, PortofinoUpstairsModule,
-    BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
-    MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
-    MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
-    MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
-    MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatMomentDateModule, ScrollingModule,
-    FileInputAccessorModule, NgxdModule, QuillModule,
-    TranslateModule.forRoot()],
-  entryComponents: [],
-  bootstrap: [AppComponent]
+    declarations: [AppComponent],
+    providers: [
+        { provide: NAVIGATION_COMPONENT, useFactory: AppModule.navigation },
+        { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
+    ],
+    imports: [
+        RouterModule.forRoot(PortofinoModule.defaultRoutes(), PortofinoModule.defaultRouterConfig()),
+        PortofinoModule, PortofinoUpstairsModule,
+        BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
+        MatAutocompleteModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule,
+        MatDividerModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule,
+        MatPaginatorModule, MatProgressBarModule, MatRadioModule, MatSelectModule, MatSidenavModule, MatSnackBarModule,
+        MatSortModule, MatTableModule, MatTreeModule, MatToolbarModule, MatLuxonDateModule, ScrollingModule,
+        FileInputAccessorModule, NgxdModule, QuillModule,
+        TranslateModule.forRoot()
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
   static navigation(): new(...args) => DefaultNavigationComponent {

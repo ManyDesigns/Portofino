@@ -40,7 +40,7 @@ import {
   ValidatorFn
 } from "@angular/forms";
 import {FieldFactoryComponent} from "./fields/field.factory";
-import * as moment from 'moment';
+import { DateTime } from "luxon";
 
 export type FormElement =
   Field|FieldSet|{name: string, component: Type<any>, dependencies?: object}|{html: string}|FormList;
@@ -136,7 +136,7 @@ export class Field {
     if(!value) {
       //value is undefined
     } else if (isDateProperty(property)) {
-      value = moment(value);
+      value = DateTime.fromMillis(value);
     } else if (isBlob(property)) {
       const portofinoBlob = value;
       value = new BlobFile();

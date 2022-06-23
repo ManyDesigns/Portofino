@@ -57,7 +57,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTreeModule } from '@angular/material/tree';
-import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import {MatLuxonDateModule} from "@angular/material-luxon-adapter";
 import {FlexLayoutModule} from "@angular/flex-layout";
 import {ExtraOptions, RouterModule, Routes} from '@angular/router';
 import {SearchComponent} from './pages/crud/search/search.component';
@@ -133,25 +133,25 @@ import {
 import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
-  declarations: [
-    FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
-    NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
-    FormComponent, DynamicFormComponentDirective],
-  imports: [
-    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatRadioModule, MatSelectModule, FileInputAccessorModule, NgxdModule, QuillModule,
-    TranslateModule.forChild()],
-  providers: [ FieldFactory ],
-  entryComponents: [
-    BlobFieldComponent, BooleanFieldComponent, DateTimeFieldComponent, FormComponent,
-    NumberFieldComponent, SelectFieldComponent, TextFieldComponent],
-  exports: [
-    FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
-    NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
-    FormComponent,
-    MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
-    MatMomentDateModule, MatRadioModule, MatSelectModule]
+    declarations: [
+        FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
+        NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
+        FormComponent, DynamicFormComponentDirective
+    ],
+    imports: [
+        BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+        MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
+        MatLuxonDateModule, MatRadioModule, MatSelectModule, FileInputAccessorModule, NgxdModule, QuillModule,
+        TranslateModule.forChild()
+    ],
+    providers: [FieldFactory],
+    exports: [
+        FieldFactoryComponent, BlobFieldComponent, BooleanFieldComponent, DateTimeValueAccessor, DateTimeFieldComponent,
+        NumberFieldComponent, RichTextComponent, SelectFieldComponent, TextFieldComponent,
+        FormComponent,
+        MatAutocompleteModule, MatCheckboxModule, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule,
+        MatLuxonDateModule, MatRadioModule, MatSelectModule
+    ]
 })
 export class PortofinoFormsModule {}
 
@@ -164,120 +164,113 @@ export class PortofinoFormsModule {}
         ToolbarDirective, DefaultToolbarComponent, FooterDirective, DefaultFooterComponent, BreadcrumbsComponent,
         CreatePageComponent, DeletePageComponent, MovePageComponent, PageSettingsPanelComponent
     ],
-  imports: [
-    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    HttpClientModule, PortofinoFormsModule,
-    MatBadgeModule, MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule,
-    MatMenuModule, MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule,
-    MatStepperModule, MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
-    NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule.forChild()
-  ],
-  providers: [PortofinoService, AuthenticationService, PageService, PageCrudService, SidenavService],
-  entryComponents: [
-    DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
-    CreatePageComponent, DeletePageComponent, MovePageComponent],
-  exports: [
-    PageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
-    ContentComponent, PageFactoryComponent, PageHeader, TemplatesComponent,
-    DefaultNavigationComponent, NavigationDirective, DefaultToolbarComponent, ToolbarDirective,
-    DefaultFooterComponent, FooterDirective,
-    MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule, MatMenuModule,
-    MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
-    MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule]
+    imports: [
+        BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+        HttpClientModule, PortofinoFormsModule,
+        MatBadgeModule, MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule,
+        MatMenuModule, MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule,
+        MatStepperModule, MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule,
+        NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule.forChild()
+    ],
+    providers: [PortofinoService, AuthenticationService, PageService, PageCrudService, SidenavService],
+    exports: [
+        PageLayout, ButtonComponent, ButtonsComponent, BreadcrumbsComponent,
+        ContentComponent, PageFactoryComponent, PageHeader, TemplatesComponent,
+        DefaultNavigationComponent, NavigationDirective, DefaultToolbarComponent, ToolbarDirective,
+        DefaultFooterComponent, FooterDirective,
+        MatButtonModule, MatCardModule, MatDialogModule, MatDividerModule, MatExpansionModule, MatMenuModule,
+        MatProgressBarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule, MatStepperModule,
+        MatTabsModule, MatTableModule, MatTreeModule, MatListModule, MatToolbarModule
+    ]
 })
 export class PortofinoPagesModule {}
 
 @NgModule({
-  declarations: [
-    CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    ManyToManyComponent
-  ],
-  imports: [
-    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
-    MatPaginatorModule, MatSortModule,
-    NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
-  ],
-  providers: [],
-  entryComponents: [
-    CrudComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    ManyToManyComponent],
-  exports: [
-    CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    ManyToManyComponent,
-    MatPaginatorModule, MatSortModule]
+    declarations: [
+        CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+        SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
+        ManyToManyComponent
+    ],
+    imports: [
+        BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+        HttpClientModule, PortofinoFormsModule, PortofinoPagesModule,
+        MatPaginatorModule, MatSortModule,
+        NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
+    ],
+    providers: [],
+    exports: [
+        CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+        SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
+        ManyToManyComponent,
+        MatPaginatorModule, MatSortModule
+    ]
 })
 export class PortofinoCrudModule {}
 
 @NgModule({
-  declarations: [
-    UpstairsComponent,
-    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
-    WizardComponent],
-  imports: [
-    BrowserModule, BrowserAnimationsModule, DragDropModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    HttpClientModule, PortofinoFormsModule, PortofinoCrudModule, PortofinoPagesModule,
-    MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
-  ],
-  providers: [],
-  entryComponents: [
-    UpstairsComponent,
-    ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
-    ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
-    WizardComponent],
-  exports: [UpstairsComponent]
+    declarations: [
+        UpstairsComponent,
+        ActionsComponent, GenericCrudComponent, GenericPage, CreateActionComponent,
+        ConnectionsComponent, MailSettingsComponent, PermissionsComponent, SettingsComponent, TablesComponent,
+        WizardComponent
+    ],
+    imports: [
+        BrowserModule, BrowserAnimationsModule, DragDropModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+        HttpClientModule, PortofinoFormsModule, PortofinoCrudModule, PortofinoPagesModule,
+        MatGridListModule, MatTooltipModule, NgxdModule, RouterModule.forChild([]), TranslateModule.forChild()
+    ],
+    providers: [],
+    exports: [UpstairsComponent]
 })
 export class PortofinoUpstairsModule {}
 
 @NgModule({
-  declarations: [
-    PortofinoAppComponent,
-    CustomPageComponent, LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent,
-    ResetPasswordComponent, TextPageComponent],
-  imports: [
-    BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
-    HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
-    NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
-  ],
-  providers: [
-    { provide: AuthenticationStrategy, useClass: InAppAuthenticationStrategy },
-    //These are factories to avoid circular dependencies
-    { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
-    { provide: CHANGE_PASSWORD_COMPONENT, useFactory: PortofinoModule.changePasswordComponent },
-    { provide: RESET_PASSWORD_COMPONENT, useFactory: PortofinoModule.resetPasswordComponent },
-    { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
-    { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
-    { provide: FOOTER_COMPONENT, useFactory: PortofinoModule.footerComponent },
-    { provide: HTTP_INTERCEPTORS, useClass: ApiVersionInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ProgressInterceptor, multi: true },
-    { provide: TOKEN_STORAGE_SERVICE, useClass: LocalStorageService },
-    { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
-    { provide: LOCALES, useValue: [
-      { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
-      { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT },
-      { key: 'es', name: 'Español', translations: TRANSLATIONS_ES }]},
-    NotificationsHolder,
-    { provide: NOTIFICATION_HANDLERS, useExisting: NotificationsHolder, multi: true },
-    { provide: NotificationService, useClass: NotificationDispatcher },
-    { provide: ErrorHandler, useClass: NotificationErrorHandler }],
-  entryComponents: [
-    CustomPageComponent, LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent,
-    ResetPasswordComponent, TextPageComponent],
-  exports: [
-    PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent,
-    LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
-    TemplatesComponent, ContentComponent, PageFactoryComponent, PageHeader,
-    DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
-    CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
-    SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
-    CustomPageComponent,
-    ManyToManyComponent, TextPageComponent]
+    declarations: [
+        PortofinoAppComponent,
+        CustomPageComponent, LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent,
+        ResetPasswordComponent, TextPageComponent
+    ],
+    imports: [
+        BrowserModule, BrowserAnimationsModule, ReactiveFormsModule, FormsModule, FlexLayoutModule,
+        HttpClientModule, PortofinoFormsModule, PortofinoPagesModule, PortofinoCrudModule,
+        NgxdModule, RouterModule.forChild([]), ScrollingModule, TranslateModule
+    ],
+    providers: [
+        { provide: AuthenticationStrategy, useClass: InAppAuthenticationStrategy },
+        //These are factories to avoid circular dependencies
+        { provide: LOGIN_COMPONENT, useFactory: PortofinoModule.loginComponent },
+        { provide: CHANGE_PASSWORD_COMPONENT, useFactory: PortofinoModule.changePasswordComponent },
+        { provide: RESET_PASSWORD_COMPONENT, useFactory: PortofinoModule.resetPasswordComponent },
+        { provide: NAVIGATION_COMPONENT, useFactory: PortofinoModule.navigationComponent },
+        { provide: TOOLBAR_COMPONENT, useFactory: PortofinoModule.toolbarComponent },
+        { provide: FOOTER_COMPONENT, useFactory: PortofinoModule.footerComponent },
+        { provide: HTTP_INTERCEPTORS, useClass: ApiVersionInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: LanguageInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: NotificationInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ProgressInterceptor, multi: true },
+        { provide: TOKEN_STORAGE_SERVICE, useClass: LocalStorageService },
+        { provide: LOCALE_STORAGE_SERVICE, useClass: LocalStorageService },
+        { provide: LOCALES, useValue: [
+                { key: 'en', name: 'English', translations: TRANSLATIONS_EN },
+                { key: 'it', name: 'Italiano', translations: TRANSLATIONS_IT },
+                { key: 'es', name: 'Español', translations: TRANSLATIONS_ES }
+            ] },
+        NotificationsHolder,
+        { provide: NOTIFICATION_HANDLERS, useExisting: NotificationsHolder, multi: true },
+        { provide: NotificationService, useClass: NotificationDispatcher },
+        { provide: ErrorHandler, useClass: NotificationErrorHandler }
+    ],
+    exports: [
+        PortofinoAppComponent, PageLayout, ButtonComponent, ButtonsComponent,
+        LoginComponent, SignupComponent, ChangePasswordComponent, ForgottenPasswordComponent, ResetPasswordComponent,
+        TemplatesComponent, ContentComponent, PageFactoryComponent, PageHeader,
+        DefaultNavigationComponent, DefaultToolbarComponent, DefaultFooterComponent,
+        CrudComponent, SearchFieldComponent, SearchComponent, DetailComponent, CreateComponent, BulkEditComponent,
+        SearchComponentHolder, DetailComponentHolder, CreateComponentHolder, BulkEditComponentHolder,
+        CustomPageComponent,
+        ManyToManyComponent, TextPageComponent
+    ]
 })
 export class PortofinoModule {
   static changePasswordComponent() {

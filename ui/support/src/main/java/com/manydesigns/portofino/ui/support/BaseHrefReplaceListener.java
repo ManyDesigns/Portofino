@@ -10,7 +10,7 @@ import java.io.*;
 
 public class BaseHrefReplaceListener implements ServletContextListener {
 
-    private static Logger logger = LoggerFactory.getLogger(BaseHrefReplaceListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(BaseHrefReplaceListener.class);
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
