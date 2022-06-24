@@ -98,13 +98,13 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Autowired
     protected ApplicationContext applicationContext;
     @Autowired
-    protected ModelService modelService;
+    public ModelService modelService;
     @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DOMAIN)
-    protected Domain actionsDomain;
+    public Domain actionsDomain;
     @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
-    protected FileObject actionsDirectory;
+    public FileObject actionsDirectory;
     @Autowired(required = false)
     protected SecurityFacade security = NoSecurity.AT_ALL;
     @Context
@@ -648,6 +648,47 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             return supportsPermissions.value();
         } else {
             return new String[0];
+        }
+    }
+
+    //Mount points
+    @Override
+    public void mount(@NotNull String segment, @NotNull String path) throws Exception {
+        if (getConfiguration() == null) {
+            loadConfiguration();
+        }
+        Optional<AdditionalChild> existing =
+                getConfiguration().getAdditionalChildren().stream().filter(
+                        c -> c.getSegment().equals(segment)
+                ).findFirst();
+        if(existing.isPresent()) {
+            String existingPath = existing.get().getPath();
+            if(!path.equals(existingPath)) {
+                throw new IllegalArgumentException("Another path is already mounted at " + segment + ": " + existingPath);
+            }
+        } else {
+            AdditionalChild child = new AdditionalChild();
+            child.setSegment(segment);
+            child.setPath(path);
+            getConfiguration().getAdditionalChildren().add(child);
+            saveConfiguration();
+            logger.info("Mounted " + segment + " --> " + path + " at " + getLocation());
+        }
+    }
+
+    @Override
+    public void unmount(String segment) throws Exception {
+        ResourceActionConfiguration descriptor = getConfiguration();
+        if (descriptor == null) {
+            descriptor = loadConfiguration();
+        }
+        if (descriptor != null) {
+            Optional<AdditionalChild> existing =
+                    descriptor.getAdditionalChildren().stream().filter(c -> c.getSegment().equals(segment)).findFirst();
+            if (existing.isPresent()) {
+                descriptor.getAdditionalChildren().remove(existing.get());
+                saveConfiguration();
+            }
         }
     }
 

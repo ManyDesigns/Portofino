@@ -78,22 +78,13 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
+    protected Persistence persistence;
     protected final AggregateCodeBase persistenceCodeBase = new AggregateCodeBase(null, getClass().getClassLoader());
     protected Disposable subscription;
 
-    //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    //Liquibase properties
     public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
 
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(DatabaseModule.class);
+    public static final Logger logger = LoggerFactory.getLogger(DatabaseModule.class);
 
     @Override
     public String getModuleVersion() {
@@ -176,13 +167,14 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
                     break;
             }
         });
+        this.persistence = persistence;
         return persistence;
     }
 
     @PreDestroy
     public void destroy() {
         logger.info("ManyDesigns Portofino database module stopping...");
-        applicationContext.getBean(Persistence.class).stop();
+        persistence.stop();
         if(subscription != null) {
             subscription.dispose();
             subscription = null;
@@ -203,7 +195,6 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        Persistence persistence = applicationContext.getBean(Persistence.class);
         Persistence.Status status = persistence.status.getValue();
         if(status == null || status == Persistence.Status.STOPPED) {
             logger.info("Starting persistence...");

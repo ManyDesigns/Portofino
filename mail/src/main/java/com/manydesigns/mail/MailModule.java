@@ -27,23 +27,24 @@ import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ResourceActionsModule;
+import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
-import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
+import com.manydesigns.portofino.rest.PortofinoRoot;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
+
+import static com.manydesigns.portofino.ResourceActionsModule.ACTIONS_DIRECTORY;
 
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,7 +52,7 @@ import javax.servlet.ServletContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MailModule implements Module, ApplicationListener<ContextRefreshedEvent> {
+public class MailModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -60,10 +61,12 @@ public class MailModule implements Module, ApplicationListener<ContextRefreshedE
     @Autowired
     public Configuration configuration;
     @Autowired
-    public ResourceActionSupport resourceActionSupport;
+    public ModelService modelService;
     @Autowired
-    @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
+    @Qualifier(ACTIONS_DIRECTORY)
     public FileObject actionsDirectory;
+    @Autowired
+    public DispatcherInitializer dispatcherInitializer;
 
     protected MailQueueSetup mailQueueSetup;
 
@@ -90,7 +93,26 @@ public class MailModule implements Module, ApplicationListener<ContextRefreshedE
     public void init() throws Exception {
         mailQueueSetup = new MailQueueSetup(configuration);
         mailQueueSetup.setup();
-        //Quartz integration (optional)
+        maybeSetupQuartz();
+
+        if(configuration.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
+            modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
+                String segment = configuration.getString(
+                        MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
+                try {
+                    PortofinoRoot root = ResourceActionsModule.getRootResource(
+                            actionsDirectory, dispatcherInitializer.getResourceResolver(), servletContext, modelService);
+                    root.mount(segment, SendMailAction.class);
+                } catch (Exception e) {
+                    logger.error("Could not install send mail action", e);
+                }
+            });
+        }
+
+        status = ModuleStatus.STARTED;
+    }
+
+    protected void maybeSetupQuartz() {
         try {
             //In classe separata per permettere al modulo di essere caricato anche in assenza di Quartz a runtime
             MailScheduler.setupMailScheduler(mailQueueSetup);
@@ -98,7 +120,6 @@ public class MailModule implements Module, ApplicationListener<ContextRefreshedE
             logger.debug(e.getMessage(), e);
             logger.info("Quartz is not available, mail scheduler not started");
         }
-        status = ModuleStatus.STARTED;
     }
 
     @PreDestroy
@@ -121,16 +142,4 @@ public class MailModule implements Module, ApplicationListener<ContextRefreshedE
         return status;
     }
 
-    @Override
-    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        if(configuration.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
-            String segment = configuration.getString(
-                    MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
-            try {
-                resourceActionSupport.mount(actionsDirectory, segment, SendMailAction.class);
-            } catch (Exception e) {
-                logger.error("Could not install send mail action", e);
-            }
-        }
-    }
 }

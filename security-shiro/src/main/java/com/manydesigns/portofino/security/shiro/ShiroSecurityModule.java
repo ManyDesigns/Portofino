@@ -23,10 +23,13 @@ package com.manydesigns.portofino.security.shiro;
 import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
 import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
+import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
@@ -61,12 +64,9 @@ import java.util.UUID;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@Order(ShiroSecurityModule.SECURITY_MODULE)
 public class ShiroSecurityModule implements Module, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
-
-    public static final int SECURITY_MODULE = ResourceActionsModule.NO_OP_LOGIN + 100;
 
     @Autowired
     public ServletContext servletContext;
@@ -79,7 +79,9 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
     @Autowired
     public CodeBase codeBase;
     @Autowired
-    public ResourceActionSupport resourceActionSupport;
+    public ModelService modelService;
+    @Autowired
+    public DispatcherInitializer dispatcherInitializer;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
     protected SecurityClassRealm realm;
@@ -129,6 +131,16 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         logger.debug("Creating SecurityClassRealm");
         realm = new SecurityClassRealm(codeBase, "Security");
         rsm.setRealm(realm);
+
+        modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
+            try {
+                PortofinoRoot root = ResourceActionsModule.getRootResource(
+                        actionsDirectory, dispatcherInitializer.getResourceResolver(), servletContext, modelService);
+                SecurityLogic.installLogin(root, configuration.getProperties(), DefaultLoginAction.class);
+            } catch (Exception e) {
+                logger.error("Could not install login action", e);
+            }
+        });
         status = ModuleStatus.STARTED;
     }
 
@@ -146,12 +158,6 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
 
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        try {
-            SecurityLogic.installLogin(
-                    resourceActionSupport, actionsDirectory, configuration.getProperties(), DefaultLoginAction.class);
-        } catch (Exception e) {
-            logger.error("Could not install login action", e);
-        }
         ApplicationContext applicationContext = event.getApplicationContext();
         if(PortofinoContextLoaderListener.BRIDGE_CONTEXT.equals(applicationContext.getId())) {
             realm.setApplicationContext(applicationContext);

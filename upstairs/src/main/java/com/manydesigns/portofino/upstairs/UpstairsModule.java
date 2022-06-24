@@ -21,30 +21,32 @@
 package com.manydesigns.portofino.upstairs;
 
 import com.manydesigns.portofino.ResourceActionsModule;
+import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
-import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
+import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.upstairs.actions.UpstairsAction;
 import org.apache.commons.vfs2.FileObject;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class UpstairsModule implements Module, ApplicationListener<ContextRefreshedEvent> {
+/**
+ * Root resource for the "upstairs" operations that work "one level above" the application, i.e. on the application's
+ * model (also known as the "metamodel" if we consider the application's database as the "model").
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class UpstairsModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -54,7 +56,9 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
     @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
     public FileObject actionsDirectory;
     @Autowired
-    public ResourceActionSupport resourceActionSupport;
+    public ModelService modelService;
+    @Autowired
+    public DispatcherInitializer dispatcherInitializer;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -72,6 +76,15 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
 
     @PostConstruct
     public void init() {
+        modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
+            try {
+                PortofinoRoot root = ResourceActionsModule.getRootResource(
+                        actionsDirectory, dispatcherInitializer.getResourceResolver(), servletContext, modelService);
+                root.mountPackage("portofino-upstairs", UpstairsAction.class.getPackage());
+            } catch (Exception e) {
+                logger.error("Could not install upstairs actions", e);
+            }
+        });
         status = ModuleStatus.STARTED;
     }
 
@@ -83,15 +96,5 @@ public class UpstairsModule implements Module, ApplicationListener<ContextRefres
     @Override
     public ModuleStatus getStatus() {
         return status;
-    }
-
-    @Override
-    public void onApplicationEvent(@NotNull ContextRefreshedEvent contextRefreshedEvent) {
-        try {
-            resourceActionSupport.mountPackage(
-                    actionsDirectory, "portofino-upstairs", UpstairsAction.class.getPackage());
-        } catch (Exception e) {
-            logger.error("Could not install upstairs actions", e);
-        }
     }
 }

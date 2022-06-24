@@ -21,11 +21,9 @@
 package com.manydesigns.portofino.resourceactions;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
-import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
@@ -45,7 +43,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,14 +50,11 @@ import java.util.Optional;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ResourceActionSupport implements ApplicationContextAware {
+public class ResourceActionSupport {
     public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(ResourceActionSupport.class);
     protected static final JAXBContext JAXB_CONTEXT;
-    protected final PortofinoDispatcherInitializer dispatcherInitializer;
-    protected final FileObject actionsDirectory;
-    protected ApplicationContext applicationContext;
 
     static {
         try {
@@ -68,11 +62,6 @@ public class ResourceActionSupport implements ApplicationContextAware {
         } catch (JAXBException e) {
             throw new Error("Can't instantiate pages jaxb context", e);
         }
-    }
-
-    public ResourceActionSupport(PortofinoDispatcherInitializer dispatcherInitializer, FileObject actionsDirectory) {
-        this.dispatcherInitializer = dispatcherInitializer;
-        this.actionsDirectory = actionsDirectory;
     }
 
     public static boolean supportsDetail(Class<?> actionClass) {
@@ -134,72 +123,6 @@ public class ResourceActionSupport implements ApplicationContextAware {
             return annotation.value();
         } else {
             return actionClass.getName();
-        }
-    }
-
-    public void mount(FileObject actionDirectory, String segment, String path) throws Exception {
-        ResourceAction instance = getResourceAction(actionDirectory);
-        if (instance == null) {
-            throw new Exception("Cannot mount " + segment + " on " + actionDirectory + ", resource does not exist");
-        }
-        ResourceActionConfiguration configuration = instance.loadConfiguration();
-        if (configuration == null) {
-            throw new Exception("Cannot mount " + segment + " on " + actionDirectory + ", resource does not exist");
-        }
-        Optional<AdditionalChild> existing =
-                configuration.getAdditionalChildren().stream().filter(c -> c.getSegment().equals(segment)).findFirst();
-        if(existing.isPresent()) {
-            String existingPath = existing.get().getPath();
-            if(!path.equals(existingPath)) {
-                throw new IllegalArgumentException("Another path is already mounted at " + segment + ": " + existingPath);
-            }
-        } else {
-            AdditionalChild child = new AdditionalChild();
-            child.setSegment(segment);
-            child.setPath(path);
-            configuration.getAdditionalChildren().add(child);
-            instance.saveConfiguration();
-        }
-    }
-
-    protected ResourceAction getResourceAction(FileObject actionDirectory) throws Exception {
-        ResourceResolver resres = dispatcherInitializer.getResourceResolver();
-        ResourceAction action;
-        if (actionDirectory.getURI().equals(actionsDirectory.getURI())) {
-            action = PortofinoRoot.get(actionsDirectory, resres);
-        }  else {
-            action = resres.resolve(actionDirectory, ResourceAction.class);
-        }
-        action.setActionInstance(new ActionInstance(null, actionDirectory, action.getClass()));
-        applicationContext.getAutowireCapableBeanFactory().autowireBean(action);
-        return action;
-    }
-
-    public void mount(FileObject actionDirectory, String segment, Class<?> actionClass) throws Exception {
-        mount(actionDirectory, segment, "res:" + actionClass.getName().replace('.', '/') + ".class");
-    }
-
-    public void mountPackage(FileObject actionDirectory, String segment, String packageName) throws Exception {
-        mount(actionDirectory, segment, "res:" + packageName.replace('.', '/'));
-    }
-
-    public void mountPackage(FileObject actionDirectory, String segment, Package pkg) throws Exception {
-        mountPackage(actionDirectory, segment, pkg.getName());
-    }
-
-    public void unmount(FileObject actionDirectory, String segment) throws Exception {
-        ResourceAction instance = getResourceAction(actionDirectory);
-        if (instance == null) {
-            return;
-        }
-        ResourceActionConfiguration descriptor = instance.loadConfiguration();
-        if (descriptor != null) {
-            Optional<AdditionalChild> existing =
-                    descriptor.getAdditionalChildren().stream().filter(c -> c.getSegment().equals(segment)).findFirst();
-            if (existing.isPresent()) {
-                descriptor.getAdditionalChildren().remove(existing.get());
-                instance.saveConfiguration();
-            }
         }
     }
 
@@ -303,10 +226,5 @@ public class ResourceActionSupport implements ApplicationContextAware {
             logger.error("Couldn't load configuration from " + configurationFile.getName().getPath(), t);
         }
         resourceAction.setActionInstance(actionInstance);
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 }

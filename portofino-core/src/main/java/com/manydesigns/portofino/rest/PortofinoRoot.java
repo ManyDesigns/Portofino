@@ -26,7 +26,10 @@ import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.i18n.TextProviderBean;
 import com.manydesigns.portofino.model.Domain;
-import com.manydesigns.portofino.resourceactions.*;
+import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.ActionContext;
+import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import ognl.OgnlContext;
@@ -45,9 +48,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.beans.IntrospectionException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -58,11 +58,11 @@ public class PortofinoRoot extends AbstractResourceAction {
     private static final Logger logger = LoggerFactory.getLogger(PortofinoRoot.class);
 
     @Context
-    protected ServletContext servletContext;
+    public ServletContext servletContext;
     @Context
-    protected HttpServletResponse response;
+    public HttpServletResponse response;
     @Context
-    protected HttpServletRequest request;
+    public HttpServletRequest request;
 
     protected ResourceResolver resourceResolver;
 
@@ -95,8 +95,10 @@ public class PortofinoRoot extends AbstractResourceAction {
 
     @Override
     public PortofinoRoot init() {
-        applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        autowire(this);
+        applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+        if (applicationContext != null) {
+            autowire(this);
+        }
         ActionInstance actionInstance = new ActionInstance(null, location, getClass());
         setActionInstance(actionInstance);
         ActionContext context = new ActionContext();

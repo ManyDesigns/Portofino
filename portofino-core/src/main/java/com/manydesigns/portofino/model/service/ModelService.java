@@ -127,9 +127,8 @@ public class ModelService {
                 (domain.eContainer() instanceof Domain && isTransient((Domain) domain.eContainer()));
     }
 
-    public Domain ensureTopLevelDomain(String name, boolean persist) {
-        Optional<Domain> any = model.getDomains().stream()
-                .filter(d -> d.getName().equals(name)).findAny();
+    public synchronized Domain ensureTopLevelDomain(String name, boolean persist) {
+        Optional<Domain> any = model.getDomains().stream().filter(d -> d.getName().equals(name)).findAny();
         Domain domain;
         if (any.isPresent()) {
             logger.debug("Not adding domain " + name + " because it's already present");

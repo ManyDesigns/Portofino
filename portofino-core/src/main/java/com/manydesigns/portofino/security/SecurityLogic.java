@@ -158,18 +158,16 @@ public class SecurityLogic {
     }
 
     public static void installLogin(
-            ResourceActionSupport support,
-            FileObject actionsDirectory, Configuration configuration,
-            Class<? extends ResourceAction> fallbackLoginClass)
-            throws Exception {
+            ResourceAction root, Configuration configuration, Class<? extends ResourceAction> fallbackLoginClass
+    ) throws Exception {
         String relLoginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
         String loginPath;
         if(relLoginPath != null) {
-            loginPath = actionsDirectory.getName().getPath() + relLoginPath;
+            loginPath = root.getLocation().getName().getPath() + relLoginPath;
         } else {
             loginPath = "res:" + fallbackLoginClass.getPackage().getName().replace('.', '/');
         }
-        support.unmount(actionsDirectory, ":auth");
-        support.mount(actionsDirectory, ":auth", loginPath);
+        root.unmount(":auth");
+        root.mount(":auth", loginPath);
     }
 }

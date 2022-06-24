@@ -25,6 +25,7 @@ import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.security.SecurityFacade;
 import org.apache.commons.vfs2.FileObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -93,4 +94,20 @@ public interface ResourceAction extends SecureResource {
     void saveConfiguration() throws Exception;
     void configured();
 
+    //Mount points
+    void mount(@NotNull String segment, @NotNull String path) throws Exception;
+
+    default void mount(@NotNull String segment, @NotNull Class<?> actionClass) throws Exception {
+        mount(segment, "res:" + actionClass.getName().replace('.', '/') + ".class");
+    }
+
+    default void mountPackage(@NotNull String segment, @NotNull String packageName) throws Exception {
+        mount(segment, "res:" + packageName.replace('.', '/'));
+    }
+
+    default void mountPackage(@NotNull String segment, @NotNull Package pkg) throws Exception {
+        mountPackage(segment, pkg.getName());
+    }
+
+    void unmount(@NotNull String segment) throws Exception;
 }
