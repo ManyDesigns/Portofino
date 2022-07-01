@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.annotations.Transient;
 import org.eclipse.emf.common.util.BasicEMap;
@@ -15,8 +16,6 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -193,7 +192,7 @@ public class Domain extends EPackageImpl {
         List<PropertyDescriptor> result = new ArrayList<>();
         for (PropertyDescriptor prop : propertyDescriptors) {
             if (prop.getWriteMethod() != null && prop.getReadMethod() != null) {
-                if (getAnnotation(prop, Transient.class) == null) {
+                if (ReflectionUtil.getAnnotation(prop, Transient.class) == null) {
                     result.add(prop);
                 }
             }
@@ -291,36 +290,6 @@ public class Domain extends EPackageImpl {
 
     public Object getJavaObject(String name, Domain classesDomain, CodeBase codeBase) throws Exception {
         return toJavaObject(getObjects().get(name), classesDomain, codeBase);
-    }
-
-    public static <T extends Annotation> T getAnnotation(PropertyDescriptor prop, Class<T> annClass) {
-        Class<?> declaringClass = null;
-        if (prop.getReadMethod() != null) {
-            T annotation = prop.getReadMethod().getAnnotation(annClass);
-            if (annotation != null) {
-                return annotation;
-            } else {
-                declaringClass = prop.getReadMethod().getDeclaringClass();
-            }
-        }
-        if (prop.getWriteMethod() != null) {
-            T annotation = prop.getReadMethod().getAnnotation(annClass);
-            if (annotation != null) {
-                return annotation;
-            } else {
-                declaringClass = prop.getWriteMethod().getDeclaringClass();
-            }
-        }
-        if (declaringClass != null) {
-            try {
-                Field field = declaringClass.getDeclaredField(prop.getName());
-                return field.getAnnotation(annClass);
-            } catch (NoSuchFieldException e) {
-                return null;
-            }
-        } else {
-            return null;
-        }
     }
 
     public static String getQualifiedName(EPackage domain) {

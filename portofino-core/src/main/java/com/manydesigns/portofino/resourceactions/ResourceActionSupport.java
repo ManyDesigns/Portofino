@@ -24,15 +24,11 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
-import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -50,7 +46,7 @@ import java.nio.charset.StandardCharsets;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ResourceActionSupport {
+public abstract class ResourceActionSupport {
     public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(ResourceActionSupport.class);

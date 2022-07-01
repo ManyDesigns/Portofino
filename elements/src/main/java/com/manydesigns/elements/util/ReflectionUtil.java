@@ -23,21 +23,21 @@ package com.manydesigns.elements.util;
 import com.manydesigns.elements.fields.FieldUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.json.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.beans.PropertyDescriptor;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 
 /**
+ * Reflection-related utilities.
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -59,7 +59,7 @@ public class ReflectionUtil {
     // Utility methods
     //**************************************************************************
 
-    public static Class loadClass(String className) {
+    public static Class<?> loadClass(String className) {
         try {
             Class<?> aClass = Class.forName(className);
             logger.debug("Loaded class: {}", aClass);
@@ -70,12 +70,11 @@ public class ReflectionUtil {
         }
     }
 
-    public static Constructor<?> getConstructor(String className,
-                                             Class... argClasses) {
+    public static Constructor<?> getConstructor(String className, Class<?>... argClasses) {
         return getConstructor(loadClass(className), argClasses);
     }
 
-    public static <T> Constructor<T> getConstructor(Class<T> aClass, Class... argClasses) {
+    public static <T> Constructor<T> getConstructor(Class<T> aClass, Class<?>... argClasses) {
         try {
             Constructor<T> constructor = aClass.getConstructor(argClasses);
             logger.debug("Found constructor: {}", constructor);
@@ -86,21 +85,20 @@ public class ReflectionUtil {
         }
     }
 
-    public static Constructor getBestMatchConstructor(Class aClass,
-                                                      Class... argClasses) {
-        for (Constructor current : aClass.getConstructors()) {
-            Class[] parameterTypes = current.getParameterTypes();
+    public static <T> Constructor<T> getBestMatchConstructor(Class<T> aClass, Class<?>... argClasses) {
+        for (Constructor<?> current : aClass.getConstructors()) {
+            Class<?>[] parameterTypes = current.getParameterTypes();
             if (parameterTypes.length != argClasses.length) {
                 continue;
             }
             boolean matches = true;
             for (int i = 0; i < argClasses.length; i++) {
-                Class paramaterType = parameterTypes[i];
-                Class argClass = argClasses[i];
+                Class<?> paramaterType = parameterTypes[i];
+                Class<?> argClass = argClasses[i];
                 matches = matches && paramaterType.isAssignableFrom(argClass);
             }
             if (matches) {
-                return current;
+                return (Constructor<T>) current;
             }
         }
         logger.debug("Could not find best match construtor for class: {}", aClass);
@@ -215,5 +213,35 @@ public class ReflectionUtil {
         }
         js.endArray();
         return js.endObject();
+    }
+
+    public static <T extends Annotation> T getAnnotation(PropertyDescriptor prop, Class<T> annClass) {
+        Class<?> declaringClass = null;
+        if (prop.getReadMethod() != null) {
+            T annotation = prop.getReadMethod().getAnnotation(annClass);
+            if (annotation != null) {
+                return annotation;
+            } else {
+                declaringClass = prop.getReadMethod().getDeclaringClass();
+            }
+        }
+        if (prop.getWriteMethod() != null) {
+            T annotation = prop.getReadMethod().getAnnotation(annClass);
+            if (annotation != null) {
+                return annotation;
+            } else {
+                declaringClass = prop.getWriteMethod().getDeclaringClass();
+            }
+        }
+        if (declaringClass != null) {
+            try {
+                Field field = declaringClass.getDeclaredField(prop.getName());
+                return field.getAnnotation(annClass);
+            } catch (NoSuchFieldException e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

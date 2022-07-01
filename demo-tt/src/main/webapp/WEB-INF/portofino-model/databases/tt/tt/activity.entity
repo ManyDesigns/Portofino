@@ -41,5 +41,6 @@ entity activity {
 	ticket_state
 	@Column(columnType = "INT", autoincrement = false, nullable = true, jdbcType = 4, length = 10, scale = 0)
 	version_state
+
 	fk_activity_type --> activity_types(id=type)
 }

@@ -32,12 +32,28 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * The Model is the principal holder of information about the application's data, and it's one of the core features of
+ * Portofino, that sets it apart from other "frameworks" and low-code tools. This <i>data</i> includes both persistent
+ * data, stored for example in a database, and configuration data for various parts of the application.
+ * <p>
+ * In model-driven parlance, this is really a <i>metamodel</i>, if we consider the data proper (as in, actual
+ * database rows) to be the <i>model</i> of a physical or social system – such as a department in the company you're
+ * working for.<br />
+ * That is, this Model describes the structure of the data and its relationships, and doesn't contain the data directly.
+ * </p><p>
+ * This Model itself – or rather its contents, in the form of {@link Model#domains} – in turn are defined in terms of
+ * a metamodel, that is, <a href="https://wiki.eclipse.org/Ecore">Ecore</a>.
+ * </p><p>
+ * The concern of persisting the model – i.e. saving and loading it – is left to other classes.
+ *
+ * </p>
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
 public class Model {
