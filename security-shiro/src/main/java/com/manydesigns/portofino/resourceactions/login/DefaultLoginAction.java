@@ -187,7 +187,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
     }
 
     public String userInfo(Subject subject, PortofinoRealm portofinoRealm, String jwt) {
-        boolean administrator = security.isAdministrator(portofinoConfiguration);
+        boolean administrator = security.isAdministrator(portofinoConfiguration.getProperties());
         JSONStringer stringer = new JSONStringer();
         stringer.
             object().
@@ -213,8 +213,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
             Serializable user = portofinoRealm.getUserByEmail(req.email);
             if(user != null) {
                 String token = portofinoRealm.generateOneTimeToken(user);
-                String body = getResetPasswordEmailBody(req.siteNameOrAddress, req.loginPageUrl.replace("TOKEN", token));
-                String from = portofinoConfiguration.getString(PortofinoProperties.MAIL_FROM);
+                String body = getResetPasswordEmailBody(
+                        req.siteNameOrAddress, req.loginPageUrl.replace("TOKEN", token));
+                String from = portofinoConfiguration.getProperties().getString(PortofinoProperties.MAIL_FROM);
                 String subject = ElementsThreadLocals.getText("password.reset.confirmation.required");
                 sendMail(from, req.email, subject, body);
             } else {
@@ -295,7 +296,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
     }
 
     public String getApplicationName() {
-        return portofinoConfiguration.getString(PortofinoProperties.APP_NAME);
+        return portofinoConfiguration.getProperties().getString(PortofinoProperties.APP_NAME);
     }
 
     protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
@@ -406,7 +407,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             String[] tokenAndEmail = portofinoRealm.saveSelfRegisteredUser(user);
             String body = getConfirmSignUpEmailBody(
                     siteNameOrAddress, confirmationUrl.replace("TOKEN", tokenAndEmail[0]));
-            String from = portofinoConfiguration.getString(
+            String from = portofinoConfiguration.getProperties().getString(
                     PortofinoProperties.MAIL_FROM, "example@example.com");
             sendMail(from, tokenAndEmail[1], ElementsThreadLocals.getText("confirm.signup"), body);
         } catch (ExistingUserException e) {

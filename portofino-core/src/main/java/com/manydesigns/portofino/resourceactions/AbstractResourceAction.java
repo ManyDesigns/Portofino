@@ -30,6 +30,7 @@ import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.model.Domain;
@@ -62,9 +63,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.beans.IntrospectionException;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
@@ -92,11 +90,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     public ActionInstance actionInstance;
     /** The global configuration object. Injected. */
     @Autowired
-    public Configuration portofinoConfiguration;
+    public ConfigurationSource portofinoConfiguration;
     @Autowired
     protected CodeBase codeBase;
     @Autowired
-    protected ApplicationContext applicationContext;
+    public ApplicationContext applicationContext;
     @Autowired
     public ModelService modelService;
     @Autowired
@@ -282,7 +280,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return ElementsThreadLocals.getOgnlContext();
     }
 
-    public Configuration getPortofinoConfiguration() {
+    public ConfigurationSource getPortofinoConfiguration() {
         return portofinoConfiguration;
     }
 
@@ -335,7 +333,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             logger.trace("Operation: {}", operation);
             Method handler = operation.getMethod();
             if (!security.isOperationAllowed(
-                    this, portofinoConfiguration, request, operation, handler)) {
+                    this, portofinoConfiguration.getProperties(), request, operation, handler)) {
                 continue;
             }
             boolean visible = Operations.doGuardsPass(this, handler, GuardType.VISIBLE);
@@ -469,9 +467,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         List<String> excluded = new ArrayList<>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             RequiresPermissions requiresPermissions = property.getAnnotation(RequiresPermissions.class);
+            Configuration conf = getPortofinoConfiguration().getProperties();
             boolean permitted =
                     requiresPermissions == null ||
-                    security.hasPermissions(getPortofinoConfiguration(), permissions, requiresPermissions);
+                    security.hasPermissions(conf, permissions, requiresPermissions);
             if(!permitted) {
                 logger.debug("Property not permitted, filtering: {}", property.getName());
                 excluded.add(property.getName());
@@ -526,7 +525,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         } else {
             parentDomain = actionsDomain;
         }
-        return parentDomain.ensureDomain(actionInstance.getDirectory().getName().getBaseName());
+        return parentDomain.ensureDomain(getSegment());
     }
 
     public ResourceActionConfiguration loadConfiguration() throws Exception {
@@ -537,26 +536,24 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
                         "Action configuration for " + this + " is not of the right type: " + configuration);
             }
             actionInstance.setConfiguration((ResourceActionConfiguration) configuration);
-            if (applicationContext != null) {
-                applicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
-            }
-            ((ResourceActionConfiguration) configuration).init();
         } else {
             // Try loading legacy action.xml and configuration.xml
-            ResourceActionSupport.configureResourceAction(this, actionInstance);
-            if (getConfiguration() != null) {
+            ResourceActionSupport.legacyConfigureResourceAction(this, actionInstance);
+            if (getConfiguration() != null && actionInstance.getDirectory() != null) {
                 FileObject oldActionXml = actionInstance.getDirectory().resolveFile("action.xml");
                 FileObject oldConf = actionInstance.getDirectory().resolveFile("configuration.xml");
                 try {
                     saveConfiguration();
-                    logger.info("Migrated configuration from " + oldConf.getName().getPath() + " and action.xml, deleting");
+                    logger.info("Migrated configuration.xml and action.xml from " +
+                            actionInstance.getDirectory().getPath() + ", deleting");
                     oldConf.delete();
                     oldActionXml.delete();
                 } catch (Exception e) {
-                    logger.error("Could not migrate configuration from " + oldConf.getName().getPath() + " and action.xml");
+                    logger.error("Could not migrate configuration.xml and action.xml from " +
+                            actionInstance.getDirectory().getPath());
                 }
-                return getConfiguration();
             }
+            configuration = getConfiguration();
         }
         if (configuration == null) {
             ResourceActionConfiguration actionConfiguration = new ResourceActionConfiguration();
@@ -564,6 +561,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             configuration = actionConfiguration;
             actionInstance.setConfiguration(actionConfiguration);
         }
+        if (applicationContext != null) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
+        }
+        ((ResourceActionConfiguration) configuration).init();
         return (ResourceActionConfiguration) configuration;
     }
 

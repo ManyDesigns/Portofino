@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.microservices.boot;
 
 import com.manydesigns.elements.ElementsThreadLocals;
@@ -25,10 +45,15 @@ import javax.servlet.ServletContext;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class PortofinoAnnotationConfigServletWebServerApplicationContext extends AnnotationConfigServletWebServerApplicationContext {
+/**
+ * @author Alessio Stalla – alessiostalla@gmail.com
+ */
+public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
+        AnnotationConfigServletWebServerApplicationContext {
 
     protected final FileObject applicationDirectory;
-    private static final Logger logger = LoggerFactory.getLogger(PortofinoAnnotationConfigServletWebServerApplicationContext.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(PortofinoAnnotationConfigServletWebServerApplicationContext.class);
 
     public PortofinoAnnotationConfigServletWebServerApplicationContext(FileObject applicationDirectory) {
         this.applicationDirectory = applicationDirectory;
@@ -40,8 +65,17 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         ElementsThreadLocals.setupDefaultElementsContext();
         ElementsThreadLocals.setServletContext(servletContext);
 
-        Set<Class<? extends CodeBase>> cbClasses = findImplementations(CodeBase.class);
-        Set<Class<? extends ResourceResolver>> resres = findImplementations(ResourceResolver.class);
+        //Only scan once, for performance
+        ClassPathScanningCandidateComponentProvider scanner =
+                new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
+        scanner.addIncludeFilter(new AssignableTypeFilter(CodeBase.class));
+        scanner.addExcludeFilter(new AssignableTypeFilter(AggregateCodeBase.class));
+        scanner.addExcludeFilter(new AssignableTypeFilter(JavaCodeBase.class));
+        scanner.addIncludeFilter(new AssignableTypeFilter(ResourceResolver.class));
+        scanner.addIncludeFilter(new AssignableTypeFilter(Module.class));
+        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("");
+        Set<Class<? extends CodeBase>> cbClasses = findImplementations(CodeBase.class, candidateComponents);
+        Set<Class<? extends ResourceResolver>> resres = findImplementations(ResourceResolver.class, candidateComponents);
         PortofinoDispatcherInitializer initializer = new PortofinoDispatcherInitializer(cbClasses, resres) {
             @Override
             protected String getApplicationDirectoryPath() {
@@ -56,18 +90,8 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         parent.setParent(grandParent);
         parent.setServletContext(servletContext);
 
-        //Modules
-        ClassPathScanningCandidateComponentProvider scanner =
-                new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
-        scanner.addIncludeFilter(new AssignableTypeFilter(Module.class));
-        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("");
-        candidateComponents.forEach(c -> {
-            try {
-                parent.register(initializer.getCodeBase().loadClass(c.getBeanClassName()));
-            } catch (Exception e) {
-                logger.error("Could not load module class", e);
-            }
-        });
+        Set<Class<? extends Module>> moduleClasses = findImplementations(Module.class, candidateComponents);
+        moduleClasses.forEach(parent::register);
 
         parent.register(PortofinoWebSpringConfiguration.class);
         parent.register(PortofinoSpringConfiguration.class);
@@ -87,19 +111,13 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
     }
 
     @NotNull
-    protected  <T> Set<Class<? extends T>> findImplementations(Class<T> target) {
-        ClassPathScanningCandidateComponentProvider scanner =
-                new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
-        scanner.addIncludeFilter(new AssignableTypeFilter(target));
-        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("");
+    private <T> Set<Class<? extends T>> findImplementations(Class<T> target, Set<BeanDefinition> candidateComponents) {
         Set<Class<? extends T>> implementations = new LinkedHashSet<>();
         candidateComponents.forEach(c -> {
             try {
                 Class<?> aClass = Class.forName(c.getBeanClassName());
-                if (aClass.isAssignableFrom(target)) {
+                if (target.isAssignableFrom(aClass)) {
                     implementations.add((Class<? extends T>) aClass);
-                } else {
-                    logger.error(aClass + " is not a " + target.getSimpleName() + " implementation");
                 }
             } catch (Exception e) {
                 logger.error("Could not load module class", e);

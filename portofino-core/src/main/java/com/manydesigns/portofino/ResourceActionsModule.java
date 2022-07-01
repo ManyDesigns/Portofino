@@ -45,9 +45,12 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
@@ -64,7 +67,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ResourceActionsModule implements Module {
+public class ResourceActionsModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
@@ -87,6 +90,8 @@ public class ResourceActionsModule implements Module {
     public ModelService modelService;
     @Autowired
     public PortofinoDispatcherInitializer dispatcherInitializer;
+
+    protected ApplicationContext applicationContext;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -133,7 +138,8 @@ public class ResourceActionsModule implements Module {
         modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
             try {
                 PortofinoRoot root = getRootResource(
-                        actionsDirectory, dispatcherInitializer.getResourceResolver(), servletContext, modelService);
+                        actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                        servletContext, applicationContext, modelService);
                 SecurityLogic.installLogin(root, configuration.getProperties(), NoOpLoginAction.class);
             } catch (Exception e) {
                 logger.error("Could not install login class", e);
@@ -145,12 +151,14 @@ public class ResourceActionsModule implements Module {
 
     public static synchronized PortofinoRoot getRootResource(
             FileObject actionsDirectory, ResourceResolver resourceResolver,
-            ServletContext servletContext, ModelService modelService) throws Exception {
+            ServletContext servletContext, ApplicationContext applicationContext,
+            ModelService modelService) throws Exception {
         PortofinoRoot root = PortofinoRoot.get(actionsDirectory, resourceResolver);
         root.servletContext = servletContext;
         root.modelService = modelService;
         root.actionsDirectory = actionsDirectory;
         root.actionsDomain = modelService.ensureTopLevelDomain(ACTIONS_DOMAIN_NAME, true);
+        root.applicationContext = applicationContext;
         return root.init();
     }
 
@@ -229,5 +237,10 @@ public class ResourceActionsModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

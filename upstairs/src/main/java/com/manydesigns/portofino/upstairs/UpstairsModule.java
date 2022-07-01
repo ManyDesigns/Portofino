@@ -30,8 +30,11 @@ import com.manydesigns.portofino.upstairs.actions.UpstairsAction;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -46,7 +49,7 @@ import javax.servlet.ServletContext;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class UpstairsModule implements Module {
+public class UpstairsModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -60,6 +63,7 @@ public class UpstairsModule implements Module {
     @Autowired
     public DispatcherInitializer dispatcherInitializer;
 
+    protected ApplicationContext applicationContext;
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     public static final Logger logger = LoggerFactory.getLogger(UpstairsModule.class);
@@ -79,7 +83,8 @@ public class UpstairsModule implements Module {
         modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
             try {
                 PortofinoRoot root = ResourceActionsModule.getRootResource(
-                        actionsDirectory, dispatcherInitializer.getResourceResolver(), servletContext, modelService);
+                        actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                        servletContext, applicationContext, modelService);
                 root.mountPackage("portofino-upstairs", UpstairsAction.class.getPackage());
             } catch (Exception e) {
                 logger.error("Could not install upstairs actions", e);
@@ -96,5 +101,10 @@ public class UpstairsModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

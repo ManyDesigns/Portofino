@@ -27,6 +27,7 @@ import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -38,6 +39,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -186,21 +188,33 @@ public abstract class ResourceActionSupport {
         return (T) configuration;
     }
 
-    public static void configureResourceAction(ResourceAction resourceAction, ActionInstance actionInstance) {
+    public static void legacyConfigureResourceAction(ResourceAction resourceAction, ActionInstance actionInstance) {
         if(actionInstance.getConfiguration() != null) {
             logger.debug("ActionDescriptor instance {} is already configured", actionInstance);
             return;
         }
 
-        ResourceActionConfiguration action;
-        try {
-            action = loadLegacyActionDescriptor(getLegacyActionDescriptorFile(resourceAction.getLocation()));
-        } catch (Exception e) {
-            logger.debug("action.xml not found or not valid", e);
-            action = new ResourceActionConfiguration();
-            action.init();
+        if (actionInstance.getDirectory() == null) {
+            // This could be an action outside of Portofino's dispatcher
+            Class<? extends ResourceActionConfiguration> configurationClass =
+                    getConfigurationClass(resourceAction.getClass());
+            ResourceActionConfiguration conf;
+            try {
+                conf = configurationClass.getConstructor().newInstance();
+            } catch (Exception e) {
+                logger.error("Could not instantiate configuration " + configurationClass, e);
+                conf = new ResourceActionConfiguration();
+            }
+            actionInstance.setConfiguration(conf);
+        } else {
+            ResourceActionConfiguration action = loadLegacyActionDescriptor(resourceAction);
+            loadLegacyConfiguration(resourceAction, actionInstance, action);
         }
+        resourceAction.setActionInstance(actionInstance);
+    }
 
+    private static void loadLegacyConfiguration(
+            ResourceAction resourceAction, ActionInstance actionInstance, ResourceActionConfiguration conf) {
         FileObject configurationFile;
         try {
             configurationFile = actionInstance.getDirectory().resolveFile("configuration.xml");
@@ -212,15 +226,27 @@ public abstract class ResourceActionSupport {
         try {
             ResourceActionConfiguration configuration = getLegacyConfiguration(configurationFile, configurationClass);
             if (configuration != null) {
-                configuration.permissions = action.permissions;
-                configuration.additionalChildren.addAll(action.additionalChildren);
+                configuration.permissions = conf.permissions;
+                configuration.additionalChildren.addAll(conf.additionalChildren);
             } else {
-                configuration = action;
+                configuration = conf;
             }
             actionInstance.setConfiguration(configuration);
         } catch (Throwable t) {
             logger.error("Couldn't load configuration from " + configurationFile.getName().getPath(), t);
         }
-        resourceAction.setActionInstance(actionInstance);
+    }
+
+    @NotNull
+    private static ResourceActionConfiguration loadLegacyActionDescriptor(ResourceAction resourceAction) {
+        ResourceActionConfiguration action;
+        try {
+            action = loadLegacyActionDescriptor(getLegacyActionDescriptorFile(resourceAction.getLocation()));
+        } catch (Exception e) {
+            logger.debug("action.xml not found or not valid", e);
+            action = new ResourceActionConfiguration();
+            action.init();
+        }
+        return action;
     }
 }

@@ -71,6 +71,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import ognl.OgnlContext;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -559,8 +560,12 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     private void checkAccessorPermissions(String[] requiredPermissions) {
+        if (classAccessor == null) { //Not properly configured
+            return;
+        }
         EntityPermissions ep = classAccessor.getAnnotation(EntityPermissions.class);
-        if(!EntityPermissionsChecks.isPermitted(portofinoConfiguration, security, requiredPermissions, ep)) {
+        Configuration conf = portofinoConfiguration.getProperties();
+        if(!EntityPermissionsChecks.isPermitted(conf, security, requiredPermissions, ep)) {
             logger.warn("CRUD source not permitted: {}", classAccessor.getName());
             throw new WebApplicationException(
                     security.isUserAuthenticated() ? Response.Status.FORBIDDEN : Response.Status.UNAUTHORIZED);
@@ -1369,7 +1374,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     //--------------------------------------------------------------------------
 
     protected String getUrlEncoding() {
-        return portofinoConfiguration.getString(
+        return portofinoConfiguration.getProperties().getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
     }
 

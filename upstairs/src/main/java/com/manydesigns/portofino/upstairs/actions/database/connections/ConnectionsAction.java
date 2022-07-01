@@ -306,7 +306,7 @@ public class ConnectionsAction extends AbstractResourceAction {
             if(selected) {
                 if(!schemaNames.contains(physicalName)) {
                     Schema modelSchema = new Schema();
-                    modelSchema.setConfiguration(portofinoConfiguration);
+                    modelSchema.setConfiguration(portofinoConfiguration.getProperties());
                     modelSchema.setDatabase(database);
                     modelSchema.setSchemaName(logicalName);
                     if(!schema.isNull("catalog")) {

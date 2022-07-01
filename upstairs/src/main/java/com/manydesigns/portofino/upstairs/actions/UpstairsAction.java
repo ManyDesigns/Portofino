@@ -611,7 +611,7 @@ public class UpstairsAction extends AbstractResourceAction {
                         null, null, createdPages, 1);
                 if(action != null) {
                     Group group = new Group();
-                    group.setName(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
+                    group.setName(SecurityLogic.getAnonymousGroup(portofinoConfiguration.getProperties()));
                     group.setAccessLevelName(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);

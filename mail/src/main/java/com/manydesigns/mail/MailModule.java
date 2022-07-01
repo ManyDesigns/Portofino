@@ -36,8 +36,11 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
@@ -52,7 +55,7 @@ import static com.manydesigns.portofino.ResourceActionsModule.ACTIONS_DIRECTORY;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MailModule implements Module {
+public class MailModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -68,8 +71,8 @@ public class MailModule implements Module {
     @Autowired
     public DispatcherInitializer dispatcherInitializer;
 
+    protected ApplicationContext applicationContext;
     protected MailQueueSetup mailQueueSetup;
-
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
@@ -101,7 +104,8 @@ public class MailModule implements Module {
                         MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
                 try {
                     PortofinoRoot root = ResourceActionsModule.getRootResource(
-                            actionsDirectory, dispatcherInitializer.getResourceResolver(), servletContext, modelService);
+                            actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                            servletContext, applicationContext, modelService);
                     root.mount(segment, SendMailAction.class);
                 } catch (Exception e) {
                     logger.error("Could not install send mail action", e);
@@ -142,4 +146,8 @@ public class MailModule implements Module {
         return status;
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

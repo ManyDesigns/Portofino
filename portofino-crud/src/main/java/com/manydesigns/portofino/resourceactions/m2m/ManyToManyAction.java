@@ -694,7 +694,7 @@ public class ManyToManyAction extends AbstractResourceAction {
         }
 
         if(!security.hasPermissions(
-                getPortofinoConfiguration(),
+                getPortofinoConfiguration().getProperties(),
                 getActionInstance(),
                 AccessLevel.VIEW, ManyToManyAction.PERMISSION_UPDATE)) {
             schema.put("readonly",true);

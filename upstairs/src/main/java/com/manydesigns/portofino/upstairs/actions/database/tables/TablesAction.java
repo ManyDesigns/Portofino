@@ -226,7 +226,7 @@ public class TablesAction extends AbstractResourceAction {
         List<Group> groups = new ArrayList<>();
         Set<String> possibleGroups = security.getGroups();
         Optional<Permissions> permissions = table.getJavaAnnotation(EntityPermissions.class).map(
-                a -> EntityPermissionsChecks.getPermissions(portofinoConfiguration, a));
+                a -> EntityPermissionsChecks.getPermissions(portofinoConfiguration.getProperties(), a));
         if(permissions.isPresent()) {
             permissions.get().getActualPermissions().forEach((name, perms) -> {
                 Group group = new Group();
@@ -237,7 +237,7 @@ public class TablesAction extends AbstractResourceAction {
             });
         } else {
             Group group = new Group();
-            group.setName(SecurityLogic.getAllGroup(portofinoConfiguration));
+            group.setName(SecurityLogic.getAllGroup(portofinoConfiguration.getProperties()));
             group.getPermissions().add(AbstractCrudAction.PERMISSION_CREATE);
             group.getPermissions().add(AbstractCrudAction.PERMISSION_READ);
             group.getPermissions().add(AbstractCrudAction.PERMISSION_EDIT);
@@ -285,7 +285,7 @@ public class TablesAction extends AbstractResourceAction {
         Permissions permissions = tableInfo.permissions;
         if(permissions != null) {
             permissions.init();
-            String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration);
+            String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration.getProperties());
             List<String> create = new ArrayList<>();
             List<String> read = new ArrayList<>();
             List<String> update = new ArrayList<>();

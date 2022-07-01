@@ -95,9 +95,11 @@ public class PortofinoRoot extends AbstractResourceAction {
 
     @Override
     public PortofinoRoot init() {
-        applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-        if (applicationContext != null) {
-            autowire(this);
+        if (applicationContext == null) {
+            applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            if (applicationContext != null) {
+                autowire(this);
+            }
         }
         ActionInstance actionInstance = new ActionInstance(null, location, getClass());
         setActionInstance(actionInstance);

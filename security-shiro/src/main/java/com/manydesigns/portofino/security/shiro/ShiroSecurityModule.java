@@ -45,9 +45,11 @@ import org.apache.shiro.web.env.WebEnvironment;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -64,7 +66,8 @@ import java.util.UUID;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ShiroSecurityModule implements Module, ApplicationListener<ContextRefreshedEvent> {
+public class ShiroSecurityModule implements
+        Module, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
@@ -83,6 +86,7 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
     @Autowired
     public DispatcherInitializer dispatcherInitializer;
 
+    protected ApplicationContext applicationContext;
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
     protected SecurityClassRealm realm;
 
@@ -101,16 +105,23 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         return "Shiro Security";
     }
 
+    @Bean
+    public ShiroSecurity getSecurityFacade() {
+        return new ShiroSecurity();
+    }
+
     @PostConstruct
     public void init() throws Exception {
         if(!configuration.getProperties().containsKey("jwt.secret")) {
             String jwtSecret = Encoders.BASE64.encode((UUID.randomUUID() + UUID.randomUUID().toString()).getBytes());
             logger.warn("No jwt.secret property was set, so we generated one: {}.", jwtSecret);
             configuration.getProperties().setProperty("jwt.secret", jwtSecret);
-            try {
+            if (configuration.isWritable()) try {
                 configuration.save();
             } catch (ConfigurationException e) {
-                logger.warn("Configuration could not be saved", e);
+                logger.warn("Configuration could not be saved: the jwt.secret won't be persisted.", e);
+            } else {
+                logger.warn("Configuration is not writable: the jwt.secret won't be persisted.");
             }
         }
 
@@ -135,7 +146,8 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
             try {
                 PortofinoRoot root = ResourceActionsModule.getRootResource(
-                        actionsDirectory, dispatcherInitializer.getResourceResolver(), servletContext, modelService);
+                        actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                        servletContext, applicationContext, modelService);
                 SecurityLogic.installLogin(root, configuration.getProperties(), DefaultLoginAction.class);
             } catch (Exception e) {
                 logger.error("Could not install login action", e);
@@ -170,8 +182,8 @@ public class ShiroSecurityModule implements Module, ApplicationListener<ContextR
         }
     }
 
-    @Bean
-    public ShiroSecurity getSecurityFacade() {
-        return new ShiroSecurity();
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

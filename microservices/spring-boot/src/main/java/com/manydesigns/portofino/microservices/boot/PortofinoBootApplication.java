@@ -123,13 +123,6 @@ public class PortofinoBootApplication {
 		FileObject actions = applicationDirectory.resolveFile("actions");
 		actions.createFolder();
 
-		FileObject actionXml = actions.resolveFile("action.xml");
-		if(!actionXml.exists()) {
-			actionXml.createFile();
-			try (Writer w = new OutputStreamWriter(actionXml.getContent().getOutputStream())) {
-				w.write("<action><permissions /></action>");
-			}
-		}
 		applicationDirectory.resolveFile("portofino.properties").createFile();
 	}
 

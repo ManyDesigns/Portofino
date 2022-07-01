@@ -135,7 +135,7 @@ public class Annotation implements ModelObject, Unmarshallable {
     }
 
     public void init(Object context, Configuration configuration) {
-        javaAnnotationClass = ReflectionUtil.loadClass(getType());
+        javaAnnotationClass = (Class) ReflectionUtil.loadClass(getType());
         if (javaAnnotationClass == null) {
             logger.error("Cannot load annotation class: {}", getType());
             return;

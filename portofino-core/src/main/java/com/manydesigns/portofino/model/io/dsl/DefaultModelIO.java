@@ -63,7 +63,9 @@ public class DefaultModelIO implements ModelIO {
         Model model = new Model();
         model.getDomains().addAll(transientDomains);
         FileObject modelDir = getModelDirectory();
-        if(!modelDirectory.exists() || !modelDirectory.getType().equals(FileType.FOLDER)) {
+        if(!modelDirectory.exists()) {
+            return model;
+        } else if(!modelDirectory.getType().equals(FileType.FOLDER)) {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
         try {

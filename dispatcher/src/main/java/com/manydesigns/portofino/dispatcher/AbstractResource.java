@@ -80,7 +80,13 @@ public abstract class AbstractResource implements SecureResource {
     }
 
     public String getPath() {
-        return parent.getPath() + getSegment() + "/";
+        String basePath;
+        if (parent != null) {
+            basePath = parent.getPath();
+        } else {
+            basePath = "";
+        }
+        return basePath + getSegment() + "/";
     }
 
     public void setResourceContext(ResourceContext resourceContext) {

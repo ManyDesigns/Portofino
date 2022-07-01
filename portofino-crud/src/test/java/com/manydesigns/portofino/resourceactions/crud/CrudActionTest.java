@@ -108,6 +108,7 @@ public class CrudActionTest extends JerseyTest {
         persistence = new Persistence(
                 modelService,
                 new ConfigurationSource(configuration, null), databasePlatformsRegistry);
+        persistence.setConvertLegacyModel(false);
         persistence.start();
         setupJPetStore();
         persistence.initModel();
@@ -232,6 +233,7 @@ public class CrudActionTest extends JerseyTest {
         Map category = query.list().get(0);
         req.setParameter("category", (String) category.get("catid"));
         crudAction.persistence = persistence;
+        crudAction.portofinoConfiguration = new ConfigurationSource(null, null);
         crudAction.setContext(actionContext);
         crudAction.setActionInstance(actionInstance);
         crudAction.configured();
