@@ -56,7 +56,7 @@ public abstract class AbstractResourceWithParameters extends AbstractResource im
             if(e.getResponse().getStatus() != Response.Status.NOT_FOUND.getStatusCode()) {
                 throw e;
             }
-            logger.debug("Invalid subresource: " + pathSegment, e);
+            logger.debug("Not a subresource: " + pathSegment, e);
             if(parameters.size() < maxParameters) {
                 consumeParameter(pathSegment);
                 if(parameters.size() == maxParameters) {

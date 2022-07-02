@@ -38,10 +38,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import javax.servlet.ServletContext;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -66,14 +68,19 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         ElementsThreadLocals.setServletContext(servletContext);
 
         //Only scan once, for performance
+        ConfigurableEnvironment environment = getEnvironment();
         ClassPathScanningCandidateComponentProvider scanner =
-                new ClassPathScanningCandidateComponentProvider(false, getEnvironment());
+                new ClassPathScanningCandidateComponentProvider(false, environment);
         scanner.addIncludeFilter(new AssignableTypeFilter(CodeBase.class));
         scanner.addExcludeFilter(new AssignableTypeFilter(AggregateCodeBase.class));
         scanner.addExcludeFilter(new AssignableTypeFilter(JavaCodeBase.class));
         scanner.addIncludeFilter(new AssignableTypeFilter(ResourceResolver.class));
         scanner.addIncludeFilter(new AssignableTypeFilter(Module.class));
-        Set<BeanDefinition> candidateComponents = scanner.findCandidateComponents("");
+        Set<BeanDefinition> candidateComponents = new HashSet<>();
+        String[] pkgs = environment.getProperty("portofino.component.packages", "").split(", *");
+        for (String basePackage: pkgs) {
+            candidateComponents.addAll(scanner.findCandidateComponents(basePackage));
+        }
         Set<Class<? extends CodeBase>> cbClasses = findImplementations(CodeBase.class, candidateComponents);
         Set<Class<? extends ResourceResolver>> resres = findImplementations(ResourceResolver.class, candidateComponents);
         PortofinoDispatcherInitializer initializer = new PortofinoDispatcherInitializer(cbClasses, resres) {

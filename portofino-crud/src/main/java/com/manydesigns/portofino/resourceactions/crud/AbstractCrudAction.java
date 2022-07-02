@@ -560,8 +560,8 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     private void checkAccessorPermissions(String[] requiredPermissions) {
-        if (classAccessor == null) { //Not properly configured
-            return;
+        if (classAccessor == null) {
+            throw new WebApplicationException("Action not properly configured", resourceActionNotConfigured());
         }
         EntityPermissions ep = classAccessor.getAnnotation(EntityPermissions.class);
         Configuration conf = portofinoConfiguration.getProperties();

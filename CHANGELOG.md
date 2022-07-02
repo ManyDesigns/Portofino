@@ -6,12 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 This is a major new version that shifts the focus of Portofino completely away from GUI building and towards service/API building.
 
+### Added
+- Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
+
 ### Changed
 - The model is no longer tied to the database. It is a generic entity-relationship model based on Ecore.
   - As a consequence, the model is no longer loaded/saved as part of the Persistence service. Rather, a new Model 
     service holds the model and knows how to load and save it.  
 - The model is no longer saved as XML. We designed a custom mini-language similar to Java.
-- Resource-action configurations (`configuration.xml` files) are now saved as objects in the model. 
+- Resource-action configurations (`action.xml` and `configuration.xml` files) are now saved as objects in the model. 
 - Hibernate has been updated to version 6.
 - Groovy has been updated to version 4.
 

@@ -101,6 +101,9 @@ public abstract class AbstractResource implements SecureResource {
     @Path("{pathSegment}")
     public Object consumePathSegment(@PathParam("pathSegment") String pathSegment) {
         try {
+            if (location == null) {
+                throw new WebApplicationException("Action is outside of dispatcher", 404);
+            }
             FileObject child = getChildLocation(pathSegment);
             return consumePathSegment(pathSegment, child, getResourceResolver());
         } catch (FileSystemException e) {
