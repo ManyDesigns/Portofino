@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.resourceactions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.manydesigns.portofino.security.AccessLevel;
 
@@ -74,6 +75,7 @@ public class Permissions {
     //**************************************************************************
 
     @XmlElement(name = "group", type = Group.class)
+    @JsonIgnore
     public List<Group> getGroups() {
         return groups;
     }

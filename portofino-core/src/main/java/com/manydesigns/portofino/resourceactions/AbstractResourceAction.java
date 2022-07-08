@@ -427,9 +427,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected ClassAccessor getConfigurationClassAccessor() {
         Class<?> configurationClass = getConfigurationClass();
         if(configurationClass == null) {
-            return null;
+            return JavaClassAccessor.getClassAccessor(ResourceActionConfiguration.class);
+        } else {
+            return JavaClassAccessor.getClassAccessor(configurationClass);
         }
-        return JavaClassAccessor.getClassAccessor(configurationClass);
     }
 
     /**
@@ -446,9 +447,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Object getSerializedConfiguration() {
         Object configuration = getConfiguration();
-        if(getConfigurationClass() == null) {
-            return configuration;
-        }
         ClassAccessor classAccessor = getConfigurationClassAccessor();
         ClassAccessor filteredClassAccessor = filterAccordingToPermissions(classAccessor);
         ResourceActionConfiguration filtered = (ResourceActionConfiguration) classAccessor.newInstance();

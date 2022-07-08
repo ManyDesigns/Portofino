@@ -20,6 +20,11 @@
 
 package com.manydesigns.portofino.resourceactions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.security.RequiresPermissions;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -41,6 +46,7 @@ public class ResourceActionConfiguration {
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     protected Permissions permissions;
+    @JsonProperty("additional-children")
     protected final List<AdditionalChild> additionalChildren = new ArrayList<>();
 
     public ResourceActionConfiguration() {
@@ -54,6 +60,7 @@ public class ResourceActionConfiguration {
     }
 
     @XmlElement()
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Permissions getPermissions() {
         return permissions;
     }
@@ -67,6 +74,7 @@ public class ResourceActionConfiguration {
     }
 
     @XmlElement(name = "additional-child", type = AdditionalChild.class)
+    @JsonIgnore
     public List<AdditionalChild> getAdditionalChildren() {
         return additionalChildren;
     }
