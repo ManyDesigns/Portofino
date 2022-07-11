@@ -1502,7 +1502,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     @GET
     @Operation(summary = "The contents of this resource: either search results or a single object, depending on path parameters")
-    public Response get(
+    public Response load(
             @Parameter(description = "The search string (see https://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
             @QueryParam("searchString") String searchString,
             @Parameter(description = "The index of the first search result. Only valid for search.")

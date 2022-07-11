@@ -35,6 +35,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -88,7 +89,7 @@ public class UpstairsAction extends AbstractResourceAction {
         Map<String, Object> info = new HashMap<>();
         info.put("version", Module.getPortofinoVersion());
         List<ModuleInfo> modules = new ArrayList<>();
-        for(Module module : applicationContext.getBeansOfType(Module.class).values()) {
+        for(Module module : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, Module.class).values()) {
             ModuleInfo view = new ModuleInfo();
             view.moduleClass = module.getClass().getName();
             view.name = module.getName();
@@ -165,7 +166,7 @@ public class UpstairsAction extends AbstractResourceAction {
 
     @POST
     @Path("application/security")
-    public void createSecurityGrooyv(WizardInfo wizard) {
+    public void configureModelDrivenUserManagement(WizardInfo wizard) {
         String databaseName = (String) (wizard.connectionProvider).get("name");
         Database database = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
         if(database == null) {

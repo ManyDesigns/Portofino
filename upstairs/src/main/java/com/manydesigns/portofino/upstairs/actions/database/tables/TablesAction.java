@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.upstairs.actions.database.tables;
 
 import com.manydesigns.elements.MapKeyValueAccessor;
@@ -101,20 +121,21 @@ public class TablesAction extends AbstractResourceAction {
 
     @Path("{db}/{schema}")
     @GET
-    public List<Map> getTables(@PathParam("db") String db, @PathParam("schema") String schema) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Map> getTablesInSchema(@PathParam("db") String db, @PathParam("schema") String schema) {
         Schema schemaObj = DatabaseLogic.findSchemaByName(persistence.getDatabases(), db, schema);
         List<Map> tables = new ArrayList<>();
         if(schemaObj == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        schemaObj.getTables().forEach(table -> {
-            tables.add(createLeaf(table.getTableName(), table.getActualEntityName()));
-        });
+        schemaObj.getTables().forEach(table ->
+                tables.add(createLeaf(table.getTableName(), table.getActualEntityName())));
         tables.sort(Comparator.comparing(o -> ((String) o.get("name"))));
         return tables;
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Map> getTables() throws FileSystemException {
         List<Map> treeTables = new ArrayList<>();
 
@@ -147,6 +168,7 @@ public class TablesAction extends AbstractResourceAction {
 
     @Path("{db}/{schema}/{table}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Map getTableInfo(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName) {
         Table table = DatabaseLogic.findTableByName(persistence.getDatabases(), db, schema, tableName);
@@ -162,6 +184,7 @@ public class TablesAction extends AbstractResourceAction {
     }
 
     @NotNull
+    @Produces(MediaType.APPLICATION_JSON)
     private List<Map> getTypeInformation(Table table) {
         List<Map> typeInfo = new ArrayList<>();
         Type[] types = persistence.getConnectionProvider(table.getDatabaseName()).getTypes();
