@@ -157,7 +157,11 @@ public class S3BlobManager implements BlobManager{
             Properties properties = blob.getMetaProperties();
 
             metadata.setContentEncoding("UTF-8");
-            metadata.setContentLength(blob.getSize());
+            if(blob.getSize()>0){
+                metadata.setContentLength(blob.getSize());
+            }else {
+                logger.warn("Blob size 0 or not set , code="+blob.getCode());
+            }
 
             for(Object obj : properties.keySet()){
                 metadata.addUserMetadata( "app_creator", "Portofino" );
