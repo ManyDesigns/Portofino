@@ -81,7 +81,7 @@
     </developers>
     <properties>
         <commons.collections.version>3.2.2</commons.collections.version>
-        <commons.configuration.version>2.7</commons.configuration.version>
+        <commons.configuration.version>2.8.0</commons.configuration.version>
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
         <commons.fileupload.version>1.3.3</commons.fileupload.version>
@@ -105,7 +105,7 @@
         <json.version>20180813</json.version>
         <jsoup.version>1.14.2</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>4.4.0</liquibase.version>
+        <liquibase.version>4.8.0</liquibase.version>
         <!--
         According to CVE-2021-42550 (https://nvd.nist.gov/vuln/detail/CVE-2021-42550), we need >1.2.7.
         However, Logback mentions 1.2.9 as the CVE fix version (https://logback.qos.ch/news.html), but 1.2.9
@@ -119,7 +119,7 @@
         <servlet.api.version>4.0.1</servlet.api.version>
         <shiro.version>1.8.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
-        <spring.version>5.3.19</spring.version>
+        <spring.version>5.3.20</spring.version>
         <aws.version>1.11.967</aws.version>
 
         <nodejs.version>v16.13.0</nodejs.version>
