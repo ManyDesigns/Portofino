@@ -171,14 +171,11 @@
         <module>microservices/spring-boot</module>
         <module>microservices/scheduler</module>
         <module>microservices/mail</module>
-        <!-- UI -->
-        <module>ui</module>
         <!-- upstairs -->
         <module>upstairs</module>
         <!-- Archetypes -->
         <module>archetypes/service-groovy</module>
         <module>archetypes/service-java</module>
-        <module>archetypes/war</module>
         <!-- Applications -->
         <module>demo-tt</module>
     </modules>

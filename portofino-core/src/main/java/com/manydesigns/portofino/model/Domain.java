@@ -209,7 +209,7 @@ public class Domain extends EPackageImpl {
             if (!Enum.class.isAssignableFrom(javaClass)) {
                 throw new RuntimeException("Not an enum: " + javaClass);
             }
-            return Enum.valueOf(javaClass, ((EEnumLiteral) eObject).getLiteral());
+            return Enum.valueOf(javaClass, ((EEnumLiteral) eObject).getName());
         }
         EClass eClass = eObject.eClass();
         if (eClass == null) {

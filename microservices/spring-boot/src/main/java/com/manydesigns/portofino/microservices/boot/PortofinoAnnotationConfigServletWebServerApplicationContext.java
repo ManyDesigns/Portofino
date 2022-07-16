@@ -26,6 +26,7 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.servlets.CorsServletContainerInitializer;
 import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
@@ -66,6 +67,7 @@ public class PortofinoAnnotationConfigServletWebServerApplicationContext extends
         super.prepareWebApplicationContext(servletContext);
         ElementsThreadLocals.setupDefaultElementsContext();
         ElementsThreadLocals.setServletContext(servletContext);
+        new CorsServletContainerInitializer().onStartup(null, servletContext);
 
         //Only scan once, for performance
         ConfigurableEnvironment environment = getEnvironment();

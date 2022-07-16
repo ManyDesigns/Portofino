@@ -171,14 +171,12 @@ public class ShiroSecurityModule implements
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
-        if(PortofinoContextLoaderListener.BRIDGE_CONTEXT.equals(applicationContext.getId())) {
-            realm.setApplicationContext(applicationContext);
-            try {
-                LifecycleUtils.init(realm);
-            } catch (Exception e) {
-                logger.warn("Security class not found or invalid or initialization failed. " +
-                        "We will reload and/or initialize it on next use.", e);
-            }
+        realm.setApplicationContext(applicationContext);
+        try {
+            LifecycleUtils.init(realm);
+        } catch (Exception e) {
+            logger.warn("Security class not found or invalid or initialization failed. " +
+                    "We will reload and/or initialize it on next use.", e);
         }
     }
 

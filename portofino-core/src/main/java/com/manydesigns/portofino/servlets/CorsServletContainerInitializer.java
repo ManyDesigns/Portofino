@@ -28,7 +28,7 @@ public class CorsServletContainerInitializer implements ServletContainerInitiali
             PortofinoFilter.PORTOFINO_API_VERSION_HEADER;
 
     @Override
-    public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
+    public void onStartup(Set<Class<?>> c, ServletContext ctx) {
         if(ctx.getInitParameter("cors.configured.externally") != null) {
             logger.info("CORS filter configured externally.");
             return;

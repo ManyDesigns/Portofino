@@ -168,7 +168,9 @@ public class ModelService {
         eEnum.setName(className);
         for (Object constant : javaClass.getEnumConstants()) {
             EEnumLiteral literal = EcoreFactory.eINSTANCE.createEEnumLiteral();
-            literal.setLiteral(((Enum<?>) constant).name());
+            String name = ((Enum<?>) constant).name();
+            literal.setName(name);
+            literal.setLiteral(name);
             eEnum.getELiterals().add(literal);
         }
         pkg.getEClassifiers().add(eEnum);

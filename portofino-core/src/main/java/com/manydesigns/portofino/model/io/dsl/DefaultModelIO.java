@@ -621,7 +621,7 @@ public class DefaultModelIO implements ModelIO {
         if (value instanceof String) {
             writer.write("\"" + value.toString().replace("\"", "\\\"") + "\"");
         } else if (value instanceof EEnumLiteral) {
-            writer.write(((EEnumLiteral) value).getLiteral());
+            writer.write(((EEnumLiteral) value).getName());
         } else if (value instanceof EObject) {
             writeObjectBody((EObject) value, writer, indent);
         } else if (value instanceof Iterable) {

@@ -57,15 +57,8 @@ public class GroovyCodeBase extends AbstractCodeBase {
 
     public void resetGroovyScriptEngine() throws FileSystemException {
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
-        try {
-            String classpath = this.root.getName().getPath();
-            cc.setClasspath(classpath);
-        } catch (Exception e) {
-            logger.debug("Could not set classpath", e);
-        }
         cc.setRecompileGroovySource(true);
         groovyScriptEngine = new GroovyScriptEngine(new URL[] { this.root.getURL() }, parent != null ? parent.asClassLoader() : getClassLoader());
-        groovyScriptEngine.setConfig(cc);
         groovyScriptEngine.getGroovyClassLoader().setShouldRecompile(Boolean.TRUE);
     }
 
