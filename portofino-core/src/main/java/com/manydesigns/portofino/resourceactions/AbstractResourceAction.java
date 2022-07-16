@@ -555,7 +555,6 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         }
         if (configuration == null) {
             ResourceActionConfiguration actionConfiguration = new ResourceActionConfiguration();
-            actionConfiguration.init();
             configuration = actionConfiguration;
             actionInstance.setConfiguration(actionConfiguration);
         }

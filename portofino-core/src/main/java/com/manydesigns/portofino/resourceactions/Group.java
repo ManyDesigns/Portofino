@@ -61,9 +61,10 @@ public class Group {
     }
 
     public void init() {
-        accessLevel = null;
-        if(!StringUtils.isEmpty(accessLevelName)) {
-            accessLevel = AccessLevel.valueOf(accessLevelName);
+        if(accessLevel == null) { //Legacy: we're loading from XML
+            if (!StringUtils.isEmpty(accessLevelName)) {
+                accessLevel = AccessLevel.valueOf(accessLevelName);
+            }
         }
     }
 
