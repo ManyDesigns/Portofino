@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.fields.search.Ordering;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -26,20 +27,22 @@ public class SingleTableQueryCollection {
     protected final Persistence persistence;
     protected final Table table;
     protected final String query;
-    protected final TableCriteria criteria;
-    
+    protected final Criteria criteria;
+    protected Ordering ordering;
+
     private static final Logger logger = LoggerFactory.getLogger(SingleTableQueryCollection.class);
 
     public SingleTableQueryCollection(
-            Persistence persistence, Table baseTable, String query, TableCriteria criteria) {
+            Persistence persistence, Table baseTable, String query, Criteria criteria, Ordering ordering) {
         this.persistence = persistence;
         this.table = baseTable;
         this.query = query;
         this.criteria = criteria;
+        this.ordering = ordering;
     }
 
     public SingleTableQueryCollection(Persistence persistence, Table baseTable, String query) {
-        this(persistence, baseTable, query, new TableCriteria(baseTable));
+        this(persistence, baseTable, query, new Criteria(), null);
     }
 
     public long count() {
@@ -47,7 +50,7 @@ public class SingleTableQueryCollection {
     }
     
     public long count(Object contextObject) {
-        QueryStringWithParameters query = QueryUtils.mergeQuery(this.query, criteria, contextObject);
+        QueryStringWithParameters query = QueryUtils.mergeQuery(this.query, table, criteria, ordering, contextObject);
 
         String queryString = query.getQueryString();
         String totalRecordsQueryString;
@@ -99,7 +102,8 @@ public class SingleTableQueryCollection {
     }
     
     public List<Object> load(Integer firstResult, Integer maxResults, Object contextObject) {
-        return QueryUtils.getObjects(getSession(), query, criteria, contextObject, firstResult, maxResults);
+        return QueryUtils.getObjects(
+                getSession(), query, table, criteria, ordering, contextObject, firstResult, maxResults);
     }
 
     public void save(Object object) {
@@ -118,11 +122,11 @@ public class SingleTableQueryCollection {
         return persistence.getSession(table.getDatabaseName());
     }
 
-    public SingleTableQueryCollection where(TableCriteria criteria) {
-        TableCriteria merged = new TableCriteria(table);
+    public SingleTableQueryCollection where(Criteria criteria) {
+        Criteria merged = new Criteria();
         merged.addAll(this.criteria);
         merged.addAll(criteria);
-        return new SingleTableQueryCollection(persistence, table, query, merged);
+        return new SingleTableQueryCollection(persistence, table, query, merged, ordering);
     }
 
     public Table getTable() {
@@ -135,5 +139,13 @@ public class SingleTableQueryCollection {
 
     public TableAccessor getClassAccessor() {
         return persistence.getTableAccessor(table);
+    }
+
+    public Ordering getOrdering() {
+        return ordering;
+    }
+
+    public void setOrdering(Ordering ordering) {
+        this.ordering = ordering;
     }
 }

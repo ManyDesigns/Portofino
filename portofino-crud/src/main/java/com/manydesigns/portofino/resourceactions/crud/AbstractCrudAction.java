@@ -245,23 +245,6 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     public abstract List<T> loadObjects();
 
     /**
-     * Configures the given criteria to take into account the requested sorting.
-     * @param criteria the criteria to apply sorting to. Will be modified.
-     */
-    protected void applySorting(Criteria criteria) {
-        if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
-            try {
-                PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
-                if(orderByProperty != null) {
-                    criteria.orderBy(orderByProperty, sortDirection);
-                }
-            } catch (NoSuchFieldException e) {
-                CrudAction.logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
-            }
-        }
-    }
-
-    /**
      * Obtains the PropertyAccessor that represents the property used for sorting the results.
      * @return a PropertyAccessor object
      */
@@ -842,7 +825,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
             Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
             UrlBuilder urlBuilder =
-                    new UrlBuilder(charset, Util.getAbsoluteUrl(context.getActionPath()), false)
+                    new UrlBuilder(charset, Util.getAbsoluteUrl(context.getRequest(), context.getActionPath()), false)
                             .addParameters(parameters);
 
             XhtmlBuffer xb = new XhtmlBuffer();

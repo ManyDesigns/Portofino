@@ -24,6 +24,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
@@ -36,7 +37,6 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
-import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
@@ -242,7 +242,7 @@ public class ManyToManyAction extends AbstractResourceAction {
 
     protected void loadAssociations() throws NoSuchFieldException {
         Table table = m2mConfiguration.getActualRelationTable();
-        TableCriteria criteria = new TableCriteria(table);
+        Criteria criteria = new Criteria();
         //TODO chiave multipla
         String onePropertyName = m2mConfiguration.getActualOnePropertyName();
         PropertyAccessor onePropertyAccessor =
@@ -255,23 +255,25 @@ public class ManyToManyAction extends AbstractResourceAction {
         criteria = criteria.eq(onePropertyAccessor, onePk);
         QueryStringWithParameters queryString;
         try {
-            queryString = QueryUtils.mergeQuery(m2mConfiguration.getQuery(), criteria, this);
+            queryString = QueryUtils.mergeQuery(m2mConfiguration.getQuery(), table, criteria, null, this);
         } catch (RuntimeException e) {
             RequestMessages.addErrorMessage("Invalid query");
             throw e;
         }
         existingAssociations =
                 QueryUtils.runHqlQuery(session, queryString.getQueryString(), queryString.getParameters());
-        availableAssociations = new ArrayList<Object>();
+        availableAssociations = new ArrayList<>();
 
-        String databaseName = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getToDatabase();
+        String databaseName = manySelectionProvider.getActualSelectionProvider().getToDatabase();
         String hql = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getHql();
 
          if (!StringUtils.isEmpty(hql)) {
             Session selectionProviderSession = persistence.getSession(databaseName);
 
-            QueryStringWithParameters manyQuery = QueryUtils.mergeQuery(hql, null, this);
-            potentiallyAvailableAssociations =QueryUtils.runHqlQuery(selectionProviderSession, manyQuery.getQueryString(), manyQuery.getParameters());
+            QueryStringWithParameters manyQuery = QueryUtils.mergeQuery(
+                    hql, null, null, null, this);
+            potentiallyAvailableAssociations = QueryUtils.runHqlQuery(
+                    selectionProviderSession, manyQuery.getQueryString(), manyQuery.getParameters());
         }else{
              throw new RuntimeException("Couldn't determine many query");
         }

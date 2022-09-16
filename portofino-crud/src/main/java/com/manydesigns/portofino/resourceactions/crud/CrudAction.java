@@ -21,8 +21,11 @@
 package com.manydesigns.portofino.resourceactions.crud;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.fields.search.Ordering;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.model.Database;
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.database.model.ForeignKey;
@@ -40,6 +43,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
@@ -231,7 +235,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @SuppressWarnings({"unchecked"})
     public List<T> loadObjects() {
         try {
-            TableCriteria criteria = setupCriteria();
+            Criteria criteria = setupCriteria();
             collection = collection.where(criteria);
             objects = (List<T>) collection.load(firstResult, maxResults, this);
         } catch (ClassCastException e) {
@@ -243,12 +247,21 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @NotNull
-    protected TableCriteria setupCriteria() {
-        TableCriteria criteria = new TableCriteria(collection.getTable());
+    protected Criteria setupCriteria() {
+        Criteria criteria = new Criteria();
         if(searchForm != null) {
             searchForm.configureCriteria(criteria);
         }
-        applySorting(criteria);
+        if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
+            try {
+                PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
+                if(orderByProperty != null) {
+                    collection.setOrdering(new Ordering(orderByProperty, sortDirection));
+                }
+            } catch (NoSuchFieldException e) {
+                CrudAction.logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
+            }
+        }
         return criteria;
     }
 

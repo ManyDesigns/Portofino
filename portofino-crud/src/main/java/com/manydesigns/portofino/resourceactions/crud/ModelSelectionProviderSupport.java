@@ -306,7 +306,8 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
         return new MemoizingOptionProvider(() -> {
             String entityName = table.getActualEntityName();
             Session session = persistence.getSession(databaseName);
-            QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
+            QueryStringWithParameters queryWithParameters =
+                    QueryUtils.mergeQuery(hql, table, null, null, this);
 
             Collection<Object> objects = getFromQueryCache(selectionProvider, queryWithParameters);
             if (objects == null) {

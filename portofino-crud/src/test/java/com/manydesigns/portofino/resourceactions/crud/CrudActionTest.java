@@ -63,6 +63,7 @@ import org.hibernate.query.Query;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
@@ -150,6 +151,45 @@ public class CrudActionTest extends JerseyTest {
         //testTable.getPrimaryKey().getPrimaryKeyColumns().get(0).setGenerator(new SequenceGenerator());
     }
 
+    public void testSearch() throws Exception {
+        MutableHttpServletRequest req = new MutableHttpServletRequest();
+        ElementsThreadLocals.setMultipart(req);
+        req.getServletContext().setInitParameter("portofino.api.root", "http://fake");
+        persistence.initModel();
+        CrudAction crudAction = makeTestCrudAction();
+
+        setUpCrudAction(crudAction, req);
+
+        crudAction.executeSearch();
+        assertEquals(16, crudAction.getTotalSearchRecords());
+        assertEquals(16, crudAction.getTableForm().getRows().length);
+
+        //Category is not searchable, so this is ignored
+        crudAction.searchString = "search_category=none";
+        crudAction.executeSearch();
+        assertEquals(16, crudAction.getTotalSearchRecords());
+        assertEquals(16, crudAction.getTableForm().getRows().length);
+        crudAction.collection.getCriteria().clear();
+
+        crudAction.searchString = "search_productid=none";
+        crudAction.executeSearch();
+        assertEquals(0, crudAction.getTotalSearchRecords());
+        assertEquals(0, crudAction.getTableForm().getRows().length);
+        crudAction.collection.getCriteria().clear();
+
+        crudAction.searchString = "search_productid=FI-SW-01";
+        crudAction.executeSearch();
+        assertEquals(1, crudAction.getTotalSearchRecords());
+        assertEquals(1, crudAction.getTableForm().getRows().length);
+        crudAction.collection.getCriteria().clear();
+
+        crudAction.searchString = "search_productid=FI-SW,search_productid_mode=STARTS";
+        crudAction.executeSearch();
+        assertEquals(2, crudAction.getTotalSearchRecords());
+        assertEquals(2, crudAction.getTableForm().getRows().length);
+        crudAction.collection.getCriteria().clear();
+    }
+
     public void testBlobs() throws Exception {
         MutableHttpServletRequest req = new MutableHttpServletRequest();
         ElementsThreadLocals.setMultipart(req);
@@ -162,82 +202,18 @@ public class CrudActionTest extends JerseyTest {
         column.getAnnotations().add(ann);
 
         persistence.initModel();
-        CrudAction crudAction = new CrudAction() {
-            public void commitTransaction() {
-                super.commitTransaction();
-                collection.getSession().beginTransaction();
-            }
+        CrudAction crudAction = makeTestCrudAction();
 
-            @NotNull
-            @Override
-            protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
-                return classAccessor; //Let's ignore Shiro
-            }
-
-            @Override
-            protected String getUrlEncoding() {
-                return PortofinoProperties.URL_ENCODING_DEFAULT;
-            }
-        };
-        CrudConfiguration configuration = new CrudConfiguration();
-        configuration.setDatabase("jpetstore");
-        configuration.setQuery("from product");
         String metaFilenamePattern = "blob-{0}.properties";
         String dataFilenamePattern = "blob-{0}.data";
         crudAction.blobManager = new HierarchicalBlobManager(new File(System.getProperty("java.io.tmpdir")), metaFilenamePattern, dataFilenamePattern);
-
-        CrudProperty property = new CrudProperty();
-        property.setName("productid");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        configuration.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setName("category");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        configuration.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setName("descn");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        configuration.getProperties().add(property);
-
-        property = new CrudProperty();
-        property.setName("name");
-        property.setEnabled(true);
-        property.setInsertable(true);
-        property.setUpdatable(true);
-        ann = new Annotation(column, Required.class.getName());
-        ann.setPropertyValue("value", "true");
-        property.getAnnotations().add(ann);
-        configuration.getProperties().add(property);
-
-        configuration.persistence = persistence;
-        configuration.init();
-
-        ActionInstance actionInstance = new ActionInstance(null, null, CrudAction.class);
-        actionInstance.setConfiguration(configuration);
-        actionInstance.getParameters().add("1");
-        ActionContext actionContext = new ActionContext();
-        actionContext.setRequest(req);
-        actionContext.setActionPath("");
-        actionContext.setServletContext(req.getServletContext());
 
         req.setParameter("productid", "1");
         Query<Map> query = persistence.getSession("jpetstore").createQuery("from category", Map.class);
         Map category = query.list().get(0);
         req.setParameter("category", (String) category.get("catid"));
-        crudAction.persistence = persistence;
-        crudAction.portofinoConfiguration = new ConfigurationSource(null, null);
-        crudAction.setContext(actionContext);
-        crudAction.setActionInstance(actionInstance);
-        crudAction.configured();
-        crudAction.init();
+
+        setUpCrudAction(crudAction, req);
         crudAction.setupForm(Mode.CREATE);
 
         Field descnField = crudAction.getForm().findFieldByPropertyName("descn");
@@ -358,6 +334,90 @@ public class CrudActionTest extends JerseyTest {
         } catch (IOException e) {
             //Ok
         }
+    }
+
+    private void setUpCrudAction(CrudAction crudAction, HttpServletRequest req) {
+        CrudConfiguration configuration = crudAction.getCrudConfiguration();
+        configuration.persistence = persistence;
+        configuration.init();
+
+        ActionInstance actionInstance = new ActionInstance(null, null, CrudAction.class);
+        actionInstance.setConfiguration(configuration);
+        actionInstance.getParameters().add("1");
+        ActionContext actionContext = new ActionContext();
+        actionContext.setRequest(req);
+        actionContext.setActionPath("");
+        actionContext.setServletContext(req.getServletContext());
+
+        crudAction.persistence = persistence;
+        crudAction.portofinoConfiguration = new ConfigurationSource(null, null);
+        crudAction.setContext(actionContext);
+        crudAction.setActionInstance(actionInstance);
+        crudAction.configured();
+        crudAction.init();
+    }
+
+    @NotNull
+    private CrudAction makeTestCrudAction() {
+        CrudAction crudAction = new CrudAction() {
+            public void commitTransaction() {
+                super.commitTransaction();
+                collection.getSession().beginTransaction();
+            }
+
+            @NotNull
+            @Override
+            protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
+                return classAccessor; //Let's ignore Shiro
+            }
+
+            @Override
+            protected String getUrlEncoding() {
+                return PortofinoProperties.URL_ENCODING_DEFAULT;
+            }
+        };
+        CrudConfiguration configuration = new CrudConfiguration();
+        configuration.setDatabase("jpetstore");
+        configuration.setQuery("from product");
+
+        CrudProperty property = new CrudProperty();
+        property.setName("productid");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        property.setInSummary(true);
+        property.setSearchable(true);
+        configuration.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("category");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        property.setInSummary(true);
+        configuration.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("descn");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        property.setInSummary(true);
+        configuration.getProperties().add(property);
+
+        property = new CrudProperty();
+        property.setName("name");
+        property.setEnabled(true);
+        property.setInsertable(true);
+        property.setUpdatable(true);
+        property.setInSummary(true);
+        Annotation ann = new Annotation(property, Required.class.getName());
+        ann.setPropertyValue("value", "true");
+        property.getAnnotations().add(ann);
+        configuration.getProperties().add(property);
+
+        crudAction.setCrudConfiguration(configuration);
+        return crudAction;
     }
 
 }

@@ -3,6 +3,7 @@ package com.manydesigns.portofino.database;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.DateField;
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
@@ -18,7 +19,6 @@ import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
-import com.manydesigns.portofino.persistence.TableCriteria;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -193,8 +193,8 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(
                 persistence.getDatabases(), "jpetstore", "PUBLIC", "CATEGORY");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria tableCriteria = new TableCriteria(table);
-        findCategory(tableAccessor, tableCriteria);
+        Criteria Criteria = new Criteria();
+        findCategory(tableAccessor, Criteria);
 
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
@@ -203,12 +203,13 @@ public class PersistenceTest {
         assertEquals("Angelfish", get(prd0, "name"));
     }
 
-    private Object findCategory(TableAccessor tableAccessor, TableCriteria criteria) {
+    private Object findCategory(TableAccessor tableAccessor, Criteria criteria) {
         Object category = null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
-            Session session = persistence.getSession(tableAccessor.getTable().getDatabaseName());
-            List<Object> listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            Table table = tableAccessor.getTable();
+            Session session = persistence.getSession(table.getDatabaseName());
+            List<Object> listObjs = QueryUtils.getObjects(session, table, criteria, null, null);
             assertEquals(1, listObjs.size());
             category = listObjs.get(0);
             String catid = get(category, "catid");
@@ -224,15 +225,15 @@ public class PersistenceTest {
                 persistence.getDatabases(), "jpetstore", "PUBLIC", "CATEGORY");
         assertNotNull(table);
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria tableCriteria = new TableCriteria(table);
+        Criteria criteria = new Criteria();
 
         Session session = persistence.getSession("jpetstore");
-        CriteriaQuery<Object> criteria = QueryUtils.createCriteria(session, "category").query;
-        List<Object> resultCat = new ArrayList<>(session.createQuery(criteria).list());
+        CriteriaQuery<Object> criteriaQuery = QueryUtils.createCriteria(session, "category").query;
+        List<Object> resultCat = new ArrayList<>(session.createQuery(criteriaQuery).list());
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
-        Object categoria0 = findCategory(tableAccessor, tableCriteria);
+        Object categoria0 = findCategory(tableAccessor, criteria);
         assertEquals("Fish", get(categoria0, "name"));
         set(categoria0, "name", "Pesciu");
         session.merge("category", categoria0);
@@ -240,8 +241,8 @@ public class PersistenceTest {
         persistence.closeSessions();
 
         //Controllo l'aggiornamento e riporto le cose come stavano
-        tableCriteria = new TableCriteria(table);
-        categoria0 =  findCategory(tableAccessor, tableCriteria);
+        criteria = new Criteria();
+        categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("Pesciu", get(categoria0, "name"));
         set(categoria0, "name", "Fish");
         session = persistence.getSession("jpetstore");
@@ -468,11 +469,11 @@ public class PersistenceTest {
                 persistence.getDatabases(), "jpetstore", "PUBLIC", "SUPPLIER");
         assertNotNull(table);
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
+        Criteria criteria = new Criteria();
         final BigInteger expectedId = new BigInteger("3");
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
-            List<?> listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            List<?> listObjs = QueryUtils.getObjects(session, table, criteria, null, null);
             assertEquals(1, listObjs.size());
             Object supp = listObjs.get(0);
             String name = get(supp, "name");
@@ -492,7 +493,7 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(
                 persistence.getModel(), "hibernatetest", "PUBLIC", "test");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
+        Criteria criteria = new Criteria(table);
         final long expectedId = 1;
         try {
             criteria.eq(tableAccessor.getProperty("id"), expectedId);
@@ -538,7 +539,7 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(
                 persistence.getModel(), "jpetstore", "PUBLIC", "orders");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
+        Criteria criteria = new Criteria(table);
         try {
             criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
             List listObjs = QueryUtils.getObjects(session, criteria, null, null);
