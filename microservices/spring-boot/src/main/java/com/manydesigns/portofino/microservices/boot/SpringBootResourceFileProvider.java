@@ -3,11 +3,7 @@ package com.manydesigns.portofino.microservices.boot;
 import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.provider.AbstractFileName;
 import org.apache.commons.vfs2.provider.AbstractFileObject;
-import org.apache.commons.vfs2.provider.VfsComponentContext;
-import org.apache.commons.vfs2.provider.local.LocalFileName;
-import org.apache.commons.vfs2.provider.local.LocalFileSystem;
 import org.apache.commons.vfs2.provider.ram.RamFileSystem;
-import org.apache.commons.vfs2.provider.res.ResourceFileNameParser;
 import org.apache.commons.vfs2.provider.res.ResourceFileProvider;
 import org.apache.commons.vfs2.provider.res.ResourceFileSystemConfigBuilder;
 

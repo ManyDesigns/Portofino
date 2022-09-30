@@ -76,7 +76,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -347,7 +347,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             String stringValue = (String) propertyAccessor.get(object);
             String cleanText;
             try {
-                Whitelist whitelist = getWhitelist();
+                Safelist whitelist = getWhitelist();
                 cleanText = Jsoup.clean(stringValue, whitelist);
             } catch (Throwable t) {
                 logger.error("Could not clean HTML, falling back to escaped text", t);
@@ -359,10 +359,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     /**
      * Returns the JSoup whitelist used to clean user-provided HTML in rich-text fields.
-     * @return the default implementation returns the "basic" whitelist ({@link Whitelist#basic()}).
+     * @return the default implementation returns the "basic" whitelist ({@link Safelist#basic()}).
      */
-    protected Whitelist getWhitelist() {
-        return Whitelist.basic();
+    protected Safelist getWhitelist() {
+        return Safelist.basic();
     }
 
     protected void preCreate() {
