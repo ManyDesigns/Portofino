@@ -166,7 +166,10 @@ public class SecurityLogic {
         String relLoginPath = configuration.getString(PortofinoProperties.LOGIN_PATH);
         String loginPath;
         if(relLoginPath != null) {
-            loginPath = actionsDirectory.getName().getPath() + relLoginPath;
+            if (relLoginPath.startsWith("/")) {
+                relLoginPath = relLoginPath.substring(0);
+            }
+            loginPath = actionsDirectory.resolveFile(relLoginPath).getName().getPath();
         } else {
             loginPath = "res:" + fallbackLoginClass.getPackage().getName().replace('.', '/');
         }

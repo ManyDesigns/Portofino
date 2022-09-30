@@ -14,9 +14,13 @@ public class ActionsTest {
     @Test
     public void testMountPath() throws FileSystemException {
         FileObject actionsDirectory = VFS.getManager().toFileObject(new File(""));
-        String loginPath = actionsDirectory.getName().getPath() + "/login";
+        String loginPath = actionsDirectory.getName().getURI() + "/login";
         FileObject fileObject = VFS.getManager().resolveFile(loginPath);
         assertEquals(fileObject.getName().getBaseName(), "login");
+
+        fileObject = actionsDirectory.resolveFile("login");
+        assertEquals(fileObject.getName().getBaseName(), "login");
+        assertEquals(fileObject.getParent().getURI(), actionsDirectory.getURI());
     }
 
 }
