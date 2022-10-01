@@ -103,7 +103,7 @@
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.7</jsqlparser.version>
         <json.version>20180813</json.version>
-        <jsoup.version>1.14.2</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>4.8.0</liquibase.version>
         <!--
@@ -117,7 +117,7 @@
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.6.1.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.8.0</shiro.version>
+        <shiro.version>1.9.1</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
         <spring.version>5.3.20</spring.version>
         <aws.version>1.11.967</aws.version>
@@ -169,6 +169,7 @@
         <!-- Microservices -->
         <module>microservices/launcher</module>
         <module>microservices/spring-boot</module>
+        <module>microservices/spring-boot-with-dispatcher</module>
         <module>microservices/scheduler</module>
         <module>microservices/mail</module>
         <!-- upstairs -->

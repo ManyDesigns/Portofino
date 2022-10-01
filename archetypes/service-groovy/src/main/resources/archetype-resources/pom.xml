@@ -121,7 +121,7 @@
         <!-- Microservice implementation. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-spring-boot</artifactId>
+            <artifactId>portofino-spring-boot-with-dispatcher</artifactId>
             <version>${portofino.version}</version>
         </dependency>
         <dependency>

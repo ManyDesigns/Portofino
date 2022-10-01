@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.0</version>
+		<version>2.4.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.manydesigns</groupId>
-	<artifactId>portofino-spring-boot</artifactId>
-	<version>6.0.0-SNAPSHOT</version>
+	<artifactId>portofino-spring-boot-with-dispatcher</artifactId>
+	<version>5.3.3-SNAPSHOT</version>
 	<name>portofino-spring-boot</name>
 	<description>Launch Portofino as a Spring Boot application</description>
 	<properties>
@@ -22,56 +22,15 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-	<dependencyManagement>
-		<dependencies>
-			<!-- Portofino parent POM that defines the versions of all dependencies (notice scope: import) -->
-			<dependency>
-				<groupId>com.manydesigns</groupId>
-				<artifactId>portofino</artifactId>
-				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>com.manydesigns</groupId>
 			<artifactId>portofino-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- Jackson – we have to override Boot's versions -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-jaxb-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-parameter-names</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jdk8</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
 		<!-- Groovy is optional -->
 		<dependency>
-			<groupId>org.apache.groovy</groupId>
+			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -111,12 +70,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.manydesigns</groupId>
-			<artifactId>portofino-database</artifactId>
-			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
