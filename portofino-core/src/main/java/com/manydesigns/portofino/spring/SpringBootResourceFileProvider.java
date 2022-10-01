@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.microservices.boot;
+package com.manydesigns.portofino.spring;
 
 import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.provider.AbstractFileName;

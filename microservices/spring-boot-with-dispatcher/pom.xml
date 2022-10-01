@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.manydesigns</groupId>
-	<artifactId>portofino-spring-boot</artifactId>
+	<artifactId>portofino-spring-boot-with-dispatcher</artifactId>
 	<version>5.3.3-SNAPSHOT</version>
 	<name>portofino-spring-boot</name>
 	<description>Launch Portofino as a Spring Boot application</description>
@@ -70,12 +70,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.manydesigns</groupId>
-			<artifactId>portofino-database</artifactId>
-			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
