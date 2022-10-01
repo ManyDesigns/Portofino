@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-spring-boot</artifactId>
+            <artifactId>portofino-spring-boot-with-dispatcher</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
