@@ -69,23 +69,6 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
-		<!-- Groovy is optional -->
-		<dependency>
-			<groupId>org.apache.groovy</groupId>
-			<artifactId>groovy</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.manydesigns</groupId>
-			<artifactId>portofino-jersey</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.manydesigns</groupId>
-			<artifactId>portofino-resteasy</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -117,6 +100,12 @@
 			<groupId>com.manydesigns</groupId>
 			<artifactId>portofino-database</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+			<version>3.0.0</version> <!-- Same version as Hibernate -->
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

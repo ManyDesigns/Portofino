@@ -128,7 +128,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             @Autowired ModelService modelService,
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry)
-            throws IOException, ConfigurationException {
+            throws IOException {
         Persistence persistence = new Persistence(modelService, configuration, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         if(applicationContext != null) { //We may want it to be null when testing
