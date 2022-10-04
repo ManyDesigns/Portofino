@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -80,9 +81,7 @@ public class WarFileLauncher {
      * Returns the absolute path to the temp directory.
      */
     public static File createTempDir(int port) throws IOException {
-        File tempDir = File.createTempFile("portofino.tomcat.", "." + port);
-        tempDir.delete();
-        tempDir.mkdir();
+        File tempDir = Files.createTempDirectory("portofino.tomcat." + "." + port).toFile();
         tempDir.deleteOnExit();
         return tempDir;
     }
