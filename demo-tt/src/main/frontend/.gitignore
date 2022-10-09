@@ -14,6 +14,7 @@ package-lock.json
 /node_modules
 
 # IDEs and editors
+/.angular
 /.idea
 .project
 .classpath

@@ -31,7 +31,7 @@ import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {QuillModule} from "ngx-quill";
 import {HttpClientModule, HttpClient} from "@angular/common/http";
 import {FlexLayoutModule} from "@angular/flex-layout";
-import {MatMomentDateModule} from "@angular/material-moment-adapter";
+import { MatLuxonDateModule } from "@angular/material-luxon-adapter";
 import {FileInputAccessorModule} from "file-input-accessor";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {registerLocaleData} from "@angular/common";
@@ -61,7 +61,7 @@ export class AppComponent {}
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
     MatAutocompleteModule, MatButtonModule, MatCheckboxModule, MatDatepickerModule, MatDialogModule, MatFormFieldModule,
     MatIconModule, MatInputModule, MatMenuModule, MatPaginatorModule, MatRadioModule, MatSelectModule, MatSidenavModule,
-    MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatMomentDateModule,
+    MatSnackBarModule, MatSortModule, MatTableModule, MatToolbarModule, MatLuxonDateModule,
     FileInputAccessorModule, QuillModule.forRoot(), TranslateModule.forRoot()],
   bootstrap: [AppComponent]
 })
