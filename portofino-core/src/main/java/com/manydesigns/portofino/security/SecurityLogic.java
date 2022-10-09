@@ -169,7 +169,7 @@ public class SecurityLogic {
             if (relLoginPath.startsWith("/")) {
                 relLoginPath = relLoginPath.substring(1);
             }
-            loginPath = actionsDirectory.resolveFile(relLoginPath).getName().getPath();
+            loginPath = actionsDirectory.resolveFile(relLoginPath).getName().getURI();
         } else {
             loginPath = "res:" + fallbackLoginClass.getPackage().getName().replace('.', '/');
         }
