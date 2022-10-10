@@ -4,9 +4,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [5.3.3] – Unreleased
 
+### Added
+- New deployment option: Portofino modules as Spring Boot components, without using Portofino's dispatcher and without setting up Portofino's context hierarchy.
+
+### Changed
+- Updated Angular to version 13
+- Replaced moment.js with Luxon
+
 ### Fixed
 - Wrong links in the war archetype [#556](https://github.com/ManyDesigns/Portofino/issues/556)
 - Omitting the login.path property results in a malfunctioning application [#557](https://github.com/ManyDesigns/Portofino/issues/557)
+- Mounted child path not converted to the native OS format [#566](https://github.com/ManyDesigns/Portofino/issues/566)
 
 ## [5.3.2] – 2022-05-12
 
