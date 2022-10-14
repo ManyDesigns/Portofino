@@ -45,6 +45,8 @@ import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.resource.CompositeResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -250,7 +252,9 @@ public class Persistence {
 
     public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
-        ResourceAccessor resourceAccessor = new VFSResourceAccessor(applicationDirectory);
+        ResourceAccessor resourceAccessor = new CompositeResourceAccessor(
+                new VFSResourceAccessor(applicationDirectory), new ClassLoaderResourceAccessor()
+        );
         ConnectionProvider connectionProvider = database.getConnectionProvider();
         for(Schema schema : database.getSchemas()) {
             String schemaName = schema.getSchemaName();
