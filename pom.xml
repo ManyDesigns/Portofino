@@ -92,7 +92,7 @@
         <guava.version>30.0-jre</guava.version>
         <hibernate.version>5.5.3.Final</hibernate.version>
         <jackson.version>2.13.4</jackson.version>
-        <jackson.databind.version>2.13.4</jackson.databind.version>
+        <jackson.databind.version>2.13.4.1</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
