@@ -124,10 +124,10 @@ import java.util.regex.Pattern;
  *   </ul>
  * <p>This ResourceAction can handle a varying number of URL path parameters (segments). Each segment is assumed to be part
  * of an object identifier - for example, a database primary key (single or multi-valued). When no parameter is
- * specified, the actionDescriptor is in search mode. When the correct number of parameters is provided, the action attempts
- * to load an object with the appropriate identifier (for example, by loading a row from a database table with
- * the corresponding primary key). As any other actionDescriptor, crud pages can have children, and they always prevail over
- * the object key: a crud actionDescriptor with a child named &quot;child&quot; will never attempt to load an object with key
+ * specified, the CRUD resource-action is in search mode. When the correct number of parameters is provided, the action
+ * attempts to load an object with the given identifier (for example, by loading a row from a database table with
+ * the corresponding primary key). As any other resource-action, crud pages can have children, and they always prevail
+ * over the object key: a crud action with a child named &quot;child&quot; will never attempt to load an object with key
  * &quot;child&quot;.</p>
  *
  * @param <T> the types of objects that this crud can handle.
@@ -297,7 +297,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected void executeSearch() {
         setupSearchForm();
         if(maxResults == null) {
-            //Load only the first actionDescriptor if the crud is paginated
+            //Load only the first page if the crud is paginated
             maxResults = getCrudConfiguration().getRowsPerPage();
         }
         loadObjects();
@@ -646,7 +646,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     /**
      * Computes the search URL from the current URL. In other words, it removes any /pk trailing path segment from the
-     * URL used to access the actionDescriptor.
+     * URL used to access this resource.
      * @return the search URL.
      */
     protected String calculateBaseSearchUrl() {
@@ -676,8 +676,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     /**
-     * Creates, configures and populates the form used to gather search parameters. If this actionDescriptor is embedded, the form's
-     * values are not read from the request to avoid having the embedding actionDescriptor influence this one.
+     * Creates, configures and populates the form used to gather search parameters.
      */
     protected void setupSearchForm() {
         SearchFormBuilder searchFormBuilder = createSearchFormBuilder();

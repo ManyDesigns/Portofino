@@ -108,6 +108,18 @@
 			<version>3.0.0</version> <!-- Same version as Hibernate -->
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>4.8.0</version> <!-- Spring Boot requires 3.x but Portofino requires 4.8.0 -->
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.199</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

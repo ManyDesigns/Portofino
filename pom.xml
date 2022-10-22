@@ -84,7 +84,7 @@
         <commons.configuration.version>2.8.0</commons.configuration.version>
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
-        <commons.fileupload.version>1.3.3</commons.fileupload.version>
+        <commons.fileupload.version>1.4</commons.fileupload.version>
         <commons.io.version>2.7</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.8.0</commons.vfs.version>
@@ -92,8 +92,8 @@
         <groovy.version>4.0.3</groovy.version>
         <guava.version>31.0.1-jre</guava.version>
         <hibernate.version>6.1.3.Final</hibernate.version>
-        <jackson.version>2.13.2</jackson.version>
-        <jackson.databind.version>2.13.2.1</jackson.databind.version>
+        <jackson.version>2.13.4</jackson.version>
+        <jackson.databind.version>2.13.4</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depended on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
@@ -117,7 +117,7 @@
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.6.1.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.9.1</shiro.version>
+        <shiro.version>1.10.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
         <spring.version>5.3.20</spring.version>
         <aws.version>1.11.967</aws.version>
@@ -563,7 +563,7 @@
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link https://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link https://shiro.apache.org/static/1.9.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
