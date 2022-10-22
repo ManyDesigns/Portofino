@@ -31,7 +31,6 @@ import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.reactivex.disposables.Disposable;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
 import org.jetbrains.annotations.NotNull;
@@ -142,26 +141,26 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
         // - make generated classes visible to shared classes and actions;
         // - write them in the application directory so the user's IDE and tools can know about them.
         subscription = persistence.databaseSetupEvents.subscribe(e -> {
-            String databaseName = e.setup.getDatabase().getDatabaseName();
-            FileObject inMemoryDatabaseDir = e.setup.getCodeBase().getRoot().resolveFile(databaseName);
+            String databaseName = e.accessor.getDatabase().getDatabaseName();
+            FileObject inMemoryDatabaseDir = e.accessor.getCodeBase().getRoot().resolveFile(databaseName);
             FileObject externalDatabaseDir = generatedClassesRoot.resolveFile(databaseName);
             externalDatabaseDir.deleteAll();
             switch (e.type) {
                 case Persistence.DatabaseSetupEvent.ADDED:
-                    persistenceCodeBase.add(e.setup.getCodeBase());
-                    if(e.setup.getEntityMode() == EntityMode.POJO) {
+                    persistenceCodeBase.add(e.accessor.getCodeBase());
+                    if(e.accessor.getEntityMode() == EntityMode.POJO) {
                         externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
                     }
                     break;
                 case Persistence.DatabaseSetupEvent.REMOVED:
-                    persistenceCodeBase.remove(e.setup.getCodeBase());
+                    persistenceCodeBase.remove(e.accessor.getCodeBase());
                     externalDatabaseDir.deleteAll();
                     inMemoryDatabaseDir.deleteAll();
                     break;
                 case Persistence.DatabaseSetupEvent.REPLACED:
-                    persistenceCodeBase.replace(e.oldSetup.getCodeBase(), e.setup.getCodeBase());
+                    persistenceCodeBase.replace(e.oldAccessor.getCodeBase(), e.accessor.getCodeBase());
                     externalDatabaseDir.deleteAll();
-                    if(e.setup.getEntityMode() == EntityMode.POJO) {
+                    if(e.accessor.getEntityMode() == EntityMode.POJO) {
                         externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
                     }
                     break;

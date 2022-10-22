@@ -31,13 +31,14 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class HibernateDatabaseSetup {
+/**
+ * Manages access to a single database using Hibernate.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class DatabaseAccessor {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -48,19 +49,20 @@ public class HibernateDatabaseSetup {
     protected final EntityMode entityMode;
     protected final Configuration configuration;
     protected final Map<String, String> jpaEntityNameToClassNameMap = new HashMap<>();
+    protected final Events events;
     protected final MultiTenancyImplementation multiTenancyImplementation;
 
-        public static final Logger logger =
-            LoggerFactory.getLogger(HibernateDatabaseSetup.class);
+    public static final Logger logger = LoggerFactory.getLogger(DatabaseAccessor.class);
 
-    public HibernateDatabaseSetup(
+    public DatabaseAccessor(
             Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode,
-            Configuration configuration, MultiTenancyImplementation multiTenancyImplementation) {
+            Configuration configuration, Events events, MultiTenancyImplementation multiTenancyImplementation) {
         this.database = database;
         this.sessionFactory = sessionFactory;
         this.codeBase = codeBase;
         this.entityMode = entityMode;
         this.configuration = configuration;
+        this.events = events;
         this.multiTenancyImplementation = multiTenancyImplementation;
         threadSessions = new ThreadLocal<>();
         database.getAllTables().forEach(t -> {
@@ -112,6 +114,10 @@ public class HibernateDatabaseSetup {
         //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
         //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
         getSessionFactory().close();
+        events.preLoad$.onComplete();
+        events.postLoad$.onComplete();
+        events.preInsert$.onComplete();
+        events.postInsert$.onComplete();
     }
 
     public void setThreadSession(Session session) {
@@ -132,6 +138,10 @@ public class HibernateDatabaseSetup {
 
     public EntityMode getEntityMode() {
         return entityMode;
+    }
+
+    public Events getEvents() {
+        return events;
     }
 
     public MultiTenancyImplementation getMultiTenancyImplementation() {

@@ -3,14 +3,13 @@ package com.manydesigns.portofino.persistence.hibernate;
 import org.hibernate.*;
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.event.spi.EventSource;
 import org.hibernate.persister.entity.EntityPersister;
 
-import java.io.Serializable;
+public class SessionDelegator extends SessionDelegatorBaseImpl implements EventSource {
+    private DatabaseAccessor setup;
 
-public class SessionDelegator extends SessionDelegatorBaseImpl {
-    private HibernateDatabaseSetup setup;
-
-    public SessionDelegator(HibernateDatabaseSetup setup, Session session) {
+    public SessionDelegator(DatabaseAccessor setup, Session session) {
         super((SessionImplementor) session);
         this.setup = setup;
     }

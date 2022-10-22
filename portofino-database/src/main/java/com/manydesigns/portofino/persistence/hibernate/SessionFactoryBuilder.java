@@ -62,6 +62,7 @@ public class SessionFactoryBuilder {
     protected String trueString = "T";
     protected String falseString = "F";
     protected final Database database;
+    protected final Events events;
     protected final ClassPool classPool = new ClassPool(ClassPool.getDefault());
     protected final Configuration configuration;
     protected final MultiTenancyImplementation multiTenancyImplementation;
@@ -76,9 +77,11 @@ public class SessionFactoryBuilder {
     }
 
     public SessionFactoryBuilder(
-            Database database, Configuration configuration, MultiTenancyImplementation multiTenancyImplementation) {
+            Database database, Configuration configuration, Events events,
+            MultiTenancyImplementation multiTenancyImplementation) {
         this.database = database;
         this.configuration = configuration;
+        this.events = events;
         this.multiTenancyImplementation = multiTenancyImplementation;
         String trueString = database.getTrueString();
         if (trueString != null) {
@@ -189,8 +192,10 @@ public class SessionFactoryBuilder {
         }
     }
 
-    public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase, List<Table> tablesToMap, List<Table> externallyMappedTables) {
+    public SessionFactoryAndCodeBase buildSessionFactory(
+            CodeBase codeBase, List<Table> tablesToMap, List<Table> externallyMappedTables) {
         BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
+        bootstrapRegistryBuilder.applyIntegrator(new EventsIntegrator(events));
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();

@@ -10,16 +10,20 @@ import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.database.model.*;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.AnnotationProperty;
-import com.manydesigns.portofino.database.model.*;
-import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
+import com.manydesigns.portofino.persistence.hibernate.Events;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import io.reactivex.disposables.Disposable;
+import jakarta.persistence.criteria.CriteriaQuery;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -29,10 +33,16 @@ import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
 import org.hibernate.UnknownEntityTypeException;
+import org.hibernate.event.spi.PostInsertEvent;
+import org.hibernate.event.spi.PostLoadEvent;
+import org.hibernate.event.spi.PreInsertEvent;
+import org.hibernate.event.spi.PreLoadEvent;
 import org.hibernate.jdbc.Work;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import jakarta.persistence.criteria.CriteriaQuery;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -41,6 +51,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.testng.Assert.*;
 import static org.testng.AssertJUnit.assertEquals;
@@ -85,9 +96,8 @@ public class PersistenceTest {
         databaseModule.configuration = new ConfigurationSource(configuration, null);
         modelService = new ModelService(appDir, new ConfigurationSource(configuration, null), new JavaCodeBase(appDir));
         modelService.loadModel();
-        modelService.getModel().getIssues().forEach(i -> {
-            System.err.println(i.message + " " + i.path + "@" + i.line+ ":" + i.column);
-        });
+        modelService.getModel().getIssues().forEach(
+                i -> System.err.println(i.message + " " + i.path + "@" + i.line+ ":" + i.column));
         assertEquals("There are issues with the model", 0, modelService.getModel().getIssues().size());
         persistence = databaseModule.getPersistence(
                 modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
@@ -103,13 +113,11 @@ public class PersistenceTest {
     }
 
     @AfterMethod
-    public void teardown() throws ConfigurationException, IOException {
-        persistence.getDatabases().forEach(d -> {
-            d.getSchemas().forEach(s -> {
-                s.getTables().clear();
-                s.getModelElement().getEClassifiers().clear();
-            });
-        });
+    public void teardown() {
+        persistence.getDatabases().forEach(d -> d.getSchemas().forEach(s -> {
+            s.getTables().clear();
+            s.getModelElement().getEClassifiers().clear();
+        }));
         persistence.stop();
         databaseModule.destroy();
     }
@@ -259,9 +267,23 @@ public class PersistenceTest {
                 "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                         "Worms</font>");
 
-        Session session = persistence.getSession("jpetstore");
-        session.save("category", makeEntity("jpetstore.public.Category", worms));
+        String databaseName = "jpetstore";
+        AtomicReference<PreInsertEvent> preInsert = new AtomicReference<>();
+        AtomicReference<PostInsertEvent> postInsert = new AtomicReference<>();
+        DatabaseAccessor databaseAccessor = persistence.getDatabaseAccessor(databaseName);
+        Events events = databaseAccessor.getEvents();
+        Disposable postInsertD = events.postInsert$.subscribe(postInsert::set);
+        Disposable preInsertD = events.preInsert$.subscribe(preInsert::set);
+        Session session = databaseAccessor.getThreadSession();
+        session.persist("category", makeEntity("jpetstore.public.Category", worms));
         session.getTransaction().commit();
+        assertNotNull(preInsert.get());
+        assertNotNull(postInsert.get());
+        assertFalse(postInsertD.isDisposed());
+        assertFalse(preInsertD.isDisposed());
+        persistence.stop();
+        assertTrue(postInsertD.isDisposed());
+        assertTrue(preInsertD.isDisposed());
     }
 
     public void testSaveLineItem() {
@@ -274,13 +296,13 @@ public class PersistenceTest {
         Object lineItem = makeEntity("jpetstore.public.Lineitem", lineItemData);
 
         Session session = persistence.getSession("jpetstore");
-        session.save("lineitem", lineItem);
+        session.persist("lineitem", lineItem);
         session.getTransaction().commit();
 
         persistence.closeSessions();
 
         session = persistence.getSession("jpetstore");
-        session.delete("lineitem", lineItem);
+        session.delete("lineitem", lineItem); //Note: there isn't a replacement taking an explicit entity name even if delete is deprecated
         session.getTransaction().commit();
         persistence.closeSessions();
     }
@@ -289,7 +311,7 @@ public class PersistenceTest {
         Map<String, Object> testItemData = new HashMap<>();
         testItemData.put("testo", "esempio");
         Session session = persistence.getSession("hibernatetest");
-        session.save("table1", makeEntity("hibernatetest.public.Table1", testItemData));
+        session.persist("table1", makeEntity("hibernatetest.public.Table1", testItemData));
         session.getTransaction().commit();
     }
 
@@ -303,7 +325,7 @@ public class PersistenceTest {
         Object wormsEntity = makeEntity("jpetstore.public.Category", worms);
 
         Session session = persistence.getSession("jpetstore");
-        session.save("category", wormsEntity);
+        session.persist("category", wormsEntity);
         session.getTransaction().commit();
         session.beginTransaction();
         session.remove(wormsEntity);
@@ -396,7 +418,7 @@ public class PersistenceTest {
         order.put("billzip", "x");
         order.put("billcountry", "x");
         order.put("courier", "x");
-        order.put("totalprice", new BigDecimal(1.0));
+        order.put("totalprice", new BigDecimal("1.0"));
         order.put("billtofirstname", "x");
         order.put("billtolastname", "x");
         order.put("shiptofirstname", "x");
@@ -407,7 +429,7 @@ public class PersistenceTest {
         order.put("locale", "x");
 
         Session session = persistence.getSession("jpetstore");
-        session.save("orders", order);
+        session.persist("orders", order);
 
         FormBuilder fb = new FormBuilder(persistence.getTableAccessor("jpetstore", "orders"));
         Form form = fb.configFields("orderdate").build();
@@ -450,9 +472,9 @@ public class PersistenceTest {
 
     public void tablesWithNoPKAreSkipped() {
         try {
-            persistence.getSession("hibernatetest").load("test_no_pk", 1);
+            persistence.getSession("hibernatetest").getReference("test_no_pk", 1);
             fail("test_no_pk should not be mapped");
-        } catch (UnknownEntityTypeException e) {
+        } catch (IllegalArgumentException e) {
             //Ok
         }
     }
@@ -463,7 +485,7 @@ public class PersistenceTest {
         supplierData.put("name", "Giampiero");
         Object supplier = makeEntity("jpetstore.public.Supplier", supplierData);
         Session session = persistence.getSession("jpetstore");
-        session.save("supplier", supplier);
+        session.persist("supplier", supplier);
         session.getTransaction().commit();
         Table table = DatabaseLogic.findTableByName(
                 persistence.getDatabases(), "jpetstore", "PUBLIC", "SUPPLIER");
@@ -562,7 +584,7 @@ public class PersistenceTest {
         assertFalse(view.isUpdatable());
         Session session = persistence.getSession("hibernatetest");
         try {
-            session.createQuery("from test_view_1").list();
+            session.createQuery("from test_view_1", Object.class).list();
             fail("View should not be mapped by default because it has no pk.");
         } catch (IllegalArgumentException e) {
             //OK
@@ -576,7 +598,7 @@ public class PersistenceTest {
         pk.getPrimaryKeyColumns().add(id);
         persistence.initModel();
         session = persistence.getSession("hibernatetest");
-        List<?> list = session.createQuery("from test_view_1").list();
+        List<?> list = session.createQuery("from test_view_1", Object.class).list();
         assertEquals(2, list.size());
     }
 
@@ -611,8 +633,28 @@ public class PersistenceTest {
         assertEquals(LocalDate.of(2010, 9, 27), get(domanda,"data"));
     }
 
+    public void testLoadById() {
+        String databaseName = "hibernatetest";
+        AtomicReference<PreLoadEvent> preLoad = new AtomicReference<>();
+        AtomicReference<PostLoadEvent> postLoad = new AtomicReference<>();
+        DatabaseAccessor databaseAccessor = persistence.getDatabaseAccessor(databaseName);
+        Events events = databaseAccessor.getEvents();
+        Disposable postLoadD = events.postLoad$.subscribe(postLoad::set);
+        Disposable preLoadD = events.preLoad$.subscribe(preLoad::set);
+        Object domanda = databaseAccessor.getThreadSession().get("domanda", "0001");
+        assertNotNull(domanda);
+        assertNotNull(preLoad.get());
+        assertNotNull(postLoad.get());
+        assertFalse(postLoadD.isDisposed());
+        assertFalse(preLoadD.isDisposed());
+        persistence.stop();
+        assertTrue(postLoadD.isDisposed());
+        assertTrue(preLoadD.isDisposed());
+    }
+
     public void testTableWithSpaces() {
-        persistence.getSession("hibernatetest").createQuery("from test_spaces").list();
+        Session hibernatetest = persistence.getSession("hibernatetest");
+        hibernatetest.createQuery("from test_spaces", Object.class).list();
     }
 
     public void testSaveModel() throws Exception {

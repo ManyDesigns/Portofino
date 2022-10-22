@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.persistence;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.database.model.ForeignKey;
@@ -39,7 +38,8 @@ import com.manydesigns.portofino.model.annotations.Id;
 import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
-import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
+import com.manydesigns.portofino.persistence.hibernate.Events;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
@@ -97,7 +97,7 @@ public class Persistence {
     //**************************************************************************
 
     protected final DatabasePlatformsRegistry databasePlatformsRegistry;
-    protected final Map<String, HibernateDatabaseSetup> setups;
+    protected final Map<String, DatabaseAccessor> accessors;
     protected final LinkedList<Database> databases = new LinkedList<>();
 
     protected final ConfigurationSource configuration;
@@ -123,7 +123,7 @@ public class Persistence {
         this.modelService = modelService;
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
-        setups = new HashMap<>();
+        accessors = new HashMap<>();
     }
 
     //**************************************************************************
@@ -343,19 +343,19 @@ public class Persistence {
     public synchronized void initModel() {
         getDatabaseDomains().forEach(this::setupDatabase);
         closeSessions();
-        for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
+        for (Map.Entry<String, DatabaseAccessor> current : accessors.entrySet()) {
             String databaseName = current.getKey();
-            logger.debug("Cleaning up old setup for: {}", databaseName);
-            HibernateDatabaseSetup setup = current.getValue();
+            logger.debug("Cleaning up old accessor for: {}", databaseName);
+            DatabaseAccessor accessor = current.getValue();
             try {
-                setup.dispose();
+                accessor.dispose();
             } catch (Throwable t) {
                 logger.warn("Cannot close session factory for: " + databaseName, t);
             }
-            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, setup));
+            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, accessor));
         }
         //TODO it would perhaps be preferable that we generated REPLACED events here rather than REMOVED followed by ADDED
-        setups.clear();
+        accessors.clear();
         for (Database database : databases) {
             initDatabase(database);
         }
@@ -397,22 +397,23 @@ public class Persistence {
             connectionProvider.init(databasePlatformsRegistry);
             if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
                 MultiTenancyImplementation implementation = getMultiTenancyImplementation(database);
+                Events events = new Events();
                 SessionFactoryBuilder builder =
-                        new SessionFactoryBuilder(database, configuration.getProperties(), implementation);
+                        new SessionFactoryBuilder(database, configuration.getProperties(), events, implementation);
                 SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
-                HibernateDatabaseSetup setup =
-                        new HibernateDatabaseSetup(
+                DatabaseAccessor accessor =
+                        new DatabaseAccessor(
                                 database, sessionFactoryAndCodeBase.sessionFactory,
-                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(), configuration.getProperties(),
-                                implementation);
+                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(),
+                                configuration.getProperties(), events, implementation);
                 String databaseName = database.getDatabaseName();
-                HibernateDatabaseSetup oldSetup = setups.get(databaseName);
-                setups.put(databaseName, setup);
-                if(oldSetup != null) {
-                    oldSetup.dispose();
-                    databaseSetupEvents.onNext(new DatabaseSetupEvent(oldSetup, setup));
+                DatabaseAccessor oldAccessor = accessors.get(databaseName);
+                accessors.put(databaseName, accessor);
+                if(oldAccessor != null) {
+                    oldAccessor.dispose();
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(oldAccessor, accessor));
                 } else {
-                    databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.ADDED, setup));
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.ADDED, accessor));
                 }
             }
         } catch (Exception e) {
@@ -501,33 +502,38 @@ public class Persistence {
     //**************************************************************************
 
     public Session getSession(String databaseName) {
-        return ensureDatabaseSetup(databaseName).getThreadSession();
+        return ensureDatabaseAccessor(databaseName).getThreadSession();
     }
 
-    protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
-        HibernateDatabaseSetup setup = getDatabaseSetup(databaseName);
-        if (setup == null) {
+    protected DatabaseAccessor ensureDatabaseAccessor(String databaseName) {
+        DatabaseAccessor accessor = getDatabaseAccessor(databaseName);
+        if (accessor == null) {
             //TODO use proper exception
-            throw new Error("No setup exists for database: " + databaseName);
+            throw new Error("No accessor exists for database: " + databaseName);
         }
-        return setup;
+        return accessor;
     }
 
-    public HibernateDatabaseSetup getDatabaseSetup(String databaseName) {
-        return setups.get(databaseName);
+    @Deprecated
+    public DatabaseAccessor getDatabaseSetup(String databaseName) {
+        return getDatabaseAccessor(databaseName);
+    }
+
+    public DatabaseAccessor getDatabaseAccessor(String databaseName) {
+        return accessors.get(databaseName);
     }
 
     public void closeSessions() {
-        for (HibernateDatabaseSetup current : setups.values()) {
+        for (DatabaseAccessor current : accessors.values()) {
             closeSession(current);
         }
     }
 
     public void closeSession(String databaseName) {
-        closeSession(ensureDatabaseSetup(databaseName));
+        closeSession(ensureDatabaseAccessor(databaseName));
     }
 
-    protected void closeSession(HibernateDatabaseSetup current) {
+    protected void closeSession(DatabaseAccessor current) {
         Session session = current.getThreadSession(false);
         if (session != null) {
             try {
@@ -582,8 +588,8 @@ public class Persistence {
         if (modelEventsSubscription != null) {
             modelEventsSubscription.dispose();
         }
-        for(HibernateDatabaseSetup setup : setups.values()) {
-            setup.dispose();
+        for(DatabaseAccessor accessor : accessors.values()) {
+            accessor.dispose();
         }
         for (Database database : databases) {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
@@ -598,11 +604,6 @@ public class Persistence {
     // App directories and files
     //**************************************************************************
 
-    @Deprecated
-    public String getName() {
-        return configuration.getProperties().getString(PortofinoProperties.APP_NAME);
-    }
-
     public FileObject getLiquibaseChangelogFile(Schema schema) throws FileSystemException {
         if(schema == null) {
             return null;
@@ -615,23 +616,23 @@ public class Persistence {
     public static class DatabaseSetupEvent {
         public static final int ADDED = +1, REMOVED = -1, REPLACED = 0;
 
-        public DatabaseSetupEvent(int type, HibernateDatabaseSetup setup) {
+        public DatabaseSetupEvent(int type, DatabaseAccessor accessor) {
             if(type == 0) {
                 throw new IllegalArgumentException();
             }
             this.type = type;
-            this.setup = setup;
+            this.accessor = accessor;
         }
 
-        public DatabaseSetupEvent(HibernateDatabaseSetup setup, HibernateDatabaseSetup oldSetup) {
-            this.setup = setup;
-            this.oldSetup = oldSetup;
+        public DatabaseSetupEvent(DatabaseAccessor accessor, DatabaseAccessor oldAccessor) {
+            this.accessor = accessor;
+            this.oldAccessor = oldAccessor;
             type = REPLACED;
         }
 
         public int type;
-        public HibernateDatabaseSetup setup;
-        public HibernateDatabaseSetup oldSetup;
+        public DatabaseAccessor accessor;
+        public DatabaseAccessor oldAccessor;
     }
 
     public MultiTenancyImplementationFactory getMultiTenancyImplementationFactory() {
