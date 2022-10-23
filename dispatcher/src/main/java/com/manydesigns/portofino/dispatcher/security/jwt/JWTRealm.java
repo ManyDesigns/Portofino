@@ -51,9 +51,9 @@ public class JWTRealm extends AuthorizingRealm {
         String secret = getSecret();
         Key key = new SecretKeySpec(Decoders.BASE64.decode(secret), getSignatureAlgorithm().getJcaName());
         
-        Jws<Claims> jwt = Jwts.parser().
+        Jws<Claims> jwt = Jwts.parserBuilder().
                 setSigningKey(key).
-                parseClaimsJws((String) token.getPrincipal());
+                build().parseClaimsJws((String) token.getPrincipal());
         Map<String, Serializable> principal = getPrincipal(jwt);
         return new SimpleAuthenticationInfo(principal, ((String) token.getCredentials()).toCharArray(), getName());
     }

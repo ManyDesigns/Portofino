@@ -39,6 +39,36 @@ public class EventsIntegrator implements Integrator {
                 return false;
             }
         });
+        eventListenerRegistry.appendListeners(EventType.PRE_UPDATE, event -> {
+            events.preUpdate$.onNext(event);
+            return false;
+        });
+        eventListenerRegistry.appendListeners(EventType.POST_UPDATE, new PostUpdateEventListener() {
+            @Override
+            public void onPostUpdate(PostUpdateEvent event) {
+                events.postUpdate$.onNext(event);
+            }
+
+            @Override
+            public boolean requiresPostCommitHandling(EntityPersister persister) {
+                return false;
+            }
+        });
+        eventListenerRegistry.appendListeners(EventType.PRE_DELETE, preDeleteEvent -> {
+            events.preDelete$.onNext(preDeleteEvent);
+            return false;
+        });
+        eventListenerRegistry.appendListeners(EventType.POST_DELETE, new PostDeleteEventListener() {
+            @Override
+            public void onPostDelete(PostDeleteEvent postDeleteEvent) {
+                events.postDelete$.onNext(postDeleteEvent);
+            }
+
+            @Override
+            public boolean requiresPostCommitHandling(EntityPersister entityPersister) {
+                return false;
+            }
+        });
     }
 
     @Override

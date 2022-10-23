@@ -118,6 +118,10 @@ public class DatabaseAccessor {
         events.postLoad$.onComplete();
         events.preInsert$.onComplete();
         events.postInsert$.onComplete();
+        events.preUpdate$.onComplete();
+        events.postUpdate$.onComplete();
+        events.preDelete$.onComplete();
+        events.postDelete$.onComplete();
     }
 
     public void setThreadSession(Session session) {

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<database databaseName="hibernatetest">
-    <jdbcConnection driver="org.h2.Driver" password="manydesigns" url="jdbc:h2:mem:hibernatetest;DB_CLOSE_DELAY=-1" username="manydesigns"/>
-    <schemas>
-        <schema schemaName="PUBLIC" />
-    </schemas>
-</database>

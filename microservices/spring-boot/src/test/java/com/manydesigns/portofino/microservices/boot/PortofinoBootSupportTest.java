@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.microservices.boot;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.model.service.ModelModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -29,15 +30,16 @@ class PortofinoBootSupportTest {
 
 	@Test
 	void canRunQuery() throws Exception {
+		ElementsThreadLocals.setupDefaultElementsContext();
 		setupTestDb();
 
 		Map<String, Object> testItemData = new HashMap<>();
 		testItemData.put("testo", "esempio");
 		Session session = persistence.getSession("hibernatetest");
-		session.save("table1", testItemData);
+		session.persist("table1", testItemData);
 		session.getTransaction().commit();
 
-		List table1 = session.createQuery("from table1").list();
+		List<?> table1 = session.createQuery("from table1", Object.class).list();
 		assertEquals("Saved one entity", 12, table1.size());
 	}
 

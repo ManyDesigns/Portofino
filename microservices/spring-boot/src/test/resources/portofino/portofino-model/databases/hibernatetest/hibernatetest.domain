@@ -1,0 +1,4 @@
+import com.manydesigns.portofino.database.model.annotations.JDBCConnection;
+
+@JDBCConnection(password = "manydesigns", driver = "org.h2.Driver", username = "manydesigns", url = "jdbc:h2:mem:hibernatetest;DB_CLOSE_DELAY=-1")
+domain hibernatetest;

@@ -140,12 +140,14 @@ public class Persistence {
                             newDb -> {
                                 String databaseName = newDb.getDatabaseName();
                                 databases.removeIf(oldDb -> oldDb.getDatabaseName().equals(databaseName));
-                                getDatabaseDomains().removeIf(d -> d.getName().equals(databaseName));
-                                databases.add(newDb);
-                                getDatabaseDomains().add(newDb.getModelElement());
+                                model.getDomains().removeIf(d -> d.getName().equals(databaseName));
                             });
-                    model.getDomains().clear();
-                    model.getDomains().add(getDatabaseDomain());
+                    modelIO.getDatabases().forEach(
+                            newDb -> {
+                                getDatabaseDomains().add(newDb.getModelElement());
+                                databases.add(newDb);
+                            });
+
                     logger.info("Loaded legacy XML model");
                     initModel();
                     if (convertLegacyModel) {

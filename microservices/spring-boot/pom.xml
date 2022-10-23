@@ -109,6 +109,17 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.transaction</groupId>
+			<artifactId>jakarta.transaction-api</artifactId>
+			<version>2.0.0</version> <!-- Same version as Hibernate -->
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<version>4.8.0</version> <!-- Spring Boot requires 3.x but Portofino requires 4.8.0 -->
