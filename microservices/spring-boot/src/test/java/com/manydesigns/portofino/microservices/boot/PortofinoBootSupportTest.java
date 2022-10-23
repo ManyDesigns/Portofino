@@ -3,6 +3,7 @@ package com.manydesigns.portofino.microservices.boot;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.model.service.ModelModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
+import com.manydesigns.portofino.modules.H2Module;
 import com.manydesigns.portofino.persistence.Persistence;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
-@SpringBootTest(classes = { PortofinoSupport.class, ModelModule.class, DatabaseModule.class })
+@SpringBootTest(classes = { PortofinoSupport.class, ModelModule.class, DatabaseModule.class, H2Module.class })
 class PortofinoBootSupportTest {
 
 	@Test

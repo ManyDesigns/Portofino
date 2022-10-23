@@ -20,26 +20,21 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
-import org.apache.commons.configuration2.Configuration;
+import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class H2Module implements Module {
-    public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    @Autowired
-    public Configuration configuration;
+    public static final String copyright = "Copyright (C) 2005-2022 ManyDesigns srl";
 
     @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;
