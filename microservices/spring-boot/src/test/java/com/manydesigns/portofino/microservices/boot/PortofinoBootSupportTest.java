@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
 @SpringBootTest(classes = { PortofinoSupport.class, ModelModule.class, DatabaseModule.class, H2Module.class })
 class PortofinoBootSupportTest {
@@ -58,6 +59,8 @@ class PortofinoBootSupportTest {
 		session.getTransaction().commit();
 		persistence.syncDataModel("hibernatetest");
 		persistence.initModel();
+		assertEquals("Database created",  1, persistence.getDatabases().size());
+		assertNotNull("Table1 entity", persistence.getTableAccessor("hibernatetest", "table1"));
 	}
 
 	@Autowired
