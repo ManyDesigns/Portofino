@@ -544,7 +544,7 @@
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link https://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link https://shiro.apache.org/static/1.9.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>
