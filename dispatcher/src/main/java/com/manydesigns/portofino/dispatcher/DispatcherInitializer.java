@@ -116,7 +116,7 @@ public abstract class DispatcherInitializer {
             }
             compositeConfiguration.addConfiguration(configuration);
         } else {
-            this.configuration.addConfiguration(new PropertiesConfiguration());
+            compositeConfiguration.addConfiguration(new PropertiesConfiguration());
             logger.debug("portofino.properties file not found in " + applicationRoot);
         }
         this.configuration = compositeConfiguration;

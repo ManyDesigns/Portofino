@@ -31,6 +31,7 @@ import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.database.model.ForeignKey;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.persistence.*;
+import com.manydesigns.portofino.persistence.hibernate.Events;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
@@ -42,19 +43,29 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Sel
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.beans.IntrospectionException;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.sse.OutboundSseEvent;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -279,6 +290,56 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @SuppressWarnings("unchecked")
     protected T loadObjectByPrimaryKey(Object pkObject) {
         return (T) collection.load(pkObject, this);
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Subscription
+    //--------------------------------------------------------------------------
+
+    @GET
+    @Path("subscribe")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void subscribe(@Context SseEventSink eventSink, @Context Sse sse) {
+        Table baseTable = getCrudConfiguration().getActualTable();
+        Events events = persistence.getDatabaseAccessor(baseTable.getDatabaseName()).getEvents();
+        // TODO filter according to query
+        subscribe(
+                events.postDelete$, eventSink,
+                event -> sse.newEvent("delete", idStrategy.getPkString(event.getId())));
+        subscribe(
+                events.postInsert$, eventSink,
+                event -> sse.newEvent("insert", idStrategy.getPkString(event.getId())));
+        subscribe(
+                events.postUpdate$, eventSink,
+                event -> sse.newEvent("update", idStrategy.getPkString(event.getId())));
+    }
+
+    protected <E> Disposable subscribe(
+            Observable<E> observable, SseEventSink eventSink, Function<E, OutboundSseEvent> eventFactory
+    ) {
+        AtomicReference<Disposable> subscriptionHolder = new AtomicReference<>();
+        return observable.subscribe(
+                hibernateEvent -> {
+                    OutboundSseEvent event = eventFactory.apply(hibernateEvent);
+                    eventSink.send(event).exceptionally(
+                            throwable -> handleSSEException(throwable, subscriptionHolder.get()));
+                },
+                throwable -> {},
+                eventSink::close,
+                subscriptionHolder::set);
+    }
+
+    @Nullable
+    protected  <T> T handleSSEException(Throwable throwable, Disposable subscription) {
+        // We have to unsubscribe if the SSE event output has been
+        // closed (either by client closing the connection (IOException) or by
+        // calling SseEventSink.close() (IllegalStateException) on the server
+        // side).
+        if (throwable instanceof IOException || throwable instanceof IllegalStateException) {
+            subscription.dispose();
+        }
+        return null;
     }
 
 }

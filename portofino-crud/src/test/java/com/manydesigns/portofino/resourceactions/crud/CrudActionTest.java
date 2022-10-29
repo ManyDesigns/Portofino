@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.resourceactions.crud;
 
+import com.fasterxml.jackson.core.util.JacksonFeature;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FileBlob;
@@ -41,6 +42,9 @@ import com.manydesigns.portofino.database.model.IncrementGenerator;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
+import com.manydesigns.portofino.dispatcher.security.ShiroResourceFilter;
+import com.manydesigns.portofino.dispatcher.web.ApplicationRoot;
+import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -48,14 +52,28 @@ import com.manydesigns.portofino.resourceactions.ActionContext;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
+import com.manydesigns.portofino.resourceactions.crud.export.CrudExporterRegistry;
+import com.manydesigns.portofino.resourceactions.crud.export.JSONExporter;
+import com.manydesigns.portofino.rest.messagebodywriters.FormMessageBodyWriter;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.media.sse.EventListener;
+import org.glassfish.jersey.media.sse.EventSource;
+import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
+import org.glassfish.jersey.test.DeploymentContext;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.ServletDeploymentContext;
+import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
+import org.glassfish.jersey.test.spi.TestContainerFactory;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
@@ -64,14 +82,20 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction.PORTOFINO_API_VERSION_5_2;
@@ -84,8 +108,9 @@ public class CrudActionTest extends JerseyTest {
     Persistence persistence;
 
     @BeforeClass
-    public void setupElements() {
+    public void setupElementsAndJersey() throws Exception {
         ElementsThreadLocals.setupDefaultElementsContext();
+        super.setUp();
     }
 
     @AfterClass
@@ -95,7 +120,7 @@ public class CrudActionTest extends JerseyTest {
 
     @BeforeMethod
     public void setup() throws Exception {
-        FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/resourceactions/crud/model");
+        FileObject appDir = VFS.getManager().resolveFile("res:com/manydesigns/portofino/resourceactions/crud/app");
         setup(appDir);
     }
 
@@ -120,9 +145,54 @@ public class CrudActionTest extends JerseyTest {
         persistence.stop();
     }
 
+    CrudAction testCrudAction;
+
     @Override
-    protected Application configure() {
-        return new ResourceConfig();
+    protected ResourceConfig configure() {
+        try {
+            setup();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        testCrudAction = makeTestCrudAction();
+        ActionInstance actionInstance = new ActionInstance(null, null, CrudAction.class);
+        ActionContext actionContext = new ActionContext();
+        MutableHttpServletRequest req = new MutableHttpServletRequest();
+        actionContext.setRequest(req);
+        actionContext.setServletContext(req.getServletContext());
+        actionContext.setActionPath("/test");
+        setUpCrudAction(testCrudAction, actionInstance, actionContext);
+        return new ResourceConfig(ApplicationRoot.class)
+                .register(JacksonFeature.class)
+                .register(FormMessageBodyWriter.class)
+                .register(testCrudAction);
+    }
+
+    @Override
+    protected void configureClient(ClientConfig config) {
+        super.configureClient(config);
+        config.property(ClientProperties.CONNECT_TIMEOUT, 15000);
+        config.property(ClientProperties.READ_TIMEOUT, 0);
+        config.property(ClientProperties.ASYNC_THREADPOOL_SIZE, 8);
+    }
+
+    @Override
+    protected TestContainerFactory getTestContainerFactory() {
+        return new GrizzlyWebTestContainerFactory();
+    }
+
+    @Override
+    protected DeploymentContext configureDeployment() {
+        try (FileObject appRoot = VFS.getManager().resolveFile(
+                "res:com/manydesigns/portofino/resourceactions/crud/app"
+        )) {
+            return ServletDeploymentContext.forServlet(new ServletContainer(configure())).
+                    contextParam("portofino.application.directory", appRoot.getURL().toString()).
+                    addListener(WebDispatcherInitializer.class).
+                    build();
+        } catch (FileSystemException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected void setupJPetStore() throws Exception {
@@ -158,7 +228,13 @@ public class CrudActionTest extends JerseyTest {
         persistence.initModel();
         CrudAction crudAction = makeTestCrudAction();
 
-        setUpCrudAction(crudAction, req);
+        ActionInstance actionInstance = new ActionInstance(null, null, CrudAction.class);
+        actionInstance.getParameters().add("1");
+        ActionContext actionContext = new ActionContext();
+        actionContext.setRequest(req);
+        actionContext.setActionPath("");
+        actionContext.setServletContext(req.getServletContext());
+        setUpCrudAction(crudAction, actionInstance, actionContext);
 
         crudAction.executeSearch();
         assertEquals(16, crudAction.getTotalSearchRecords());
@@ -213,7 +289,13 @@ public class CrudActionTest extends JerseyTest {
         Map category = query.list().get(0);
         req.setParameter("category", (String) category.get("catid"));
 
-        setUpCrudAction(crudAction, req);
+        ActionInstance actionInstance = new ActionInstance(null, null, CrudAction.class);
+        actionInstance.getParameters().add("1");
+        ActionContext actionContext = new ActionContext();
+        actionContext.setRequest(req);
+        actionContext.setActionPath("");
+        actionContext.setServletContext(req.getServletContext());
+        setUpCrudAction(crudAction, actionInstance, actionContext);
         crudAction.setupForm(Mode.CREATE);
 
         Field descnField = crudAction.getForm().findFieldByPropertyName("descn");
@@ -336,19 +418,11 @@ public class CrudActionTest extends JerseyTest {
         }
     }
 
-    private void setUpCrudAction(CrudAction crudAction, HttpServletRequest req) {
+    private void setUpCrudAction(CrudAction crudAction, ActionInstance actionInstance, ActionContext actionContext) {
         CrudConfiguration configuration = crudAction.getCrudConfiguration();
         configuration.persistence = persistence;
         configuration.init();
-
-        ActionInstance actionInstance = new ActionInstance(null, null, CrudAction.class);
         actionInstance.setConfiguration(configuration);
-        actionInstance.getParameters().add("1");
-        ActionContext actionContext = new ActionContext();
-        actionContext.setRequest(req);
-        actionContext.setActionPath("");
-        actionContext.setServletContext(req.getServletContext());
-
         crudAction.persistence = persistence;
         crudAction.portofinoConfiguration = new ConfigurationSource(null, null);
         crudAction.setContext(actionContext);
@@ -359,26 +433,14 @@ public class CrudActionTest extends JerseyTest {
 
     @NotNull
     private CrudAction makeTestCrudAction() {
-        CrudAction crudAction = new CrudAction() {
-            public void commitTransaction() {
-                super.commitTransaction();
-                collection.getSession().beginTransaction();
-            }
-
-            @NotNull
-            @Override
-            protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
-                return classAccessor; //Let's ignore Shiro
-            }
-
-            @Override
-            protected String getUrlEncoding() {
-                return PortofinoProperties.URL_ENCODING_DEFAULT;
-            }
-        };
+        CrudAction crudAction = new TestCrudAction();
         CrudConfiguration configuration = new CrudConfiguration();
         configuration.setDatabase("jpetstore");
         configuration.setQuery("from product");
+
+        CrudExporterRegistry registry = new CrudExporterRegistry();
+        registry.register(new JSONExporter());
+        crudAction.crudExporterRegistry = registry;
 
         CrudProperty property = new CrudProperty();
         property.setName("productid");
@@ -420,4 +482,41 @@ public class CrudActionTest extends JerseyTest {
         return crudAction;
     }
 
+    @Test
+    public void resource() {
+        String result = target("/test").request().get(String.class);
+/*        assertEquals(
+                "{\"recordsReturned\":16,\"totalRecords\":16,\"startIndex\":0,\"records\":[{\"__rowKey\":\"FI-SW-01\",\"productid\":{\"value\":\"FI-SW-01\",\"href\":\"http://localhost:9998null/test/FI-SW-01\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Angelfish\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish1.jpg\\\">Salt Water fish from Australia\"}},{\"__rowKey\":\"FI-SW-02\",\"productid\":{\"value\":\"FI-SW-02\",\"href\":\"http://localhost:9998null/test/FI-SW-02\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Tiger Shark\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish4.gif\\\">Salt Water fish from Australia\"}},{\"__rowKey\":\"FI-FW-01\",\"productid\":{\"value\":\"FI-FW-01\",\"href\":\"http://localhost:9998null/test/FI-FW-01\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Koi\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish3.gif\\\">Fresh Water fish from Japan\"}},{\"__rowKey\":\"FI-FW-02\",\"productid\":{\"value\":\"FI-FW-02\",\"href\":\"http://localhost:9998null/test/FI-FW-02\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Goldfish\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish2.gif\\\">Fresh Water fish from China\"}},{\"__rowKey\":\"K9-BD-01\",\"productid\":{\"value\":\"K9-BD-01\",\"href\":\"http://localhost:9998null/test/K9-BD-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Bulldog\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog2.gif\\\">Friendly dog from England\"}},{\"__rowKey\":\"K9-PO-02\",\"productid\":{\"value\":\"K9-PO-02\",\"href\":\"http://localhost:9998null/test/K9-PO-02\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Poodle\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog6.gif\\\">Cute dog from France\"}},{\"__rowKey\":\"K9-DL-01\",\"productid\":{\"value\":\"K9-DL-01\",\"href\":\"http://localhost:9998null/test/K9-DL-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Dalmation\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog5.gif\\\">Great dog for a Fire Station\"}},{\"__rowKey\":\"K9-RT-01\",\"productid\":{\"value\":\"K9-RT-01\",\"href\":\"http://localhost:9998null/test/K9-RT-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Golden Retriever\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog1.gif\\\">Great family dog\"}},{\"__rowKey\":\"K9-RT-02\",\"productid\":{\"value\":\"K9-RT-02\",\"href\":\"http://localhost:9998null/test/K9-RT-02\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Labrador Retriever\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog5.gif\\\">Great hunting dog\"}},{\"__rowKey\":\"K9-CW-01\",\"productid\":{\"value\":\"K9-CW-01\",\"href\":\"http://localhost:9998null/test/K9-CW-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Chihuahua\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog4.gif\\\">Great companion dog\"}},{\"__rowKey\":\"RP-SN-01\",\"productid\":{\"value\":\"RP-SN-01\",\"href\":\"http://localhost:9998null/test/RP-SN-01\"},\"category\":{\"value\":\"REPTILES\"},\"name\":{\"value\":\"Rattlesnake\"},\"descn\":{\"value\":\"<image src=\\\"../images/lizard3.gif\\\">Doubles as a watch dog\"}},{\"__rowKey\":\"RP-LI-02\",\"productid\":{\"value\":\"RP-LI-02\",\"href\":\"http://localhost:9998null/test/RP-LI-02\"},\"category\":{\"value\":\"REPTILES\"},\"name\":{\"value\":\"Iguana\"},\"descn\":{\"value\":\"<image src=\\\"../images/lizard2.gif\\\">Friendly green friend\"}},{\"__rowKey\":\"FL-DSH-01\",\"productid\":{\"value\":\"FL-DSH-01\",\"href\":\"http://localhost:9998null/test/FL-DSH-01\"},\"category\":{\"value\":\"CATS\"},\"name\":{\"value\":\"Manx\"},\"descn\":{\"value\":\"<image src=\\\"../images/cat3.gif\\\">Great for reducing mouse populations\"}},{\"__rowKey\":\"FL-DLH-02\",\"productid\":{\"value\":\"FL-DLH-02\",\"href\":\"http://localhost:9998null/test/FL-DLH-02\"},\"category\":{\"value\":\"CATS\"},\"name\":{\"value\":\"Persian\"},\"descn\":{\"value\":\"<image src=\\\"../images/cat1.gif\\\">Friendly house cat, doubles as a princess\"}},{\"__rowKey\":\"AV-CB-01\",\"productid\":{\"value\":\"AV-CB-01\",\"href\":\"http://localhost:9998null/test/AV-CB-01\"},\"category\":{\"value\":\"BIRDS\"},\"name\":{\"value\":\"Amazon Parrot\"},\"descn\":{\"value\":\"<image src=\\\"../images/bird4.gif\\\">Great companion for up to 75 years\"}},{\"__rowKey\":\"AV-SB-02\",\"productid\":{\"value\":\"AV-SB-02\",\"href\":\"http://localhost:9998null/test/AV-SB-02\"},\"category\":{\"value\":\"BIRDS\"},\"name\":{\"value\":\"Finch\"},\"descn\":{\"value\":\"<image src=\\\"../images/bird1.gif\\\">Great stress reliever\"}}]}",
+                result);*/
+
+        EventSource es = EventSource.target(target("/test/subscribe")).build();
+        List<InboundEvent> events = new ArrayList<>();
+        es.register(events::add);
+        es.open();
+        Response response = target("/test").request().post(Entity.entity(
+                "{\"productid\":\"new_prod_1\", \"name\":\"New Product 1\", \"category\":\"FISH\"}",
+                MediaType.APPLICATION_JSON_TYPE));
+        assertEquals(response.getStatus(), 201);
+        assertEquals(1, events.size());
+    }
+
+}
+
+@Path("/test")
+class TestCrudAction extends CrudAction {
+    public void commitTransaction() {
+        super.commitTransaction();
+        collection.getSession().beginTransaction();
+    }
+
+    @NotNull
+    @Override
+    protected ClassAccessor filterAccordingToPermissions(ClassAccessor classAccessor) {
+        return classAccessor; //Let's ignore Shiro
+    }
+
+    @Override
+    protected String getUrlEncoding() {
+        return PortofinoProperties.URL_ENCODING_DEFAULT;
+    }
 }

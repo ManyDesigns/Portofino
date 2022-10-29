@@ -1,12 +1,37 @@
 ## From database to REST API in 30 seconds
 
 Portofino 6 is the next generation of ManyDesigns Portofino, the result of decades of experience in model-driven, 
-less-code application frameworks.
+low-code application frameworks.
 
 Portofino connects to your databases, constructs an enriched model of your data, and exposes it with a REST API.
 
 Authentication and authorization are built-in (using Apache Shiro) or can be managed externally with your favorite 
 implementation. 
+
+## What sets Portofino apart
+
+Portofino is characterized by being **feature-rich, model-driven, and reflective**. Let's see what we mean by that.
+
+* **Feature-rich:** Portofino is the result of many years of production usage. If you encounter a problem, chances are 
+  that Portofino comes with a beaten path to arrive at a solution. Master-detail? Logical deletion of records? 
+  Viewing but not modifying historical data? We got you covered!
+* **Model-driven:** in traditional software applications, everything is code. User management? Code! Access to the 
+  database? Code! **Your business rules? Code.** Developers like that, because they can read code and reason about it. 
+  However, when you need answers to questions like, *when do we apply that discount?*, or, *where do we store user profiles, 
+  and who can look at them?*, then you'll need a developer to "decode the code" and reconstruct the answer.
+  **In Portofino, business information is stored in a high-level model of your application, not in code.** This model
+  is human-readable as text, and can easily be exported to other formats, including diagrams.
+* **Reflective:** traditional model-driven software engineering is heavily based on code generation. Someone authors the
+  model with specific tools, then generates the code, and finally developers work on the generated code.
+  This is not a lean process and it doesn't play well with agile development practices. Just adding a field on a form
+  may require authoring a new version of the model, running the code generator again, and having a developer add the 
+  field to the form. This may require different people, with different schedules, using different tools. 
+  And, in such a scenario, usually the generated code cannot consult the model – the information, again, is lost, too
+  "encoded" to be practically retrievable.
+  
+  Portofino, instead, doesn't do code generation – the model is consulted on the fly and it's authored directly in the
+  same application, either reverse-engineering changes to the database, or using command-line or GUI tools that are
+  familiar to developers.
 
 ### Built-in Data Access
 
