@@ -39,14 +39,7 @@ import javax.annotation.PreDestroy;
 */
 public class MssqlModule implements Module {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    @Autowired
-    public Configuration configuration;
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;

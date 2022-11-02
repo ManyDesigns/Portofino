@@ -114,33 +114,38 @@ public class PortofinoWebSpringConfiguration implements InitializingBean {
 
     protected void checkForNewVersion(String portofinoVersion, String versionCheckUrl) {
         String SEPARATOR = "--------------------------------------------------------------------------------";
-        Client client = ClientBuilder.newClient();
-        WebTarget target = client.target(versionCheckUrl).queryParam("version", portofinoVersion);
-        Future<Response> responseFuture = target.request().async().get();
-        Executors.newSingleThreadExecutor().submit(() -> {
-            try {
-                Response response = responseFuture.get();
-                if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
-                    String latestVersion = response.readEntity(String.class).trim();
-                    if (Objects.equals(portofinoVersion, latestVersion)) {
-                        logger.info("Your installation of Portofino is up-to-date");
+        try {
+            Client client = ClientBuilder.newClient();
+            WebTarget target = client.target(versionCheckUrl).queryParam("version", portofinoVersion);
+            Future<Response> responseFuture = target.request().async().get();
+            Executors.newSingleThreadExecutor().submit(() -> {
+                try {
+                    Response response = responseFuture.get();
+                    if (response.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL) {
+                        String latestVersion = response.readEntity(String.class).trim();
+                        if (Objects.equals(portofinoVersion, latestVersion)) {
+                            logger.info("Your installation of Portofino is up-to-date");
+                        } else {
+                            String lineSeparator = System.getProperty("line.separator", "\n");
+                            logger.info(lineSeparator + SEPARATOR + lineSeparator +
+                                    "A new version of Portofino is available: " + latestVersion +
+                                    lineSeparator + SEPARATOR);
+                        }
                     } else {
-                        String lineSeparator = System.getProperty("line.separator", "\n");
-                        logger.info(lineSeparator + SEPARATOR + lineSeparator +
-                                "A new version of Portofino is available: " + latestVersion +
-                                lineSeparator + SEPARATOR);
+                        logger.info("Version check failed: " + response.getStatus());
                     }
-                } else {
-                    logger.info("Version check failed: " + response.getStatus());
+                    String message = response.getHeaderString("X-Message");
+                    if (message != null) {
+                        logger.info(message);
+                    }
+                } catch (Exception e) {
+                    logger.info("Could not check for new version: " + e.getMessage());
+                    logger.debug("Additional information", e);
                 }
-                String message = response.getHeaderString("X-Message");
-                if (message != null) {
-                    logger.info(message);
-                }
-            } catch (Exception e) {
-                logger.info("Could not check for new version: " + e.getMessage());
-                logger.debug("Additional information", e);
-            }
-        });
+            });
+        } catch (Throwable e) {
+            logger.info("Could not check for new version: " + e.getMessage());
+            logger.debug("Additional information", e);
+        }
     }
 }

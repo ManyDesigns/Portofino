@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.platforms.GoogleCloudSQLDatabasePlatform;
 import com.manydesigns.portofino.liquibase.databases.GoogleCloudSQLDatabase;
 import com.manydesigns.portofino.liquibase.sqlgenerators.GoogleCloudSQLLockDatabaseChangeLogGenerator;
@@ -42,14 +43,14 @@ import javax.annotation.PreDestroy;
 */
 public class GooglecloudsqlModule implements Module {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
     @Autowired
-    public Configuration configuration;
+    public ConfigurationSource configuration;
 
     @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;
@@ -75,7 +76,7 @@ public class GooglecloudsqlModule implements Module {
 
     @PostConstruct
     public void init() {
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+        if(configuration.getProperties().getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
             logger.debug("Registering Google Cloud SQL");
             DatabaseFactory.getInstance().register(new GoogleCloudSQLDatabase());
             logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");

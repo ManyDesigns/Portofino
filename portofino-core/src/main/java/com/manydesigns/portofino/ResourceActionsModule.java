@@ -25,7 +25,6 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.model.Domain;
-import com.manydesigns.portofino.model.service.ModelModule;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
@@ -34,7 +33,6 @@ import com.manydesigns.portofino.resourceactions.custom.CustomAction;
 import com.manydesigns.portofino.resourceactions.form.FormAction;
 import com.manydesigns.portofino.resourceactions.form.TableFormAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
-import com.manydesigns.portofino.rest.PortofinoApplicationRoot;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.security.noop.login.NoOpLoginAction;
@@ -46,7 +44,6 @@ import org.apache.commons.vfs2.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -59,7 +56,6 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
-import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 /**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

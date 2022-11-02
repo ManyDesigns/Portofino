@@ -59,19 +59,9 @@ public class ModelModule implements Module, ApplicationListener<ContextRefreshed
 
     public static final int MODEL_LOAD = 100;
 
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.CONFIGURATION_SOURCE)
-    public ConfigurationSource configuration;
-
-    @Autowired
-    @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
-    public FileObject applicationDirectory;
-
-    @Autowired
-    public CodeBase codeBase;
+    public @Autowired ModelService modelService;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
-    protected ModelService modelService;
 
     public static final Logger logger = LoggerFactory.getLogger(ModelModule.class);
 
@@ -88,11 +78,6 @@ public class ModelModule implements Module, ApplicationListener<ContextRefreshed
     @PostConstruct
     public void init() {
         status = ModuleStatus.ACTIVE;
-    }
-
-    @Bean
-    public ModelService getModelService() throws IOException {
-        return modelService = new ModelService(applicationDirectory, configuration, codeBase);
     }
 
     @Bean(name = PORTOFINO_DOMAIN)

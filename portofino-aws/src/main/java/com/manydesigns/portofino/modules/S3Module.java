@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.blobs.S3BlobManagerFactory;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -13,12 +14,11 @@ public class S3Module implements Module {
     private ModuleStatus moduleStatus = ModuleStatus.STARTED;
 
     @Autowired
-    @Qualifier("com.manydesigns.portofino.portofinoConfiguration")
-    org.apache.commons.configuration2.Configuration configuration;
+    public ConfigurationSource configuration;
 
     @Bean
     public S3BlobManagerFactory getS3BlobManagerFactory() {
-        return new S3BlobManagerFactory(configuration);
+        return new S3BlobManagerFactory(configuration.getProperties());
     }
 
     @PostConstruct

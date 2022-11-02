@@ -30,12 +30,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-modules</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>

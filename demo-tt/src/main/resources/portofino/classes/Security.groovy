@@ -218,7 +218,7 @@ class Security extends AbstractPortofinoRealm {
         List<String> result = new ArrayList<String>()
         if (principal.admin) {
             result.add(ADMIN_GROUP_NAME);
-            result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
+            result.add(SecurityLogic.getAdministratorsGroup(configuration.properties))
         }
         if (principal.project_manager) {
             result.add(PROJECT_MANAGER_GROUP_NAME);

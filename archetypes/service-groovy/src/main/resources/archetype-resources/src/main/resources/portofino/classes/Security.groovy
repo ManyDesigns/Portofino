@@ -43,7 +43,7 @@ class Security extends AbstractPortofinoRealm {
     @Override
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         if (ADMIN_LOGIN.equals(principal)) {
-            return [ SecurityLogic.getAdministratorsGroup(portofinoConfiguration) ]
+            return [ SecurityLogic.getAdministratorsGroup(configuration.properties) ]
         } else {
             return []
         }

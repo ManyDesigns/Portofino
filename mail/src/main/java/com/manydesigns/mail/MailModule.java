@@ -27,6 +27,7 @@ import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ResourceActionsModule;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
@@ -62,7 +63,7 @@ public class MailModule implements Module, ApplicationContextAware {
     @Autowired
     public ServletContext servletContext;
     @Autowired
-    public Configuration configuration;
+    public ConfigurationSource configuration;
     @Autowired
     public ModelService modelService;
     @Autowired
@@ -93,14 +94,15 @@ public class MailModule implements Module, ApplicationContextAware {
     }
 
     @PostConstruct
-    public void init() throws Exception {
-        mailQueueSetup = new MailQueueSetup(configuration);
+    public void init() {
+        Configuration properties = configuration.getProperties();
+        mailQueueSetup = new MailQueueSetup(properties);
         mailQueueSetup.setup();
         maybeSetupQuartz();
 
-        if(configuration.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
+        if(properties.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
             modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
-                String segment = configuration.getString(
+                String segment = properties.getString(
                         MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
                 try {
                     PortofinoRoot root = ResourceActionsModule.getRootResource(

@@ -24,12 +24,15 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import io.reactivex.disposables.Disposable;
+import org.apache.commons.vfs2.FileObject;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigRegistry;
@@ -47,6 +50,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -227,15 +231,16 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     public static ApplicationContext setupGrandParentContext(PortofinoDispatcherInitializer initializer) {
         GenericApplicationContext grandParent = new GenericApplicationContext();
         grandParent.refresh();
-        grandParent.getBeanFactory().registerSingleton("codeBase", initializer.getCodeBase());
-        grandParent.getBeanFactory().registerSingleton(
-                PortofinoSpringConfiguration.APPLICATION_DIRECTORY, initializer.getApplicationRoot());
-        grandParent.getBeanFactory().registerSingleton(
-                PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, initializer.getConfiguration());
+        ConfigurableListableBeanFactory bf = grandParent.getBeanFactory();
+        bf.registerSingleton("codeBase", initializer.getCodeBase());
+        FileObject appDir = initializer.getApplicationRoot();
+        bf.registerSingleton(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, appDir);
         ConfigurationSource configSource =
                 new ConfigurationSource(initializer.getConfiguration(), initializer.getConfigurationFile());
-        grandParent.getBeanFactory().registerSingleton(PortofinoSpringConfiguration.CONFIGURATION_SOURCE, configSource);
-        grandParent.getBeanFactory().registerSingleton(PortofinoSpringConfiguration.DISPATCHER, initializer);
+        bf.registerSingleton(PortofinoSpringConfiguration.CONFIGURATION_SOURCE, configSource);
+        bf.registerSingleton(PortofinoSpringConfiguration.DISPATCHER, initializer);
+        ModelService modelService = new ModelService(appDir, configSource, initializer.getCodeBase());
+        bf.registerSingleton(PortofinoSpringConfiguration.MODEL_SERVICE, modelService);
         initializer.getConfiguration().addConfiguration(
                 new SpringEnvironmentConfiguration(grandParent.getEnvironment()));
         return grandParent;

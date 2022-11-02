@@ -103,7 +103,6 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
         serverInfo = new ServerInfo(servletContext);
         super.initWithServletContext(servletContext);
         servletContext.setAttribute(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, applicationRoot);
-        servletContext.setAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, configuration);
         servletContext.setAttribute(PortofinoSpringConfiguration.CONFIGURATION_SOURCE,
                 new ConfigurationSource(configuration, configurationFile));
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,10 +23,10 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.security.SecurityLogic;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -63,13 +63,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements PortofinoRealm {
-    public static final String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
+    public static final String copyright = "Copyright (C) 2005-2022 ManyDesigns srl";
 
     public static final String JWT_EXPIRATION_PROPERTY = "jwt.expiration";
     public static final String JWT_SECRET_PROPERTY = "jwt.secret";
 
     @Autowired
-    protected Configuration portofinoConfiguration;
+    protected ConfigurationSource configuration;
 
     @Autowired
     protected CodeBase codeBase;
@@ -146,7 +146,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
             throw new RuntimeException(e);
         }
         claims.put("serialized-principal", bytes.toByteArray());
-        int expireAfterMinutes = portofinoConfiguration.getInt(JWT_EXPIRATION_PROPERTY, 30);
+        int expireAfterMinutes = configuration.getProperties().getInt(JWT_EXPIRATION_PROPERTY, 30);
         return Jwts.builder().
                 setClaims(claims).
                 setExpiration(new DateTime().plusMinutes(expireAfterMinutes).toDate()).
@@ -188,7 +188,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     @NotNull
     protected Key getJWTKey() {
-        String secret = portofinoConfiguration.getString(JWT_SECRET_PROPERTY);
+        String secret = configuration.getProperties().getString(JWT_SECRET_PROPERTY);
         return new SecretKeySpec(Decoders.BASE64.decode(secret), SignatureAlgorithm.HS512.getJcaName());
     }
 
@@ -208,7 +208,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         Set<String> groups = getGroups(principal);
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
-        if(groups.contains(SecurityLogic.getAdministratorsGroup(portofinoConfiguration))) {
+        if(groups.contains(SecurityLogic.getAdministratorsGroup(configuration.getProperties()))) {
             info.addStringPermission("*");
         }
         Permission permission = new GroupPermission(groups);
@@ -220,11 +220,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     @NotNull
     public Set<String> getGroups(Object principal) {
         Set<String> groups = new HashSet<>();
-        groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
+        groups.add(SecurityLogic.getAllGroup(configuration.getProperties()));
         if (principal == null) {
-            groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
+            groups.add(SecurityLogic.getAnonymousGroup(configuration.getProperties()));
         } else if (principal instanceof Serializable) {
-            groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));
+            groups.add(SecurityLogic.getRegisteredGroup(configuration.getProperties()));
             groups.addAll(loadAuthorizationInfo((Serializable) principal));
         } else {
             throw new AuthorizationException("Invalid principal: " + principal);
@@ -254,10 +254,10 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     public Set<String> getGroups() {
         Set<String> groups = new LinkedHashSet<>();
-        groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
-        groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
-        groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));
-        groups.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
+        groups.add(SecurityLogic.getAllGroup(configuration.getProperties()));
+        groups.add(SecurityLogic.getAnonymousGroup(configuration.getProperties()));
+        groups.add(SecurityLogic.getRegisteredGroup(configuration.getProperties()));
+        groups.add(SecurityLogic.getAdministratorsGroup(configuration.getProperties()));
         return groups;
     }
 

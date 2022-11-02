@@ -24,6 +24,7 @@ import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.spring.SpringBootResourceFileProvider;
 import com.manydesigns.portofino.spring.SpringEnvironmentConfiguration;
@@ -50,7 +51,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
+import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.*;
 
 /** Import this configuration in a Spring Boot application to support configuring Portofino modules
  * such as persistence.
@@ -67,7 +68,7 @@ public class PortofinoSupport implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    @Bean(name = PortofinoSpringConfiguration.CONFIGURATION_SOURCE)
+    @Bean(name = CONFIGURATION_SOURCE)
     public ConfigurationSource getConfiguration(@Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject appDir)
             throws FileSystemException, ConfigurationException {
         CompositeConfiguration configuration = new CompositeConfiguration();
@@ -101,6 +102,14 @@ public class PortofinoSupport implements ApplicationContextAware {
             throw new FileNotFolderException(fileObject);
         }
         return fileObject;
+    }
+
+    @Bean(name = MODEL_SERVICE)
+    public ModelService getModelService(
+            @Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject appDir,
+            @Autowired @Qualifier(CONFIGURATION_SOURCE) ConfigurationSource configuration,
+            @Autowired CodeBase codeBase) {
+        return new ModelService(appDir, configuration, codeBase);
     }
 
     @Bean

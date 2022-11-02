@@ -38,11 +38,11 @@ import com.manydesigns.mail.queue.model.Email
 import com.manydesigns.mail.queue.model.Recipient
 import com.manydesigns.mail.queue.model.Recipient.Type
 import com.manydesigns.mail.setup.MailProperties
+import com.manydesigns.portofino.config.ConfigurationSource
 import com.manydesigns.portofino.i18n.I18nUtils
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration
-import org.apache.commons.configuration2.Configuration
 import org.hibernate.Session
 import org.quartz.DisallowConcurrentExecution
 import org.quartz.Job
@@ -75,8 +75,8 @@ public class NotificationsJob implements Job {
     public ServletContext servletContext
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration
+    @Qualifier(PortofinoSpringConfiguration.CONFIGURATION_SOURCE)
+    public ConfigurationSource configuration
 
     @Autowired
     Persistence persistence
@@ -93,10 +93,10 @@ public class NotificationsJob implements Job {
                 new MutableHttpServletRequest();
             ElementsThreadLocals.setHttpServletRequest(request);
             I18nUtils.setupTextProvider(servletContext, request);
-            request.setScheme(configuration.getString(TtUtils.BASE_URL_SCHEME_PROPERTY, "http"));
-            request.setServerName(configuration.getString(TtUtils.BASE_URL_SERVER_NAME_PROPERTY, "localhost"));
-            request.setServerPort(configuration.getInt(TtUtils.BASE_URL_SERVER_PORT_PROPERTY, 8080));
-            request.setContextPath(configuration.getString(TtUtils.BASE_URL_CONTEXT_PATH_PROPERTY, "/demo-tt"));
+            request.setScheme(configuration.properties.getString(TtUtils.BASE_URL_SCHEME_PROPERTY, "http"));
+            request.setServerName(configuration.properties.getString(TtUtils.BASE_URL_SERVER_NAME_PROPERTY, "localhost"));
+            request.setServerPort(configuration.properties.getInt(TtUtils.BASE_URL_SERVER_PORT_PROPERTY, 8080));
+            request.setContextPath(configuration.properties.getString(TtUtils.BASE_URL_CONTEXT_PATH_PROPERTY, "/demo-tt"));
 
             Session session = persistence.getSession("tt");
 
@@ -168,7 +168,7 @@ public class NotificationsJob implements Job {
             email.htmlBody = htmlBody
             Recipient recipient = new Recipient(Type.TO, user.email)
             email.recipients.add(recipient)
-            String sender = configuration.getString(MailProperties.MAIL_SMTP_LOGIN)
+            String sender = configuration.properties.getString(MailProperties.MAIL_SMTP_LOGIN)
             email.from = sender
             mailQueue.enqueue(email)
         }
