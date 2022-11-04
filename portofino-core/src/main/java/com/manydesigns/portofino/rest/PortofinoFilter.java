@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -38,6 +38,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.annotation.Priority;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.ConstrainedTo;
@@ -60,10 +61,11 @@ import static javax.ws.rs.core.Response.Status.CONFLICT;
  */
 @Provider
 @ConstrainedTo(RuntimeType.SERVER)
+@Priority(PortofinoFilter.PRIORITY)
 public class PortofinoFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     public static final String ACCESS_LOGGER_NAME = "com.manydesigns.portofino.access";
     public static final String MESSAGE_HEADER = "X-Portofino-Message";
@@ -71,6 +73,8 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     private static final Logger logger = LoggerFactory.getLogger(PortofinoFilter.class);
     private static final Logger accessLogger = LoggerFactory.getLogger(ACCESS_LOGGER_NAME);
     public static final String PORTOFINO_API_VERSION = "5.2";
+
+    public static final int PRIORITY = 6000; //Priorities.USER + 1000;
 
     @Context
     protected ResourceInfo resourceInfo;
