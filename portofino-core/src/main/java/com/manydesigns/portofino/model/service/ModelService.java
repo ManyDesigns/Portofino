@@ -35,7 +35,6 @@ public class ModelService {
     protected final FileObject applicationDirectory;
     protected final ConfigurationSource configuration;
     protected final List<Domain> systemDomains = new CopyOnWriteArrayList<>();
-    protected final List<Domain> transientDomains = new CopyOnWriteArrayList<>();
     protected final CodeBase codeBase;
     private static final Logger logger = LoggerFactory.getLogger(ModelService.class);
 
@@ -78,10 +77,7 @@ public class ModelService {
     }
 
     public synchronized void saveModel() throws IOException, ConfigurationException {
-        Model toSave = new Model();
-        toSave.getDomains().addAll(model.getDomains());
-        toSave.getDomains().removeAll(transientDomains);
-        getDefaultModelIO().save(toSave);
+        getDefaultModelIO().save(model);
         if (configuration.isWritable()) {
             configuration.save();
         }
@@ -94,9 +90,6 @@ public class ModelService {
     }
 
     public synchronized void saveDomain(Domain domain) throws IOException {
-        if (isTransient(domain)) {
-            throw new UnsupportedOperationException(domain.getQualifiedName() + " is transient");
-        }
         getDefaultModelIO().save(domain);
     }
 
@@ -105,42 +98,22 @@ public class ModelService {
         if (!(pkg instanceof Domain)) {
             throw new UnsupportedOperationException(entity + " does not belong to a domain");
         }
-        Domain domain = (Domain) pkg;
-        if (isTransient(domain)) {
-            throw new UnsupportedOperationException(domain.getQualifiedName() + " is transient");
-        }
         getDefaultModelIO().save(entity);
     }
 
     public synchronized void saveObject(Domain domain, String name) throws IOException {
-        if (isTransient(domain)) {
-            throw new UnsupportedOperationException(domain.getQualifiedName() + " is transient");
-        }
         getDefaultModelIO().saveObject(domain, name);
     }
 
-    public boolean isTransient(Domain domain) {
-        return transientDomains.contains(domain) ||
-                (domain.eContainer() instanceof Domain && isTransient((Domain) domain.eContainer()));
-    }
-
-    public synchronized Domain ensureTopLevelDomain(String name, boolean persist) {
+    public synchronized Domain ensureSystemDomain(String name) {
         Optional<Domain> any = model.getDomains().stream().filter(d -> d.getName().equals(name)).findAny();
         Domain domain;
         if (any.isPresent()) {
             logger.debug("Not adding domain " + name + " because it's already present");
-            Domain existing = any.get();
-            if (persist) {
-                // TODO merge domains?
-                transientDomains.remove(existing);
-            }
-            return existing;
+            return any.get();
         } else {
             domain = new Domain(name);
             model.getDomains().add(domain);
-        }
-        if (!persist) {
-            transientDomains.add(domain);
         }
         systemDomains.add(domain);
         return domain;
@@ -271,7 +244,7 @@ public class ModelService {
     }
 
     public Domain getPortofinoDomain() {
-        return ensureTopLevelDomain("portofino", false);
+        return ensureSystemDomain("portofino");
     }
 
 }

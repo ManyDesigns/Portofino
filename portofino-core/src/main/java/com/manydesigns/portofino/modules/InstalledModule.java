@@ -2,7 +2,9 @@ package com.manydesigns.portofino.modules;
 
 public class InstalledModule {
 
-    protected final String version;
+    protected String version;
+
+    public InstalledModule() {}
 
     public InstalledModule(String version) {
         this.version = version;
@@ -10,5 +12,9 @@ public class InstalledModule {
 
     public String getVersion() {
         return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

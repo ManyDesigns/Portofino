@@ -165,7 +165,7 @@ public class Persistence {
     }
 
     protected Domain getDatabaseDomain() {
-        return modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, true);
+        return modelService.ensureSystemDomain(DATABASES_DOMAIN_NAME);
     }
 
     protected EList<Domain> getDatabaseDomains() {

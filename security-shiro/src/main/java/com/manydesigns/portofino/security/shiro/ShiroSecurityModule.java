@@ -175,7 +175,8 @@ public class ShiroSecurityModule implements
         try {
             LifecycleUtils.init(realm);
         } catch (Exception e) {
-            logger.warn("Security class not found or invalid or initialization failed. " +
+            logger.warn(
+                    "Security class not found or invalid or initialization failed. " +
                     "We will reload and/or initialize it on next use.", e);
         }
     }

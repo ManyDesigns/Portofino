@@ -61,6 +61,7 @@ public class DefaultModelIO implements ModelIO {
     public synchronized Model load() throws IOException {
         logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
         Model model = new Model();
+        //TODO merge/check system domains?
         model.getDomains().addAll(systemDomains);
         FileObject modelDir = getModelDirectory();
         if(!modelDirectory.exists()) {

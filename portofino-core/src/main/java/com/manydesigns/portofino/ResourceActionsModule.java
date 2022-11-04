@@ -52,7 +52,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
@@ -154,7 +153,7 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
         root.servletContext = servletContext;
         root.modelService = modelService;
         root.actionsDirectory = actionsDirectory;
-        root.actionsDomain = modelService.ensureTopLevelDomain(ACTIONS_DOMAIN_NAME, true);
+        root.actionsDomain = modelService.ensureSystemDomain(ACTIONS_DOMAIN_NAME);
         root.applicationContext = applicationContext;
         return root.init();
     }
@@ -180,7 +179,7 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
     @Bean(name = ACTIONS_DOMAIN)
     @Scope("prototype")
     public Domain getActionsDomain() {
-        return modelService.ensureTopLevelDomain(ACTIONS_DOMAIN_NAME, true);
+        return modelService.ensureSystemDomain(ACTIONS_DOMAIN_NAME);
     }
 
     protected void preloadResourceActions(FileObject directory, ResourceResolver resourceResolver) throws FileSystemException {
