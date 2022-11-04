@@ -24,6 +24,10 @@ import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
+import com.manydesigns.portofino.dispatcher.resolvers.CachingResourceResolver;
+import com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver;
+import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
+import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.InstallableModule;
@@ -86,7 +90,7 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
     public CacheResetListenerRegistry cacheResetListenerRegistry;
     @Autowired
     public ModelService modelService;
-    @Autowired
+    @Autowired(required = false)
     public PortofinoDispatcherInitializer dispatcherInitializer;
 
     protected ApplicationContext applicationContext;
@@ -112,12 +116,14 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
         //noinspection SpringConfigurationProxyMethods - @PostConstruct init() is a lifecycle method, it cannot have arguments
         FileObject actionsDirectory = getActionsDirectory(configuration, applicationDirectory);
         logger.info("Actions directory: " + actionsDirectory);
-        //TODO ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(actionsDirectory);
+        if (!actionsDirectory.exists()) {
+            actionsDirectory.createFolder();
+        }
 
         if(configuration.getProperties().getBoolean(PortofinoProperties.PRELOAD_ACTIONS, false)) {
             logger.info("Preloading resource-actions");
             try {
-                ResourceResolver resourceResolver = dispatcherInitializer.getResourceResolver();
+                ResourceResolver resourceResolver = getResourceResolver();
                 preloadResourceActions(actionsDirectory, resourceResolver);
             } catch (Exception e) {
                 logger.warn("Could not preload actions", e);
@@ -131,13 +137,24 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
         modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
             try {
                 PortofinoRoot root = getRootResource(
-                        actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                        actionsDirectory, getResourceResolver(),
                         servletContext, applicationContext, modelService);
                 SecurityLogic.installLogin(root, configuration.getProperties(), NoOpLoginAction.class);
             } catch (Exception e) {
                 logger.error("Could not install login class", e);
             }
         });
+    }
+
+    private ResourceResolver getResourceResolver() {
+        if (dispatcherInitializer != null) {
+            return dispatcherInitializer.getResourceResolver();
+        } else {
+            ResourceResolvers resourceResolver = new ResourceResolvers();
+            resourceResolver.resourceResolvers.add(new JavaResourceResolver());
+            resourceResolver.resourceResolvers.add(new CachingResourceResolver(new JacksonResourceResolver()));
+            return resourceResolver;
+        }
     }
 
     @Override

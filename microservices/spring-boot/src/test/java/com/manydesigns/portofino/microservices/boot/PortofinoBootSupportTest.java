@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.microservices.boot;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.model.service.ModelModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.modules.H2Module;
@@ -10,8 +11,14 @@ import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,8 +29,19 @@ import java.util.Map;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
-@SpringBootTest(classes = { PortofinoSupport.class, ModelModule.class, DatabaseModule.class, H2Module.class })
+@SpringBootTest(
+		classes = {
+				PortofinoSupport.class, ModelModule.class, DatabaseModule.class, H2Module.class,
+				ResourceActionsModule.class
+		},
+		properties = { "spring.jersey.type=filter", "spring.jersey.application-path=/" },
+		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
+@EnableAutoConfiguration
 class PortofinoBootSupportTest {
+
+	@LocalServerPort
+	public int port;
 
 	@Test
 	void contextLoads() {
@@ -31,7 +49,7 @@ class PortofinoBootSupportTest {
 	}
 
 	@Test
-	void canRunQuery() throws Exception {
+	public void canRunQuery() throws Exception {
 		ElementsThreadLocals.setupDefaultElementsContext();
 		setupTestDb();
 
@@ -61,6 +79,14 @@ class PortofinoBootSupportTest {
 		persistence.initModel();
 		assertEquals("Database created",  1, persistence.getDatabases().size());
 		assertNotNull("Table1 entity", persistence.getTableAccessor("hibernatetest", "table1"));
+	}
+
+	@Test
+	public void canInvokeRootResource() {
+		Client client = ClientBuilder.newClient();
+		WebTarget target = client.target("http://localhost:" + port);
+		Response response = target.request().get();
+		assertEquals("HTTP OK", 200, response.getStatus());
 	}
 
 	@Autowired
