@@ -167,9 +167,10 @@ public class SecurityLogic {
         String loginPath;
         if(relLoginPath != null) {
             if (relLoginPath.startsWith("/")) {
-                relLoginPath = relLoginPath.substring(1);
+                loginPath = "file:" + relLoginPath.substring(1);
+            } else {
+                loginPath = "file:" + relLoginPath;
             }
-            loginPath = actionsDirectory.resolveFile(relLoginPath).getName().getURI();
         } else {
             loginPath = "res:" + fallbackLoginClass.getPackage().getName().replace('.', '/');
         }

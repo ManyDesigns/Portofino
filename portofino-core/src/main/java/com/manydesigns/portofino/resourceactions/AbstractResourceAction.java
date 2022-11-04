@@ -29,6 +29,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.actions.*;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
@@ -52,6 +53,7 @@ import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 
 import javax.servlet.ServletContext;
@@ -94,6 +96,9 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected CodeBase codeBase;
     @Autowired
     protected ActionRegistry actionRegistry;
+    @Autowired
+    @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
+    public FileObject actionsDirectory;
     @Autowired
     protected ApplicationContext applicationContext;
     @Autowired(required = false)
@@ -176,7 +181,12 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
         Optional<AdditionalChild> child = getAdditionalChild(pathSegment);
         if(child.isPresent()) {
-            return VFS.getManager().resolveFile(child.get().getPath());
+            String path = child.get().getPath();
+            if (path.startsWith("file:")) {
+                return actionsDirectory.resolveFile(path.substring("file:".length()));
+            } else {
+                return VFS.getManager().resolveFile(child.get().getPath());
+            }
         }
         return super.getChildLocation(pathSegment);
     }
