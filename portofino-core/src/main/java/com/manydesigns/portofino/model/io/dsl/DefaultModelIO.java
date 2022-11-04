@@ -36,7 +36,7 @@ public class DefaultModelIO implements ModelIO {
 
     private final FileObject modelDirectory;
     private final List<ToLink> toLinkQueue = new ArrayList<>();
-    private final List<Domain> transientDomains;
+    private final List<Domain> systemDomains;
 
     private static class ToLink {
         final ParseTree parseTree;
@@ -48,9 +48,9 @@ public class DefaultModelIO implements ModelIO {
         }
     }
 
-    public DefaultModelIO(FileObject modelDirectory, List<Domain> transientDomains) {
+    public DefaultModelIO(FileObject modelDirectory, List<Domain> systemDomains) {
         this.modelDirectory = modelDirectory;
-        this.transientDomains = transientDomains;
+        this.systemDomains = systemDomains;
     }
 
     public DefaultModelIO(FileObject modelDirectory) {
@@ -61,7 +61,7 @@ public class DefaultModelIO implements ModelIO {
     public synchronized Model load() throws IOException {
         logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
         Model model = new Model();
-        model.getDomains().addAll(transientDomains);
+        model.getDomains().addAll(systemDomains);
         FileObject modelDir = getModelDirectory();
         if(!modelDirectory.exists()) {
             return model;
@@ -95,7 +95,7 @@ public class DefaultModelIO implements ModelIO {
             });
         } else {
             domain = model.ensureDomain(domainName);
-            if (transientDomains.contains(domain)) {
+            if (systemDomains.contains(domain)) {
                 logger.warn("Skipping domain " + domainDir.getPath() + " because it's transient");
                 return;
             }
@@ -183,7 +183,7 @@ public class DefaultModelIO implements ModelIO {
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 EObject object =
                         new ModelObjectBuilderVisitor(model, domain).visitStandaloneObject(parseTree);
-                domain.addObject(parseTree.object().name.getText(), object);
+                domain.putObject(parseTree.object().name.getText(), object);
             }
         } catch (Exception e) {
             String msg = "Could not load resource: " + file.getName().getURI();

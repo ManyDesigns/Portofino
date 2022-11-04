@@ -26,6 +26,7 @@ import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
+import com.manydesigns.portofino.modules.InstallableModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
@@ -55,6 +56,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
+import java.beans.IntrospectionException;
+
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 
 /**
@@ -63,7 +66,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPL
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ResourceActionsModule implements Module, ApplicationContextAware {
+public class ResourceActionsModule extends InstallableModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
@@ -89,8 +92,6 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
 
     protected ApplicationContext applicationContext;
 
-    protected ModuleStatus status = ModuleStatus.CREATED;
-
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -108,8 +109,7 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
         return "ResourceActions";
     }
 
-    @PostConstruct
-    public void init() throws Exception {
+    public void start() throws Exception {
         //noinspection SpringConfigurationProxyMethods - @PostConstruct init() is a lifecycle method, it cannot have arguments
         FileObject actionsDirectory = getActionsDirectory(configuration, applicationDirectory);
         logger.info("Actions directory: " + actionsDirectory);
@@ -129,8 +129,6 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
             preloadClasses(codeBase.getRoot());
         }
 
-        modelService.addBuiltInClass(ResourceActionConfiguration.class);
-
         modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
             try {
                 PortofinoRoot root = getRootResource(
@@ -141,8 +139,11 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
                 logger.error("Could not install login class", e);
             }
         });
+    }
 
-        status = ModuleStatus.STARTED;
+    @Override
+    protected void doInstall() throws IntrospectionException {
+        modelService.addBuiltInClass(ResourceActionConfiguration.class);
     }
 
     public static synchronized PortofinoRoot getRootResource(
@@ -228,11 +229,6 @@ public class ResourceActionsModule implements Module, ApplicationContextAware {
     @PreDestroy
     public void destroy() {
         status = ModuleStatus.DESTROYED;
-    }
-
-    @Override
-    public ModuleStatus getStatus() {
-        return status;
     }
 
     @Override

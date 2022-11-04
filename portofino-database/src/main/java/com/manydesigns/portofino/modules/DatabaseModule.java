@@ -97,7 +97,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @PostConstruct
     public void init() {
-        status = ModuleStatus.ACTIVE;
+        status = ModuleStatus.STARTED;
     }
 
     @Autowired

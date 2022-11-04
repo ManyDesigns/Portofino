@@ -77,7 +77,7 @@ public class ModelModule implements Module, ApplicationListener<ContextRefreshed
 
     @PostConstruct
     public void init() {
-        status = ModuleStatus.ACTIVE;
+        status = ModuleStatus.STARTED;
     }
 
     @Bean(name = PORTOFINO_DOMAIN)

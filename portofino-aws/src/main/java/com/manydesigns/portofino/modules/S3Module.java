@@ -23,7 +23,7 @@ public class S3Module implements Module {
 
     @PostConstruct
     public void init() {
-        moduleStatus = ModuleStatus.ACTIVE;
+        moduleStatus = ModuleStatus.STARTED;
     }
 
     @PreDestroy

@@ -8,10 +8,6 @@ import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.io.ModelIO;
 import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
 import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.PublishSubject;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -38,6 +34,7 @@ public class ModelService {
     public static final String APP_MODEL_DIRECTORY = "portofino-model";
     protected final FileObject applicationDirectory;
     protected final ConfigurationSource configuration;
+    protected final List<Domain> systemDomains = new CopyOnWriteArrayList<>();
     protected final List<Domain> transientDomains = new CopyOnWriteArrayList<>();
     protected final CodeBase codeBase;
     private static final Logger logger = LoggerFactory.getLogger(ModelService.class);
@@ -93,7 +90,7 @@ public class ModelService {
 
     @NotNull
     public DefaultModelIO getDefaultModelIO() throws FileSystemException {
-        return new DefaultModelIO(getModelDirectory(), transientDomains);
+        return new DefaultModelIO(getModelDirectory(), systemDomains);
     }
 
     public synchronized void saveDomain(Domain domain) throws IOException {
@@ -145,6 +142,7 @@ public class ModelService {
         if (!persist) {
             transientDomains.add(domain);
         }
+        systemDomains.add(domain);
         return domain;
     }
 
@@ -225,14 +223,19 @@ public class ModelService {
 
     @NotNull
     private Optional<EClassifier> getDataType(Class<?> type) {
-        Optional<EClassifier> builtin =
-                EcorePackage.eINSTANCE.getEClassifiers().stream().filter(t -> type.equals(t.getInstanceClass())).findFirst();
-        return builtin;
+        return EcorePackage.eINSTANCE.getEClassifiers().stream().filter(
+                t -> type.equals(t.getInstanceClass())
+        ).findFirst();
     }
 
     public Object getJavaObject(Domain domain, String name) throws Exception {
         EObject eObject = domain.getObjects().get(name);
         return toJavaObject(eObject);
+    }
+
+    public EObject putJavaObject(Domain domain, String name, Object object)
+            throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        return domain.putObject(name, object, getClassesDomain());
     }
 
     @Nullable

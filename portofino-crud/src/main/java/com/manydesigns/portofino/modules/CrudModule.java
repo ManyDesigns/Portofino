@@ -43,7 +43,7 @@ import java.beans.IntrospectionException;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class CrudModule implements Module {
+public class CrudModule extends InstallableModule {
     public static final String copyright =
             "Copyright (C) 2005-2022 ManyDesigns srl";
 
@@ -79,15 +79,18 @@ public class CrudModule implements Module {
         return registry;
     }
 
-    @PostConstruct
-    public void init() throws IntrospectionException {
+    @Override
+    protected void doInstall() throws Exception {
         modelService.addBuiltInClass(CrudConfiguration.class);
         modelService.addBuiltInClass(
                 com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration.class);
         modelService.addBuiltInClass(ManyToManyConfiguration.class);
+    }
+
+    @Override
+    protected void start() {
         actionRegistry.register(CrudAction.class);
         actionRegistry.register(ManyToManyAction.class);
-        status = ModuleStatus.STARTED;
     }
 
     @PreDestroy

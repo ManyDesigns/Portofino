@@ -55,13 +55,20 @@ public class Domain extends EPackageImpl {
         return objects;
     }
 
-    public void addObject(String name, EObject object) {
+    public void putObject(String name, EObject object) {
         if(getObjects().containsKey(name)) {
             throw new RuntimeException("Object already present: " + name + " in domain " + getName());
         }
         getObjects().put(name, object);
     }
 
+    /**
+     * Registers an object under a given name.
+     * @param name the name of the object.
+     * @param javaObject the object. To be stored in the model, it has to be translated to a model object.
+     * @param domain the {@link Domain} containing the entity definitions necessary to model the object.
+     * @return the object translated to a model object.
+     */
     public EObject putObject(String name, Object javaObject, Domain domain)
             throws IntrospectionException, InvocationTargetException, IllegalAccessException {
         EObject object = toEObject(javaObject, domain);
