@@ -36,7 +36,7 @@ import javax.servlet.DispatcherType;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureAfter(ServletWebServerFactoryAutoConfiguration.class)
-public class PortofinoDispatcherAutoConfiguration {
+public class ElementsAutoConfiguration {
 
     @Bean
     public FilterRegistrationBean<ElementsFilter> getElementsFilter() {

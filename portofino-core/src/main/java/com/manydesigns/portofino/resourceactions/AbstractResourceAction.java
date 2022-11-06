@@ -293,6 +293,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return security;
     }
 
+    public void setSecurity(SecurityFacade security) {
+        this.security = security;
+    }
+
     @Override
     public void setContext(ActionContext context) {
         this.context = context;

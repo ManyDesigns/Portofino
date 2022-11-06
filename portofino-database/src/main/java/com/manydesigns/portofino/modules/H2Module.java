@@ -22,7 +22,6 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.database.platforms.DatabasePlatformsRegistry;
-import org.apache.commons.configuration2.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -37,9 +36,6 @@ import javax.annotation.PreDestroy;
 public class H2Module implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    @Autowired
-    public Configuration configuration;
 
     @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;

@@ -121,7 +121,7 @@
         <!-- Microservice implementation. Note that this does NOT include Groovy. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-spring-boot-with-dispatcher</artifactId>
+            <artifactId>portofino-spring-boot</artifactId>
             <version>${portofino.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -170,6 +170,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring.boot.version}</version>
         </dependency>
         <!-- Security using Apache Shiro -->

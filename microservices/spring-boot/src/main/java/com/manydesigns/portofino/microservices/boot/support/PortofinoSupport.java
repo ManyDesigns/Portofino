@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.microservices.boot;
+package com.manydesigns.portofino.microservices.boot.support;
 
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
