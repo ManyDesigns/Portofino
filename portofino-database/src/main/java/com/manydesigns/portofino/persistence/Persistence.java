@@ -71,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.*;
 
@@ -91,6 +92,7 @@ public class Persistence {
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
     public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
     public static final String DATABASES_DOMAIN_NAME = "databases";
+    public static final String LEGACY_MODEL_DIRECTORY = "portofino-model";
 
     //**************************************************************************
     // Fields
@@ -106,7 +108,6 @@ public class Persistence {
     protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
     public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
-    protected Disposable modelEventsSubscription;
     protected boolean convertLegacyModel = true; // If false (during testing), don't delete the legacy model
 
     public enum Status {
@@ -133,8 +134,10 @@ public class Persistence {
     protected boolean tryLoadingLegacyModel() {
         synchronized (modelService) {
             try {
-                XMLModel modelIO = new XMLModel(modelService.getModelDirectory(), this);
-                Model model = modelService.loadModel(modelIO);
+                FileObject modelDirectory =
+                        modelService.getApplicationDirectory().resolveFile(LEGACY_MODEL_DIRECTORY);
+                XMLModel modelIO = new XMLModel(modelDirectory, this);
+                Model model = modelIO.load();
                 if(model != null) {
                     modelIO.getDatabases().forEach(
                             newDb -> {
@@ -147,11 +150,10 @@ public class Persistence {
                                 getDatabaseDomains().add(newDb.getModelElement());
                                 databases.add(newDb);
                             });
-
                     logger.info("Loaded legacy XML model");
                     initModel();
                     if (convertLegacyModel) {
-                        modelService.saveModel();
+                        saveModel();
                         modelIO.delete();
                         logger.info("Converted legacy XML model to the new format");
                     }
@@ -164,8 +166,16 @@ public class Persistence {
         return false;
     }
 
+    public void saveModel() throws IOException {
+        modelService.saveDomain(getDatabaseDomain());
+    }
+
     protected Domain getDatabaseDomain() {
-        return modelService.ensureSystemDomain(DATABASES_DOMAIN_NAME);
+        try {
+            return modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, !convertLegacyModel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected EList<Domain> getDatabaseDomains() {
@@ -570,12 +580,9 @@ public class Persistence {
 
     public void start() {
         status.onNext(Status.STARTING);
-        tryLoadingLegacyModel();
-        modelEventsSubscription = modelService.modelEvents.subscribe(evt -> {
-            if(evt == ModelService.EventType.LOADED) {
-                initModel();
-            }
-        });
+        if (!tryLoadingLegacyModel()) {
+            initModel();
+        }
         for(Database database : databases) {
             if(ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 runLiquibase(database);
@@ -587,9 +594,6 @@ public class Persistence {
     public void stop() {
         status.onNext(Status.STOPPING);
         closeSessions();
-        if (modelEventsSubscription != null) {
-            modelEventsSubscription.dispose();
-        }
         for(DatabaseAccessor accessor : accessors.values()) {
             accessor.dispose();
         }

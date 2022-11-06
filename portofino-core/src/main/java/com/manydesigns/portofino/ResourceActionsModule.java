@@ -30,7 +30,7 @@ import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
-import com.manydesigns.portofino.modules.InstallableModule;
+import com.manydesigns.portofino.modules.ManagedModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
@@ -60,6 +60,7 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
 import java.beans.IntrospectionException;
+import java.io.IOException;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 
@@ -69,7 +70,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPL
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ResourceActionsModule extends InstallableModule implements Module, ApplicationContextAware {
+public class ResourceActionsModule extends ManagedModule implements Module, ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
@@ -112,7 +113,7 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
         return "ResourceActions";
     }
 
-    public void start() throws Exception {
+    public void start(ApplicationContext applicationContext) throws Exception {
         //noinspection SpringConfigurationProxyMethods - @PostConstruct init() is a lifecycle method, it cannot have arguments
         FileObject actionsDirectory = getActionsDirectory(configuration, applicationDirectory);
         logger.info("Actions directory: " + actionsDirectory);
@@ -134,16 +135,14 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
             preloadClasses(codeBase.getRoot());
         }
 
-        modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
-            try {
-                PortofinoRoot root = getRootResource(
-                        actionsDirectory, getResourceResolver(),
-                        servletContext, applicationContext, modelService);
-                SecurityLogic.installLogin(root, configuration.getProperties(), NoOpLoginAction.class);
-            } catch (Exception e) {
-                logger.error("Could not install login class", e);
-            }
-        });
+        try {
+            PortofinoRoot root = getRootResource(
+                    actionsDirectory, getResourceResolver(),
+                    servletContext, this.applicationContext, modelService);
+            SecurityLogic.installLogin(root, configuration.getProperties(), NoOpLoginAction.class);
+        } catch (Exception e) {
+            logger.error("Could not install login class", e);
+        }
     }
 
     private ResourceResolver getResourceResolver() {
@@ -158,7 +157,8 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
     }
 
     @Override
-    protected void doInstall() throws IntrospectionException {
+    protected void addRequiredClasses() throws IntrospectionException {
+        super.addRequiredClasses();
         modelService.addBuiltInClass(ResourceActionConfiguration.class);
     }
 
@@ -170,7 +170,7 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
         root.servletContext = servletContext;
         root.modelService = modelService;
         root.actionsDirectory = actionsDirectory;
-        root.actionsDomain = modelService.ensureSystemDomain(ACTIONS_DOMAIN_NAME);
+        root.actionsDomain = modelService.ensureTopLevelDomain(ACTIONS_DOMAIN_NAME);
         root.applicationContext = applicationContext;
         return root.init();
     }
@@ -195,8 +195,8 @@ public class ResourceActionsModule extends InstallableModule implements Module, 
 
     @Bean(name = ACTIONS_DOMAIN)
     @Scope("prototype")
-    public Domain getActionsDomain() {
-        return modelService.ensureSystemDomain(ACTIONS_DOMAIN_NAME);
+    public Domain getActionsDomain() throws IOException {
+        return modelService.ensureTopLevelDomain(ACTIONS_DOMAIN_NAME);
     }
 
     protected void preloadResourceActions(FileObject directory, ResourceResolver resourceResolver) throws FileSystemException {

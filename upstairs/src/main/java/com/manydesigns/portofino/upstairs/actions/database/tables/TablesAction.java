@@ -31,13 +31,12 @@ import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.resourceactions.Group;
-import com.manydesigns.portofino.resourceactions.Permissions;
-import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.database.model.*;
-import com.manydesigns.portofino.model.service.ModelService;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.Group;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissionsChecks;
@@ -114,8 +113,6 @@ public class TablesAction extends AbstractResourceAction {
             MIN_DECIMAL_VALUE, MIN_INT_VALUE, MAX_DECIMAL_VALUE, MAX_INT_VALUE,
             DECIMAL_FORMAT, DATE_FORMAT, ENCRYPTED);
 
-    @Autowired
-    protected ModelService modelService;
     @Autowired
     protected Persistence persistence;
 
@@ -345,7 +342,7 @@ public class TablesAction extends AbstractResourceAction {
         }
 
         persistence.initModel();
-        modelService.saveModel();
+        persistence.saveModel();
     }
 
     @Path("{db}/{schema}/{table}/{column}")
@@ -475,7 +472,7 @@ public class TablesAction extends AbstractResourceAction {
                 }
             });
             persistence.initModel();
-            modelService.saveModel();
+            persistence.saveModel();
         } else {
             throw new WebApplicationException(Response.serverError().entity(annotationsForm).build());
         }

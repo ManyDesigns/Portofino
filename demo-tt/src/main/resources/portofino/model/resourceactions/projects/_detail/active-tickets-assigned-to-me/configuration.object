@@ -1,0 +1,12 @@
+import classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
+import classes.com.manydesigns.portofino.resourceactions.Group;
+import classes.com.manydesigns.portofino.resourceactions.Permissions;
+import classes.com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
+import classes.com.manydesigns.portofino.security.AccessLevel;
+
+object configuration : ResourceActionConfiguration {
+	additionalChildren = []
+	permissions = Permissions {
+		groups = []
+	}
+}

@@ -8,7 +8,6 @@ import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import org.apache.commons.vfs2.FileObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
@@ -17,7 +16,6 @@ import java.util.Set;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 
-@Configuration
 public class PortofinoDispatcherSupport {
 
     @Autowired

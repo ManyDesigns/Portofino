@@ -29,7 +29,6 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.portofino.database.model.*;
-import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.security.RequiresAdministrator;
@@ -68,8 +67,6 @@ public class ConnectionsAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(ConnectionsAction.class);
 
-    @Autowired
-    protected ModelService modelService;
     @Autowired
     protected Persistence persistence;
 
@@ -152,13 +149,13 @@ public class ConnectionsAction extends AbstractResourceAction {
         try {
             String connectionsWithSchemas =
                     connectionWithSchemas(connectionProvider.getDatabase().getDatabaseName(), connectionProvider, form);
-            modelService.saveModel();
+            persistence.saveModel();
             return Response.created(new URI(getActionPath() + "/" + databaseName)).entity(connectionsWithSchemas).build();
         } catch (Exception e) {
             persistence.getDatabases().remove(connectionProvider.getDatabase());
             persistence.initModel();
             try {
-                modelService.saveModel();
+                persistence.saveModel();
             } catch (Exception ex) {
                 logger.error("Cannot save restored model", ex);
             }
@@ -206,7 +203,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         connectionProvider.init(persistence.getDatabasePlatformsRegistry());
         persistence.initModel();
         try {
-            modelService.saveModel();
+            persistence.saveModel();
             String connectionsWithSchemas =
                     connectionWithSchemas(connectionProvider.getDatabase().getDatabaseName(), connectionProvider, form);
             return Response.ok(connectionsWithSchemas).build();
@@ -226,7 +223,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         updateSchemas(connectionProvider, new JSONArray(jsonInput), (database, schema) -> schema.ensureAnnotation(ExcludeFromWizard.class));
         persistence.syncDataModel(databaseName);
         persistence.initModel();
-        modelService.saveModel();
+        persistence.saveModel();
         logger.info("Schemas for database {} updated", databaseName);
         List<TableInfo> tableInfos = determineRoots(connectionProvider.getDatabase().getSchemas());
         tableInfos.sort(Comparator.comparing(t -> t.table.getQualifiedName()));
@@ -379,7 +376,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         } else {
             persistence.getDatabases().remove(database);
             persistence.initModel();
-            modelService.saveModel();
+            persistence.saveModel();
             logger.info("Database {} deleted", databaseName);
         }
     }
@@ -392,7 +389,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         }
         persistence.syncDataModel(databaseName);
         persistence.initModel();
-        modelService.saveModel();
+        persistence.saveModel();
         RequestMessages.addInfoMessage("Model synchronized");
     }
 

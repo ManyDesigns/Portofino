@@ -30,6 +30,7 @@ import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
 import com.manydesigns.portofino.model.service.ModelService;
+import com.manydesigns.portofino.modules.ManagedModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.rest.PortofinoRoot;
@@ -56,7 +57,7 @@ import static com.manydesigns.portofino.ResourceActionsModule.ACTIONS_DIRECTORY;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MailModule implements Module, ApplicationContextAware {
+public class MailModule extends ManagedModule implements ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -95,24 +96,25 @@ public class MailModule implements Module, ApplicationContextAware {
 
     @PostConstruct
     public void init() {
-        Configuration properties = configuration.getProperties();
-        mailQueueSetup = new MailQueueSetup(properties);
+        mailQueueSetup = new MailQueueSetup(configuration.getProperties());
         mailQueueSetup.setup();
         maybeSetupQuartz();
+    }
 
+    @Override
+    public void start(ApplicationContext applicationContext) {
+        Configuration properties = configuration.getProperties();
         if(properties.getBoolean(MailProperties.MAIL_SENDER_ACTION_ENABLED, true)) {
-            modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
-                String segment = properties.getString(
-                        MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
-                try {
-                    PortofinoRoot root = ResourceActionsModule.getRootResource(
-                            actionsDirectory, dispatcherInitializer.getResourceResolver(),
-                            servletContext, applicationContext, modelService);
-                    root.mount(segment, SendMailAction.class);
-                } catch (Exception e) {
-                    logger.error("Could not install send mail action", e);
-                }
-            });
+            String segment = properties.getString(
+                    MailProperties.MAIL_SENDER_ACTION_SEGMENT, "portofino-send-mail");
+            try {
+                PortofinoRoot root = ResourceActionsModule.getRootResource(
+                        actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                        servletContext, this.applicationContext, modelService);
+                root.mount(segment, SendMailAction.class);
+            } catch (Exception e) {
+                logger.error("Could not install send mail action", e);
+            }
         }
 
         status = ModuleStatus.STARTED;

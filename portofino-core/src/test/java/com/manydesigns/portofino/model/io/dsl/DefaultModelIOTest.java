@@ -3,6 +3,8 @@ package com.manydesigns.portofino.model.io.dsl;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.io.ModelIO;
+import com.manydesigns.portofino.model.io.EntityModelBuilderVisitor;
 import com.manydesigns.portofino.model.language.ModelLexer;
 import com.manydesigns.portofino.model.language.ModelParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -40,11 +42,11 @@ public class DefaultModelIOTest {
     @Test
     public void testSimpleModel() throws IOException {
         ElementsThreadLocals.setupDefaultElementsContext();
-        DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
+        ModelIO io = new ModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 2);
         FileObject outDir = VFS.getManager().resolveFile("ram://portofino/test-model-1");
-        io = new DefaultModelIO(outDir);
+        io = new ModelIO(outDir);
         io.save(model);
         FileObject domainFile = outDir.resolveFile("testDomain1/testDomain1.domain");
         assertFalse(domainFile.exists());
@@ -72,7 +74,7 @@ public class DefaultModelIOTest {
     @Test
     public void testWithObject() throws IOException {
         ElementsThreadLocals.setupDefaultElementsContext();
-        DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
+        ModelIO io = new ModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 2);
         Domain testDomain1 = model.getDomain("testDomain1");
@@ -81,7 +83,7 @@ public class DefaultModelIOTest {
         person.eSet(Person.getEStructuralFeature("name"), "Alessio");
         testDomain1.getObjects().put("alessio", person);
         FileObject outDir = VFS.getManager().resolveFile("ram://portofino/test-model-1");
-        io = new DefaultModelIO(outDir);
+        io = new ModelIO(outDir);
         io.save(model);
         FileObject objectFile = outDir.resolveFile("testDomain1/alessio.object");
         assertTrue(objectFile.exists());
@@ -105,7 +107,7 @@ public class DefaultModelIOTest {
     @Test
     public void testModelWithErrors() throws IOException {
         ElementsThreadLocals.setupDefaultElementsContext();
-        DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
+        ModelIO io = new ModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 2);
         assertEquals(model.getIssues().size(), 4);

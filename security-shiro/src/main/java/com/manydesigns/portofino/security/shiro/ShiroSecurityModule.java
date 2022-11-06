@@ -25,16 +25,15 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
 import com.manydesigns.portofino.model.service.ModelService;
+import com.manydesigns.portofino.modules.ManagedModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
-import com.manydesigns.portofino.resourceactions.ResourceActionSupport;
 import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.SecurityLogic;
 import com.manydesigns.portofino.shiro.SecurityClassRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.shiro.ShiroSecurity;
-import com.manydesigns.portofino.spring.PortofinoContextLoaderListener;
 import io.jsonwebtoken.io.Encoders;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
@@ -50,12 +49,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.annotation.Order;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.util.UUID;
@@ -66,8 +62,7 @@ import java.util.UUID;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ShiroSecurityModule implements
-        Module, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
+public class ShiroSecurityModule extends ManagedModule {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
@@ -86,7 +81,6 @@ public class ShiroSecurityModule implements
     @Autowired
     public DispatcherInitializer dispatcherInitializer;
 
-    protected ApplicationContext applicationContext;
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
     protected SecurityClassRealm realm;
 
@@ -110,8 +104,7 @@ public class ShiroSecurityModule implements
         return new ShiroSecurity();
     }
 
-    @PostConstruct
-    public void init() throws Exception {
+    public void start(ApplicationContext applicationContext) {
         if(!configuration.getProperties().containsKey("jwt.secret")) {
             String jwtSecret = Encoders.BASE64.encode((UUID.randomUUID() + UUID.randomUUID().toString()).getBytes());
             logger.warn("No jwt.secret property was set, so we generated one: {}.", jwtSecret);
@@ -141,18 +134,24 @@ public class ShiroSecurityModule implements
         }
         logger.debug("Creating SecurityClassRealm");
         realm = new SecurityClassRealm(codeBase, "Security");
+        realm.setApplicationContext(applicationContext);
+        try {
+            LifecycleUtils.init(realm);
+        } catch (Exception e) {
+            logger.warn(
+                    "Security class not found or invalid or initialization failed. " +
+                            "We will reload and/or initialize it on next use.", e);
+        }
         rsm.setRealm(realm);
 
-        modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
-            try {
-                PortofinoRoot root = ResourceActionsModule.getRootResource(
-                        actionsDirectory, dispatcherInitializer.getResourceResolver(),
-                        servletContext, applicationContext, modelService);
-                SecurityLogic.installLogin(root, configuration.getProperties(), DefaultLoginAction.class);
-            } catch (Exception e) {
-                logger.error("Could not install login action", e);
-            }
-        });
+        try {
+            PortofinoRoot root = ResourceActionsModule.getRootResource(
+                    actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                    servletContext, applicationContext, modelService);
+            SecurityLogic.installLogin(root, configuration.getProperties(), DefaultLoginAction.class);
+        } catch (Exception e) {
+            logger.error("Could not install login action", e);
+        }
         status = ModuleStatus.STARTED;
     }
 
@@ -168,21 +167,4 @@ public class ShiroSecurityModule implements
         return status;
     }
 
-    @Override
-    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        ApplicationContext applicationContext = event.getApplicationContext();
-        realm.setApplicationContext(applicationContext);
-        try {
-            LifecycleUtils.init(realm);
-        } catch (Exception e) {
-            logger.warn(
-                    "Security class not found or invalid or initialization failed. " +
-                    "We will reload and/or initialize it on next use.", e);
-        }
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
 }

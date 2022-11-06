@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.model.io.dsl;
+package com.manydesigns.portofino.model.io;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;

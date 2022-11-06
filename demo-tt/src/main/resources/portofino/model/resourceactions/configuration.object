@@ -1,8 +1,8 @@
-import portofino.classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
-import portofino.classes.com.manydesigns.portofino.resourceactions.Group;
-import portofino.classes.com.manydesigns.portofino.resourceactions.Permissions;
-import portofino.classes.com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
-import portofino.classes.com.manydesigns.portofino.security.AccessLevel;
+import classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
+import classes.com.manydesigns.portofino.resourceactions.Group;
+import classes.com.manydesigns.portofino.resourceactions.Permissions;
+import classes.com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
+import classes.com.manydesigns.portofino.security.AccessLevel;
 
 object configuration : ResourceActionConfiguration {
 	additionalChildren = []

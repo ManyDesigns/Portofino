@@ -3,6 +3,7 @@ package com.manydesigns.portofino.model.io.dsl;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
+import com.manydesigns.portofino.model.io.ModelIO;
 import org.apache.commons.vfs2.VFS;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -31,7 +32,7 @@ public class EMFTest {
     @Test
     public void testSimpleModel() throws IOException {
         ElementsThreadLocals.setupDefaultElementsContext();
-        DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
+        ModelIO io = new ModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 2);
         XMIResource resource = new XMIResourceImpl();
@@ -53,7 +54,7 @@ public class EMFTest {
     @Test
     public void testSimpleModelWithObjects() throws IOException {
         ElementsThreadLocals.setupDefaultElementsContext();
-        DefaultModelIO io = new DefaultModelIO(VFS.getManager().resolveFile("res:test-model-1"));
+        ModelIO io = new ModelIO(VFS.getManager().resolveFile("res:test-model-1"));
         Model model = io.load();
         assertEquals(model.getDomains().size(), 2);
         model.getDomain("testDomain1").putObject("someObject", EcoreFactory.eINSTANCE.createEObject());

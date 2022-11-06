@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.model.io.dsl;
+package com.manydesigns.portofino.model.io;
 
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.language.ModelParser;

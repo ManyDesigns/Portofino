@@ -46,16 +46,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.*;
 
-/** Import this configuration in a Spring Boot application to support configuring Portofino modules
- * such as persistence.
- */
-@Configuration
+
 public class PortofinoSupport implements ApplicationContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSupport.class);

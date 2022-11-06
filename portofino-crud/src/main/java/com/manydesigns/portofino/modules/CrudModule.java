@@ -31,9 +31,9 @@ import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.beans.IntrospectionException;
 
@@ -43,7 +43,7 @@ import java.beans.IntrospectionException;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class CrudModule extends InstallableModule {
+public class CrudModule extends ManagedModule {
     public static final String copyright =
             "Copyright (C) 2005-2022 ManyDesigns srl";
 
@@ -80,7 +80,8 @@ public class CrudModule extends InstallableModule {
     }
 
     @Override
-    protected void doInstall() throws Exception {
+    protected void addRequiredClasses() throws IntrospectionException {
+        super.addRequiredClasses();
         modelService.addBuiltInClass(CrudConfiguration.class);
         modelService.addBuiltInClass(
                 com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration.class);
@@ -88,7 +89,7 @@ public class CrudModule extends InstallableModule {
     }
 
     @Override
-    protected void start() {
+    protected void start(ApplicationContext applicationContext) {
         actionRegistry.register(CrudAction.class);
         actionRegistry.register(ManyToManyAction.class);
     }

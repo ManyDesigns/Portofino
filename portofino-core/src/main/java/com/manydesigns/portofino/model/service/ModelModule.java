@@ -20,28 +20,14 @@
 
 package com.manydesigns.portofino.model.service;
 
-import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.config.ConfigurationSource;
-import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
-import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.vfs2.FileObject;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.Order;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,12 +36,9 @@ import java.io.IOException;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @Order(ModelModule.MODEL_LOAD)
-public class ModelModule implements Module, ApplicationListener<ContextRefreshedEvent> {
+public class ModelModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    public static final String PORTOFINO_DOMAIN =
-            "com.manydesigns.portofino.model.service.ModelModule.portofinoDomain";
 
     public static final int MODEL_LOAD = 100;
 
@@ -80,23 +63,9 @@ public class ModelModule implements Module, ApplicationListener<ContextRefreshed
         status = ModuleStatus.STARTED;
     }
 
-    @Bean(name = PORTOFINO_DOMAIN)
-    public Domain getPortofinoDomain(@Autowired ModelService modelService) {
-        return modelService.getPortofinoDomain();
-    }
-
     @Override
     public ModuleStatus getStatus() {
         return status;
-    }
-
-    @Override
-    public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        try {
-            modelService.loadModel();
-        } catch (IOException e) {
-            logger.error("Could not load model", e);
-        }
     }
 
 }

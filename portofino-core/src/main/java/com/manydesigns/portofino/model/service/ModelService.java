@@ -6,8 +6,6 @@ import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.io.ModelIO;
-import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
-import io.reactivex.subjects.BehaviorSubject;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -30,11 +28,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ModelService {
 
     protected Model model = new Model();
-    public final BehaviorSubject<EventType> modelEvents = BehaviorSubject.create();
-    public static final String APP_MODEL_DIRECTORY = "portofino-model";
+    public static final String APP_MODEL_DIRECTORY = "model";
     protected final FileObject applicationDirectory;
     protected final ConfigurationSource configuration;
-    protected final List<Domain> systemDomains = new CopyOnWriteArrayList<>();
+    protected final List<Domain> transientDomains = new CopyOnWriteArrayList<>();
     protected final CodeBase codeBase;
     private static final Logger logger = LoggerFactory.getLogger(ModelService.class);
 
@@ -45,27 +42,8 @@ public class ModelService {
         this.codeBase = codeBase;
     }
 
-    public enum EventType {
-        LOADED, SAVED
-    }
-
     public Model getModel() {
         return model;
-    }
-
-    public synchronized Model loadModel(ModelIO modelIO) throws IOException {
-        Model loaded = modelIO.load();
-        if(loaded != null) {
-            model = loaded;
-            modelEvents.onNext(EventType.LOADED);
-            return model;
-        } else {
-            return null;
-        }
-    }
-
-    public void loadModel() throws IOException {
-        loadModel(getDefaultModelIO());
     }
 
     public FileObject getModelDirectory() throws FileSystemException {
@@ -76,17 +54,26 @@ public class ModelService {
         return applicationDirectory;
     }
 
+    public synchronized Model loadModel() throws IOException {
+        Model loaded = getDefaultModelIO().load();
+        if(loaded != null) {
+            model = loaded;
+            return model;
+        } else {
+            return null;
+        }
+    }
+
     public synchronized void saveModel() throws IOException, ConfigurationException {
         getDefaultModelIO().save(model);
         if (configuration.isWritable()) {
             configuration.save();
         }
-        modelEvents.onNext(EventType.SAVED);
     }
 
     @NotNull
-    public DefaultModelIO getDefaultModelIO() throws FileSystemException {
-        return new DefaultModelIO(getModelDirectory(), systemDomains);
+    public ModelIO getDefaultModelIO() throws FileSystemException {
+        return new ModelIO(getModelDirectory());
     }
 
     public synchronized void saveDomain(Domain domain) throws IOException {
@@ -105,17 +92,28 @@ public class ModelService {
         getDefaultModelIO().saveObject(domain, name);
     }
 
-    public synchronized Domain ensureSystemDomain(String name) {
+    public synchronized Domain ensureTopLevelDomain(String name) throws IOException {
+        return ensureTopLevelDomain(name, false);
+    }
+
+    public synchronized Domain ensureTopLevelDomain(String name, boolean isTransient) throws IOException {
         Optional<Domain> any = model.getDomains().stream().filter(d -> d.getName().equals(name)).findAny();
         Domain domain;
         if (any.isPresent()) {
             logger.debug("Not adding domain " + name + " because it's already present");
             return any.get();
-        } else {
+        } else if (isTransient) {
             domain = new Domain(name);
             model.getDomains().add(domain);
+            transientDomains.add(domain);
+        } else {
+            domain = getDefaultModelIO().load(name, model);
+            if (domain == null) {
+                domain = new Domain(name);
+                model.getDomains().add(domain);
+            }
         }
-        systemDomains.add(domain);
+
         return domain;
     }
 
@@ -124,7 +122,7 @@ public class ModelService {
         String className = javaClass.getSimpleName();
         EClassifier existing = pkg.getEClassifier(className);
         if (existing != null) {
-            // TODO check they model the same class?
+            // TODO check they model the same class
             return existing;
         }
         if (javaClass.isEnum()) {
@@ -240,11 +238,11 @@ public class ModelService {
     }
 
     public Domain getClassesDomain() {
-        return getPortofinoDomain().ensureDomain("classes");
-    }
-
-    public Domain getPortofinoDomain() {
-        return ensureSystemDomain("portofino");
+        try {
+            return ensureTopLevelDomain("classes", true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

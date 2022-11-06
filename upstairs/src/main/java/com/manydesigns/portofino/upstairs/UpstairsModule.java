@@ -23,6 +23,7 @@ package com.manydesigns.portofino.upstairs;
 import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
 import com.manydesigns.portofino.model.service.ModelService;
+import com.manydesigns.portofino.modules.ManagedModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.rest.PortofinoRoot;
@@ -36,7 +37,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 
@@ -49,7 +49,7 @@ import javax.servlet.ServletContext;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class UpstairsModule implements Module, ApplicationContextAware {
+public class UpstairsModule extends ManagedModule implements ApplicationContextAware {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -78,18 +78,16 @@ public class UpstairsModule implements Module, ApplicationContextAware {
         return "\"Upstairs\" (configure, add, remove pages)";
     }
 
-    @PostConstruct
-    public void init() {
-        modelService.modelEvents.filter(evt -> evt == ModelService.EventType.LOADED).take(1).subscribe(evt -> {
-            try {
-                PortofinoRoot root = ResourceActionsModule.getRootResource(
-                        actionsDirectory, dispatcherInitializer.getResourceResolver(),
-                        servletContext, applicationContext, modelService);
-                root.mountPackage("portofino-upstairs", UpstairsAction.class.getPackage());
-            } catch (Exception e) {
-                logger.error("Could not install upstairs actions", e);
-            }
-        });
+    @Override
+    public void start(ApplicationContext applicationContext) {
+        try {
+            PortofinoRoot root = ResourceActionsModule.getRootResource(
+                    actionsDirectory, dispatcherInitializer.getResourceResolver(),
+                    servletContext, this.applicationContext, modelService);
+            root.mountPackage("portofino-upstairs", UpstairsAction.class.getPackage());
+        } catch (Exception e) {
+            logger.error("Could not install upstairs actions", e);
+        }
         status = ModuleStatus.STARTED;
     }
 

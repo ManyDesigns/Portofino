@@ -4,10 +4,9 @@ standaloneDomain: importDeclaration* domain EOF;
 domain: annotation* DOMAIN name=identifier (';' | '{' (domain | entity | enum | relationship)* '}')?;
 
 standaloneEntity: importDeclaration* entity EOF;
-entity: annotation* ENTITY name=identifier '{'
+entity: annotation* ENTITY name=identifier (COLON baseEntity=identifier) '{'
   (ID '{' idProperties+=property+ '}')?
-  properties+=property*
-  relationshipProperty*
+  (properties+=property | relationshipProperty)*
 '}';
 property: annotation* name=identifier (':' type)? (NOT_NULLABLE)?;
 
@@ -47,6 +46,7 @@ SIGNED_INTEGER: ('+' | '-') UNSIGNED_INTEGER;
 REAL: ('+' | '-')?([0-9]+('.'[0-9]*)?|[0-9]*'.'[0-9]+);
 STRING: '"' ('\\'('"'|'\\')|.)*? '"';
 NOT_NULLABLE: '!';
+COLON: ':';
 
 SCHEMA: 'schema';
 OBJECT: 'object';
