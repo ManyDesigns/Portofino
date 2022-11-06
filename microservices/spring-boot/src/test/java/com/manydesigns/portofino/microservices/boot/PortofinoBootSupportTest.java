@@ -2,6 +2,8 @@ package com.manydesigns.portofino.microservices.boot;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ResourceActionsModule;
+import com.manydesigns.portofino.microservices.boot.support.PortofinoDispatcherSupport;
+import com.manydesigns.portofino.microservices.boot.support.PortofinoSupport;
 import com.manydesigns.portofino.model.service.ModelModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.modules.H2Module;
@@ -32,9 +34,11 @@ import static org.springframework.test.util.AssertionErrors.assertNotNull;
 @SpringBootTest(
 		classes = {
 				PortofinoSupport.class, ModelModule.class, DatabaseModule.class, H2Module.class,
-				ResourceActionsModule.class
+				PortofinoDispatcherSupport.class, ResourceActionsModule.class
 		},
-		properties = { "spring.jersey.type=filter", "spring.jersey.application-path=/" },
+		properties = {
+				"portofino.dispatcher.enabled=true", "spring.jersey.type=filter", "spring.jersey.application-path=/"
+		},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 @EnableAutoConfiguration

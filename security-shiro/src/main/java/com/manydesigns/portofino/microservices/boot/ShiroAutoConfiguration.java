@@ -14,7 +14,7 @@ import javax.servlet.DispatcherType;
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@AutoConfigureAfter(PortofinoDispatcherAutoConfiguration.class)
+@AutoConfigureAfter(ElementsAutoConfiguration.class)
 public class ShiroAutoConfiguration {
 
     @Bean

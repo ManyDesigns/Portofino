@@ -289,6 +289,10 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return security;
     }
 
+    public void setSecurity(SecurityFacade security) {
+        this.security = security;
+    }
+
     @Override
     public void setContext(ActionContext context) {
         this.context = context;
@@ -548,7 +552,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
                     oldActionXml.delete();
                 } catch (Exception e) {
                     logger.error("Could not migrate configuration.xml and action.xml from " +
-                            actionInstance.getDirectory().getPath());
+                            actionInstance.getDirectory().getPath(), e);
                 }
             }
             configuration = getConfiguration();

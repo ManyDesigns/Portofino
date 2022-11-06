@@ -18,14 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.microservices.boot;
+package com.manydesigns.portofino.microservices.boot.support;
 
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.service.ModelService;
-import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.spring.SpringBootResourceFileProvider;
 import com.manydesigns.portofino.spring.SpringEnvironmentConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;

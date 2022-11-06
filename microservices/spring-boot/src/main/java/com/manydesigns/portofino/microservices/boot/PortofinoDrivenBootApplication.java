@@ -37,17 +37,17 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.List;
 import java.util.Properties;
 
-@SpringBootApplication(exclude = { ErrorMvcAutoConfiguration.class, GroovyTemplateAutoConfiguration.class })
-public class PortofinoBootApplication {
-	private static final Logger logger = LoggerFactory.getLogger(PortofinoBootApplication.class);
+@SpringBootApplication(exclude = {
+		ErrorMvcAutoConfiguration.class, GroovyTemplateAutoConfiguration.class,
+})
+public class PortofinoDrivenBootApplication {
+	private static final Logger logger = LoggerFactory.getLogger(PortofinoDrivenBootApplication.class);
 
 	public static void main(String[] args) throws Exception {
-		run(PortofinoBootApplication.class, args);
+		run(PortofinoDrivenBootApplication.class, args);
 	}
 
 	public static ConfigurableApplicationContext run(Class<?> applicationClass, String... args) throws FileSystemException {
@@ -84,6 +84,7 @@ public class PortofinoBootApplication {
 			}
 		});
 		Properties defaultProperties = new Properties();
+		defaultProperties.put(ConfigProperties.DISPATCHER_ENABLED, "true");
 		defaultProperties.put("spring.jersey.type", "filter");
 		defaultProperties.put("spring.jersey.application-path", "/");
 		defaultProperties.put("spring.resteasy.application-path", "/api/");
@@ -147,7 +148,7 @@ public class PortofinoBootApplication {
 	}
 
 	private static void dumpBundledApplication(FileObject applicationDirectory) throws FileSystemException {
-		if(PortofinoBootApplication.class.getClassLoader().getResource("portofino") != null) try {
+		if(PortofinoDrivenBootApplication.class.getClassLoader().getResource("portofino") != null) try {
 			FileObject bundledApplication = VFS.getManager().resolveFile("res:portofino");
 			if(bundledApplication.isFolder()) {
 				logger.info("Dumping bundled application to " + applicationDirectory.getName().getPath());

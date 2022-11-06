@@ -288,7 +288,7 @@ public class Domain extends EPackageImpl {
     ) throws IOException, ClassNotFoundException {
         String javaClassName = type.getName();
         EPackage pkg = type.getEPackage();
-        while (pkg != null && pkg != classesDomain) {
+        while (!classesDomain.equals(pkg)) {
             javaClassName = pkg.getName() + "." + javaClassName;
             pkg = pkg.getESuperPackage();
         }
@@ -313,5 +313,21 @@ public class Domain extends EPackageImpl {
 
     public String getQualifiedName() {
         return getQualifiedName(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (!(obj instanceof Domain)) {
+            return false;
+        } else {
+            return getQualifiedName().equals(((Domain) obj).getQualifiedName());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getQualifiedName().hashCode();
     }
 }
