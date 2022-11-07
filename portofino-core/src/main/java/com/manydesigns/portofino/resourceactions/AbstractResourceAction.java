@@ -101,7 +101,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     public FileObject actionsDirectory;
     @Autowired
     protected ApplicationContext applicationContext;
-    @Autowired(required = false)
+    // Autowired with setter method
     protected SecurityFacade security = NoSecurity.AT_ALL;
     @Context
     protected UriInfo uriInfo;
@@ -293,8 +293,13 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return security;
     }
 
+    @Autowired(required = false)
     public void setSecurity(SecurityFacade security) {
-        this.security = security;
+        if (security != null) {
+            this.security = security;
+        } else {
+            this.security = NoSecurity.AT_ALL;
+        }
     }
 
     @Override

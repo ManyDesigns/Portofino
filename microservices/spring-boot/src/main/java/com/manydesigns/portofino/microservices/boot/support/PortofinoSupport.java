@@ -55,7 +55,6 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPL
 /** Import this configuration in a Spring Boot application to support configuring Portofino modules
  * such as persistence.
  */
-@Configuration
 public class PortofinoSupport implements ApplicationContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSupport.class);
