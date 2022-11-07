@@ -4,6 +4,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.modules.ModuleStatus;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
@@ -47,14 +48,14 @@ public class ModelServiceTest {
         ModelService modelService = new ModelService(
                 applicationDirectory, new ConfigurationSource(new PropertiesConfiguration(), null),
                 new JavaCodeBase(applicationDirectory));
-        EClassifier eEnum = modelService.addBuiltInClass(ModelService.EventType.class);
+        EClassifier eEnum = modelService.addBuiltInClass(ModuleStatus.class);
         assertTrue(eEnum instanceof EEnum);
         assertEquals(modelService.getModel().getDomains().size(), 1);
-        assertEquals(eEnum.getName(), ModelService.EventType.class.getSimpleName());
-        assertEquals(eEnum, modelService.getClassesDomain().findClass(ModelService.EventType.class));
-        assertEquals(2, ((EEnum) eEnum).getELiterals().size());
-        assertEquals(ModelService.EventType.LOADED.name(), ((EEnum) eEnum).getELiterals().get(0).getLiteral());
-        assertEquals(ModelService.EventType.SAVED.name(), ((EEnum) eEnum).getELiterals().get(1).getLiteral());
+        assertEquals(eEnum.getName(), ModuleStatus.class.getSimpleName());
+        assertEquals(eEnum, modelService.getClassesDomain().findClass(ModuleStatus.class));
+        assertEquals(6, ((EEnum) eEnum).getELiterals().size());
+        assertEquals(ModuleStatus.CREATED.name(), ((EEnum) eEnum).getELiterals().get(0).getLiteral());
+        assertEquals(ModuleStatus.INSTALLED.name(), ((EEnum) eEnum).getELiterals().get(1).getLiteral());
     }
 
     @Test

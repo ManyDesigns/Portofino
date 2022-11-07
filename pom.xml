@@ -164,7 +164,6 @@
         <module>keycloak</module>
         <module>portofino-aws</module>
         <!-- Microservices -->
-        <module>microservices/launcher</module>
         <module>microservices/spring-boot</module>
         <module>microservices/scheduler</module>
         <module>microservices/mail</module>

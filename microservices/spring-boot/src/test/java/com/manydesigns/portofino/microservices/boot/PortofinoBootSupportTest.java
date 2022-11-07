@@ -34,7 +34,8 @@ import static org.springframework.test.util.AssertionErrors.assertNotNull;
 @SpringBootTest(
 		classes = {
 				PortofinoSupport.class, ModelModule.class, DatabaseModule.class, H2Module.class,
-				PortofinoDispatcherSupport.class, ResourceActionsModule.class
+				ElementsAutoConfiguration.class,
+				PortofinoDispatcherSupport.class, PortofinoJerseyAutoConfiguration.class, ResourceActionsModule.class
 		},
 		properties = {
 				"portofino.dispatcher.enabled=true", "spring.jersey.type=filter", "spring.jersey.application-path=/"
@@ -88,7 +89,7 @@ class PortofinoBootSupportTest {
 	@Test
 	public void canInvokeRootResource() {
 		Client client = ClientBuilder.newClient();
-		WebTarget target = client.target("http://localhost:" + port);
+		WebTarget target = client.target("http://localhost:" + port + "/:auth");
 		Response response = target.request().get();
 		assertEquals("HTTP OK", 200, response.getStatus());
 	}
