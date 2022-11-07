@@ -29,6 +29,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ResourceActionsModule;
+import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
@@ -98,11 +99,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     @Autowired
     public ModelService modelService;
     @Autowired
-    @Qualifier(ResourceActionsModule.ACTIONS_DOMAIN)
-    public Domain actionsDomain;
-    @Autowired
     @Qualifier(ResourceActionsModule.ACTIONS_DIRECTORY)
     public FileObject actionsDirectory;
+    @Autowired
+    @Qualifier(ResourceActionsModule.ACTIONS_DOMAIN)
+    public Domain actionsDomain;
     // Autowired with setter method
     protected SecurityFacade security = NoSecurity.AT_ALL;
     @Context
@@ -183,7 +184,12 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     protected FileObject getChildLocation(String pathSegment) throws FileSystemException {
         Optional<AdditionalChild> child = getAdditionalChild(pathSegment);
         if(child.isPresent()) {
-            return VFS.getManager().resolveFile(child.get().getPath());
+            String path = child.get().getPath();
+            if (path.startsWith("file:")) {
+                return actionsDirectory.resolveFile(path.substring("file:".length()));
+            } else {
+                return VFS.getManager().resolveFile(child.get().getPath());
+            }
         }
         return super.getChildLocation(pathSegment);
     }

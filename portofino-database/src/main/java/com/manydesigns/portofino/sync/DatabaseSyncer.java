@@ -85,6 +85,7 @@ public class DatabaseSyncer {
                 targetDatabase.setFalseString(sourceDatabase.getFalseString());
                 targetDatabase.setEntityMode(sourceDatabase.getEntityMode());
             }
+            copyAnnotations(sourceDatabase, targetDatabase);
 
             logger.debug("Reading schema names from metadata");
             List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
