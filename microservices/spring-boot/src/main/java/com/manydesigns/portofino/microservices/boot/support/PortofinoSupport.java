@@ -54,6 +54,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPL
 
 /** Import this configuration in a Spring Boot application to support configuring Portofino modules
  * such as persistence.
+ * Note that this doesn't enable Portofino's dispatcher. You need {@link PortofinoDispatcherSupport} for that.
  */
 public class PortofinoSupport implements ApplicationContextAware {
 

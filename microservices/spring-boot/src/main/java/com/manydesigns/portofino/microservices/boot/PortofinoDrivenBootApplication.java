@@ -42,6 +42,11 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Boot application with a reloadable context managed by Portofino.
+ * If you don't need the flexibility and would rather use a traditional Boot application with Portofino,
+ * see {@link com.manydesigns.portofino.microservices.boot.support.PortofinoSupport}.
+ */
 @SpringBootApplication(exclude = {
 		ErrorMvcAutoConfiguration.class, GroovyTemplateAutoConfiguration.class,
 })

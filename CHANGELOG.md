@@ -2,10 +2,24 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [5.3.3] – Unreleased
+## [5.3.4] – Unreleased
 
 ### Added
-- New deployment option: Portofino modules as Spring Boot components, without using Portofino's dispatcher and without setting up Portofino's context hierarchy.
+- Explicit priority to `PortofinoFilter` so that users can install their own filters before or after Portofino's.
+- Possibility to enable Portofino's dispatcher in Boot applications not managed by Portofino, thus easing migration.
+
+### Changed
+- Mounted children that point to files are resolved relative to the application directory. In practice,
+  this means that Portofino no longer saves the absolute path of the login action in the root `action.xml`.
+
+### Fixed
+- Database annotations lost when synchronizing the model [#593](https://github.com/ManyDesigns/Portofino/issues/593)
+
+## [5.3.3] – 2022-10-22
+
+### Added
+- New deployment option: Portofino modules as Spring Boot components, without using Portofino's dispatcher and without 
+  setting up Portofino's context hierarchy.
 
 ### Changed
 - Updated Angular to version 13
