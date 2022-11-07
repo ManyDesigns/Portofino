@@ -84,7 +84,7 @@ class PortofinoBootSupportTest {
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target("http://localhost:" + port + "/:auth");
 		Response response = target.request().get();
-		// TODO assertEquals("HTTP OK", 200, response.getStatus());
+		assertEquals("HTTP OK", 200, response.getStatus());
 	}
 
 	@Autowired

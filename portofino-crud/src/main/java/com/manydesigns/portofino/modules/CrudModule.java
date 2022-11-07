@@ -25,7 +25,6 @@ import com.manydesigns.portofino.resourceactions.crud.export.CrudExporterRegistr
 import com.manydesigns.portofino.resourceactions.crud.export.JSONExporter;
 import com.manydesigns.portofino.resourceactions.m2m.ManyToManyAction;
 import com.manydesigns.portofino.resourceactions.registry.ActionRegistry;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +42,6 @@ import javax.annotation.PreDestroy;
 public class CrudModule implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    @Autowired
-    public Configuration configuration;
 
     @Autowired
     public ActionRegistry actionRegistry;

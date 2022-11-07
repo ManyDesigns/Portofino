@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
 import com.manydesigns.portofino.quartz.SchedulerService;
 import org.apache.commons.configuration2.Configuration;
@@ -54,7 +55,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
     //**************************************************************************
 
     @Autowired
-    public Configuration configuration;
+    public ConfigurationSource configuration;
 
     @Autowired
     public ServletContext servletContext;
@@ -89,9 +90,10 @@ public class QuartzModule implements Module, ApplicationContextAware {
     public void init() {
         StdSchedulerFactory factory;
         try {
-            String configFile = configuration.getString("quartz.config-file");
-            startOnLoad = configuration.getBoolean("quartz.start-on-load", true);
-            waitOnShutdown = configuration.getBoolean("quartz.wait-on-shutdown", true);
+            Configuration properties = configuration.getProperties();
+            String configFile = properties.getString("quartz.config-file");
+            startOnLoad = properties.getBoolean("quartz.start-on-load", true);
+            waitOnShutdown = properties.getBoolean("quartz.wait-on-shutdown", true);
             factory = getSchedulerFactory(configFile);
 
             // Always want to get the scheduler, even if it isn't starting,
@@ -99,7 +101,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
             scheduler = factory.getScheduler();
             scheduler.setJobFactory(new PortofinoJobFactory(servletContext, applicationContext));
 
-            String factoryKey = configuration.getString("quartz.servlet-context-factory-key");
+            String factoryKey = properties.getString("quartz.servlet-context-factory-key");
             if (factoryKey == null) {
                 factoryKey = QuartzInitializerListener.QUARTZ_FACTORY_KEY;
             }
@@ -108,7 +110,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
                     + factoryKey);
             servletContext.setAttribute(factoryKey, factory);
 
-            String servletCtxtKey = configuration.getString("quartz.scheduler-context-servlet-context-key");
+            String servletCtxtKey = properties.getString("quartz.scheduler-context-servlet-context-key");
             if (servletCtxtKey != null) {
                 logger.info("Storing the ServletContext in the scheduler context at key: "
                         + servletCtxtKey);
@@ -120,7 +122,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
             }
 
             try {
-                int seconds = configuration.getInt("database.failed.connections.retry.every.seconds", 60);
+                int seconds = properties.getInt("database.failed.connections.retry.every.seconds", 60);
                 if(seconds > 0) {
                     Class jobClass = Class.forName("com.manydesigns.portofino.quartz.FailedDatabaseConnectionRetryJob");
                     JobDetail job = JobBuilder.newJob(jobClass).build();
