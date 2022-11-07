@@ -17,7 +17,6 @@ import java.util.Set;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 
-@Configuration
 public class PortofinoDispatcherSupport {
 
     @Autowired
