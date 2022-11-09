@@ -111,6 +111,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.manydesigns</groupId>
+			<artifactId>portofino-crud</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<version>4.8.0</version> <!-- Spring Boot requires 3.x but Portofino requires 4.8.0 -->

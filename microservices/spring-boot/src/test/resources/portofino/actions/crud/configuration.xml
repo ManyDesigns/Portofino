@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration variable="t1" searchTitle="" rowsPerPage="10" readTitle="" query="from table1" name="test" largeResultSet="false" editTitle="" database="hibernatetest" createTitle="">
+    <properties>
+        <property updatable="false" searchable="false" name="id" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="true" searchable="true" name="testo" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+    </properties>
+    <selectionProviders/>
+</configuration>

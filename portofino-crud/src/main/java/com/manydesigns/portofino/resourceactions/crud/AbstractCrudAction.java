@@ -1482,10 +1482,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         selectionProviderLoadStrategy = skipSelectionProviders ?
                 SelectionProviderLoadStrategy.NONE :
                 SelectionProviderLoadStrategy.ALL;
-        List<org.springframework.http.MediaType> mediaTypes =
-                org.springframework.http.MediaType.parseMediaTypes(acceptedFormats);
-        org.springframework.http.MediaType.sortBySpecificityAndQuality(mediaTypes);
-        CrudExporter exporter = crudExporterRegistry.get(mediaTypes);
+        CrudExporter exporter = getExporter(acceptedFormats);
         if(newObject) {
             preCreate();
             return exportObject(exporter);
@@ -1507,6 +1504,16 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             }
             return exportObject(exporter);
         }
+    }
+
+    protected CrudExporter getExporter(String acceptedFormats) {
+        List<org.springframework.http.MediaType> mediaTypes =
+                org.springframework.http.MediaType.parseMediaTypes(acceptedFormats);
+        if (mediaTypes.isEmpty()) {
+            mediaTypes = Collections.singletonList(org.springframework.http.MediaType.APPLICATION_JSON);
+        }
+        org.springframework.http.MediaType.sortBySpecificityAndQuality(mediaTypes);
+        return crudExporterRegistry.get(mediaTypes);
     }
 
     /**

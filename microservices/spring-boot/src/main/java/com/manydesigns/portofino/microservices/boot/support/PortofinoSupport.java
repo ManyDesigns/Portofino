@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.microservices.boot.support;
 
-import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
@@ -47,6 +46,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 import java.io.IOException;
 
@@ -57,6 +57,7 @@ import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.CONF
  * such as persistence.
  * Note that this doesn't enable Portofino's dispatcher. You need {@link PortofinoDispatcherSupport} for that.
  */
+@Import({ PortofinoSpringConfiguration.class })
 public class PortofinoSupport implements ApplicationContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSupport.class);
@@ -112,11 +113,6 @@ public class PortofinoSupport implements ApplicationContextAware {
     @Bean
     public CodeBase getCodeBase(@Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject appDir) throws IOException {
         return new JavaCodeBase(appDir.getParent());
-    }
-
-    @Bean
-    public CacheResetListenerRegistry getCacheResetListenerRegistry() {
-        return new CacheResetListenerRegistry();
     }
 
     public static void installCommonsVfsBootSupport() throws FileSystemException {
