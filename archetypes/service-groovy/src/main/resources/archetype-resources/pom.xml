@@ -9,7 +9,7 @@
     <version>${version}</version>
     <properties>
         <portofino.version>${portofinoVersion}</portofino.version>
-        <spring.boot.version>2.4.5</spring.boot.version>
+        <spring.boot.version>2.5.12</spring.boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencyManagement>
@@ -164,12 +164,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
         <!-- Security using Apache Shiro -->
         <dependency>
