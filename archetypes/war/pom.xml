@@ -10,6 +10,10 @@
     </parent>
     <artifactId>portofino-war-archetype</artifactId>
     <packaging>maven-archetype</packaging>
+    <description>
+        A Maven Archetype for a Portofino application (backend + fronted) packaged as a WAR file,
+        for deployment on a servlet container.
+    </description>
     <build>
         <extensions>
             <extension>

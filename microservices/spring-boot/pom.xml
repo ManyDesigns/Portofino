@@ -143,7 +143,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.manydesigns.portofino.microservices.boot.PortofinoBootApplication</mainClass>
+					<mainClass>com.manydesigns.portofino.microservices.boot.PortofinoDrivenBootApplication</mainClass>
 					<classifier>standalone</classifier>
 				</configuration>
 				<executions>

@@ -8,8 +8,13 @@
         <version>5.3.4-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>portofino-java-service-archetype</artifactId>
+    <artifactId>portofino-service-minimal-archetype</artifactId>
     <packaging>maven-archetype</packaging>
+    <description>
+        A Maven Archetype for a minimal Portofino service (API only, no frontend), based on Spring Boot and packaged
+        as an executable JAR file, without (by default) any security implementation, without Groovy and without
+        Portofino's filesystem-based dispatcher.
+    </description>
     <build>
         <extensions>
             <extension>
