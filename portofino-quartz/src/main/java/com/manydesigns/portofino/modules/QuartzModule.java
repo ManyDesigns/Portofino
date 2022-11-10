@@ -40,7 +40,8 @@ import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.util.Date;
 
-/*
+/**
+ * Module enabling support for the Quartz scheduler.
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -101,7 +102,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
             scheduler = factory.getScheduler();
             scheduler.setJobFactory(new PortofinoJobFactory(servletContext, applicationContext));
 
-            String factoryKey = properties.getString("quartz.servlet-context-factory-key");
+            String factoryKey = configuration.getString("quartz.servlet-context-factory-key");
             if (factoryKey == null) {
                 factoryKey = QuartzInitializerListener.QUARTZ_FACTORY_KEY;
             }
@@ -110,7 +111,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
                     + factoryKey);
             servletContext.setAttribute(factoryKey, factory);
 
-            String servletCtxtKey = properties.getString("quartz.scheduler-context-servlet-context-key");
+            String servletCtxtKey = configuration.getString("quartz.scheduler-context-servlet-context-key");
             if (servletCtxtKey != null) {
                 logger.info("Storing the ServletContext in the scheduler context at key: "
                         + servletCtxtKey);
@@ -122,7 +123,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
             }
 
             try {
-                int seconds = properties.getInt("database.failed.connections.retry.every.seconds", 60);
+                int seconds = configuration.getInt("database.failed.connections.retry.every.seconds", 60);
                 if(seconds > 0) {
                     Class jobClass = Class.forName("com.manydesigns.portofino.quartz.FailedDatabaseConnectionRetryJob");
                     JobDetail job = JobBuilder.newJob(jobClass).build();
