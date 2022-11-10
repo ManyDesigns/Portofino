@@ -16,6 +16,8 @@ import java.util.Set;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.APPLICATION_DIRECTORY;
 
+/** Import this configuration in a Spring Boot application to enable Portofino's filesystem-based dispatcher.
+ */
 public class PortofinoDispatcherSupport {
 
     @Autowired

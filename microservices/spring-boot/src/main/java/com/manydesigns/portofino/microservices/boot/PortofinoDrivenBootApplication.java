@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.microservices.boot;
 
-import com.manydesigns.portofino.spring.SpringBootResourceFileProvider;
+import com.manydesigns.portofino.microservices.boot.support.PortofinoSupport;
 import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.impl.DefaultFileSystemManager;
 import org.slf4j.Logger;
@@ -40,6 +40,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Boot application with a reloadable context managed by Portofino.
+ * If you don't need the flexibility and would rather use a traditional Boot application with Portofino,
+ * see {@link com.manydesigns.portofino.microservices.boot.support.PortofinoSupport}.
+ */
 @SpringBootApplication(exclude = {
 		ErrorMvcAutoConfiguration.class, GroovyTemplateAutoConfiguration.class,
 })
@@ -51,7 +56,7 @@ public class PortofinoDrivenBootApplication {
 	}
 
 	public static ConfigurableApplicationContext run(Class<?> applicationClass, String... args) throws FileSystemException {
-		installCommonsVfsBootSupport();
+		PortofinoSupport.installCommonsVfsBootSupport();
 		SpringApplication application = new SpringApplication(applicationClass);
 		ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
 		FileObject appDir;
@@ -90,11 +95,6 @@ public class PortofinoDrivenBootApplication {
 		defaultProperties.put("spring.resteasy.application-path", "/api/");
 		application.setDefaultProperties(defaultProperties);
 		return application.run(args);
-	}
-
-	public static void installCommonsVfsBootSupport() throws FileSystemException {
-		((DefaultFileSystemManager) VFS.getManager()).removeProvider("res");
-		((DefaultFileSystemManager) VFS.getManager()).addProvider("res", new SpringBootResourceFileProvider());
 	}
 
 	public static FileObject getApplicationDirectory(ApplicationArguments applicationArguments) throws IOException {

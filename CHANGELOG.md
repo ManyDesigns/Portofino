@@ -10,21 +10,39 @@ This is a major new version that shifts the focus of Portofino completely away f
 - Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
 
 ### Changed
-- The model is no longer tied to the database. It is a generic entity-relationship model based on Ecore.
-  - As a consequence, the model is no longer loaded/saved as part of the Persistence service. Rather, a new Model 
-    service holds the model and knows how to load and save it.  
+- The model is no longer tied to the database. It is a generic entity-relationship model based on Ecore. Therefore:
+  - the model is no longer loaded/saved as part of the Persistence service. Rather, a new Model 
+    service holds the model and knows how to load and save it.
+  - in normal operation, Portofino doesn't load and save the model in its entirety. It loads and saves the parts that it
+    needs on demand.
 - The model is no longer saved as XML. We designed a custom mini-language similar to Java.
+  - Portofino 6 can read Portofino 5 models and will convert them to the new format automatically. 
 - Resource-action configurations (`action.xml` and `configuration.xml` files) are now saved as objects in the model. 
+  - Actions update automatically to the new format.
 - Hibernate has been updated to version 6.
 - Groovy has been updated to version 4.
 
 ### Removed
 - The Angular UI is no longer part of Portofino. It is now a separate project.
 
-## [5.3.3] – Unreleased
+## [5.3.4] – Unreleased
 
 ### Added
-- New deployment option: Portofino modules as Spring Boot components, without using Portofino's dispatcher and without setting up Portofino's context hierarchy.
+- Explicit priority to `PortofinoFilter` so that users can install their own filters before or after Portofino's.
+- Possibility to enable Portofino's dispatcher in Boot applications not managed by Portofino, thus easing migration.
+
+### Changed
+- Mounted children that point to files are resolved relative to the application directory. In practice,
+  this means that Portofino no longer saves the absolute path of the login action in the root `action.xml`.
+
+### Fixed
+- Database annotations lost when synchronizing the model [#593](https://github.com/ManyDesigns/Portofino/issues/593)
+
+## [5.3.3] – 2022-10-22
+
+### Added
+- New deployment option: Portofino modules as Spring Boot components, without using Portofino's dispatcher and without 
+  setting up Portofino's context hierarchy.
 
 ### Changed
 - Updated Angular to version 13

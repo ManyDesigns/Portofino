@@ -158,6 +158,12 @@
 			<version>4.0.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.manydesigns</groupId>
+			<artifactId>portofino-crud</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 			<version>4.8.0</version> <!-- Spring Boot requires 3.x but Portofino requires 4.8.0 -->
@@ -190,7 +196,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.manydesigns.portofino.microservices.boot.PortofinoBootApplication</mainClass>
+					<mainClass>com.manydesigns.portofino.microservices.boot.PortofinoDrivenBootApplication</mainClass>
 					<classifier>standalone</classifier>
 				</configuration>
 				<executions>

@@ -8,8 +8,12 @@
         <version>6.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-    <artifactId>portofino-groovy-service-archetype</artifactId>
+    <artifactId>portofino-service-full-archetype</artifactId>
     <packaging>maven-archetype</packaging>
+    <description>
+        A Maven Archetype for a Portofino service (API only, no frontend), based on Spring Boot and packaged as an
+        executable JAR file, with Portofino's filesystem-based REST dispatcher, Groovy actions, and Apache Shiro.
+    </description>
     <build>
         <extensions>
             <extension>

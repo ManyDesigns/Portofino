@@ -120,6 +120,7 @@
         <servlet.api.version>4.0.1</servlet.api.version>
         <shiro.version>1.10.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
+        <spring.boot.version>2.5.12</spring.boot.version>
         <spring.version>5.3.20</spring.version>
         <spring.boot.version>2.6.0</spring.boot.version>
 
@@ -170,8 +171,8 @@
         <!-- upstairs -->
         <module>upstairs</module>
         <!-- Archetypes -->
-        <module>archetypes/service-groovy</module>
-        <module>archetypes/service-java</module>
+        <module>archetypes/service-minimal</module>
+        <module>archetypes/service-full</module>
         <!-- Applications -->
         <module>demo-tt</module>
     </modules>
@@ -277,6 +278,22 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
                 <version>${spring.version}</version>
+            </dependency>
+            <!-- Boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jersey</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.version}</version>
             </dependency>
             <!-- Utilities -->
             <dependency>

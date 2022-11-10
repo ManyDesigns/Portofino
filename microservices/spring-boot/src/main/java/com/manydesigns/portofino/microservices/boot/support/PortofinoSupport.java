@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.microservices.boot.support;
 
-import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
@@ -28,6 +27,7 @@ import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.spring.SpringBootResourceFileProvider;
 import com.manydesigns.portofino.spring.SpringEnvironmentConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -46,14 +46,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 
 import java.io.IOException;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.*;
+import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.CONFIGURATION_SOURCE;
 
 /** Import this configuration in a Spring Boot application to support configuring Portofino modules
  * such as persistence.
+ * Note that this doesn't enable Portofino's dispatcher. You need {@link PortofinoDispatcherSupport} for that.
  */
+@Import({ PortofinoSpringConfiguration.class })
 public class PortofinoSupport implements ApplicationContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSupport.class);
@@ -91,6 +95,11 @@ public class PortofinoSupport implements ApplicationContextAware {
         return new ConfigurationSource(configuration, writableConfiguration);
     }
 
+    @Bean(name = PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
+    public Configuration getPortofinoConfiguration(@Autowired @Qualifier(CONFIGURATION_SOURCE) ConfigurationSource c) {
+        return c.getProperties();
+    }
+
     @Bean(name = APPLICATION_DIRECTORY)
     public FileObject getApplicationDirectory() throws FileSystemException {
         installCommonsVfsBootSupport();
@@ -112,11 +121,6 @@ public class PortofinoSupport implements ApplicationContextAware {
     @Bean
     public CodeBase getCodeBase(@Autowired @Qualifier(APPLICATION_DIRECTORY) FileObject appDir) throws IOException {
         return new JavaCodeBase(appDir.getParent());
-    }
-
-    @Bean
-    public CacheResetListenerRegistry getCacheResetListenerRegistry() {
-        return new CacheResetListenerRegistry();
     }
 
     public static void installCommonsVfsBootSupport() throws FileSystemException {

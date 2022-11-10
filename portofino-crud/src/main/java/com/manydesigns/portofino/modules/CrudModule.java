@@ -46,7 +46,6 @@ import java.beans.IntrospectionException;
 public class CrudModule extends ManagedModule {
     public static final String copyright =
             "Copyright (C) 2005-2022 ManyDesigns srl";
-
     @Autowired
     public ActionRegistry actionRegistry;
 

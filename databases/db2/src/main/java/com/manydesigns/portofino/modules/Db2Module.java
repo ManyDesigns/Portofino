@@ -24,7 +24,6 @@ import com.manydesigns.portofino.database.platforms.IbmDb2DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.IbmDb2ZosDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.IbmDb2iDatabasePlatform;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,6 @@ import javax.annotation.PreDestroy;
 public class Db2Module implements Module {
     public static final String copyright =
             "Copyright (C) 2005-2022 ManyDesigns srl";
-
     @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;
 

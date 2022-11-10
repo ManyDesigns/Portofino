@@ -80,7 +80,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <mainClass>com.manydesigns.portofino.microservices.boot.PortofinoBootApplication</mainClass>
+                    <mainClass>com.manydesigns.portofino.microservices.boot.PortofinoDrivenBootApplication</mainClass>
                     <classifier>standalone</classifier>
                 </configuration>
                 <executions>
