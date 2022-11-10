@@ -24,6 +24,7 @@ import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.code.JavaCodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.service.ModelService;
+import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import com.manydesigns.portofino.spring.SpringBootResourceFileProvider;
 import com.manydesigns.portofino.spring.SpringEnvironmentConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
@@ -51,7 +52,6 @@ import org.springframework.context.annotation.Import;
 import java.io.IOException;
 
 import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.*;
-import static com.manydesigns.portofino.spring.PortofinoSpringConfiguration.CONFIGURATION_SOURCE;
 
 /** Import this configuration in a Spring Boot application to support configuring Portofino modules
  * such as persistence.
@@ -93,11 +93,6 @@ public class PortofinoSupport implements ApplicationContextAware {
 
         configuration.addConfiguration(new SpringEnvironmentConfiguration(applicationContext.getEnvironment()));
         return new ConfigurationSource(configuration, writableConfiguration);
-    }
-
-    @Bean(name = PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration getPortofinoConfiguration(@Autowired @Qualifier(CONFIGURATION_SOURCE) ConfigurationSource c) {
-        return c.getProperties();
     }
 
     @Bean(name = APPLICATION_DIRECTORY)

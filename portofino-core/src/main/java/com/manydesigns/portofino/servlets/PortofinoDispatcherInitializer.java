@@ -232,7 +232,6 @@ public class PortofinoDispatcherInitializer extends WebDispatcherInitializer {
             logger.info("No local configuration found at {}", localConfigurationPath);
         }
         configuration.addConfiguration(baseConf);
-        servletContext.setAttribute(PortofinoApplicationRoot.PORTOFINO_CONFIGURATION_ATTRIBUTE, configuration);
         this.configuration = configuration;
     }
 
