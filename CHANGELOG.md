@@ -16,9 +16,12 @@ This is a major new version that shifts the focus of Portofino completely away f
   - in normal operation, Portofino doesn't load and save the model in its entirety. It loads and saves the parts that it
     needs on demand.
 - The model is no longer saved as XML. We designed a custom mini-language similar to Java.
-  - Portofino 6 can read Portofino 5 models and will convert them to the new format automatically. 
+  - Portofino 6 can read Portofino 5 models and will convert them to the new format automatically.
 - Resource-action configurations (`action.xml` and `configuration.xml` files) are now saved as objects in the model. 
   - Actions update automatically to the new format.
+- The dispatcher (that associates a URL with a resource-action) is now based on the hierarchy of configurations in the model,
+  rather than the position of the actions in the filesystem.
+  - The legacy dispatcher is still used as a fallback.
 - Hibernate has been updated to version 6.
 - Groovy has been updated to version 4.
 
