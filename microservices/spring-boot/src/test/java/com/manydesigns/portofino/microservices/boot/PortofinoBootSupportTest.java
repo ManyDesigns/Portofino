@@ -106,10 +106,18 @@ class PortofinoBootSupportTest {
 		assertEquals("HTTP OK", 200, response.getStatus());
 
 		setupTestDb();
-		target = client.target("http://localhost:" + port + "/crud");
+
+		target = client.target("http://localhost:" + port + "/legacycrud");
 		response = target.request().get();
 		assertEquals("HTTP OK", 200, response.getStatus());
 		JSONObject body = new JSONObject(response.readEntity(String.class));
+		assertEquals("Records returned", 10, body.getInt("recordsReturned"));
+		assertEquals("Total records", 11, body.getInt("totalRecords"));
+
+		target = client.target("http://localhost:" + port + "/model-driven-crud");
+		response = target.request().get();
+		assertEquals("HTTP OK", 200, response.getStatus());
+		body = new JSONObject(response.readEntity(String.class));
 		assertEquals("Records returned", 10, body.getInt("recordsReturned"));
 		assertEquals("Total records", 11, body.getInt("totalRecords"));
 

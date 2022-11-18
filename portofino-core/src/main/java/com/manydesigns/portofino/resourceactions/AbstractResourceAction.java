@@ -221,7 +221,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             try {
                 Class<?> subResourceClass = codeBase.loadClass(childActionClass.get());
                 if(subResourceClass != null) {
-                        return createSubResource(subResourceClass, null, segment);
+                        return createSubResource(subResourceClass, null, pathSegment);
                 } else {
                     logger.debug("Subresource could not be resolved");
                 }

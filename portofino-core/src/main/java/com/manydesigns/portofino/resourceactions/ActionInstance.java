@@ -80,29 +80,6 @@ public class ActionInstance {
     //**************************************************************************
 
     /**
-     * Returns the portion of the URL that identifies this ActionInstance, including any parameters.
-     */
-    public String getUrlSegment() {
-        String segment = directory.getName().getBaseName();
-        for(String param : parameters) {
-            segment += "/" + param;
-        }
-        return segment;
-    }
-
-    /**
-     * Reconstructs the URL path to this ActionInstance from the rootFactory of the application (not including the
-     * webapp's context path).
-     */
-    public String getPath() {
-        if(getParent() == null) {
-            return "";
-        } else {
-            return getParent().getPath() + "/" + getUrlSegment();
-        }
-    }
-
-    /**
      * Returns the directory from which this action was loaded.
      */
     public FileObject getDirectory() {

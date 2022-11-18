@@ -532,7 +532,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         this.crudConfiguration = (CrudConfiguration) actionInstance.getConfiguration();
 
         if (crudConfiguration == null) {
-            logger.warn("Crud is not configured: " + actionInstance.getPath());
+            logger.warn("Crud is not configured: " + getPath());
             return;
         }
 

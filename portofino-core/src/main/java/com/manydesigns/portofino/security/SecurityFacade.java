@@ -94,7 +94,7 @@ public abstract class SecurityFacade {
             boolean allowed;
             if(actionInstance != null) {
                 logger.debug("The protected resource is a actionDescriptor action");
-                resource = actionInstance.getPath();
+                resource = resourceAction.getPath();
                 allowed = hasPermissions(configuration.getProperties(), actionInstance, handler);
             } else {
                 logger.debug("The protected resource is a regular JAX-RS resource");

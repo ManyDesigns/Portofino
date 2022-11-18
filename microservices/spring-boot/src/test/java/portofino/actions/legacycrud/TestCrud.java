@@ -1,4 +1,4 @@
-package portofino.actions.crud;
+package portofino.actions.legacycrud;
 
 import com.manydesigns.portofino.resourceactions.crud.CrudAction;
 
