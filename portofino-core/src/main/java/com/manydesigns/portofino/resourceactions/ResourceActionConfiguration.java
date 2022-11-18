@@ -49,6 +49,8 @@ public class ResourceActionConfiguration {
     @JsonProperty("additional-children")
     protected final List<AdditionalChild> additionalChildren = new ArrayList<>();
 
+    protected String actionClass;
+
     public ResourceActionConfiguration() {
         permissions = new Permissions();
     }
@@ -82,5 +84,13 @@ public class ResourceActionConfiguration {
     public void setAdditionalChildren(List<AdditionalChild> children) {
         additionalChildren.clear();
         additionalChildren.addAll(children);
+    }
+
+    public String getActionClass() {
+        return actionClass;
+    }
+
+    public void setActionClass(String actionClass) {
+        this.actionClass = actionClass;
     }
 }

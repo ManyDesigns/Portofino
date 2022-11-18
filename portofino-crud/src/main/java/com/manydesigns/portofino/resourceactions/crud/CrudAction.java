@@ -165,7 +165,10 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
                 crudConfiguration.getSelectionProviders().add(sp);
             }
         });
-        List<CrudProperty> existingProperties = this.crudConfiguration.getProperties();
+        List<CrudProperty> existingProperties = new ArrayList<>();
+        if (this.crudConfiguration != null) {
+            existingProperties.addAll(this.crudConfiguration.getProperties());
+        }
         List<CrudProperty> configuredProperties = crudConfiguration.getProperties();
         List<CrudProperty> newProperties = configuredProperties.stream().map(p1 -> {
             Optional<CrudProperty> maybeP2 =

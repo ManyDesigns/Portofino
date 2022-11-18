@@ -64,6 +64,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
@@ -81,7 +82,7 @@ import java.util.stream.Collectors;
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
 public abstract class AbstractResourceAction extends AbstractResourceWithParameters implements ResourceAction {
-    public static final String COPYRIGHT = "Copyright (C) 2005-2020 ManyDesigns srl";
+    public static final String COPYRIGHT = "Copyright (C) 2005-2022 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -178,6 +179,87 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     public void consumeParameter(String pathSegment) {
         super.consumeParameter(pathSegment);
         actionInstance.getParameters().add(pathSegment);
+    }
+
+    @NotNull
+    private AbstractResourceAction consumeParameterIfPossible(String pathSegment) {
+        if(parameters.size() < maxParameters) {
+            consumeParameter(pathSegment);
+            if(parameters.size() == maxParameters) {
+                parametersAcquired();
+            }
+            return this;
+        } else {
+            throw new WebApplicationException("Too many path parameters", 404);
+        }
+    }
+
+    @Override
+    @Path("{pathSegment}")
+    public Object consumePathSegment(@PathParam("pathSegment") String pathSegment) {
+        if(parameters.size() < minParameters) {
+            consumeParameter(pathSegment);
+            return this;
+        }
+        Object element;
+        try {
+            element = loadChild(pathSegment);
+        } catch (WebApplicationException e) {
+            if(e.getResponse().getStatus() != Response.Status.NOT_FOUND.getStatusCode()) {
+                throw e;
+            }
+            logger.debug("Not a subresource: " + pathSegment, e);
+            return consumeParameterIfPossible(pathSegment);
+        }
+        parametersAcquired();
+        return element;
+    }
+
+    public Object loadChild(String pathSegment) {
+        Optional<String> childActionClass = getChildActionClass(pathSegment);
+        if (childActionClass.isPresent()) {
+            try {
+                Class<?> subResourceClass = codeBase.loadClass(childActionClass.get());
+                if(subResourceClass != null) {
+                        return createSubResource(subResourceClass, null, segment);
+                } else {
+                    logger.debug("Subresource could not be resolved");
+                }
+            } catch (Exception e) {
+                logger.warn(
+                        getPath() + ": sub-resource " + pathSegment +
+                        " exists in the model but couldn't be instantiated, falling back to legacy dispatcher", e);
+            }
+        }
+        // Legacy filesystem-based dispatcher
+        try {
+            if (location == null) {
+                throw new WebApplicationException("Action is outside of dispatcher", 404);
+            }
+            FileObject child = getChildLocation(pathSegment);
+            return consumePathSegment(pathSegment, child, getResourceResolver());
+        } catch (FileSystemException e) {
+            logger.error("Could not access child: " + pathSegment, e);
+            throw new WebApplicationException(404);
+        }
+    }
+
+    @NotNull
+    private Optional<String> getChildActionClass(String pathSegment) {
+        return getConfigurationDomain().getSubdomain(pathSegment).map(d -> {
+            try {
+                Object configuration = modelService.getJavaObject(d, "configuration");
+                if (configuration instanceof ResourceActionConfiguration) {
+                    return ((ResourceActionConfiguration) configuration).getActionClass();
+                } else {
+                    logger.debug(getPath() + ": invalid configuration for " + pathSegment + ": " + configuration);
+                    return null;
+                }
+            } catch (Exception e) {
+                logger.debug(getPath() + ": cannot load child configuration for " + pathSegment, e);
+                return null;
+            }
+        });
     }
 
     @Override
