@@ -279,7 +279,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
         return annotations;
     }
 
-    public EPackage getModelElement() {
+    public Domain getModelElement() {
         return domain;
     }
 

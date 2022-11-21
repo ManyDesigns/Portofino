@@ -90,7 +90,7 @@ public class Persistence {
     //**************************************************************************
 
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
-    public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
+    public final static String changelogFileNameTemplate = "liquibase.changelog.";
     public static final String DATABASES_DOMAIN_NAME = "databases";
     public static final String LEGACY_MODEL_DIRECTORY = "portofino-model";
 
@@ -149,6 +149,7 @@ public class Persistence {
                             newDb -> {
                                 getDatabaseDomains().add(newDb.getModelElement());
                                 databases.add(newDb);
+                                copyLiquibaseChangelogs(modelDirectory, newDb);
                             });
                     logger.info("Loaded legacy XML model");
                     initModel();
@@ -164,6 +165,25 @@ public class Persistence {
             }
         }
         return false;
+    }
+
+    protected void copyLiquibaseChangelogs(FileObject modelDirectory, Database db)  {
+        try {
+            FileObject dbDir = modelDirectory.getChild(db.getName());
+            for (Schema schema : db.getSchemas()) {
+                FileObject schemaDir = dbDir.getChild(schema.getName());
+                if (schemaDir != null && schemaDir.getType() == FileType.FOLDER) {
+                    for (FileObject child : schemaDir.getChildren()) {
+                        String fileName = child.getName().getBaseName();
+                        if (fileName.startsWith(changelogFileNameTemplate)) {
+                            child.moveTo(modelService.getDomainDirectory(schema.getModelElement()).resolveFile(fileName));
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.warn("Could not copy liquibase changelog(s) for database " + db.getName(), e);
+        }
     }
 
     public void saveModel() throws IOException {
@@ -331,8 +351,8 @@ public class Persistence {
             String schemaName = schema.getSchemaName();
             try(Connection connection = connectionProvider.acquireConnection()) {
                 FileObject changelogFile = getLiquibaseChangelogFile(schema);
-                if(changelogFile.getType() != FileType.FILE) {
-                    logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
+                if(changelogFile == null || changelogFile.getType() != FileType.FILE) {
+                    logger.debug("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
                     continue;
                 }
                 logger.info("Running changelog file: {}", changelogFile);
@@ -341,11 +361,11 @@ public class Persistence {
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                 lqDatabase.setDefaultSchemaName(schema.getActualSchemaName());
                 String relativeChangelogPath = appDir.getName().getRelativeName(changelogFile.getName());
-                Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase);
-
-                String[] contexts = configuration.getProperties().getStringArray(LIQUIBASE_CONTEXT);
-                logger.info("Using context {}", Arrays.toString(contexts));
-                lq.update(new Contexts(contexts));
+                try(Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase)) {
+                    String[] contexts = configuration.getProperties().getStringArray(LIQUIBASE_CONTEXT);
+                    logger.info("Using context {}", Arrays.toString(contexts));
+                    lq.update(new Contexts(contexts));
+                }
             } catch (Exception e) {
                 logger.error("Couldn't update database: " + schemaName, e);
             }
@@ -614,9 +634,15 @@ public class Persistence {
         if(schema == null) {
             return null;
         }
-        FileObject dbDir = modelService.getModelDirectory().resolveFile(schema.getDatabaseName());
-        FileObject schemaDir = dbDir.resolveFile(schema.getSchemaName());
-        return schemaDir.resolveFile(changelogFileNameTemplate);
+        FileObject schemaDir = modelService.getDomainDirectory(schema.getModelElement());
+        if (schemaDir.getType() == FileType.FOLDER) {
+            for (FileObject child : schemaDir.getChildren()) {
+                if (child.getName().getBaseName().startsWith(changelogFileNameTemplate)) {
+                    return child;
+                }
+            }
+        }
+        return null;
     }
 
     public static class DatabaseSetupEvent {

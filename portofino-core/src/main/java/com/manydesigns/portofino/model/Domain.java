@@ -131,6 +131,15 @@ public class Domain extends EPackageImpl {
         return (EList) getESubpackages(); // TODO check that only domains can be added
     }
 
+    public Domain getParentDomain() {
+        EObject eObject = eContainer();
+        if (eObject instanceof Domain) {
+            return (Domain) eObject;
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public Object eGet(int featureID, boolean resolve, boolean coreType) {
         if (featureID == OBJECTS_ATTRIBUTE.getFeatureID()) {

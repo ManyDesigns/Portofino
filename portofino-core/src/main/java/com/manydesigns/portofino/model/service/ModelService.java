@@ -50,6 +50,14 @@ public class ModelService {
         return applicationDirectory.resolveFile(APP_MODEL_DIRECTORY);
     }
 
+    public FileObject getDomainDirectory(Domain domain) throws FileSystemException {
+        if (domain == null) {
+            return getModelDirectory();
+        } else {
+            return getDomainDirectory(domain.getParentDomain()).resolveFile(domain.getName());
+        }
+    }
+
     public FileObject getApplicationDirectory() {
         return applicationDirectory;
     }

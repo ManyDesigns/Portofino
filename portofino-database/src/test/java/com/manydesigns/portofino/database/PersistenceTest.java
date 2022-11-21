@@ -713,4 +713,20 @@ public class PersistenceTest {
         }
     }
 
+    public void testLiquibaseSQL() throws Exception {
+        persistence.syncDataModel("liquibase_sql");
+        persistence.initModel();
+        TableAccessor usersTable = persistence.getTableAccessor("liquibase_sql", "sql_users");
+        assertNotNull(usersTable);
+        assertNotNull(usersTable.getProperty("id"));
+    }
+
+    public void testLiquibaseXML() throws Exception {
+        persistence.syncDataModel("liquibase_xml");
+        persistence.initModel();
+        TableAccessor usersTable = persistence.getTableAccessor("liquibase_xml", "xml_users");
+        assertNotNull(usersTable);
+        assertNotNull(usersTable.getProperty("id"));
+    }
+
 }
