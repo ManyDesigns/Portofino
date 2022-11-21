@@ -141,7 +141,9 @@ public final class ElementsThreadLocals {
     }
 
     public static void removeElementsContext() {
-        threadLocalElementsContext.remove();
+        if (threadLocalElementsContext != null) {
+            threadLocalElementsContext.remove();
+        }
     }
 
     //**************************************************************************

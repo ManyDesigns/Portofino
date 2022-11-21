@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -36,23 +36,21 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+/**
+ * Represents a database table in the model.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlRootElement(name = "table")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"tableName", "entityName", "shortName", "javaClass","annotations","columns","foreignKeys","primaryKey","selectionProviders"})
 public class Table implements ModelObject, Annotated {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
+    @JsonProperty("columns")
     protected final List<Column> columns;
     protected final List<ForeignKey> foreignKeys;
     protected final List<Annotation> annotations;
@@ -230,7 +228,6 @@ public class Table implements ModelObject, Annotated {
 
     @XmlElementWrapper(name="columns")
     @XmlElement(name = "column", type = Column.class)
-    @JsonProperty("columns")
     public List<Column> getColumns() {
         return columns;
     }

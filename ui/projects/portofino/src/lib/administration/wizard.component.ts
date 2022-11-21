@@ -13,8 +13,24 @@ export class WizardComponent extends Page implements OnInit {
 
   connectionProviders: ConnectionProviderSummary[];
   databasePlatforms: DatabasePlatform[];
-  wizard: { connectionProvider: ConnectionProviderSummary, newConnectionType?: string, entityMode: string } | any =
-    { newConnectionType: 'jdbc', strategy: "automatic", entityMode: 'MAP' };
+  wizard: {
+    connectionProvider: ConnectionProviderSummary,
+    newConnectionType?: string,
+    entityMode: string,
+    tables?: any[],
+    usersTable?: any,
+    userEmailProperty?: any,
+    userNameProperty?: any,
+    userTokenProperty?: any,
+    userPasswordProperty?: any,
+    encryptionAlgorithm?: string,
+    groupsTable?: any,
+    userGroupTable?: any,
+    groupLinkProperty?: string,
+    groupNameProperty?: string,
+    userLinkProperty?: string,
+    adminGroupName?: string,
+  } | any = { newConnectionType: 'jdbc', strategy: "automatic", entityMode: 'MAP' };
   @ViewChild("stepper", { static: true })
   stepper: MatStepper;
 
@@ -86,6 +102,17 @@ export class WizardComponent extends Page implements OnInit {
         }
       });
       this.wizard.tables = tables;
+      delete this.wizard.usersTable;
+      delete this.wizard.userEmailProperty;
+      delete this.wizard.userNameProperty;
+      delete this.wizard.userPasswordProperty;
+      delete this.wizard.userTokenProperty;
+      delete this.wizard.groupsTable;
+      delete this.wizard.groupNameProperty;
+      delete this.wizard.userGroupTable;
+      delete this.wizard.groupLinkProperty;
+      delete this.wizard.userLinkProperty;
+      delete this.wizard.adminGroupName;
       this.stepper.next();
     });
   }
