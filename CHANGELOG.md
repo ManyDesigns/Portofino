@@ -8,6 +8,7 @@ This is a major new version that shifts the focus of Portofino completely away f
 
 ### Added
 - Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
+- Support for Liquibase changelogs written in SQL (and any other language supported by Liquibase).
 
 ### Changed
 - The model is no longer tied to the database. It is a generic entity-relationship model based on Ecore. Therefore:
@@ -19,8 +20,8 @@ This is a major new version that shifts the focus of Portofino completely away f
   - Portofino 6 can read Portofino 5 models and will convert them to the new format automatically.
 - Resource-action configurations (`action.xml` and `configuration.xml` files) are now saved as objects in the model. 
   - Actions update automatically to the new format.
-- The dispatcher (that associates a URL with a resource-action) is now based on the hierarchy of configurations in the model,
-  rather than the position of the actions in the filesystem.
+- The dispatcher (that associates a URL with a REST resource-action) is now based on the hierarchy of configurations 
+  in the model, rather than the position of the action class in the filesystem.
   - The legacy dispatcher is still used as a fallback.
 - Hibernate has been updated to version 6.
 - Groovy has been updated to version 4.

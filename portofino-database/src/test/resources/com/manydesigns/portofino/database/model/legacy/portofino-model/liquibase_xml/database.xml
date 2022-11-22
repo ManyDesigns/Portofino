@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database databaseName="liquibase_xml">
+    <jdbcConnection driver="org.h2.Driver" password="manydesigns" url="jdbc:h2:mem:liquibase_xml" username="manydesigns"/>
+    <schemas>
+        <schema schemaName="PUBLIC" />
+    </schemas>
+</database>

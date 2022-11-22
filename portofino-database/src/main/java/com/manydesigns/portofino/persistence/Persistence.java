@@ -59,9 +59,7 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.resource.CompositeResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.*;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.*;
 import org.hibernate.Session;
@@ -176,7 +174,31 @@ public class Persistence {
                     for (FileObject child : schemaDir.getChildren()) {
                         String fileName = child.getName().getBaseName();
                         if (fileName.startsWith(changelogFileNameTemplate)) {
-                            child.moveTo(modelService.getDomainDirectory(schema.getModelElement()).resolveFile(fileName));
+                            FileObject domainDirectory = modelService.getDomainDirectory(schema.getModelElement());
+                            if (!domainDirectory.exists()) {
+                                domainDirectory.createFolder();
+                            }
+                            if (domainDirectory.getType() == FileType.FOLDER) {
+                                if (convertLegacyModel) {
+                                    child.moveTo(domainDirectory.resolveFile(fileName));
+                                } else {
+                                    domainDirectory.copyFrom(child.getParent(), new FileSelector() {
+                                        @Override
+                                        public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
+                                            return fileInfo.getFile().getPath().equals(child.getPath());
+                                        }
+
+                                        @Override
+                                        public boolean traverseDescendents(FileSelectInfo fileInfo) throws Exception {
+                                            return true;
+                                        }
+                                    });
+                                }
+                            } else {
+                                logger.error(
+                                        "Could not copy Liquibase changelog " + child.getName().getPath() + " to " +
+                                                domainDirectory.getName().getPath() + " because it's not a directory.");
+                            }
                         }
                     }
                 }
