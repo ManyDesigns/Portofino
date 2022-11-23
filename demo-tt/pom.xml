@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.4.1</version>
+            <version>42.4.3</version>
             <scope>provided</scope>
         </dependency>
         <!-- This is for building an executable war. -->
