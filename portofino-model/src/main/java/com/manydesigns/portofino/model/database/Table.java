@@ -124,7 +124,7 @@ public class Table implements ModelObject, Annotated {
     public void init(Model model, Configuration configuration) {
         assert schema != null;
         assert tableName != null;
-        
+
         // wire up javaClass
         actualJavaClass = ReflectionUtil.loadClass(javaClass);
         if(!StringUtils.isBlank(idStrategy)) {
@@ -215,6 +215,14 @@ public class Table implements ModelObject, Annotated {
 
     public void setJavaClass(String javaClass) {
         this.javaClass = javaClass;
+    }
+
+    public void setJavaClass(Class<?> javaClass) {
+        if (javaClass != null) {
+            setJavaClass(javaClass.getName());
+        } else {
+            this.javaClass = null;
+        }
     }
 
     @XmlAttribute

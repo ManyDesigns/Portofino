@@ -63,9 +63,9 @@ public class HibernateDatabaseSetup {
         this.configuration = configuration;
         this.multiTenancyImplementation = multiTenancyImplementation;
         threadSessions = new ThreadLocal<>();
-        database.getAllTables().forEach(t -> {
-            jpaEntityNameToClassNameMap.put(t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode));
-        });
+        database.getAllTables().forEach(
+                t -> jpaEntityNameToClassNameMap.put(
+                        t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode)));
     }
 
     public SessionFactory getSessionFactory() {

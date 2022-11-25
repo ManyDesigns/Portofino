@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import org.apache.commons.vfs2.FileObject;
@@ -31,14 +32,16 @@ public class POJOPersistenceTest extends PersistenceTest {
 
     @Test
     public void testGeneratedClasses() throws FileSystemException {
-        FileObject genClassesDir = persistence.getApplicationDirectory().resolveFile(DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
+        FileObject genClassesDir = persistence.getApplicationDirectory().resolveFile(
+                DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
         assertTrue(genClassesDir.exists());
         FileObject jpetstoreDir = genClassesDir.resolveFile("jpetstore");
         assertTrue(jpetstoreDir.exists());
-        DatabaseLogic.findDatabaseByName(persistence.getModel(), "jpetstore").setEntityMode(EntityMode.MAP.getExternalName());
+        Database jpetstore = DatabaseLogic.findDatabaseByName(persistence.getModel(), "jpetstore");
+        jpetstore.setEntityMode(EntityMode.MAP.getExternalName());
         persistence.initModel();
         assertFalse(jpetstoreDir.exists());
-        DatabaseLogic.findDatabaseByName(persistence.getModel(), "jpetstore").setEntityMode(EntityMode.POJO.getExternalName());
+        jpetstore.setEntityMode(EntityMode.POJO.getExternalName());
         persistence.initModel();
         assertTrue(jpetstoreDir.exists());
     }

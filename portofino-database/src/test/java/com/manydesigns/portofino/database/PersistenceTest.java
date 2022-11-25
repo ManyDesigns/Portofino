@@ -22,6 +22,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
@@ -625,6 +626,24 @@ public class PersistenceTest {
         if(error == null) {
             fail("Was expecting an exception");
         }
+    }
+
+    @Test
+    public void testCustomClassMapping() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "hibernatetest", "PUBLIC", "TABLE_WITHOUT_REFERENCES");
+        table.setJavaClass(TableWithoutReferences.class);
+        persistence.initModel();
+        assertEquals("table_without_references", table.getActualEntityName());
+        TableWithoutReferences t = new TableWithoutReferences();
+        t.setContents("first");
+        Session session = persistence.getSession("hibernatetest");
+        session.persist(t);
+        session.flush();
+        TableWithoutReferences actualT = session.get(TableWithoutReferences.class, t.getId());
+        assertEquals(actualT, t);
+        actualT = session.createQuery("from table_without_references", TableWithoutReferences.class).list().get(0);
+        assertEquals(actualT, t);
     }
 
 }
