@@ -245,7 +245,7 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
         if (javaClass != null) {
             setJavaClass(javaClass.getName());
         } else {
-            this.javaClass = null;
+            setJavaClass((String) null);
         }
     }
 

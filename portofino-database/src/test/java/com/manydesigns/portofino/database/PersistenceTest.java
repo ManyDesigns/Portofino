@@ -717,7 +717,7 @@ public class PersistenceTest {
     @Test
     public void testCustomClassMapping() {
         Table table = DatabaseLogic.findTableByName(
-                persistence.getModel(), "hibernatetest", "PUBLIC", "TABLE_WITHOUT_REFERENCES");
+                persistence.getDatabases(), "hibernatetest", "PUBLIC", "TABLE_WITHOUT_REFERENCES");
         table.setJavaClass(TableWithoutReferences.class);
         persistence.initModel();
         assertEquals("table_without_references", table.getActualEntityName());
@@ -735,7 +735,7 @@ public class PersistenceTest {
     @Test
     public void testCustomClassMappingWithRelationships() {
         Table table = DatabaseLogic.findTableByName(
-                persistence.getModel(), "hibernatetest", "PUBLIC", "TABLE1");
+                persistence.getDatabases(), "hibernatetest", "PUBLIC", "TABLE1");
         table.setJavaClass(Table1.class);
         persistence.initModel();
         assertEquals("table1", table.getActualEntityName());

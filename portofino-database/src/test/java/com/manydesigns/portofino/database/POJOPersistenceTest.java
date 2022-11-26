@@ -1,9 +1,8 @@
 package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.database.model.Database;
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
-import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import org.apache.commons.vfs2.FileObject;
@@ -38,8 +37,7 @@ public class POJOPersistenceTest extends PersistenceTest {
         FileObject jpetstoreDir = genClassesDir.resolveFile("jpetstore");
         assertTrue(jpetstoreDir.exists());
         Database jpetstore = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore");
-        jpetstore
-                .setEntityMode(EntityMode.MAP.name());
+        jpetstore.setEntityMode(EntityMode.MAP.name());
         persistence.initModel();
         assertFalse(jpetstoreDir.exists());
         jpetstore.setEntityMode(EntityMode.POJO.name());
