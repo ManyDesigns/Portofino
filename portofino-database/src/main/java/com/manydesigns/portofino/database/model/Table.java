@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -40,22 +40,19 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+/**
+ * Represents a database table in the model.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlRootElement(name = "table")
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlType(propOrder = {"tableName", "entityName", "shortName", "javaClass","annotations","columns","foreignKeys","primaryKey","selectionProviders"})
 public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     @JsonProperty("columns")
     protected final List<Column> columns;
@@ -242,6 +239,14 @@ public class Table implements ModelObject, Annotated, Named, Unmarshallable {
     public void setJavaClass(String javaClass) {
         tableInfo.setPropertyValue("javaClass", javaClass);
         eClass.setInstanceClassName(getJavaClass());
+    }
+
+    public void setJavaClass(Class<?> javaClass) {
+        if (javaClass != null) {
+            setJavaClass(javaClass.getName());
+        } else {
+            this.javaClass = null;
+        }
     }
 
     @XmlAttribute

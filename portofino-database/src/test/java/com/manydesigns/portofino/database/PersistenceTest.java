@@ -29,6 +29,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
@@ -711,6 +712,42 @@ public class PersistenceTest {
         if(error == null) {
             fail("Was expecting an exception");
         }
+    }
+
+    @Test
+    public void testCustomClassMapping() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "hibernatetest", "PUBLIC", "TABLE_WITHOUT_REFERENCES");
+        table.setJavaClass(TableWithoutReferences.class);
+        persistence.initModel();
+        assertEquals("table_without_references", table.getActualEntityName());
+        TableWithoutReferences t = new TableWithoutReferences();
+        t.setContents("first");
+        Session session = persistence.getSession("hibernatetest");
+        session.persist(t);
+        session.flush();
+        TableWithoutReferences actualT = session.get(TableWithoutReferences.class, t.getId());
+        assertEquals(actualT, t);
+        actualT = session.createQuery("from table_without_references", TableWithoutReferences.class).list().get(0);
+        assertEquals(actualT, t);
+    }
+
+    @Test
+    public void testCustomClassMappingWithRelationships() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "hibernatetest", "PUBLIC", "TABLE1");
+        table.setJavaClass(Table1.class);
+        persistence.initModel();
+        assertEquals("table1", table.getActualEntityName());
+        Table1 t = new Table1();
+        t.setText("testCustomClass");
+        Session session = persistence.getSession("hibernatetest");
+        session.persist(t);
+        session.flush();
+        Table1 actualT = session.get(Table1.class, t.getId());
+        assertEquals(t, actualT);
+        actualT = session.createQuery("from table1 where id = " + t.getId(), Table1.class).list().get(0);
+        assertEquals(t.getId(), actualT.getId());
     }
 
     public void testLiquibaseSQL() throws Exception {

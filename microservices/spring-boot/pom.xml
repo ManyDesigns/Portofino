@@ -45,12 +45,6 @@
 			<artifactId>spring-boot-autoconfigure</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.manydesigns</groupId>
-			<artifactId>portofino-jersey</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jersey</artifactId>
 			<scope>provided</scope>
@@ -60,17 +54,12 @@
 			<artifactId>jersey-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.manydesigns</groupId>
-			<artifactId>portofino-resteasy</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
 		<!-- Jackson – we have to override Boot's versions -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 		</dependency>
+		<!-- JAX-RS impl -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>

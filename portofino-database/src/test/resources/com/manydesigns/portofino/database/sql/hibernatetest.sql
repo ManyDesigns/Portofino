@@ -9,7 +9,7 @@ CREATE TABLE comune (
 
 
 --
--- Name: domanda; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: domanda; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.domanda;
 CREATE TABLE public.domanda (
@@ -24,7 +24,7 @@ CREATE TABLE public.domanda (
 
 
 --
--- Name: table1; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table1; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table1;
 CREATE TABLE public.table1 (
@@ -34,7 +34,7 @@ CREATE TABLE public.table1 (
 
 
 --
--- Name: table2; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table2; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table2;
 CREATE TABLE public.table2 (
@@ -46,7 +46,7 @@ CREATE TABLE public.table2 (
 
 
 --
--- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP VIEW IF EXISTS public.test_view_1; --view depends on this table
 DROP TABLE IF EXISTS public.table3;
@@ -60,7 +60,7 @@ CREATE TABLE public.table3 (
 
 
 --
--- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table4;
 CREATE TABLE public.table4 (
@@ -70,7 +70,7 @@ CREATE TABLE public.table4 (
 
 
 --
--- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace:
+-- Name: delibera; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.delibera;
 CREATE TABLE public.delibera (
@@ -79,7 +79,7 @@ CREATE TABLE public.delibera (
     regione character varying(30) NOT NULL,
     provincia character varying(30) NOT NULL,
     comune character varying(30) NOT NULL,
-    catid varchar(10) not null   
+    catid varchar(10) not null
 );
 
 
@@ -205,3 +205,9 @@ DROP TABLE IF EXISTS public.test_spaces; --it looks like Liquibase doesn't find 
 CREATE TABLE public.test_spaces(
     "id spaces" bigint not null primary key,
     "some other column with spaces" character varying (123));
+
+DROP TABLE IF EXISTS public.table_without_references;
+CREATE TABLE public.table_without_references (
+    id IDENTITY NOT NULL,
+    text character varying(15) NOT NULL
+);
