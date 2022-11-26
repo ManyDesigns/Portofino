@@ -646,4 +646,22 @@ public class PersistenceTest {
         assertEquals(actualT, t);
     }
 
+    @Test
+    public void testCustomClassMappingWithRelationships() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getModel(), "hibernatetest", "PUBLIC", "TABLE1");
+        table.setJavaClass(Table1.class);
+        persistence.initModel();
+        assertEquals("table1", table.getActualEntityName());
+        Table1 t = new Table1();
+        t.setText("testCustomClass");
+        Session session = persistence.getSession("hibernatetest");
+        session.persist(t);
+        session.flush();
+        Table1 actualT = session.get(Table1.class, t.getId());
+        assertEquals(t, actualT);
+        actualT = session.createQuery("from table1 where id = " + t.getId(), Table1.class).list().get(0);
+        assertEquals(t.getId(), actualT.getId());
+    }
+
 }
