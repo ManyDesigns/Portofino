@@ -60,6 +60,12 @@
 			<artifactId>jersey-client</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.manydesigns</groupId>
+			<artifactId>portofino-resteasy</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Jackson – we have to override Boot's versions -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
