@@ -159,11 +159,11 @@
   "defaultProject": "frontend",
   "schematics": {
     "@schematics/angular:component": {
-      "prefix": "app",
+      "prefix": "demo-tt",
       "style": "scss"
     },
     "@schematics/angular:directive": {
-      "prefix": "app"
+      "prefix": "demo-tt"
     }
   },
   "cli": {

@@ -1,27 +1,27 @@
 import {Component, Input, NgModule, OnInit} from '@angular/core';
-import { MatAutocompleteModule } from "@angular/material/autocomplete";
-import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
-import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatDatepickerModule } from "@angular/material/datepicker";
-import { MatDialogModule } from "@angular/material/dialog";
-import { MatDividerModule } from "@angular/material/divider";
-import { MatExpansionModule } from "@angular/material/expansion";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatListModule } from "@angular/material/list";
-import { MatMenuModule } from "@angular/material/menu";
-import { MatPaginatorModule } from "@angular/material/paginator";
-import { MatProgressBarModule } from "@angular/material/progress-bar";
-import { MatRadioModule } from "@angular/material/radio";
-import { MatSelectModule } from "@angular/material/select";
-import { MatSidenavModule } from "@angular/material/sidenav";
-import { MatSnackBarModule } from "@angular/material/snack-bar";
-import { MatSortModule } from "@angular/material/sort";
-import { MatTableModule } from "@angular/material/table";
-import { MatToolbarModule } from "@angular/material/toolbar";
-import { MatTreeModule } from "@angular/material/tree";
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTreeModule } from '@angular/material/tree';
 import {
   PortofinoModule,
   Page,
@@ -36,26 +36,26 @@ import {
   TextPageComponent,
   CustomPageComponent,
   DetailComponent, PortofinoFormsModule, UpstairsComponent
-} from "portofino";
-import {BrowserModule} from "@angular/platform-browser";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {QuillModule} from "ngx-quill";
-import {HttpClient, HttpClientModule} from "@angular/common/http";
-import {FlexLayoutModule} from "@angular/flex-layout";
-import {MatLuxonDateModule} from "@angular/material-luxon-adapter";
-import {FileInputAccessorModule} from "file-input-accessor";
-import {TranslateModule} from "@ngx-translate/core";
-import {ScrollingModule} from "@angular/cdk/scrolling";
-import {NgxdModule} from "@ngxd/core";
-import {RouterModule} from "@angular/router";
+} from 'portofino';
+import {BrowserModule} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {QuillModule} from 'ngx-quill';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
+import {FlexLayoutModule} from '@angular/flex-layout';
+import {MatLuxonDateModule} from '@angular/material-luxon-adapter';
+import {FileInputAccessorModule} from 'file-input-accessor';
+import {TranslateModule} from '@ngx-translate/core';
+import {ScrollingModule} from '@angular/cdk/scrolling';
+import {NgxdModule} from '@ngxd/core';
+import {RouterModule} from '@angular/router';
 
-import {registerLocaleData} from "@angular/common";
-import localeEs from "@angular/common/locales/es";
-import localeIt from "@angular/common/locales/it";
+import {registerLocaleData} from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+import localeIt from '@angular/common/locales/it';
 import { ProfileComponent } from './profile.component';
-import {MatChipsModule} from "@angular/material/chips";
-import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatChipsModule} from '@angular/material/chips';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
@@ -63,27 +63,28 @@ registerLocaleData(localeEs);
 registerLocaleData(localeIt);
 
 @Component({
-  selector: 'portofino-hello',
-  template: `<p>Welcome to Portofino 5!</p>`
+  selector: 'demo-tt-hello',
+  template: `<p>Welcome to the sample Portofino 5 ticket-tracker application, Demo-tt!</p>
+  <p>This is a completely custom Angular component.</p>`
 })
-export class HelloPortofino implements OnInit {
+export class HelloPortofinoComponent implements OnInit {
 
   constructor(protected http: HttpClient, protected portofino: PortofinoService) {}
 
   ngOnInit(): void {
-    this.http.get(this.portofino.apiRoot).subscribe(x => console.log("API Call", x));
+    this.http.get(this.portofino.apiRoot).subscribe(x => console.log('API Call', x));
   }
 
 }
 
 @Component({
-  selector: 'custom-navigation',
+  selector: 'demo-tt-custom-navigation',
   template: `<h3>Custom navigation</h3><p><a routerLink="/hello">Start here</a> </p>`
 })
-export class CustomNavigation {}
+export class CustomNavigationComponent {}
 
 @Component({
-  selector: 'portofino-welcome',
+  selector: 'demo-tt-welcome',
   templateUrl: 'home.html',
   styleUrls: ['home.scss']
 })
@@ -102,16 +103,16 @@ export class WelcomeComponent extends Page implements OnInit {
   selector: 'demo-tt-projects-crud',
   templateUrl: '../../node_modules/portofino/assets/pages/crud/crud.component.html'
 })
-export class ProjectsCrud extends CrudComponent {
+export class ProjectsCrudComponent extends CrudComponent {
 
   initialize(): void {
     super.initialize();
-    this.detailComponent = ProjectsSummary;
-    this.detailComponentContext = { customInput: "works!" };
+    this.detailComponent = ProjectsSummaryComponent;
+    this.detailComponentContext = { customInput: 'works!' };
   }
 
   showSearch() {
-    this.router.navigateByUrl("/");
+    this.router.navigateByUrl('/');
   }
 }
 
@@ -152,18 +153,18 @@ export class ProjectsCrud extends CrudComponent {
   </div>`,
   styleUrls: ['../../node_modules/portofino/assets/pages/crud/search/search.component.scss']
 })
-export class ProjectsSummary extends DetailComponent {
+export class ProjectsSummaryComponent extends DetailComponent implements OnInit {
   @Input()
   customInput;
   ngOnInit(): void {
-    console.log("Custom detail with input", this.customInput);
+    console.log('Custom detail with input', this.customInput);
     super.ngOnInit();
   }
 
   // Return to read instead of search
   afterSaved() {
     const objectUrl = `${this.sourceUrl}/${this.id}`;
-    //Refresh the object
+    // Refresh the object
     this.loadObject(objectUrl, () => {
       this.setEditMode(false);
     });
@@ -171,7 +172,7 @@ export class ProjectsSummary extends DetailComponent {
 }
 
 @Component({
-  selector: 'app-root',
+  selector: 'demo-tt-root',
   template: `<portofino-app appTitle="Demo-TT" apiRoot="http://localhost:8080/demo-tt/api/">
     <portofino-templates></portofino-templates>
   </portofino-app>`
@@ -180,15 +181,15 @@ export class DemoTTAppComponent {}
 
 @NgModule({
   declarations: [
-    DemoTTAppComponent, HelloPortofino, CustomNavigation, WelcomeComponent, ProfileComponent,
-    ProjectsCrud, ProjectsSummary],
+    DemoTTAppComponent, HelloPortofinoComponent, CustomNavigationComponent, WelcomeComponent, ProfileComponent,
+    ProjectsCrudComponent, ProjectsSummaryComponent],
   providers: [
     { provide: NAVIGATION_COMPONENT, useFactory: DemoTTAppModule.navigation },
     { provide: NOTIFICATION_HANDLERS, useClass: MatSnackBarNotificationService, multi: true },
   ],
   imports: [
     RouterModule.forRoot([
-        {path: "hello", component: HelloPortofino}, ...PortofinoModule.defaultRoutes()],
+        {path: 'hello', component: HelloPortofinoComponent}, ...PortofinoModule.defaultRoutes()],
       PortofinoModule.defaultRouterConfig()),
     PortofinoModule,
     BrowserModule, BrowserAnimationsModule, FlexLayoutModule, FormsModule, HttpClientModule, ReactiveFormsModule,
@@ -202,15 +203,16 @@ export class DemoTTAppComponent {}
   bootstrap: [DemoTTAppComponent]
 })
 export class DemoTTAppModule {
-  static navigation() {
-    return DefaultNavigationComponent
-    //return CustomNavigation
-  }
-
   // It's necessary to spell used components here, otherwise Angular (Ivy) tree-shakes them.
   // See https://github.com/angular/angular/issues/33715#issuecomment-617606494 and
   // https://github.com/angular/angular/issues/35314#issuecomment-584821399
   static entryComponents = [
-    CustomPageComponent, ProjectsCrud, ProjectsSummary, TextPageComponent, WelcomeComponent, ProfileComponent,
+    CustomPageComponent, ProjectsCrudComponent, ProjectsSummaryComponent, TextPageComponent, WelcomeComponent, ProfileComponent,
     UpstairsComponent ];
+
+  static navigation() {
+    return DefaultNavigationComponent;
+    // Replace with the following to configure a custom navigation (sidebar) component.
+    // return CustomNavigationComponent;
+  }
 }
