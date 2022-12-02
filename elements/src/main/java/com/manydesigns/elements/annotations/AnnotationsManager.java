@@ -31,8 +31,9 @@ import java.util.*;
 
 /**
  * A central registry that knows about all annotation implementations in Elements (listed in elements.properties).
- * @deprecated in favor of {@link AnnotationFactory}.
- * 
+ * @deprecated in favor of {@link AnnotationFactory}, but kept around in order to support loading older models from
+ * Portofino 4.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com

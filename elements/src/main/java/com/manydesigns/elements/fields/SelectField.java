@@ -22,7 +22,6 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.json.JsonBuffer;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
@@ -33,6 +32,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONStringer;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -390,7 +390,7 @@ public class SelectField extends AbstractField<Object> {
                 selectionModel.getOptions(selectionModelIndex);
 
         int counter = 0;
-        
+
         if (!required) {
             String radioId = id + "_" + counter;
             boolean checked = (value == null);
@@ -494,36 +494,36 @@ public class SelectField extends AbstractField<Object> {
         Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
         // prepariamo Json
-        JsonBuffer jb = new JsonBuffer();
+        JSONStringer jb = new JSONStringer();
 
         // apertura array Json
-        jb.openArray();
+        jb.array();
 
         if (includeSelectPrompt && !options.isEmpty()) {
-            jb.openObject();
-            jb.writeKeyValue("v", ""); // value
-            jb.writeKeyValue("l", comboLabel); // label
-            jb.writeKeyValue("s", true); // selected
-            jb.closeObject();
+            jb.object();
+            jb.key("v").value(""); // value
+            jb.key("l").value(comboLabel); // label
+            jb.key("s").value(true); // selected
+            jb.endObject();
         }
 
         for (Map.Entry<Object,SelectionModel.Option> option : options.entrySet()) {
             if(!option.getValue().active) {
                 continue;
             }
-            jb.openObject();
+            jb.object();
             Object optionValue = option.getKey();
             String optionStringValue = OgnlUtils.convertValueToString(optionValue);
             String optionLabel = option.getValue().label;
 
-            jb.writeKeyValue("v", optionStringValue);
-            jb.writeKeyValue("l", optionLabel);
-            jb.writeKeyValue("s", false);
-            jb.closeObject();
+            jb.key("v").value(optionStringValue);
+            jb.key("l").value(optionLabel);
+            jb.key("s").value(false);
+            jb.endObject();
         }
 
         // chiusura array Json
-        jb.closeArray();
+        jb.endArray();
 
         return jb.toString();
     }
