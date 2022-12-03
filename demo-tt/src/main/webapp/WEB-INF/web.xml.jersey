@@ -49,6 +49,12 @@
         <param-name>portofino.api.root</param-name>
         <param-value>api</param-value>
     </context-param>
+    <!-- If this parameter is not present, jersey-spring5 automatically registers a ContextLoaderListener that clashes
+         with Portofino's. -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>DISABLE</param-value>
+    </context-param>
 
     <servlet>
         <servlet-name>Portofino Frontend API</servlet-name>

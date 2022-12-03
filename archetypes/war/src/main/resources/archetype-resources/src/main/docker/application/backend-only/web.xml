@@ -21,5 +21,11 @@
         <servlet-name>com.manydesigns.portofino.jersey.PortofinoApplication</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+    <!-- If this parameter is not present, jersey-spring5 automatically registers a ContextLoaderListener that clashes
+     with Portofino's. -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>DISABLE</param-value>
+    </context-param>
 
 </web-app>

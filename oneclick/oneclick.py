@@ -3,11 +3,11 @@
 """
 In order to run this script, you must first create a "local.py" file using the following template:
 
-portofino_version = "5.3.2"
-tomcat_dir = "apache-tomcat-9.0.62"
+portofino_version = "5.3.4"
+tomcat_dir = "apache-tomcat-9.0.69"
 portofino_path = "~/projects/portofino5"
-tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.62/bin/apache-tomcat-9.0.62.zip"
-drivers = [["org/postgresql/postgresql/42.3.3/", "postgresql-42.3.3.jar"],
+tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-9/v9.0.69/bin/apache-tomcat-9.0.69.zip"
+drivers = [["org/postgresql/postgresql/42.4.3/", "postgresql-42.4.3.jar"],
            ["mysql/mysql-connector-java/8.0.20/", "mysql-connector-java-8.0.20.jar"],
            ["net/sourceforge/jtds/jtds/1.3.1/", "jtds-1.3.1.jar"],
            ["org/mariadb/jdbc/mariadb-java-client/2.6.1/", "mariadb-java-client-2.6.1.jar"]]
