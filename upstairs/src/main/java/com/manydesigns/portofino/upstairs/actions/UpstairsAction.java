@@ -165,7 +165,7 @@ public class UpstairsAction extends AbstractResourceAction {
 
     @POST
     @Path("application/security")
-    public void createSecurityGrooyv(WizardInfo wizard) {
+    public void createSecurityGroovy(WizardInfo wizard) {
         String databaseName = (String) (wizard.connectionProvider).get("name");
         Database database = DatabaseLogic.findDatabaseByName(persistence.getModel(), databaseName);
         if(database == null) {
