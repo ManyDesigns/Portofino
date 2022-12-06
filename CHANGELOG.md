@@ -29,18 +29,24 @@ This is a major new version that shifts the focus of Portofino completely away f
 ### Removed
 - The Angular UI is no longer part of Portofino. It is now a separate project.
 
-## [5.3.4] – Unreleased
+## [5.3.4] – 2022-12-02
 
 ### Added
 - Explicit priority to `PortofinoFilter` so that users can install their own filters before or after Portofino's.
 - Possibility to enable Portofino's dispatcher in Boot applications not managed by Portofino, thus easing migration.
+- Some long-due API documentation of Elements.
+- Support references between externally mapped classes and automatically mapped classes.
 
 ### Changed
 - Mounted children that point to files are resolved relative to the application directory. In practice,
   this means that Portofino no longer saves the absolute path of the login action in the root `action.xml`.
+- Updated various dependencies to address security vulnerability reports.
+- The Maven archetypes have been renamed to better reflect their nature, and a description has been added to each of them.
+- Avoid explicit quoting of database identifiers when Hibernate applies it automatically.
 
 ### Fixed
 - Database annotations lost when synchronizing the model [#593](https://github.com/ManyDesigns/Portofino/issues/593)
+- Wizard: users and groups columns can't be selected [#609](https://github.com/ManyDesigns/Portofino/issues/609)
 
 ## [5.3.3] – 2022-10-22
 

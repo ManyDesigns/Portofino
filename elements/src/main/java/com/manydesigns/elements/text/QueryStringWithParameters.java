@@ -22,6 +22,7 @@ package com.manydesigns.elements.text;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,10 +58,10 @@ public class QueryStringWithParameters implements Serializable {
         QueryStringWithParameters that = (QueryStringWithParameters) o;
 
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        if (!Arrays.equals(parameters, that.parameters)) return false;
-        if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null) return false;
-
-        return true;
+        if (!Arrays.equals(parameters, that.parameters)) {
+            return false;
+        }
+        return Objects.equals(queryString, that.queryString);
     }
 
     @Override
