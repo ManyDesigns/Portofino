@@ -144,7 +144,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         if(persistence.getConnectionProvider(databaseName) != null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
-        persistence.getDatabases().add(connectionProvider.getDatabase());
+        persistence.addDatabase(connectionProvider.getDatabase());
         persistence.initModel();
         try {
             String connectionsWithSchemas =
@@ -152,7 +152,7 @@ public class ConnectionsAction extends AbstractResourceAction {
             persistence.saveModel();
             return Response.created(new URI(getActionPath() + "/" + databaseName)).entity(connectionsWithSchemas).build();
         } catch (Exception e) {
-            persistence.getDatabases().remove(connectionProvider.getDatabase());
+            persistence.removeDatabase(connectionProvider.getDatabase());
             persistence.initModel();
             try {
                 persistence.saveModel();
@@ -374,7 +374,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         if (database == null) {
             throw new WebApplicationException("Delete failed. Connection provider not found: " + databaseName);
         } else {
-            persistence.getDatabases().remove(database);
+            persistence.removeDatabase(database);
             persistence.initModel();
             persistence.saveModel();
             logger.info("Database {} deleted", databaseName);

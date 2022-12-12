@@ -421,8 +421,7 @@ public class Persistence {
 
     public synchronized void removeDatabase(Database database) {
         databases.remove(database);
-        EPackage pkg = database.getModelElement();
-        getDatabaseDomains().remove(pkg);
+        getDatabaseDomains().remove(database.getModelElement());
     }
 
     public void addDatabase(Database database) {
@@ -698,7 +697,7 @@ public class Persistence {
     }
 
     public List<Database> getDatabases() {
-        return databases;
+        return Collections.unmodifiableList(databases);
     }
 
     public boolean isConvertLegacyModel() {

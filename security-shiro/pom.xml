@@ -20,13 +20,13 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-database</artifactId>
+            <artifactId>portofino-mail</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mail</artifactId>
+            <artifactId>portofino-database</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
