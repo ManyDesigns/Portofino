@@ -22,8 +22,6 @@ package com.manydesigns.portofino.database.model;
 
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EcoreFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,6 +138,20 @@ public class Database implements ModelObject, Named, Unmarshallable, Annotated {
     @XmlElement(name = "schema", type = Schema.class)
     public List<Schema> getSchemas() {
         return schemas;
+    }
+
+    public void addSchema(Schema schema) {
+        if (schemas.contains(schema)) {
+            return;
+        }
+        schema.setParent(this);
+        getModelElement().getSubdomains().add(schema.getModelElement());
+        schemas.add(schema);
+    }
+
+    public void removeSchema(Schema schema) {
+        getModelElement().getSubdomains().remove(schema.getModelElement());
+        schemas.remove(schema);
     }
 
     //**************************************************************************

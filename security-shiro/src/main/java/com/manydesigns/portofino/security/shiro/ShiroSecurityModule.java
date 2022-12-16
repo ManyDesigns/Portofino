@@ -96,7 +96,7 @@ public class ShiroSecurityModule extends ManagedModule {
 
     @Override
     public String getName() {
-        return "Shiro Security";
+        return "shiro-security";
     }
 
     @Bean

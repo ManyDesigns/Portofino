@@ -52,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -99,7 +100,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         js.object();
         FormUtil.writeToJson(form, js);
         js.key("schemas").array();
-        for(SelectableSchema schema: getSchemas(connectionProvider)) {
+        for(SelectableSchema schema : getSchemas(connectionProvider)) {
             js.object();
             js.key("catalog").value(schema.catalogName);
             js.key("name").value(schema.schemaName);
@@ -118,6 +119,7 @@ public class ConnectionsAction extends AbstractResourceAction {
     }
 
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createConnection(String jsonInput) {
         JSONObject jsonObject = new JSONObject(jsonInput);
@@ -194,7 +196,7 @@ public class ConnectionsAction extends AbstractResourceAction {
             if(jsonObject.has("schemas")) {
                 JSONArray schemasJson = jsonObject.getJSONArray("schemas");
                 updateSchemas(connectionProvider, schemasJson,
-                        (database, schema) -> database.getSchemas().remove(schema));
+                        (database, schema) -> database.removeSchema(schema));
             }
             form.writeToObject(cp);
             return handler.apply(connectionProvider, form);
@@ -314,7 +316,7 @@ public class ConnectionsAction extends AbstractResourceAction {
                         modelSchema.setCatalog(schema.getString("catalog"));
                     }
                     modelSchema.setActualSchemaName(physicalName);
-                    database.getSchemas().add(modelSchema);
+                    database.addSchema(modelSchema);
                 } else {
                     for(Schema aSchema : database.getSchemas()) {
                         if(aSchema.getActualSchemaName().equals(physicalName)) {
@@ -376,7 +378,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         Database database =
                 DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
         if (database == null) {
-            throw new WebApplicationException("Delete failed. Connection provider not found: " + databaseName);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         } else {
             persistence.removeDatabase(database);
             persistence.initModel();
@@ -399,10 +401,55 @@ public class ConnectionsAction extends AbstractResourceAction {
 
     @POST
     @Path("{databaseName}/:test")
+    @Produces(MediaType.APPLICATION_JSON)
     public String[] test(@PathParam("databaseName") String databaseName) {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         connectionProvider.init(persistence.getDatabasePlatformsRegistry());
         return new String[] { connectionProvider.getStatus(), connectionProvider.getErrorMessage() };
+    }
+
+    //Schemas
+    @POST
+    @Path("{databaseName}/{schemaName}")
+    public Response addSchema(
+            @PathParam("databaseName") String databaseName,
+            @PathParam("schemaName") String schemaName,
+            String actualSchemaName) throws IOException {
+        Database database = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
+        if (database == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        if (DatabaseLogic.findSchemaByName(database, schemaName) != null) {
+            return Response
+                    .status(Response.Status.CONFLICT)
+                    .entity(ElementsThreadLocals.getText("the.schema.already.exists"))
+                    .build();
+        }
+        Schema schema = new Schema(database);
+        schema.setConfiguration(portofinoConfiguration.getProperties());
+        schema.setSchemaName(schemaName);
+        schema.setActualSchemaName(StringUtils.trimToNull(actualSchemaName));
+        database.addSchema(schema);
+        persistence.saveDatabase(database);
+        return Response.created(uriInfo.getRequestUri()).build();
+    }
+
+    @DELETE
+    @Path("{databaseName}/{schemaName}")
+    public Response removeSchema(
+            @PathParam("databaseName") String databaseName,
+            @PathParam("schemaName") String schemaName) throws IOException {
+        Database database = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
+        if (database == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        Schema schema = DatabaseLogic.findSchemaByName(database, schemaName);
+        if (schema == null) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+        database.removeSchema(schema);
+        persistence.saveDatabase(database);
+        return Response.ok().build();
     }
 
 }

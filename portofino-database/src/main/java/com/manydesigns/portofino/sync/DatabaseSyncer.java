@@ -125,7 +125,7 @@ public class DatabaseSyncer {
                 targetSchema.setCatalog(catalog);
                 targetSchema.setSchemaName(sourceSchema.getSchemaName());
                 targetSchema.setActualSchemaName(sourceSchema.getActualSchemaName());
-                targetDatabase.getSchemas().add(targetSchema);
+                targetDatabase.addSchema(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
             }
         }

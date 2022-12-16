@@ -75,7 +75,7 @@ public class UpstairsModule extends ManagedModule implements ApplicationContextA
 
     @Override
     public String getName() {
-        return "\"Upstairs\" (configure, add, remove pages)";
+        return "portofino-upstairs";
     }
 
     @Override

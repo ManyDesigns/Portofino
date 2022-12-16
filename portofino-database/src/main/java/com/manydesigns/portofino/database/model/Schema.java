@@ -63,7 +63,7 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     protected Configuration configuration;
     protected String key;
     protected final List<Annotation> annotations = new ArrayList<>();
-    
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -156,9 +156,14 @@ public class Schema implements ModelObject, Annotated, Named, Unmarshallable {
     }
 
     public void setDatabase(Database database) {
+        if (this.database == database) {
+            return;
+        } else if (this.database != null) {
+            this.database.removeSchema(this);
+        }
         this.database = database;
         if(this.database != null) {
-            database.getModelElement().getESubpackages().add(this.domain);
+            database.addSchema(this);
         }
     }
 

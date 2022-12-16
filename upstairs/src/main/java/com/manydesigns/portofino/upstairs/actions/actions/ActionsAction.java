@@ -130,7 +130,7 @@ public class ActionsAction extends AbstractResourceAction {
             logger.error("Can't create actionDescriptor - directory {} exists", directory.getName().getPath());
             throw new WebApplicationException(
                     Response.serverError()
-                    .entity(ElementsThreadLocals.getText("error.creating.page.the.directory.already.exists"))
+                    .entity(ElementsThreadLocals.getText("error.creating.action.the.directory.already.exists"))
                     .build());
         }
         directory.createFolder();

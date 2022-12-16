@@ -212,6 +212,10 @@ public class Persistence {
         modelService.saveDomain(getDatabaseDomain());
     }
 
+    public void saveDatabase(Database database) throws IOException {
+        modelService.saveDomain(database.getModelElement());
+    }
+
     protected Domain getDatabaseDomain() {
         try {
             return modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, !convertLegacyModel);
@@ -280,7 +284,7 @@ public class Persistence {
     protected Schema setupSchema(Database database, Domain domain) {
         Schema schema = new Schema(domain);
         schema.setDatabase(database);
-        database.getSchemas().add(schema);
+        database.addSchema(schema);
         EAnnotation schemaAnn =
                 domain.getEAnnotation(com.manydesigns.portofino.database.model.annotations.Schema.class.getName());
         if(schemaAnn != null) {

@@ -134,7 +134,7 @@ public class TableTest {
         db.setDatabaseName("portofino");
         Schema schema = new Schema();
         schema.setDatabase(db);
-        db.getSchemas().add(schema);
+        db.addSchema(schema);
         schema.setSchemaName("meta");
         Table table = new Table();
         table.setSchema(schema);
@@ -168,7 +168,7 @@ public class TableTest {
         initDatabase(db, databases);
         assertEquals("_0dprpt", column.getActualPropertyName());
 
-        
+
         column.setColumnName("XYZéèçò°àùì");
         initDatabase(db, databases);
         assertEquals("xyzéèçò_àùì", column.getActualPropertyName());
@@ -192,7 +192,7 @@ public class TableTest {
         db.setConnectionProvider(new JdbcConnectionProvider());
         Schema schema = new Schema();
         schema.setDatabase(db);
-        db.getSchemas().add(schema);
+        db.addSchema(schema);
         schema.setSchemaName("meta");
 
         Table table = new Table();
