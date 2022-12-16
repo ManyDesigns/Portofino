@@ -43,6 +43,7 @@ import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.resourceactions.login.support.ConfirmUserRequest;
@@ -295,10 +296,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
         }
     }
 
-    public String getApplicationName() {
-        return portofinoConfiguration.getProperties().getString(PortofinoProperties.APP_NAME);
-    }
-
     protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
         if (password == null) {
             errorMessages.add(ElementsThreadLocals.getText("null.password"));
@@ -380,7 +377,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
         Subject subject = SecurityUtils.getSubject();
         if (subject.getPrincipal() != null) {
             logger.debug("Already logged in");
-            throw new WebApplicationException(Response.Status.CONFLICT);
+            throw new WebApplicationException(
+                    ElementsThreadLocals.getText("user.already.logged.in"),
+                    Response.Status.CONFLICT);
         }
 
         String confirmationUrl = context.getRequest().getParameter("portofino:confirmationUrl");
@@ -460,4 +459,24 @@ public class DefaultLoginAction extends AbstractResourceAction {
         logger.info("User logout");
     }
 
+    @Override
+    public ResourceActionConfiguration loadConfiguration() {
+        // Load a default configuration
+        ResourceActionConfiguration configuration = new ResourceActionConfiguration();
+        actionInstance.setConfiguration(configuration);
+        if (applicationContext != null) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
+        }
+        configuration.init();
+        return configuration;
+    }
+
+    /**
+     * Subclasses can invoke this method in {@link #loadConfiguration()} to restore normal behavior.
+     * @return the configuration loaded from the model.
+     * @throws Exception in case the configuration cannot be loaded.
+     */
+    protected ResourceActionConfiguration loadConfigurationNormally() throws Exception {
+        return super.loadConfiguration();
+    }
 }

@@ -232,16 +232,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             }
         }
         // Legacy filesystem-based dispatcher
-        try {
-            if (location == null) {
-                throw new WebApplicationException("Action is outside of dispatcher", 404);
-            }
-            FileObject child = getChildLocation(pathSegment);
-            return consumePathSegment(pathSegment, child, getResourceResolver());
-        } catch (FileSystemException e) {
-            logger.error("Could not access child: " + pathSegment, e);
-            throw new WebApplicationException(404);
-        }
+        return super.consumePathSegment(pathSegment);
     }
 
     @NotNull
@@ -623,6 +614,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         return parentDomain.ensureDomain(getSegment());
     }
 
+    /**
+     * Loads this action's configuration from the model or from legacy action.xml and configuration.xml files.
+     * @return the loaded configuration.
+     * @throws Exception in case the configuration cannot be loaded.
+     */
     public ResourceActionConfiguration loadConfiguration() throws Exception {
         Object configuration = modelService.getJavaObject(getConfigurationDomain(), "configuration");
         if (configuration != null) {

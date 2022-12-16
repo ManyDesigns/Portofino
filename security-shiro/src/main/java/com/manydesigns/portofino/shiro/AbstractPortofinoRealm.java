@@ -99,7 +99,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         Key key = getJWTKey();
         Jws<Claims> jwt;
         try {
-            jwt = Jwts.parser().setSigningKey(key).parseClaimsJws(token.getPrincipal());
+            jwt = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.getPrincipal());
         } catch (JwtException e) {
             throw new AuthenticationException(e);
         }

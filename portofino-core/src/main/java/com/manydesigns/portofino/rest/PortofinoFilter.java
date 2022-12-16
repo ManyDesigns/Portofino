@@ -207,7 +207,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             } else {
                 requestContext.abortWith(
                         Response.status(CONFLICT)
-                                .entity("The action couldn't be invoked, a guard did not pass")
+                                .entity("a.guard.did.not.pass")
                                 .build());
             }
         } else {

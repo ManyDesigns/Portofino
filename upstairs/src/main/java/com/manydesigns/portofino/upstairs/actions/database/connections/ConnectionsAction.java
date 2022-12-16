@@ -22,6 +22,7 @@ package com.manydesigns.portofino.upstairs.actions.database.connections;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
@@ -142,7 +143,10 @@ public class ConnectionsAction extends AbstractResourceAction {
     protected Response doCreateConnectionProvider(ConnectionProvider connectionProvider, Form form) {
         String databaseName = connectionProvider.getDatabase().getDatabaseName();
         if(persistence.getConnectionProvider(databaseName) != null) {
-            return Response.status(Response.Status.CONFLICT).build();
+            return Response
+                    .status(Response.Status.CONFLICT)
+                    .entity(ElementsThreadLocals.getText("the.database.already.exists"))
+                    .build();
         }
         persistence.addDatabase(connectionProvider.getDatabase());
         persistence.initModel();
