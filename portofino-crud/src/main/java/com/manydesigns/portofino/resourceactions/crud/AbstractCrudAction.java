@@ -439,7 +439,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
                 (classAccessor.getAnnotation(Insertable.class) == null ||
                  classAccessor.getAnnotation(Insertable.class).value());
     }
-    
+
     /**
      * Hook method called just after a new object has been created.
      * @param object the new object.
@@ -474,7 +474,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
                 (classAccessor.getAnnotation(Updatable.class) == null ||
                  classAccessor.getAnnotation(Updatable.class).value());
     }
-    
+
     /**
      * Hook method called just before an object is used to populate the edit form.
      * @param object the object.
@@ -503,7 +503,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
                 (classAccessor.getAnnotation(Updatable.class) == null ||
                  classAccessor.getAnnotation(Updatable.class).value());
     }
-    
+
     /**
      * Hook method called before an object is deleted.
      * @param object the object.
@@ -732,10 +732,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     protected SearchFormBuilder configureSearchFormBuilder(SearchFormBuilder searchFormBuilder) {
         // setup option providers
-        if(selectionProviderSupport != null) {
+        if(selectionProviderSupport != null && selectionProviderLoadStrategy != SelectionProviderLoadStrategy.NONE) {
             for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
                 SelectionProvider selectionProvider = current.getSelectionProvider();
-                if(selectionProvider == null || !current.isEnforced()) {
+                if(selectionProvider == null) {
                     continue;
                 }
                 String[] fieldNames = current.getFieldNames();
@@ -768,10 +768,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
         // setup option providers
-        if(selectionProviderSupport != null) {
+        if(selectionProviderSupport != null && selectionProviderLoadStrategy != SelectionProviderLoadStrategy.NONE) {
             for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
                 SelectionProvider selectionProvider = current.getSelectionProvider();
-                if (selectionProvider == null) {
+                if(selectionProvider == null) {
                     continue;
                 }
                 String[] fieldNames = current.getFieldNames();
@@ -917,7 +917,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
             if(selectionProvider == null || (
-                    selectionProviderLoadStrategy == SelectionProviderLoadStrategy.ONLY_ENFORCED  && !current.isEnforced())) {
+                    selectionProviderLoadStrategy == SelectionProviderLoadStrategy.ONLY_ENFORCED && !current.isEnforced())) {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
@@ -1260,7 +1260,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         return jsonOptions(selectionProviderName, 0, labelSearch, prefix, includeSelectPrompt);
     }
-    
+
     /**
      * Returns values to update multiple related select fields or a single autocomplete text field, in JSON form.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
@@ -1277,7 +1277,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @GET
     @Path(":selectionProvider/{selectionProviderName}/{selectionProviderIndex : (\\d+)}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "The values a given selection provider can assume")
+    @Operation(summary =
+            "The values a given selection provider can assume. We can use such values to update multiple " +
+            "related select fields or a single autocomplete text field.")
     public Response jsonOptions(
             @Parameter(description = "The name of the selection provider")
             @PathParam("selectionProviderName") String selectionProviderName,
@@ -1317,7 +1319,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             field.setUpdatable(true);
         }
         form.readFromRequest(context.getRequest());
-        
+
         //The form only contains fields from the selection provider, so the index matches that of the field
         if(selectionProviderIndex < 0 || selectionProviderIndex >= fieldSet.size()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid index").build();
@@ -1590,7 +1592,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * Handles object creation with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2.1
      * @return the created object as JSON (in a JAX-RS Response).
-     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug. 
+     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)
