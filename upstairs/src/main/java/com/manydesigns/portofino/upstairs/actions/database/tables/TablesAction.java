@@ -32,6 +32,7 @@ import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.database.model.*;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
@@ -184,7 +185,8 @@ public class TablesAction extends AbstractResourceAction {
     @Produces(MediaType.APPLICATION_JSON)
     private List<Map> getTypeInformation(Table table) {
         List<Map> typeInfo = new ArrayList<>();
-        Type[] types = persistence.getConnectionProvider(table.getDatabaseName()).getTypes();
+        ConnectionProvider connectionProvider = persistence.getConnectionProvider(table.getDatabaseName());
+        Type[] types = connectionProvider.getTypes();
         for(Column column : table.getColumns()) {
             Type type = null;
             for (Type candidate : types) {
@@ -207,12 +209,14 @@ public class TablesAction extends AbstractResourceAction {
                 break;
             }
             Integer precision = column.getLength();
-            Class[] javaTypes = type.getAvailableJavaTypes(precision);
+            DatabasePlatform databasePlatform = connectionProvider.getDatabasePlatform();
+            Class[] javaTypes = databasePlatform.getAvailableJavaTypes(type, precision);
             Map<String, Object> info = new HashMap<>();
             info.put("type", type);
 
             //Default
-            Class defaultJavaType = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), precision, column.getScale());
+            Class defaultJavaType = databasePlatform.getDefaultJavaType(
+                    column.getJdbcType(), column.getColumnType(), precision, column.getScale());
             if(defaultJavaType == null) {
                 defaultJavaType = Object.class;
             }
@@ -619,7 +623,10 @@ public class TablesAction extends AbstractResourceAction {
     public Class getColumnType(Column column, String typeName) throws ClassNotFoundException {
         Class type;
         if("default".equals(typeName) || typeName == null) {
-            type = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), column.getLength(), column.getScale());
+            ConnectionProvider connectionProvider = persistence.getConnectionProvider(column.getDatabaseName());
+            DatabasePlatform databasePlatform = connectionProvider.getDatabasePlatform();
+            type = databasePlatform.getDefaultJavaType(
+                    column.getJdbcType(), column.getColumnType(), column.getLength(), column.getScale());
         } else {
             type = Class.forName(typeName);
         }

@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.database.model;
 
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
@@ -264,7 +265,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         if (property.getEType() != null) {
             return property.getEType().getInstanceClass();
         } else {
-            return Type.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
+            DatabasePlatform databasePlatform =
+                    getTable().getSchema().getDatabase().getConnectionProvider().getDatabasePlatform();
+            return databasePlatform.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
         }
     }
 

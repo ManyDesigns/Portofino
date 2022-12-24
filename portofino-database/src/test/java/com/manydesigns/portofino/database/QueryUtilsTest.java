@@ -3,6 +3,7 @@ package com.manydesigns.portofino.database;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.text.QueryStringWithParameters;
+import com.manydesigns.portofino.database.model.platforms.GenericDatabasePlatform;
 import com.manydesigns.portofino.model.InitVisitor;
 import com.manydesigns.portofino.model.LinkVisitor;
 import com.manydesigns.portofino.model.Model;
@@ -28,9 +29,11 @@ public class QueryUtilsTest {
     }
 
     public void testMergeQueryWithAlias() throws NoSuchFieldException {
-        Model model = new Model();
-
         Database database = new Database();
+        JdbcConnectionProvider connectionProvider = new JdbcConnectionProvider() {{
+            databasePlatform = new GenericDatabasePlatform();
+        }};
+        database.setConnectionProvider(connectionProvider);
         database.setDatabaseName("db");
         List<Database> databases = new ArrayList<>();
         databases.add(database);

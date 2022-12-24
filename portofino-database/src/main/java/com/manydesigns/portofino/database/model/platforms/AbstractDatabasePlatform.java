@@ -22,14 +22,22 @@ package com.manydesigns.portofino.database.model.platforms;
 
 import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.ConnectionProvider;
+import com.manydesigns.portofino.database.model.Type;
 import org.apache.commons.dbutils.DbUtils;
+import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -78,6 +86,8 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     protected String status;
     protected String hibernateDialect;
     protected String connectionStringTemplate;
+    protected final List<TypeProvider> additionalTypeProviders = new ArrayList<>();
+
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractDatabasePlatform.class);
 
@@ -128,6 +138,144 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     public void shutdown(ConnectionProvider connectionProvider) {
         logger.info("Shutting down connection provider: {}",
                 connectionProvider.getDatabase().getDatabaseName());
+    }
+
+    //**************************************************************************
+    // Types
+    //**************************************************************************
+
+    @Override
+    public List<TypeProvider> getAdditionalTypeProviders() {
+        return additionalTypeProviders;
+    }
+
+    @Nullable
+    @Override
+    public Class<?> getDefaultJavaType(int jdbcType, String typeName, Integer precision, Integer scale) {
+        for (TypeProvider typeProvider : additionalTypeProviders) {
+            Class<?> defaultJavaType = typeProvider.getDefaultJavaType(jdbcType, typeName, precision, scale);
+            if (defaultJavaType != null) {
+                logger.debug(
+                        "Additional type provider " + typeProvider + " returned "+ defaultJavaType + " for" +
+                        jdbcType + ", " + typeName + ", " + precision + ", " + scale);
+                return defaultJavaType;
+            }
+        }
+        switch (jdbcType) {
+            case Types.BIGINT:
+                return Long.class;
+            case Types.BIT:
+            case Types.BOOLEAN:
+                return Boolean.class;
+            case Types.CHAR:
+            case Types.VARCHAR:
+            case Types.NCHAR:
+            case Types.NVARCHAR:
+            case Types.CLOB:
+            case Types.LONGVARCHAR:
+                return String.class;
+            case Types.DATE:
+                return java.sql.Date.class;
+            case Types.TIME:
+                return Time.class;
+            case Types.TIMESTAMP:
+                return Timestamp.class;
+            case Types.DECIMAL:
+            case Types.NUMERIC:
+                if(scale != null && scale > 0) {
+                    return BigDecimal.class;
+                } else {
+                    return getDefaultNumericType(precision);
+                }
+            case Types.DOUBLE:
+            case Types.REAL:
+                return Double.class;
+            case Types.FLOAT:
+                return Float.class;
+            case Types.INTEGER:
+                return getDefaultNumericType(precision);
+            case Types.SMALLINT:
+                return Short.class;
+            case Types.TINYINT:
+                return Byte.class;
+            case Types.BINARY:
+            case Types.BLOB:
+            case Types.LONGVARBINARY:
+            case Types.VARBINARY:
+                return byte[].class;
+            case Types.ARRAY:
+                return java.sql.Array.class;
+            case Types.DATALINK:
+                return java.net.URL.class;
+            case Types.DISTINCT:
+            case Types.JAVA_OBJECT:
+                return Object.class;
+            case Types.NULL:
+            case Types.REF:
+                return java.sql.Ref.class;
+            case Types.STRUCT:
+                return java.sql.Struct.class;
+            default:
+                logger.warn("Unsupported JDBC type: {}", jdbcType);
+                return null;
+        }
+    }
+
+    @Nullable
+    public Class<?> getDefaultJavaType(Type type) {
+        return getDefaultJavaType(type.getJdbcType(), type.getTypeName(), type.getMaximumPrecision(), type.getMaximumScale());
+    }
+
+    protected Class<? extends Number> getDefaultNumericType(Integer precision) {
+        if(precision == null) {
+            return BigInteger.class;
+        }
+        if(precision < Math.log10(Integer.MAX_VALUE)) {
+            return Integer.class;
+        } else if(precision < Math.log10(Long.MAX_VALUE)) {
+            return Long.class;
+        } else {
+            return BigInteger.class;
+        }
+    }
+
+
+    @Override
+    public Class[] getAvailableJavaTypes(Type type, Integer length) {
+        for (TypeProvider typeProvider : additionalTypeProviders) {
+            Class[] javaTypes = typeProvider.getAvailableJavaTypes(type, length);
+            if (javaTypes != null) {
+                logger.debug(
+                        "Additional type provider " + typeProvider + " returned " + Arrays.toString(javaTypes) +
+                                " for" + type + " with length " + length);
+                return javaTypes;
+            }
+        }
+        if(type.isNumeric()) {
+            return new Class[] {
+                    Integer.class, Long.class, Byte.class, Short.class,
+                    Float.class, Double.class, BigInteger.class, BigDecimal.class,
+                    Boolean.class };
+        } else {
+            Class<?> defaultJavaType = getDefaultJavaType(type);
+            if(defaultJavaType == String.class) {
+                if(length != null && length < 256) {
+                    return new Class[] { String.class, Boolean.class };
+                } else {
+                    return new Class[] { String.class };
+                }
+            } else if(defaultJavaType == Timestamp.class) {
+                return new Class[] { Timestamp.class, DateTime.class, java.sql.Date.class, LocalDateTime.class, ZonedDateTime.class, Instant.class };
+            } else if(defaultJavaType == java.sql.Date.class) {
+                return new Class[] { java.sql.Date.class, DateTime.class, LocalDate.class, Timestamp.class }; //TODO Joda LocalDate as well?
+            } else {
+                if(defaultJavaType != null) {
+                    return new Class[] { defaultJavaType };
+                } else {
+                    return new Class[] { Object.class };
+                }
+            }
+        }
     }
 
     //**************************************************************************
