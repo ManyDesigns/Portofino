@@ -49,26 +49,12 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields (physical JDBC)
-    //**************************************************************************
-
     protected Table table;
-
-    //**************************************************************************
-    // Fields (logical)
-    //**************************************************************************
-
     protected String javaType; // Legacy XML-only property
     protected EAttribute property;
     protected Annotation columnInfo;
     protected List<Annotation> annotations = new ArrayList<>();
-
-    //**************************************************************************
-    // Fields for wire-up
-    //**************************************************************************
-
-    protected String propertyName;
+    protected String propertyName; // Legacy XML-only property
 
     public static final Logger logger = LoggerFactory.getLogger(Column.class);
 
@@ -121,13 +107,15 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
             throw new IllegalStateException("columnName must not be null");
         }
 
-        if (StringUtils.isEmpty(propertyName)) {
-            String initialName = DatabaseLogic.normalizeName(getColumnName());
-            if(!initialName.equals(property.getName())) {
-                property.setName(DatabaseLogic.getUniquePropertyName(table, initialName));
+        if (property.getName() == null) {
+            if (StringUtils.isEmpty(propertyName)) {
+                String initialName = DatabaseLogic.normalizeName(getColumnName());
+                if (!initialName.equals(property.getName())) {
+                    property.setName(DatabaseLogic.getUniquePropertyName(table, initialName));
+                }
+            } else {
+                property.setName(DatabaseLogic.getUniquePropertyName(table, propertyName));
             }
-        } else {
-            property.setName(propertyName); //AS do not normalize (can be mixed-case Java properties)
         }
         // Re-set the column name so that if it's equal to the property name it's not saved in the annotation
         setColumnName(getColumnName());

@@ -23,6 +23,7 @@ package com.manydesigns.portofino.database.model.platforms;
 import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.ConnectionProvider;
 import com.manydesigns.portofino.database.model.Type;
+import com.manydesigns.portofino.model.Annotation;
 import org.apache.commons.dbutils.DbUtils;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -121,6 +123,11 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     @Override
     public TypeDescriptor getDatabaseSpecificType(Column column) {
         return null;
+    }
+
+    @Override
+    public List<Annotation> getAdditionalAnnotations(Column column) {
+        return Collections.emptyList();
     }
 
     public String getHibernateDialect() {

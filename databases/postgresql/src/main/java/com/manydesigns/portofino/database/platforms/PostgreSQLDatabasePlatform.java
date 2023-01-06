@@ -23,13 +23,17 @@ package com.manydesigns.portofino.database.platforms;
 import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.ConnectionProvider;
 import com.manydesigns.portofino.database.model.platforms.AbstractDatabasePlatform;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.persistence.hibernate.ColumnParameterType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQL82Dialect;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.usertype.DynamicParameterizedType;
 
 import java.math.BigDecimal;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -73,21 +77,15 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     }
 
     @Override
-    public TypeDescriptor getDatabaseSpecificType(Column column) {
+    public List<Annotation> getAdditionalAnnotations(Column column) {
         if ("JSONB".equalsIgnoreCase(column.getColumnType())) {
-            // TODO Hibernate 6 should support JSON mapping na
-            Properties typeParams = new Properties();
-            if(column.getActualJavaType() == Map.class) {
-                typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Map.class));
-                return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonUserType", typeParams);
-            } else if(column.getActualJavaType() == List.class) {
-                typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Object.class));
-                return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonListUserType", typeParams);
-            } else {
-                logger.warn("Unsupported column data type: " + column.getActualJavaType());
-            }
+            Annotation annotation = new Annotation();
+            annotation.setType(JdbcTypeCode.class.getName());
+            annotation.setPropertyValue("value", SqlTypes.JSON + "");
+            return Collections.singletonList(annotation);
+        } else {
+            return super.getAdditionalAnnotations(column);
         }
-        return super.getDatabaseSpecificType(column);
     }
 
     @Override

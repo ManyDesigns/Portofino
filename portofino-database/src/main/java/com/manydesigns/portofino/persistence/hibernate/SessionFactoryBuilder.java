@@ -23,7 +23,6 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
-import org.hibernate.MappingException;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.boot.Metadata;
@@ -48,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import jakarta.persistence.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -570,7 +568,8 @@ public class SessionFactoryBuilder {
                 }
             }
 
-            setupColumnType(column, fieldAnnotations, constPool);
+            setupColumnTypeAnnotation(column, fieldAnnotations, constPool);
+            setupColumnCustomAnnotations(column, fieldAnnotations, constPool);
 
             column.getAnnotations().forEach(ann -> {
                 Class<?> annotationClass = ann.getJavaAnnotationClass();
@@ -668,7 +667,7 @@ public class SessionFactoryBuilder {
         return annotation;
     }
 
-    protected void setupColumnType(Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
+    protected void setupColumnTypeAnnotation(Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
         Annotation annotation;
         if(Boolean.class.equals(column.getActualJavaType())) {
             if(column.getJdbcType() == Types.CHAR || column.getJdbcType() == Types.VARCHAR) {
@@ -698,6 +697,18 @@ public class SessionFactoryBuilder {
                 parameters.setValue(typeParams.toArray(new AnnotationMemberValue[0]));
                 annotation.addMemberValue("parameters", parameters);
                 fieldAnnotations.addAnnotation(annotation);
+            }
+        }
+    }
+
+    protected void setupColumnCustomAnnotations
+            (Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
+        List<com.manydesigns.portofino.model.Annotation> annotations =
+                database.getConnectionProvider().getDatabasePlatform().getAdditionalAnnotations(column);
+        for (com.manydesigns.portofino.model.Annotation annotation : annotations) {
+            Annotation fieldAnn = convertAnnotation(constPool, annotation);
+            if (fieldAnn != null) {
+                fieldAnnotations.addAnnotation(fieldAnn);
             }
         }
     }

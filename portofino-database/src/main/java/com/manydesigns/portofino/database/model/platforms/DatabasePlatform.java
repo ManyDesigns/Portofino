@@ -24,6 +24,7 @@ import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.ConnectionProvider;
 import com.manydesigns.portofino.database.model.Type;
+import com.manydesigns.portofino.model.Annotation;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.DatabaseMetaData;
@@ -61,6 +62,8 @@ public interface DatabasePlatform extends TypeProvider {
     String getStatus();
 
     TypeDescriptor getDatabaseSpecificType(Column column);
+
+    List<Annotation> getAdditionalAnnotations(Column column);
 
     void test();
     boolean isApplicable(ConnectionProvider connectionProvider);
