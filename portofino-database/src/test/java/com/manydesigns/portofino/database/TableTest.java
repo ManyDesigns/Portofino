@@ -169,10 +169,12 @@ public class TableTest {
         assertEquals("_0dprpt", column.getActualPropertyName());
 
 
+        column.getModelElement().setName(null);
         column.setColumnName("XYZéèçò°àùì");
         initDatabase(db, databases);
         assertEquals("xyzéèçò_àùì", column.getActualPropertyName());
 
+        column.getModelElement().setName(null);
         column.setColumnName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
         initDatabase(db, databases);
         assertEquals("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", column.getActualPropertyName());
