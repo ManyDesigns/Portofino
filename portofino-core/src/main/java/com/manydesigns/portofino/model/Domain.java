@@ -25,6 +25,7 @@ public class Domain extends EPackageImpl {
 
     public static final EClass CLASS;
     public static final EAttribute OBJECTS_ATTRIBUTE;
+    public static final String PATH_SEPARATOR = ".";
 
     static {
         CLASS = EcoreFactory.eINSTANCE.createEClass();
@@ -314,7 +315,7 @@ public class Domain extends EPackageImpl {
         }
         String superQName = getQualifiedName(domain.getESuperPackage());
         if (superQName != null) {
-            return superQName + "." + domain.getName();
+            return superQName + PATH_SEPARATOR + domain.getName();
         } else {
             return domain.getName();
         }

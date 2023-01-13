@@ -21,10 +21,12 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.testng.Assert.*;
 
-public class DefaultModelIOTest {
+public class ModelIOTest {
 
     @Test
     public void testSimpleDomain() throws IOException {
@@ -111,6 +113,32 @@ public class DefaultModelIOTest {
         Model model = io.load();
         assertEquals(model.getDomains().size(), 2);
         assertEquals(model.getIssues().size(), 4);
+    }
+
+    @Test
+    public void testExternallyLoadedDomains() throws IOException {
+        ElementsThreadLocals.setupDefaultElementsContext();
+        Map<String, Domain> externallyLoadedDomains = new HashMap<>();
+        Model model = new Model();
+        ModelIO io = new ModelIO(VFS.getManager().resolveFile("res:test-model-1"), externallyLoadedDomains);
+        FileObject testDomain2Dir = VFS.getManager().resolveFile("res:testDomain2");
+        io.loadExternalDomain("testDomain2", testDomain2Dir, model);
+        io.loadExternalDomain("testDomain1.testDomain2", testDomain2Dir, model);
+        model = io.load();
+        assertEquals(model.getDomains().size(), 3);
+        Domain testDomain1 = model.getDomain("testDomain1");
+        assertNotNull(testDomain1);
+        Domain testDomain2 = testDomain1.getSubdomain("testDomain2").orElse(null);
+        assertNotNull(testDomain2);
+        assertEquals(1, testDomain2.getEClassifiers().size());
+        assertNotNull(testDomain2.getEClassifier("Person"));
+        FileObject outDir = VFS.getManager().resolveFile("ram://portofino/test-model-1");
+        io = new ModelIO(outDir, externallyLoadedDomains);
+        io.save(model);
+        FileObject domainFile = outDir.resolveFile("testDomain1/testDomain2");
+        assertFalse(domainFile.exists());
+        model = io.load();
+        assertEquals(model.getDomains().size(), 3);
     }
 
 }

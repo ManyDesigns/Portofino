@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class ModelIO {
@@ -35,6 +36,7 @@ public class ModelIO {
     private static final Logger logger = LoggerFactory.getLogger(ModelIO.class);
 
     private final FileObject modelDirectory;
+    private final Map<String, Domain> externallyLoadedDomains;
     private final List<ToLink> toLinkQueue = new ArrayList<>();
 
     private static class ToLink {
@@ -47,30 +49,13 @@ public class ModelIO {
         }
     }
 
-    public ModelIO(FileObject modelDirectory) {
+    public ModelIO(FileObject modelDirectory, Map<String, Domain> externallyLoadedDomains) {
         this.modelDirectory = modelDirectory;
+        this.externallyLoadedDomains = externallyLoadedDomains;
     }
 
-    public Domain load(String name, Model model) throws IOException {
-        return loadDomain(name, null, modelDirectory, model);
-    }
-
-    public Domain load(String name, Domain parent, Model model) throws IOException {
-        return loadDomain(name, parent, getDomainDirectory(parent), model);
-    }
-
-    @Nullable
-    protected Domain loadDomain(String name, Domain parent, FileObject parentDirectory, Model model) throws IOException {
-        if (parentDirectory.exists() && parentDirectory.getType().equals(FileType.FOLDER)) {
-            FileObject domainDir = parentDirectory.getChild(name);
-            if (domainDir != null && domainDir.exists()) {
-                return loadDomainDirectory(model, parent, domainDir);
-            } else {
-                return null;
-            }
-        } else {
-            throw new IOException("Not a directory: " + parentDirectory.getName().getPath());
-        }
+    public ModelIO(FileObject modelDirectory) {
+        this(modelDirectory, new ConcurrentHashMap<>());
     }
 
     public synchronized Model load() throws IOException {
@@ -83,6 +68,11 @@ public class ModelIO {
             throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
         }
         try {
+            for (Map.Entry<String, Domain> entry: externallyLoadedDomains.entrySet()) {
+                if (!entry.getKey().contains(Domain.PATH_SEPARATOR)) {
+                    model.getDomains().add(entry.getValue());
+                }
+            }
             for (FileObject domainDir : modelDir.getChildren()) {
                 if (domainDir.isFolder()) {
                     loadDomainDirectory(model, null, domainDir);
@@ -97,19 +87,89 @@ public class ModelIO {
         }
     }
 
-    protected Domain loadDomainDirectory(Model model, Domain parent, FileObject domainDir) throws IOException {
-        String domainName = domainDir.getName().getBaseName();
-        Domain domain;
-        if(parent != null) {
-            domain = parent.getSubdomains().stream().filter(p -> p.getName().equals(domainName)).findFirst().orElseGet(() -> {
-                Domain newDomain = new Domain();
-                newDomain.setName(domainName);
-                parent.getSubdomains().add(newDomain);
-                return newDomain;
-            });
-        } else {
-            domain = model.ensureDomain(domainName);
+
+    public synchronized Domain load(String name, Model model) throws IOException {
+        return loadDomain(name, null, modelDirectory, model);
+    }
+
+    public synchronized Domain load(String name, Domain parent, Model model) throws IOException {
+        return loadDomain(name, parent, getDomainDirectory(parent), model);
+    }
+
+    public synchronized Domain loadExternalDomain(String path, FileObject directory, Model model) throws IOException {
+        String name = path.substring(path.lastIndexOf('.') + 1);
+        if (!directory.getName().getBaseName().equals(name)) {
+            throw new IllegalArgumentException(
+                    "The directory name must match the domain name: " + directory.getPublicURIString() + ", " + path);
         }
+        Domain domain = loadDomainDirectory(model, directory, new Domain(name));
+        externallyLoadedDomains.put(path, domain);
+        String[] elems = path.split("[.]");
+        if (elems.length > 1) {
+            try {
+                Domain parent = model.getDomain(elems[0]);
+                for (int i = 1; i < elems.length - 1; i++) {
+                    parent = parent.getSubdomain(elems[i]).orElse(null);
+                    if (parent == null) {
+                        break;
+                    }
+                }
+                if (parent != null) {
+                    parent.getSubdomains().add(domain);
+                }
+            } catch (IllegalArgumentException e) {
+                logger.debug("Not adding externally loaded domain right now because no parent domain exists at the specified path");
+            }
+        } else {
+            model.getDomains().add(domain);
+        }
+        return domain;
+    }
+
+    @Nullable
+    protected synchronized Domain loadDomain(String name, Domain parent, FileObject parentDirectory, Model model) throws IOException {
+        String path;
+        if (parent != null) {
+            path = parent.getQualifiedName() + Domain.PATH_SEPARATOR + name;
+        } else {
+            path = name;
+        }
+        Domain ext = externallyLoadedDomains.get(path);
+        if (ext != null) {
+            return ext;
+        }
+        return doLoadDomain(name, parent, parentDirectory, model);
+    }
+
+    @Nullable
+    protected synchronized Domain doLoadDomain(String name, Domain parent, FileObject parentDirectory, Model model) throws IOException {
+        if (parentDirectory.exists() && parentDirectory.getType().equals(FileType.FOLDER)) {
+            FileObject domainDir = parentDirectory.getChild(name);
+            if (domainDir != null && domainDir.exists()) {
+                try {
+                    Domain domain = loadDomainDirectory(model, parent, domainDir);
+                    for (ToLink toLink : toLinkQueue) {
+                        new EntityModelLinkerVisitor(model, toLink.domain).visit(toLink.parseTree);
+                    }
+                    return domain;
+                } finally {
+                    toLinkQueue.clear();
+                }
+            } else {
+                return null;
+            }
+        } else {
+            throw new IOException("Not a directory: " + parentDirectory.getName().getPath());
+        }
+    }
+
+    protected Domain loadDomainDirectory(Model model, Domain parent, FileObject domainDir) throws IOException {
+        Domain domain = ensureDomain(model, parent, domainDir);
+        return loadDomainDirectory(model, domainDir, domain);
+    }
+
+    protected Domain loadDomainDirectory(Model model, FileObject domainDir, Domain domain) throws IOException {
+        addExternallyLoadedDomains(domain);
         for (FileObject child : domainDir.getChildren()) {
             String baseName = child.getName().getBaseName();
             if(child.isFile() && !baseName.endsWith(".changelog.xml") && !baseName.endsWith(".properties")) {
@@ -129,6 +189,39 @@ public class ModelIO {
             } else if(child.isFolder()) {
                 loadDomainDirectory(model, domain, child);
             }
+        }
+        return domain;
+    }
+
+    protected void addExternallyLoadedDomains(Domain domain) {
+        String basePath = domain.getQualifiedName() + Domain.PATH_SEPARATOR;
+        for (Map.Entry<String, Domain> entry: externallyLoadedDomains.entrySet()) {
+            String path = entry.getKey();
+            if (path.startsWith(basePath)) {
+                String subpath = path.substring(basePath.length());
+                if (!subpath.contains(Domain.PATH_SEPARATOR)) {
+                    Domain subdomain = entry.getValue();
+                    if (!domain.getSubdomains().contains(subdomain)) {
+                        domain.getSubdomains().add(subdomain);
+                    }
+                }
+            }
+        }
+    }
+
+    public static Domain ensureDomain(Model model, Domain parent, FileObject domainDir) {
+        String domainName = domainDir.getName().getBaseName();
+        Domain domain;
+        if(parent != null) {
+            domain = parent.getSubdomains().stream().filter(p -> p.getName().equals(domainName))
+                    .findFirst().orElseGet(() -> {
+                Domain newDomain = new Domain();
+                newDomain.setName(domainName);
+                parent.getSubdomains().add(newDomain);
+                return newDomain;
+            });
+        } else {
+            domain = model.ensureDomain(domainName);
         }
         return domain;
     }
@@ -214,7 +307,7 @@ public class ModelIO {
         return parser;
     }
 
-    public void save(Model model) throws IOException {
+    public synchronized void save(Model model) throws IOException {
         logger.info("Saving model into directory: {}", getModelDirectory().getName().getPath());
         if(!modelDirectory.exists()) {
             modelDirectory.createFolder();
@@ -228,8 +321,12 @@ public class ModelIO {
         deleteUnusedDomainDirectories(modelDirectory, model.getDomains());
     }
 
-    public void save(Domain domain) throws IOException {
+    public synchronized void save(Domain domain) throws IOException {
+        if (externallyLoadedDomains.containsValue(domain)) {
+            return;
+        }
         FileObject domainDir = getDomainDirectory(domain);
+        logger.info("Saving domain into directory: {}", domainDir.getName().getPath());
         domainDir.createFolder();
         FileObject domainDefFile = domainDir.resolveFile(domain.getName() + ".domain");
         if(domain.getEAnnotations().isEmpty()) {
@@ -448,7 +545,7 @@ public class ModelIO {
             if(ePackage == EcorePackage.eINSTANCE || ePackage == domain) {
                 return false;
             }
-            fullTypeName = Domain.getQualifiedName(ePackage) + "." + fullTypeName;
+            fullTypeName = Domain.getQualifiedName(ePackage) + Domain.PATH_SEPARATOR + fullTypeName;
         }
         return addImport(fullTypeName, imports);
     }

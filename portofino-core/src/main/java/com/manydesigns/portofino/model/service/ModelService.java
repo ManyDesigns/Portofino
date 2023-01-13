@@ -24,14 +24,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class ModelService {
 
     protected Model model = new Model();
+    protected final Map<String, Domain> externallyLoadedDomains = new ConcurrentHashMap<>();
     public static final String APP_MODEL_DIRECTORY = "model";
     protected final FileObject applicationDirectory;
     protected final ConfigurationSource configuration;
@@ -85,7 +87,7 @@ public class ModelService {
 
     @NotNull
     public ModelIO getModelIO() throws FileSystemException {
-        return new ModelIO(getModelDirectory());
+        return new ModelIO(getModelDirectory(), externallyLoadedDomains);
     }
 
     public synchronized void saveDomain(Domain domain) throws IOException {
@@ -280,5 +282,9 @@ public class ModelService {
             }
             return getModelIO().load(path[path.length - 1], parent, model);
         }
+    }
+
+    public synchronized Domain loadExternalDomain(String path, FileObject directory) throws IOException {
+        return getModelIO().loadExternalDomain(path, directory, model);
     }
 }
