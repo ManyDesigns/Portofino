@@ -6,7 +6,9 @@ import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.io.ModelIO;
+import com.manydesigns.portofino.model.issues.Issue;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.eclipse.emf.ecore.*;
@@ -22,8 +24,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class ModelService {
 
@@ -63,7 +67,7 @@ public class ModelService {
     }
 
     public synchronized Model loadModel() throws IOException {
-        Model loaded = getDefaultModelIO().load();
+        Model loaded = getModelIO().load();
         if(loaded != null) {
             model = loaded;
             return model;
@@ -73,19 +77,19 @@ public class ModelService {
     }
 
     public synchronized void saveModel() throws IOException, ConfigurationException {
-        getDefaultModelIO().save(model);
+        getModelIO().save(model);
         if (configuration.isWritable()) {
             configuration.save();
         }
     }
 
     @NotNull
-    public ModelIO getDefaultModelIO() throws FileSystemException {
+    public ModelIO getModelIO() throws FileSystemException {
         return new ModelIO(getModelDirectory());
     }
 
     public synchronized void saveDomain(Domain domain) throws IOException {
-        getDefaultModelIO().save(domain);
+        getModelIO().save(domain);
     }
 
     public synchronized void saveEntity(EClass entity) throws IOException {
@@ -93,11 +97,11 @@ public class ModelService {
         if (!(pkg instanceof Domain)) {
             throw new UnsupportedOperationException(entity + " does not belong to a domain");
         }
-        getDefaultModelIO().save(entity);
+        getModelIO().save(entity);
     }
 
     public synchronized void saveObject(Domain domain, String name) throws IOException {
-        getDefaultModelIO().saveObject(domain, name);
+        getModelIO().saveObject(domain, name);
     }
 
     public synchronized Domain ensureTopLevelDomain(String name) throws IOException {
@@ -115,7 +119,7 @@ public class ModelService {
             model.getDomains().add(domain);
             transientDomains.add(domain);
         } else {
-            domain = getDefaultModelIO().load(name, model);
+            domain = getModelIO().load(name, model);
             if (domain == null) {
                 domain = new Domain(name);
                 model.getDomains().add(domain);
@@ -253,4 +257,28 @@ public class ModelService {
         }
     }
 
+    public List<Issue> getIssues(String... path) {
+        if (path.length == 0) {
+            return model.getIssues();
+        } else {
+            String pathString = StringUtils.join(path, ".");
+            return model.getIssues().stream()
+                    .filter(issue -> StringUtils.defaultString(issue.path).startsWith(pathString))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public synchronized Domain loadDomain(String... path) throws IOException {
+        if (path.length == 0) {
+            throw new IllegalArgumentException("At least one path element is needed to load a domain");
+        } else if (path.length == 1) {
+            return getModelIO().load(path[0], model);
+        } else {
+            Domain parent = model.getDomain(path[0]);
+            for (int i = 1; i < path.length - 1; i++) {
+                parent = parent.getSubdomain(path[i]).orElseThrow();
+            }
+            return getModelIO().load(path[path.length - 1], parent, model);
+        }
+    }
 }

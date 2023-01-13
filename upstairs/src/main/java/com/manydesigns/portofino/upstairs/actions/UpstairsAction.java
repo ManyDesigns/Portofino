@@ -256,7 +256,7 @@ public class UpstairsAction extends AbstractResourceAction {
         }
 
         logger.debug("Creating _detail directory");
-        FileObject detailDir = dir.resolveFile(ActionInstance.DETAIL);
+        FileObject detailDir = dir.resolveFile(AbstractResourceAction.DETAIL);
         if(detailDir.exists() && detailDir.getType() != FileType.FOLDER) {
             logger.warn("Invalid detail directory {}", detailDir.getName().getPath());
             RequestMessages.addWarningMessage(
@@ -268,7 +268,7 @@ public class UpstairsAction extends AbstractResourceAction {
         String path = dir.getName().getBaseName();
         FileObject parent = dir.getParent().getParent(); //two because of _detail
         for(int i = 1; i < depth; i++) {
-            path = parent.getName().getBaseName() + "/" + ActionInstance.DETAIL + "/" + path;
+            path = parent.getName().getBaseName() + "/" + AbstractResourceAction.DETAIL + "/" + path;
             parent = parent.getParent().getParent();
         }
         Map<String, Object> pageInfo = new HashMap<>();
@@ -330,7 +330,7 @@ public class UpstairsAction extends AbstractResourceAction {
         if (multipleRoles) {
             childDirName += "-as-" + linkToParentProperty;
         }
-        FileObject childDir = dir.resolveFile(ActionInstance.DETAIL).resolveFile(childDirName);
+        FileObject childDir = dir.resolveFile(AbstractResourceAction.DETAIL).resolveFile(childDirName);
 
         Map<String, String> bindings = new HashMap<>();
         bindings.put("generatedClassName",  "CrudAction_" + RandomUtil.createRandomId());

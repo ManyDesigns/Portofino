@@ -147,7 +147,7 @@ public class ActionsAction extends AbstractResourceAction {
             w.write(script);
         }
         if(supportsDetail) {
-            FileObject detailDir = directory.resolveFile(ActionInstance.DETAIL);
+            FileObject detailDir = directory.resolveFile(AbstractResourceAction.DETAIL);
             logger.debug("Creating _detail directory: {}", detailDir);
             detailDir.createFolder();
         }

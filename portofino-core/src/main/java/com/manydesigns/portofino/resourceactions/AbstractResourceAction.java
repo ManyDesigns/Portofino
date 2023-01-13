@@ -29,7 +29,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ResourceActionsModule;
-import com.manydesigns.portofino.ResourceActionsModule;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.dispatcher.AbstractResourceWithParameters;
@@ -64,7 +63,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.*;
@@ -83,6 +81,7 @@ import java.util.stream.Collectors;
 @RequiresPermissions(level = AccessLevel.VIEW)
 public abstract class AbstractResourceAction extends AbstractResourceWithParameters implements ResourceAction {
     public static final String COPYRIGHT = "Copyright (C) 2005-2022 ManyDesigns srl";
+    public static final String DETAIL = "_detail";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -290,7 +289,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         if(parameters.isEmpty()) {
             return getLocation();
         } else {
-            return getLocation().resolveFile(ActionInstance.DETAIL);
+            return getLocation().resolveFile(DETAIL);
         }
     }
 
@@ -514,7 +513,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
 
     protected ClassAccessor getConfigurationClassAccessor() {
         Class<?> configurationClass = getConfigurationClass();
-        if(configurationClass == null) {
+        if (configurationClass == null) {
             return JavaClassAccessor.getClassAccessor(ResourceActionConfiguration.class);
         } else {
             return JavaClassAccessor.getClassAccessor(configurationClass);
@@ -606,7 +605,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             ResourceAction parentAction = (ResourceAction) parent;
             parentDomain = parentAction.getConfigurationDomain();
             if (!parentAction.getActionInstance().getParameters().isEmpty()) {
-                parentDomain = parentDomain.ensureDomain(ActionInstance.DETAIL);
+                parentDomain = parentDomain.ensureDomain(DETAIL);
             }
         } else {
             parentDomain = actionsDomain;
@@ -729,7 +728,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     public String[] getSupportedPermissions() {
-        Class<?> actualActionClass = getActionInstance().getActionClass();
+        Class<?> actualActionClass = getClass();
         SupportsPermissions supportsPermissions = actualActionClass.getAnnotation(SupportsPermissions.class);
         while(supportsPermissions == null && actualActionClass.getSuperclass() != Object.class) {
             actualActionClass = actualActionClass.getSuperclass();

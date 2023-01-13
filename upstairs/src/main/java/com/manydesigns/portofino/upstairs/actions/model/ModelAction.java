@@ -5,6 +5,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.issues.Issue;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
@@ -17,12 +18,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Alessio Stalla - alessiostalla@gmail.com
  */
 @RequiresAuthentication
 @RequiresAdministrator
+@SupportsDetail
 public class ModelAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelAction.class);
@@ -39,8 +42,16 @@ public class ModelAction extends AbstractResourceAction {
     @Path(":reload")
     public void reloadModel() {
         try {
-            modelService.loadModel();
-            for (Issue issue : modelService.getModel().getIssues()) {
+            List<Issue> issues;
+            if (parameters.isEmpty()) {
+                modelService.loadModel();
+                issues = modelService.getIssues();
+            } else {
+                String[] path = parameters.toArray(new String[0]);
+                modelService.loadDomain(path);
+                issues = modelService.getIssues(path);
+            }
+            for (Issue issue : issues) {
                 switch (issue.severity) {
                     case ERROR:
                         RequestMessages.addErrorMessage(issue.message + " (path: " + issue.path + ")");

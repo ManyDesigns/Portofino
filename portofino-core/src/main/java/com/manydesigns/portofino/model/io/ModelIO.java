@@ -18,6 +18,7 @@ import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.PatternFileSelector;
 import org.eclipse.emf.ecore.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +52,24 @@ public class ModelIO {
     }
 
     public Domain load(String name, Model model) throws IOException {
-        if (modelDirectory.exists() && modelDirectory.getType().equals(FileType.FOLDER)) {
-            FileObject domainDir = modelDirectory.getChild(name);
+        return loadDomain(name, null, modelDirectory, model);
+    }
+
+    public Domain load(String name, Domain parent, Model model) throws IOException {
+        return loadDomain(name, parent, getDomainDirectory(parent), model);
+    }
+
+    @Nullable
+    protected Domain loadDomain(String name, Domain parent, FileObject parentDirectory, Model model) throws IOException {
+        if (parentDirectory.exists() && parentDirectory.getType().equals(FileType.FOLDER)) {
+            FileObject domainDir = parentDirectory.getChild(name);
             if (domainDir != null && domainDir.exists()) {
-                return loadDomainDirectory(model, null, domainDir);
+                return loadDomainDirectory(model, parent, domainDir);
             } else {
                 return null;
             }
         } else {
-            throw new IOException("Not a directory: " + modelDirectory.getName().getPath());
+            throw new IOException("Not a directory: " + parentDirectory.getName().getPath());
         }
     }
 

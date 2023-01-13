@@ -49,13 +49,6 @@ public class ActionInstance {
     protected final Class<? extends ResourceAction> actionClass;
     protected ResourceActionConfiguration configuration;
     protected ResourceAction actionBean;
-    protected boolean prepared;
-
-    public static final String DETAIL = "_detail";
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
 
     public static final Logger logger = LoggerFactory.getLogger(ActionInstance.class);
 
@@ -68,7 +61,6 @@ public class ActionInstance {
 
     public ActionInstance copy() {
         ActionInstance actionInstance = new ActionInstance(parent, directory, actionClass);
-        actionInstance.prepared = false;
         actionInstance.parameters.addAll(parameters);
         actionInstance.configuration = configuration;
         actionInstance.actionBean = actionBean;
@@ -147,7 +139,7 @@ public class ActionInstance {
         FileObject baseDir = directory;
         if(!parameters.isEmpty()) {
             try {
-                baseDir = baseDir.resolveFile(DETAIL);
+                baseDir = baseDir.resolveFile(AbstractResourceAction.DETAIL);
             } catch (FileSystemException e) {
                 throw new RuntimeException(e);
             }

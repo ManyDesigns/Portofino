@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2023 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,6 +31,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The Model is the principal holder of information about the application's data, and it's one of the core features of
@@ -58,14 +59,10 @@ import java.util.*;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Model {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2023 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    protected final List<Domain> domains = new ArrayList<>();
-    protected final List<Issue> issues = new ArrayList<>();
+    protected final List<Domain> domains = new CopyOnWriteArrayList<>();
+    protected final List<Issue> issues = new CopyOnWriteArrayList<>();
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
