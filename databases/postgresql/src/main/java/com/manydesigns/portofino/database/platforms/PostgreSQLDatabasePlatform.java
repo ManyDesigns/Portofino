@@ -24,19 +24,15 @@ import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.ConnectionProvider;
 import com.manydesigns.portofino.database.model.platforms.AbstractDatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.persistence.hibernate.ColumnParameterType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.dialect.PostgreSQL82Dialect;
+import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.type.SqlTypes;
-import org.hibernate.usertype.DynamicParameterizedType;
 
 import java.math.BigDecimal;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -57,7 +53,7 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public PostgreSQLDatabasePlatform() {
-        super(PostgreSQL82Dialect.class.getName(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
+        super(PostgreSQLDialect.class.getName(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
     }
 
     //**************************************************************************
