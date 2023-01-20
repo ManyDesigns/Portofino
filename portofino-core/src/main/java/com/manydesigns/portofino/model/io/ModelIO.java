@@ -287,7 +287,7 @@ public class ModelIO {
             if (parser.getNumberOfSyntaxErrors() == 0) {
                 EObject object =
                         new ModelObjectBuilderVisitor(model, domain).visitStandaloneObject(parseTree);
-                domain.putObject(parseTree.object().name.getText(), object);
+                domain.putObject(parseTree.object().objectName().getText(), object);
             }
         } catch (Exception e) {
             String msg = "Could not load resource: " + file.getName().getURI();

@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
@@ -33,9 +34,9 @@ import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import ognl.OgnlContext;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.VFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -184,9 +185,18 @@ public class PortofinoRoot extends AbstractResourceAction {
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response welcomePage() throws IOException {
-        URL resource = getClass().getResource("/com/manydesigns/portofino/actions/welcome.en.html");
-        String welcomePage = IOUtils.toString(resource, StandardCharsets.UTF_8);
-        return Response.ok(welcomePage).build();
+        String welcomePageDir = portofinoConfiguration.getProperties().getString(
+                PortofinoProperties.APP_WELCOME_DIR, "res:com/manydesigns/portofino/actions");
+        FileObject dir = VFS.getManager().resolveFile(welcomePageDir);
+        if (dir != null && dir.isFolder()) {
+            try (FileObject fileObject = dir.resolveFile("welcome.en.html")) {
+                if (fileObject.exists()) {
+                    String welcomePage = fileObject.getContent().getString(StandardCharsets.UTF_8);
+                    return Response.ok(welcomePage).build();
+                }
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
 
 }

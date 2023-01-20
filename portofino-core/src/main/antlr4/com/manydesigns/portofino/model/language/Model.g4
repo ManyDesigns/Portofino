@@ -13,7 +13,8 @@ property: annotation* name=identifier (':' type)? (NOT_NULLABLE)?;
 enum: ENUM name=identifier '{' values+=identifier+ '}';
 
 standaloneObject: importDeclaration* object EOF;
-object: OBJECT name=identifier ':' objectBody;
+object: OBJECT objectName ':' objectBody;
+objectName: identifier ('-' identifier)*;
 objectBody: className=identifier '{' properties+=propertyAssignment* '}';
 propertyAssignment: name=identifier ('=' propertyValue | '-->' referredObject=fqn);
 propertyValue: literal | objectBody | enumValue=identifier | propertyListValue;
