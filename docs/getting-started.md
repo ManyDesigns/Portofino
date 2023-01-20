@@ -40,3 +40,9 @@ portofino new my-great-project
 
 That will generate a new project using the Portofino Maven archetype as a template, 
 in a newly created directory called `my-great-project`.
+
+### Getting stuck?
+
+If you don't know how to continue or how to solve some problem with Portofino, you could look at 
+[the official Q&A page](https://github.com/ManyDesigns/Portofino/discussions/categories/q-a). 
+Someone else might have had and solved the same issue, or you could ask a new question. 
