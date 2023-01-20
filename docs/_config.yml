@@ -1,3 +1,7 @@
+title: ManyDesigns Portofino
+author: ManyDesigns, Alessio Stalla
+email: manydesigns-portofino@googlegroups.com
+
 # Build settings
 plugins:
   - jekyll-feed
