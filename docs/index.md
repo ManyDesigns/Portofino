@@ -14,8 +14,8 @@ customize and extend the API declaratively and, when needed, by coding in Java o
 Authentication and authorization are built-in (using Apache Shiro) or can be managed externally with your favorite 
 implementation.
 
-<a class="btn btn-primary" role="button">Getting Started</a> 
-<a class="btn btn-secondary" role="button" href="#what-sets-portofino-apart">What sets Portofino apart</a>
+<a class="btn btn-success" role="button" href="getting-started">Getting Started</a> 
+<a class="btn btn-primary" role="button" href="#what-sets-portofino-apart">What sets Portofino apart</a>
 
 ## What sets Portofino apart
 
