@@ -1,3 +1,8 @@
+---
+layout: home
+title: ManyDesigns Portofino
+---
+
 ## From database to REST API in 30 seconds
 
 Portofino 6 is the next generation of ManyDesigns Portofino, the result of decades of experience in model-driven, 
@@ -7,7 +12,10 @@ Portofino connects to your databases, constructs an enriched model of your data,
 customize and extend the API declaratively and, when needed, by coding in Java or Groovy.
 
 Authentication and authorization are built-in (using Apache Shiro) or can be managed externally with your favorite 
-implementation. 
+implementation.
+
+<a class="btn btn-primary" role="button">Getting Started</a> 
+<a class="btn btn-secondary" role="button" href="#what-sets-portofino-apart">What sets Portofino apart</a>
 
 ## What sets Portofino apart
 
