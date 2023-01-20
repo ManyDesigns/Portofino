@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2023 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,6 +33,8 @@ import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import ognl.OgnlContext;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +50,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The root of the application's REST APIs managed by Portofino.
+ */
 public class PortofinoRoot extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoRoot.class);
@@ -171,6 +179,14 @@ public class PortofinoRoot extends AbstractResourceAction {
     @Produces("application/yaml")
     public Response openAPIYAML() throws URISyntaxException {
         return Response.temporaryRedirect(new URI("openapi.yaml")).build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response welcomePage() throws IOException {
+        URL resource = getClass().getResource("/com/manydesigns/portofino/actions/welcome.en.html");
+        String welcomePage = IOUtils.toString(resource, StandardCharsets.UTF_8);
+        return Response.ok(welcomePage).build();
     }
 
 }
