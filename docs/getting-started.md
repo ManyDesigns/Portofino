@@ -28,7 +28,7 @@ application that can _do something useful_ with our data. However, it's not stri
 
 ### Installing the CLI
 
-Follow the instructions on https://github.com/alessiostalla/portofino-cli.
+Follow the [instructions to install the Portofino CLI](https://github.com/alessiostalla/portofino-cli#installation).
 
 ### Creating a new Portofino application
 
