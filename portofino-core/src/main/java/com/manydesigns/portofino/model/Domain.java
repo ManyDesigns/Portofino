@@ -63,6 +63,10 @@ public class Domain extends EPackageImpl {
         getObjects().put(name, object);
     }
 
+    public EObject removeObject(String name) {
+        return getObjects().removeKey(name);
+    }
+
     /**
      * Registers an object under a given name.
      * @param name the name of the object.

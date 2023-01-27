@@ -90,7 +90,14 @@ public interface ResourceAction extends SecureResource {
     List<String> getAccessibleChildren();
 
     Domain getConfigurationDomain();
+
+    /**
+     * Loads this action's configuration.
+     * @return the loaded configuration.
+     * @throws Exception in case the configuration cannot be loaded.
+     */
     ResourceActionConfiguration loadConfiguration() throws Exception;
+    void setConfiguration(ResourceActionConfiguration configuration);
     void saveConfiguration() throws Exception;
     void configured();
 

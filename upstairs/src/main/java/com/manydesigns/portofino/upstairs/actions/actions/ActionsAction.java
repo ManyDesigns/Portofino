@@ -5,6 +5,7 @@ import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.WithParameters;
@@ -22,7 +23,6 @@ import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +34,14 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiresAdministrator
 public class ActionsAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionsAction.class);
 
+    public static final String PORTOFINO_ACTION_COPY_TYPE = "application/vnd.com.manydesigns.portofino.action-copy";
     public static final String PORTOFINO_ACTION_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.action-move";
 
     @Autowired
@@ -155,11 +157,19 @@ public class ActionsAction extends AbstractResourceAction {
     }
 
     @POST
-    @Consumes(PORTOFINO_ACTION_MOVE_TYPE)
-    public void move(String sourceActionPath) throws FileSystemException {
+    @Consumes(PORTOFINO_ACTION_COPY_TYPE)
+    public void copy(String sourceActionPath) throws Exception {
         String actionPath = StringUtils.join(parameters.subList(0, parameters.size() - 1), "/");
         String segment = parameters.get(parameters.size() - 1);
-        copyOrMovePage(sourceActionPath, actionPath, segment, true);
+        copyOrMoveAction(sourceActionPath, actionPath, segment, false);
+    }
+
+    @POST
+    @Consumes(PORTOFINO_ACTION_MOVE_TYPE)
+    public void move(String sourceActionPath) throws Exception {
+        String actionPath = StringUtils.join(parameters.subList(0, parameters.size() - 1), "/");
+        String segment = parameters.get(parameters.size() - 1);
+        copyOrMoveAction(sourceActionPath, actionPath, segment, true);
     }
 
     @DELETE
@@ -183,11 +193,12 @@ public class ActionsAction extends AbstractResourceAction {
         return actionInstance;
     }
 
-    protected void copyOrMovePage(
-            String sourceActionPath, String destinationParentActionPath, String segment, boolean move) throws FileSystemException {
+    protected void copyOrMoveAction(
+            String sourceActionPath, String destinationParentActionPath, String segment, boolean move) throws Exception {
         ActionInstance sourceActionInstance = getPageInstance(sourceActionPath);
         ActionInstance destinationParentActionInstance = getPageInstance(destinationParentActionPath);
         FileObject newChild = destinationParentActionInstance.getChildPageDirectory(segment);
+        ResourceActionConfiguration configuration = sourceActionInstance.getActionBean().loadConfiguration();
 
         if(move) {
             if(sourceActionPath.equals("/") || sourceActionPath.isEmpty()) {
@@ -196,6 +207,20 @@ public class ActionsAction extends AbstractResourceAction {
             sourceActionInstance.getDirectory().moveTo(newChild);
         } else {
             newChild.copyFrom(sourceActionInstance.getDirectory(), new AllFileSelector());
+        }
+        String actionPath = segment;
+        if (StringUtils.isNotEmpty(destinationParentActionPath)) {
+            actionPath = destinationParentActionPath + "/" + actionPath;
+        }
+        ActionInstance targetActionInstance = getPageInstance(actionPath);
+        targetActionInstance.getActionBean().setConfiguration(configuration);
+        targetActionInstance.getActionBean().saveConfiguration();
+        if (move) {
+            Domain domain = sourceActionInstance.getParent().getActionBean().getConfigurationDomain();
+            String[] segments = sourceActionPath.split("/");
+            Optional<Domain> subdomain = domain.getSubdomain(segments[segments.length - 1]);
+            subdomain.ifPresent(it -> domain.getSubdomains().remove(it));
+            modelService.saveDomain(domain);
         }
     }
 

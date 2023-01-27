@@ -625,7 +625,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
                 throw new RuntimeException(
                         "Action configuration for " + this + " is not of the right type: " + configuration);
             }
-            actionInstance.setConfiguration((ResourceActionConfiguration) configuration);
+            setConfiguration((ResourceActionConfiguration) configuration);
         } else {
             // Try loading legacy action.xml and configuration.xml
             ResourceActionSupport.legacyConfigureResourceAction(this, actionInstance);
@@ -655,6 +655,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         }
         ((ResourceActionConfiguration) configuration).init();
         return (ResourceActionConfiguration) configuration;
+    }
+
+    @Override
+    public void setConfiguration(ResourceActionConfiguration configuration) {
+        actionInstance.setConfiguration(configuration);
     }
 
     @io.swagger.v3.oas.annotations.Operation(
