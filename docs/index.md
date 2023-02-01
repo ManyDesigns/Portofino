@@ -82,8 +82,8 @@ Portofino is built on top of Spring and Hibernate and is designed to be a nice c
 Portofino exposes REST APIs, so any REST client can consume its services. However, a few client libraries specifically
 designed for Portofino exist, such as:
 
- * portofino-js
- * portofino-commander
+ * [portofino-commander](https://github.com/alessiostalla/portofino-commander) designed for Portofino 6, may also work with 5
+ * [portofino-js](https://manydesigns.github.io/portofino-js/) designed for Portofino 5, may also work with 6
 
 ## UI
 

@@ -9,22 +9,34 @@ This is a major new version that shifts the focus of Portofino completely away f
 ### Added
 - Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
 - Support for Liquibase changelogs written in SQL (and any other language supported by Liquibase).
+- More fine-grained REST APIs to operate on the model, e.g. adding and removing database schema mappings.
+- Improvements on modules:
+  - they can handle installation and updates on startup 
+  - they can provide parts of the Portofino model to add to the application.
+- [A new website](https://manydesigns.github.io/Portofino/) with tutorials and documentation.
+- Welcome page for newly created applications.
 
 ### Changed
-- The model is no longer tied to the database. It is a generic entity-relationship model based on Ecore. Therefore:
-  - the model is no longer loaded/saved as part of the Persistence service. Rather, a new Model 
+- The model is no longer limited to a representation of the application's database(s). 
+  Now, it's a generic entity-relationship model based on Ecore. Therefore:
+  - Portofino can store more kinds of information in the model, both for built-in features (detailed in the following)
+    and for user-defined extensions.
+  - The model is no longer loaded/saved as part of the Persistence service. Rather, a new Model 
     service holds the model and knows how to load and save it.
-  - in normal operation, Portofino doesn't load and save the model in its entirety. It loads and saves the parts that it
-    needs on demand.
-- The model is no longer saved as XML. We designed a custom mini-language similar to Java.
+  - For normal operations, Portofino doesn't load and save the model all at once anymore. 
+    It loads and saves the parts that it needs on demand.
+- Portofino doesn't store the model as XML anymore. We designed a custom mini-language with Java-inspired syntax.
   - Portofino 6 can read Portofino 5 models and will convert them to the new format automatically.
 - Resource-action configurations (`action.xml` and `configuration.xml` files) are now saved as objects in the model. 
-  - Actions update automatically to the new format.
+  - Portofino will update existing actions automatically to the new format the first time they're accessed.
 - The dispatcher (that associates a URL with a REST resource-action) is now based on the hierarchy of configurations 
   in the model, rather than the position of the action class in the filesystem.
   - The legacy dispatcher is still used as a fallback.
 - Hibernate has been updated to version 6.
+  - Portofino now uses Hibernate's native JSON mapping rather than outdated third-party code.
+  - Extensions have more opportunities for customizing Hibernate mapping (e.g. to integrate spatial extensions).
 - Groovy has been updated to version 4.
+- Spring Boot has been updated to version 2.7, and related dependencies have been updated as well.
 
 ### Removed
 - The Angular UI is no longer part of Portofino. It is now a separate project.
