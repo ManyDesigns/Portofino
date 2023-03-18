@@ -1,6 +1,6 @@
 ManyDesigns Portofino includes other software as detailed below.
 
-This product includes software developed by the Apache Software 
+This product includes software developed by the Apache Software
 Foundation (http://www.apache.org/).
 
 This software contains unmodified binary redistributions for H2 database engine (http://www.h2database.com/),
@@ -190,11 +190,6 @@ JSoup
 Site: http://jsoup.org/
 File: jsoup-1.9.2.jar
 License: MIT
-
-JSqlParser
-Site: http://jsqlparser.sourceforge.net/home.php
-File: jsqlparser-0.9.6.jar
-License: LGPL
 
 Liquibase
 Site: http://www.liquibase.org/

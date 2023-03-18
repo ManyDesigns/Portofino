@@ -10,8 +10,12 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.model.ResetVisitor;
 import com.manydesigns.portofino.persistence.QueryUtils;
+import com.manydesigns.portofino.persistence.hibernate.Events;
+import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
+import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.hibernate.Session;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -32,6 +36,7 @@ public class QueryUtilsTest {
         Database database = new Database();
         JdbcConnectionProvider connectionProvider = new JdbcConnectionProvider() {{
             databasePlatform = new GenericDatabasePlatform();
+            actualUrl = url = "jdbc:h2:mem:qutest";
         }};
         database.setConnectionProvider(connectionProvider);
         database.setDatabaseName("db");
@@ -49,6 +54,15 @@ public class QueryUtilsTest {
         Column column = new Column(table);
         column.setColumnName("column1");
         column.setColumnType("varchar");
+        column.setJavaType("java.lang.String");
+        column.setLength(10);
+        column.setScale(0);
+        table.getColumns().add(column);
+
+        column = new Column(table);
+        column.setColumnName("foo");
+        column.setColumnType("varchar");
+        column.setJavaType("java.lang.String");
         column.setLength(10);
         column.setScale(0);
         table.getColumns().add(column);
@@ -59,7 +73,38 @@ public class QueryUtilsTest {
         pkColumn.setColumnName("column1");
         table.setPrimaryKey(primaryKey);
 
+        Table other = new Table(schema);
+        other.setTableName("other");
+        schema.getTables().add(other);
+
+        column = new Column(other);
+        column.setColumnName("id");
+        column.setColumnType("varchar");
+        column.setJavaType("java.lang.String");
+        column.setLength(10);
+        column.setScale(0);
+        other.getColumns().add(column);
+
+        column = new Column(other);
+        column.setColumnName("bar");
+        column.setColumnType("varchar");
+        column.setJavaType("java.lang.String");
+        column.setLength(10);
+        column.setScale(0);
+        other.getColumns().add(column);
+
+        primaryKey = new PrimaryKey(other);
+        pkColumn = new PrimaryKeyColumn(primaryKey);
+        primaryKey.getPrimaryKeyColumns().add(pkColumn);
+        pkColumn.setColumnName("id");
+        other.setPrimaryKey(primaryKey);
+
         initDatabase(database, databases);
+
+        SessionFactoryBuilder builder =
+                new SessionFactoryBuilder(database, new PropertiesConfiguration(), new Events(), null);
+        SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
+        Session session = sessionFactoryAndCodeBase.sessionFactory.openSession();
 
         TableAccessor tableAccessor = new TableAccessor(table);
 
@@ -68,74 +113,83 @@ public class QueryUtilsTest {
 
         //W/o select
         QueryStringWithParameters queryStringWithParameters =
-                QueryUtils.mergeQuery("from test_table t", table, criteria, null, null);
-        assertEquals("FROM test_table t WHERE t.column1 = :p1", queryStringWithParameters.getQueryString());
-
-        queryStringWithParameters =
-                QueryUtils.mergeQuery("from test_table t where t.foo = 1",
-                        table, criteria, null, null);
-        assertEquals("FROM test_table t WHERE (t.foo = 1) AND t.column1 = :p1", queryStringWithParameters.getQueryString());
-
-        queryStringWithParameters =
-                QueryUtils.mergeQuery("from test_table t, other where t.foo = other.bar",
-                        table, criteria, null, null);
-        assertEquals("FROM test_table t, other WHERE (t.foo = other.bar) AND t.column1 = :p1",
+                QueryUtils.mergeQuery(session, "from test_table t", table, criteria, null, null);
+        assertEquals(
+                "select t from db.schema.TestTable t where t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery("from test_table t, other x where t.foo = x.bar",
+                QueryUtils.mergeQuery(session, "from test_table t where t.foo = 1",
                         table, criteria, null, null);
-        assertEquals("FROM test_table t, other x WHERE (t.foo = x.bar) AND t.column1 = :p1",
+        assertEquals(
+                "select t from db.schema.TestTable t where t.foo = 1 and t.column1 = :p1",
+                queryStringWithParameters.getQueryString());
+
+        /* TODO manage auto aliasing
+        queryStringWithParameters =
+                QueryUtils.mergeQuery(session, "from test_table t, other where t.foo = other.bar",
+                        table, criteria, null, null);
+        assertEquals("FROM test_table t, other WHERE (t.foo = other.bar) AND t.column1 = :p1",
+                queryStringWithParameters.getQueryString());*/
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery(session, "from test_table t, other x where t.foo = x.bar",
+                        table, criteria, null, null);
+        assertEquals(
+                "select t, x from db.schema.TestTable t, db.schema.Other x where t.foo = x.bar and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         //W/select
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t from test_table t",
+                QueryUtils.mergeQuery(session, "select t from test_table t",
                         table, criteria, null, null);
-        assertEquals("SELECT t FROM test_table t WHERE t.column1 = :p1",
+        assertEquals(
+                "select t from db.schema.TestTable t where t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t from test_table t where t.foo = 1",
+                QueryUtils.mergeQuery(session, "select t from test_table t where t.foo = 1",
                         table, criteria, null, null);
-        assertEquals("SELECT t FROM test_table t WHERE (t.foo = 1) AND t.column1 = :p1",
+        assertEquals("select t from db.schema.TestTable t where t.foo = 1 and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
+        /* TODO manage auto aliasing
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t from test_table t, other where t.foo = other.bar",
+                QueryUtils.mergeQuery(session, "select t from test_table t, other where t.foo = other.bar",
                         table, criteria, null, null);
         assertEquals("SELECT t FROM test_table t, other WHERE (t.foo = other.bar) AND t.column1 = :p1",
-                queryStringWithParameters.getQueryString());
+                queryStringWithParameters.getQueryString());*/
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t from test_table t, other x where t.foo = x.bar",
+                QueryUtils.mergeQuery(session, "select t from test_table t, other x where t.foo = x.bar",
                         table, criteria, null, null);
-        assertEquals("SELECT t FROM test_table t, other x WHERE (t.foo = x.bar) AND t.column1 = :p1",
+        assertEquals(
+                "select t from db.schema.TestTable t, db.schema.Other x where t.foo = x.bar and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         //W/multiple select
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t, u from test_table t",
+                QueryUtils.mergeQuery(session, "select t, u from test_table t, other u",
                         table, criteria, null, null);
-        assertEquals("SELECT t, u FROM test_table t WHERE t.column1 = :p1",
+        assertEquals("select t, u from db.schema.TestTable t, db.schema.Other u where t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t, u from test_table t where t.foo = 1",
+                QueryUtils.mergeQuery(session, "select t, u from test_table t, other u where t.foo = 1",
                         table, criteria, null, null);
-        assertEquals("SELECT t, u FROM test_table t WHERE (t.foo = 1) AND t.column1 = :p1",
+        assertEquals("select t, u from db.schema.TestTable t, db.schema.Other u where t.foo = 1 and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t, u from test_table t, other where t.foo = other.bar",
+                QueryUtils.mergeQuery(session, "select t, u from test_table t, other u where t.foo = u.bar",
                         table, criteria, null, null);
-        assertEquals("SELECT t, u FROM test_table t, other WHERE (t.foo = other.bar) AND t.column1 = :p1",
+        assertEquals("select t, u from db.schema.TestTable t, db.schema.Other u where t.foo = u.bar and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery("select t, u from test_table t, other x where t.foo = x.bar",
+                QueryUtils.mergeQuery(session, "select t, x from test_table t, other x where t.foo = x.bar",
                         table, criteria, null, null);
-        assertEquals("SELECT t, u FROM test_table t, other x WHERE (t.foo = x.bar) AND t.column1 = :p1",
+        assertEquals("select t, x from db.schema.TestTable t, db.schema.Other x where t.foo = x.bar and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
     }
 

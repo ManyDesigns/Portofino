@@ -32,29 +32,35 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Alias;
-import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.JdbcNamedParameter;
-import net.sf.jsqlparser.expression.Parenthesis;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.statement.select.*;
+import jakarta.persistence.criteria.*;
+import liquibase.repackaged.net.sf.jsqlparser.statement.select.PlainSelect;
+import org.antlr.v4.runtime.BailErrorStrategy;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.grammars.hql.HqlLexer;
+import org.hibernate.grammars.hql.HqlParser;
 import org.hibernate.jdbc.Work;
 import org.hibernate.query.Query;
+import org.hibernate.query.hql.internal.HqlParseTreeBuilder;
+import org.hibernate.query.hql.internal.SemanticQueryBuilder;
+import org.hibernate.query.spi.QueryEngine;
+import org.hibernate.query.sqm.SortOrder;
+import org.hibernate.query.sqm.SqmExpressible;
+import org.hibernate.query.sqm.SqmQuerySource;
+import org.hibernate.query.sqm.tree.SqmStatement;
+import org.hibernate.query.sqm.tree.from.SqmFromClause;
+import org.hibernate.query.sqm.tree.from.SqmRoot;
+import org.hibernate.query.sqm.tree.predicate.SqmPredicate;
+import org.hibernate.query.sqm.tree.select.SqmSelectStatement;
+import org.hibernate.query.sqm.tree.select.SqmSortSpecification;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import jakarta.persistence.metamodel.EntityType;
 import jakarta.persistence.metamodel.ManagedType;
 import java.io.Serializable;
@@ -428,7 +434,7 @@ public class QueryUtils {
             @Nullable Object rootObject,
             @Nullable Integer firstResult,
             @Nullable Integer maxResults) {
-        QueryStringWithParameters result = mergeQuery(queryString, table, criteria, ordering, rootObject);
+        QueryStringWithParameters result = mergeQuery(session, queryString, table, criteria, ordering, rootObject);
 
         return runHqlQuery(session, result.getQueryString(), result.getParameters(), firstResult, maxResults);
     }
@@ -443,89 +449,71 @@ public class QueryUtils {
      * @return the merged query
      */
     public static QueryStringWithParameters mergeQuery
-            (String queryString,
+            (Session session, String queryString,
              @Nullable Table table, @Nullable Criteria criteria, @Nullable Ordering ordering,
              Object rootObject) {
         OgnlHqlFormat hqlFormat = OgnlHqlFormat.create(queryString);
         String formatString = hqlFormat.getFormatString();
         Object[] parameters = hqlFormat.evaluateOgnlExpressions(rootObject);
 
-        CCJSqlParserManager parserManager = new CCJSqlParserManager();
-        PlainSelect parsedQueryString;
-        PlainSelect parsedCriteriaQuery;
-        try {
-            parsedQueryString = parseQuery(parserManager, formatString);
-        } catch (JSQLParserException e) {
-            throw new RuntimeException("Couldn't merge query", e);
-        }
+        SqmSelectStatement<Object> parsedQuery;
+        SqmSelectStatement<Object> parsedCriteriaQuery;
+        parsedQuery = parseQuery(session, formatString);
 
-        Alias mainEntityAlias = null;
+        String mainEntityAlias = null;
         if(table != null) {
-            mainEntityAlias = getEntityAlias(table.getActualEntityName(), parsedQueryString);
+            mainEntityAlias = getEntityAlias(table.getActualEntityName(), parsedQuery);
         }
 
         QueryStringWithParameters criteriaQuery =
-                getQueryStringWithParametersForCriteria(
-                        table, criteria, mainEntityAlias != null ? mainEntityAlias.getName() : null,
-                        parameters.length + 1);
+                getQueryStringWithParametersForCriteria(table, criteria, mainEntityAlias,parameters.length + 1);
         String criteriaQueryString = criteriaQuery.getQueryString();
         Object[] criteriaParameters = criteriaQuery.getParameters();
 
-        try {
-            if(StringUtils.isEmpty(criteriaQueryString)) {
-                parsedCriteriaQuery = new PlainSelect();
-            } else {
-                parsedCriteriaQuery = parseQuery(parserManager, criteriaQueryString);
-            }
-        } catch (JSQLParserException e) {
-            throw new RuntimeException("Couldn't merge query", e);
+        if(StringUtils.isEmpty(criteriaQueryString)) {
+            parsedCriteriaQuery = new SqmSelectStatement<>(getQueryEngine(session).getCriteriaBuilder());
+        } else {
+            parsedCriteriaQuery = parseQuery(session, criteriaQueryString);
         }
 
-        Expression whereExpression;
-        if(parsedQueryString.getWhere() != null) {
-            if(parsedCriteriaQuery.getWhere() != null) {
-                whereExpression = parsedQueryString.getWhere();
-                if(!(whereExpression instanceof Parenthesis)) {
-                    whereExpression = new Parenthesis(whereExpression);
-                }
-                whereExpression = new AndExpression(whereExpression, parsedCriteriaQuery.getWhere());
+        SqmPredicate[] whereExpression;
+        if(parsedQuery.getRestriction() != null) {
+            if(parsedCriteriaQuery.getRestriction() != null) {
+                whereExpression = new SqmPredicate[] {
+                        parsedQuery.getRestriction(),
+                        parsedCriteriaQuery.getRestriction()
+                };
             } else {
-                whereExpression = parsedQueryString.getWhere();
+                whereExpression = new SqmPredicate[] { parsedQuery.getRestriction() };
             }
         } else {
-            whereExpression = parsedCriteriaQuery.getWhere();
+            whereExpression = new SqmPredicate[] { parsedCriteriaQuery.getRestriction() };
         }
-        parsedQueryString.setWhere(whereExpression);
+        parsedQuery.where(whereExpression);
         if(ordering != null) {
-            List orderByElements = new ArrayList();
-            OrderByElement orderByElement = new OrderByElement();
-            orderByElement.setAsc(ordering.isAsc());
+            List<Order> orderByElements = new ArrayList<>();
             String propertyName = ordering.getPropertyAccessor().getName();
             if(mainEntityAlias != null) {
-                propertyName = mainEntityAlias.getName() + "." + propertyName;
+                propertyName = mainEntityAlias + "." + propertyName;
             }
-            orderByElement.setExpression(
-                    new net.sf.jsqlparser.schema.Column(
-                            new net.sf.jsqlparser.schema.Table(), propertyName));
-            orderByElements.add(orderByElement);
-            if(parsedQueryString.getOrderByElements() != null) {
-                for(Object el : parsedQueryString.getOrderByElements()) {
-                    OrderByElement toAdd = (OrderByElement) el;
-                    if(toAdd.getExpression() instanceof net.sf.jsqlparser.schema.Column) {
+            Order order = new SqmSortSpecification(
+                    null, //TODO
+                    ordering.isAsc() ? SortOrder.ASCENDING : SortOrder.DESCENDING);
+            // orderByElements.add(order);
+            if(parsedQuery.getOrderList() != null) {
+                for(Order toAdd : parsedQuery.getOrderList()) {
+                    /* TODO if(toAdd.getExpression() instanceof net.sf.jsqlparser.schema.Column) {
                         net.sf.jsqlparser.schema.Column column = (net.sf.jsqlparser.schema.Column) toAdd.getExpression();
                         if(StringUtils.isEmpty(column.getTable().getName()) && propertyName.equals(column.getColumnName())) {
                             continue; //do not add
                         }
-                    }
+                    }*/
                     orderByElements.add(toAdd);
                 }
             }
-            parsedQueryString.setOrderByElements(orderByElements);
+            parsedQuery.orderBy(orderByElements);
         }
-        String fullQueryString = parsedQueryString.toString();
-        if(fullQueryString.toLowerCase().startsWith(FAKE_SELECT_PREFIX)) {
-            fullQueryString = fullQueryString.substring(FAKE_SELECT_PREFIX.length());
-        }
+        String fullQueryString = parsedQuery.toHqlString();
 
         // merge the parameters
         ArrayList<Object> mergedParametersList = new ArrayList<Object>();
@@ -537,17 +525,20 @@ public class QueryUtils {
         return new QueryStringWithParameters(fullQueryString, mergedParameters);
     }
 
-    public static final String FAKE_SELECT_PREFIX = "select __portofino_fake_select__ ";
-
-    public static PlainSelect parseQuery(CCJSqlParserManager parserManager, String query) throws JSQLParserException {
-        PlainSelect parsedQueryString;
-        if(!query.toLowerCase().trim().startsWith("select")) {
-            query = FAKE_SELECT_PREFIX + query;
+    public static SqmSelectStatement<Object> parseQuery(Session session, String query) {
+        QueryEngine queryEngine = getQueryEngine(session);
+        SqmStatement<Object> statement = queryEngine.getHqlTranslator().translate(query, Object.class);
+        if (statement instanceof SqmSelectStatement) {
+            return (SqmSelectStatement<Object>) statement;
+        } else {
+            throw new RuntimeException("Not a select query: " + query);
         }
-        parsedQueryString =
-                (PlainSelect) ((Select) parserManager.parse(new StringReader(query)))
-                        .getSelectBody();
-        return parsedQueryString;
+    }
+
+    public static QueryEngine getQueryEngine(Session session) {
+        SessionFactoryImplementor sessionFactory = (SessionFactoryImplementor) session.getSessionFactory();
+        QueryEngine queryEngine = sessionFactory.getQueryEngine();
+        return queryEngine;
     }
 
     /**
@@ -698,73 +689,56 @@ public class QueryUtils {
         int p = ognlParameters.length;
         Object[] parameters = new Object[p + keyProperties.length];
         System.arraycopy(ognlParameters, 0, parameters, 0, p);
-        try {
-            PlainSelect parsedQuery = parseQuery(new CCJSqlParserManager(), formatString);
-            if(parsedQuery.getWhere() == null) {
-                return getObjectByPk(persistence, database, entityName, pk);
-            }
+        SqmSelectStatement<Object> parsedQuery = parseQuery(persistence.getSession(database), formatString);
+        if(parsedQuery.getRestriction() == null) {
+            return getObjectByPk(persistence, database, entityName, pk);
+        }
 
-            Alias mainEntityAlias = getEntityAlias(entityName, parsedQuery);
-            net.sf.jsqlparser.schema.Table mainEntityTable;
-            if(mainEntityAlias != null) {
-                mainEntityTable = new net.sf.jsqlparser.schema.Table(null, mainEntityAlias.getName());
-            } else {
-                mainEntityTable = new net.sf.jsqlparser.schema.Table();
-            }
+        String mainEntityAlias = getEntityAlias(entityName, parsedQuery);
+        for(int i = 0; i < keyProperties.length; i++) {
+            /* TODO PropertyAccessor propertyAccessor = keyProperties[i];
+            EqualsTo condition = new EqualsTo();
+            parsedQuery.setWhere(
+                    new AndExpression(condition, new Parenthesis(parsedQuery.getWhere())));
+            net.sf.jsqlparser.schema.Column column =
+                    new net.sf.jsqlparser.schema.Column(mainEntityTable, propertyAccessor.getName());
+            condition.setLeftExpression(column);
+            JdbcNamedParameter jdbcParameter = new JdbcNamedParameter();
+            jdbcParameter.setName("p" + (p + i + 1));
+            condition.setRightExpression(jdbcParameter);
+            parameters[p + i] = propertyAccessor.get(pk);*/
+        }
 
-
-            for(int i = 0; i < keyProperties.length; i++) {
-                PropertyAccessor propertyAccessor = keyProperties[i];
-                EqualsTo condition = new EqualsTo();
-                parsedQuery.setWhere(
-                        new AndExpression(condition, new Parenthesis(parsedQuery.getWhere())));
-                net.sf.jsqlparser.schema.Column column =
-                        new net.sf.jsqlparser.schema.Column(mainEntityTable, propertyAccessor.getName());
-                condition.setLeftExpression(column);
-                JdbcNamedParameter jdbcParameter = new JdbcNamedParameter();
-                jdbcParameter.setName("p" + (p + i + 1));
-                condition.setRightExpression(jdbcParameter);
-                parameters[p + i] = propertyAccessor.get(pk);
-            }
-
-            String fullQueryString = parsedQuery.toString();
-            if(fullQueryString.toLowerCase().startsWith(FAKE_SELECT_PREFIX)) {
-                fullQueryString = fullQueryString.substring(FAKE_SELECT_PREFIX.length());
-            }
-            Session session = persistence.getSession(database);
-            result = runHqlQuery(session, fullQueryString, parameters);
-            if(result != null && !result.isEmpty()) {
-                return result.get(0);
-            } else {
-                return null;
-            }
-        } catch (JSQLParserException e) {
-            throw new Error(e);
+        String fullQueryString = parsedQuery.toString();
+        Session session = persistence.getSession(database);
+        result = runHqlQuery(session, fullQueryString, parameters);
+        if(result != null && !result.isEmpty()) {
+            return result.get(0);
+        } else {
+            return null;
         }
     }
 
-    protected static Alias getEntityAlias(String entityName, PlainSelect query) {
-        FromItem fromItem = query.getFromItem();
-        if (hasEntityAlias(entityName, fromItem)) {
-            return fromItem.getAlias();
-        }
-        if(query.getJoins() != null) {
-            for(Object o : query.getJoins()) {
-                Join join = (Join) o;
-                if (hasEntityAlias(entityName, join.getRightItem())) {
-                    return join.getRightItem().getAlias();
+    protected static String getEntityAlias(String entityName, SqmSelectStatement<?> query) {
+        SqmFromClause fromClause = query.getQuerySpec().getFromClause();
+        for (SqmRoot<?> root : fromClause.getRoots()) {
+            String alias = root.getAlias();
+            if (alias == null) {
+                alias = root.getExplicitAlias();
+            }
+            if (alias != null) {
+                if (entityName.equals(root.getEntityName())) {
+                    return alias;
+                } else {
+                    SqmExpressible<?> expressible = root.getExpressible();
+                    if (expressible instanceof EntityType && entityName.equals(((EntityType<?>) expressible).getName())) {
+                        return alias;
+                    }
                 }
             }
         }
         logger.debug("Alias from entity " + entityName + " not found in query " + query);
         return null;
-    }
-
-    private static boolean hasEntityAlias(String entityName, FromItem fromItem) {
-        return fromItem instanceof net.sf.jsqlparser.schema.Table &&
-               ((net.sf.jsqlparser.schema.Table) fromItem).getName().equals(entityName) &&
-               fromItem.getAlias() != null &&
-               !StringUtils.isBlank(fromItem.getAlias().getName());
     }
 
     /**
@@ -789,7 +763,7 @@ public class QueryUtils {
      * @param entityName the type (entity name) of the master object
      * @param obj the master object
      * @param oneToManyRelationshipName the name of the relationship to navigate
-     * @return the list of associated objects   
+     * @return the list of associated objects
      */
     @SuppressWarnings({"unchecked"})
     public static List<Object> getRelatedObjects(

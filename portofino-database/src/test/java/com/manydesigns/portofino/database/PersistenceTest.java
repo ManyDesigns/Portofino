@@ -81,6 +81,13 @@ public class PersistenceTest {
     }
 
     protected void setup(FileObject appDir) throws Exception {
+        setupPersistence(appDir);
+        setupJPetStore();
+        setupHibernateTest();
+        persistence.initModel();
+    }
+
+    public void setupPersistence(FileObject appDir) throws IOException {
         Configuration configuration = new PropertiesConfiguration();
         final DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
@@ -104,9 +111,6 @@ public class PersistenceTest {
                 modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
         configure(persistence);
         persistence.start();
-        setupJPetStore();
-        setupHibernateTest();
-        persistence.initModel();
     }
 
     protected void configure(Persistence persistence) {

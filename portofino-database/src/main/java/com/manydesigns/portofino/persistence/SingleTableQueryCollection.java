@@ -5,15 +5,9 @@ import com.manydesigns.elements.fields.search.Ordering;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Function;
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
 import org.hibernate.Session;
+import org.hibernate.query.criteria.JpaSelection;
+import org.hibernate.query.sqm.tree.select.SqmSelectStatement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,51 +42,47 @@ public class SingleTableQueryCollection {
     public long count() {
         return count(null);
     }
-    
+
     public long count(Object contextObject) {
-        QueryStringWithParameters query = QueryUtils.mergeQuery(this.query, table, criteria, ordering, contextObject);
+        QueryStringWithParameters query =
+                QueryUtils.mergeQuery(getSession(), this.query, table, criteria, ordering, contextObject);
 
         String queryString = query.getQueryString();
-        String totalRecordsQueryString;
-        try {
-            totalRecordsQueryString = generateCountQuery(queryString);
-        } catch (JSQLParserException e) {
-            throw new Error(e);
-        }
+        String totalRecordsQueryString = generateCountQuery(queryString);
         //TODO gestire count non disponibile (totalRecordsQueryString == null)
         List<Object> result = QueryUtils.runHqlQuery(getSession(), totalRecordsQueryString, query.getParameters());
         return ((Number) result.get(0)).longValue();
     }
 
-    protected String generateCountQuery(String queryString) throws JSQLParserException {
-        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+    protected String generateCountQuery(String queryString) {
         try {
-            PlainSelect plainSelect =
-                    (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
-            List<SelectItem> items = plainSelect.getSelectItems();
-            if(items.size() != 1) {
+            SqmSelectStatement<Object> parsedQuery = QueryUtils.parseQuery(getSession(), queryString);
+            JpaSelection<Object> items = parsedQuery.getSelection();
+            if(items.getSelectionItems().size() != 1) {
                 logger.error("I don't know how to generate a count query for {}", queryString);
                 return null;
             }
-            SelectExpressionItem item = (SelectExpressionItem) items.get(0);
-            Function function = new Function();
+            JpaSelection<?> item = items.getSelectionItems().get(0);
+            /* TODO Function function = new Function();
             function.setName("count");
             function.setParameters(new ExpressionList(Collections.singletonList(item.getExpression())));
             item.setExpression(function);
             plainSelect.setOrderByElements(null);
-            return plainSelect.toString();
+            return plainSelect.toString();*/
         } catch(Exception e) {
-            queryString = "SELECT count(*) " + queryString;
+            /* TODO queryString = "SELECT count(*) " + queryString;
             PlainSelect plainSelect =
                     (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
             plainSelect.setOrderByElements(null);
-            return plainSelect.toString();
+            return plainSelect.toString();*/
         }
+        return null; // TODO
     }
+
     public Object load(Object pkObject) {
         return load(pkObject, null);
     }
-    
+
     public Object load(Object pkObject, Object contextObject) {
         return QueryUtils.getObjectByPk(persistence, table, (Serializable) pkObject, query, contextObject);
     }
@@ -100,7 +90,7 @@ public class SingleTableQueryCollection {
     public List<Object> load(Integer firstResult, Integer maxResults) {
         return load(firstResult, maxResults, null);
     }
-    
+
     public List<Object> load(Integer firstResult, Integer maxResults, Object contextObject) {
         return QueryUtils.getObjects(
                 getSession(), query, table, criteria, ordering, contextObject, firstResult, maxResults);
@@ -113,7 +103,7 @@ public class SingleTableQueryCollection {
     public void update(Object object) {
         getSession().merge(table.getActualEntityName(), object);
     }
-    
+
     public void delete(Object object) {
         getSession().remove(object);
     }
