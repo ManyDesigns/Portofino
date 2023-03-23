@@ -119,7 +119,7 @@
         <shiro.version>1.10.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
         <spring.boot.version>2.5.12</spring.boot.version>
-        <spring.version>5.3.23</spring.version>
+        <spring.version>5.3.26</spring.version>
         <aws.version>1.11.967</aws.version>
 
         <nodejs.version>v16.13.0</nodejs.version>
