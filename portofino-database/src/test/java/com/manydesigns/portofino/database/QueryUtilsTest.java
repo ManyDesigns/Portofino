@@ -125,12 +125,11 @@ public class QueryUtilsTest {
                 "select t from db.schema.TestTable t where t.foo = 1 and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
-        /* TODO manage auto aliasing
         queryStringWithParameters =
-                QueryUtils.mergeQuery(session, "from test_table t, other where t.foo = other.bar",
+                QueryUtils.mergeQuery(session, "from test_table t, other o where t.foo = o.bar",
                         table, criteria, null, null);
-        assertEquals("FROM test_table t, other WHERE (t.foo = other.bar) AND t.column1 = :p1",
-                queryStringWithParameters.getQueryString());*/
+        assertEquals("select t, o from db.schema.TestTable t, db.schema.Other o where t.foo = o.bar and t.column1 = :p1",
+                queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
                 QueryUtils.mergeQuery(session, "from test_table t, other x where t.foo = x.bar",

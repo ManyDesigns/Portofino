@@ -29,11 +29,9 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
-import org.hibernate.UnknownEntityTypeException;
 import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostLoadEvent;
 import org.hibernate.event.spi.PreInsertEvent;
@@ -87,6 +85,7 @@ public class PersistenceTest {
         persistence.initModel();
     }
 
+    @Test(enabled = false)
     public void setupPersistence(FileObject appDir) throws IOException {
         Configuration configuration = new PropertiesConfiguration();
         final DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
