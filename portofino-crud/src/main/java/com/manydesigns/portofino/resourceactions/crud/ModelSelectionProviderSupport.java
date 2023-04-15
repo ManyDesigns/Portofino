@@ -307,7 +307,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             String entityName = table.getActualEntityName();
             Session session = persistence.getSession(databaseName);
             QueryStringWithParameters queryWithParameters =
-                    QueryUtils.mergeQuery(hql, table, null, null, this);
+                    QueryUtils.mergeQuery(session, hql, table, null, null, this);
 
             Collection<Object> objects = getFromQueryCache(selectionProvider, queryWithParameters);
             if (objects == null) {

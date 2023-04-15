@@ -255,7 +255,8 @@ public class ManyToManyAction extends AbstractResourceAction {
         criteria = criteria.eq(onePropertyAccessor, onePk);
         QueryStringWithParameters queryString;
         try {
-            queryString = QueryUtils.mergeQuery(m2mConfiguration.getQuery(), table, criteria, null, this);
+            queryString = QueryUtils.mergeQuery(
+                    session, m2mConfiguration.getQuery(), table, criteria, null, this);
         } catch (RuntimeException e) {
             RequestMessages.addErrorMessage("Invalid query");
             throw e;
@@ -271,7 +272,7 @@ public class ManyToManyAction extends AbstractResourceAction {
             Session selectionProviderSession = persistence.getSession(databaseName);
 
             QueryStringWithParameters manyQuery = QueryUtils.mergeQuery(
-                    hql, null, null, null, this);
+                    session, hql, null, null, null, this);
             potentiallyAvailableAssociations = QueryUtils.runHqlQuery(
                     selectionProviderSession, manyQuery.getQueryString(), manyQuery.getParameters());
         }else{
@@ -300,7 +301,7 @@ public class ManyToManyAction extends AbstractResourceAction {
     }
 
     protected void deleteRelation(Object rel) {
-        session.delete(m2mConfiguration.getActualRelationTable().getActualEntityName(), rel);
+        session.remove(rel);
     }
 
     protected Object saveNewRelation(Object pk, PropertyAccessor onePropertyAccessor, PropertyAccessor manyPropertyAccessor) {
@@ -308,7 +309,7 @@ public class ManyToManyAction extends AbstractResourceAction {
         onePropertyAccessor.set(newRelation, onePk);
         manyPropertyAccessor.set(newRelation, pk);
         prepareSave(newRelation);
-        session.save(m2mConfiguration.getActualRelationTable().getActualEntityName(), newRelation);
+        session.persist(m2mConfiguration.getActualRelationTable().getActualEntityName(), newRelation);
         return newRelation;
     }
 
