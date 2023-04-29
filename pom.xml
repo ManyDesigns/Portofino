@@ -101,7 +101,7 @@
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.7</jsqlparser.version>
-        <json.version>20180813</json.version>
+        <json.version>20230227</json.version>
         <jsoup.version>1.15.3</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>4.8.0</liquibase.version>
