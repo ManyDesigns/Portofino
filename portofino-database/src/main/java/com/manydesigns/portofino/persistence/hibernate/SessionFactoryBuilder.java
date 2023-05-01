@@ -219,7 +219,7 @@ public class SessionFactoryBuilder {
         List<String> externallyMappedClasses = new ArrayList<>();
         try {
             for (Table table : tablesToMap) {
-                Class persistentClass = getPersistentClass(table, codeBase);
+                Class<?> persistentClass = getPersistentClass(table, codeBase);
                 sources.addAnnotatedClass(persistentClass);
                 classLoaderService.classes.put(persistentClass.getName(), persistentClass);
                 if(entityMode == EntityMode.POJO) {
