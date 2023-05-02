@@ -26,15 +26,12 @@ public class JSONExporter implements CrudExporter {
         final long totalRecords = action.getTotalSearchRecords();
 
         JSONStringer js = new JSONStringer();
-        js.object()
-                .key("recordsReturned")
-                .value(action.getObjects().size())
-                .key("totalRecords")
-                .value(totalRecords)
-                .key("startIndex")
-                .value(action.getFirstResult() == null ? 0 : action.getFirstResult())
-                .key("records")
-                .array();
+        js.object();
+        if (totalRecords >= 0) {
+            js.key("totalRecords").value(totalRecords);
+        }
+        js.key("startIndex").value(action.getFirstResult() == null ? 0 : action.getFirstResult());
+        js.key("records").array();
         for (TableForm.Row row : action.getTableForm().getRows()) {
             js.object()
                     .key("__rowKey")

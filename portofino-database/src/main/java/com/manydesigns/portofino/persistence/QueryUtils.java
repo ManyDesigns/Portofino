@@ -537,8 +537,7 @@ public class QueryUtils {
 
     public static QueryEngine getQueryEngine(Session session) {
         SessionFactoryImplementor sessionFactory = (SessionFactoryImplementor) session.getSessionFactory();
-        QueryEngine queryEngine = sessionFactory.getQueryEngine();
-        return queryEngine;
+        return sessionFactory.getQueryEngine();
     }
 
     /**

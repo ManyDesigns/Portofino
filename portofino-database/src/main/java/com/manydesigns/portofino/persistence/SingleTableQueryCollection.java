@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.io.StringReader;
-import java.util.Collections;
 import java.util.List;
 
 public class SingleTableQueryCollection {
@@ -49,7 +47,9 @@ public class SingleTableQueryCollection {
 
         String queryString = query.getQueryString();
         String totalRecordsQueryString = generateCountQuery(queryString);
-        //TODO gestire count non disponibile (totalRecordsQueryString == null)
+        if (totalRecordsQueryString == null) {
+            return -1;
+        }
         List<Object> result = QueryUtils.runHqlQuery(getSession(), totalRecordsQueryString, query.getParameters());
         return ((Number) result.get(0)).longValue();
     }
@@ -57,18 +57,18 @@ public class SingleTableQueryCollection {
     protected String generateCountQuery(String queryString) {
         try {
             SqmSelectStatement<Object> parsedQuery = QueryUtils.parseQuery(getSession(), queryString);
-            JpaSelection<Object> items = parsedQuery.getSelection();
-            if(items.getSelectionItems().size() != 1) {
-                logger.error("I don't know how to generate a count query for {}", queryString);
+            JpaSelection<Object> selection = parsedQuery.getSelection();
+            if (selection.isCompoundSelection()) {
+                logger.warn("I don't know how to generate a count query for {}", queryString);
                 return null;
             }
-            JpaSelection<?> item = items.getSelectionItems().get(0);
-            /* TODO Function function = new Function();
-            function.setName("count");
-            function.setParameters(new ExpressionList(Collections.singletonList(item.getExpression())));
-            item.setExpression(function);
-            plainSelect.setOrderByElements(null);
-            return plainSelect.toString();*/
+            String entityName = this.table.getActualEntityName();
+            SqmSelectStatement<Object> templateQuery =
+                    QueryUtils.parseQuery(getSession(), "select count(*) from " + entityName);
+            parsedQuery.select(templateQuery.getSelection());
+
+            // For some reason, Hibernate loses the "*" when printing back to a string
+            return parsedQuery.toHqlString().replace("count()", "count(*)");
         } catch(Exception e) {
             /* TODO queryString = "SELECT count(*) " + queryString;
             PlainSelect plainSelect =
@@ -76,7 +76,8 @@ public class SingleTableQueryCollection {
             plainSelect.setOrderByElements(null);
             return plainSelect.toString();*/
         }
-        return null; // TODO
+        logger.warn("I don't know how to generate a count query for {}", queryString);
+        return null;
     }
 
     public Object load(Object pkObject) {
