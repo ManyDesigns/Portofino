@@ -119,10 +119,10 @@ public class QueryUtilsTest {
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery(session, "from test_table t where t.foo = 1",
+                QueryUtils.mergeQuery(session, "from test_table t where t.foo = '1'",
                         table, criteria, null, null);
         assertEquals(
-                "select t from db.schema.TestTable t where t.foo = 1 and t.column1 = :p1",
+                "select t from db.schema.TestTable t where t.foo = '1' and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
@@ -147,17 +147,17 @@ public class QueryUtilsTest {
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery(session, "select t from test_table t where t.foo = 1",
+                QueryUtils.mergeQuery(session, "select t from test_table t where t.foo = '1'",
                         table, criteria, null, null);
-        assertEquals("select t from db.schema.TestTable t where t.foo = 1 and t.column1 = :p1",
+        assertEquals("select t from db.schema.TestTable t where t.foo = '1' and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
-        /* TODO manage auto aliasing
+        // TODO auto aliasing?
         queryStringWithParameters =
-                QueryUtils.mergeQuery(session, "select t from test_table t, other where t.foo = other.bar",
+                QueryUtils.mergeQuery(session, "select t from test_table t, other o where t.foo = o.bar",
                         table, criteria, null, null);
-        assertEquals("SELECT t FROM test_table t, other WHERE (t.foo = other.bar) AND t.column1 = :p1",
-                queryStringWithParameters.getQueryString());*/
+        assertEquals("select t from db.schema.TestTable t, db.schema.Other o where t.foo = o.bar and t.column1 = :p1",
+                queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
                 QueryUtils.mergeQuery(session, "select t from test_table t, other x where t.foo = x.bar",
@@ -174,9 +174,9 @@ public class QueryUtilsTest {
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
-                QueryUtils.mergeQuery(session, "select t, u from test_table t, other u where t.foo = 1",
+                QueryUtils.mergeQuery(session, "select t, u from test_table t, other u where t.foo = '1'",
                         table, criteria, null, null);
-        assertEquals("select t, u from db.schema.TestTable t, db.schema.Other u where t.foo = 1 and t.column1 = :p1",
+        assertEquals("select t, u from db.schema.TestTable t, db.schema.Other u where t.foo = '1' and t.column1 = :p1",
                 queryStringWithParameters.getQueryString());
 
         queryStringWithParameters =
