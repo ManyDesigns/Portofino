@@ -2,6 +2,16 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [5.3.5] – Not yet released
+
+### Added
+- Possibility to specify the project root with --dev for PortofinoDrivenBootApplication
+- Notes on how to connect using JNDI in `hibernate.properties`
+
+### Fixed
+- Search field disabled for foreign keys [#618](https://github.com/ManyDesigns/Portofino/issues/618)
+- Several security vulnerabilities in dependencies
+
 ## [5.3.4] – 2022-12-02
 
 ### Added
