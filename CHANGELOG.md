@@ -4,7 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [6.0.0] – Unreleased
 
-This is a major new version that shifts the focus of Portofino completely away from GUI building and towards service/API building.
+This is a major new version that shifts the focus of Portofino completely away from GUI building and towards service/API
+building, a process started with Portofino 5.3.
 
 ### Added
 - Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
@@ -40,6 +41,9 @@ This is a major new version that shifts the focus of Portofino completely away f
 
 ### Removed
 - The Angular UI is no longer part of Portofino. It is now a separate project.
+  - Given the lack of built-in UI, several new helper projects have been started to help build Portofino-based 
+    applications, including a command-line tool and libraries to integrate Portofino into web applications. Please
+    refer to [the website](https://manydesigns.github.io/Portofino/).
 
 ## [5.3.4] – 2022-12-02
 
