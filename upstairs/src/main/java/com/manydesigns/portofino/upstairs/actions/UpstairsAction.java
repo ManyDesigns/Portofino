@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.servlet.ServletContext;
@@ -89,13 +90,17 @@ public class UpstairsAction extends AbstractResourceAction {
         Map<String, Object> info = new HashMap<>();
         info.put("version", Module.getPortofinoVersion());
         List<ModuleInfo> modules = new ArrayList<>();
-        for(Module module : applicationContext.getBeansOfType(Module.class).values()) {
-            ModuleInfo view = new ModuleInfo();
-            view.moduleClass = module.getClass().getName();
-            view.name = module.getName();
-            view.status = module.getStatus().name();
-            view.version = module.getModuleVersion();
-            modules.add(view);
+        ApplicationContext ctx = applicationContext;
+        while (ctx != null) {
+            for (Module module : ctx.getBeansOfType(Module.class).values()) {
+                ModuleInfo view = new ModuleInfo();
+                view.moduleClass = module.getClass().getName();
+                view.name = module.getName();
+                view.status = module.getStatus().name();
+                view.version = module.getModuleVersion();
+                modules.add(view);
+            }
+            ctx = ctx.getParent();
         }
         info.put("modules", modules);
         return info;

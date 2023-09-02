@@ -132,7 +132,7 @@ export class Annotation {
   type: string;
   properties: any;
 
-constructor(type?: string, properties?: any) {
+  constructor(type?: string, properties?: any) {
     this.type = type;
     this.properties = properties;
   }

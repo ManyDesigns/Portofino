@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Search field disabled for foreign keys [#618](https://github.com/ManyDesigns/Portofino/issues/618)
 - Several security vulnerabilities in dependencies
+- `portofino-upstairs` returning empty list of modules
 
 ## [5.3.4] – 2022-12-02
 
