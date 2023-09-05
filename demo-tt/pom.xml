@@ -112,7 +112,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.14</version>
+            <version>42.6.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -155,7 +155,7 @@
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.31.0</version>
+                        <version>0.43.4</version>
                         <configuration>
                             <images>
                                 <image>
@@ -201,6 +201,11 @@
                                         <contextDir>${project.basedir}/src/main/docker/database</contextDir>
                                     </build>
                                     <run>
+                                        <env>
+                                            <POSTGRES_PASSWORD>tt</POSTGRES_PASSWORD>
+                                            <POSTGRES_USER>tt</POSTGRES_USER>
+                                            <POSTGRES_DB>tt</POSTGRES_DB>
+                                        </env>
                                         <ports>
                                             <!-- Expose the database to outside tools (e.g., pgAdmin) -->
                                             <port>15432:5432</port>
@@ -209,6 +214,7 @@
                                             <log>database system is ready to accept connections</log>
                                             <time>20000</time>
                                         </wait>
+
                                     </run>
                                 </image>
                             </images>
