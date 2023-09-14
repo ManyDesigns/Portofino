@@ -27,6 +27,7 @@ import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.security.SecurityLogic;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -38,8 +39,12 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.HashService;
+import org.apache.shiro.crypto.hash.format.Base64Format;
 import org.apache.shiro.crypto.hash.format.HashFormat;
+import org.apache.shiro.crypto.hash.format.HexFormat;
+import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.jetbrains.annotations.NotNull;
@@ -48,8 +53,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Key;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -80,10 +87,57 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractPortofinoRealm.class);
 
-    protected AbstractPortofinoRealm() {
-        //Legacy - let the actual implementation handle hashing
-        setup(new PlaintextHashService(), new PlaintextHashFormat());
-        legacyHashing = true;
+    @PostConstruct
+    public void setup() {
+        Configuration conf = configuration.getProperties();
+        String hashAlgorithm = conf.getString("auth.hash.algorithm", null);
+        if (hashAlgorithm != null) {
+            if (!"plaintext".equals(hashAlgorithm)) {
+                DefaultHashService hashService = new DefaultHashService();
+                hashService.setHashIterations(conf.getInt("auth.hash.iterations", 1));
+                hashService.setHashAlgorithmName(hashAlgorithm);
+                boolean generatePublicSalt = false; //TODO read from configuration
+                HashFormat hashFormat;
+                hashService.setGeneratePublicSalt(generatePublicSalt); //to enable salting, set this to true and/or call setPrivateSalt
+                if (generatePublicSalt) {
+                    //Otherwise different realm instances will fail to match credentials stored in the database
+                    hashFormat = new Shiro1CryptFormat();
+                } else {
+                    hashFormat = getHashFormatFromConfiguration();
+                }
+                setup(hashService, hashFormat);
+            }
+        } else {
+            //Legacy - let the actual implementation handle hashing
+            setup(new PlaintextHashService(), new PlaintextHashFormat());
+            legacyHashing = true;
+        }
+    }
+
+    protected HashFormat getHashFormatFromConfiguration() {
+        String formatSpec = configuration.getProperties().getString("auth.hash.format", null);
+        if (formatSpec == null) {
+            return null;
+        }
+        switch (formatSpec) {
+            case "plaintext":
+                return null;
+            case "hex":
+                return new HexFormat();
+            case "base64":
+                return new Base64Format();
+            default:
+                try {
+                    Class<?> formatClass = Class.forName(formatSpec);
+                    if (HashFormat.class.isAssignableFrom(formatClass)) {
+                        return (HashFormat) formatClass.getConstructor().newInstance();
+                    } else {
+                        throw new IllegalArgumentException("Not a hash format class: " + formatSpec);
+                    }
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Unsupported hash format: " + formatSpec, e);
+                }
+        }
     }
 
     //--------------------------------------------------------------------------

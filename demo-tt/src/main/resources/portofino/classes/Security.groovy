@@ -199,9 +199,8 @@ class Security extends AbstractPortofinoRealm {
     }
 
     String encryptPassword(String plainText) {
-        Sha1Hash sha1Hash = new Sha1Hash(plainText);
-        String encrypted = sha1Hash.toHex();
-        return encrypted;
+        Sha1Hash sha1Hash = new Sha1Hash(plainText)
+        return sha1Hash.toHex()
     }
 
     @Override
@@ -320,7 +319,7 @@ class Security extends AbstractPortofinoRealm {
         principal.admin = false;
         principal.project_manager = false;
 
-        session.save("users", (Object)principal);
+        session.persist("users", (Object)principal);
         session.getTransaction().commit();
 
         [token, principal.email]
@@ -332,7 +331,7 @@ class Security extends AbstractPortofinoRealm {
         String encryptedNewPassword = encryptPassword(newPassword);
         def session = persistence.getSession("tt");
         def q = session.createQuery(
-                "update users set password = :newPassword where id = :id and password = :oldPassword");
+                "update users set password = :newPassword where id = :id and password = :oldPassword", Object)
         q.setParameter("newPassword", encryptedNewPassword);
         q.setParameter("oldPassword", encryptedOldPassword);
         q.setParameter("id", user.id);
@@ -347,7 +346,7 @@ class Security extends AbstractPortofinoRealm {
         Session session = persistence.getSession("tt");
         String token = RandomUtil.createRandomId();
         principal.token = token;
-        session.save("users", (Object)principal);
+        session.persist("users", (Object)principal);
         session.getTransaction().commit();
 
         return token;
