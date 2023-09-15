@@ -48,7 +48,6 @@ import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancy
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import liquibase.Contexts;
@@ -88,7 +87,7 @@ public class Persistence {
     //**************************************************************************
 
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
-    public final static String changelogFileNameTemplate = "liquibase.changelog.";
+    public static final String CHANGELOG_FILE_NAME_TEMPLATE = "liquibase.changelog.";
     public static final String DATABASES_DOMAIN_NAME = "databases";
     public static final String LEGACY_MODEL_DIRECTORY = "portofino-model";
 
@@ -173,7 +172,7 @@ public class Persistence {
                 if (schemaDir != null && schemaDir.getType() == FileType.FOLDER) {
                     for (FileObject child : schemaDir.getChildren()) {
                         String fileName = child.getName().getBaseName();
-                        if (fileName.startsWith(changelogFileNameTemplate)) {
+                        if (fileName.startsWith(CHANGELOG_FILE_NAME_TEMPLATE)) {
                             FileObject domainDirectory = modelService.getDomainDirectory(schema.getModelElement());
                             if (!domainDirectory.exists()) {
                                 domainDirectory.createFolder();
@@ -662,7 +661,7 @@ public class Persistence {
         FileObject schemaDir = modelService.getDomainDirectory(schema.getModelElement());
         if (schemaDir.getType() == FileType.FOLDER) {
             for (FileObject child : schemaDir.getChildren()) {
-                if (child.getName().getBaseName().startsWith(changelogFileNameTemplate)) {
+                if (child.getName().getBaseName().startsWith(CHANGELOG_FILE_NAME_TEMPLATE)) {
                     return child;
                 }
             }

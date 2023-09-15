@@ -172,7 +172,9 @@ public class ModelIO {
         addExternallyLoadedDomains(domain);
         for (FileObject child : domainDir.getChildren()) {
             String baseName = child.getName().getBaseName();
-            if(child.isFile() && !baseName.endsWith(".changelog.xml") && !baseName.endsWith(".properties")) {
+            if(child.isFile() &&
+                    !baseName.startsWith("liquibase.changelog") && // TODO this is ugly. Modules should contribute predicates to test for valid files.
+                    !baseName.endsWith(".properties")) {
                 if(baseName.endsWith(".domain")) {
                     loadDomainFile(model, domain, child);
                 } else if(baseName.endsWith(".entity")) {

@@ -333,15 +333,13 @@ public class PersistenceTest {
     }
 
     public void testGetObjByPk(){
-        //Test Chiave singola
-        HashMap<String, Object> pk = new HashMap<>();
-        pk.put("catid", "BIRDS");
+        //Test single key
         Object bird =  QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+                (persistence, "jpetstore", "category", "BIRDS");
         assertEquals("Birds", get(bird, "name"));
 
-        //Test Chiave composta
-        pk = new HashMap<>();
+        //Test composite key
+        HashMap<String, Object> pk = new HashMap<>();
         pk.put("orderid", new BigInteger("1"));
         pk.put("linenum", new BigInteger("1"));
         Object lineItem = QueryUtils.getObjectByPk
@@ -350,10 +348,7 @@ public class PersistenceTest {
     }
 
     public void testForeignKeyNavigation() {
-        HashMap<String, Object> pk = new HashMap<>();
-        pk.put("catid", "BIRDS");
-        Object bird = QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+        Object bird = QueryUtils.getObjectByPk(persistence, "jpetstore", "category", "BIRDS");
         assertEquals("Birds", get(bird, "name"));
         assertTrue(get(bird, "fk_product_1") instanceof Collection);
         assertFalse(((Collection) get(bird, "fk_product_1")).isEmpty());
@@ -362,7 +357,7 @@ public class PersistenceTest {
             assertEquals(bird, get(o, "fk_product_1"));
         }
 
-        pk = new HashMap<>();
+        HashMap<String, Object>pk = new HashMap<>();
         pk.put("regione", "liguria");
         pk.put("provincia", "genova");
         pk.put("comune", "rapallo");
@@ -385,15 +380,14 @@ public class PersistenceTest {
     }
 
     public void testGetRelatedObjects(){
-        HashMap<String, Object> pk = new HashMap<String, Object>();
-        pk.put("catid", "BIRDS");
         Object bird = QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+                (persistence, "jpetstore", "category", "BIRDS");
         assertEquals("Birds", get(bird, "name"));
 
-        List objs = QueryUtils.getRelatedObjects(persistence, "jpetstore", "category",
+        List<?> objs = QueryUtils.getRelatedObjects(persistence, "jpetstore", "category",
                 bird, "fk_product_1");
-        assertTrue(objs.size() > 0);
+        assertNotNull(objs);
+        assertFalse(objs.isEmpty());
     }
 
     @Test(enabled = false) //Disable because it fails on the CI server where the timezone is different
