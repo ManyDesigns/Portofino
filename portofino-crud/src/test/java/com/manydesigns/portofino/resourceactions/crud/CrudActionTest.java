@@ -42,7 +42,6 @@ import com.manydesigns.portofino.database.model.IncrementGenerator;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
-import com.manydesigns.portofino.dispatcher.security.ShiroResourceFilter;
 import com.manydesigns.portofino.dispatcher.web.ApplicationRoot;
 import com.manydesigns.portofino.dispatcher.web.WebDispatcherInitializer;
 import com.manydesigns.portofino.model.Annotation;
@@ -64,7 +63,6 @@ import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.media.sse.EventListener;
 import org.glassfish.jersey.media.sse.EventSource;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -81,10 +79,8 @@ import org.hibernate.query.Query;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
@@ -421,6 +417,7 @@ public class CrudActionTest extends JerseyTest {
     private void setUpCrudAction(CrudAction crudAction, ActionInstance actionInstance, ActionContext actionContext) {
         CrudConfiguration configuration = crudAction.getCrudConfiguration();
         configuration.persistence = persistence;
+        configuration.setSubscriptionSupport("fine");
         configuration.init();
         actionInstance.setConfiguration(configuration);
         crudAction.persistence = persistence;
@@ -483,12 +480,7 @@ public class CrudActionTest extends JerseyTest {
     }
 
     @Test
-    public void resource() throws InterruptedException {
-        String result = target("/test").request().get(String.class);
-/*        assertEquals(
-                "{\"recordsReturned\":16,\"totalRecords\":16,\"startIndex\":0,\"records\":[{\"__rowKey\":\"FI-SW-01\",\"productid\":{\"value\":\"FI-SW-01\",\"href\":\"http://localhost:9998null/test/FI-SW-01\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Angelfish\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish1.jpg\\\">Salt Water fish from Australia\"}},{\"__rowKey\":\"FI-SW-02\",\"productid\":{\"value\":\"FI-SW-02\",\"href\":\"http://localhost:9998null/test/FI-SW-02\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Tiger Shark\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish4.gif\\\">Salt Water fish from Australia\"}},{\"__rowKey\":\"FI-FW-01\",\"productid\":{\"value\":\"FI-FW-01\",\"href\":\"http://localhost:9998null/test/FI-FW-01\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Koi\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish3.gif\\\">Fresh Water fish from Japan\"}},{\"__rowKey\":\"FI-FW-02\",\"productid\":{\"value\":\"FI-FW-02\",\"href\":\"http://localhost:9998null/test/FI-FW-02\"},\"category\":{\"value\":\"FISH\"},\"name\":{\"value\":\"Goldfish\"},\"descn\":{\"value\":\"<image src=\\\"../images/fish2.gif\\\">Fresh Water fish from China\"}},{\"__rowKey\":\"K9-BD-01\",\"productid\":{\"value\":\"K9-BD-01\",\"href\":\"http://localhost:9998null/test/K9-BD-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Bulldog\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog2.gif\\\">Friendly dog from England\"}},{\"__rowKey\":\"K9-PO-02\",\"productid\":{\"value\":\"K9-PO-02\",\"href\":\"http://localhost:9998null/test/K9-PO-02\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Poodle\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog6.gif\\\">Cute dog from France\"}},{\"__rowKey\":\"K9-DL-01\",\"productid\":{\"value\":\"K9-DL-01\",\"href\":\"http://localhost:9998null/test/K9-DL-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Dalmation\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog5.gif\\\">Great dog for a Fire Station\"}},{\"__rowKey\":\"K9-RT-01\",\"productid\":{\"value\":\"K9-RT-01\",\"href\":\"http://localhost:9998null/test/K9-RT-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Golden Retriever\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog1.gif\\\">Great family dog\"}},{\"__rowKey\":\"K9-RT-02\",\"productid\":{\"value\":\"K9-RT-02\",\"href\":\"http://localhost:9998null/test/K9-RT-02\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Labrador Retriever\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog5.gif\\\">Great hunting dog\"}},{\"__rowKey\":\"K9-CW-01\",\"productid\":{\"value\":\"K9-CW-01\",\"href\":\"http://localhost:9998null/test/K9-CW-01\"},\"category\":{\"value\":\"DOGS\"},\"name\":{\"value\":\"Chihuahua\"},\"descn\":{\"value\":\"<image src=\\\"../images/dog4.gif\\\">Great companion dog\"}},{\"__rowKey\":\"RP-SN-01\",\"productid\":{\"value\":\"RP-SN-01\",\"href\":\"http://localhost:9998null/test/RP-SN-01\"},\"category\":{\"value\":\"REPTILES\"},\"name\":{\"value\":\"Rattlesnake\"},\"descn\":{\"value\":\"<image src=\\\"../images/lizard3.gif\\\">Doubles as a watch dog\"}},{\"__rowKey\":\"RP-LI-02\",\"productid\":{\"value\":\"RP-LI-02\",\"href\":\"http://localhost:9998null/test/RP-LI-02\"},\"category\":{\"value\":\"REPTILES\"},\"name\":{\"value\":\"Iguana\"},\"descn\":{\"value\":\"<image src=\\\"../images/lizard2.gif\\\">Friendly green friend\"}},{\"__rowKey\":\"FL-DSH-01\",\"productid\":{\"value\":\"FL-DSH-01\",\"href\":\"http://localhost:9998null/test/FL-DSH-01\"},\"category\":{\"value\":\"CATS\"},\"name\":{\"value\":\"Manx\"},\"descn\":{\"value\":\"<image src=\\\"../images/cat3.gif\\\">Great for reducing mouse populations\"}},{\"__rowKey\":\"FL-DLH-02\",\"productid\":{\"value\":\"FL-DLH-02\",\"href\":\"http://localhost:9998null/test/FL-DLH-02\"},\"category\":{\"value\":\"CATS\"},\"name\":{\"value\":\"Persian\"},\"descn\":{\"value\":\"<image src=\\\"../images/cat1.gif\\\">Friendly house cat, doubles as a princess\"}},{\"__rowKey\":\"AV-CB-01\",\"productid\":{\"value\":\"AV-CB-01\",\"href\":\"http://localhost:9998null/test/AV-CB-01\"},\"category\":{\"value\":\"BIRDS\"},\"name\":{\"value\":\"Amazon Parrot\"},\"descn\":{\"value\":\"<image src=\\\"../images/bird4.gif\\\">Great companion for up to 75 years\"}},{\"__rowKey\":\"AV-SB-02\",\"productid\":{\"value\":\"AV-SB-02\",\"href\":\"http://localhost:9998null/test/AV-SB-02\"},\"category\":{\"value\":\"BIRDS\"},\"name\":{\"value\":\"Finch\"},\"descn\":{\"value\":\"<image src=\\\"../images/bird1.gif\\\">Great stress reliever\"}}]}",
-                result);*/
-
+    public void subscription() throws InterruptedException {
         EventSource es = EventSource.target(target("/test/subscribe")).build();
         List<InboundEvent> events = new ArrayList<>();
         es.register(events::add);
@@ -498,8 +490,12 @@ public class CrudActionTest extends JerseyTest {
                 MediaType.APPLICATION_JSON_TYPE))) {
             assertEquals(response.getStatus(), 201);
         }
+        Map result = target("/test/new_prod_1").request().get(Map.class);
+        assertNotNull(result);
+        assertEquals(((Map) result.get("productid")).get("value"), "new_prod_1");
         Thread.sleep(1000);
         assertEquals(1, events.size());
+        assertEquals("new_prod_1", events.get(0).readData());
     }
 
 }
@@ -520,5 +516,10 @@ class TestCrudAction extends CrudAction {
     @Override
     protected String getUrlEncoding() {
         return PortofinoProperties.URL_ENCODING_DEFAULT;
+    }
+
+    @Override
+    public Object loadChild(String pathSegment) {
+        return null;
     }
 }

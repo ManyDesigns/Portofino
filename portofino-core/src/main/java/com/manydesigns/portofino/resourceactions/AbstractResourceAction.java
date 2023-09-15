@@ -200,18 +200,21 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             consumeParameter(pathSegment);
             return this;
         }
-        Object element;
+        Object child = null;
         try {
-            element = loadChild(pathSegment);
+            child = loadChild(pathSegment);
         } catch (WebApplicationException e) {
             if(e.getResponse().getStatus() != Response.Status.NOT_FOUND.getStatusCode()) {
                 throw e;
             }
-            logger.debug("Not a subresource: " + pathSegment, e);
-            return consumeParameterIfPossible(pathSegment);
         }
-        parametersAcquired();
-        return element;
+        if (child == null) {
+            logger.debug("Not a subresource: " + pathSegment);
+            return consumeParameterIfPossible(pathSegment);
+        } else {
+            parametersAcquired();
+            return child;
+        }
     }
 
     public Object loadChild(String pathSegment) {

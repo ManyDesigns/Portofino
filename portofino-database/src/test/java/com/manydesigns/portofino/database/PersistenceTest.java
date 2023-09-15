@@ -20,6 +20,7 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseScopedEvent;
 import com.manydesigns.portofino.persistence.hibernate.Events;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import io.reactivex.disposables.Disposable;
@@ -29,11 +30,9 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
-import org.hibernate.UnknownEntityTypeException;
 import org.hibernate.event.spi.PostInsertEvent;
 import org.hibernate.event.spi.PostLoadEvent;
 import org.hibernate.event.spi.PreInsertEvent;
@@ -269,8 +268,8 @@ public class PersistenceTest {
                         "Worms</font>");
 
         String databaseName = "jpetstore";
-        AtomicReference<PreInsertEvent> preInsert = new AtomicReference<>();
-        AtomicReference<PostInsertEvent> postInsert = new AtomicReference<>();
+        AtomicReference<DatabaseScopedEvent<PreInsertEvent>> preInsert = new AtomicReference<>();
+        AtomicReference<DatabaseScopedEvent<PostInsertEvent>> postInsert = new AtomicReference<>();
         DatabaseAccessor databaseAccessor = persistence.getDatabaseAccessor(databaseName);
         Events events = databaseAccessor.getEvents();
         Disposable postInsertD = events.postInsert$.subscribe(postInsert::set);
@@ -636,8 +635,8 @@ public class PersistenceTest {
 
     public void testLoadById() {
         String databaseName = "hibernatetest";
-        AtomicReference<PreLoadEvent> preLoad = new AtomicReference<>();
-        AtomicReference<PostLoadEvent> postLoad = new AtomicReference<>();
+        AtomicReference<DatabaseScopedEvent<PreLoadEvent>> preLoad = new AtomicReference<>();
+        AtomicReference<DatabaseScopedEvent<PostLoadEvent>> postLoad = new AtomicReference<>();
         DatabaseAccessor databaseAccessor = persistence.getDatabaseAccessor(databaseName);
         Events events = databaseAccessor.getEvents();
         Disposable postLoadD = events.postLoad$.subscribe(postLoad::set);
@@ -645,7 +644,9 @@ public class PersistenceTest {
         Object domanda = databaseAccessor.getThreadSession().get("domanda", "0001");
         assertNotNull(domanda);
         assertNotNull(preLoad.get());
+        assertEquals(preLoad.get().database.getName(), databaseName);
         assertNotNull(postLoad.get());
+        assertEquals(postLoad.get().database.getName(), databaseName);
         assertFalse(postLoadD.isDisposed());
         assertFalse(preLoadD.isDisposed());
         persistence.stop();

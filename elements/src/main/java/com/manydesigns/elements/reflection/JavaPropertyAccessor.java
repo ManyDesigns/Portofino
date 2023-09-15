@@ -30,13 +30,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class JavaPropertyAccessor extends AbstractAnnotatedAccessor implements PropertyAccessor {
+/**
+ * Accessor to a Java property (as in JavaBeans, i.e. with getter and setter).
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class JavaPropertyAccessor<T> extends AbstractAnnotatedAccessor implements PropertyAccessor<Object, T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -100,10 +102,7 @@ public class JavaPropertyAccessor extends AbstractAnnotatedAccessor implements P
     public Object get(Object obj) {
         try {
             return getter.invoke(obj);
-        } catch (IllegalAccessException e) {
-            throw new ReflectionException(
-                    String.format("Cannot get property: %s", getName()), e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ReflectionException(
                     String.format("Cannot get property: %s", getName()), e);
         }
@@ -116,13 +115,10 @@ public class JavaPropertyAccessor extends AbstractAnnotatedAccessor implements P
         } else {
             try {
                 setter.invoke(obj, value);
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new ReflectionException(
                         String.format("Cannot set property: %s", getName()), e);
 
-            } catch (InvocationTargetException e) {
-                throw new ReflectionException(
-                        String.format("Cannot set property: %s", getName()), e);
             }
         }
     }

@@ -29,7 +29,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlHqlFormat;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
@@ -108,7 +107,7 @@ public class QueryUtils {
      * @return the results of the query as an Object[] (an array cell per column)
      */
     public static List<Object[]> runSql(Session session, final String queryString, final Object[] parameters) {
-        final List<Object[]> result = new ArrayList<Object[]>();
+        final List<Object[]> result = new ArrayList<>();
 
         try {
             session.doWork(new Work() {
@@ -636,17 +635,7 @@ public class QueryUtils {
      */
     public static Object getObjectByPk(Session session, TableAccessor table, Object pk) {
         String actualEntityName = table.getTable().getActualEntityName();
-        Object result;
-        PropertyAccessor[] keyProperties = table.getKeyProperties();
-        int size = keyProperties.length;
-        if (size > 1) {
-            result = session.get(actualEntityName, pk);
-            return result;
-        }
-        PropertyAccessor propertyAccessor = keyProperties[0];
-        Serializable key = (Serializable) propertyAccessor.get(pk);
-        result = session.get(actualEntityName, key);
-        return result;
+        return session.get(actualEntityName, pk);
     }
 
     /**
@@ -749,8 +738,7 @@ public class QueryUtils {
             return fromItem.getAlias();
         }
         if(query.getJoins() != null) {
-            for(Object o : query.getJoins()) {
-                Join join = (Join) o;
+            for(Join join : query.getJoins()) {
                 if (hasEntityAlias(entityName, join.getRightItem())) {
                     return join.getRightItem().getAlias();
                 }
@@ -789,7 +777,7 @@ public class QueryUtils {
      * @param entityName the type (entity name) of the master object
      * @param obj the master object
      * @param oneToManyRelationshipName the name of the relationship to navigate
-     * @return the list of associated objects   
+     * @return the list of associated objects
      */
     @SuppressWarnings({"unchecked"})
     public static List<Object> getRelatedObjects(

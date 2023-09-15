@@ -6,6 +6,8 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.persister.entity.EntityPersister;
 
+import java.util.Map;
+
 public class SessionDelegator extends SessionDelegatorBaseImpl implements EventSource {
     private DatabaseAccessor setup;
 
@@ -51,7 +53,12 @@ public class SessionDelegator extends SessionDelegatorBaseImpl implements EventS
 
     @Override
     public Object save(String entityName, Object object) {
-        return super.save(setup.translateEntityNameFromJpaToHibernate(entityName), object);
+        entityName = setup.translateEntityNameFromJpaToHibernate(entityName);
+        if (object instanceof Map) {
+            // This is necessary, otherwise in some circumstances Hibernate doesn't consider the object managed
+            ((Map) object).put("$type$", entityName);
+        }
+        return super.save(entityName, object);
     }
 
     @Override
@@ -71,7 +78,12 @@ public class SessionDelegator extends SessionDelegatorBaseImpl implements EventS
 
     @Override
     public void persist(String entityName, Object object) {
-        super.persist(setup.translateEntityNameFromJpaToHibernate(entityName), object);
+        entityName = setup.translateEntityNameFromJpaToHibernate(entityName);
+        if (object instanceof Map) {
+            // This is necessary, otherwise in some circumstances Hibernate doesn't consider the object managed
+            ((Map) object).put("$type$", entityName);
+        }
+        super.persist(entityName, object);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.persistence.hibernate;
 
+import com.manydesigns.portofino.database.model.Database;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -12,9 +13,11 @@ import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 public class EventsIntegrator implements Integrator {
 
     protected final Events events;
+    protected final Database database;
 
-    public EventsIntegrator(Events events) {
+    public EventsIntegrator(Events events, Database database) {
         this.events = events;
+        this.database = database;
     }
 
     @Override
@@ -22,16 +25,18 @@ public class EventsIntegrator implements Integrator {
         final EventListenerRegistry eventListenerRegistry =
                 sessionFactory.getServiceRegistry().getService(EventListenerRegistry.class);
 
-        eventListenerRegistry.appendListeners(EventType.PRE_LOAD, events.preLoad$::onNext);
-        eventListenerRegistry.appendListeners(EventType.POST_LOAD, events.postLoad$::onNext);
+        eventListenerRegistry.appendListeners(EventType.PRE_LOAD,
+                event -> events.preLoad$.onNext(new DatabaseScopedEvent<>(event, database)));
+        eventListenerRegistry.appendListeners(EventType.POST_LOAD,
+                event -> events.postLoad$.onNext(new DatabaseScopedEvent<>(event, database)));
         eventListenerRegistry.appendListeners(EventType.PRE_INSERT, event -> {
-            events.preInsert$.onNext(event);
+            events.preInsert$.onNext(new DatabaseScopedEvent<>(event, database));
             return false;
         });
         eventListenerRegistry.appendListeners(EventType.POST_INSERT, new PostInsertEventListener() {
             @Override
             public void onPostInsert(PostInsertEvent event) {
-                events.postInsert$.onNext(event);
+                events.postInsert$.onNext(new DatabaseScopedEvent<>(event, database));
             }
 
             @Override
@@ -40,13 +45,13 @@ public class EventsIntegrator implements Integrator {
             }
         });
         eventListenerRegistry.appendListeners(EventType.PRE_UPDATE, event -> {
-            events.preUpdate$.onNext(event);
+            events.preUpdate$.onNext(new DatabaseScopedEvent<>(event, database));
             return false;
         });
         eventListenerRegistry.appendListeners(EventType.POST_UPDATE, new PostUpdateEventListener() {
             @Override
             public void onPostUpdate(PostUpdateEvent event) {
-                events.postUpdate$.onNext(event);
+                events.postUpdate$.onNext(new DatabaseScopedEvent<>(event, database));
             }
 
             @Override
@@ -54,14 +59,14 @@ public class EventsIntegrator implements Integrator {
                 return false;
             }
         });
-        eventListenerRegistry.appendListeners(EventType.PRE_DELETE, preDeleteEvent -> {
-            events.preDelete$.onNext(preDeleteEvent);
+        eventListenerRegistry.appendListeners(EventType.PRE_DELETE, event -> {
+            events.preDelete$.onNext(new DatabaseScopedEvent<>(event, database));
             return false;
         });
         eventListenerRegistry.appendListeners(EventType.POST_DELETE, new PostDeleteEventListener() {
             @Override
-            public void onPostDelete(PostDeleteEvent postDeleteEvent) {
-                events.postDelete$.onNext(postDeleteEvent);
+            public void onPostDelete(PostDeleteEvent event) {
+                events.postDelete$.onNext(new DatabaseScopedEvent<>(event, database));
             }
 
             @Override

@@ -22,7 +22,13 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
-public class SingleTableQueryCollection {
+/**
+ * A collection of persistent objects, defined by an HQL query returning a single entity (i.e. rows from a single table,
+ * generally). Doesn't actually hold the objects, but offers methods to retrieve them.
+ *
+ * @author Alessio Stalla – alessiostalla@gmail.com
+ */
+public class SingleEntityQueryCollection {
 
     protected final Persistence persistence;
     protected final Table table;
@@ -30,9 +36,9 @@ public class SingleTableQueryCollection {
     protected final Criteria criteria;
     protected Ordering ordering;
 
-    private static final Logger logger = LoggerFactory.getLogger(SingleTableQueryCollection.class);
+    private static final Logger logger = LoggerFactory.getLogger(SingleEntityQueryCollection.class);
 
-    public SingleTableQueryCollection(
+    public SingleEntityQueryCollection(
             Persistence persistence, Table baseTable, String query, Criteria criteria, Ordering ordering) {
         this.persistence = persistence;
         this.table = baseTable;
@@ -41,14 +47,14 @@ public class SingleTableQueryCollection {
         this.ordering = ordering;
     }
 
-    public SingleTableQueryCollection(Persistence persistence, Table baseTable, String query) {
+    public SingleEntityQueryCollection(Persistence persistence, Table baseTable, String query) {
         this(persistence, baseTable, query, new Criteria(), null);
     }
 
     public long count() {
         return count(null);
     }
-    
+
     public long count(Object contextObject) {
         QueryStringWithParameters query = QueryUtils.mergeQuery(this.query, table, criteria, ordering, contextObject);
 
@@ -92,7 +98,7 @@ public class SingleTableQueryCollection {
     public Object load(Object pkObject) {
         return load(pkObject, null);
     }
-    
+
     public Object load(Object pkObject, Object contextObject) {
         return QueryUtils.getObjectByPk(persistence, table, (Serializable) pkObject, query, contextObject);
     }
@@ -100,7 +106,7 @@ public class SingleTableQueryCollection {
     public List<Object> load(Integer firstResult, Integer maxResults) {
         return load(firstResult, maxResults, null);
     }
-    
+
     public List<Object> load(Integer firstResult, Integer maxResults, Object contextObject) {
         return QueryUtils.getObjects(
                 getSession(), query, table, criteria, ordering, contextObject, firstResult, maxResults);
@@ -113,7 +119,7 @@ public class SingleTableQueryCollection {
     public void update(Object object) {
         getSession().merge(table.getActualEntityName(), object);
     }
-    
+
     public void delete(Object object) {
         getSession().remove(object);
     }
@@ -122,11 +128,11 @@ public class SingleTableQueryCollection {
         return persistence.getSession(table.getDatabaseName());
     }
 
-    public SingleTableQueryCollection where(Criteria criteria) {
+    public SingleEntityQueryCollection where(Criteria criteria) {
         Criteria merged = new Criteria();
         merged.addAll(this.criteria);
         merged.addAll(criteria);
-        return new SingleTableQueryCollection(persistence, table, query, merged, ordering);
+        return new SingleEntityQueryCollection(persistence, table, query, merged, ordering);
     }
 
     public Table getTable() {
@@ -147,5 +153,9 @@ public class SingleTableQueryCollection {
 
     public void setOrdering(Ordering ordering) {
         this.ordering = ordering;
+    }
+
+    public boolean contains(Object id) {
+        return load(id) != null;
     }
 }

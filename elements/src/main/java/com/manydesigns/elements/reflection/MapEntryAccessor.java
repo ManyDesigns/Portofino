@@ -22,8 +22,10 @@ package com.manydesigns.elements.reflection;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.impl.LabelImpl;
+import com.manydesigns.elements.ognl.OgnlUtils;
 
 import java.lang.annotation.Annotation;
+import java.util.Map;
 import java.util.Properties;
 
 /*
@@ -32,14 +34,14 @@ import java.util.Properties;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PropertiesEntryAccessor<T> implements PropertyAccessor<Properties, T> {
+public class MapEntryAccessor<T> implements PropertyAccessor<Map, T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     protected final String name;
     protected final Label labelAnnotation;
 
-    public PropertiesEntryAccessor(String name) {
+    public MapEntryAccessor(String name) {
         this.name = name;
         labelAnnotation = new LabelImpl(name);
     }
@@ -78,11 +80,11 @@ public class PropertiesEntryAccessor<T> implements PropertyAccessor<Properties, 
         return getAnnotations();
     }
 
-    public String get(Properties obj) {
-        return obj.getProperty(name);
+    public String get(Map obj) {
+        return OgnlUtils.convertValueToString(obj.get(name));
     }
 
-    public void set(Properties obj, Object value) {
-        obj.setProperty(name, (String)value);
+    public void set(Map obj, Object value) {
+        obj.put(name, value);
     }
 }

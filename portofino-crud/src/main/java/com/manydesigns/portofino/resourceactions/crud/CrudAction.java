@@ -31,6 +31,8 @@ import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.database.model.ForeignKey;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.persistence.*;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseScopedEvent;
 import com.manydesigns.portofino.persistence.hibernate.Events;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
@@ -45,9 +47,12 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.event.spi.AbstractEvent;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.persister.entity.EntityPersister;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -88,7 +93,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @Autowired
     public Persistence persistence;
 
-    protected SingleTableQueryCollection collection;
+    protected SingleEntityQueryCollection collection;
 
     public static final Logger logger = LoggerFactory.getLogger(CrudAction.class);
 
@@ -214,8 +219,8 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @NotNull
-    protected SingleTableQueryCollection getCollection(Table baseTable) {
-        return new SingleTableQueryCollection(persistence, baseTable, getBaseQuery());
+    protected SingleEntityQueryCollection getCollection(Table baseTable) {
+        return new SingleEntityQueryCollection(persistence, baseTable, getBaseQuery());
     }
 
     @Override
@@ -304,37 +309,72 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @Path("subscribe")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void subscribe(@Context SseEventSink eventSink, @Context Sse sse) {
-        Table baseTable = getCrudConfiguration().getActualTable();
-        Events events = persistence.getDatabaseAccessor(baseTable.getDatabaseName()).getEvents();
-        // TODO filter according to query
+        CrudConfiguration cc = getCrudConfiguration();
+        if (!isConfigured() ||
+                StringUtils.defaultIfEmpty(cc.getSubscriptionSupport(), "none")
+                        .equalsIgnoreCase("none")) {
+            throw new UnsupportedOperationException("This resource doesn't support subscription");
+        }
+        Table baseTable = cc.getActualTable();
+        String subType = cc.getSubscriptionSupport();
+        DatabaseAccessor accessor = persistence.getDatabaseAccessor(baseTable.getDatabaseName());
+        Events events = accessor.getEvents();
+        Function<Object, String> dataF;
+        if (StringUtils.defaultString(subType).equalsIgnoreCase("fine")) {
+            dataF = idStrategy::getPkString;
+        } else if (StringUtils.defaultString(subType).equalsIgnoreCase("coarse")) {
+            dataF = ignore -> "";
+        } else {
+            throw new UnsupportedOperationException("This resource doesn't support `" + subType + "` subscription");
+        }
+
         subscribe(
                 events.postDelete$, eventSink,
-                event -> sse.newEvent("delete", idStrategy.getPkString(event.getId())));
+                event ->
+                        sameEntity(event.getPersister(), accessor, collection.getTable()),
+                event -> sse.newEvent("delete", dataF.apply(event.getId())));
         subscribe(
                 events.postInsert$, eventSink,
-                event -> sse.newEvent("insert", idStrategy.getPkString(event.getId())));
+                event ->
+                        sameEntity(event.getPersister(), accessor, collection.getTable()) &&
+                        collection.contains(event.getId()),
+                event -> sse.newEvent("insert", dataF.apply(event.getId())));
         subscribe(
                 events.postUpdate$, eventSink,
-                event -> sse.newEvent("update", idStrategy.getPkString(event.getId())));
+                event ->
+                        sameEntity(event.getPersister(), accessor, collection.getTable()) &&
+                        collection.contains(event.getId()),
+                event -> sse.newEvent("update", dataF.apply(event.getId())));
     }
 
-    protected <E> Disposable subscribe(
-            Observable<E> observable, SseEventSink eventSink, Function<E, OutboundSseEvent> eventFactory
+    private boolean sameEntity(EntityPersister persister, DatabaseAccessor accessor, Table table) {
+        return persister.getEntityName().equals(
+                accessor.translateEntityNameFromJpaToHibernate(table.getActualEntityName()));
+    }
+
+    protected <E extends AbstractEvent> Disposable subscribe(
+            Observable<DatabaseScopedEvent<E>> observable, SseEventSink eventSink,
+            Predicate<E> filter,
+            Function<E, OutboundSseEvent> eventFactory
     ) {
         AtomicReference<Disposable> subscriptionHolder = new AtomicReference<>();
-        return observable.subscribe(
-                hibernateEvent -> {
-                    OutboundSseEvent event = eventFactory.apply(hibernateEvent);
-                    eventSink.send(event).exceptionally(
-                            throwable -> handleSSEException(throwable, subscriptionHolder.get()));
-                },
-                throwable -> {},
-                eventSink::close,
-                subscriptionHolder::set);
+        return observable
+                .filter(e -> e.database.equals(collection.getTable().getSchema().getDatabase()))
+                .map(e -> e.event)
+                .filter(filter)
+                .subscribe(
+                        hibernateEvent -> {
+                            OutboundSseEvent event = eventFactory.apply(hibernateEvent);
+                            eventSink.send(event).exceptionally(
+                                    throwable -> handleSSEException(throwable, subscriptionHolder.get()));
+                        },
+                        throwable -> handleSSEException(throwable, subscriptionHolder.get()),
+                        eventSink::close,
+                        subscriptionHolder::set);
     }
 
     @Nullable
-    protected  <T> T handleSSEException(Throwable throwable, Disposable subscription) {
+    protected  <NULL> NULL handleSSEException(Throwable throwable, Disposable subscription) {
         // We have to unsubscribe if the SSE event output has been
         // closed (either by client closing the connection (IOException) or by
         // calling SseEventSink.close() (IllegalStateException) on the server

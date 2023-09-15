@@ -124,7 +124,7 @@ public class SessionFactoryBuilder {
         Thread.currentThread().setContextClassLoader(scratchClassLoader);
 
         BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
-        bootstrapRegistryBuilder.applyIntegrator(new EventsIntegrator(events));
+        bootstrapRegistryBuilder.applyIntegrator(new EventsIntegrator(events, database));
         DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
         bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
         BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();

@@ -47,7 +47,7 @@ import java.util.List;
 */
 
 @XmlRootElement(name = "configuration")
-@XmlType(name = "databaseConfiguration", propOrder = {"database","query","selectionProviders"})
+@XmlType(name = "databaseConfiguration", propOrder = {"database","query","selectionProviders","subscriptionSupport"})
 @XmlAccessorType(value = XmlAccessType.NONE)
 @JsonIgnoreProperties({"persistence", "actualTable", "actualDatabase"})
 public class CrudConfiguration extends com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration {
@@ -62,6 +62,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
 
     protected String database;
     protected String query;
+    protected String subscriptionSupport;
 
     @Autowired
     @Enabled(false)
@@ -168,6 +169,17 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
         this.selectionProviders.clear();
         this.selectionProviders.addAll(selectionProviders);
     }
+
+    @XmlAttribute
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    public String getSubscriptionSupport() {
+        return subscriptionSupport;
+    }
+
+    public void setSubscriptionSupport(String subscriptionSupport) {
+        this.subscriptionSupport = subscriptionSupport;
+    }
+
 
     public Table getActualTable() {
         return actualTable;

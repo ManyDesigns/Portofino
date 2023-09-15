@@ -23,32 +23,32 @@ package com.manydesigns.elements.reflection;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Properties;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Accessor for Java maps.
+ *
+ * @author Alessio Stalla – alessiostalla@gmail.com
+ */
 @SuppressWarnings({"UnusedDeclaration"})
-public class PropertiesAccessor implements ClassAccessor {
+public class MapAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    protected final PropertiesEntryAccessor[] accessors;
+    protected final MapEntryAccessor[] accessors;
 
-    public PropertiesAccessor(Properties properties) {
-        accessors = new PropertiesEntryAccessor[properties.size()];
+    public MapAccessor(Map template) {
+        accessors = new MapEntryAccessor[template.size()];
         int i = 0;
-        for (Object current : properties.keySet()) {
+        for (Object current : template.keySet()) {
             String name = (String)current;
-            accessors[i] = new PropertiesEntryAccessor(name);
+            accessors[i] = new MapEntryAccessor(name);
             i++;
         }
 
         // sort alphabetically
-        Arrays.sort(accessors, Comparator.comparing(PropertiesEntryAccessor::getName));
+        Arrays.sort(accessors, Comparator.comparing(MapEntryAccessor::getName));
     }
 
     public String getName() {
@@ -60,8 +60,8 @@ public class PropertiesAccessor implements ClassAccessor {
         return Properties.class;
     }
 
-    public PropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
-        for (PropertiesEntryAccessor current : accessors) {
+    public MapEntryAccessor getProperty(String propertyName) throws NoSuchFieldException {
+        for (MapEntryAccessor current : accessors) {
             if (current.getName().equals(propertyName)) {
                 return current;
             }
@@ -69,13 +69,13 @@ public class PropertiesAccessor implements ClassAccessor {
         throw new NoSuchFieldException(propertyName);
     }
 
-    public PropertyAccessor[] getProperties() {
+    public MapEntryAccessor[] getProperties() {
         return accessors.clone();
     }
 
 
-    public PropertyAccessor[] getKeyProperties() {
-        return new PropertyAccessor[0];
+    public MapEntryAccessor[] getKeyProperties() {
+        return new MapEntryAccessor[0];
     }
 
     public Object newInstance() {

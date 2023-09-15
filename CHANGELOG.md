@@ -8,14 +8,15 @@ This is a major new version that shifts the focus of Portofino completely away f
 building, a process started with Portofino 5.3.
 
 ### Added
-- Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
 - Support for Liquibase changelogs written in SQL (and any other language supported by Liquibase).
+- CRUD subscriptions using Server-Sent Events (clients get notified when records are added/updated/deleted).
 - More fine-grained REST APIs to operate on the model, e.g. adding and removing database schema mappings.
+- [A new website](https://manydesigns.github.io/Portofino/) with tutorials and documentation.
+- Welcome page for newly created applications.
+- Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
 - Improvements on modules:
   - they can handle installation and updates on startup 
   - they can provide parts of the Portofino model to add to the application.
-- [A new website](https://manydesigns.github.io/Portofino/) with tutorials and documentation.
-- Welcome page for newly created applications.
 
 ### Changed
 - The model is no longer limited to a representation of the application's database(s). 

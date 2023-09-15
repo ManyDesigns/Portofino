@@ -6,16 +6,16 @@ import org.hibernate.event.spi.*;
 
 public class Events {
 
-    public final Subject<PreLoadEvent> preLoad$ = PublishSubject.create();
-    public final Subject<PostLoadEvent> postLoad$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PreLoadEvent>> preLoad$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PostLoadEvent>> postLoad$ = PublishSubject.create();
 
-    public final Subject<PreInsertEvent> preInsert$ = PublishSubject.create();
-    public final Subject<PostInsertEvent> postInsert$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PreInsertEvent>> preInsert$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PostInsertEvent>> postInsert$ = PublishSubject.create();
 
-    public final Subject<PreUpdateEvent> preUpdate$ = PublishSubject.create();
-    public final Subject<PostUpdateEvent> postUpdate$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PreUpdateEvent>> preUpdate$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PostUpdateEvent>> postUpdate$ = PublishSubject.create();
 
-    public final Subject<PreDeleteEvent> preDelete$ = PublishSubject.create();
-    public final Subject<PostDeleteEvent> postDelete$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PreDeleteEvent>> preDelete$ = PublishSubject.create();
+    public final Subject<DatabaseScopedEvent<PostDeleteEvent>> postDelete$ = PublishSubject.create();
 
 }
