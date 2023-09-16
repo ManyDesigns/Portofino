@@ -300,7 +300,6 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
         return (T) collection.load(pkObject, this);
     }
 
-
     //--------------------------------------------------------------------------
     // Subscription
     //--------------------------------------------------------------------------
@@ -384,5 +383,4 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
         }
         return null;
     }
-
 }

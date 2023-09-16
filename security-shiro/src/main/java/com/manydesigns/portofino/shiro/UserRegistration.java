@@ -23,7 +23,7 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.annotations.Required;
 
-public class User {
+public class UserRegistration {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 

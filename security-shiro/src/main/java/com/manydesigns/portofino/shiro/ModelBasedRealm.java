@@ -1,15 +1,14 @@
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.database.model.Column;
-import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.persistence.CriteriaDefinition;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
@@ -26,7 +25,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
-import java.beans.PropertyDescriptor;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -193,9 +192,19 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
             throws AuthenticationException {
         if (authenticationToken instanceof UsernamePasswordToken) {
             return loadAuthenticationInfo((UsernamePasswordToken) authenticationToken);
+        } else if (authenticationToken instanceof SignUpToken) {
+            return loadAuthenticationInfo((SignUpToken) authenticationToken);
+        } else if (authenticationToken instanceof PasswordResetToken) {
+            return loadAuthenticationInfo((PasswordResetToken) authenticationToken);
         } else {
             return handleUnsupportedToken(authenticationToken);
         }
+    }
+
+    @Override
+    protected Object getPrincipal(String userId) {
+        List<Column> pkcols = usersTable.getPrimaryKey().getColumns();
+        return new User(OgnlUtils.convertValue(userId, pkcols.get(0).getActualJavaType()));
     }
 
     protected AuthenticationInfo handleUnsupportedToken(AuthenticationToken authenticationToken)
@@ -205,21 +214,46 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
 
     protected AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String userName = usernamePasswordToken.getUsername();
+        UserQuery query = getUserQuery().wherePropertyEqual(userNameProperty, userName);
+        List<?> result = query.session.createQuery(query.criteria).list();
+
+        if (result.size() == 1) {
+            Object user = result.get(0);
+            Serializable userId = getUserId(user);
+            Object password = getUserProperty(user, userPasswordProperty);
+            return new SimpleAuthenticationInfo(new User(userId, user), password, getName());
+        } else {
+            throw new IncorrectCredentialsException("Login failed");
+        }
+    }
+
+    @NotNull
+    protected UserQuery getUserQuery() {
         Session session = persistence.getSession(usersTable.getDatabaseName());
         CriteriaDefinition criteriaTuple =
                 QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.query;
-        CriteriaBuilder cb = criteriaTuple.builder;
-        Root<?> from = criteriaTuple.root;
-        criteria.where(cb.equal(from.get(userNameProperty), userName));
+        return new UserQuery(session, criteriaTuple);
+    }
 
-        List<?> result = session.createQuery(criteria).list();
+    protected static class UserQuery {
+        public final Session session;
+        public final CriteriaQuery<Object> criteria;
+        public final CriteriaBuilder builder;
+        public final Root<?> root;
 
-        if (result.size() == 1) {
-            Object user = cleanUserPrincipal(result.get(0));
-            return new SimpleAuthenticationInfo(user, getUserProperty(user, userPasswordProperty), getName());
-        } else {
-            throw new IncorrectCredentialsException("Login failed");
+        public UserQuery(Session session, CriteriaDefinition definition) {
+            this(session, definition.query, definition.builder, definition.root);
+        }
+
+        public UserQuery(Session session, CriteriaQuery<Object> criteria, CriteriaBuilder builder, Root<?> root) {
+            this.session = session;
+            this.criteria = criteria;
+            this.builder = builder;
+            this.root = root;
+        }
+
+        public UserQuery wherePropertyEqual(String property, Object value) {
+            return new UserQuery(session, criteria.where(builder.equal(root.get(property), value)), builder, root);
         }
     }
 
@@ -229,25 +263,17 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        CriteriaDefinition criteriaTuple =
-                QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.query;
-        CriteriaBuilder cb = criteriaTuple.builder;
-        Root<?> from = criteriaTuple.root;
-        criteria.where(cb.equal(from.get(userTokenProperty), token.getPrincipal()));
-
-        List result = session.createQuery(criteria).list();
+        UserQuery userQuery = getUserQuery().wherePropertyEqual(userTokenProperty, token.getPrincipal());
+        List result = session.createQuery(userQuery.criteria).list();
 
         if (result.size() == 1) {
             String hashedPassword = encryptPassword(token.newPassword);
             Object user = result.get(0);
             setUserProperty(user, userTokenProperty, null); //Consume token
             setUserProperty(user, userPasswordProperty, hashedPassword);
-            session.update(usersTable.getActualEntityName(), user);
+            session.merge(usersTable.getActualEntityName(), user);
             session.getTransaction().commit();
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(cleanUserPrincipal(user), hashedPassword, getName());
-            return info;
+            return new SimpleAuthenticationInfo(new User(getUserId(user), user), hashedPassword, getName());
         } else {
             throw new IncorrectCredentialsException("Invalid token");
         }
@@ -260,41 +286,19 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
         }
 
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        CriteriaDefinition criteriaTuple =
-                QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.query;
-        CriteriaBuilder cb = criteriaTuple.builder;
-        Root<?> from = criteriaTuple.root;
-        criteria.where(cb.equal(from.get(userTokenProperty), token.getPrincipal()));
-
-        List result = session.createQuery(criteria).list();
+        UserQuery userQuery = getUserQuery().wherePropertyEqual(userTokenProperty, token.getPrincipal());
+        List result = session.createQuery(userQuery.criteria).list();
 
         if (result.size() == 1) {
             Object user = result.get(0);
             setUserProperty(user, userTokenProperty, null); //Consume token
-            session.update(usersTable.getActualEntityName(), user);
+            session.merge(usersTable.getActualEntityName(), user);
             session.getTransaction().commit();
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(cleanUserPrincipal(user), encryptPassword(token.getCredentials()), getName());
-            return info;
+            return new SimpleAuthenticationInfo(
+                    new User(getUserId(user), user), encryptPassword(token.getCredentials()), getName());
         } else {
             throw new IncorrectCredentialsException("Invalid token");
         }
-    }
-
-    @Override
-    protected Object cleanUserPrincipal(Object principal) {
-        if(principal instanceof Map) {
-            return super.cleanUserPrincipal(principal);
-        }
-        Object clean = persistence.getTableAccessor(usersTable).newInstance();
-        PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(principal);
-        for(PropertyDescriptor pd : propertyDescriptors) {
-            if(DatabaseLogic.findColumnByName(usersTable, pd.getName()) != null) {
-                setUserProperty(clean, pd.getName(), getUserProperty(principal, pd.getName()));
-            }
-        }
-        return clean;
     }
 
     @Override
@@ -347,28 +351,20 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
             throw new UnsupportedOperationException("Email property not configured.");
         }
         Session session = persistence.getSession(usersTable.getDatabaseName());
-        CriteriaDefinition criteriaTuple =
-                QueryUtils.createCriteria(session, usersTable.getActualEntityName());
-        CriteriaQuery<Object> criteria = criteriaTuple.query;
-        CriteriaBuilder cb = criteriaTuple.builder;
-        Root<?> from = criteriaTuple.root;
-        criteria.where(cb.equal(from.get(userEmailProperty), email));
-        return (Serializable) session.createQuery(criteria).uniqueResult();
+        UserQuery userQuery = getUserQuery().wherePropertyEqual(userEmailProperty, email);
+        return (Serializable) session.createQuery(userQuery.criteria).uniqueResult();
     }
 
     @Override
     public String getUserPrettyName(Serializable user) {
         if(StringUtils.isEmpty(userNameProperty)) {
-            return user.toString();
+            return OgnlUtils.convertValueToString(getUserId(user));
         }
         return (String) getUserProperty(user, userNameProperty);
     }
 
     @Override
-    public Serializable getUserId(Serializable user) {
-        if(StringUtils.isEmpty(userIdProperty)) {
-            return user.toString();
-        }
+    public Serializable getUserId(Object user) {
         return (Serializable) getUserProperty(user, userIdProperty);
     }
 
@@ -411,7 +407,7 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
         if(StringUtils.isEmpty(userTokenProperty)) {
             throw new UnsupportedOperationException("Token property not configured.");
         }
-        User theUser = (User) user;
+        UserRegistration theUser = (UserRegistration) user;
         Session session = persistence.getSession(usersTable.getDatabaseName());
         TableAccessor accessor = persistence.getTableAccessor(usersTable);
         Object persistentUser = accessor.newInstance();
@@ -461,5 +457,28 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
 
     public Table getUsersGroupsTable() {
         return usersGroupsTable;
+    }
+
+    public class User {
+        public final Object id;
+        protected Object properties;
+
+        public User(Object id) {
+            this.id = id;
+        }
+
+        public User(Object id, Object properties) {
+            this.id = id;
+            this.properties = properties;
+        }
+
+        public Object getProperties() {
+            if (properties == null) {
+                Session session = persistence.getSession(usersTable.getDatabaseName());
+                UserQuery query = getUserQuery().wherePropertyEqual(userIdProperty, id);
+                properties = query.session.createQuery(query.criteria).getSingleResult();
+            }
+            return properties;
+        }
     }
 }

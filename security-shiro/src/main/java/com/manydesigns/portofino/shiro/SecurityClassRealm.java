@@ -212,7 +212,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     }
 
     @Override
-    public Serializable getUserId(Serializable user) {
+    public Serializable getUserId(Object user) {
         return ensureDelegate().getUserId(user);
     }
 
