@@ -656,8 +656,11 @@ public class UpstairsAction extends AbstractResourceAction {
                     .ensureAnnotation(UserLink.class);
         }
 
-        security.setup(actionsDirectory.getParent(), wizard.adminGroupName, wizard.encryptionAlgorithm);
+        security.setup(
+                actionsDirectory.getParent(), portofinoConfiguration, modelService,
+                wizard.adminGroupName, wizard.encryptionAlgorithm);
         modelService.saveModel();
+        RequestMessages.addInfoMessage("Authentication/authorization set up correctly");
     }
 
     private void removeSecurityAnnotations(Table table) {

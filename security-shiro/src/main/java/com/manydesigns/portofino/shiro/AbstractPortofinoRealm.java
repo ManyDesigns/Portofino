@@ -29,6 +29,7 @@ import com.manydesigns.portofino.security.SecurityLogic;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -72,6 +73,10 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     public static final String JWT_EXPIRATION_PROPERTY = "jwt.expiration";
     public static final String JWT_SECRET_PROPERTY = "jwt.secret";
+    public static final String HASH_ALGORITHM = "auth.hash.algorithm";
+    public static final String HASH_FORMAT = "auth.hash.format";
+    public static final String HASH_ITERATIONS = "auth.hash.iterations";
+    public static final String PLAINTEXT = "plaintext";
 
     @Autowired
     protected ConfigurationSource configuration;
@@ -88,11 +93,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     @PostConstruct
     public void setup() {
         Configuration conf = configuration.getProperties();
-        String hashAlgorithm = conf.getString("auth.hash.algorithm", null);
+        String hashAlgorithm = conf.getString(HASH_ALGORITHM, null);
         if (hashAlgorithm != null) {
-            if (!"plaintext".equals(hashAlgorithm)) {
+            if (!PLAINTEXT.equalsIgnoreCase(hashAlgorithm)) {
                 DefaultHashService hashService = new DefaultHashService();
-                hashService.setHashIterations(conf.getInt("auth.hash.iterations", 1));
+                hashService.setHashIterations(conf.getInt(HASH_ITERATIONS, 1));
                 hashService.setHashAlgorithmName(hashAlgorithm);
                 boolean generatePublicSalt = false; //TODO read from configuration
                 HashFormat hashFormat;
@@ -113,9 +118,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     }
 
     protected HashFormat getHashFormatFromConfiguration() {
-        String formatSpec = configuration.getProperties().getString("auth.hash.format", null);
-        if (formatSpec == null) {
+        String formatSpec = configuration.getProperties().getString(HASH_FORMAT, null);
+        if (StringUtils.isBlank(formatSpec)) {
             return null;
+        } else {
+            formatSpec = formatSpec.toLowerCase();
         }
         switch (formatSpec) {
             case "plaintext":
