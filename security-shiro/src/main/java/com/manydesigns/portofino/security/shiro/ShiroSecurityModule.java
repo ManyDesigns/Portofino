@@ -31,7 +31,7 @@ import com.manydesigns.portofino.modules.ModuleStatus;
 import com.manydesigns.portofino.resourceactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.rest.PortofinoRoot;
 import com.manydesigns.portofino.security.SecurityLogic;
-import com.manydesigns.portofino.shiro.SecurityClassRealm;
+import com.manydesigns.portofino.shiro.DelegateRealm;
 import com.manydesigns.portofino.shiro.SelfRegisteringShiroFilter;
 import com.manydesigns.portofino.shiro.ShiroSecurity;
 import io.jsonwebtoken.io.Encoders;
@@ -41,16 +41,12 @@ import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
@@ -82,7 +78,7 @@ public class ShiroSecurityModule extends ManagedModule {
     public DispatcherInitializer dispatcherInitializer;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
-    protected SecurityClassRealm realm;
+    protected DelegateRealm realm;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -133,14 +129,14 @@ public class ShiroSecurityModule extends ManagedModule {
             }
         }
         logger.debug("Creating SecurityClassRealm");
-        realm = new SecurityClassRealm(codeBase, "Security");
-        realm.setApplicationContext(applicationContext);
+        realm = new DelegateRealm(codeBase, "Security", applicationContext, configuration);
         try {
             LifecycleUtils.init(realm);
         } catch (Exception e) {
-            logger.warn(
-                    "Security class not found or invalid or initialization failed. " +
-                            "We will reload and/or initialize it on next use.", e);
+            logger.error(
+                    "Initialization of the authentication/authorization realm failed. We will retry on next use.",
+                    e
+            );
         }
         rsm.setRealm(realm);
 

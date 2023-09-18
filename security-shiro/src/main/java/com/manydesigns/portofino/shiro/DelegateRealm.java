@@ -22,6 +22,8 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.persistence.PersistenceNotStartedException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -39,17 +41,18 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
- * Realm implementation that delegates to another class, written in Groovy and dynamically reloaded.
+ * Realm implementation that delegates to another class, written in Groovy and dynamically reloaded, if available.
+ * Typically, this is saved in a file called <code>Security.groovy</code>. If the customized realm is not available,
+ * this realm instantiates a {@link ModelBasedRealm} instead.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class SecurityClassRealm implements PortofinoRealm, Initializable, Destroyable {
+public class DelegateRealm implements PortofinoRealm, Initializable, Destroyable {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
@@ -57,7 +60,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     // Logger
     //--------------------------------------------------------------------------
 
-    public static final Logger logger = LoggerFactory.getLogger(SecurityClassRealm.class);
+    public static final Logger logger = LoggerFactory.getLogger(DelegateRealm.class);
 
     //--------------------------------------------------------------------------
     // Properties
@@ -69,15 +72,21 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     protected volatile boolean destroyed = false;
 
     protected CacheManager cacheManager;
-    protected ApplicationContext applicationContext;
+    protected final ApplicationContext applicationContext;
+    protected final ConfigurationSource configuration;
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityClassRealm(CodeBase codeBase, String className) {
+    public DelegateRealm(
+            CodeBase codeBase, String className,
+            ApplicationContext applicationContext, ConfigurationSource configuration
+    ) {
         this.codeBase = codeBase;
         this.className = className;
+        this.applicationContext = applicationContext;
+        this.configuration = configuration;
     }
 
     //--------------------------------------------------------------------------
@@ -85,11 +94,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     //--------------------------------------------------------------------------
 
     public void init() {
-        try {
-            doEnsureDelegate();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        ensureDelegate();
     }
 
     private synchronized PortofinoRealm ensureDelegate() {
@@ -97,15 +102,26 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
             throw new IllegalStateException("This realm has been destroyed.");
         }
         try {
-            return doEnsureDelegate();
+            return tryToLoadUserDefinedDelegate();
         } catch (Exception e) {
-            logger.info("Security.groovy not found or not loadable");
-            logger.debug("Could not load Security.groovy because", e);
-            return new ModelBasedRealm();
+            logger.info("Custom authentication/authorization class " + className + " not found or not loadable");
+            logger.debug("Could not load" + className + " because", e);
+            try {
+                ModelBasedRealm realm = new ModelBasedRealm();
+                configureDelegate(realm, applicationContext);
+                return replaceDelegate(realm);
+            } catch (PersistenceNotStartedException p) {
+                throw p;
+            } catch (IllegalStateException i) { // TODO distinguish between no conf and bad conf
+                logger.info("Model-based realm not configured, falling back to properties-backed realm");
+                ConfigurationBasedRealm realm = new ConfigurationBasedRealm(configuration);
+                configureDelegate(realm, applicationContext);
+                return replaceDelegate(realm);
+            }
         }
     }
 
-    private PortofinoRealm doEnsureDelegate() throws Exception {
+    private PortofinoRealm tryToLoadUserDefinedDelegate() throws Exception {
         Class<?> scriptClass = codeBase.loadClass(className);
         if(scriptClass.isInstance(security) || (security != null && applicationContext == null)) {
             //Class did not change or context is refreshing
@@ -122,16 +138,13 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
                     configureDelegate(realm, applicationContext);
                 } catch (Exception e) {
                     if(security != null) {
-                        logger.warn("Could not refresh Security.groovy delegate, returning old instance", e);
+                        logger.warn("Could not refresh user-defined delegate, returning old instance: " + security, e);
                         return security;
                     } else {
                         throw e;
                     }
                 }
-                PortofinoRealm oldSecurity = security;
-                security = realm;
-                LifecycleUtils.destroy(oldSecurity);
-                return realm;
+                return replaceDelegate(realm);
             } else {
                  throw new ClassCastException(
                          "Security object is not an instance of " + PortofinoRealm.class + ": " + securityTemp +
@@ -139,6 +152,13 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
                          Arrays.asList(securityTemp.getClass().getInterfaces()) + ")");
             }
         }
+    }
+
+    private PortofinoRealm replaceDelegate(PortofinoRealm realm) {
+        PortofinoRealm oldSecurity = security;
+        security = realm;
+        LifecycleUtils.destroy(oldSecurity);
+        return realm;
     }
 
     protected void configureDelegate(PortofinoRealm security, ApplicationContext applicationContext) {
@@ -351,10 +371,6 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
         if(security != null) {
             security.setCacheManager(cacheManager);
         }
-    }
-
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
     }
 
     @Override

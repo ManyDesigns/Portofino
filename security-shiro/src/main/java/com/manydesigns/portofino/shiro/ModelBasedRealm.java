@@ -6,6 +6,7 @@ import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.persistence.CriteriaDefinition;
 import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.persistence.PersistenceNotStartedException;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.beanutils.BeanUtils;
@@ -55,9 +56,7 @@ public class ModelBasedRealm extends AbstractPortofinoRealm {
 
     @PostConstruct
     public void configure() {
-        if(persistence.status.getValue() != Persistence.Status.STARTED) {
-            throw new IllegalStateException("Persistence is not yet started");
-        }
+        persistence.checkStarted();
         persistence.getDatabases().forEach(d -> {
             d.getAllTables().forEach(t -> {
                 t.getColumns().forEach(c -> {

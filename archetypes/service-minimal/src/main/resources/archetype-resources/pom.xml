@@ -174,12 +174,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!-- Security using Apache Shiro -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-security-shiro</artifactId>
-            <version>${portofino.version}</version>
-        </dependency>
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
