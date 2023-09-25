@@ -77,7 +77,7 @@ public class Util {
             return url;
         }
 
-        if (!"/".equals(req.getContextPath())) {
+        if (req != null && !"/".equals(req.getContextPath())) {
             sb.append(req.getContextPath());
         }
 

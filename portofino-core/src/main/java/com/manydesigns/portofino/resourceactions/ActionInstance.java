@@ -20,8 +20,6 @@
 
 package com.manydesigns.portofino.resourceactions;
 
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.Permissions;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
@@ -45,71 +43,33 @@ public class ActionInstance {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    protected final ActionDescriptor actionDescriptor;
     protected final FileObject directory;
     protected final List<String> parameters;
     protected final ActionInstance parent;
     protected final Class<? extends ResourceAction> actionClass;
-    protected Object configuration;
+    protected ResourceActionConfiguration configuration;
     protected ResourceAction actionBean;
-    protected boolean prepared;
-
-    public static final String DETAIL = "_detail";
-
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
 
     public static final Logger logger = LoggerFactory.getLogger(ActionInstance.class);
 
-    public ActionInstance(ActionInstance parent, FileObject directory,
-                          ActionDescriptor actionDescriptor, Class<? extends ResourceAction> actionClass) {
+    public ActionInstance(ActionInstance parent, FileObject directory, Class<? extends ResourceAction> actionClass) {
         this.parent = parent;
         this.directory = directory;
-        this.actionDescriptor = actionDescriptor;
         this.actionClass = actionClass;
         parameters = new ArrayList<>();
     }
 
     public ActionInstance copy() {
-        ActionInstance actionInstance = new ActionInstance(parent, directory, actionDescriptor, actionClass);
-        actionInstance.prepared = false;
+        ActionInstance actionInstance = new ActionInstance(parent, directory, actionClass);
         actionInstance.parameters.addAll(parameters);
         actionInstance.configuration = configuration;
         actionInstance.actionBean = actionBean;
         return actionInstance;
     }
 
-    public ActionDescriptor getActionDescriptor() {
-        return actionDescriptor;
-    }
-
     //**************************************************************************
     // Utility Methods
     //**************************************************************************
-
-    /**
-     * Returns the portion of the URL that identifies this ActionInstance, including any parameters.
-     */
-    public String getUrlSegment() {
-        String segment = directory.getName().getBaseName();
-        for(String param : parameters) {
-            segment += "/" + param;
-        }
-        return segment;
-    }
-
-    /**
-     * Reconstructs the URL path to this ActionInstance from the rootFactory of the application (not including the
-     * webapp's context path).
-     */
-    public String getPath() {
-        if(getParent() == null) {
-            return "";
-        } else {
-            return getParent().getPath() + "/" + getUrlSegment();
-        }
-    }
 
     /**
      * Returns the directory from which this action was loaded.
@@ -128,11 +88,11 @@ public class ActionInstance {
     /**
      * Returns the configuration object for this action.
      */
-    public Object getConfiguration() {
+    public ResourceActionConfiguration getConfiguration() {
         return configuration;
     }
 
-    public void setConfiguration(Object configuration) {
+    public void setConfiguration(ResourceActionConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -163,7 +123,7 @@ public class ActionInstance {
     }
 
     public Permissions getPermissions() {
-        return actionDescriptor.getPermissions();
+        return configuration.getPermissions();
     }
 
     public FileObject getChildPageDirectory(String name) {
@@ -179,7 +139,7 @@ public class ActionInstance {
         FileObject baseDir = directory;
         if(!parameters.isEmpty()) {
             try {
-                baseDir = baseDir.resolveFile(DETAIL);
+                baseDir = baseDir.resolveFile(AbstractResourceAction.DETAIL);
             } catch (FileSystemException e) {
                 throw new RuntimeException(e);
             }

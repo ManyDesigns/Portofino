@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.security.noop;
 
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;

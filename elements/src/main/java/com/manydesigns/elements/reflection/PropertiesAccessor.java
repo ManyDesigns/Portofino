@@ -48,13 +48,7 @@ public class PropertiesAccessor implements ClassAccessor {
         }
 
         // sort alphabetically
-        Arrays.sort(accessors, new Comparator<PropertiesEntryAccessor>() {
-
-            public int compare(PropertiesEntryAccessor o1,
-                               PropertiesEntryAccessor o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
+        Arrays.sort(accessors, Comparator.comparing(PropertiesEntryAccessor::getName));
     }
 
     public String getName() {
@@ -88,8 +82,7 @@ public class PropertiesAccessor implements ClassAccessor {
         return null;
     }
 
-    public boolean isAnnotationPresent(
-            Class<? extends Annotation> annotationClass) {
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
         return false;
     }
 

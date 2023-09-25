@@ -5,6 +5,7 @@ import com.manydesigns.portofino.shiro.JSONWebToken;
 import com.manydesigns.portofino.shiro.JWTFilter;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +64,7 @@ public class KeyCloakLoginAction extends DefaultLoginAction {
 
     protected Invocation.Builder createTokenRequest() {
         Client client = ClientBuilder.newClient();
-        String kRealmUrl = portofinoConfiguration.getString("keycloak.realm.url");
+        String kRealmUrl = portofinoConfiguration.getProperties().getString("keycloak.realm.url");
         if(!kRealmUrl.endsWith("/")) {
             kRealmUrl = kRealmUrl + "/";
         }
@@ -111,10 +112,11 @@ public class KeyCloakLoginAction extends DefaultLoginAction {
 
     @NotNull
     protected Form prepareForm() {
-        String clientId = portofinoConfiguration.getString("keycloak.client.id", "portofino");
+        Configuration conf = portofinoConfiguration.getProperties();
+        String clientId = conf.getString("keycloak.client.id", "portofino");
         Form form = new Form();
         form.param("client_id", clientId);
-        form.param("client_secret", portofinoConfiguration.getString("keycloak.client.secret"));
+        form.param("client_secret", conf.getString("keycloak.client.secret"));
         form.param("scope", "openid");
         return form;
     }

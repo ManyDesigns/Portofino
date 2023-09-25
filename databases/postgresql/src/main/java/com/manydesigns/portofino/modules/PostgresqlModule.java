@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,17 +20,16 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.PostgreSQLDatabasePlatform;
 import com.manydesigns.portofino.liquibase.databases.PortofinoPostgresDatabase;
-import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import liquibase.database.DatabaseFactory;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,14 +39,7 @@ import jakarta.annotation.PreDestroy;
 */
 public class PostgresqlModule implements Module {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    @Autowired
-    public Configuration configuration;
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;

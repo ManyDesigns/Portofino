@@ -3,7 +3,7 @@ package com.manydesigns.portofino.database.model;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.configuration2.Configuration;
 
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.annotation.*;
 
 /**
  * A mapped database view

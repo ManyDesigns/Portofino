@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
@@ -42,7 +42,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
     protected ResourceConfig configure() {
         return new ResourceConfig(TestResource.class).register(JacksonFeature.class).register(ShiroResourceFilter.class);
     }
-    
+
     @Override
     protected TestContainerFactory getTestContainerFactory() {
         //Must be in-memory so that REST API calls are handled in the test thread to propagate Shiro subject state
@@ -53,7 +53,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
     public static class TestResource {
         public final ResourceResolvers resourceResolver = new ResourceResolvers();
         public final Resource root;
-        
+
         @Context
         protected ResourceContext resourceContext;
 
@@ -64,7 +64,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
             assertTrue(javaRoot.exists());
             root = Root.get(javaRoot, resourceResolver);
         }
-        
+
         @PostConstruct
         public void init() {
             root.setResourceContext(resourceContext);
@@ -97,7 +97,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
         result = target("test/b/2").request().get(String.class);
         assertEquals("2", result);
     }
-    
+
     @Test
     public void parameters() {
         try {
@@ -117,7 +117,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
             logger.debug("Thrown exception", e);
         }
     }
-    
+
     @Test
     public void description() {
         Map result = target("test/p/1/2/:description").request().get(Map.class);
@@ -176,7 +176,7 @@ public class TestRESTInMemory extends JerseyTestNg.ContainerPerClassTest {
 
         subjectThreadState.clear();
     }
-    
+
     @Test
     public void secure1Wrapper() {
         IniSecurityManagerFactory iniSecurityManagerFactory = new IniSecurityManagerFactory("classpath:test/shiro.ini");

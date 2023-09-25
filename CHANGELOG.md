@@ -2,6 +2,102 @@
 All notable changes to this project from version 5.0.0 upwards are documented in this file. 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [6.0.0] – Unreleased
+
+This is a major new version that shifts the focus of Portofino completely away from GUI building and towards service/API
+building, a process started with Portofino 5.3.
+
+### Added
+- Support for Liquibase changelogs written in SQL (and any other language supported by Liquibase).
+- CRUD subscriptions using Server-Sent Events (clients get notified when records are added/updated/deleted).
+- More fine-grained REST APIs to operate on the model, e.g. adding and removing database schema mappings.
+- [A new website](https://manydesigns.github.io/Portofino/) with tutorials and documentation.
+- Welcome page for newly created applications.
+- Provisions for deploying ResourceActions using regular JAX-RS, outside of Portofino's dispatcher.
+- Improvements on modules:
+  - they can handle installation and updates on startup 
+  - they can provide parts of the Portofino model to add to the application.
+
+### Changed
+- The model is no longer limited to a representation of the application's database(s). 
+  Now, it's a generic entity-relationship model based on Ecore. Therefore:
+  - Portofino can store more kinds of information in the model, both for built-in features (detailed in the following)
+    and for user-defined extensions.
+  - The model is no longer loaded/saved as part of the Persistence service. Rather, a new Model 
+    service holds the model and knows how to load and save it.
+  - For normal operations, Portofino doesn't load and save the model all at once anymore. 
+    It loads and saves the parts that it needs on demand.
+- Portofino doesn't store the model as XML anymore. We designed a custom mini-language with Java-inspired syntax.
+  - Portofino 6 can read Portofino 5 models and will convert them to the new format automatically.
+- Resource-action configurations (`action.xml` and `configuration.xml` files) are now saved as objects in the model. 
+  - Portofino will update existing actions automatically to the new format the first time they're accessed.
+- The dispatcher (that associates a URL with a REST resource-action) is now based on the hierarchy of configurations 
+  in the model, rather than the position of the action class in the filesystem.
+  - The legacy dispatcher is still used as a fallback.
+- Hibernate has been updated to version 6.
+  - Portofino now uses Hibernate's native JSON mapping rather than outdated third-party code.
+  - Extensions have more opportunities for customizing Hibernate mapping (e.g. to integrate spatial extensions).
+- Groovy has been updated to version 4.
+- Spring Boot has been updated to version 2.7, and related dependencies have been updated as well.
+
+### Removed
+- The Angular UI is no longer part of Portofino. It is now a separate project.
+  - Given the lack of built-in UI, several new helper projects have been started to help build Portofino-based 
+    applications, including a command-line tool and libraries to integrate Portofino into web applications. Please
+    refer to [the website](https://manydesigns.github.io/Portofino/).
+
+## [5.3.4] – 2022-12-02
+
+### Added
+- Explicit priority to `PortofinoFilter` so that users can install their own filters before or after Portofino's.
+- Possibility to enable Portofino's dispatcher in Boot applications not managed by Portofino, thus easing migration.
+- Some long-due API documentation of Elements.
+- Support references between externally mapped classes and automatically mapped classes.
+
+### Changed
+- Mounted children that point to files are resolved relative to the application directory. In practice,
+  this means that Portofino no longer saves the absolute path of the login action in the root `action.xml`.
+- Updated various dependencies to address security vulnerability reports.
+- The Maven archetypes have been renamed to better reflect their nature, and a description has been added to each of them.
+- Avoid explicit quoting of database identifiers when Hibernate applies it automatically.
+
+### Fixed
+- Database annotations lost when synchronizing the model [#593](https://github.com/ManyDesigns/Portofino/issues/593)
+- Wizard: users and groups columns can't be selected [#609](https://github.com/ManyDesigns/Portofino/issues/609)
+
+## [5.3.3] – 2022-10-22
+
+### Added
+- New deployment option: Portofino modules as Spring Boot components, without using Portofino's dispatcher and without 
+  setting up Portofino's context hierarchy.
+
+### Changed
+- Updated Angular to version 13
+- Replaced moment.js with Luxon
+
+### Fixed
+- Wrong links in the war archetype [#556](https://github.com/ManyDesigns/Portofino/issues/556)
+- Omitting the login.path property results in a malfunctioning application [#557](https://github.com/ManyDesigns/Portofino/issues/557)
+- Mounted child path not converted to the native OS format [#566](https://github.com/ManyDesigns/Portofino/issues/566)
+
+## [5.3.2] – 2022-05-12
+
+### Added
+- Pluggable exporters for CRUD.
+- Configuration abstraction, integrated with Spring's *Environment* (which includes `application.properties` in Spring Boot).  
+
+### Changed
+- Refactored the CRUD's JSON output logic into a separate exporter class. **This is a breaking API change**
+  for CRUD extensions overriding `jsonXYZData` methods.
+- In Spring Boot applications, when using Jersey (the default), allow Portofino actions to coexist with Boot services 
+  such as actuators.
+
+### Fixed
+- Multiple issues with the Spring Boot-based archetypes, including but not limited to:
+  - Application generated from Java service archetype searches for action classes in `src/main/resources/portofino`
+  - Unsupported CORS with service archetypes. By default, archetypes will use an embedded Tomcat instead of Undertow for the time being (startup is slower)
+  - Misleading Java service archetype `SpringConfiguration.java`
+
 ## [5.3.1] – 2022-03-10
 
 ### Added

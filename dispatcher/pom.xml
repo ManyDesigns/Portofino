@@ -71,7 +71,7 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2</artifactId>
-            <version>2.2.0</version>
+            <version>2.2.4</version>
             <exclusions>
                 <exclusion>
                     <groupId>jakarta.ws.rs</groupId>
@@ -122,7 +122,7 @@
         </dependency>
         <!-- Groovy is optional -->
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
+            <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
             <scope>provided</scope>
         </dependency>

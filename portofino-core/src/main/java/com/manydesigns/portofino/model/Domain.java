@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.code.CodeBase;
 import com.manydesigns.portofino.model.annotations.Transient;
 import org.eclipse.emf.common.util.BasicEMap;
@@ -15,19 +16,16 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.lang.reflect.Modifier;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Domain extends EPackageImpl {
 
     public static final EClass CLASS;
     public static final EAttribute OBJECTS_ATTRIBUTE;
+    public static final String PATH_SEPARATOR = ".";
 
     static {
         CLASS = EcoreFactory.eINSTANCE.createEClass();
@@ -58,13 +56,24 @@ public class Domain extends EPackageImpl {
         return objects;
     }
 
-    public void addObject(String name, EObject object) {
+    public void putObject(String name, EObject object) {
         if(getObjects().containsKey(name)) {
             throw new RuntimeException("Object already present: " + name + " in domain " + getName());
         }
         getObjects().put(name, object);
     }
 
+    public EObject removeObject(String name) {
+        return getObjects().removeKey(name);
+    }
+
+    /**
+     * Registers an object under a given name.
+     * @param name the name of the object.
+     * @param javaObject the object. To be stored in the model, it has to be translated to a model object.
+     * @param domain the {@link Domain} containing the entity definitions necessary to model the object.
+     * @return the object translated to a model object.
+     */
     public EObject putObject(String name, Object javaObject, Domain domain)
             throws IntrospectionException, InvocationTargetException, IllegalAccessException {
         EObject object = toEObject(javaObject, domain);
@@ -73,17 +82,33 @@ public class Domain extends EPackageImpl {
     }
 
     public static EObject toEObject(Object javaObject, Domain domain)
-            throws IntrospectionException, IllegalAccessException, InvocationTargetException {
+            throws IntrospectionException, IllegalAccessException, InvocationTargetException, IllegalArgumentException {
+        if (javaObject == null) {
+            return null;
+        }
         Class<?> javaClass = javaObject.getClass();
-        EClass eClass = domain.findClass(javaClass);
+        EClassifier eClassifier = domain.findClass(javaClass);
+        if (eClassifier instanceof EClass) {
+            return toEObject(javaObject, domain, javaClass, (EClass) eClassifier);
+        } else if (eClassifier instanceof EEnum) {
+            EEnum eEnum = (EEnum) eClassifier;
+            return eEnum.getEEnumLiteralByLiteral(((Enum<?>) javaObject).name());
+        }
+        throw new IllegalArgumentException(
+                "We don't know how to convert " + javaObject + " in the domain " + domain.getName());
+    }
+
+    protected static EObject toEObject(
+            Object javaObject, Domain domain, Class<?> javaClass, EClass eClass
+    ) throws IntrospectionException, IllegalAccessException, InvocationTargetException {
         EObject object = EcoreUtil.create(eClass);
         for (PropertyDescriptor prop : getPersistentProperties(javaClass)) {
             EStructuralFeature eStructuralFeature = eClass.getEStructuralFeature(prop.getName());
             Object value = prop.getReadMethod().invoke(javaObject);
             if(eStructuralFeature.isMany()) {
                 if (value != null) {
-                    EList list = (EList) object.eGet(eStructuralFeature);
-                    for (Object elem : (Iterable) value) {
+                    EList list = (EList<?>) object.eGet(eStructuralFeature);
+                    for (Object elem : (Iterable<?>) value) {
                         list.add(toEObject(elem, domain));
                     }
                 }
@@ -96,12 +121,12 @@ public class Domain extends EPackageImpl {
         return object;
     }
 
-    public EClass findClass(Class<?> aClass) {
+    public EClassifier findClass(Class<?> aClass) {
         String className = aClass.getSimpleName();
         Domain pkg = resolveDomain(aClass.getPackageName());
         EClassifier eClassifier = pkg.getEClassifier(className);
-        if (eClassifier instanceof EClass) {
-            return (EClass) eClassifier;
+        if (eClassifier instanceof EClass || eClassifier instanceof EEnum) {
+            return eClassifier;
         } else {
             throw new IllegalArgumentException("Not a modeled class: " + aClass.getName());
         }
@@ -109,6 +134,15 @@ public class Domain extends EPackageImpl {
 
     public EList<Domain> getSubdomains() {
         return (EList) getESubpackages(); // TODO check that only domains can be added
+    }
+
+    public Domain getParentDomain() {
+        EObject eObject = eContainer();
+        if (eObject instanceof Domain) {
+            return (Domain) eObject;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -179,7 +213,7 @@ public class Domain extends EPackageImpl {
         List<PropertyDescriptor> result = new ArrayList<>();
         for (PropertyDescriptor prop : propertyDescriptors) {
             if (prop.getWriteMethod() != null && prop.getReadMethod() != null) {
-                if (getAnnotation(prop, Transient.class) == null) {
+                if (ReflectionUtil.getAnnotation(prop, Transient.class) == null) {
                     result.add(prop);
                 }
             }
@@ -187,23 +221,22 @@ public class Domain extends EPackageImpl {
         return result;
     }
 
-    public static Object toJavaObject(EObject eObject, Domain classesDomain, CodeBase codeBase)
-            throws IOException, ClassNotFoundException, NoSuchMethodException, IntrospectionException,
-            InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+    public static Object toJavaObject(EObject eObject, Domain classesDomain, CodeBase codeBase) throws Exception {
         if (eObject == null) {
             return null;
+        }
+        if (eObject instanceof EEnumLiteral) {
+            Class javaClass = getJavaClass(classesDomain, codeBase, ((EEnumLiteral) eObject).getEEnum());
+            if (!Enum.class.isAssignableFrom(javaClass)) {
+                throw new RuntimeException("Not an enum: " + javaClass);
+            }
+            return Enum.valueOf(javaClass, ((EEnumLiteral) eObject).getName());
         }
         EClass eClass = eObject.eClass();
         if (eClass == null) {
             return null;
         }
-        String javaClassName = eClass.getName();
-        EPackage pkg = eClass.getEPackage();
-        while (pkg != null && pkg != classesDomain) {
-            javaClassName = pkg.getName() + "." + javaClassName;
-            pkg = pkg.getESuperPackage();
-        }
-        Class<?> javaClass = codeBase.loadClass(javaClassName);
+        Class<?> javaClass = getJavaClass(classesDomain, codeBase, eClass);
         Object object = javaClass.getConstructor().newInstance();
         PropertyDescriptor[] props = Introspector.getBeanInfo(javaClass).getPropertyDescriptors();
         for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
@@ -211,18 +244,7 @@ public class Domain extends EPackageImpl {
                     Arrays.stream(props).filter(p -> p.getName().equals(feature.getName())).findFirst();
             PropertyDescriptor propertyDescriptor = pd.orElseThrow(() -> new NoSuchFieldException(feature.getName()));
             if (feature.isMany()) {
-                List<EObject> values = (List) eObject.eGet(feature);
-                List list;
-                if (propertyDescriptor.getWriteMethod() != null) {
-                    list = new ArrayList();
-                    propertyDescriptor.getWriteMethod().invoke(object, list);
-                } else {
-                    list = (List) propertyDescriptor.getReadMethod().invoke(object);
-                    list.clear();
-                }
-                for (EObject value : values) {
-                    list.add(toJavaObject(value, classesDomain, codeBase));
-                }
+                setCollection(eObject, classesDomain, codeBase, object, feature, propertyDescriptor);
             } else {
                 Object value = eObject.eGet(feature);
                 if (value instanceof EObject) {
@@ -234,39 +256,92 @@ public class Domain extends EPackageImpl {
         return object;
     }
 
-    public Object getJavaObject(String name, Domain classesDomain, CodeBase codeBase)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
-            IntrospectionException, NoSuchFieldException, IOException, ClassNotFoundException {
+    protected static void setCollection(
+            EObject eObject, Domain classesDomain, CodeBase codeBase, Object object, EStructuralFeature feature,
+            PropertyDescriptor propertyDescriptor
+    ) throws Exception {
+        Collection<Object> values = (Collection) eObject.eGet(feature);
+        Collection<Object> coll;
+        if (propertyDescriptor.getWriteMethod() != null) {
+            Class<?> collType = propertyDescriptor.getReadMethod().getReturnType();
+            if (Modifier.isAbstract(collType.getModifiers())) {
+                if (List.class.isAssignableFrom(collType)) {
+                    if (!collType.isAssignableFrom(ArrayList.class)) {
+                        throw new RuntimeException("Unsupported list type: " + collType);
+                    }
+                    coll = new ArrayList<>();
+                } else if (Set.class.isAssignableFrom(collType)) {
+                    if (!collType.isAssignableFrom(HashSet.class)) {
+                        throw new RuntimeException("Unsupported set type: " + collType);
+                    }
+                    coll = new HashSet<>();
+                } else {
+                    throw new RuntimeException("Unsupported collection type: " + collType);
+                }
+            } else {
+                coll = (Collection<Object>) collType.getConstructor().newInstance();
+            }
+        } else {
+            coll = (Collection) propertyDescriptor.getReadMethod().invoke(object);
+            coll.clear();
+        }
+        for (Object value : values) {
+            if (value instanceof EObject) {
+                coll.add(toJavaObject((EObject) value, classesDomain, codeBase));
+            } else {
+                coll.add(value);
+            }
+        }
+        if (propertyDescriptor.getWriteMethod() != null) {
+            propertyDescriptor.getWriteMethod().invoke(object, coll);
+        }
+    }
+
+    private static Class<?> getJavaClass(
+            Domain classesDomain, CodeBase codeBase, EClassifier type
+    ) throws IOException, ClassNotFoundException {
+        String javaClassName = type.getName();
+        EPackage pkg = type.getEPackage();
+        while (!classesDomain.equals(pkg)) {
+            javaClassName = pkg.getName() + "." + javaClassName;
+            pkg = pkg.getESuperPackage();
+        }
+        return (Class<?>) codeBase.loadClass(javaClassName);
+    }
+
+    public Object getJavaObject(String name, Domain classesDomain, CodeBase codeBase) throws Exception {
         return toJavaObject(getObjects().get(name), classesDomain, codeBase);
     }
 
-    public static <T extends Annotation> T getAnnotation(PropertyDescriptor prop, Class<T> annClass) {
-        Class<?> declaringClass = null;
-        if (prop.getReadMethod() != null) {
-            T annotation = prop.getReadMethod().getAnnotation(annClass);
-            if (annotation != null) {
-                return annotation;
-            } else {
-                declaringClass = prop.getReadMethod().getDeclaringClass();
-            }
-        }
-        if (prop.getWriteMethod() != null) {
-            T annotation = prop.getReadMethod().getAnnotation(annClass);
-            if (annotation != null) {
-                return annotation;
-            } else {
-                declaringClass = prop.getWriteMethod().getDeclaringClass();
-            }
-        }
-        if (declaringClass != null) {
-            try {
-                Field field = declaringClass.getDeclaredField(prop.getName());
-                return field.getAnnotation(annClass);
-            } catch (NoSuchFieldException e) {
-                return null;
-            }
-        } else {
+    public static String getQualifiedName(EPackage domain) {
+        if (domain == null) {
             return null;
         }
+        String superQName = getQualifiedName(domain.getESuperPackage());
+        if (superQName != null) {
+            return superQName + PATH_SEPARATOR + domain.getName();
+        } else {
+            return domain.getName();
+        }
+    }
+
+    public String getQualifiedName() {
+        return getQualifiedName(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (!(obj instanceof Domain)) {
+            return false;
+        } else {
+            return getQualifiedName().equals(((Domain) obj).getQualifiedName());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return getQualifiedName().hashCode();
     }
 }

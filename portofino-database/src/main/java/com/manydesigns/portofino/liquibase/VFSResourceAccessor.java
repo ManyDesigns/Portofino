@@ -31,7 +31,7 @@ public class VFSResourceAccessor extends AbstractResourceAccessor {
         if(file.exists() && file.isFile()) {
             return new InputStreamList(file.getURI(), file.getContent().getInputStream());
         } else {
-            return null;
+            return new InputStreamList();
         }
     }
 

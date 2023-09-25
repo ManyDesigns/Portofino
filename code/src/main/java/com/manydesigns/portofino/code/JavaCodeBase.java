@@ -96,14 +96,7 @@ public class JavaCodeBase extends AbstractCodeBase {
     }
 
     public Class loadClassFile(FileObject location, String name) throws ClassNotFoundException {
-        try {
-            return new VFSClassloader(location, getClassLoader()).loadClass(name);
-        } catch (LinkageError e) {
-            //LinkageError happens (also) when defining the same class twice. Since this classloader ignores the name,
-            //code like theClass.getClassloader().loadClass(anotherName) would fail with an error. Here we wrap it
-            //with a ClassNotFoundException, which is more often expected and handled.
-            throw new ClassNotFoundException(name, e);
-        }
+        return new VFSClassloader(location, getClassLoader()).loadClass(name);
     }
 
     public Class loadJavaFile(final FileObject fileObject, final String name) throws ClassNotFoundException {
@@ -235,6 +228,14 @@ public class JavaCodeBase extends AbstractCodeBase {
                         return defineClass(null, code, 0, code.length);
                     }
                 } catch (Exception e) {
+                    throw new ClassNotFoundException(name, e);
+                } catch (LinkageError e) {
+                    // LinkageError happens (also) when defining the same class twice.
+                    // Since this classloader ignores the name, code like
+                    // theClass.getClassloader().loadClass(anotherName) would fail with an error. Here we wrap it
+                    // with a ClassNotFoundException, which is more often expected and handled.
+                    // TODO maybe we should cache the class and, if the name differs, throw CNFE, rather that
+                    //  wait for a LinkageError.
                     throw new ClassNotFoundException(name, e);
                 }
             }

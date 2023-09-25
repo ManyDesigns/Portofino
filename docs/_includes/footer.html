@@ -1,0 +1,45 @@
+
+<div class="py-5 border-top">
+  <div class="container">
+
+    <p class="h5 mb-3">{{ site.title | escape }}</p>
+
+    <div class="row">
+
+      <div class="col-sm">
+        <ul class="list-unstyled">
+          <li>
+            {%- if site.author -%}
+              {{ site.author | escape }}
+            {%- else -%}
+              {{ site.title | escape }}
+            {%- endif -%}
+          </li>
+          {%- if site.email -%}
+            <li>
+              <a href="mailto:{{ site.email }}">
+                {{ site.email }}
+              </a>
+            </li>
+          {%- endif -%}
+        </ul>
+      </div>
+
+
+      <div class="col-sm text-right">
+        <!--<p>{{- site.description | escape -}}</p>-->
+
+        <p>
+          This site is powered by
+          <a href="https://nicolas-van.github.io/bootstrap-4-github-pages/">Bootstrap 4 Github Pages</a> and
+          the <a href="https://bootswatch.com/zephyr/">Zephyr theme by Bootswatch</a>
+        </p>
+        <p>
+          <a href="https://github.com/ManyDesigns/Portofino"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/ManyDesigns/Portofino?style=social"></a>
+        <p>
+      </div>
+
+    </div>
+
+  </div>
+</div>

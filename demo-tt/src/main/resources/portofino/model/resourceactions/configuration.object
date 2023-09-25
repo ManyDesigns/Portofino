@@ -1,0 +1,49 @@
+import classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
+import classes.com.manydesigns.portofino.resourceactions.Group;
+import classes.com.manydesigns.portofino.resourceactions.Permissions;
+import classes.com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
+import classes.com.manydesigns.portofino.security.AccessLevel;
+
+object configuration : ResourceActionConfiguration {
+	additionalChildren = []
+	permissions = Permissions {
+		groups = [
+			Group {
+				accessLevel = NONE
+				accessLevelName = "NONE"
+				name = "anonymous"
+				permissions = []
+			},
+			Group {
+				accessLevel = NONE
+				accessLevelName = "NONE"
+				name = "admin"
+				permissions = []
+			},
+			Group {
+				accessLevel = NONE
+				accessLevelName = "NONE"
+				name = "registered"
+				permissions = []
+			},
+			Group {
+				accessLevel = NONE
+				accessLevelName = "NONE"
+				name = "administrators"
+				permissions = []
+			},
+			Group {
+				accessLevel = NONE
+				accessLevelName = "NONE"
+				name = "project-manager"
+				permissions = []
+			},
+			Group {
+				accessLevel = NONE
+				accessLevelName = "NONE"
+				name = "all"
+				permissions = []
+			}
+		]
+	}
+}

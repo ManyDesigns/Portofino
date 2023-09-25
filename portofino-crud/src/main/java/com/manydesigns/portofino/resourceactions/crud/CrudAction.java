@@ -21,13 +21,19 @@
 package com.manydesigns.portofino.resourceactions.crud;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.fields.search.Ordering;
 import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.model.Database;
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.database.model.ForeignKey;
 import com.manydesigns.portofino.database.model.Table;
 import com.manydesigns.portofino.persistence.*;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseScopedEvent;
+import com.manydesigns.portofino.persistence.hibernate.Events;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
@@ -39,17 +45,32 @@ import com.manydesigns.portofino.resourceactions.crud.configuration.database.Sel
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Predicate;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
+import org.hibernate.event.spi.AbstractEvent;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.persister.entity.EntityPersister;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.beans.IntrospectionException;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.sse.OutboundSseEvent;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +93,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @Autowired
     public Persistence persistence;
 
-    protected SingleTableQueryCollection collection;
+    protected SingleEntityQueryCollection collection;
 
     public static final Logger logger = LoggerFactory.getLogger(CrudAction.class);
 
@@ -84,6 +105,14 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @Override
     protected void commitTransaction() {
         collection.getSession().getTransaction().commit();
+    }
+
+    /**
+     * Returns the Hibernate session of the underlying {@link #collection}, for convenience and backward compatibility.
+     * @return <code>collection.getSession()</code>
+     */
+    protected Session getSession() {
+        return collection.getSession();
     }
 
     @Override
@@ -124,9 +153,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @Override
-    public void saveConfiguration()
-            throws ConfigurationException, IntrospectionException, IOException, InvocationTargetException,
-            IllegalAccessException {
+    public void saveConfiguration() throws Exception {
         CrudConfiguration crudConfiguration = (CrudConfiguration) getConfiguration();
         List<SelectionProviderReference> sps = new ArrayList<>(crudConfiguration.getSelectionProviders());
         crudConfiguration.getSelectionProviders().clear();
@@ -143,7 +170,10 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
                 crudConfiguration.getSelectionProviders().add(sp);
             }
         });
-        List<CrudProperty> existingProperties = this.crudConfiguration.getProperties();
+        List<CrudProperty> existingProperties = new ArrayList<>();
+        if (this.crudConfiguration != null) {
+            existingProperties.addAll(this.crudConfiguration.getProperties());
+        }
         List<CrudProperty> configuredProperties = crudConfiguration.getProperties();
         List<CrudProperty> newProperties = configuredProperties.stream().map(p1 -> {
             Optional<CrudProperty> maybeP2 =
@@ -168,7 +198,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
         //TODO I18n
         if (actualDatabase == null) {
             String message =
-                    "Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
+                    "Crud " + crudConfiguration.getName() + " (" + getPath() + ") " +
                     "refers to a nonexistent database: " + getCrudConfiguration().getDatabase();
             logger.warn(message);
             RequestMessages.addErrorMessage(message);
@@ -178,7 +208,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
         Table baseTable = getCrudConfiguration().getActualTable();
         if (baseTable == null) {
             String message =
-                    "Crud " + crudConfiguration.getName() + " (" + actionInstance.getPath() + ") " +
+                    "Crud " + crudConfiguration.getName() + " (" + getPath() + ") " +
                     "refers to an invalid table.";
             logger.warn(message);
             RequestMessages.addErrorMessage(message);
@@ -189,8 +219,8 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @NotNull
-    protected SingleTableQueryCollection getCollection(Table baseTable) {
-        return new SingleTableQueryCollection(persistence, baseTable, getBaseQuery());
+    protected SingleEntityQueryCollection getCollection(Table baseTable) {
+        return new SingleEntityQueryCollection(persistence, baseTable, getBaseQuery());
     }
 
     @Override
@@ -224,7 +254,7 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @SuppressWarnings({"unchecked"})
     public List<T> loadObjects() {
         try {
-            TableCriteria criteria = setupCriteria();
+            Criteria criteria = setupCriteria();
             collection = collection.where(criteria);
             objects = (List<T>) collection.load(firstResult, maxResults, this);
         } catch (ClassCastException e) {
@@ -236,12 +266,21 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     }
 
     @NotNull
-    protected TableCriteria setupCriteria() {
-        TableCriteria criteria = new TableCriteria(collection.getTable());
+    protected Criteria setupCriteria() {
+        Criteria criteria = new Criteria();
         if(searchForm != null) {
             searchForm.configureCriteria(criteria);
         }
-        applySorting(criteria);
+        if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
+            try {
+                PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
+                if(orderByProperty != null) {
+                    collection.setOrdering(new Ordering(orderByProperty, sortDirection));
+                }
+            } catch (NoSuchFieldException e) {
+                CrudAction.logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
+            }
+        }
         return criteria;
     }
 
@@ -259,6 +298,91 @@ public class CrudAction<T> extends AbstractCrudAction<T> {
     @SuppressWarnings("unchecked")
     protected T loadObjectByPrimaryKey(Object pkObject) {
         return (T) collection.load(pkObject, this);
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Subscription
+    //--------------------------------------------------------------------------
+
+    @GET
+    @Path("subscribe")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void subscribe(@Context SseEventSink eventSink, @Context Sse sse) {
+        CrudConfiguration cc = getCrudConfiguration();
+        if (!isConfigured() ||
+                StringUtils.defaultIfEmpty(cc.getSubscriptionSupport(), "none")
+                        .equalsIgnoreCase("none")) {
+            throw new UnsupportedOperationException("This resource doesn't support subscription");
+        }
+        Table baseTable = cc.getActualTable();
+        String subType = cc.getSubscriptionSupport();
+        DatabaseAccessor accessor = persistence.getDatabaseAccessor(baseTable.getDatabaseName());
+        Events events = accessor.getEvents();
+        Function<Object, String> dataF;
+        if (StringUtils.defaultString(subType).equalsIgnoreCase("fine")) {
+            dataF = idStrategy::getPkString;
+        } else if (StringUtils.defaultString(subType).equalsIgnoreCase("coarse")) {
+            dataF = ignore -> "";
+        } else {
+            throw new UnsupportedOperationException("This resource doesn't support `" + subType + "` subscription");
+        }
+
+        subscribe(
+                events.postDelete$, eventSink,
+                event ->
+                        sameEntity(event.getPersister(), accessor, collection.getTable()),
+                event -> sse.newEvent("delete", dataF.apply(event.getId())));
+        subscribe(
+                events.postInsert$, eventSink,
+                event ->
+                        sameEntity(event.getPersister(), accessor, collection.getTable()) &&
+                        collection.contains(event.getId()),
+                event -> sse.newEvent("insert", dataF.apply(event.getId())));
+        subscribe(
+                events.postUpdate$, eventSink,
+                event ->
+                        sameEntity(event.getPersister(), accessor, collection.getTable()) &&
+                        collection.contains(event.getId()),
+                event -> sse.newEvent("update", dataF.apply(event.getId())));
+    }
+
+    private boolean sameEntity(EntityPersister persister, DatabaseAccessor accessor, Table table) {
+        return persister.getEntityName().equals(
+                accessor.translateEntityNameFromJpaToHibernate(table.getActualEntityName()));
+    }
+
+    protected <E extends AbstractEvent> Disposable subscribe(
+            Observable<DatabaseScopedEvent<E>> observable, SseEventSink eventSink,
+            Predicate<E> filter,
+            Function<E, OutboundSseEvent> eventFactory
+    ) {
+        AtomicReference<Disposable> subscriptionHolder = new AtomicReference<>();
+        return observable
+                .filter(e -> e.database.equals(collection.getTable().getSchema().getDatabase()))
+                .map(e -> e.event)
+                .filter(filter)
+                .subscribe(
+                        hibernateEvent -> {
+                            OutboundSseEvent event = eventFactory.apply(hibernateEvent);
+                            eventSink.send(event).exceptionally(
+                                    throwable -> handleSSEException(throwable, subscriptionHolder.get()));
+                        },
+                        throwable -> handleSSEException(throwable, subscriptionHolder.get()),
+                        eventSink::close,
+                        subscriptionHolder::set);
+    }
+
+    @Nullable
+    protected  <NULL> NULL handleSSEException(Throwable throwable, Disposable subscription) {
+        // We have to unsubscribe if the SSE event output has been
+        // closed (either by client closing the connection (IOException) or by
+        // calling SseEventSink.close() (IllegalStateException) on the server
+        // side).
+        if (throwable instanceof IOException || throwable instanceof IllegalStateException) {
+            subscription.dispose();
+        }
+        return null;
     }
 
 }

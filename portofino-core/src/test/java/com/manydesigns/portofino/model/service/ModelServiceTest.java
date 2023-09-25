@@ -2,11 +2,15 @@ package com.manydesigns.portofino.model.service;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.code.JavaCodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.modules.ModuleStatus;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EEnum;
 import org.testng.annotations.Test;
 
 import java.beans.IntrospectionException;
@@ -29,19 +33,36 @@ public class ModelServiceTest {
     public void testAddBuiltInClass() throws IOException, IntrospectionException {
         FileObject applicationDirectory = VFS.getManager().resolveFile("ram://test");
         ModelService modelService = new ModelService(
-                applicationDirectory, new PropertiesConfiguration(), null,
+                applicationDirectory, new ConfigurationSource(new PropertiesConfiguration(), null),
                 new JavaCodeBase(applicationDirectory));
-        EClass eClass = modelService.addBuiltInClass(ModelServiceTest.class);
+        EClassifier eClass = modelService.addBuiltInClass(ModelServiceTest.class);
+        assertTrue(eClass instanceof EClass);
         assertEquals(modelService.getModel().getDomains().size(), 1);
         assertEquals(eClass.getName(), ModelServiceTest.class.getSimpleName());
         assertEquals(eClass, modelService.getClassesDomain().findClass(ModelServiceTest.class));
     }
 
     @Test
+    public void testAddBuiltInEnum() throws IOException, IntrospectionException {
+        FileObject applicationDirectory = VFS.getManager().resolveFile("ram://test");
+        ModelService modelService = new ModelService(
+                applicationDirectory, new ConfigurationSource(new PropertiesConfiguration(), null),
+                new JavaCodeBase(applicationDirectory));
+        EClassifier eEnum = modelService.addBuiltInClass(ModuleStatus.class);
+        assertTrue(eEnum instanceof EEnum);
+        assertEquals(modelService.getModel().getDomains().size(), 1);
+        assertEquals(eEnum.getName(), ModuleStatus.class.getSimpleName());
+        assertEquals(eEnum, modelService.getClassesDomain().findClass(ModuleStatus.class));
+        assertEquals(6, ((EEnum) eEnum).getELiterals().size());
+        assertEquals(ModuleStatus.CREATED.name(), ((EEnum) eEnum).getELiterals().get(0).getLiteral());
+        assertEquals(ModuleStatus.INSTALLED.name(), ((EEnum) eEnum).getELiterals().get(1).getLiteral());
+    }
+
+    @Test
     public void testPutObject() throws Exception {
         FileObject applicationDirectory = VFS.getManager().resolveFile("ram://test");
         ModelService modelService = new ModelService(
-                applicationDirectory, new PropertiesConfiguration(), null,
+                applicationDirectory, new ConfigurationSource(new PropertiesConfiguration(), null),
                 new JavaCodeBase(applicationDirectory));
         Domain domain = modelService.getModel().ensureDomain("domain");
         try {

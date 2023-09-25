@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,14 +38,7 @@ import jakarta.annotation.PreDestroy;
 */
 public class DerbyModule implements Module {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    @Autowired
-    public Configuration configuration;
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     @Autowired
     DatabasePlatformsRegistry databasePlatformsRegistry;

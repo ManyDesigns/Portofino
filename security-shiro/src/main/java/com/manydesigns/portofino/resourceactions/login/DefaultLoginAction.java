@@ -43,9 +43,13 @@ import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 import com.manydesigns.portofino.resourceactions.ResourceActionName;
 import com.manydesigns.portofino.resourceactions.annotations.ScriptTemplate;
-import com.manydesigns.portofino.security.SecurityLogic;
+import com.manydesigns.portofino.resourceactions.login.support.ConfirmUserRequest;
+import com.manydesigns.portofino.resourceactions.login.support.LoginData;
+import com.manydesigns.portofino.resourceactions.login.support.ResetPasswordEmailRequest;
+import com.manydesigns.portofino.resourceactions.login.support.ResetPasswordRequest;
 import com.manydesigns.portofino.shiro.*;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.commons.io.IOUtils;
@@ -80,7 +84,7 @@ import java.util.Map;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@ScriptTemplate("script_template.groovy")
+@ScriptTemplate("script_template.groovy.txt")
 @ResourceActionName("Login")
 public class DefaultLoginAction extends AbstractResourceAction {
     public static final String copyright =
@@ -107,11 +111,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
     public Response login(@FormParam("username") String username, @FormParam("password") String password)
             throws AuthenticationException {
         return Response.ok(doLogin(username, password)).build();
-    }
-
-    public static class LoginData {
-        public String username;
-        public String password;
     }
 
     @POST
@@ -189,7 +188,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
     }
 
     public String userInfo(Subject subject, PortofinoRealm portofinoRealm, String jwt) {
-        boolean administrator = security.isAdministrator(portofinoConfiguration);
+        boolean administrator = security.isAdministrator(portofinoConfiguration.getProperties());
         JSONStringer stringer = new JSONStringer();
         stringer.
             object().
@@ -200,12 +199,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
                 key("jwt").value(jwt).
             endObject();
         return stringer.toString();
-    }
-
-    public static class ResetPasswordEmailRequest {
-        public String email;
-        public String siteNameOrAddress;
-        public String loginPageUrl;
     }
 
     @Path(":send-reset-password-email")
@@ -221,8 +214,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
             Serializable user = portofinoRealm.getUserByEmail(req.email);
             if(user != null) {
                 String token = portofinoRealm.generateOneTimeToken(user);
-                String body = getResetPasswordEmailBody(req.siteNameOrAddress, req.loginPageUrl.replace("TOKEN", token));
-                String from = portofinoConfiguration.getString(PortofinoProperties.MAIL_FROM);
+                String body = getResetPasswordEmailBody(
+                        req.siteNameOrAddress, req.loginPageUrl.replace("TOKEN", token));
+                String from = portofinoConfiguration.getProperties().getString(PortofinoProperties.MAIL_FROM);
                 String subject = ElementsThreadLocals.getText("password.reset.confirmation.required");
                 sendMail(from, req.email, subject, body);
             } else {
@@ -256,11 +250,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
             String template = IOUtils.toString(stream, StandardCharsets.UTF_8);
             return template.replace("$link", confirmSignUpLink).replace("$site", site);
         }
-    }
-
-    public static class ResetPasswordRequest {
-        public String token;
-        public String newPassword;
     }
 
     @Path(":reset-password")
@@ -305,10 +294,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
         } catch (QueueException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public String getApplicationName() {
-        return portofinoConfiguration.getString(PortofinoProperties.APP_NAME);
     }
 
     protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
@@ -392,7 +377,9 @@ public class DefaultLoginAction extends AbstractResourceAction {
         Subject subject = SecurityUtils.getSubject();
         if (subject.getPrincipal() != null) {
             logger.debug("Already logged in");
-            throw new WebApplicationException(Response.Status.CONFLICT);
+            throw new WebApplicationException(
+                    ElementsThreadLocals.getText("user.already.logged.in"),
+                    Response.Status.CONFLICT);
         }
 
         String confirmationUrl = context.getRequest().getParameter("portofino:confirmationUrl");
@@ -419,7 +406,7 @@ public class DefaultLoginAction extends AbstractResourceAction {
             String[] tokenAndEmail = portofinoRealm.saveSelfRegisteredUser(user);
             String body = getConfirmSignUpEmailBody(
                     siteNameOrAddress, confirmationUrl.replace("TOKEN", tokenAndEmail[0]));
-            String from = portofinoConfiguration.getString(
+            String from = portofinoConfiguration.getProperties().getString(
                     PortofinoProperties.MAIL_FROM, "example@example.com");
             sendMail(from, tokenAndEmail[1], ElementsThreadLocals.getText("confirm.signup"), body);
         } catch (ExistingUserException e) {
@@ -430,10 +417,6 @@ public class DefaultLoginAction extends AbstractResourceAction {
             logger.error("Error during sign-up", e);
             throw new WebApplicationException(e);
         }
-    }
-
-    public static class ConfirmUserRequest {
-        public String token;
     }
 
     @Path("user/:confirm")
@@ -476,4 +459,24 @@ public class DefaultLoginAction extends AbstractResourceAction {
         logger.info("User logout");
     }
 
+    @Override
+    public ResourceActionConfiguration loadConfiguration() {
+        // Load a default configuration
+        ResourceActionConfiguration configuration = new ResourceActionConfiguration();
+        actionInstance.setConfiguration(configuration);
+        if (applicationContext != null) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBean(configuration);
+        }
+        configuration.init();
+        return configuration;
+    }
+
+    /**
+     * Subclasses can invoke this method in {@link #loadConfiguration()} to restore normal behavior.
+     * @return the configuration loaded from the model.
+     * @throws Exception in case the configuration cannot be loaded.
+     */
+    protected ResourceActionConfiguration loadConfigurationNormally() throws Exception {
+        return super.loadConfiguration();
+    }
 }

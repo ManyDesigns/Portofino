@@ -26,6 +26,7 @@ import com.manydesigns.elements.blobs.DefaultBlobManagerFactory;
 import com.manydesigns.elements.crypto.KeyManager;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
@@ -42,25 +43,27 @@ public class PortofinoSpringConfiguration implements InitializingBean {
 
     public static final String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public static final String DEFAULT_BLOB_MANAGER = "defaultBlobManager";
-    public final static String PORTOFINO_CONFIGURATION = "com.manydesigns.portofino.portofinoConfiguration";
-    public final static String PORTOFINO_CONFIGURATION_FILE = "com.manydesigns.portofino.portofinoConfigurationFile";
+    public final static String CONFIGURATION_SOURCE = "com.manydesigns.portofino.configuration";
+    public final static String DISPATCHER = "com.manydesigns.portofino.dispatcher";
+
+    public final static String MODEL_SERVICE = "com.manydesigns.portofino.model.service";
     private static final Logger logger = LoggerFactory.getLogger(PortofinoSpringConfiguration.class);
 
     @Autowired
-    @Qualifier(PORTOFINO_CONFIGURATION)
-    Configuration configuration;
+    @Qualifier(CONFIGURATION_SOURCE)
+    ConfigurationSource configuration;
     @Autowired
     @Qualifier(APPLICATION_DIRECTORY)
     FileObject applicationDirectory;
 
     @Bean
     public DefaultBlobManagerFactory getStandardBlobManagerFactory() {
-        return new DefaultBlobManagerFactory(configuration, applicationDirectory);
+        return new DefaultBlobManagerFactory(configuration.getProperties(), applicationDirectory);
     }
 
     @Bean(name = DEFAULT_BLOB_MANAGER)
     public BlobManager getDefaultBlobManager(@Autowired List<BlobManagerFactory> factories) {
-        String type = configuration.getString(PortofinoProperties.BLOB_MANAGER_TYPE, "standard");
+        String type = configuration.getProperties().getString(PortofinoProperties.BLOB_MANAGER_TYPE, "standard");
         return factories.stream()
                 .filter(f -> f.accept(type))
                 .findFirst()
@@ -78,7 +81,7 @@ public class PortofinoSpringConfiguration implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         if(!KeyManager.isActive()) {
             logger.info("Initializing KeyManager ");
-            KeyManager.init(configuration);
+            KeyManager.init(configuration.getProperties());
         }
     }
 }

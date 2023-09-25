@@ -1,15 +1,15 @@
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.portofino.database.model.Database;
 import com.manydesigns.portofino.database.model.DatabaseLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.EntityMode;
+import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -23,22 +23,24 @@ public class POJOPersistenceTest extends PersistenceTest {
     @Override
     public void setup() throws Exception {
         super.setup();
-        persistence.getDatabases().forEach(d -> d.setEntityMode(EntityMode.POJO.name()));
+        persistence.getDatabases().forEach(d -> {
+            d.setEntityMode(EntityMode.POJO.name());
+        });
         persistence.initModel();
     }
 
     @Test
     public void testGeneratedClasses() throws FileSystemException {
-        FileObject genClassesDir = modelService.getApplicationDirectory().resolveFile(DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
+        FileObject genClassesDir = modelService.getApplicationDirectory().resolveFile(
+                DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
         assertTrue(genClassesDir.exists());
         FileObject jpetstoreDir = genClassesDir.resolveFile("jpetstore");
         assertTrue(jpetstoreDir.exists());
-        DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore")
-                .setEntityMode(EntityMode.MAP.name());
+        Database jpetstore = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore");
+        jpetstore.setEntityMode(EntityMode.MAP.name());
         persistence.initModel();
         assertFalse(jpetstoreDir.exists());
-        DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore")
-                .setEntityMode(EntityMode.POJO.name());
+        jpetstore.setEntityMode(EntityMode.POJO.name());
         persistence.initModel();
         assertTrue(jpetstoreDir.exists());
     }

@@ -23,19 +23,16 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.AggregateCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
-import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementationFactory;
 import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.reactivex.disposables.Disposable;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +45,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.io.IOException;
 
@@ -63,7 +60,6 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
     public static final String GENERATED_CLASSES_DIRECTORY_NAME = "classes-generated";
-    public static final String DATABASES_DOMAIN_NAME = "databases";
 
     @Autowired
     public ServletContext servletContext;
@@ -72,9 +68,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public ModelService modelService;
 
     @Autowired
-    @Qualifier(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
+    public ConfigurationSource configuration;
     @Autowired
     @Qualifier(PortofinoSpringConfiguration.APPLICATION_DIRECTORY)
     public FileObject applicationDirectory;
@@ -83,22 +77,13 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
+    protected Persistence persistence;
     protected final AggregateCodeBase persistenceCodeBase = new AggregateCodeBase(null, getClass().getClassLoader());
     protected Disposable subscription;
 
-    //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    //Liquibase properties
     public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
 
-    //**************************************************************************
-    // Logging
-    //**************************************************************************
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(DatabaseModule.class);
+    public static final Logger logger = LoggerFactory.getLogger(DatabaseModule.class);
 
     @Override
     public String getModuleVersion() {
@@ -112,7 +97,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @PostConstruct
     public void init() {
-        status = ModuleStatus.ACTIVE;
+        status = ModuleStatus.STARTED;
     }
 
     @Autowired
@@ -122,7 +107,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @Bean
     public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
-        return new DatabasePlatformsRegistry(configuration);
+        return new DatabasePlatformsRegistry(configuration.getProperties());
     }
 
     @Bean
@@ -142,9 +127,8 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             @Autowired ModelService modelService,
             @Autowired DatabasePlatformsRegistry databasePlatformsRegistry,
             @Autowired CacheResetListenerRegistry cacheResetListenerRegistry)
-            throws IOException, ConfigurationException {
-        Domain databasesDomain = modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, true);
-        Persistence persistence = new Persistence(modelService, databasesDomain, configuration, databasePlatformsRegistry);
+            throws IOException {
+        Persistence persistence = new Persistence(modelService, configuration, databasePlatformsRegistry);
         persistence.cacheResetListenerRegistry = cacheResetListenerRegistry;
         if(applicationContext != null) { //We may want it to be null when testing
             applicationContext.getAutowireCapableBeanFactory().autowireBean(persistence);
@@ -157,38 +141,39 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
         // - make generated classes visible to shared classes and actions;
         // - write them in the application directory so the user's IDE and tools can know about them.
         subscription = persistence.databaseSetupEvents.subscribe(e -> {
-            String databaseName = e.setup.getDatabase().getDatabaseName();
-            FileObject inMemoryDatabaseDir = e.setup.getCodeBase().getRoot().resolveFile(databaseName);
+            String databaseName = e.accessor.getDatabase().getDatabaseName();
+            FileObject inMemoryDatabaseDir = e.accessor.getCodeBase().getRoot().resolveFile(databaseName);
             FileObject externalDatabaseDir = generatedClassesRoot.resolveFile(databaseName);
             externalDatabaseDir.deleteAll();
             switch (e.type) {
                 case Persistence.DatabaseSetupEvent.ADDED:
-                    persistenceCodeBase.add(e.setup.getCodeBase());
-                    if(e.setup.getEntityMode() == EntityMode.POJO) {
+                    persistenceCodeBase.add(e.accessor.getCodeBase());
+                    if(e.accessor.getEntityMode() == EntityMode.POJO) {
                         externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
                     }
                     break;
                 case Persistence.DatabaseSetupEvent.REMOVED:
-                    persistenceCodeBase.remove(e.setup.getCodeBase());
+                    persistenceCodeBase.remove(e.accessor.getCodeBase());
                     externalDatabaseDir.deleteAll();
                     inMemoryDatabaseDir.deleteAll();
                     break;
                 case Persistence.DatabaseSetupEvent.REPLACED:
-                    persistenceCodeBase.replace(e.oldSetup.getCodeBase(), e.setup.getCodeBase());
+                    persistenceCodeBase.replace(e.oldAccessor.getCodeBase(), e.accessor.getCodeBase());
                     externalDatabaseDir.deleteAll();
-                    if(e.setup.getEntityMode() == EntityMode.POJO) {
+                    if(e.accessor.getEntityMode() == EntityMode.POJO) {
                         externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
                     }
                     break;
             }
         });
+        this.persistence = persistence;
         return persistence;
     }
 
     @PreDestroy
     public void destroy() {
         logger.info("ManyDesigns Portofino database module stopping...");
-        applicationContext.getBean(Persistence.class).stop();
+        persistence.stop();
         if(subscription != null) {
             subscription.dispose();
             subscription = null;
@@ -209,7 +194,6 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
 
     @Override
     public void onApplicationEvent(@NotNull ContextRefreshedEvent event) {
-        Persistence persistence = applicationContext.getBean(Persistence.class);
         Persistence.Status status = persistence.status.getValue();
         if(status == null || status == Persistence.Status.STOPPED) {
             logger.info("Starting persistence...");

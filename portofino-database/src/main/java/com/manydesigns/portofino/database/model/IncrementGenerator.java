@@ -23,8 +23,8 @@ package com.manydesigns.portofino.database.model;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.configuration2.Configuration;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

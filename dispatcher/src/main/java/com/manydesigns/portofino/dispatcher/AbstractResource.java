@@ -80,7 +80,13 @@ public abstract class AbstractResource implements SecureResource {
     }
 
     public String getPath() {
-        return parent.getPath() + getSegment() + "/";
+        String basePath;
+        if (parent != null) {
+            basePath = parent.getPath();
+        } else {
+            basePath = "";
+        }
+        return basePath + getSegment() + "/";
     }
 
     public void setResourceContext(ResourceContext resourceContext) {
@@ -95,6 +101,9 @@ public abstract class AbstractResource implements SecureResource {
     @Path("{pathSegment}")
     public Object consumePathSegment(@PathParam("pathSegment") String pathSegment) {
         try {
+            if (location == null) {
+                throw new WebApplicationException("Action is outside of dispatcher", 404);
+            }
             FileObject child = getChildLocation(pathSegment);
             return consumePathSegment(pathSegment, child, getResourceResolver());
         } catch (FileSystemException e) {

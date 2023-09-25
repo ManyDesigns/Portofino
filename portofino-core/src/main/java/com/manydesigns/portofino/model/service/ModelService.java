@@ -1,19 +1,18 @@
 package com.manydesigns.portofino.model.service;
 
 import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.PortofinoPackage;
 import com.manydesigns.portofino.model.io.ModelIO;
-import com.manydesigns.portofino.model.io.dsl.DefaultModelIO;
-import io.reactivex.subjects.PublishSubject;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import com.manydesigns.portofino.model.issues.Issue;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.eclipse.emf.ecore.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,107 +24,144 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class ModelService {
 
     protected Model model = new Model();
-    public final PublishSubject<EventType> modelEvents = PublishSubject.create();
-    public static final String APP_MODEL_DIRECTORY = "portofino-model";
+    protected final Map<String, Domain> externallyLoadedDomains = new ConcurrentHashMap<>();
+    public static final String APP_MODEL_DIRECTORY = "model";
     protected final FileObject applicationDirectory;
-    protected final Configuration configuration;
-    protected final FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile;
+    protected final ConfigurationSource configuration;
     protected final List<Domain> transientDomains = new CopyOnWriteArrayList<>();
     protected final CodeBase codeBase;
     private static final Logger logger = LoggerFactory.getLogger(ModelService.class);
 
     public ModelService(
-            FileObject applicationDirectory, Configuration configuration,
-            FileBasedConfigurationBuilder<PropertiesConfiguration> configurationFile, CodeBase codeBase) {
+            FileObject applicationDirectory, ConfigurationSource configuration, CodeBase codeBase) {
         this.applicationDirectory = applicationDirectory;
         this.configuration = configuration;
-        this.configurationFile = configurationFile;
         this.codeBase = codeBase;
-    }
-
-    public enum EventType {
-        LOADED, SAVED
     }
 
     public Model getModel() {
         return model;
     }
 
-    public synchronized Model loadModel(ModelIO modelIO) throws IOException {
-        Model loaded = modelIO.load();
-        if(loaded != null) {
-            loaded.getDomains().removeIf(d -> transientDomains.stream().anyMatch(t -> t.getName().equals(d.getName())));
-            loaded.getDomains().addAll(transientDomains);
-            loaded.init();
-            model = loaded;
-            modelEvents.onNext(EventType.LOADED);
-            return model;
-        } else {
-            return null;
-        }
-    }
-
-    public synchronized void loadModel() throws IOException {
-        loadModel(new DefaultModelIO(getModelDirectory()));
-    }
-
     public FileObject getModelDirectory() throws FileSystemException {
         return applicationDirectory.resolveFile(APP_MODEL_DIRECTORY);
+    }
+
+    public FileObject getDomainDirectory(Domain domain) throws FileSystemException {
+        if (domain == null) {
+            return getModelDirectory();
+        } else {
+            return getDomainDirectory(domain.getParentDomain()).resolveFile(domain.getName());
+        }
     }
 
     public FileObject getApplicationDirectory() {
         return applicationDirectory;
     }
 
-    public synchronized void saveModel() throws IOException, ConfigurationException {
-        model.init();
-        Model toSave = new Model();
-        toSave.getDomains().addAll(model.getDomains());
-        toSave.getDomains().removeAll(transientDomains);
-        new DefaultModelIO(getModelDirectory()).save(toSave);
-        if (configurationFile != null) {
-            configurationFile.save();
-            logger.info("Saved configuration file {}", configurationFile.getFileHandler().getFile().getAbsolutePath());
+    public synchronized Model loadModel() throws IOException {
+        Model loaded = getModelIO().load();
+        if(loaded != null) {
+            model = loaded;
+            return model;
+        } else {
+            return null;
         }
-        modelEvents.onNext(EventType.SAVED);
     }
 
-    public Domain ensureTopLevelDomain(String name, boolean persist) {
-        Optional<Domain> any = model.getDomains().stream()
-                .filter(d -> d.getName().equals(name)).findAny();
+    public synchronized void saveModel() throws IOException, ConfigurationException {
+        getModelIO().save(model);
+        if (configuration.isWritable()) {
+            configuration.save();
+        }
+    }
+
+    @NotNull
+    public ModelIO getModelIO() throws FileSystemException {
+        return new ModelIO(getModelDirectory(), externallyLoadedDomains);
+    }
+
+    public synchronized void saveDomain(Domain domain) throws IOException {
+        getModelIO().save(domain);
+    }
+
+    public synchronized void saveEntity(EClass entity) throws IOException {
+        EObject pkg = entity.eContainer();
+        if (!(pkg instanceof Domain)) {
+            throw new UnsupportedOperationException(entity + " does not belong to a domain");
+        }
+        getModelIO().save(entity);
+    }
+
+    public synchronized void saveObject(Domain domain, String name) throws IOException {
+        getModelIO().saveObject(domain, name);
+    }
+
+    public synchronized Domain ensureTopLevelDomain(String name) throws IOException {
+        return ensureTopLevelDomain(name, false);
+    }
+
+    public synchronized Domain ensureTopLevelDomain(String name, boolean isTransient) throws IOException {
+        Optional<Domain> any = model.getDomains().stream().filter(d -> d.getName().equals(name)).findAny();
         Domain domain;
         if (any.isPresent()) {
             logger.debug("Not adding domain " + name + " because it's already present");
-            Domain existing = any.get();
-            if (persist) {
-                // TODO merge domains?
-                transientDomains.remove(existing);
-            }
-            return existing;
-        } else {
+            return any.get();
+        } else if (isTransient) {
             domain = new Domain(name);
             model.getDomains().add(domain);
-        }
-        if (!persist) {
             transientDomains.add(domain);
+        } else {
+            domain = getModelIO().load(name, model);
+            if (domain == null) {
+                domain = new Domain(name);
+                model.getDomains().add(domain);
+            }
         }
+
         return domain;
     }
 
-    public EClass addBuiltInClass(Class<?> javaClass) throws IntrospectionException {
+    public EClassifier addBuiltInClass(Class<?> javaClass) throws IntrospectionException {
         Domain pkg = ensureDomain(javaClass);
         String className = javaClass.getSimpleName();
         EClassifier existing = pkg.getEClassifier(className);
         if (existing != null) {
-            // TODO check they model the same class?
-            return (EClass) existing;
+            // TODO check they model the same class
+            return existing;
         }
+        if (javaClass.isEnum()) {
+            return addEnum(javaClass, pkg, className);
+        } else {
+            return addClass(javaClass, pkg, className);
+        }
+    }
+
+    protected EEnum addEnum(Class<?> javaClass, Domain pkg, String className) {
+        EEnum eEnum = EcoreFactory.eINSTANCE.createEEnum();
+        eEnum.setName(className);
+        for (Object constant : javaClass.getEnumConstants()) {
+            EEnumLiteral literal = EcoreFactory.eINSTANCE.createEEnumLiteral();
+            String name = ((Enum<?>) constant).name();
+            literal.setName(name);
+            literal.setLiteral(name);
+            eEnum.getELiterals().add(literal);
+        }
+        pkg.getEClassifiers().add(eEnum);
+        return eEnum;
+    }
+
+    @NotNull
+    protected EClass addClass(Class<?> javaClass, Domain pkg, String className) throws IntrospectionException {
         EClass eClass = EcoreFactory.eINSTANCE.createEClass();
         eClass.setName(className);
         pkg.getEClassifiers().add(eClass); // We must add it early to break recursion when properties refer to itself
@@ -137,15 +173,19 @@ public class ModelService {
                 if (returnType instanceof ParameterizedType) {
                     Type typeArgument = ((ParameterizedType) returnType).getActualTypeArguments()[0];
                     if (typeArgument instanceof Class) {
-                        reference.setEType(addBuiltInClass((Class<?>) typeArgument));
+                        Optional<EClassifier> dataType = getDataType((Class<?>) typeArgument);
+                        if (dataType.isPresent()) {
+                            reference.setEType(dataType.get());
+                        } else {
+                            reference.setEType(addBuiltInClass((Class<?>) typeArgument));
+                        }
                     }
                 }
                 reference.setName(prop.getName());
                 reference.setUpperBound(-1);
                 eClass.getEStructuralFeatures().add(reference);
             } else {
-                Optional<EClassifier> builtin =
-                        EcorePackage.eINSTANCE.getEClassifiers().stream().filter(t -> type.equals(t.getInstanceClass())).findFirst();
+                Optional<EClassifier> builtin = getDataType(type);
                 EStructuralFeature feature = builtin.map(t -> {
                     EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
                     attribute.setEType(t);
@@ -166,15 +206,25 @@ public class ModelService {
         return eClass;
     }
 
-    public Object getJavaObject(Domain domain, String name)
-            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException,
-            IntrospectionException, NoSuchFieldException, IOException, ClassNotFoundException {
+    @NotNull
+    private Optional<EClassifier> getDataType(Class<?> type) {
+        return EcorePackage.eINSTANCE.getEClassifiers().stream().filter(
+                t -> type.equals(t.getInstanceClass())
+        ).findFirst();
+    }
+
+    public Object getJavaObject(Domain domain, String name) throws Exception {
         EObject eObject = domain.getObjects().get(name);
         return toJavaObject(eObject);
     }
 
+    public EObject putJavaObject(Domain domain, String name, Object object)
+            throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+        return domain.putObject(name, object, getClassesDomain());
+    }
+
     @Nullable
-    public Object toJavaObject(EObject eObject) throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, IntrospectionException, NoSuchFieldException {
+    public Object toJavaObject(EObject eObject) throws Exception {
         return Domain.toJavaObject(eObject, getClassesDomain(), codeBase);
     }
 
@@ -202,11 +252,39 @@ public class ModelService {
     }
 
     public Domain getClassesDomain() {
-        return getPortofinoDomain().ensureDomain("classes");
+        try {
+            return ensureTopLevelDomain("classes", true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public Domain getPortofinoDomain() {
-        return ensureTopLevelDomain("portofino", false);
+    public List<Issue> getIssues(String... path) {
+        if (path.length == 0) {
+            return model.getIssues();
+        } else {
+            String pathString = StringUtils.join(path, ".");
+            return model.getIssues().stream()
+                    .filter(issue -> StringUtils.defaultString(issue.path).startsWith(pathString))
+                    .collect(Collectors.toList());
+        }
     }
 
+    public synchronized Domain loadDomain(String... path) throws IOException {
+        if (path.length == 0) {
+            throw new IllegalArgumentException("At least one path element is needed to load a domain");
+        } else if (path.length == 1) {
+            return getModelIO().load(path[0], model);
+        } else {
+            Domain parent = model.getDomain(path[0]);
+            for (int i = 1; i < path.length - 1; i++) {
+                parent = parent.getSubdomain(path[i]).orElseThrow();
+            }
+            return getModelIO().load(path[path.length - 1], parent, model);
+        }
+    }
+
+    public synchronized Domain loadExternalDomain(String path, FileObject directory) throws IOException {
+        return getModelIO().loadExternalDomain(path, directory, model);
+    }
 }

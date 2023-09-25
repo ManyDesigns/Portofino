@@ -14,7 +14,7 @@ if(len(sys.argv) > 1):
     if(not directory.endswith("/")):
         directory = directory + "/"
 
-for version in ["4", "5"]:
+for version in ["4", "5", "6"]:
     file = open(directory + version + ".x", "w")
     file.write(get_latest_version(version))
     file.close()

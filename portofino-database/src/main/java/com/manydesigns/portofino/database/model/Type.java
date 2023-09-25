@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,27 +37,23 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+/**
+ * Represents all known information about a data type in a database.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+*  @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class Type {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
-
-    //**************************************************************************
-    // Logger
-    //**************************************************************************
+            "Copyright (C) 2005-2022 ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(Type.class);
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
     protected final String typeName;
+    /**
+     * The JDBC type number, as returned by the JDBC driver.
+     */
     protected final int jdbcType;
     protected final boolean autoincrement;
     protected final Integer maximumPrecision;
@@ -70,11 +66,6 @@ public class Type {
     protected final int maximumScale;
     protected final Boolean precisionRequired;
     protected final Boolean scaleRequired;
-
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
 
     public Type(String typeName, int jdbcType, Integer maximumPrecision,
                 String literalPrefix, String literalSuffix,
@@ -129,125 +120,6 @@ public class Type {
 
     public int getJdbcType() {
         return jdbcType;
-    }
-
-    public Class getDefaultJavaType() {
-        return getDefaultJavaType(jdbcType, typeName, maximumPrecision, maximumScale);
-    }
-
-    public static @Nullable Class getDefaultJavaType(int jdbcType, String databaseType, Integer precision, Integer scale) {
-        switch (jdbcType) {
-            case Types.BIGINT:
-                return Long.class;
-            case Types.BIT:
-            case Types.BOOLEAN:
-                return Boolean.class;
-            case Types.CHAR:
-            case Types.VARCHAR:
-            case Types.NCHAR:
-            case Types.NVARCHAR:
-            case Types.CLOB:
-            case Types.LONGVARCHAR:
-                return String.class;
-            case Types.DATE:
-                return java.sql.Date.class;
-            case Types.TIME:
-                return Time.class;
-            case Types.TIMESTAMP:
-                return Timestamp.class;
-            case Types.DECIMAL:
-            case Types.NUMERIC:
-                if(scale != null && scale > 0) {
-                    return BigDecimal.class;
-                } else {
-                    return getDefaultIntegerType(precision);
-                }
-            case Types.DOUBLE:
-            case Types.REAL:
-                return Double.class;
-            case Types.FLOAT:
-                return Float.class;
-            case Types.INTEGER:
-                return getDefaultIntegerType(precision);
-            case Types.SMALLINT:
-                return Short.class;
-            case Types.TINYINT:
-                return Byte.class;
-            case Types.BINARY:
-            case Types.BLOB:
-            case Types.LONGVARBINARY:
-            case Types.VARBINARY:
-                return byte[].class;
-            case Types.ARRAY:
-                return java.sql.Array.class;
-            case Types.DATALINK:
-                return java.net.URL.class;
-            case Types.DISTINCT:
-            case Types.JAVA_OBJECT:
-                return Object.class;
-            case Types.NULL:
-            case Types.REF:
-                return java.sql.Ref.class;
-            case Types.OTHER:
-                if("JSONB".equalsIgnoreCase(databaseType)) { //TODO make configurable by modules
-                    return String.class;
-                } else {
-                    return java.sql.Ref.class;
-                }
-            case Types.STRUCT:
-                return java.sql.Struct.class;
-            default:
-                logger.warn("Unsupported jdbc type: {}", jdbcType);
-                return null;
-        }
-    }
-
-    public static Class<? extends Number> getDefaultIntegerType(Integer precision) {
-        if(precision == null) {
-            return BigInteger.class;
-        }
-        if(precision < Math.log10(Integer.MAX_VALUE)) {
-            return Integer.class;
-        } else if(precision < Math.log10(Long.MAX_VALUE)) {
-            return Long.class;
-        } else {
-            if(precision == 131089) {
-                return BigDecimal.class; //Postgres bug - #925
-            } else {
-                return BigInteger.class;
-            }
-        }
-    }
-
-    public Class[] getAvailableJavaTypes(Integer length) {
-        if(isNumeric()) {
-            return new Class[] {
-                    Integer.class, Long.class, Byte.class, Short.class,
-                    Float.class, Double.class, BigInteger.class, BigDecimal.class,
-                    Boolean.class };
-        } else {
-            if("JSONB".equalsIgnoreCase(typeName)) { //TODO make configurable by modules
-                return new Class[] { String.class, Map.class, List.class };
-            }
-            Class defaultJavaType = getDefaultJavaType();
-            if(defaultJavaType == String.class) {
-                if(length != null && length < 256) {
-                    return new Class[] { String.class, Boolean.class };
-                } else {
-                    return new Class[] { String.class };
-                }
-            } else if(defaultJavaType == Timestamp.class) {
-                return new Class[] { Timestamp.class, DateTime.class, java.sql.Date.class, LocalDateTime.class, ZonedDateTime.class, Instant.class };
-            } else if(defaultJavaType == java.sql.Date.class) {
-                return new Class[] { java.sql.Date.class, DateTime.class, LocalDate.class, Timestamp.class }; //TODO Joda LocalDate as well?
-            } else {
-                if(defaultJavaType != null) {
-                    return new Class[] { defaultJavaType };
-                } else {
-                    return new Class[] { Object.class };
-                }
-            }
-        }
     }
 
     public boolean isAutoincrement() {

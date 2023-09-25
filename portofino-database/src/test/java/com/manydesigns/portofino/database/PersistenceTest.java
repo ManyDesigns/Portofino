@@ -3,22 +3,28 @@ package com.manydesigns.portofino.database;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.DateField;
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.code.JavaCodeBase;
+import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.database.model.*;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.AnnotationProperty;
-import com.manydesigns.portofino.database.model.*;
-import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
-import com.manydesigns.portofino.persistence.TableCriteria;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseScopedEvent;
+import com.manydesigns.portofino.persistence.hibernate.Events;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import io.reactivex.disposables.Disposable;
+import jakarta.persistence.criteria.CriteriaQuery;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -27,20 +33,25 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.h2.tools.RunScript;
 import org.hibernate.Session;
-import org.hibernate.UnknownEntityTypeException;
+import org.hibernate.event.spi.PostInsertEvent;
+import org.hibernate.event.spi.PostLoadEvent;
+import org.hibernate.event.spi.PreInsertEvent;
+import org.hibernate.event.spi.PreLoadEvent;
 import org.hibernate.jdbc.Work;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import jakarta.persistence.criteria.CriteriaQuery;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.testng.Assert.*;
 import static org.testng.AssertJUnit.assertEquals;
@@ -82,25 +93,31 @@ public class PersistenceTest {
             }
         };
         databaseModule.applicationDirectory = appDir;
-        databaseModule.configuration = configuration;
-        modelService = new ModelService(appDir, configuration, null, new JavaCodeBase(appDir));
+        databaseModule.configuration = new ConfigurationSource(configuration, null);
+        modelService = new ModelService(appDir, new ConfigurationSource(configuration, null), new JavaCodeBase(appDir));
         modelService.loadModel();
-        persistence = databaseModule.getPersistence(modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
-        databaseModule.init();
+        modelService.getModel().getIssues().forEach(
+                i -> System.err.println(i.message + " " + i.path + "@" + i.line+ ":" + i.column));
+        assertEquals("There are issues with the model", 0, modelService.getModel().getIssues().size());
+        persistence = databaseModule.getPersistence(
+                modelService, databasePlatformsRegistry, new CacheResetListenerRegistry());
+        configure(persistence);
         persistence.start();
         setupJPetStore();
         setupHibernateTest();
         persistence.initModel();
     }
 
+    protected void configure(Persistence persistence) {
+        persistence.setConvertLegacyModel(true);
+    }
+
     @AfterMethod
-    public void teardown() throws ConfigurationException, IOException {
-        persistence.getDatabases().forEach(d -> {
-            d.getSchemas().forEach(s -> {
-                s.getTables().clear();
-                s.getModelElement().getEClassifiers().clear();
-            });
-        });
+    public void teardown() {
+        persistence.getDatabases().forEach(d -> d.getSchemas().forEach(s -> {
+            s.getTables().clear();
+            s.getModelElement().getEClassifiers().clear();
+        }));
         persistence.stop();
         databaseModule.destroy();
     }
@@ -184,8 +201,8 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(
                 persistence.getDatabases(), "jpetstore", "PUBLIC", "CATEGORY");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria tableCriteria = new TableCriteria(table);
-        findCategory(tableAccessor, tableCriteria);
+        Criteria Criteria = new Criteria();
+        findCategory(tableAccessor, Criteria);
 
         int sizePrd = resultProd.size();
         assertEquals("prodotti", 16, sizePrd);
@@ -194,12 +211,13 @@ public class PersistenceTest {
         assertEquals("Angelfish", get(prd0, "name"));
     }
 
-    private Object findCategory(TableAccessor tableAccessor, TableCriteria criteria) {
+    private Object findCategory(TableAccessor tableAccessor, Criteria criteria) {
         Object category = null;
         try {
             criteria.eq(tableAccessor.getProperty("catid"), "FISH");
-            Session session = persistence.getSession(tableAccessor.getTable().getDatabaseName());
-            List<Object> listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            Table table = tableAccessor.getTable();
+            Session session = persistence.getSession(table.getDatabaseName());
+            List<Object> listObjs = QueryUtils.getObjects(session, table, criteria, null, null);
             assertEquals(1, listObjs.size());
             category = listObjs.get(0);
             String catid = get(category, "catid");
@@ -215,28 +233,28 @@ public class PersistenceTest {
                 persistence.getDatabases(), "jpetstore", "PUBLIC", "CATEGORY");
         assertNotNull(table);
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria tableCriteria = new TableCriteria(table);
+        Criteria criteria = new Criteria();
 
         Session session = persistence.getSession("jpetstore");
-        CriteriaQuery<Object> criteria = QueryUtils.createCriteria(session, "category").query;
-        List<Object> resultCat = new ArrayList<>(session.createQuery(criteria).list());
+        CriteriaQuery<Object> criteriaQuery = QueryUtils.createCriteria(session, "category").query;
+        List<Object> resultCat = new ArrayList<>(session.createQuery(criteriaQuery).list());
 
         int sizeCat = resultCat.size();
         assertEquals("categorie", 5, sizeCat);
-        Object categoria0 = findCategory(tableAccessor, tableCriteria);
+        Object categoria0 = findCategory(tableAccessor, criteria);
         assertEquals("Fish", get(categoria0, "name"));
         set(categoria0, "name", "Pesciu");
-        session.update("category", categoria0);
+        session.merge("category", categoria0);
         session.getTransaction().commit();
         persistence.closeSessions();
 
         //Controllo l'aggiornamento e riporto le cose come stavano
-        tableCriteria = new TableCriteria(table);
-        categoria0 =  findCategory(tableAccessor, tableCriteria);
+        criteria = new Criteria();
+        categoria0 =  findCategory(tableAccessor, criteria);
         assertEquals("Pesciu", get(categoria0, "name"));
         set(categoria0, "name", "Fish");
         session = persistence.getSession("jpetstore");
-        session.update("category", categoria0);
+        session.merge("category", categoria0);
         session.getTransaction().commit();
         persistence.closeSessions();
     }
@@ -249,9 +267,23 @@ public class PersistenceTest {
                 "<image src=\"../images/worms_icon.gif\"><font size=\"5\" color=\"blue\">" +
                         "Worms</font>");
 
-        Session session = persistence.getSession("jpetstore");
-        session.save("category", makeEntity("jpetstore.public.Category", worms));
+        String databaseName = "jpetstore";
+        AtomicReference<DatabaseScopedEvent<PreInsertEvent>> preInsert = new AtomicReference<>();
+        AtomicReference<DatabaseScopedEvent<PostInsertEvent>> postInsert = new AtomicReference<>();
+        DatabaseAccessor databaseAccessor = persistence.getDatabaseAccessor(databaseName);
+        Events events = databaseAccessor.getEvents();
+        Disposable postInsertD = events.postInsert$.subscribe(postInsert::set);
+        Disposable preInsertD = events.preInsert$.subscribe(preInsert::set);
+        Session session = databaseAccessor.getThreadSession();
+        session.persist("category", makeEntity("jpetstore.public.Category", worms));
         session.getTransaction().commit();
+        assertNotNull(preInsert.get());
+        assertNotNull(postInsert.get());
+        assertFalse(postInsertD.isDisposed());
+        assertFalse(preInsertD.isDisposed());
+        persistence.stop();
+        assertTrue(postInsertD.isDisposed());
+        assertTrue(preInsertD.isDisposed());
     }
 
     public void testSaveLineItem() {
@@ -264,13 +296,13 @@ public class PersistenceTest {
         Object lineItem = makeEntity("jpetstore.public.Lineitem", lineItemData);
 
         Session session = persistence.getSession("jpetstore");
-        session.save("lineitem", lineItem);
+        session.persist("lineitem", lineItem);
         session.getTransaction().commit();
 
         persistence.closeSessions();
 
         session = persistence.getSession("jpetstore");
-        session.delete("lineitem", lineItem);
+        session.delete("lineitem", lineItem); //Note: there isn't a replacement taking an explicit entity name even if delete is deprecated
         session.getTransaction().commit();
         persistence.closeSessions();
     }
@@ -279,7 +311,7 @@ public class PersistenceTest {
         Map<String, Object> testItemData = new HashMap<>();
         testItemData.put("testo", "esempio");
         Session session = persistence.getSession("hibernatetest");
-        session.save("table1", makeEntity("hibernatetest.public.Table1", testItemData));
+        session.persist("table1", makeEntity("hibernatetest.public.Table1", testItemData));
         session.getTransaction().commit();
     }
 
@@ -293,23 +325,21 @@ public class PersistenceTest {
         Object wormsEntity = makeEntity("jpetstore.public.Category", worms);
 
         Session session = persistence.getSession("jpetstore");
-        session.save("category", wormsEntity);
+        session.persist("category", wormsEntity);
         session.getTransaction().commit();
         session.beginTransaction();
-        session.delete("category", wormsEntity);
+        session.remove(wormsEntity);
         session.getTransaction().commit();
     }
 
     public void testGetObjByPk(){
-        //Test Chiave singola
-        HashMap<String, Object> pk = new HashMap<>();
-        pk.put("catid", "BIRDS");
+        //Test single key
         Object bird =  QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+                (persistence, "jpetstore", "category", "BIRDS");
         assertEquals("Birds", get(bird, "name"));
 
-        //Test Chiave composta
-        pk = new HashMap<>();
+        //Test composite key
+        HashMap<String, Object> pk = new HashMap<>();
         pk.put("orderid", new BigInteger("1"));
         pk.put("linenum", new BigInteger("1"));
         Object lineItem = QueryUtils.getObjectByPk
@@ -318,10 +348,7 @@ public class PersistenceTest {
     }
 
     public void testForeignKeyNavigation() {
-        HashMap<String, Object> pk = new HashMap<>();
-        pk.put("catid", "BIRDS");
-        Object bird = QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+        Object bird = QueryUtils.getObjectByPk(persistence, "jpetstore", "category", "BIRDS");
         assertEquals("Birds", get(bird, "name"));
         assertTrue(get(bird, "fk_product_1") instanceof Collection);
         assertFalse(((Collection) get(bird, "fk_product_1")).isEmpty());
@@ -330,7 +357,7 @@ public class PersistenceTest {
             assertEquals(bird, get(o, "fk_product_1"));
         }
 
-        pk = new HashMap<>();
+        HashMap<String, Object>pk = new HashMap<>();
         pk.put("regione", "liguria");
         pk.put("provincia", "genova");
         pk.put("comune", "rapallo");
@@ -353,15 +380,14 @@ public class PersistenceTest {
     }
 
     public void testGetRelatedObjects(){
-        HashMap<String, Object> pk = new HashMap<String, Object>();
-        pk.put("catid", "BIRDS");
         Object bird = QueryUtils.getObjectByPk
-                (persistence, "jpetstore", "category", makeEntity("jpetstore.public.Category", pk));
+                (persistence, "jpetstore", "category", "BIRDS");
         assertEquals("Birds", get(bird, "name"));
 
-        List objs = QueryUtils.getRelatedObjects(persistence, "jpetstore", "category",
+        List<?> objs = QueryUtils.getRelatedObjects(persistence, "jpetstore", "category",
                 bird, "fk_product_1");
-        assertTrue(objs.size() > 0);
+        assertNotNull(objs);
+        assertFalse(objs.isEmpty());
     }
 
     @Test(enabled = false) //Disable because it fails on the CI server where the timezone is different
@@ -386,7 +412,7 @@ public class PersistenceTest {
         order.put("billzip", "x");
         order.put("billcountry", "x");
         order.put("courier", "x");
-        order.put("totalprice", new BigDecimal(1.0));
+        order.put("totalprice", new BigDecimal("1.0"));
         order.put("billtofirstname", "x");
         order.put("billtolastname", "x");
         order.put("shiptofirstname", "x");
@@ -397,7 +423,7 @@ public class PersistenceTest {
         order.put("locale", "x");
 
         Session session = persistence.getSession("jpetstore");
-        session.save("orders", order);
+        session.persist("orders", order);
 
         FormBuilder fb = new FormBuilder(persistence.getTableAccessor("jpetstore", "orders"));
         Form form = fb.configFields("orderdate").build();
@@ -412,7 +438,7 @@ public class PersistenceTest {
         dateField.readFromRequest(request);
         assertTrue(dateField.validate());
         dateField.writeToObject(order);
-        session.update("orders", order);
+        session.merge("orders", order);
         session.flush();
         session.clear(); //Forget about order
         order = (Map) session.get("orders", new BigInteger("1"));
@@ -440,9 +466,9 @@ public class PersistenceTest {
 
     public void tablesWithNoPKAreSkipped() {
         try {
-            persistence.getSession("hibernatetest").load("test_no_pk", 1);
+            persistence.getSession("hibernatetest").getReference("test_no_pk", 1);
             fail("test_no_pk should not be mapped");
-        } catch (UnknownEntityTypeException e) {
+        } catch (IllegalArgumentException e) {
             //Ok
         }
     }
@@ -453,17 +479,17 @@ public class PersistenceTest {
         supplierData.put("name", "Giampiero");
         Object supplier = makeEntity("jpetstore.public.Supplier", supplierData);
         Session session = persistence.getSession("jpetstore");
-        session.save("supplier", supplier);
+        session.persist("supplier", supplier);
         session.getTransaction().commit();
         Table table = DatabaseLogic.findTableByName(
                 persistence.getDatabases(), "jpetstore", "PUBLIC", "SUPPLIER");
         assertNotNull(table);
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
+        Criteria criteria = new Criteria();
         final BigInteger expectedId = new BigInteger("3");
         try {
             criteria.eq(tableAccessor.getProperty("suppid"), expectedId);
-            List<?> listObjs = QueryUtils.getObjects(session, criteria, null, null);
+            List<?> listObjs = QueryUtils.getObjects(session, table, criteria, null, null);
             assertEquals(1, listObjs.size());
             Object supp = listObjs.get(0);
             String name = get(supp, "name");
@@ -483,7 +509,7 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(
                 persistence.getModel(), "hibernatetest", "PUBLIC", "test");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
+        Criteria criteria = new Criteria(table);
         final long expectedId = 1;
         try {
             criteria.eq(tableAccessor.getProperty("id"), expectedId);
@@ -529,7 +555,7 @@ public class PersistenceTest {
         Table table = DatabaseLogic.findTableByName(
                 persistence.getModel(), "jpetstore", "PUBLIC", "orders");
         TableAccessor tableAccessor = new TableAccessor(table);
-        TableCriteria criteria = new TableCriteria(table);
+        Criteria criteria = new Criteria(table);
         try {
             criteria.eq(tableAccessor.getProperty("orderid"), expectedId);
             List listObjs = QueryUtils.getObjects(session, criteria, null, null);
@@ -552,7 +578,7 @@ public class PersistenceTest {
         assertFalse(view.isUpdatable());
         Session session = persistence.getSession("hibernatetest");
         try {
-            session.createQuery("from test_view_1").list();
+            session.createQuery("from test_view_1", Object.class).list();
             fail("View should not be mapped by default because it has no pk.");
         } catch (IllegalArgumentException e) {
             //OK
@@ -566,7 +592,7 @@ public class PersistenceTest {
         pk.getPrimaryKeyColumns().add(id);
         persistence.initModel();
         session = persistence.getSession("hibernatetest");
-        List<?> list = session.createQuery("from test_view_1").list();
+        List<?> list = session.createQuery("from test_view_1", Object.class).list();
         assertEquals(2, list.size());
     }
 
@@ -601,8 +627,30 @@ public class PersistenceTest {
         assertEquals(LocalDate.of(2010, 9, 27), get(domanda,"data"));
     }
 
+    public void testLoadById() {
+        String databaseName = "hibernatetest";
+        AtomicReference<DatabaseScopedEvent<PreLoadEvent>> preLoad = new AtomicReference<>();
+        AtomicReference<DatabaseScopedEvent<PostLoadEvent>> postLoad = new AtomicReference<>();
+        DatabaseAccessor databaseAccessor = persistence.getDatabaseAccessor(databaseName);
+        Events events = databaseAccessor.getEvents();
+        Disposable postLoadD = events.postLoad$.subscribe(postLoad::set);
+        Disposable preLoadD = events.preLoad$.subscribe(preLoad::set);
+        Object domanda = databaseAccessor.getThreadSession().get("domanda", "0001");
+        assertNotNull(domanda);
+        assertNotNull(preLoad.get());
+        assertEquals(preLoad.get().database.getName(), databaseName);
+        assertNotNull(postLoad.get());
+        assertEquals(postLoad.get().database.getName(), databaseName);
+        assertFalse(postLoadD.isDisposed());
+        assertFalse(preLoadD.isDisposed());
+        persistence.stop();
+        assertTrue(postLoadD.isDisposed());
+        assertTrue(preLoadD.isDisposed());
+    }
+
     public void testTableWithSpaces() {
-        persistence.getSession("hibernatetest").createQuery("from test_spaces").list();
+        Session hibernatetest = persistence.getSession("hibernatetest");
+        hibernatetest.createQuery("from test_spaces", Object.class).list();
     }
 
     public void testSaveModel() throws Exception {
@@ -616,9 +664,9 @@ public class PersistenceTest {
             Database hibernatetest = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "hibernatetest");
             hibernatetest.setDatabaseName("test");
             FileObject file;
-            FileObject dbsDir = appDir.resolveFile("portofino-model").resolveFile(DatabaseModule.DATABASES_DOMAIN_NAME);
+            FileObject dbsDir = appDir.resolveFile(ModelService.APP_MODEL_DIRECTORY).resolveFile(Persistence.DATABASES_DOMAIN_NAME);
             file = dbsDir.resolveFile("test");
-            modelService.saveModel();
+            persistence.saveModel();
             assertTrue(file.exists());
             //Old directory is deleted
             assertFalse(dbsDir.resolveFile("hibernatetest").exists());
@@ -659,6 +707,58 @@ public class PersistenceTest {
         if(error == null) {
             fail("Was expecting an exception");
         }
+    }
+
+    @Test
+    public void testCustomClassMapping() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getDatabases(), "hibernatetest", "PUBLIC", "TABLE_WITHOUT_REFERENCES");
+        table.setJavaClass(TableWithoutReferences.class);
+        persistence.initModel();
+        assertEquals("table_without_references", table.getActualEntityName());
+        TableWithoutReferences t = new TableWithoutReferences();
+        t.setContents("first");
+        Session session = persistence.getSession("hibernatetest");
+        session.persist(t);
+        session.flush();
+        TableWithoutReferences actualT = session.get(TableWithoutReferences.class, t.getId());
+        assertEquals(actualT, t);
+        actualT = session.createQuery("from table_without_references", TableWithoutReferences.class).list().get(0);
+        assertEquals(actualT, t);
+    }
+
+    @Test
+    public void testCustomClassMappingWithRelationships() {
+        Table table = DatabaseLogic.findTableByName(
+                persistence.getDatabases(), "hibernatetest", "PUBLIC", "TABLE1");
+        table.setJavaClass(Table1.class);
+        persistence.initModel();
+        assertEquals("table1", table.getActualEntityName());
+        Table1 t = new Table1();
+        t.setText("testCustomClass");
+        Session session = persistence.getSession("hibernatetest");
+        session.persist(t);
+        session.flush();
+        Table1 actualT = session.get(Table1.class, t.getId());
+        assertEquals(t, actualT);
+        actualT = session.createQuery("from table1 where id = " + t.getId(), Table1.class).list().get(0);
+        assertEquals(t.getId(), actualT.getId());
+    }
+
+    public void testLiquibaseSQL() throws Exception {
+        persistence.syncDataModel("liquibase_sql");
+        persistence.initModel();
+        TableAccessor usersTable = persistence.getTableAccessor("liquibase_sql", "sql_users");
+        assertNotNull(usersTable);
+        assertNotNull(usersTable.getProperty("id"));
+    }
+
+    public void testLiquibaseXML() throws Exception {
+        persistence.syncDataModel("liquibase_xml");
+        persistence.initModel();
+        TableAccessor usersTable = persistence.getTableAccessor("liquibase_xml", "xml_users");
+        assertNotNull(usersTable);
+        assertNotNull(usersTable.getProperty("id"));
     }
 
 }

@@ -22,14 +22,17 @@ package com.manydesigns.portofino.spring;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.code.CodeBase;
-import com.manydesigns.portofino.dispatcher.DispatcherInitializer;
+import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.dispatcher.ResourceResolver;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.servlets.PortofinoDispatcherInitializer;
 import io.reactivex.disposables.Disposable;
-import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.vfs2.FileObject;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigRegistry;
@@ -47,8 +50,10 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -82,16 +87,30 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     protected final Set<Class<? extends Module>> moduleClasses = new HashSet<>();
     protected ServletContext servletContext;
     protected ConfigurableWebApplicationContext parentContext;
-    protected PortofinoDispatcherInitializer initializer = new PortofinoDispatcherInitializer();
+    protected final PortofinoDispatcherInitializer initializer;
     protected final ConfigurableWebApplicationContext bridgeContext = new AnnotationConfigWebApplicationContext();
 
-    public PortofinoContextLoaderListener(Set<Class<?>> candidateModuleClasses) {
+    public PortofinoContextLoaderListener(
+            Set<Class<?>> candidateModuleClasses, Set<Class<?>> codebaseClasses, Set<Class<?>> resourceResolverClasses
+    ) {
+        this.moduleClasses.addAll(getImplementations(Module.class, candidateModuleClasses));
+        initializer = new PortofinoDispatcherInitializer(
+                getImplementations(CodeBase.class, codebaseClasses),
+                getImplementations(ResourceResolver.class, resourceResolverClasses));
+    }
+
+    @NotNull
+    public static <T> Set<Class<? extends T>> getImplementations(
+            Class<T> target, Set<Class<?>> candidateModuleClasses
+    ) {
+        Set<Class<? extends T>> concreteClasses = new LinkedHashSet<>();
         for(Class<?> candidate: candidateModuleClasses) {
             if(!candidate.isInterface() && !Modifier.isAbstract(candidate.getModifiers()) &&
-                    Module.class.isAssignableFrom(candidate)) {
-                moduleClasses.add(candidate.asSubclass(Module.class));
+                    target.isAssignableFrom(candidate)) {
+                concreteClasses.add(candidate.asSubclass(target));
             }
         }
+        return concreteClasses;
     }
 
     @Override
@@ -194,10 +213,10 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
         parentContext.setServletContext(servletContext);
         ConfigurableEnvironment environment = parentContext.getEnvironment();
         MutablePropertySources sources = environment.getPropertySources();
-        Configuration configuration =
-                (Configuration) servletContext.getAttribute(PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION);
+        ConfigurationSource configuration =
+                (ConfigurationSource) servletContext.getAttribute(PortofinoSpringConfiguration.CONFIGURATION_SOURCE);
         sources.addFirst(
-                new ConfigurationPropertySource("portofino.properties", configuration));
+                new ConfigurationPropertySource("portofino.properties", configuration.getProperties()));
         for (Class<?> moduleClass : moduleClasses) {
             parentContext.register(moduleClass);
         }
@@ -212,13 +231,18 @@ public class PortofinoContextLoaderListener extends ContextLoaderListener {
     public static ApplicationContext setupGrandParentContext(PortofinoDispatcherInitializer initializer) {
         GenericApplicationContext grandParent = new GenericApplicationContext();
         grandParent.refresh();
-        grandParent.getBeanFactory().registerSingleton("codeBase", initializer.getCodeBase());
-        grandParent.getBeanFactory().registerSingleton(
-                PortofinoSpringConfiguration.APPLICATION_DIRECTORY, initializer.getApplicationRoot());
-        grandParent.getBeanFactory().registerSingleton(
-                PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION, initializer.getConfiguration());
-        grandParent.getBeanFactory().registerSingleton(
-                PortofinoSpringConfiguration.PORTOFINO_CONFIGURATION_FILE, initializer.getConfigurationFile());
+        ConfigurableListableBeanFactory bf = grandParent.getBeanFactory();
+        bf.registerSingleton("codeBase", initializer.getCodeBase());
+        FileObject appDir = initializer.getApplicationRoot();
+        bf.registerSingleton(PortofinoSpringConfiguration.APPLICATION_DIRECTORY, appDir);
+        ConfigurationSource configSource =
+                new ConfigurationSource(initializer.getConfiguration(), initializer.getConfigurationFile());
+        bf.registerSingleton(PortofinoSpringConfiguration.CONFIGURATION_SOURCE, configSource);
+        bf.registerSingleton(PortofinoSpringConfiguration.DISPATCHER, initializer);
+        ModelService modelService = new ModelService(appDir, configSource, initializer.getCodeBase());
+        bf.registerSingleton(PortofinoSpringConfiguration.MODEL_SERVICE, modelService);
+        initializer.getConfiguration().addConfiguration(
+                new SpringEnvironmentConfiguration(grandParent.getEnvironment()));
         return grandParent;
     }
 

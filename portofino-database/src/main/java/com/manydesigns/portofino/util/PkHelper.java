@@ -36,7 +36,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-/*
+/**
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -58,18 +58,24 @@ public class PkHelper extends IdStrategy {
 
     public Serializable getPrimaryKey(String... params) {
         int i = 0;
-        Serializable result = (Serializable)classAccessor.newInstance();
-        if(params.length != classAccessor.getKeyProperties().length) {
-            throw new RuntimeException("Wrong number of parameters for primary key: expected " + classAccessor.getKeyProperties().length + ", got " + params.length);
+        PropertyAccessor[] keyProperties = classAccessor.getKeyProperties();
+        if(params.length != keyProperties.length) {
+            throw new RuntimeException(
+                    "Wrong number of parameters for primary key: expected " + keyProperties.length +
+                            ", got " + params.length);
         }
-        for(PropertyAccessor property : classAccessor.getKeyProperties()) {
-            String stringValue = params[i];
-            Object value = OgnlUtils.convertValue(stringValue, property.getType());
-            property.set(result, value);
-            i++;
+        if (keyProperties.length == 1) {
+            return (Serializable) OgnlUtils.convertValue(params[0], keyProperties[0].getType());
+        } else {
+            Serializable result = (Serializable) classAccessor.newInstance();
+            for (PropertyAccessor property : keyProperties) {
+                String stringValue = params[i];
+                Object value = OgnlUtils.convertValue(stringValue, property.getType());
+                property.set(result, value);
+                i++;
+            }
+            return result;
         }
-
-        return result;
     }
 
 }

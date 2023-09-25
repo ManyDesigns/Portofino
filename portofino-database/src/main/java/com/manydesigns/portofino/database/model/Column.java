@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.database.model;
 
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
 import com.manydesigns.portofino.model.*;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
@@ -28,8 +29,8 @@ import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,26 +49,12 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
     public static final String copyright =
             "Copyright (C) 2005-2021 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields (physical JDBC)
-    //**************************************************************************
-
     protected Table table;
-
-    //**************************************************************************
-    // Fields (logical)
-    //**************************************************************************
-
     protected String javaType; // Legacy XML-only property
     protected EAttribute property;
     protected Annotation columnInfo;
     protected List<Annotation> annotations = new ArrayList<>();
-
-    //**************************************************************************
-    // Fields for wire-up
-    //**************************************************************************
-
-    protected String propertyName;
+    protected String propertyName; // Legacy XML-only property
 
     public static final Logger logger = LoggerFactory.getLogger(Column.class);
 
@@ -120,13 +107,15 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
             throw new IllegalStateException("columnName must not be null");
         }
 
-        if (StringUtils.isEmpty(propertyName)) {
-            String initialName = DatabaseLogic.normalizeName(getColumnName());
-            if(!initialName.equals(property.getName())) {
-                property.setName(DatabaseLogic.getUniquePropertyName(table, initialName));
+        if (property.getName() == null) {
+            if (StringUtils.isEmpty(propertyName)) {
+                String initialName = DatabaseLogic.normalizeName(getColumnName());
+                if (!initialName.equals(property.getName())) {
+                    property.setName(DatabaseLogic.getUniquePropertyName(table, initialName));
+                }
+            } else {
+                property.setName(DatabaseLogic.getUniquePropertyName(table, propertyName));
             }
-        } else {
-            property.setName(propertyName); //AS do not normalize (can be mixed-case Java properties)
         }
         // Re-set the column name so that if it's equal to the property name it's not saved in the annotation
         setColumnName(getColumnName());
@@ -264,7 +253,9 @@ public class Column implements ModelObject, Annotated, Named, Unmarshallable {
         if (property.getEType() != null) {
             return property.getEType().getInstanceClass();
         } else {
-            return Type.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
+            DatabasePlatform databasePlatform =
+                    getTable().getSchema().getDatabase().getConnectionProvider().getDatabasePlatform();
+            return databasePlatform.getDefaultJavaType(getJdbcType(), getColumnType(), getLength(), getScale());
         }
     }
 

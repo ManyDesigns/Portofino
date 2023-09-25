@@ -50,6 +50,12 @@ public class CrudSelectionProvider {
         return fieldNames;
     }
 
+    /**
+     * Whether Portofino will enforce the selection provider, making sure that submitted values fall within the
+     * possible values, upon save and update. Foreign keys are not enforced, because we assume that the DB will
+     * check them anyway, so we can avoid loading unnecessary data.
+     * @return whether this s.p. is enforced by Portofino.
+     */
     public boolean isEnforced() {
         return enforced;
     }

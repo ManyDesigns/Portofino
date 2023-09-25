@@ -12,6 +12,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
@@ -20,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Path;
@@ -30,7 +31,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
+public class ModelBasedRealm extends AbstractPortofinoRealm {
 
     protected Table usersTable;
     protected Table groupsTable;
@@ -79,26 +80,30 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
                     }
                     if(c.getAnnotation(GroupName.class).isPresent()) {
                         if(groupsTable != null) {
-                            throw new IllegalStateException("Multiple tables with an @GroupName annotation: " + groupsTable.getQualifiedName() + " and " + t.getQualifiedName());
+                            throw new IllegalStateException(
+                                    "Multiple tables with an @GroupName annotation: " + groupsTable.getQualifiedName() + " and " + t.getQualifiedName());
                         }
                         groupsTable = t;
                         groupNameProperty = c.getActualPropertyName();
                         List<Column> pkcols = t.getPrimaryKey().getColumns();
                         if(pkcols.size() > 1) {
-                            throw new IllegalStateException("Group table has composite id, not supported: " + groupsTable.getQualifiedName());
+                            throw new IllegalStateException(
+                                    "Group table has composite id, not supported: " + groupsTable.getQualifiedName());
                         }
                         groupIdProperty = pkcols.get(0).getActualPropertyName();
                     }
                     if(c.getAnnotation(GroupLink.class).isPresent()) {
                         if(usersGroupsTable != null && usersGroupsTable != t) {
-                            throw new IllegalStateException("Multiple user-group tables: " + usersGroupsTable.getQualifiedName() + " and " + t.getQualifiedName());
+                            throw new IllegalStateException(
+                                    "Multiple user-group tables: " + usersGroupsTable.getQualifiedName() + " and " + t.getQualifiedName());
                         }
                         usersGroupsTable = t;
                         groupLinkProperty = c.getActualPropertyName();
                     }
                     if(c.getAnnotation(UserLink.class).isPresent()) {
                         if(usersGroupsTable != null && usersGroupsTable != t) {
-                            throw new IllegalStateException("Multiple user-group tables: " + usersGroupsTable.getQualifiedName() + " and " + t.getQualifiedName());
+                            throw new IllegalStateException(
+                                    "Multiple user-group tables: " + usersGroupsTable.getQualifiedName() + " and " + t.getQualifiedName());
                         }
                         usersGroupsTable = t;
                         userLinkProperty = c.getActualPropertyName();
@@ -116,12 +121,14 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
 
     protected void setupUserTable(Table t) {
         if(usersTable != null && usersTable != t) {
-            throw new IllegalStateException("Multiple users tables : " + usersTable.getQualifiedName() + " and " + t.getQualifiedName());
+            throw new IllegalStateException(
+                    "Multiple users tables : " + usersTable.getQualifiedName() + " and " + t.getQualifiedName());
         }
         usersTable = t;
         List<Column> pkcols = t.getPrimaryKey().getColumns();
         if(pkcols.size() > 1) {
-            throw new IllegalStateException("Users table has composite id, not supported: " + groupsTable.getQualifiedName());
+            throw new IllegalStateException(
+                    "Users table has composite id, not supported: " + groupsTable.getQualifiedName());
         }
         userIdProperty = pkcols.get(0).getActualPropertyName();
     }
@@ -179,6 +186,21 @@ public abstract class ModelBasedRealm extends AbstractPortofinoRealm {
                 throw new IllegalStateException("Not a valid POJO principal: " + principal, e);
             }
         }
+    }
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken)
+            throws AuthenticationException {
+        if (authenticationToken instanceof UsernamePasswordToken) {
+            return loadAuthenticationInfo((UsernamePasswordToken) authenticationToken);
+        } else {
+            return handleUnsupportedToken(authenticationToken);
+        }
+    }
+
+    protected AuthenticationInfo handleUnsupportedToken(AuthenticationToken authenticationToken)
+            throws AuthenticationException {
+        throw new UnsupportedTokenException(String.valueOf(authenticationToken));
     }
 
     protected AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {

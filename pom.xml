@@ -80,32 +80,33 @@
         </developer>
     </developers>
     <properties>
+        <aws.version>1.11.967</aws.version>
         <commons.collections.version>3.2.2</commons.collections.version>
-        <commons.configuration.version>2.7</commons.configuration.version>
+        <commons.configuration.version>2.8.0</commons.configuration.version>
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
-        <commons.fileupload.version>1.3.3</commons.fileupload.version>
+        <commons.fileupload.version>1.4</commons.fileupload.version>
         <commons.io.version>2.7</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.8.0</commons.vfs.version>
-        <fop.version>2.6</fop.version>
-        <groovy.version>3.0.8</groovy.version>
+        <fop.version>2.8</fop.version>
+        <groovy.version>4.0.3</groovy.version>
         <guava.version>31.0.1-jre</guava.version>
-        <hibernate.version>6.0.1.Final</hibernate.version>
-        <jackson.version>2.13.2</jackson.version>
-        <jackson.databind.version>2.13.2.1</jackson.databind.version>
+        <hibernate.version>6.1.7.Final</hibernate.version>
+        <jackson.version>2.13.4</jackson.version>
+        <jackson.databind.version>2.13.4.2</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depended on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
         <jersey.version>3.0.4</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
-        <jjwt.version>0.11.2</jjwt.version>
+        <jjwt.version>0.11.5</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
         <jsqlparser.version>0.9.7</jsqlparser.version>
         <json.version>20180813</json.version>
-        <jsoup.version>1.14.2</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>4.4.0</liquibase.version>
+        <liquibase.version>4.8.0</liquibase.version>
         <!--
         According to CVE-2021-42550 (https://nvd.nist.gov/vuln/detail/CVE-2021-42550), we need >1.2.7.
         However, Logback mentions 1.2.9 as the CVE fix version (https://logback.qos.ch/news.html), but 1.2.9
@@ -117,13 +118,10 @@
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>4.6.1.Final</resteasy.version>
         <servlet.api.version>4.0.1</servlet.api.version>
-        <shiro.version>1.8.0</shiro.version>
+        <shiro.version>1.10.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
-        <spring.version>5.3.13</spring.version> <!-- Same as Spring Boot 2.6.0 -->
-        <aws.version>1.11.967</aws.version>
-
-        <nodejs.version>v16.13.0</nodejs.version>
-        <npm.version>8.1.3</npm.version>
+        <spring.boot.version>2.7.7</spring.boot.version>
+        <spring.version>5.3.23</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -143,7 +141,6 @@
         <module>code</module>
         <module>dispatcher</module>
         <module>elements</module>
-        <module>modules</module>
         <module>mail</module>
         <module>portofino-core</module>
         <module>security-shiro</module>
@@ -158,25 +155,23 @@
         <module>databases/mysql</module>
         <module>databases/oracle</module>
         <module>databases/postgresql</module>
-        <!-- Pages -->
+        <!-- Resource-actions -->
         <module>portofino-crud</module>
+        <!-- Languages -->
+        <module>portofino-groovy</module>
         <!-- Optional services and integrations -->
         <module>portofino-quartz</module>
         <module>keycloak</module>
         <module>portofino-aws</module>
         <!-- Microservices -->
-        <module>microservices/launcher</module>
         <module>microservices/spring-boot</module>
         <module>microservices/scheduler</module>
         <module>microservices/mail</module>
-        <!-- UI -->
-        <module>ui</module>
         <!-- upstairs -->
         <module>upstairs</module>
         <!-- Archetypes -->
-        <module>archetypes/service-groovy</module>
-        <module>archetypes/service-java</module>
-        <module>archetypes/war</module>
+        <module>archetypes/service-minimal</module>
+        <module>archetypes/service-full</module>
         <!-- Applications -->
         <module>demo-tt</module>
     </modules>
@@ -249,6 +244,22 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-common</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-json-jackson</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.ext</groupId>
+                <artifactId>jersey-spring5</artifactId>
+                <version>${jersey.version}</version>
+            </dependency>
+            <!-- Spring -->
+            <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
                 <artifactId>jackson-module-parameter-names</artifactId>
                 <version>${jackson.version}</version>
@@ -282,6 +293,22 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
                 <version>${spring.version}</version>
+            </dependency>
+            <!-- Boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jersey</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.version}</version>
             </dependency>
             <!-- Utilities -->
             <dependency>
@@ -328,7 +355,7 @@
             </dependency>
             <!-- Groovy -->
             <dependency>
-                <groupId>org.codehaus.groovy</groupId>
+                <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy</artifactId>
                 <version>${groovy.version}</version>
             </dependency>
@@ -344,19 +371,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.0</version>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.4.0-b180830.0359</version>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>2.1.0</version>
+            <version>1.3.5</version>
         </dependency>
         <dependency>
             <groupId>jakarta.activation</groupId>
             <artifactId>jakarta.activation-api</artifactId>
-            <version>2.1.0</version>
+            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
@@ -562,7 +589,7 @@
                                 <link>https://docs.oracle.com/javaee/7/api/</link>
                                 <link>https://docs.oracle.com/javase/8/docs/api/</link>
                                 <!-- Corresponding javadoc command line:
-                                -source 8 -link https://shiro.apache.org/static/1.7.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
+                                -source 8 -link https://shiro.apache.org/static/1.9.1/apidocs/ -link https://commons.apache.org/proper/commons-configuration/apidocs/ -link https://docs.jboss.org/hibernate/orm/5.4/javadocs/ -link https://docs.groovy-lang.org/3.0.8/html/gapi/ -link https://www.joda.org/joda-time/apidocs/ -link https://docs.oracle.com/javase/8/docs/api/ -link https://docs.oracle.com/javaee/7/api/ -encoding UTF-8
                                 -->
                             </links>
                         </configuration>

@@ -55,6 +55,8 @@ import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.resourceactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.resourceactions.crud.export.CrudExporter;
+import com.manydesigns.portofino.resourceactions.crud.export.CrudExporterRegistry;
 import com.manydesigns.portofino.resourceactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissionsChecks;
@@ -69,6 +71,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import ognl.OgnlContext;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -78,7 +81,6 @@ import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
-import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +88,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import javax.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
@@ -121,10 +124,10 @@ import java.util.regex.Pattern;
  *   </ul>
  * <p>This ResourceAction can handle a varying number of URL path parameters (segments). Each segment is assumed to be part
  * of an object identifier - for example, a database primary key (single or multi-valued). When no parameter is
- * specified, the actionDescriptor is in search mode. When the correct number of parameters is provided, the action attempts
- * to load an object with the appropriate identifier (for example, by loading a row from a database table with
- * the corresponding primary key). As any other actionDescriptor, crud pages can have children, and they always prevail over
- * the object key: a crud actionDescriptor with a child named &quot;child&quot; will never attempt to load an object with key
+ * specified, the CRUD resource-action is in search mode. When the correct number of parameters is provided, the action
+ * attempts to load an object with the given identifier (for example, by loading a row from a database table with
+ * the corresponding primary key). As any other resource-action, crud pages can have children, and they always prevail
+ * over the object key: a crud action with a child named &quot;child&quot; will never attempt to load an object with key
  * &quot;child&quot;.</p>
  *
  * @param <T> the types of objects that this crud can handle.
@@ -208,6 +211,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @Qualifier(PortofinoSpringConfiguration.DEFAULT_BLOB_MANAGER)
     protected BlobManager blobManager;
 
+    @Autowired
+    protected CrudExporterRegistry crudExporterRegistry;
+
     //--------------------------------------------------------------------------
     // Configuration
     //--------------------------------------------------------------------------
@@ -237,23 +243,6 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * the result to the <code>objects</code> field.
      */
     public abstract List<T> loadObjects();
-
-    /**
-     * Configures the given criteria to take into account the requested sorting.
-     * @param criteria the criteria to apply sorting to. Will be modified.
-     */
-    protected void applySorting(Criteria criteria) {
-        if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
-            try {
-                PropertyAccessor orderByProperty = getOrderByProperty(sortProperty);
-                if(orderByProperty != null) {
-                    criteria.orderBy(orderByProperty, sortDirection);
-                }
-            } catch (NoSuchFieldException e) {
-                CrudAction.logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
-            }
-        }
-    }
 
     /**
      * Obtains the PropertyAccessor that represents the property used for sorting the results.
@@ -308,62 +297,12 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     protected void executeSearch() {
         setupSearchForm();
         if(maxResults == null) {
-            //Load only the first actionDescriptor if the crud is paginated
+            //Load only the first page if the crud is paginated
             maxResults = getCrudConfiguration().getRowsPerPage();
         }
         loadObjects();
         setupTableForm(Mode.VIEW);
         BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
-    }
-
-    public Response jsonSearchData() throws JSONException {
-        executeSearch();
-        final long totalRecords = getTotalSearchRecords();
-
-        JSONStringer js = new JSONStringer();
-        js.object()
-                .key("recordsReturned")
-                .value(objects.size())
-                .key("totalRecords")
-                .value(totalRecords)
-                .key("startIndex")
-                .value(firstResult == null ? 0 : firstResult)
-                .key("records")
-                .array();
-        for (TableForm.Row row : tableForm.getRows()) {
-            js.object()
-                    .key("__rowKey")
-                    .value(row.getKey());
-            FormUtil.fieldsToJson(js, row);
-            js.endObject();
-        }
-        js.endArray();
-        js.endObject();
-        String jsonText = js.toString();
-        Response.ResponseBuilder builder = Response.ok(jsonText).type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8");
-        Integer rowsPerPage = getCrudConfiguration().getRowsPerPage();
-        if(rowsPerPage != null && totalRecords > rowsPerPage) {
-            int firstResult = getFirstResult() != null ? getFirstResult() : 1;
-            int currentPage = firstResult / rowsPerPage;
-            int lastPage = (int) (totalRecords / rowsPerPage);
-            if(totalRecords % rowsPerPage == 0) {
-                lastPage--;
-            }
-            StringBuilder sb = new StringBuilder();
-            if(currentPage > 0) {
-                sb.append("<").append(getLinkToPage(0)).append(">; rel=\"first\", ");
-                sb.append("<").append(getLinkToPage(currentPage - 1)).append(">; rel=\"prev\"");
-            }
-            if(currentPage != lastPage) {
-                if(currentPage > 0) {
-                    sb.append(", ");
-                }
-                sb.append("<").append(getLinkToPage(currentPage + 1)).append(">; rel=\"next\", ");
-                sb.append("<").append(getLinkToPage(lastPage)).append(">; rel=\"last\"");
-            }
-            builder.header("Link", sb.toString());
-        }
-        return builder.build();
     }
 
     /**
@@ -373,39 +312,19 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      */
     public abstract long getTotalSearchRecords();
 
+    protected Response exportSearchResults(CrudExporter exporter) {
+        return exporter.exportSearchResults(this).build();
+    }
+
     //**************************************************************************
     // Read
     //**************************************************************************
 
-    public Response jsonReadData() throws JSONException {
-        if(object == null) {
-            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
-        }
-        setupForm(Mode.VIEW);
-        form.readFromObject(object);
-        return jsonFormData();
-    }
-
-    public Response jsonEditData() throws JSONException {
-        if(object == null) {
-            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
-        }
-        preEdit();
-        return jsonFormData();
-    }
-
-    public Response jsonCreateData() throws JSONException {
-        preCreate();
-        return jsonFormData();
-    }
-
-    public Response jsonFormData() {
+    public Response exportObject(CrudExporter exporter) {
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
-        String jsonText = FormUtil.writeToJson(form);
         String prettyName = safeGetPrettyName();
-        return Response.ok(jsonText)
-                .type(MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8")
+        return exporter.exportObject(this)
                 .header(PORTOFINO_PRETTY_NAME_HEADER, prettyName)
                 .build();
     }
@@ -517,7 +436,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
                 (classAccessor.getAnnotation(Insertable.class) == null ||
                  classAccessor.getAnnotation(Insertable.class).value());
     }
-    
+
     /**
      * Hook method called just after a new object has been created.
      * @param object the new object.
@@ -552,7 +471,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
                 (classAccessor.getAnnotation(Updatable.class) == null ||
                  classAccessor.getAnnotation(Updatable.class).value());
     }
-    
+
     /**
      * Hook method called just before an object is used to populate the edit form.
      * @param object the object.
@@ -581,7 +500,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
                 (classAccessor.getAnnotation(Updatable.class) == null ||
                  classAccessor.getAnnotation(Updatable.class).value());
     }
-    
+
     /**
      * Hook method called before an object is deleted.
      * @param object the object.
@@ -610,7 +529,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         this.crudConfiguration = (CrudConfiguration) actionInstance.getConfiguration();
 
         if (crudConfiguration == null) {
-            logger.warn("Crud is not configured: " + actionInstance.getPath());
+            logger.warn("Crud is not configured: " + getPath());
             return;
         }
 
@@ -624,8 +543,12 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     private void checkAccessorPermissions(String[] requiredPermissions) {
+        if (classAccessor == null) {
+            throw new WebApplicationException("Action not properly configured", resourceActionNotConfigured());
+        }
         EntityPermissions ep = classAccessor.getAnnotation(EntityPermissions.class);
-        if(!EntityPermissionsChecks.isPermitted(portofinoConfiguration, security, requiredPermissions, ep)) {
+        Configuration conf = portofinoConfiguration.getProperties();
+        if(!EntityPermissionsChecks.isPermitted(conf, security, requiredPermissions, ep)) {
             logger.warn("CRUD source not permitted: {}", classAccessor.getName());
             throw new WebApplicationException(
                     security.isUserAuthenticated() ? Response.Status.FORBIDDEN : Response.Status.UNAUTHORIZED);
@@ -723,7 +646,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     /**
      * Computes the search URL from the current URL. In other words, it removes any /pk trailing path segment from the
-     * URL used to access the actionDescriptor.
+     * URL used to access this resource.
      * @return the search URL.
      */
     protected String calculateBaseSearchUrl() {
@@ -753,8 +676,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     }
 
     /**
-     * Creates, configures and populates the form used to gather search parameters. If this actionDescriptor is embedded, the form's
-     * values are not read from the request to avoid having the embedding actionDescriptor influence this one.
+     * Creates, configures and populates the form used to gather search parameters.
      */
     protected void setupSearchForm() {
         SearchFormBuilder searchFormBuilder = createSearchFormBuilder();
@@ -807,10 +729,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     protected SearchFormBuilder configureSearchFormBuilder(SearchFormBuilder searchFormBuilder) {
         // setup option providers
-        if(selectionProviderSupport != null) {
+        if(selectionProviderSupport != null && selectionProviderLoadStrategy != SelectionProviderLoadStrategy.NONE) {
             for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
                 SelectionProvider selectionProvider = current.getSelectionProvider();
-                if(selectionProvider == null || !current.isEnforced()) {
+                if(selectionProvider == null) {
                     continue;
                 }
                 String[] fieldNames = current.getFieldNames();
@@ -843,10 +765,10 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
         // setup option providers
-        if(selectionProviderSupport != null) {
+        if(selectionProviderSupport != null && selectionProviderLoadStrategy != SelectionProviderLoadStrategy.NONE) {
             for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
                 SelectionProvider selectionProvider = current.getSelectionProvider();
-                if (selectionProvider == null) {
+                if(selectionProvider == null) {
                     continue;
                 }
                 String[] fieldNames = current.getFieldNames();
@@ -902,7 +824,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
 
             Charset charset = Charset.forName(context.getRequest().getCharacterEncoding());
             UrlBuilder urlBuilder =
-                    new UrlBuilder(charset, Util.getAbsoluteUrl(context.getActionPath()), false)
+                    new UrlBuilder(charset, Util.getAbsoluteUrl(context.getRequest(), context.getActionPath()), false)
                             .addParameters(parameters);
 
             XhtmlBuffer xb = new XhtmlBuffer();
@@ -992,7 +914,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
             if(selectionProvider == null || (
-                    selectionProviderLoadStrategy == SelectionProviderLoadStrategy.ONLY_ENFORCED  && !current.isEnforced())) {
+                    selectionProviderLoadStrategy == SelectionProviderLoadStrategy.ONLY_ENFORCED && !current.isEnforced())) {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
@@ -1335,7 +1257,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @QueryParam("includeSelectPrompt") boolean includeSelectPrompt) {
         return jsonOptions(selectionProviderName, 0, labelSearch, prefix, includeSelectPrompt);
     }
-    
+
     /**
      * Returns values to update multiple related select fields or a single autocomplete text field, in JSON form.
      * @param selectionProviderName name of the selection provider. See {@link #selectionProviders()}.
@@ -1352,7 +1274,9 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     @GET
     @Path(":selectionProvider/{selectionProviderName}/{selectionProviderIndex : (\\d+)}")
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "The values a given selection provider can assume")
+    @Operation(summary =
+            "The values a given selection provider can assume. We can use such values to update multiple " +
+            "related select fields or a single autocomplete text field.")
     public Response jsonOptions(
             @Parameter(description = "The name of the selection provider")
             @PathParam("selectionProviderName") String selectionProviderName,
@@ -1392,7 +1316,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             field.setUpdatable(true);
         }
         form.readFromRequest(context.getRequest());
-        
+
         //The form only contains fields from the selection provider, so the index matches that of the field
         if(selectionProviderIndex < 0 || selectionProviderIndex >= fieldSet.size()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid index").build();
@@ -1434,7 +1358,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
     //--------------------------------------------------------------------------
 
     protected String getUrlEncoding() {
-        return portofinoConfiguration.getString(
+        return portofinoConfiguration.getProperties().getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
     }
 
@@ -1561,9 +1485,8 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * @return search results (/) or single object (/pk) as JSON
      */
     @GET
-    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Operation(summary = "The contents of this resource: either search results or a single object, depending on path parameters")
-    public Response getAsJson(
+    public Response load(
             @Parameter(description = "The search string (see https://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest for its format)")
             @QueryParam("searchString") String searchString,
             @Parameter(description = "The index of the first search result. Only valid for search.")
@@ -1579,13 +1502,16 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             @Parameter(description = "The returned object is a new instance pre-populated for being saved (including computed fields). Only valid for create, read, edit.")
             @QueryParam("newObject") boolean newObject,
             @Parameter(description = "The returned object does not load a displayValue for fields that have selection providers. The client will have to query selection providers by itself. Only valid for create, read, edit.")
-            @QueryParam("skipSelectionProviders") boolean skipSelectionProviders) {
+            @QueryParam("skipSelectionProviders") boolean skipSelectionProviders,
+            @HeaderParam("Accept") String acceptedFormats) {
         checkAccessorPermissions(new String[]{ PERMISSION_READ });
         selectionProviderLoadStrategy = skipSelectionProviders ?
                 SelectionProviderLoadStrategy.NONE :
                 SelectionProviderLoadStrategy.ALL;
+        CrudExporter exporter = getExporter(acceptedFormats);
         if(newObject) {
-            return jsonCreateData();
+            preCreate();
+            return exportObject(exporter);
         }
         if(object == null) {
             this.searchString = searchString;
@@ -1593,12 +1519,27 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             this.maxResults = maxResults;
             this.sortProperty = sortProperty;
             this.sortDirection = sortDirection;
-            return jsonSearchData();
-        } else if(forEdit) {
-            return jsonEditData();
+            executeSearch();
+            return exportSearchResults(exporter);
         } else {
-            return jsonReadData();
+            if(forEdit) {
+                preEdit();
+            } else {
+                setupForm(Mode.VIEW);
+                form.readFromObject(object);
+            }
+            return exportObject(exporter);
         }
+    }
+
+    protected CrudExporter getExporter(String acceptedFormats) {
+        List<org.springframework.http.MediaType> mediaTypes =
+                org.springframework.http.MediaType.parseMediaTypes(acceptedFormats);
+        if (mediaTypes.isEmpty()) {
+            mediaTypes = Collections.singletonList(org.springframework.http.MediaType.APPLICATION_JSON);
+        }
+        org.springframework.http.MediaType.sortBySpecificityAndQuality(mediaTypes);
+        return crudExporterRegistry.get(mediaTypes);
     }
 
     /**
@@ -1648,7 +1589,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * Handles object creation with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2.1
      * @return the created object as JSON (in a JAX-RS Response).
-     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug. 
+     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)

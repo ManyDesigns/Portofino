@@ -23,7 +23,6 @@ import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.VFS;
-import org.hibernate.MappingException;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.boot.Metadata;
@@ -35,6 +34,8 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.registry.classloading.internal.ClassLoaderServiceImpl;
 import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.engine.config.spi.ConfigurationService;
+import org.hibernate.engine.config.spi.StandardConverters;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.ServiceRegistry;
@@ -46,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import jakarta.persistence.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -62,12 +62,14 @@ public class SessionFactoryBuilder {
     protected String trueString = "T";
     protected String falseString = "F";
     protected final Database database;
+    protected final Events events;
     protected final ClassPool classPool = new ClassPool(ClassPool.getDefault());
     protected final Configuration configuration;
     protected final MultiTenancyImplementation multiTenancyImplementation;
     protected EntityMode entityMode = EntityMode.MAP;
 
     protected static final Set<String> JAVA_KEYWORDS = new HashSet<>();
+    private ConfigurationService configurationService;
 
     static {
         JAVA_KEYWORDS.add("private");
@@ -76,9 +78,11 @@ public class SessionFactoryBuilder {
     }
 
     public SessionFactoryBuilder(
-            Database database, Configuration configuration, MultiTenancyImplementation multiTenancyImplementation) {
+            Database database, Configuration configuration, Events events,
+            MultiTenancyImplementation multiTenancyImplementation) {
         this.database = database;
         this.configuration = configuration;
+        this.events = events;
         this.multiTenancyImplementation = multiTenancyImplementation;
         String trueString = database.getTrueString();
         if (trueString != null) {
@@ -119,6 +123,16 @@ public class SessionFactoryBuilder {
         URLClassLoader scratchClassLoader = new URLClassLoader(new URL[0], contextClassLoader);
         Thread.currentThread().setContextClassLoader(scratchClassLoader);
 
+        BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
+        bootstrapRegistryBuilder.applyIntegrator(new EventsIntegrator(events, database));
+        DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
+        bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
+        BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
+        Map<String, Object> settings = setupConnection();
+        ServiceRegistry standardRegistry =
+                new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
+        configurationService = standardRegistry.getService(ConfigurationService.class);
+
         try {
             FileObject databaseDir = root.resolveFile(database.getDatabaseName());
             databaseDir.deleteAll();
@@ -139,7 +153,8 @@ public class SessionFactoryBuilder {
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
-        return buildSessionFactory(new JavaCodeBase(root), mappableTables, externallyMappedTables);
+        return buildSessionFactory(
+                new JavaCodeBase(root), mappableTables, externallyMappedTables, standardRegistry, classLoaderService);
     }
 
     protected boolean checkInvalidPrimaryKey(Table table) {
@@ -189,14 +204,9 @@ public class SessionFactoryBuilder {
         }
     }
 
-    public SessionFactoryAndCodeBase buildSessionFactory(CodeBase codeBase, List<Table> tablesToMap, List<Table> externallyMappedTables) {
-        BootstrapServiceRegistryBuilder bootstrapRegistryBuilder = new BootstrapServiceRegistryBuilder();
-        DynamicClassLoaderService classLoaderService = new DynamicClassLoaderService();
-        bootstrapRegistryBuilder.applyClassLoaderService(classLoaderService);
-        BootstrapServiceRegistry bootstrapServiceRegistry = bootstrapRegistryBuilder.build();
-        Map<String, Object> settings = setupConnection();
-        ServiceRegistry standardRegistry =
-                new StandardServiceRegistryBuilder(bootstrapServiceRegistry).applySettings(settings).build();
+    public SessionFactoryAndCodeBase buildSessionFactory(
+            CodeBase codeBase, List<Table> tablesToMap, List<Table> externallyMappedTables,
+            ServiceRegistry standardRegistry, DynamicClassLoaderService classLoaderService) {
         MetadataSources sources = new MetadataSources(standardRegistry);
         List<String> externallyMappedClasses = new ArrayList<>();
         try {
@@ -430,12 +440,14 @@ public class SessionFactoryBuilder {
         Annotation annotation;
 
         annotation = new Annotation(jakarta.persistence.Table.class.getName(), constPool);
-        annotation.addMemberValue("name", new StringMemberValue(jpaEscape(table.getTableName()), constPool));
+        annotation.addMemberValue("name",
+                new StringMemberValue(jpaEscape(table.getTableName(), false), constPool));
         if(multiTenancyImplementation == null ||
                 multiTenancyImplementation.getStrategy() != MultiTenancyStrategy.SEPARATE_SCHEMA) {
             //Don't configure the schema name if we're using schema-based multitenancy
             String schemaName = table.getSchema().getActualSchemaName();
-            annotation.addMemberValue("schema", new StringMemberValue(jpaEscape(schemaName), constPool));
+            annotation.addMemberValue("schema",
+                    new StringMemberValue(jpaEscape(schemaName, false), constPool));
         }
         classAnnotations.addAnnotation(annotation);
 
@@ -529,7 +541,8 @@ public class SessionFactoryBuilder {
             CtField field = new CtField(classPool.get(javaType.getName()), propertyName, cc);
             AnnotationsAttribute fieldAnnotations = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
             annotation = new Annotation(jakarta.persistence.Column.class.getName(), constPool);
-            annotation.addMemberValue("name", new StringMemberValue(jpaEscape(column.getColumnName()), constPool));
+            annotation.addMemberValue("name",
+                    new StringMemberValue(jpaEscape(column.getColumnName(), true), constPool));
             annotation.addMemberValue("nullable", new BooleanMemberValue(column.isNullable(), constPool));
             if(column.getLength() != null) {
                 annotation.addMemberValue("precision", new IntegerMemberValue(constPool, column.getLength()));
@@ -555,7 +568,8 @@ public class SessionFactoryBuilder {
                 }
             }
 
-            setupColumnType(column, fieldAnnotations, constPool);
+            setupColumnTypeAnnotation(column, fieldAnnotations, constPool);
+            setupColumnCustomAnnotations(column, fieldAnnotations, constPool);
 
             column.getAnnotations().forEach(ann -> {
                 Class<?> annotationClass = ann.getJavaAnnotationClass();
@@ -582,10 +596,23 @@ public class SessionFactoryBuilder {
     }
 
     /**
-     * https://vladmihalcea.com/escape-sql-reserved-keywords-jpa-hibernate/
+     * See <a href="https://vladmihalcea.com/escape-sql-reserved-keywords-jpa-hibernate/">https://vladmihalcea.com/escape-sql-reserved-keywords-jpa-hibernate/</a>
      */
-    public String jpaEscape(String columnName) {
-        return "\"" + columnName + "\"";
+    public String jpaEscape(String name, boolean column) {
+        boolean needsQuoting = !configurationService.getSetting(
+                AvailableSettings.GLOBALLY_QUOTED_IDENTIFIERS, StandardConverters.BOOLEAN, false);
+        if (column && !needsQuoting) {
+            boolean skipColumns = configurationService.getSetting(
+                    AvailableSettings.GLOBALLY_QUOTED_IDENTIFIERS_SKIP_COLUMN_DEFINITIONS, StandardConverters.BOOLEAN, false);
+            if (skipColumns) {
+                needsQuoting = true;
+            }
+        }
+        if (needsQuoting) {
+            return "\"" + name + "\"";
+        } else {
+            return name;
+        }
     }
 
     protected void setupIdentityGenerator(AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
@@ -640,7 +667,7 @@ public class SessionFactoryBuilder {
         return annotation;
     }
 
-    protected void setupColumnType(Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
+    protected void setupColumnTypeAnnotation(Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
         Annotation annotation;
         if(Boolean.class.equals(column.getActualJavaType())) {
             if(column.getJdbcType() == Types.CHAR || column.getJdbcType() == Types.VARCHAR) {
@@ -674,6 +701,18 @@ public class SessionFactoryBuilder {
         }
     }
 
+    protected void setupColumnCustomAnnotations
+            (Column column, AnnotationsAttribute fieldAnnotations, ConstPool constPool) {
+        List<com.manydesigns.portofino.model.Annotation> annotations =
+                database.getConnectionProvider().getDatabasePlatform().getAdditionalAnnotations(column);
+        for (com.manydesigns.portofino.model.Annotation annotation : annotations) {
+            Annotation fieldAnn = convertAnnotation(constPool, annotation);
+            if (fieldAnn != null) {
+                fieldAnnotations.addAnnotation(fieldAnn);
+            }
+        }
+    }
+
     public void mapRelationships(Table table) throws NotFoundException, CannotCompileException {
         for(ForeignKey foreignKey : table.getForeignKeys()) {
             if(checkValidFk(foreignKey)) {
@@ -702,8 +741,8 @@ public class SessionFactoryBuilder {
             annotation = new Annotation(JoinColumn.class.getName(), constPool);
             annotation.addMemberValue("insertable", new BooleanMemberValue(false, constPool));
             annotation.addMemberValue("updatable", new BooleanMemberValue(false, constPool));
-            annotation.addMemberValue("name", new StringMemberValue(jpaEscape(fromColumn), constPool));
-            annotation.addMemberValue("referencedColumnName", new StringMemberValue(jpaEscape(toColumn), constPool));
+            annotation.addMemberValue("name", new StringMemberValue(jpaEscape(fromColumn, true), constPool));
+            annotation.addMemberValue("referencedColumnName", new StringMemberValue(jpaEscape(toColumn, true), constPool));
             joinColumnsValue.add(new AnnotationMemberValue(annotation, constPool));
         }
         annotation = new Annotation(JoinColumns.class.getName(), constPool);
@@ -749,7 +788,11 @@ public class SessionFactoryBuilder {
     }
 
     protected void mapOneToMany(ForeignKey foreignKey) throws NotFoundException, CannotCompileException {
-        CtClass cc = getMappedClass(foreignKey.getToTable());
+        Table toTable = foreignKey.getToTable();
+        if (toTable.getActualJavaClass() != null) {
+            return;
+        }
+        CtClass cc = getMappedClass(toTable);
         ClassFile ccFile = cc.getClassFile();
         ConstPool constPool = ccFile.getConstPool();
         Table fromTable = foreignKey.getFromTable();

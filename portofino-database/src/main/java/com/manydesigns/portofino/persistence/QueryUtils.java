@@ -20,14 +20,15 @@
 
 package com.manydesigns.portofino.persistence;
 
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.fields.search.Criterion;
+import com.manydesigns.elements.fields.search.Ordering;
 import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlHqlFormat;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
@@ -106,7 +107,7 @@ public class QueryUtils {
      * @return the results of the query as an Object[] (an array cell per column)
      */
     public static List<Object[]> runSql(Session session, final String queryString, final Object[] parameters) {
-        final List<Object[]> result = new ArrayList<Object[]>();
+        final List<Object[]> result = new ArrayList<>();
 
         try {
             session.doWork(new Work() {
@@ -139,7 +140,7 @@ public class QueryUtils {
     }
 
     /**
-     * Runs a query, expressed as {@link TableCriteria}, against the database.
+     * Runs a query, expressed as {@link Table} with {@link Criteria}, against the database.
      * @param session the session
      * @param criteria the search criteria
      * @param firstResult index of the first result to return
@@ -147,10 +148,10 @@ public class QueryUtils {
      * @return at most <code>maxResults</code> results from the query
      */
     public static List<Object> getObjects(
-            Session session, TableCriteria criteria,
+            Session session, Table table, Criteria criteria,
             @Nullable Integer firstResult, @Nullable Integer maxResults) {
         QueryStringWithParameters queryStringWithParameters =
-                getQueryStringWithParametersForCriteria(criteria);
+                getQueryStringWithParametersForCriteria(table, criteria);
 
         return runHqlQuery(
                 session,
@@ -194,46 +195,43 @@ public class QueryUtils {
     public static List<Object> getObjects(
             Session session, String queryString,
             @Nullable Integer firstResult, @Nullable Integer maxResults) {
-        return getObjects(session, queryString, (TableCriteria) null, null, firstResult, maxResults);
+        return getObjects(session, queryString, null, null, null, null, firstResult, maxResults);
     }
 
     /**
-     * Tranforms a {@link TableCriteria} to a query string with an associated array of parameters.
+     * Transforms a {@link Table} with {@link Criteria} to a query string with an associated array of parameters.
+     * @param table the table.
      * @param criteria the criteria.
      * @return the same criteria encoded as a HQL query with parameters.
      */
-    public static QueryStringWithParameters getQueryStringWithParametersForCriteria(
-            TableCriteria criteria) {
-        return getQueryStringWithParametersForCriteria(criteria, null, 1);
+    public static QueryStringWithParameters getQueryStringWithParametersForCriteria(Table table, Criteria criteria) {
+        return getQueryStringWithParametersForCriteria(table, criteria, null, 1);
     }
 
     /**
-     * Tranforms a {@link TableCriteria} to a query string with an associated array of parameters.
+     * Transforms a {@link Table} with {@link Criteria} to a query string with an associated array of parameters.
+     * @param table the table.
      * @param criteria the criteria.
      * @param alias the alias to use for the main entity.
      * @return the same criteria encoded as a HQL query with parameters.
      */
     public static QueryStringWithParameters getQueryStringWithParametersForCriteria(
-            @Nullable TableCriteria criteria, @Nullable String alias, int initialParameterIndex) {
+            Table table, @Nullable Criteria criteria, @Nullable String alias, int initialParameterIndex) {
         if (criteria == null) {
             return new QueryStringWithParameters("", new Object[0]);
         }
-        Table table = criteria.getTable();
-
-        ArrayList<Object> parametersList = new ArrayList<Object>();
+        ArrayList<Object> parametersList = new ArrayList<>();
         StringBuilder whereBuilder = new StringBuilder();
         for (Criterion criterion : criteria) {
             PropertyAccessor accessor = criterion.getPropertyAccessor();
             String hqlFormat;
-            if (criterion instanceof TableCriteria.EqCriterion) {
-                TableCriteria.EqCriterion eqCriterion =
-                        (TableCriteria.EqCriterion) criterion;
+            if (criterion instanceof Criteria.EqCriterion) {
+                Criteria.EqCriterion eqCriterion = (Criteria.EqCriterion) criterion;
                 Object value = eqCriterion.getValue();
                 hqlFormat = "{0} = :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.InCriterion) {
-                TableCriteria.InCriterion inCriterion =
-                        (TableCriteria.InCriterion) criterion;
+            } else if (criterion instanceof Criteria.InCriterion) {
+                Criteria.InCriterion inCriterion = (Criteria.InCriterion) criterion;
                 Object[] values = inCriterion.getValues();
                 StringBuilder params = new StringBuilder();
                 if (values != null){
@@ -251,15 +249,14 @@ public class QueryUtils {
                 } else {
                     hqlFormat = null;
                 }
-            } else if (criterion instanceof TableCriteria.NeCriterion) {
-                TableCriteria.NeCriterion neCriterion =
-                        (TableCriteria.NeCriterion) criterion;
+            } else if (criterion instanceof Criteria.NeCriterion) {
+                Criteria.NeCriterion neCriterion = (Criteria.NeCriterion) criterion;
                 Object value = neCriterion.getValue();
                 hqlFormat = "{0} <> :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.BetweenCriterion) {
-                TableCriteria.BetweenCriterion betweenCriterion =
-                        (TableCriteria.BetweenCriterion) criterion;
+            } else if (criterion instanceof Criteria.BetweenCriterion) {
+                Criteria.BetweenCriterion betweenCriterion =
+                        (Criteria.BetweenCriterion) criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
                 hqlFormat =
@@ -267,33 +264,33 @@ public class QueryUtils {
                         " AND {0} <= :p" + (parametersList.size() + initialParameterIndex + 1);
                 parametersList.add(min);
                 parametersList.add(max);
-            } else if (criterion instanceof TableCriteria.GtCriterion) {
-                TableCriteria.GtCriterion gtCriterion =
-                        (TableCriteria.GtCriterion) criterion;
+            } else if (criterion instanceof Criteria.GtCriterion) {
+                Criteria.GtCriterion gtCriterion =
+                        (Criteria.GtCriterion) criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} > :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.GeCriterion) {
-                TableCriteria.GeCriterion gtCriterion =
-                        (TableCriteria.GeCriterion) criterion;
+            } else if (criterion instanceof Criteria.GeCriterion) {
+                Criteria.GeCriterion gtCriterion =
+                        (Criteria.GeCriterion) criterion;
                 Object value = gtCriterion.getValue();
                 hqlFormat = "{0} >= :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.LtCriterion) {
-                TableCriteria.LtCriterion ltCriterion =
-                        (TableCriteria.LtCriterion) criterion;
+            } else if (criterion instanceof Criteria.LtCriterion) {
+                Criteria.LtCriterion ltCriterion =
+                        (Criteria.LtCriterion) criterion;
                 Object value = ltCriterion.getValue();
                 hqlFormat = "{0} < :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.LeCriterion) {
-                TableCriteria.LeCriterion leCriterion =
-                        (TableCriteria.LeCriterion) criterion;
+            } else if (criterion instanceof Criteria.LeCriterion) {
+                Criteria.LeCriterion leCriterion =
+                        (Criteria.LeCriterion) criterion;
                 Object value = leCriterion.getValue();
                 hqlFormat = "{0} <= :p" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
-            } else if (criterion instanceof TableCriteria.LikeCriterion) {
-                TableCriteria.LikeCriterion likeCriterion =
-                        (TableCriteria.LikeCriterion) criterion;
+            } else if (criterion instanceof Criteria.LikeCriterion) {
+                Criteria.LikeCriterion likeCriterion =
+                        (Criteria.LikeCriterion) criterion;
                 String value = (String) likeCriterion.getValue();
                 if(likeCriterion.getTextMatchMode() == TextMatchMode.EQUALS) {
                     hqlFormat = "{0} = :p" + (parametersList.size() + initialParameterIndex);
@@ -303,9 +300,9 @@ public class QueryUtils {
                     hqlFormat = "{0} like :p" + (parametersList.size() + initialParameterIndex);
                     parametersList.add(pattern);
                 }
-            } else if (criterion instanceof TableCriteria.IlikeCriterion) {
-                TableCriteria.IlikeCriterion ilikeCriterion =
-                        (TableCriteria.IlikeCriterion) criterion;
+            } else if (criterion instanceof Criteria.IlikeCriterion) {
+                Criteria.IlikeCriterion ilikeCriterion =
+                        (Criteria.IlikeCriterion) criterion;
                 String value = (String) ilikeCriterion.getValue();
                 if(ilikeCriterion.getTextMatchMode() == TextMatchMode.EQUALS) {
                     hqlFormat = "lower({0}) = lower(:p" + (parametersList.size() + initialParameterIndex + ")");
@@ -315,9 +312,9 @@ public class QueryUtils {
                     hqlFormat = "lower({0}) like lower(:p" + (parametersList.size() + initialParameterIndex) + ")";
                     parametersList.add(pattern);
                 }
-            } else if (criterion instanceof TableCriteria.IsNullCriterion) {
+            } else if (criterion instanceof Criteria.IsNullCriterion) {
                 hqlFormat = "{0} is null";
-            } else if (criterion instanceof TableCriteria.IsNotNullCriterion) {
+            } else if (criterion instanceof Criteria.IsNotNullCriterion) {
                 hqlFormat = "{0} is not null";
             } else {
                 logger.error("Unrecognized criterion: {}", criterion);
@@ -409,7 +406,7 @@ public class QueryUtils {
     }
 
      /**
-      * Runs a query against the database. The query is expressed as a {@link TableCriteria} object plus a
+      * Runs a query against the database. The query is expressed as a {@link Criteria} object plus a
       * query string to be merged with it (the typical case of a search in a crud defined by a query).
       * The query string is processed with an {@link OgnlSqlFormat}, so it can access values from the OGNL context,
       * as well as from an (optional) rootFactory object.
@@ -424,17 +421,19 @@ public class QueryUtils {
     public static List<Object> getObjects(
             Session session,
             String queryString,
-            TableCriteria criteria,
+            @Nullable Table table,
+            @Nullable Criteria criteria,
+            @Nullable Ordering ordering,
             @Nullable Object rootObject,
             @Nullable Integer firstResult,
             @Nullable Integer maxResults) {
-        QueryStringWithParameters result = mergeQuery(queryString, criteria, rootObject);
+        QueryStringWithParameters result = mergeQuery(queryString, table, criteria, ordering, rootObject);
 
         return runHqlQuery(session, result.getQueryString(), result.getParameters(), firstResult, maxResults);
     }
 
     /**
-     * Merges a HQL query string with a {@link TableCriteria} object representing a search. The query string
+     * Merges a HQL query string with a {@link Criteria} object representing a search. The query string
      * is processed with an {@link OgnlSqlFormat}, so it can access values from the OGNL context, as well as
      * from an (optional) rootFactory object.
      * @param queryString the base query
@@ -443,7 +442,9 @@ public class QueryUtils {
      * @return the merged query
      */
     public static QueryStringWithParameters mergeQuery
-            (String queryString, @Nullable TableCriteria criteria, Object rootObject) {
+            (String queryString,
+             @Nullable Table table, @Nullable Criteria criteria, @Nullable Ordering ordering,
+             Object rootObject) {
         OgnlHqlFormat hqlFormat = OgnlHqlFormat.create(queryString);
         String formatString = hqlFormat.getFormatString();
         Object[] parameters = hqlFormat.evaluateOgnlExpressions(rootObject);
@@ -458,13 +459,14 @@ public class QueryUtils {
         }
 
         Alias mainEntityAlias = null;
-        if(criteria != null) {
-            mainEntityAlias = getEntityAlias(criteria.getTable().getActualEntityName(), parsedQueryString);
+        if(table != null) {
+            mainEntityAlias = getEntityAlias(table.getActualEntityName(), parsedQueryString);
         }
 
         QueryStringWithParameters criteriaQuery =
                 getQueryStringWithParametersForCriteria(
-                        criteria, mainEntityAlias != null ? mainEntityAlias.getName() : null, parameters.length + 1);
+                        table, criteria, mainEntityAlias != null ? mainEntityAlias.getName() : null,
+                        parameters.length + 1);
         String criteriaQueryString = criteriaQuery.getQueryString();
         Object[] criteriaParameters = criteriaQuery.getParameters();
 
@@ -493,11 +495,11 @@ public class QueryUtils {
             whereExpression = parsedCriteriaQuery.getWhere();
         }
         parsedQueryString.setWhere(whereExpression);
-        if(criteria != null && criteria.getOrderBy() != null) {
+        if(ordering != null) {
             List orderByElements = new ArrayList();
             OrderByElement orderByElement = new OrderByElement();
-            orderByElement.setAsc(criteria.getOrderBy().isAsc());
-            String propertyName = criteria.getOrderBy().getPropertyAccessor().getName();
+            orderByElement.setAsc(ordering.isAsc());
+            String propertyName = ordering.getPropertyAccessor().getName();
             if(mainEntityAlias != null) {
                 propertyName = mainEntityAlias.getName() + "." + propertyName;
             }
@@ -579,7 +581,7 @@ public class QueryUtils {
             @Nullable Integer firstResult,
             @Nullable Integer maxResults) {
 
-        Query query = session.createQuery(queryString, null);
+        Query<Object> query = session.createQuery(queryString, null);
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
                 if (parameters[i] instanceof Collection) {
@@ -597,10 +599,8 @@ public class QueryUtils {
             query.setMaxResults(maxResults);
         }
 
-        //noinspection unchecked
         try {
-            List<Object> result = query.list();
-            return result;
+            return query.list();
         } catch (HibernateException e) {
             logger.error("Error running query", e);
             session.getTransaction().rollback();
@@ -635,17 +635,7 @@ public class QueryUtils {
      */
     public static Object getObjectByPk(Session session, TableAccessor table, Object pk) {
         String actualEntityName = table.getTable().getActualEntityName();
-        Object result;
-        PropertyAccessor[] keyProperties = table.getKeyProperties();
-        int size = keyProperties.length;
-        if (size > 1) {
-            result = session.get(actualEntityName, pk);
-            return result;
-        }
-        PropertyAccessor propertyAccessor = keyProperties[0];
-        Serializable key = (Serializable) propertyAccessor.get(pk);
-        result = session.get(actualEntityName, key);
-        return result;
+        return session.get(actualEntityName, pk);
     }
 
     /**
@@ -748,8 +738,7 @@ public class QueryUtils {
             return fromItem.getAlias();
         }
         if(query.getJoins() != null) {
-            for(Object o : query.getJoins()) {
-                Join join = (Join) o;
+            for(Join join : query.getJoins()) {
                 if (hasEntityAlias(entityName, join.getRightItem())) {
                     return join.getRightItem().getAlias();
                 }
@@ -788,7 +777,7 @@ public class QueryUtils {
      * @param entityName the type (entity name) of the master object
      * @param obj the master object
      * @param oneToManyRelationshipName the name of the relationship to navigate
-     * @return the list of associated objects   
+     * @return the list of associated objects
      */
     @SuppressWarnings({"unchecked"})
     public static List<Object> getRelatedObjects(

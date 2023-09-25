@@ -1,0 +1,8 @@
+import com.manydesigns.portofino.database.model.annotations.JDBCConnection;
+import com.manydesigns.portofino.database.model.annotations.Schema;
+
+@JDBCConnection(password = "manydesigns", driver = "org.h2.Driver", username = "manydesigns", url = "jdbc:h2:mem:liquibase_xml")
+domain liquibase_xml {
+    @Schema(name = "PUBLIC")
+    domain public;
+}

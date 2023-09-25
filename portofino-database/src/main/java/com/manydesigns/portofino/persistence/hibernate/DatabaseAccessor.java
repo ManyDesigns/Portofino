@@ -1,0 +1,154 @@
+/*
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package com.manydesigns.portofino.persistence.hibernate;
+
+import com.manydesigns.portofino.code.CodeBase;
+import com.manydesigns.portofino.database.model.Database;
+import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
+import org.apache.commons.configuration2.Configuration;
+import org.hibernate.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Manages access to a single database using Hibernate.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class DatabaseAccessor {
+    public static final String copyright =
+            "Copyright (C) 2005-2020 ManyDesigns srl";
+
+    protected final Database database;
+    protected final SessionFactory sessionFactory;
+    protected final CodeBase codeBase;
+    protected final ThreadLocal<Session> threadSessions;
+    protected final EntityMode entityMode;
+    protected final Configuration configuration;
+    protected final Map<String, String> jpaEntityNameToClassNameMap = new HashMap<>();
+    protected final Events events;
+    protected final MultiTenancyImplementation multiTenancyImplementation;
+
+    public static final Logger logger = LoggerFactory.getLogger(DatabaseAccessor.class);
+
+    public DatabaseAccessor(
+            Database database, SessionFactory sessionFactory, CodeBase codeBase, EntityMode entityMode,
+            Configuration configuration, Events events, MultiTenancyImplementation multiTenancyImplementation) {
+        this.database = database;
+        this.sessionFactory = sessionFactory;
+        this.codeBase = codeBase;
+        this.entityMode = entityMode;
+        this.configuration = configuration;
+        this.events = events;
+        this.multiTenancyImplementation = multiTenancyImplementation;
+        threadSessions = new ThreadLocal<>();
+        database.getAllTables().forEach(
+                t -> jpaEntityNameToClassNameMap.put(
+                        t.getActualEntityName(), SessionFactoryBuilder.getMappedClassName(t, entityMode)));
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public ThreadLocal<Session> getThreadSessions() {
+        return threadSessions;
+    }
+
+    public Session getThreadSession() {
+        return getThreadSession(true);
+    }
+
+    public Session getThreadSession(boolean create) {
+        Session session = threadSessions.get();
+        if(session == null && create) {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Creating thread-local session for {}", Thread.currentThread());
+            }
+            session = createSession();
+            session.beginTransaction();
+            threadSessions.set(session);
+        }
+        return session;
+    }
+
+    public Session createSession() {
+        Session session;
+        if(multiTenancyImplementation != null) {
+            session = sessionFactory.withOptions().tenantIdentifier(multiTenancyImplementation.getTenant()).openSession();
+        } else {
+            session = sessionFactory.openSession();
+        }
+        return new SessionDelegator(this, session);
+    }
+
+    public String translateEntityNameFromJpaToHibernate(String entityName) {
+        String hibernateEntityName = jpaEntityNameToClassNameMap.get(entityName);
+        return hibernateEntityName != null ? hibernateEntityName : entityName;
+    }
+
+    public void dispose() {
+        //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
+        //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
+        getSessionFactory().close();
+        events.preLoad$.onComplete();
+        events.postLoad$.onComplete();
+        events.preInsert$.onComplete();
+        events.postInsert$.onComplete();
+        events.preUpdate$.onComplete();
+        events.postUpdate$.onComplete();
+        events.preDelete$.onComplete();
+        events.postDelete$.onComplete();
+    }
+
+    public void setThreadSession(Session session) {
+        threadSessions.set(session);
+    }
+
+    public void removeThreadSession() {
+        threadSessions.remove();
+    }
+
+    public Database getDatabase() {
+        return database;
+    }
+
+    public CodeBase getCodeBase() {
+        return codeBase;
+    }
+
+    public EntityMode getEntityMode() {
+        return entityMode;
+    }
+
+    public Events getEvents() {
+        return events;
+    }
+
+    public MultiTenancyImplementation getMultiTenancyImplementation() {
+        return multiTenancyImplementation;
+    }
+}

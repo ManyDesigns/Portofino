@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.SecurityFacade;
 import groovy.text.SimpleTemplateEngine;
@@ -10,7 +10,6 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;

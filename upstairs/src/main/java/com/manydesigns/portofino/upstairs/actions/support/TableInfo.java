@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.upstairs.actions.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.database.model.Reference;
 import com.manydesigns.portofino.database.model.Table;
 

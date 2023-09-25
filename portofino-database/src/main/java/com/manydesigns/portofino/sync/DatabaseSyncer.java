@@ -85,6 +85,7 @@ public class DatabaseSyncer {
                 targetDatabase.setFalseString(sourceDatabase.getFalseString());
                 targetDatabase.setEntityMode(sourceDatabase.getEntityMode());
             }
+            copyAnnotations(sourceDatabase, targetDatabase);
 
             logger.debug("Reading schema names from metadata");
             List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
@@ -124,7 +125,7 @@ public class DatabaseSyncer {
                 targetSchema.setCatalog(catalog);
                 targetSchema.setSchemaName(sourceSchema.getSchemaName());
                 targetSchema.setActualSchemaName(sourceSchema.getActualSchemaName());
-                targetDatabase.getSchemas().add(targetSchema);
+                targetDatabase.addSchema(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
             }
         }

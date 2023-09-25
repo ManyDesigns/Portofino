@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -8,76 +7,28 @@
         <artifactId>portofino</artifactId>
         <version>6.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>demo-tt</artifactId>
-    <packaging>war</packaging>
-    <url>https://www.manydesigns.com/</url>
+    <artifactId>portofino-demo-tt-service</artifactId>
+    <packaging>jar</packaging>
     <properties>
-        <portofino.application.directory>${serverInfo:realPath}/WEB-INF</portofino.application.directory>
-        <spring.boot.version>2.4.5</spring.boot.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-database</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-postgresql</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-upstairs</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.5.1</version>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-crud</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
         </dependency>
-        <!-- Jersey JAX-RS. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-jersey</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- RestEasy JAX-RS. Enable instead of Jersey. -->
-        <!--
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-resteasy</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        -->
-        <!-- Security -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-security-shiro</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Keycloak support -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-keycloak</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Quartz support. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-quartz</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Email support -->
+        <!-- Email -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
@@ -89,25 +40,63 @@
             <artifactId>javax.mail</artifactId>
             <scope>compile</scope>
         </dependency>
-        <!-- Angular UI support -->
+        <!-- Quartz integration. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-angular-ui-support</artifactId>
+            <artifactId>portofino-quartz</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- URL rewriting for the Angular router -->
         <dependency>
-            <groupId>org.tuckey</groupId>
-            <artifactId>urlrewritefilter</artifactId>
-            <version>4.0.3</version>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-spring-boot</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        <!-- Servlet API. -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-groovy</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        <!-- logging -->
+        <!-- Support for database connectivity. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-database</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-upstairs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- REST support through Jersey. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-jersey</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jersey</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <!-- Spring Boot facilities. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <!-- Security using Apache Shiro -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-security-shiro</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
@@ -125,25 +114,32 @@
             <artifactId>diff</artifactId>
             <version>1.1.11</version>
         </dependency>
-        <!-- This is needed for building the Docker image. -->
+        <!-- JAXB for Java 11+ -->
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.3.3</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- This is for building an executable war. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-microservice-launcher</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.58</version>
-            <scope>provided</scope>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>3.0.2</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
@@ -151,23 +147,21 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.2</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
                 <configuration>
-                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-                    <webResources>
-                        <resource><directory>target/frontend/</directory></resource>
-                        <resource><directory>src/main/webapp/</directory></resource>
-                    </webResources>
+                    <source>11</source>
+                    <target>11</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-            <!-- We use this to repackage the war and make it executable, even if we don't use Spring Boot -->
+            <!-- We use this to repackage the jar and make it executable. -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <mainClass>com.manydesigns.portofino.microservices.launcher.WarFileLauncher</mainClass>
+                    <mainClass>com.manydesigns.portofino.microservices.boot.PortofinoDrivenBootApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -177,230 +171,11 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Remove the portofino Angular lib so that it's freshly reinstalled -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>src/main/frontend/.angular/cache</directory>
-                            <includes>
-                                <include>**</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>src/main/frontend/node_modules/portofino</directory>
-                            <includes>
-                                <include>**</include>
-                            </includes>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                        <fileset>
-                            <directory>src/main/frontend</directory>
-                            <includes>
-                                <include>package-lock.json</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <target>
-                                <mkdir dir="target/frontend"/>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>false</filtering>
             </resource>
         </resources>
     </build>
-
-    <profiles>
-        <profile>
-            <id>build-frontend</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>1.12.1</version>
-                        <configuration>
-                            <workingDirectory>src/main/frontend</workingDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>install node and npm</id>
-                                <goals>
-                                    <goal>install-node-and-npm</goal>
-                                </goals>
-                                <configuration>
-                                    <nodeVersion>${nodejs.version}</nodeVersion>
-                                    <npmVersion>${npm.version}</npmVersion>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>npm install</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>install --legacy-peer-deps</arguments>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>build-client</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run-script build</arguments>
-                                </configuration>
-                                <phase>generate-resources</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <!-- Build Docker images and launch the application. See web.xml for additional explanations. -->
-            <id>docker</id>
-            <properties>
-                <portofino.application.directory>${env:PORTOFINO_APPLICATION_DIRECTORY}</portofino.application.directory>
-                <debug.port>8000</debug.port>
-                <tomcat.port>8080</tomcat.port>
-                <frontend.port>3000</frontend.port>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.33.0</version>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <alias>demo-tt</alias>
-                                    <name>demo-tt:${project.version}</name>
-                                    <build>
-                                        <contextDir>${project.basedir}/src/main/docker/application</contextDir>
-                                        <assembly>
-                                            <descriptor>${project.basedir}/src/main/docker/application/assembly.xml</descriptor>
-                                        </assembly>
-                                    </build>
-                                    <run>
-                                        <skip>true</skip>
-                                    </run>
-                                </image>
-                                <image>
-                                    <alias>demo-tt-debug</alias>
-                                    <name>demo-tt-debug:${project.version}</name>
-                                    <build>
-                                        <contextDir>${project.basedir}/src/main/docker/application/debug</contextDir>
-                                    </build>
-                                    <run>
-                                        <ports>
-                                            <!-- Tomcat HTTP port -->
-                                            <port>tomcat.port:8080</port>
-                                            <!-- JPDA port for remote debugging -->
-                                            <port>debug.port:8000</port>
-                                        </ports>
-                                        <links>
-                                            <link>demo-tt-database:db</link>
-                                        </links>
-                                        <volumes>
-                                            <bind>
-                                                <volume>${project.basedir}/src/main/webapp/WEB-INF:/application</volume>
-                                                <volume>${project.basedir}/src/main/frontend/src/assets:/usr/local/tomcat/webapps/ROOT/assets</volume>
-                                                <volume>${project.basedir}/src/main/frontend/src/pages:/usr/local/tomcat/webapps/ROOT/pages</volume>
-                                            </bind>
-                                        </volumes>
-                                    </run>
-                                </image>
-                                <image>
-                                    <alias>demo-tt-database</alias>
-                                    <name>demo-tt-database:${project.version}</name>
-                                    <build>
-                                        <contextDir>${project.basedir}/src/main/docker/database</contextDir>
-                                    </build>
-                                    <run>
-                                        <ports>
-                                            <!-- Expose the database to outside tools (e.g., pgAdmin) -->
-                                            <port>15432:5432</port>
-                                        </ports>
-                                        <wait>
-                                            <log>database system is ready to accept connections</log>
-                                            <time>20000</time>
-                                        </wait>
-                                    </run>
-                                </image>
-                                <image>
-                                    <alias>demo-tt-frontend</alias>
-                                    <name>demo-tt-frontend:${project.version}</name>
-                                    <build>
-                                        <contextDir>${project.basedir}/src/main/docker/frontend</contextDir>
-                                        <assembly>
-                                            <descriptor>${project.basedir}/src/main/docker/frontend/assembly.xml</descriptor>
-                                        </assembly>
-                                    </build>
-                                    <run>
-                                        <skip>true</skip>
-                                        <ports>
-                                            <port>frontend.port:80</port>
-                                        </ports>
-                                    </run>
-                                </image>
-                                <image>
-                                    <alias>demo-tt-backend</alias>
-                                    <name>demo-tt-backend:${project.version}</name>
-                                    <build>
-                                        <contextDir>${project.basedir}/src/main/docker/application/backend-only</contextDir>
-                                    </build>
-                                    <run>
-                                        <skip>true</skip>
-                                        <ports>
-                                            <port>tomcat.port:8080</port>
-                                        </ports>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>docker:build</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

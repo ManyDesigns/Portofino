@@ -23,15 +23,16 @@ package com.manydesigns.portofino.database.platforms;
 import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.ConnectionProvider;
 import com.manydesigns.portofino.database.model.platforms.AbstractDatabasePlatform;
-import com.manydesigns.portofino.persistence.hibernate.ColumnParameterType;
-import org.hibernate.dialect.PostgreSQL82Dialect;
-import org.hibernate.usertype.DynamicParameterizedType;
+import com.manydesigns.portofino.model.Annotation;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -46,13 +47,13 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     public final static String DESCRIPTION = "PostgreSQL";
     public final static String STANDARD_DRIVER_CLASS_NAME =
             "org.postgresql.Driver";
-    
+
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
     public PostgreSQLDatabasePlatform() {
-        super(PostgreSQL82Dialect.class.getName(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
+        super(PostgreSQLDialect.class.getName(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
     }
 
     //**************************************************************************
@@ -72,20 +73,15 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     }
 
     @Override
-    public TypeDescriptor getDatabaseSpecificType(Column column) {
+    public List<Annotation> getAdditionalAnnotations(Column column) {
         if ("JSONB".equalsIgnoreCase(column.getColumnType())) {
-            Properties typeParams = new Properties();
-            if(column.getActualJavaType() == Map.class) {
-                typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Map.class));
-                return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonUserType", typeParams);
-            } else if(column.getActualJavaType() == List.class) {
-                typeParams.put(DynamicParameterizedType.PARAMETER_TYPE, new ColumnParameterType(column, Object.class));
-                return new TypeDescriptor("com.marvinformatics.hibernate.json.JsonListUserType", typeParams);
-            } else {
-                logger.warn("Unsupported column data type: " + column.getActualJavaType());
-            }
+            Annotation annotation = new Annotation();
+            annotation.setType(JdbcTypeCode.class.getName());
+            annotation.setPropertyValue("value", SqlTypes.JSON + "");
+            return Collections.singletonList(annotation);
+        } else {
+            return super.getAdditionalAnnotations(column);
         }
-        return super.getDatabaseSpecificType(column);
     }
 
     @Override
@@ -93,5 +89,13 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
         List<String[]> schemaNames = super.getSchemaNames(databaseMetaData);
         schemaNames.removeIf(schema -> "information_schema".equalsIgnoreCase(schema[1]) || schema[1].startsWith("pg_"));
         return schemaNames;
+    }
+
+    @Override
+    protected Class<? extends Number> getDefaultNumericType(Integer precision) {
+        if(precision != null && precision == 131089) {
+            return BigDecimal.class; //Postgres bug - #925
+        }
+        return super.getDefaultNumericType(precision);
     }
 }

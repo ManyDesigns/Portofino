@@ -7,18 +7,13 @@ import com.manydesigns.elements.messages.RequestMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.*;
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.model.Annotation;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.persistence.Persistence;
-import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
-import com.manydesigns.portofino.resourceactions.ActionInstance;
+import com.manydesigns.portofino.resourceactions.crud.CrudAction;
 import com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -40,6 +35,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -93,7 +89,7 @@ public class UpstairsAction extends AbstractResourceAction {
         Map<String, Object> info = new HashMap<>();
         info.put("version", Module.getPortofinoVersion());
         List<ModuleInfo> modules = new ArrayList<>();
-        for(Module module : applicationContext.getBeansOfType(Module.class).values()) {
+        for(Module module : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, Module.class).values()) {
             ModuleInfo view = new ModuleInfo();
             view.moduleClass = module.getClass().getName();
             view.name = module.getName();
@@ -170,7 +166,7 @@ public class UpstairsAction extends AbstractResourceAction {
 
     @POST
     @Path("application/security")
-    public void createSecurityGrooyv(WizardInfo wizard) {
+    public void configureModelDrivenUserManagement(WizardInfo wizard) {
         String databaseName = (String) (wizard.connectionProvider).get("name");
         Database database = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), databaseName);
         if(database == null) {
@@ -203,7 +199,7 @@ public class UpstairsAction extends AbstractResourceAction {
                 persistence.getDatabases(), tableInfo.database, tableInfo.schema, tableInfo.table.getTableName());
     }
 
-    protected ActionDescriptor createCrudAction(
+    protected CrudAction<Object> createCrudAction(
             ConnectionProvider connectionProvider, FileObject dir, Table table, Template template,
             Table userTable, Column userPasswordColumn, List<Map> createdPages) throws Exception {
         String query = "from " + table.getActualEntityName() + " order by id desc";
@@ -212,10 +208,12 @@ public class UpstairsAction extends AbstractResourceAction {
         bindings.put("parentName", "");
         bindings.put("parentProperty", "nothing");
         bindings.put("linkToParentProperty", NO_LINK_TO_PARENT);
-        return createCrudAction(connectionProvider, dir, table, query, template, bindings, userTable, userPasswordColumn, createdPages, 1);
+        return createCrudAction(
+                connectionProvider, dir, table, query, template, bindings, userTable, userPasswordColumn,
+                createdPages, 1);
     }
 
-    protected ActionDescriptor createCrudAction(
+    protected CrudAction<Object> createCrudAction(
             ConnectionProvider connectionProvider,
             FileObject dir, Table table, String query,
             Template template, Map<String, String> bindings, Table userTable, Column userPasswordColumn, List<Map> createdPages, int depth)
@@ -223,70 +221,70 @@ public class UpstairsAction extends AbstractResourceAction {
         if(dir.exists()) {
             RequestMessages.addWarningMessage(
                     ElementsThreadLocals.getText("directory.exists.page.not.created._", dir.getName().getPath()));
-        } else {
-            dir.createFolder();
-            logger.info("Creating CRUD action {}", dir.getName().getPath());
-            CrudConfiguration configuration = new CrudConfiguration();
-            configuration.setDatabase(table.getDatabaseName());
-            configuration.setupDefaults();
-            configuration.setQuery(query);
-            String variable = table.getActualEntityName();
-            configuration.setVariable(variable);
-            detectLargeResultSet(connectionProvider, table, configuration);
-
-            configuration.setName(table.getActualEntityName());
-
-            int summ = 0;
-            String linkToParentProperty = bindings.get("linkToParentProperty");
-            for(Column column : table.getColumns()) {
-                String name = column.getColumnName();
-                boolean isPassword =
-                        column.equals(userPasswordColumn) ||
-                        (column.getActualJavaType() == String.class &&
-                                ("password".equalsIgnoreCase(name) || "pwd".equalsIgnoreCase(name)));
-                summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, isPassword);
-            }
-
-            ActionLogic.saveConfiguration(dir, configuration);
-            ActionDescriptor action = new ActionDescriptor();
-            ActionLogic.saveActionDescriptor(dir, action);
-            FileObject actionFile = dir.resolveFile("action.groovy");
-            try(Writer fileWriter = new OutputStreamWriter(actionFile.getContent().getOutputStream())) {
-                template.make(bindings).writeTo(fileWriter);
-            }
-
-            logger.debug("Creating _detail directory");
-            FileObject detailDir = dir.resolveFile(ActionInstance.DETAIL);
-            if(detailDir.exists() && detailDir.getType() != FileType.FOLDER) {
-                logger.warn("Invalid detail directory {}", detailDir.getName().getPath());
-                RequestMessages.addWarningMessage(
-                        ElementsThreadLocals.getText("invalid.detail.directory", detailDir.getName().getPath()));
-            } else {
-                detailDir.createFolder();
-            }
-
-            String path = dir.getName().getBaseName();
-            FileObject parent = dir.getParent().getParent(); //two because of _detail
-            for(int i = 1; i < depth; i++) {
-                path = parent.getName().getBaseName() + "/" + ActionInstance.DETAIL + "/" + path;
-                parent = parent.getParent().getParent();
-            }
-            Map<String, Object> pageInfo = new HashMap<>();
-            pageInfo.put("path", path);
-            pageInfo.put("detail", depth > 1);
-            pageInfo.put("type", "crud");
-            pageInfo.put("title", Util.guessToWords(dir.getName().getBaseName()));
-            createdPages.add(pageInfo);
-
-            if(depth < maxDepth) {
-                List<Reference> children = computeChildren(table);
-                for(Reference ref : children) {
-                    createChildCrudAction(connectionProvider, dir, template, variable, children, ref, userTable, userPasswordColumn, createdPages, depth);
-                }
-            }
-            return action;
+            return null;
         }
-        return null;
+        dir.createFolder();
+        logger.info("Creating CRUD action {}", dir.getName().getPath());
+        CrudConfiguration configuration = new CrudConfiguration();
+        configuration.setDatabase(table.getDatabaseName());
+        configuration.setupDefaults();
+        configuration.setQuery(query);
+        String variable = table.getActualEntityName();
+        configuration.setVariable(variable);
+        detectLargeResultSet(connectionProvider, table, configuration);
+
+        configuration.setName(table.getActualEntityName());
+
+        int summ = 0;
+        String linkToParentProperty = bindings.get("linkToParentProperty");
+        for(Column column : table.getColumns()) {
+            String name = column.getColumnName();
+            boolean isPassword =
+                    column.equals(userPasswordColumn) ||
+                    (column.getActualJavaType() == String.class &&
+                            ("password".equalsIgnoreCase(name) || "pwd".equalsIgnoreCase(name)));
+            summ = setupColumn(connectionProvider, column, configuration, summ, linkToParentProperty, isPassword);
+        }
+
+        CrudAction<Object> crudAction = new CrudAction<>();
+        autowire(crudAction);
+        crudAction.crudConfiguration = configuration;
+        crudAction.saveConfiguration();
+        FileObject actionFile = dir.resolveFile("action.groovy");
+        try(Writer fileWriter = new OutputStreamWriter(actionFile.getContent().getOutputStream())) {
+            template.make(bindings).writeTo(fileWriter);
+        }
+
+        logger.debug("Creating _detail directory");
+        FileObject detailDir = dir.resolveFile(AbstractResourceAction.DETAIL);
+        if(detailDir.exists() && detailDir.getType() != FileType.FOLDER) {
+            logger.warn("Invalid detail directory {}", detailDir.getName().getPath());
+            RequestMessages.addWarningMessage(
+                    ElementsThreadLocals.getText("invalid.detail.directory", detailDir.getName().getPath()));
+        } else {
+            detailDir.createFolder();
+        }
+
+        String path = dir.getName().getBaseName();
+        FileObject parent = dir.getParent().getParent(); //two because of _detail
+        for(int i = 1; i < depth; i++) {
+            path = parent.getName().getBaseName() + "/" + AbstractResourceAction.DETAIL + "/" + path;
+            parent = parent.getParent().getParent();
+        }
+        Map<String, Object> pageInfo = new HashMap<>();
+        pageInfo.put("path", path);
+        pageInfo.put("detail", depth > 1);
+        pageInfo.put("type", "crud");
+        pageInfo.put("title", Util.guessToWords(dir.getName().getBaseName()));
+        createdPages.add(pageInfo);
+
+        if(depth < maxDepth) {
+            List<Reference> children = computeChildren(table);
+            for(Reference ref : children) {
+                createChildCrudAction(connectionProvider, dir, template, variable, children, ref, userTable, userPasswordColumn, createdPages, depth);
+            }
+        }
+        return crudAction;
     }
 
     protected List<Reference> computeChildren(Table table) {
@@ -332,7 +330,7 @@ public class UpstairsAction extends AbstractResourceAction {
         if (multipleRoles) {
             childDirName += "-as-" + linkToParentProperty;
         }
-        FileObject childDir = dir.resolveFile(ActionInstance.DETAIL).resolveFile(childDirName);
+        FileObject childDir = dir.resolveFile(AbstractResourceAction.DETAIL).resolveFile(childDirName);
 
         Map<String, String> bindings = new HashMap<>();
         bindings.put("generatedClassName",  "CrudAction_" + RandomUtil.createRandomId());
@@ -609,17 +607,17 @@ public class UpstairsAction extends AbstractResourceAction {
                 bindings.put("parentProperty", "primaryPrincipal.id");
                 bindings.put("linkToParentProperty", linkToUserProperty);
 
-                ActionDescriptor action = createCrudAction(
-                        connectionProvider, dir, fromTable, childQuery, template, bindings, null, null,
-                        createdPages, 1);
+                ResourceAction action = createCrudAction(
+                        connectionProvider, dir, fromTable, childQuery, template, bindings,
+                        null, null, createdPages, 1);
                 if(action != null) {
                     Group group = new Group();
-                    group.setName(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
-                    group.setAccessLevel(AccessLevel.DENY.name());
+                    group.setName(SecurityLogic.getAnonymousGroup(portofinoConfiguration.getProperties()));
+                    group.setAccessLevelName(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);
-                    action.setPermissions(permissions);
-                    ActionLogic.saveActionDescriptor(dir, action);
+                    action.getActionInstance().getConfiguration().setPermissions(permissions);
+                    action.saveConfiguration();
                 }
             }
         }

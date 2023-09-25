@@ -99,7 +99,9 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
         try {
             return doEnsureDelegate();
         } catch (Exception e) {
-            throw new Error("Security.groovy not found or not loadable", e);
+            logger.info("Security.groovy not found or not loadable");
+            logger.debug("Could not load Security.groovy because", e);
+            return new ModelBasedRealm();
         }
     }
 
@@ -153,7 +155,7 @@ public class SecurityClassRealm implements PortofinoRealm, Initializable, Destro
     //--------------------------------------------------------------------------
     // PortofinoRealm implementation
     //--------------------------------------------------------------------------
-    
+
     @Override
     public void verifyUser(Serializable user) {
         ensureDelegate().verifyUser(user);

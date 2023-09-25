@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.quartz.PortofinoJobFactory;
 import com.manydesigns.portofino.quartz.SchedulerService;
 import org.apache.commons.configuration2.Configuration;
@@ -34,12 +35,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.servlet.ServletContext;
 import java.util.Date;
 
-/*
+/**
+ * Module enabling support for the Quartz scheduler.
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -54,7 +56,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
     //**************************************************************************
 
     @Autowired
-    public Configuration configuration;
+    public ConfigurationSource configuration;
 
     @Autowired
     public ServletContext servletContext;
@@ -89,6 +91,7 @@ public class QuartzModule implements Module, ApplicationContextAware {
     public void init() {
         StdSchedulerFactory factory;
         try {
+            Configuration configuration = this.configuration.getProperties();
             String configFile = configuration.getString("quartz.config-file");
             startOnLoad = configuration.getBoolean("quartz.start-on-load", true);
             waitOnShutdown = configuration.getBoolean("quartz.wait-on-shutdown", true);

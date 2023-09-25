@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.persistence;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.database.model.ForeignKey;
@@ -28,6 +27,7 @@ import com.manydesigns.portofino.database.model.PrimaryKey;
 import com.manydesigns.portofino.database.model.annotations.JDBCConnection;
 import com.manydesigns.portofino.database.model.annotations.JNDIConnection;
 import com.manydesigns.portofino.database.model.annotations.SelectionProvider;
+import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.database.multitenancy.MultiTenant;
 import com.manydesigns.portofino.liquibase.VFSResourceAccessor;
 import com.manydesigns.portofino.model.*;
@@ -38,7 +38,8 @@ import com.manydesigns.portofino.model.annotations.Id;
 import com.manydesigns.portofino.model.annotations.KeyMappings;
 import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.modules.DatabaseModule;
-import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
+import com.manydesigns.portofino.persistence.hibernate.Events;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryAndCodeBase;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
 import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancyImplementation;
@@ -47,19 +48,17 @@ import com.manydesigns.portofino.persistence.hibernate.multitenancy.MultiTenancy
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.reflection.ViewAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.resource.CompositeResourceAccessor;
 import liquibase.resource.ResourceAccessor;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.*;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.*;
 import org.hibernate.Session;
@@ -69,9 +68,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -88,24 +87,25 @@ public class Persistence {
     //**************************************************************************
 
     public static final String LIQUIBASE_CONTEXT = "liquibase.context";
-    public final static String changelogFileNameTemplate = "liquibase.changelog.xml";
+    public static final String CHANGELOG_FILE_NAME_TEMPLATE = "liquibase.changelog.";
+    public static final String DATABASES_DOMAIN_NAME = "databases";
+    public static final String LEGACY_MODEL_DIRECTORY = "portofino-model";
 
     //**************************************************************************
     // Fields
     //**************************************************************************
 
     protected final DatabasePlatformsRegistry databasePlatformsRegistry;
-    protected final Map<String, HibernateDatabaseSetup> setups;
+    protected final Map<String, DatabaseAccessor> accessors;
     protected final LinkedList<Database> databases = new LinkedList<>();
 
-    protected final Configuration configuration;
+    protected final ConfigurationSource configuration;
     protected final ModelService modelService;
-    protected final Domain databasesDomain;
     @Autowired
     protected MultiTenancyImplementationFactory multiTenancyImplementationFactory = MultiTenancyImplementationFactory.DEFAULT;
     public final BehaviorSubject<Status> status = BehaviorSubject.create();
     public final PublishSubject<DatabaseSetupEvent> databaseSetupEvents = PublishSubject.create();
-    protected Disposable modelEventsSubscription;
+    protected boolean convertLegacyModel = true; // If false (during testing), don't delete the legacy model
 
     public enum Status {
         STARTING, STARTED, STOPPING, STOPPED
@@ -115,14 +115,13 @@ public class Persistence {
     public static final Logger logger = LoggerFactory.getLogger(Persistence.class);
 
     public Persistence(
-            ModelService modelService, Domain databasesDomain, Configuration configuration,
+            ModelService modelService, ConfigurationSource configuration,
             DatabasePlatformsRegistry databasePlatformsRegistry)
             throws FileSystemException {
         this.modelService = modelService;
         this.configuration = configuration;
         this.databasePlatformsRegistry = databasePlatformsRegistry;
-        this.databasesDomain = databasesDomain;
-        setups = new HashMap<>();
+        accessors = new HashMap<>();
     }
 
     //**************************************************************************
@@ -132,20 +131,30 @@ public class Persistence {
     protected boolean tryLoadingLegacyModel() {
         synchronized (modelService) {
             try {
-                XMLModel modelIO = new XMLModel(modelService.getModelDirectory(), this);
-                Model model = modelService.loadModel(modelIO);
+                FileObject modelDirectory =
+                        modelService.getApplicationDirectory().resolveFile(LEGACY_MODEL_DIRECTORY);
+                XMLModel modelIO = new XMLModel(modelDirectory, this);
+                Model model = modelIO.load();
                 if(model != null) {
                     modelIO.getDatabases().forEach(
                             newDb -> {
                                 String databaseName = newDb.getDatabaseName();
                                 databases.removeIf(oldDb -> oldDb.getDatabaseName().equals(databaseName));
-                                getDatabaseDomains().removeIf(d -> d.getName().equals(databaseName));
-                                databases.add(newDb);
-                                getDatabaseDomains().add(newDb.getModelElement());
+                                model.getDomains().removeIf(d -> d.getName().equals(databaseName));
                             });
-                    model.getDomains().clear();
-                    model.getDomains().add(databasesDomain);
-                    logger.info("Loaded legacy XML model. It will be converted to the new format upon save.");
+                    modelIO.getDatabases().forEach(
+                            newDb -> {
+                                getDatabaseDomains().add(newDb.getModelElement());
+                                databases.add(newDb);
+                                copyLiquibaseChangelogs(modelDirectory, newDb);
+                            });
+                    logger.info("Loaded legacy XML model");
+                    initModel();
+                    if (convertLegacyModel) {
+                        saveModel();
+                        modelIO.delete();
+                        logger.info("Converted legacy XML model to the new format");
+                    }
                     return true;
                 }
             } catch (Exception e) {
@@ -155,8 +164,67 @@ public class Persistence {
         return false;
     }
 
-    private EList<Domain> getDatabaseDomains() {
-        return databasesDomain.getSubdomains();
+    protected void copyLiquibaseChangelogs(FileObject modelDirectory, Database db)  {
+        try {
+            FileObject dbDir = modelDirectory.getChild(db.getName());
+            for (Schema schema : db.getSchemas()) {
+                FileObject schemaDir = dbDir.getChild(schema.getName());
+                if (schemaDir != null && schemaDir.getType() == FileType.FOLDER) {
+                    for (FileObject child : schemaDir.getChildren()) {
+                        String fileName = child.getName().getBaseName();
+                        if (fileName.startsWith(CHANGELOG_FILE_NAME_TEMPLATE)) {
+                            FileObject domainDirectory = modelService.getDomainDirectory(schema.getModelElement());
+                            if (!domainDirectory.exists()) {
+                                domainDirectory.createFolder();
+                            }
+                            if (domainDirectory.getType() == FileType.FOLDER) {
+                                if (convertLegacyModel) {
+                                    child.moveTo(domainDirectory.resolveFile(fileName));
+                                } else {
+                                    domainDirectory.copyFrom(child.getParent(), new FileSelector() {
+                                        @Override
+                                        public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
+                                            return fileInfo.getFile().getPath().equals(child.getPath());
+                                        }
+
+                                        @Override
+                                        public boolean traverseDescendents(FileSelectInfo fileInfo) throws Exception {
+                                            return true;
+                                        }
+                                    });
+                                }
+                            } else {
+                                logger.error(
+                                        "Could not copy Liquibase changelog " + child.getName().getPath() + " to " +
+                                                domainDirectory.getName().getPath() + " because it's not a directory.");
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.warn("Could not copy liquibase changelog(s) for database " + db.getName(), e);
+        }
+    }
+
+    public void saveModel() throws IOException {
+        modelService.saveDomain(getDatabaseDomain());
+    }
+
+    public void saveDatabase(Database database) throws IOException {
+        modelService.saveDomain(database.getModelElement());
+    }
+
+    protected Domain getDatabaseDomain() {
+        try {
+            return modelService.ensureTopLevelDomain(DATABASES_DOMAIN_NAME, !convertLegacyModel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected EList<Domain> getDatabaseDomains() {
+        return getDatabaseDomain().getSubdomains();
     }
 
     private void annotateDatabase(Database db) {
@@ -176,6 +244,7 @@ public class Persistence {
     }
 
     protected Database setupDatabase(Domain domain) {
+        logger.info("Setting up database " + domain.getQualifiedName());
         //Can't use getJavaAnnotation as they've not yet been resolved
         EAnnotation ann = domain.getEAnnotation(JDBCConnection.class.getName());
         ConnectionProvider connectionProvider = null;
@@ -214,7 +283,7 @@ public class Persistence {
     protected Schema setupSchema(Database database, Domain domain) {
         Schema schema = new Schema(domain);
         schema.setDatabase(database);
-        database.getSchemas().add(schema);
+        database.addSchema(schema);
         EAnnotation schemaAnn =
                 domain.getEAnnotation(com.manydesigns.portofino.database.model.annotations.Schema.class.getName());
         if(schemaAnn != null) {
@@ -299,14 +368,16 @@ public class Persistence {
     public void runLiquibase(Database database) {
         logger.info("Updating database definitions");
         FileObject appDir = modelService.getApplicationDirectory();
-        ResourceAccessor resourceAccessor = new VFSResourceAccessor(appDir);
+        ResourceAccessor resourceAccessor = new CompositeResourceAccessor(
+                new VFSResourceAccessor(appDir), new ClassLoaderResourceAccessor()
+        );
         ConnectionProvider connectionProvider = database.getConnectionProvider();
         for(Schema schema : database.getSchemas()) {
             String schemaName = schema.getSchemaName();
             try(Connection connection = connectionProvider.acquireConnection()) {
                 FileObject changelogFile = getLiquibaseChangelogFile(schema);
-                if(changelogFile.getType() != FileType.FILE) {
-                    logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
+                if(changelogFile == null || changelogFile.getType() != FileType.FILE) {
+                    logger.debug("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
                     continue;
                 }
                 logger.info("Running changelog file: {}", changelogFile);
@@ -315,11 +386,11 @@ public class Persistence {
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                 lqDatabase.setDefaultSchemaName(schema.getActualSchemaName());
                 String relativeChangelogPath = appDir.getName().getRelativeName(changelogFile.getName());
-                Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase);
-
-                String[] contexts = configuration.getStringArray(LIQUIBASE_CONTEXT);
-                logger.info("Using context {}", Arrays.toString(contexts));
-                lq.update(new Contexts(contexts));
+                try(Liquibase lq = new Liquibase(relativeChangelogPath, resourceAccessor, lqDatabase)) {
+                    String[] contexts = configuration.getProperties().getStringArray(LIQUIBASE_CONTEXT);
+                    logger.info("Using context {}", Arrays.toString(contexts));
+                    lq.update(new Contexts(contexts));
+                }
             } catch (Exception e) {
                 logger.error("Couldn't update database: " + schemaName, e);
             }
@@ -327,22 +398,21 @@ public class Persistence {
     }
 
     public synchronized void initModel() {
-        logger.info("Cleaning up old setups");
+        getDatabaseDomains().forEach(this::setupDatabase);
         closeSessions();
-        for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
+        for (Map.Entry<String, DatabaseAccessor> current : accessors.entrySet()) {
             String databaseName = current.getKey();
-            logger.debug("Cleaning up old setup for: {}", databaseName);
-            HibernateDatabaseSetup setup = current.getValue();
+            logger.debug("Cleaning up old accessor for: {}", databaseName);
+            DatabaseAccessor accessor = current.getValue();
             try {
-                setup.dispose();
+                accessor.dispose();
             } catch (Throwable t) {
                 logger.warn("Cannot close session factory for: " + databaseName, t);
             }
-            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, setup));
+            databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.REMOVED, accessor));
         }
         //TODO it would perhaps be preferable that we generated REPLACED events here rather than REMOVED followed by ADDED
-        setups.clear();
-        modelService.getModel().init();
+        accessors.clear();
         for (Database database : databases) {
             initDatabase(database);
         }
@@ -354,8 +424,7 @@ public class Persistence {
 
     public synchronized void removeDatabase(Database database) {
         databases.remove(database);
-        EPackage pkg = database.getModelElement();
-        getDatabaseDomains().remove(pkg);
+        getDatabaseDomains().remove(database.getModelElement());
     }
 
     public void addDatabase(Database database) {
@@ -365,8 +434,8 @@ public class Persistence {
 
     protected boolean initDatabase(Database database) {
         new ResetVisitor().visit(database);
-        new InitVisitor(databases, configuration).visit(database);
-        new LinkVisitor(databases, configuration).visit(database);
+        new InitVisitor(databases, configuration.getProperties()).visit(database);
+        new LinkVisitor(databases, configuration.getProperties()).visit(database);
         Boolean enabled = database.getJavaAnnotation(Enabled.class).map(Enabled::value).orElse(true);
         if(enabled) {
             initConnectionProvider(database);
@@ -384,21 +453,23 @@ public class Persistence {
             connectionProvider.init(databasePlatformsRegistry);
             if (connectionProvider.getStatus().equals(ConnectionProvider.STATUS_CONNECTED)) {
                 MultiTenancyImplementation implementation = getMultiTenancyImplementation(database);
-                SessionFactoryBuilder builder = new SessionFactoryBuilder(database, configuration, implementation);
+                Events events = new Events();
+                SessionFactoryBuilder builder =
+                        new SessionFactoryBuilder(database, configuration.getProperties(), events, implementation);
                 SessionFactoryAndCodeBase sessionFactoryAndCodeBase = builder.buildSessionFactory();
-                HibernateDatabaseSetup setup =
-                        new HibernateDatabaseSetup(
+                DatabaseAccessor accessor =
+                        new DatabaseAccessor(
                                 database, sessionFactoryAndCodeBase.sessionFactory,
-                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(), configuration,
-                                implementation);
+                                sessionFactoryAndCodeBase.codeBase, builder.getEntityMode(),
+                                configuration.getProperties(), events, implementation);
                 String databaseName = database.getDatabaseName();
-                HibernateDatabaseSetup oldSetup = setups.get(databaseName);
-                setups.put(databaseName, setup);
-                if(oldSetup != null) {
-                    oldSetup.dispose();
-                    databaseSetupEvents.onNext(new DatabaseSetupEvent(oldSetup, setup));
+                DatabaseAccessor oldAccessor = accessors.get(databaseName);
+                accessors.put(databaseName, accessor);
+                if(oldAccessor != null) {
+                    oldAccessor.dispose();
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(oldAccessor, accessor));
                 } else {
-                    databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.ADDED, setup));
+                    databaseSetupEvents.onNext(new DatabaseSetupEvent(DatabaseSetupEvent.ADDED, accessor));
                 }
             }
         } catch (Exception e) {
@@ -453,7 +524,7 @@ public class Persistence {
         return null;
     }
 
-    public Configuration getConfiguration() {
+    public ConfigurationSource getConfiguration() {
         return configuration;
     }
 
@@ -470,7 +541,7 @@ public class Persistence {
         if(sourceDatabase == null) {
             throw new IllegalArgumentException("Database " + databaseName + " does not exist");
         }
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+        if(configuration.getProperties().getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
             runLiquibase(sourceDatabase);
         } else {
             logger.debug("syncDataModel called, but Liquibase is not enabled");
@@ -487,33 +558,38 @@ public class Persistence {
     //**************************************************************************
 
     public Session getSession(String databaseName) {
-        return ensureDatabaseSetup(databaseName).getThreadSession();
+        return ensureDatabaseAccessor(databaseName).getThreadSession();
     }
 
-    protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
-        HibernateDatabaseSetup setup = getDatabaseSetup(databaseName);
-        if (setup == null) {
+    protected DatabaseAccessor ensureDatabaseAccessor(String databaseName) {
+        DatabaseAccessor accessor = getDatabaseAccessor(databaseName);
+        if (accessor == null) {
             //TODO use proper exception
-            throw new Error("No setup exists for database: " + databaseName);
+            throw new Error("No accessor exists for database: " + databaseName);
         }
-        return setup;
+        return accessor;
     }
 
-    public HibernateDatabaseSetup getDatabaseSetup(String databaseName) {
-        return setups.get(databaseName);
+    @Deprecated
+    public DatabaseAccessor getDatabaseSetup(String databaseName) {
+        return getDatabaseAccessor(databaseName);
+    }
+
+    public DatabaseAccessor getDatabaseAccessor(String databaseName) {
+        return accessors.get(databaseName);
     }
 
     public void closeSessions() {
-        for (HibernateDatabaseSetup current : setups.values()) {
+        for (DatabaseAccessor current : accessors.values()) {
             closeSession(current);
         }
     }
 
     public void closeSession(String databaseName) {
-        closeSession(ensureDatabaseSetup(databaseName));
+        closeSession(ensureDatabaseAccessor(databaseName));
     }
 
-    protected void closeSession(HibernateDatabaseSetup current) {
+    protected void closeSession(DatabaseAccessor current) {
         Session session = current.getThreadSession(false);
         if (session != null) {
             try {
@@ -548,20 +624,9 @@ public class Persistence {
 
     public void start() {
         status.onNext(Status.STARTING);
-        loadModel();
-        AtomicBoolean loading = new AtomicBoolean(false);
-        modelEventsSubscription = modelService.modelEvents.subscribe(evt -> {
-            if(evt == ModelService.EventType.LOADED) {
-                if(!loading.get()) try {
-                    loading.set(true);
-                    loadModel();
-                } finally {
-                    loading.set(false);
-                }
-            } else if (evt == ModelService.EventType.SAVED) {
-                new XMLModel(modelService.getModelDirectory(), this).delete();
-            }
-        });
+        if (!tryLoadingLegacyModel()) {
+            initModel();
+        }
         for(Database database : databases) {
             if(ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 runLiquibase(database);
@@ -570,21 +635,11 @@ public class Persistence {
         status.onNext(Status.STARTED);
     }
 
-    public void loadModel() {
-        if (!tryLoadingLegacyModel()) {
-            getDatabaseDomains().forEach(this::setupDatabase);
-        }
-        initModel();
-    }
-
     public void stop() {
         status.onNext(Status.STOPPING);
         closeSessions();
-        if (modelEventsSubscription != null) {
-            modelEventsSubscription.dispose();
-        }
-        for(HibernateDatabaseSetup setup : setups.values()) {
-            setup.dispose();
+        for(DatabaseAccessor accessor : accessors.values()) {
+            accessor.dispose();
         }
         for (Database database : databases) {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
@@ -599,39 +654,41 @@ public class Persistence {
     // App directories and files
     //**************************************************************************
 
-    public String getName() {
-        return getConfiguration().getString(PortofinoProperties.APP_NAME);
-    }
-
     public FileObject getLiquibaseChangelogFile(Schema schema) throws FileSystemException {
         if(schema == null) {
             return null;
         }
-        FileObject dbDir = modelService.getModelDirectory().resolveFile(schema.getDatabaseName());
-        FileObject schemaDir = dbDir.resolveFile(schema.getSchemaName());
-        return schemaDir.resolveFile(changelogFileNameTemplate);
+        FileObject schemaDir = modelService.getDomainDirectory(schema.getModelElement());
+        if (schemaDir.getType() == FileType.FOLDER) {
+            for (FileObject child : schemaDir.getChildren()) {
+                if (child.getName().getBaseName().startsWith(CHANGELOG_FILE_NAME_TEMPLATE)) {
+                    return child;
+                }
+            }
+        }
+        return null;
     }
 
     public static class DatabaseSetupEvent {
         public static final int ADDED = +1, REMOVED = -1, REPLACED = 0;
 
-        public DatabaseSetupEvent(int type, HibernateDatabaseSetup setup) {
+        public DatabaseSetupEvent(int type, DatabaseAccessor accessor) {
             if(type == 0) {
                 throw new IllegalArgumentException();
             }
             this.type = type;
-            this.setup = setup;
+            this.accessor = accessor;
         }
 
-        public DatabaseSetupEvent(HibernateDatabaseSetup setup, HibernateDatabaseSetup oldSetup) {
-            this.setup = setup;
-            this.oldSetup = oldSetup;
+        public DatabaseSetupEvent(DatabaseAccessor accessor, DatabaseAccessor oldAccessor) {
+            this.accessor = accessor;
+            this.oldAccessor = oldAccessor;
             type = REPLACED;
         }
 
         public int type;
-        public HibernateDatabaseSetup setup;
-        public HibernateDatabaseSetup oldSetup;
+        public DatabaseAccessor accessor;
+        public DatabaseAccessor oldAccessor;
     }
 
     public MultiTenancyImplementationFactory getMultiTenancyImplementationFactory() {
@@ -643,6 +700,14 @@ public class Persistence {
     }
 
     public List<Database> getDatabases() {
-        return databases;
+        return Collections.unmodifiableList(databases);
+    }
+
+    public boolean isConvertLegacyModel() {
+        return convertLegacyModel;
+    }
+
+    public void setConvertLegacyModel(boolean convertLegacyModel) {
+        this.convertLegacyModel = convertLegacyModel;
     }
 }

@@ -31,7 +31,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.annotations.DateFormat;
-import com.manydesigns.elements.fields.search.BaseCriteria;
+import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.fields.search.DateSearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -83,10 +83,10 @@ public class DateSearchFieldTest extends AbstractElementsTest {
         assertEquals(new DateTime(date.getTime()), dateTime);
         assertEquals(maxDate, dateField.getMaxStringValue());
 
-        BaseCriteria criteria = new BaseCriteria();
+        Criteria criteria = new Criteria();
         dateField.configureCriteria(criteria);
-        assertEquals (dateField.getMinValue(), ((BaseCriteria.BetweenCriterion) criteria.get(0)).getMin());
-        assertEquals (dateField.getMaxValue(), ((BaseCriteria.BetweenCriterion) criteria.get(0)).getMax());
+        assertEquals (dateField.getMinValue(), ((Criteria.BetweenCriterion) criteria.get(0)).getMin());
+        assertEquals (dateField.getMaxValue(), ((Criteria.BetweenCriterion) criteria.get(0)).getMax());
 
         //Invers
         request.setParameter("date_min", maxDate);
@@ -102,10 +102,10 @@ public class DateSearchFieldTest extends AbstractElementsTest {
         assertEquals(new DateTime(date.getTime()), dateTime);
         assertEquals(minDate, dateField.getMaxStringValue());
 
-        criteria = new BaseCriteria();
+        criteria = new Criteria();
         dateField.configureCriteria(criteria);
-        assertEquals (dateField.getMinValue(), ((BaseCriteria.BetweenCriterion) criteria.get(0)).getMin());
-        assertEquals (dateField.getMaxValue(), ((BaseCriteria.BetweenCriterion) criteria.get(0)).getMax());
+        assertEquals (dateField.getMinValue(), ((Criteria.BetweenCriterion) criteria.get(0)).getMin());
+        assertEquals (dateField.getMaxValue(), ((Criteria.BetweenCriterion) criteria.get(0)).getMax());
     }
 
     @Test(enabled = false)

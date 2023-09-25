@@ -32,7 +32,7 @@ import java.util.Properties;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PropertiesEntryAccessor implements PropertyAccessor {
+public class PropertiesEntryAccessor<T> implements PropertyAccessor<Properties, T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -78,11 +78,11 @@ public class PropertiesEntryAccessor implements PropertyAccessor {
         return getAnnotations();
     }
 
-    public String get(Object obj) {
-        return ((Properties)obj).getProperty(name);
+    public String get(Properties obj) {
+        return obj.getProperty(name);
     }
 
-    public void set(Object obj, Object value) {
-        ((Properties)obj).setProperty(name, (String)value);
+    public void set(Properties obj, Object value) {
+        obj.setProperty(name, (String)value);
     }
 }

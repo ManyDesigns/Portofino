@@ -43,12 +43,6 @@
             <artifactId>rxjava</artifactId>
             <version>2.2.21</version>
         </dependency>
-        <!-- Groovy is optional -->
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
 </project>

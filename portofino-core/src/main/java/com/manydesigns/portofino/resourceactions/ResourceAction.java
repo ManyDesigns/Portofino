@@ -21,7 +21,11 @@
 package com.manydesigns.portofino.resourceactions;
 
 import com.manydesigns.portofino.dispatcher.security.SecureResource;
+import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.security.SecurityFacade;
+import org.apache.commons.vfs2.FileObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -55,6 +59,10 @@ public interface ResourceAction extends SecureResource {
      */
     ActionInstance getActionInstance();
 
+    default ResourceActionConfiguration getConfiguration() {
+        return getActionInstance().getConfiguration();
+    }
+
     /**
      * Sets the ActionInstance of this element. Invoked automatically by the framework.
      * @param actionInstance the new {@link ActionInstance}.
@@ -81,7 +89,32 @@ public interface ResourceAction extends SecureResource {
      */
     List<String> getAccessibleChildren();
 
-    Object loadConfiguration() throws Exception;
+    Domain getConfigurationDomain();
+
+    /**
+     * Loads this action's configuration.
+     * @return the loaded configuration.
+     * @throws Exception in case the configuration cannot be loaded.
+     */
+    ResourceActionConfiguration loadConfiguration() throws Exception;
+    void setConfiguration(ResourceActionConfiguration configuration);
     void saveConfiguration() throws Exception;
     void configured();
+
+    //Mount points
+    void mount(@NotNull String segment, @NotNull String path) throws Exception;
+
+    default void mount(@NotNull String segment, @NotNull Class<?> actionClass) throws Exception {
+        mount(segment, "res:" + actionClass.getName().replace('.', '/') + ".class");
+    }
+
+    default void mountPackage(@NotNull String segment, @NotNull String packageName) throws Exception {
+        mount(segment, "res:" + packageName.replace('.', '/'));
+    }
+
+    default void mountPackage(@NotNull String segment, @NotNull Package pkg) throws Exception {
+        mountPackage(segment, pkg.getName());
+    }
+
+    void unmount(@NotNull String segment) throws Exception;
 }

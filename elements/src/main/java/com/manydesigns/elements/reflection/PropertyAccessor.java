@@ -28,7 +28,7 @@ import java.lang.reflect.AnnotatedElement;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public interface PropertyAccessor extends AnnotatedElement {
+public interface PropertyAccessor<OBJ, TYPE> extends AnnotatedElement {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -38,15 +38,15 @@ public interface PropertyAccessor extends AnnotatedElement {
     //**************************************************************************
 
     String getName();
-    Class getType();
+    Class<TYPE> getType();
     int getModifiers();
 
     //**************************************************************************
     // Accessors
     //**************************************************************************
 
-    Object get(Object obj);
-    void set(Object obj, Object value);
+    Object get(OBJ obj);
+    void set(OBJ obj, TYPE value);
 
     default boolean isWritable() {
         return true;

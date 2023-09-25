@@ -109,7 +109,6 @@ public class ElementsFilter implements Filter {
 
         try {
             logger.debug("Setting up default OGNL context");
-            ElementsThreadLocals.setupDefaultElementsContext();
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
 
             logger.debug("Creating request attribute mapper");

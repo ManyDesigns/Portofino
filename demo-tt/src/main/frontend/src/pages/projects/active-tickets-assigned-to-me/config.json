@@ -1,8 +1,0 @@
-{
-  "title": "Active tickets assigned to me",
-  "type": "custom",
-  "children": [],
-  "detailChildren": [],
-  "script": "tickets.js",
-  "html": "tickets.html"
-}

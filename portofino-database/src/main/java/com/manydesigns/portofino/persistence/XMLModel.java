@@ -2,11 +2,6 @@ package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.portofino.database.model.*;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.io.ModelIO;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
@@ -14,6 +9,10 @@ import org.apache.commons.vfs2.PatternFileSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-public class XMLModel implements ModelIO {
+public class XMLModel {
 
     public static final String LEGACY_APP_MODEL_FILE = "portofino-model.xml";
     private static final Logger logger = LoggerFactory.getLogger(XMLModel.class);
@@ -36,7 +35,6 @@ public class XMLModel implements ModelIO {
         this.persistence = persistence;
     }
 
-    @Override
     public Model load() throws IOException {
         try {
             Model model;
@@ -47,7 +45,6 @@ public class XMLModel implements ModelIO {
                 logger.error("Loading legacy xml model from single file not supported: {}", appModelFile.getName().getPath());
                 return null;
             } else {
-                logger.info("Loading model from directory: {}", getModelDirectory().getName().getPath());
                 model = new Model();
             }
             FileObject modelDir = getModelDirectory();
@@ -140,13 +137,11 @@ public class XMLModel implements ModelIO {
         return modelDirectory.getParent().resolveFile(LEGACY_APP_MODEL_FILE);
     }
 
-    @Override
     public FileObject getModelDirectory() {
         return modelDirectory;
     }
 
-    @Override
-    public void save(Model model) throws IOException {
+    public void save() throws IOException {
         try {
             JAXBContext jc = createModelJAXBContext();
             Marshaller m = jc.createMarshaller();
@@ -251,7 +246,6 @@ public class XMLModel implements ModelIO {
         });
     }
 
-    @Override
     public void delete() throws IOException {
         FileObject appModelFile = getLegacyModelFile();
         if (appModelFile.exists()) {

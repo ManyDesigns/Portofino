@@ -35,7 +35,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +47,7 @@ import java.util.List;
 */
 
 @XmlRootElement(name = "configuration")
-@XmlType(name = "databaseConfiguration", propOrder = {"database","query","selectionProviders"})
+@XmlType(name = "databaseConfiguration", propOrder = {"database","query","selectionProviders","subscriptionSupport"})
 @XmlAccessorType(value = XmlAccessType.NONE)
 @JsonIgnoreProperties({"persistence", "actualTable", "actualDatabase"})
 public class CrudConfiguration extends com.manydesigns.portofino.resourceactions.crud.configuration.CrudConfiguration {
@@ -62,6 +62,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
 
     protected String database;
     protected String query;
+    protected String subscriptionSupport;
 
     @Autowired
     @Enabled(false)
@@ -106,6 +107,7 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
     //**************************************************************************
 
     public void init() {
+        super.init();
         actualDatabase = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), database);
         if(actualDatabase != null && query != null) { //Query can be null if the user hasn't got permission to see it
             actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
@@ -167,6 +169,17 @@ public class CrudConfiguration extends com.manydesigns.portofino.resourceactions
         this.selectionProviders.clear();
         this.selectionProviders.addAll(selectionProviders);
     }
+
+    @XmlAttribute
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    public String getSubscriptionSupport() {
+        return subscriptionSupport;
+    }
+
+    public void setSubscriptionSupport(String subscriptionSupport) {
+        this.subscriptionSupport = subscriptionSupport;
+    }
+
 
     public Table getActualTable() {
         return actualTable;

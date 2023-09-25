@@ -7,6 +7,7 @@ import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.dispatcher.security.ResourcePermissions;
+import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
 import com.manydesigns.portofino.dispatcher.web.ApplicationRoot;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.jackson.ModelResolver;
@@ -20,7 +21,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import jakarta.ws.rs.Path;
@@ -36,12 +37,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Path("/")
-public class PortofinoApplicationRoot extends ApplicationRoot {
+public class PortofinoApplicationRoot extends DocumentedApiRoot {
 
     @Context
     protected ServletConfig config;
     @Context
     protected Application application;
+    @Context
+    protected ResourceContext resourceContext;
 
     @PostConstruct
     public void init() {
@@ -83,6 +86,13 @@ public class PortofinoApplicationRoot extends ApplicationRoot {
     public void beforeScan(OpenApiReader reader, OpenAPI openAPI) {
         super.beforeScan(reader, openAPI);
         ModelConverters.getInstance().addConverter(new PortofinoModelResolver(Json.mapper()));
+    }
+
+    @Path("")
+    public Object start() throws Exception {
+        Resource root = rootFactory.createRoot();
+        resourceContext.initResource(root);
+        return root.init();
     }
 }
 

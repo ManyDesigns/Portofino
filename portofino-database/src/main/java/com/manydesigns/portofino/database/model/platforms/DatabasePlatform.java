@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2022 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,19 +23,23 @@ package com.manydesigns.portofino.database.model.platforms;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.portofino.database.model.Column;
 import com.manydesigns.portofino.database.model.ConnectionProvider;
+import com.manydesigns.portofino.database.model.Type;
+import com.manydesigns.portofino.model.Annotation;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public interface DatabasePlatform {
+/**
+ * Represents a database platform.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public interface DatabasePlatform extends TypeProvider {
     String copyright = "Copyright (C) 2005-2020 ManyDesigns srl";
 
     String STATUS_CREATED = "created";
@@ -58,15 +62,23 @@ public interface DatabasePlatform {
     String getStatus();
 
     TypeDescriptor getDatabaseSpecificType(Column column);
-    
+
+    List<Annotation> getAdditionalAnnotations(Column column);
+
     void test();
     boolean isApplicable(ConnectionProvider connectionProvider);
     void shutdown(ConnectionProvider connectionProvider);
 
     List<String[]> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException;
-    
+
+    //**************************************************************************
+    // Types
+    //**************************************************************************
+
+    List<TypeProvider> getAdditionalTypeProviders();
+
     class TypeDescriptor {
-        
+
         public final String name;
         public final Properties parameters;
 

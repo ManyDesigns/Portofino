@@ -12,7 +12,9 @@ public class AggregateCodeBaseTest {
         try {
             aggregateCodeBase.loadClass("test");
             fail("Exception expected");
-        } catch (ClassNotFoundException e) {}
+        } catch (ClassNotFoundException e) {
+            // OK
+        }
         aggregateCodeBase.loadClass(AggregateCodeBaseTest.class.getName());
         aggregateCodeBase.clear(true);
         aggregateCodeBase.close();

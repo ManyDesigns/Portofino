@@ -26,8 +26,7 @@ import com.manydesigns.portofino.dispatcher.resolvers.CachingResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.JavaResourceResolver;
 import com.manydesigns.portofino.dispatcher.resolvers.ResourceResolvers;
 import com.manydesigns.portofino.dispatcher.swagger.DocumentedApiRoot;
-import org.apache.commons.configuration2.CombinedConfiguration;
-import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -40,11 +39,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public abstract class DispatcherInitializer {
     protected FileObject applicationRoot;
-    protected Configuration configuration;
+    protected CompositeConfiguration configuration;
     protected CodeBase codeBase;
+    protected ResourceResolver resourceResolver;
 
     private static final Logger logger = LoggerFactory.getLogger(DispatcherInitializer.class);
 
@@ -52,12 +53,16 @@ public abstract class DispatcherInitializer {
         return applicationRoot;
     }
 
-    public Configuration getConfiguration() {
+    public CompositeConfiguration getConfiguration() {
         return configuration;
     }
 
     public CodeBase getCodeBase() {
         return codeBase;
+    }
+
+    public ResourceResolver getResourceResolver() {
+        return resourceResolver;
     }
 
     public void initialize() {
@@ -87,7 +92,7 @@ public abstract class DispatcherInitializer {
         }
 
         String actionsDirectory = getConfiguration().getString("portofino.actions.path", "actions");
-        codeBase = initApplicationRoot(actionsDirectory);
+        initApplicationRoot(actionsDirectory);
         logger.info("Application initialized.");
     }
 
@@ -98,7 +103,7 @@ public abstract class DispatcherInitializer {
     protected void loadConfiguration()
             throws FileSystemException, ConfigurationException {
         FileObject configurationFile = applicationRoot.getChild("portofino.properties");
-        CombinedConfiguration compositeConfiguration = new CombinedConfiguration();
+        CompositeConfiguration compositeConfiguration = new CompositeConfiguration();
         if(configurationFile != null) {
             Configurations configurations = new Configurations();
             PropertiesConfiguration configuration = configurations.properties(configurationFile.getURL());
@@ -110,14 +115,14 @@ public abstract class DispatcherInitializer {
                 compositeConfiguration.addConfiguration(localConfiguration);
             }
             compositeConfiguration.addConfiguration(configuration);
-            this.configuration = compositeConfiguration;
         } else {
-            this.configuration = new PropertiesConfiguration();
-            logger.warn("portofino.properties file not found in " + applicationRoot);
+            compositeConfiguration.addConfiguration(new PropertiesConfiguration());
+            logger.debug("portofino.properties file not found in " + applicationRoot);
         }
+        this.configuration = compositeConfiguration;
     }
 
-    protected CodeBase initApplicationRoot(String actionsDirectoryName) {
+    protected void initApplicationRoot(String actionsDirectoryName) {
         try {
             FileObject actionsDirectory = applicationRoot.getChild(actionsDirectoryName);
             if(actionsDirectory == null || actionsDirectory.getType() != FileType.FOLDER) {
@@ -127,27 +132,16 @@ public abstract class DispatcherInitializer {
             ResourceResolvers resourceResolver = new ResourceResolvers();
             configureResourceResolvers(resourceResolver, codeBase);
             DocumentedApiRoot.setRootFactory(() -> getRoot(actionsDirectory, resourceResolver));
-            return codeBase;
+            this.codeBase = codeBase;
+            this.resourceResolver = resourceResolver;
         } catch (Exception e) {
             initializationFailed(e);
-            return null;
         }
     }
 
     protected CodeBase createCodeBase() throws IOException {
-        //TODO auto discovery?
         FileObject codeBaseRoot = getCodeBaseRoot();
-        JavaCodeBase javaCodeBase = new JavaCodeBase(codeBaseRoot, null, getClass().getClassLoader());
-        CodeBase codeBase = javaCodeBase;
-        try {
-            Class<?> gcb = Class.forName("com.manydesigns.portofino.code.GroovyCodeBase");
-            Constructor<?> gcbConstructor = gcb.getConstructor(FileObject.class, CodeBase.class);
-            codeBase = (CodeBase) gcbConstructor.newInstance(codeBaseRoot, javaCodeBase);
-            logger.info("Groovy is available");
-        } catch (Exception e) {
-            logger.debug("Groovy not available", e);
-        }
-        return codeBase;
+        return new JavaCodeBase(codeBaseRoot, null, getClass().getClassLoader());
     }
 
     protected FileObject getCodeBaseRoot() throws FileSystemException {
@@ -156,7 +150,6 @@ public abstract class DispatcherInitializer {
 
     protected void configureResourceResolvers(ResourceResolvers resourceResolver, CodeBase codeBase) {
         resourceResolver.resourceResolvers.add(new JavaResourceResolver(codeBase));
-        addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.GroovyResourceResolver", codeBase, false);
         addResourceResolver(resourceResolver, "com.manydesigns.portofino.dispatcher.resolvers.JacksonResourceResolver", codeBase, true);
     }
 
@@ -167,21 +160,27 @@ public abstract class DispatcherInitializer {
     protected void addResourceResolver(ResourceResolvers resourceResolver, String className, CodeBase codeBase, boolean caching) {
         try {
             Class<?> resClass = Class.forName(className);
-            ResourceResolver resolver;
-            try {
-                Constructor<?> resClassConstructor = resClass.getConstructor(CodeBase.class);
-                resolver = (ResourceResolver) resClassConstructor.newInstance(codeBase);
-            } catch (Exception e) {
-                logger.debug("Constructor from CodeBase not available", e);
-                resolver = (ResourceResolver) resClass.getConstructor().newInstance();
-            }
-            if(caching) {
-                resolver = new CachingResourceResolver(resolver);
-            }
-            resourceResolver.resourceResolvers.add(resolver);
+            addResourceResolver(resourceResolver, resClass, codeBase, caching);
         } catch (Exception e) {
             logger.debug(className + " not available", e);
         }
+    }
+
+    protected void addResourceResolver(
+            ResourceResolvers resourceResolver, Class<?> resClass, CodeBase codeBase, boolean caching
+    ) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        ResourceResolver resolver;
+        try {
+            Constructor<?> resClassConstructor = resClass.getConstructor(CodeBase.class);
+            resolver = (ResourceResolver) resClassConstructor.newInstance(codeBase);
+        } catch (Exception e) {
+            logger.debug("Constructor from CodeBase not available", e);
+            resolver = (ResourceResolver) resClass.getConstructor().newInstance();
+        }
+        if(caching) {
+            resolver = new CachingResourceResolver(resolver);
+        }
+        resourceResolver.resourceResolvers.add(resolver);
     }
 
     protected void initializationFailed(Exception e) {

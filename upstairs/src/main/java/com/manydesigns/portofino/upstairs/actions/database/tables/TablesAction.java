@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.upstairs.actions.database.tables;
 
 import com.manydesigns.elements.MapKeyValueAccessor;
@@ -11,13 +31,13 @@ import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.reflection.MutableClassAccessor;
 import com.manydesigns.elements.reflection.MutablePropertyAccessor;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
-import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.database.model.*;
-import com.manydesigns.portofino.model.service.ModelService;
+import com.manydesigns.portofino.database.model.platforms.DatabasePlatform;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
+import com.manydesigns.portofino.resourceactions.Group;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissions;
 import com.manydesigns.portofino.resourceactions.crud.security.EntityPermissionsChecks;
@@ -95,26 +115,25 @@ public class TablesAction extends AbstractResourceAction {
             DECIMAL_FORMAT, DATE_FORMAT, ENCRYPTED);
 
     @Autowired
-    protected ModelService modelService;
-    @Autowired
     protected Persistence persistence;
 
     @Path("{db}/{schema}")
     @GET
-    public List<Map> getTables(@PathParam("db") String db, @PathParam("schema") String schema) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Map> getTablesInSchema(@PathParam("db") String db, @PathParam("schema") String schema) {
         Schema schemaObj = DatabaseLogic.findSchemaByName(persistence.getDatabases(), db, schema);
         List<Map> tables = new ArrayList<>();
         if(schemaObj == null) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-        schemaObj.getTables().forEach(table -> {
-            tables.add(createLeaf(table.getTableName(), table.getActualEntityName()));
-        });
+        schemaObj.getTables().forEach(table ->
+                tables.add(createLeaf(table.getTableName(), table.getActualEntityName())));
         tables.sort(Comparator.comparing(o -> ((String) o.get("name"))));
         return tables;
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public List<Map> getTables() throws FileSystemException {
         List<Map> treeTables = new ArrayList<>();
 
@@ -147,6 +166,7 @@ public class TablesAction extends AbstractResourceAction {
 
     @Path("{db}/{schema}/{table}")
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Map getTableInfo(
             @PathParam("db") String db, @PathParam("schema") String schema, @PathParam("table") String tableName) {
         Table table = DatabaseLogic.findTableByName(persistence.getDatabases(), db, schema, tableName);
@@ -162,9 +182,11 @@ public class TablesAction extends AbstractResourceAction {
     }
 
     @NotNull
+    @Produces(MediaType.APPLICATION_JSON)
     private List<Map> getTypeInformation(Table table) {
         List<Map> typeInfo = new ArrayList<>();
-        Type[] types = persistence.getConnectionProvider(table.getDatabaseName()).getTypes();
+        ConnectionProvider connectionProvider = persistence.getConnectionProvider(table.getDatabaseName());
+        Type[] types = connectionProvider.getTypes();
         for(Column column : table.getColumns()) {
             Type type = null;
             for (Type candidate : types) {
@@ -187,12 +209,14 @@ public class TablesAction extends AbstractResourceAction {
                 break;
             }
             Integer precision = column.getLength();
-            Class[] javaTypes = type.getAvailableJavaTypes(precision);
+            DatabasePlatform databasePlatform = connectionProvider.getDatabasePlatform();
+            Class[] javaTypes = databasePlatform.getAvailableJavaTypes(type, precision);
             Map<String, Object> info = new HashMap<>();
             info.put("type", type);
 
             //Default
-            Class defaultJavaType = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), precision, column.getScale());
+            Class defaultJavaType = databasePlatform.getDefaultJavaType(
+                    column.getJdbcType(), column.getColumnType(), precision, column.getScale());
             if(defaultJavaType == null) {
                 defaultJavaType = Object.class;
             }
@@ -226,7 +250,7 @@ public class TablesAction extends AbstractResourceAction {
         List<Group> groups = new ArrayList<>();
         Set<String> possibleGroups = security.getGroups();
         Optional<Permissions> permissions = table.getJavaAnnotation(EntityPermissions.class).map(
-                a -> EntityPermissionsChecks.getPermissions(portofinoConfiguration, a));
+                a -> EntityPermissionsChecks.getPermissions(portofinoConfiguration.getProperties(), a));
         if(permissions.isPresent()) {
             permissions.get().getActualPermissions().forEach((name, perms) -> {
                 Group group = new Group();
@@ -237,7 +261,7 @@ public class TablesAction extends AbstractResourceAction {
             });
         } else {
             Group group = new Group();
-            group.setName(SecurityLogic.getAllGroup(portofinoConfiguration));
+            group.setName(SecurityLogic.getAllGroup(portofinoConfiguration.getProperties()));
             group.getPermissions().add(AbstractCrudAction.PERMISSION_CREATE);
             group.getPermissions().add(AbstractCrudAction.PERMISSION_READ);
             group.getPermissions().add(AbstractCrudAction.PERMISSION_EDIT);
@@ -285,7 +309,7 @@ public class TablesAction extends AbstractResourceAction {
         Permissions permissions = tableInfo.permissions;
         if(permissions != null) {
             permissions.init();
-            String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration);
+            String allGroup = SecurityLogic.getAllGroup(portofinoConfiguration.getProperties());
             List<String> create = new ArrayList<>();
             List<String> read = new ArrayList<>();
             List<String> update = new ArrayList<>();
@@ -322,7 +346,7 @@ public class TablesAction extends AbstractResourceAction {
         }
 
         persistence.initModel();
-        modelService.saveModel();
+        persistence.saveModel();
     }
 
     @Path("{db}/{schema}/{table}/{column}")
@@ -452,7 +476,7 @@ public class TablesAction extends AbstractResourceAction {
                 }
             });
             persistence.initModel();
-            modelService.saveModel();
+            persistence.saveModel();
         } else {
             throw new WebApplicationException(Response.serverError().entity(annotationsForm).build());
         }
@@ -599,7 +623,10 @@ public class TablesAction extends AbstractResourceAction {
     public Class getColumnType(Column column, String typeName) throws ClassNotFoundException {
         Class type;
         if("default".equals(typeName) || typeName == null) {
-            type = Type.getDefaultJavaType(column.getJdbcType(), column.getColumnType(), column.getLength(), column.getScale());
+            ConnectionProvider connectionProvider = persistence.getConnectionProvider(column.getDatabaseName());
+            DatabasePlatform databasePlatform = connectionProvider.getDatabasePlatform();
+            type = databasePlatform.getDefaultJavaType(
+                    column.getJdbcType(), column.getColumnType(), column.getLength(), column.getScale());
         } else {
             type = Class.forName(typeName);
         }

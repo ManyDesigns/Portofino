@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <!-- java.util.logging integration (for better performance) -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <appender name="PORTOFINO-CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d %-5level %-40logger{40} %X{userId} %X{req.requestURI} %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="PORTOFINO-CONSOLE"/>
+    </root>
+
+    <logger name="org.hibernate" level="WARN" additivity="false">
+        <appender-ref ref="PORTOFINO-CONSOLE"/>
+    </logger>
+
+    <logger name="org.hibernate.c3p0.internal.C3P0ConnectionProvider" level="INFO" additivity="false">
+        <appender-ref ref="PORTOFINO-CONSOLE"/>
+    </logger>
+</configuration>

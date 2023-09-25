@@ -49,7 +49,7 @@ public final class ElementsThreadLocals {
     // Static
     //**************************************************************************
     private static ThreadLocal<ElementsContext> threadLocalElementsContext =
-            ThreadLocal.withInitial(ElementsContext::new);
+            ThreadLocal.withInitial(ElementsThreadLocals::makeDefaultElementsContext);
 
     //**************************************************************************
     // Static cleanup
@@ -126,12 +126,15 @@ public final class ElementsThreadLocals {
     //**************************************************************************
 
     public static void setupDefaultElementsContext() {
+        ElementsContext elementsContext = getElementsContext();
+        setupDefaultElementsContext(elementsContext);
+    }
+
+    public static void setupDefaultElementsContext(ElementsContext elementsContext) {
         CustomTypeConverter typeConverter = new CustomTypeConverter(new DefaultTypeConverter());
         OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(
                 null, new DefaultMemberAccess(true), null, typeConverter);
         TextProvider textProvider = SimpleTextProvider.create();
-
-        ElementsContext elementsContext = getElementsContext();
 
         elementsContext.setOgnlContext(ognlContext);
         elementsContext.setTextProvider(textProvider);
@@ -140,8 +143,16 @@ public final class ElementsThreadLocals {
         elementsContext.setServletContext(null);
     }
 
+    public static ElementsContext makeDefaultElementsContext() {
+        ElementsContext context = new ElementsContext();
+        setupDefaultElementsContext(context);
+        return context;
+    }
+
     public static void removeElementsContext() {
-        threadLocalElementsContext.remove();
+        if (threadLocalElementsContext != null) {
+            threadLocalElementsContext.remove();
+        }
     }
 
     //**************************************************************************

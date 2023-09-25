@@ -5,8 +5,8 @@ import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
+import com.manydesigns.portofino.model.Domain;
+import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.WithParameters;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
@@ -23,7 +23,6 @@ import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +34,14 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiresAdministrator
 public class ActionsAction extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(ActionsAction.class);
 
+    public static final String PORTOFINO_ACTION_COPY_TYPE = "application/vnd.com.manydesigns.portofino.action-copy";
     public static final String PORTOFINO_ACTION_MOVE_TYPE = "application/vnd.com.manydesigns.portofino.action-move";
 
     @Autowired
@@ -106,7 +107,6 @@ public class ActionsAction extends AbstractResourceAction {
         Class actionClass = codeBase.loadClass(actionClassName);
         ActionInfo info = actionRegistry.getInfo(actionClass);
         String scriptTemplate = info.scriptTemplate;
-        Class<?> configurationClass = info.configurationClass;
         boolean supportsDetail = info.supportsDetail;
 
         String className = actionClass.getSimpleName() + "_" + RandomUtil.createRandomId();
@@ -115,13 +115,15 @@ public class ActionsAction extends AbstractResourceAction {
         ognlContext.put("actionClassName", actionClassName);
         String script = OgnlTextFormat.format(scriptTemplate, parent);
 
-        ActionDescriptor action = new ActionDescriptor();
-        Object configuration = null;
-        if(configurationClass != null) {
-            configuration = ReflectionUtil.newInstance(configurationClass);
+        ResourceActionConfiguration action = new ResourceActionConfiguration();
+        ResourceActionConfiguration configuration;
+        if(info.configurationClass != null) {
+            configuration = ReflectionUtil.newInstance(info.configurationClass);
             if(configuration instanceof ConfigurationWithDefaults) {
                 ((ConfigurationWithDefaults) configuration).setupDefaults();
             }
+        } else {
+            configuration = new ResourceActionConfiguration();
         }
         action.init();
 
@@ -130,22 +132,24 @@ public class ActionsAction extends AbstractResourceAction {
             logger.error("Can't create actionDescriptor - directory {} exists", directory.getName().getPath());
             throw new WebApplicationException(
                     Response.serverError()
-                    .entity(ElementsThreadLocals.getText("error.creating.page.the.directory.already.exists"))
+                    .entity(ElementsThreadLocals.getText("error.creating.action.the.directory.already.exists"))
                     .build());
         }
         directory.createFolder();
         logger.debug("Creating the new child actionDescriptor in directory: {}", directory);
-        ActionLogic.saveActionDescriptor(directory, action);
-        if(configuration != null) {
-            ActionLogic.saveConfiguration(directory, configuration);
-        }
+        ResourceAction theAction = (ResourceAction) actionClass.getConstructor().newInstance();
+        autowire(theAction);
+        ActionInstance actionInstance = new ActionInstance(null, directory, actionClass);
+        actionInstance.setConfiguration(configuration);
+        theAction.setActionInstance(actionInstance);
+        theAction.saveConfiguration();
         FileObject groovyScriptFile = directory.resolveFile("action.groovy");
         groovyScriptFile.createFile();
         try(Writer w = new OutputStreamWriter(groovyScriptFile.getContent().getOutputStream())) {
             w.write(script);
         }
         if(supportsDetail) {
-            FileObject detailDir = directory.resolveFile(ActionInstance.DETAIL);
+            FileObject detailDir = directory.resolveFile(AbstractResourceAction.DETAIL);
             logger.debug("Creating _detail directory: {}", detailDir);
             detailDir.createFolder();
         }
@@ -153,11 +157,19 @@ public class ActionsAction extends AbstractResourceAction {
     }
 
     @POST
-    @Consumes(PORTOFINO_ACTION_MOVE_TYPE)
-    public void move(String sourceActionPath) throws FileSystemException {
+    @Consumes(PORTOFINO_ACTION_COPY_TYPE)
+    public void copy(String sourceActionPath) throws Exception {
         String actionPath = StringUtils.join(parameters.subList(0, parameters.size() - 1), "/");
         String segment = parameters.get(parameters.size() - 1);
-        copyOrMovePage(sourceActionPath, actionPath, segment, true);
+        copyOrMoveAction(sourceActionPath, actionPath, segment, false);
+    }
+
+    @POST
+    @Consumes(PORTOFINO_ACTION_MOVE_TYPE)
+    public void move(String sourceActionPath) throws Exception {
+        String actionPath = StringUtils.join(parameters.subList(0, parameters.size() - 1), "/");
+        String segment = parameters.get(parameters.size() - 1);
+        copyOrMoveAction(sourceActionPath, actionPath, segment, true);
     }
 
     @DELETE
@@ -181,11 +193,12 @@ public class ActionsAction extends AbstractResourceAction {
         return actionInstance;
     }
 
-    protected void copyOrMovePage(
-            String sourceActionPath, String destinationParentActionPath, String segment, boolean move) throws FileSystemException {
+    protected void copyOrMoveAction(
+            String sourceActionPath, String destinationParentActionPath, String segment, boolean move) throws Exception {
         ActionInstance sourceActionInstance = getPageInstance(sourceActionPath);
         ActionInstance destinationParentActionInstance = getPageInstance(destinationParentActionPath);
         FileObject newChild = destinationParentActionInstance.getChildPageDirectory(segment);
+        ResourceActionConfiguration configuration = sourceActionInstance.getActionBean().loadConfiguration();
 
         if(move) {
             if(sourceActionPath.equals("/") || sourceActionPath.isEmpty()) {
@@ -194,6 +207,20 @@ public class ActionsAction extends AbstractResourceAction {
             sourceActionInstance.getDirectory().moveTo(newChild);
         } else {
             newChild.copyFrom(sourceActionInstance.getDirectory(), new AllFileSelector());
+        }
+        String actionPath = segment;
+        if (StringUtils.isNotEmpty(destinationParentActionPath)) {
+            actionPath = destinationParentActionPath + "/" + actionPath;
+        }
+        ActionInstance targetActionInstance = getPageInstance(actionPath);
+        targetActionInstance.getActionBean().setConfiguration(configuration);
+        targetActionInstance.getActionBean().saveConfiguration();
+        if (move) {
+            Domain domain = sourceActionInstance.getParent().getActionBean().getConfigurationDomain();
+            String[] segments = sourceActionPath.split("/");
+            Optional<Domain> subdomain = domain.getSubdomain(segments[segments.length - 1]);
+            subdomain.ifPresent(it -> domain.getSubdomains().remove(it));
+            modelService.saveDomain(domain);
         }
     }
 
@@ -213,7 +240,7 @@ public class ActionsAction extends AbstractResourceAction {
     }
 
     protected boolean checkPermissionsOnTargetPage(ActionInstance targetActionInstance, AccessLevel accessLevel) {
-        if(!security.hasPermissions(portofinoConfiguration, targetActionInstance, accessLevel)) {
+        if(!security.hasPermissions(portofinoConfiguration.getProperties(), targetActionInstance, accessLevel)) {
             logger.warn("User not authorized modify actionDescriptor {}", targetActionInstance);
             return false;
         }

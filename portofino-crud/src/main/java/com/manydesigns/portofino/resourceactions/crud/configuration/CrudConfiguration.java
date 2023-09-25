@@ -5,7 +5,7 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.resourceactions.ConfigurationWithDefaults;
 import com.manydesigns.portofino.resourceactions.ResourceActionConfiguration;
 
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +19,7 @@ import java.util.List;
 @XmlRootElement(name = "configuration")
 @XmlType(name = "configuration",propOrder = {"name", "searchTitle","createTitle","readTitle","editTitle","variable","largeResultSet","rowsPerPage","useLocalOrder","properties"})
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class CrudConfiguration implements ResourceActionConfiguration, ConfigurationWithDefaults {
+public class CrudConfiguration extends ResourceActionConfiguration implements ConfigurationWithDefaults {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -41,8 +41,6 @@ public class CrudConfiguration implements ResourceActionConfiguration, Configura
     public CrudConfiguration() {
         properties = new ArrayList<>();
     }
-
-    public void init() {}
 
     public void setupDefaults() {
         rowsPerPage = 10;

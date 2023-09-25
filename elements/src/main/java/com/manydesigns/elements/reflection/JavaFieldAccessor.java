@@ -25,36 +25,24 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class JavaFieldAccessor implements PropertyAccessor {
+/**
+ * Accessor to a Java field.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class JavaFieldAccessor<T> implements PropertyAccessor<Object, T> {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    //**************************************************************************
-    // Fields
-    //**************************************************************************
-
-    private Field field;
-
-
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
+    private final Field field;
 
     public JavaFieldAccessor(Field field) {
         assert field != null;
         this.field = field;
     }
-
-
-    //**************************************************************************
-    // PropertyAccessor implementation
-    //**************************************************************************
 
     public String getName() {
         return field.getName();
@@ -86,7 +74,7 @@ public class JavaFieldAccessor implements PropertyAccessor {
         }
     }
 
-    
+
     //**************************************************************************
     // AnnotatedElement implementation
     //**************************************************************************

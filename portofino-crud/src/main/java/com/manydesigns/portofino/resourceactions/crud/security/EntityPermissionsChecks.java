@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.resourceactions.crud.security;
 
-import com.manydesigns.portofino.actions.Group;
-import com.manydesigns.portofino.actions.Permissions;
+import com.manydesigns.portofino.resourceactions.Group;
+import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.SecurityFacade;
@@ -45,7 +45,7 @@ public abstract class EntityPermissionsChecks {
                     .findFirst().orElseGet(() -> {
                         Group grp = new Group();
                         grp.setName(finalGroup);
-                        grp.setAccessLevel(AccessLevel.VIEW.name());
+                        grp.setAccessLevelName(AccessLevel.VIEW.name());
                         permissions.getGroups().add(grp);
                         return grp;
                     });

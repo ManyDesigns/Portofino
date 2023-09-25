@@ -31,7 +31,7 @@ import org.eclipse.emf.ecore.EAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,8 +85,8 @@ public class CrudProperty implements Annotated {
         assert name != null;
         for(Annotation annotation : annotations) {
             annotation.reset();
-            annotation.init(persistence.getDatabases(), persistence.getConfiguration());
-            annotation.link(persistence.getDatabases(), persistence.getConfiguration());
+            annotation.init(persistence.getDatabases(), persistence.getConfiguration().getProperties());
+            annotation.link(persistence.getDatabases(), persistence.getConfiguration().getProperties());
         }
     }
 

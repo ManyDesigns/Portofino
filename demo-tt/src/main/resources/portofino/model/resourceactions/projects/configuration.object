@@ -1,0 +1,133 @@
+import classes.com.manydesigns.elements.options.DisplayMode;
+import classes.com.manydesigns.elements.options.SearchDisplayMode;
+import classes.com.manydesigns.portofino.model.Annotation;
+import classes.com.manydesigns.portofino.model.AnnotationProperty;
+import classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
+import classes.com.manydesigns.portofino.resourceactions.Group;
+import classes.com.manydesigns.portofino.resourceactions.Permissions;
+import classes.com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
+import classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
+import classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
+import classes.com.manydesigns.portofino.security.AccessLevel;
+
+object configuration : CrudConfiguration {
+    permissions = Permissions {
+		groups = [
+		    Group {
+		        name = "project-manager"
+		        permissions = ["crud-create", "crud-edit", "crud-delete"]
+		    },
+		    Group {
+		        name = "all"
+		        accessLevel = VIEW
+		    }
+		]
+	}
+	createTitle = ""
+	database = "tt"
+	editTitle = ""
+	largeResultSet = false
+	name = "Projects"
+	properties = [
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "id"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "title"
+			searchable = false
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = false
+			insertable = true
+			label = ""
+			name = "description"
+			searchable = false
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "url"
+			searchable = false
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "public_"
+			searchable = false
+			updatable = true
+		},
+		CrudProperty {
+			annotations = []
+			enabled = false
+			inSummary = false
+			insertable = false
+			name = "last_ticket"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = false
+			insertable = false
+			label = ""
+			name = "created"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = [
+				Annotation {
+					properties = [
+						AnnotationProperty {
+							name = "value"
+							value = "dd/MMM/yyyy HH:mm:ss"
+						}
+					]
+					type = "com.manydesigns.elements.annotations.DateFormat"
+				}
+			]
+			enabled = true
+			inSummary = false
+			insertable = false
+			label = ""
+			name = "last_updated"
+			searchable = false
+			updatable = true
+		}
+	]
+	query = "select distinct p 
+from projects p 
+left outer join p.fk_member_project as m
+where p.public_ = true or (p.public_ = false and m.user_ = %{(#securityUtils.subject.principal != null) ? #securityUtils.subject.principal.id : -1L})
+order by p.id asc"
+	readTitle = ""
+	rowsPerPage = 10
+	searchTitle = ""
+	selectionProviders = []
+	useLocalOrder = false
+	variable = "project"
+}

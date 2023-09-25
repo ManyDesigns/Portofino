@@ -49,7 +49,9 @@ import java.io.*;
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ * @deprecated uses Apache FOP (XSLT) and hasn't been updated in years.
  */
+@Deprecated
 public class TableFormPdfExporter {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";

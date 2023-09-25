@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.database;
 
+import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
@@ -19,6 +20,10 @@ public class POJOLegacyPersistenceTest extends POJOPersistenceTest {
             d.setEntityMode(EntityMode.POJO.name());
         });
         persistence.initModel();
+    }
+
+    protected void configure(Persistence persistence) {
+        persistence.setConvertLegacyModel(false);
     }
 
     @Override

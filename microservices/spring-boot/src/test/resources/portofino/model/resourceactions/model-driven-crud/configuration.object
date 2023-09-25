@@ -1,0 +1,49 @@
+import classes.com.manydesigns.elements.options.DisplayMode;
+import classes.com.manydesigns.elements.options.SearchDisplayMode;
+import classes.com.manydesigns.portofino.model.Annotation;
+import classes.com.manydesigns.portofino.model.AnnotationProperty;
+import classes.com.manydesigns.portofino.resourceactions.AdditionalChild;
+import classes.com.manydesigns.portofino.resourceactions.Group;
+import classes.com.manydesigns.portofino.resourceactions.Permissions;
+import classes.com.manydesigns.portofino.resourceactions.crud.configuration.CrudProperty;
+import classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.CrudConfiguration;
+import classes.com.manydesigns.portofino.resourceactions.crud.configuration.database.SelectionProviderReference;
+import classes.com.manydesigns.portofino.security.AccessLevel;
+
+object configuration : CrudConfiguration {
+    actionClass = "com.manydesigns.portofino.resourceactions.crud.CrudAction"
+	createTitle = ""
+	database = "hibernatetest"
+	editTitle = ""
+	largeResultSet = false
+	name = "Table1"
+	properties = [
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "id"
+			searchable = false
+			updatable = false
+		},
+		CrudProperty {
+			annotations = []
+			enabled = true
+			inSummary = true
+			insertable = true
+			label = ""
+			name = "testo"
+			searchable = false
+			updatable = true
+		}
+	]
+	query = "from table1"
+	readTitle = ""
+	rowsPerPage = 10
+	searchTitle = ""
+	selectionProviders = []
+	useLocalOrder = false
+	variable = "mdc"
+}

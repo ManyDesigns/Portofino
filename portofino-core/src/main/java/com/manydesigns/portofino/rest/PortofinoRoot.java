@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2023 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -21,12 +21,12 @@
 package com.manydesigns.portofino.rest;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.actions.ActionDescriptor;
-import com.manydesigns.portofino.actions.ActionLogic;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.Resource;
 import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.dispatcher.Root;
 import com.manydesigns.portofino.i18n.TextProviderBean;
+import com.manydesigns.portofino.model.Domain;
 import com.manydesigns.portofino.resourceactions.AbstractResourceAction;
 import com.manydesigns.portofino.resourceactions.ActionContext;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
@@ -34,7 +34,9 @@ import com.manydesigns.portofino.resourceactions.ResourceAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import ognl.OgnlContext;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.VFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -49,21 +51,27 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The root of the application's REST APIs managed by Portofino.
+ */
 public class PortofinoRoot extends AbstractResourceAction {
 
     private static final Logger logger = LoggerFactory.getLogger(PortofinoRoot.class);
 
     @Context
-    protected ServletContext servletContext;
+    public ServletContext servletContext;
     @Context
-    protected HttpServletResponse response;
+    public HttpServletResponse response;
     @Context
-    protected HttpServletRequest request;
+    public HttpServletRequest request;
 
     protected ResourceResolver resourceResolver;
 
@@ -96,19 +104,25 @@ public class PortofinoRoot extends AbstractResourceAction {
 
     @Override
     public PortofinoRoot init() {
-        super.init();
-        ActionDescriptor rootActionDescriptor = ActionLogic.getActionDescriptor(location);
-        ActionInstance actionInstance = new ActionInstance(null, location, rootActionDescriptor, getClass());
+        if (applicationContext == null) {
+            applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            if (applicationContext != null) {
+                autowire(this);
+            }
+        }
+        ActionInstance actionInstance = new ActionInstance(null, location, getClass());
         setActionInstance(actionInstance);
         ActionContext context = new ActionContext();
         context.setServletContext(servletContext);
         context.setRequest(request);
         context.setResponse(response);
         context.setActionPath("/");
+        try {
+            loadConfiguration();
+        } catch (Exception e) {
+            throw new RuntimeException("Initialization failed", e);
+        }
         setContext(context);
-
-        applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        autowire(this);
         return this;
     }
 
@@ -130,11 +144,15 @@ public class PortofinoRoot extends AbstractResourceAction {
         Map<String, Object> description = new HashMap<>();
         description.put("superclass", getClass().getSuperclass().getName());
         description.put("class", getClass().getName());
-        description.put("page", actionInstance.getActionDescriptor());
         description.put("path", getPath());
         description.put("children", getSubResources());
         description.put("loginPath", "/:auth"); //For legacy clients
         return description;
+    }
+
+    @Override
+    public Domain getConfigurationDomain() {
+        return actionsDomain;
     }
 
     @Override
@@ -162,6 +180,23 @@ public class PortofinoRoot extends AbstractResourceAction {
     @Produces("application/yaml")
     public Response openAPIYAML() throws URISyntaxException {
         return Response.temporaryRedirect(new URI("openapi.yaml")).build();
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    public Response welcomePage() throws IOException {
+        String welcomePageDir = portofinoConfiguration.getProperties().getString(
+                PortofinoProperties.APP_WELCOME_DIR, "res:com/manydesigns/portofino/actions");
+        FileObject dir = VFS.getManager().resolveFile(welcomePageDir);
+        if (dir != null && dir.isFolder()) {
+            try (FileObject fileObject = dir.resolveFile("welcome.en.html")) {
+                if (fileObject.exists()) {
+                    String welcomePage = fileObject.getContent().getString(StandardCharsets.UTF_8);
+                    return Response.ok(welcomePage).build();
+                }
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
 
 }
