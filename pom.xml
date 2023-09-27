@@ -98,7 +98,7 @@
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depended on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
-        <jersey.version>3.0.4</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
+        <jersey.version>3.1.3</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
         <jjwt.version>0.11.5</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jakarta.jsp.api.version>3.1.1</jakarta.jsp.api.version>
@@ -120,8 +120,8 @@
         <servlet.api.version>6.0.0</servlet.api.version>
         <shiro.version>1.11.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
-        <spring.boot.version>2.7.7</spring.boot.version>
-        <spring.version>5.3.23</spring.version>
+        <spring.boot.version>3.1.4</spring.boot.version>
+        <spring.version>6.0.12</spring.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -255,7 +255,7 @@
             </dependency>
             <dependency>
                 <groupId>org.glassfish.jersey.ext</groupId>
-                <artifactId>jersey-spring5</artifactId>
+                <artifactId>jersey-spring6</artifactId>
                 <version>${jersey.version}</version>
             </dependency>
             <!-- Spring -->
