@@ -22,7 +22,7 @@ package com.manydesigns.portofino.shiro;
 
 import org.apache.shiro.authc.AuthenticationToken;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 /**

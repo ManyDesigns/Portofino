@@ -52,8 +52,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import javax.servlet.RequestDispatcher
-import javax.servlet.ServletContext
+import jakarta.servlet.RequestDispatcher
+import jakarta.servlet.ServletContext
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com

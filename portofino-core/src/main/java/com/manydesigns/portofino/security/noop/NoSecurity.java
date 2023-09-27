@@ -37,7 +37,7 @@ import com.manydesigns.portofino.security.SecurityFacade;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import java.lang.reflect.Method;
 import java.util.Collections;

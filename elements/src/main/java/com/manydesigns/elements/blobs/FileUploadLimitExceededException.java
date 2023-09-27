@@ -14,7 +14,7 @@
  */
 package com.manydesigns.elements.blobs;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 /**
  * Exception that is thrown when the post size of a multipart/form post used for file

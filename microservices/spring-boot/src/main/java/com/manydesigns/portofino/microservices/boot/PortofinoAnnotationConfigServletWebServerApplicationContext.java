@@ -43,7 +43,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;

@@ -37,7 +37,7 @@ import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.Date;
 
 /**

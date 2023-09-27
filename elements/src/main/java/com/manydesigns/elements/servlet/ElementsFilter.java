@@ -28,10 +28,10 @@ import ognl.OgnlContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 
@@ -152,7 +152,7 @@ public class ElementsFilter implements Filter {
     protected MultipartWrapper buildMultipart(HttpServletRequest request) throws IOException, FileUploadLimitExceededException {
         StreamingCommonsMultipartWrapper multipart = new StreamingCommonsMultipartWrapper();
         // Figure out where the temp directory is, and store that info
-        File tempDir = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+        File tempDir = (File) servletContext.getAttribute("jakarta.servlet.context.tempdir");
         if (tempDir == null) {
             String tmpDir = System.getProperty("java.io.tmpdir");
             if (tmpDir != null) {

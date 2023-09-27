@@ -38,7 +38,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PreDestroy;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * Root resource for the "upstairs" operations that work "one level above" the application, i.e. on the application's

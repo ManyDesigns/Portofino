@@ -48,8 +48,8 @@ import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -58,7 +58,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * {@link javax.servlet.ServletContextListener} to start and shut down Portofino's Spring application context.
+ * {@link jakarta.servlet.ServletContextListener} to start and shut down Portofino's Spring application context.
  * The context is made of 3 layers:
  * <ol>
  *     <li><strong>Parent context</strong> - defines Portofino's own beans and modules. It's created once at application startup and destroyed once at shutdown.</li>

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 
-import javax.servlet.DispatcherType;
+import jakarta.servlet.DispatcherType;
 
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @Configuration(proxyBeanMethods = false)

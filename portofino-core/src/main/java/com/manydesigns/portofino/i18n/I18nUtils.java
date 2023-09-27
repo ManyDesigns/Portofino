@@ -36,8 +36,8 @@ import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;

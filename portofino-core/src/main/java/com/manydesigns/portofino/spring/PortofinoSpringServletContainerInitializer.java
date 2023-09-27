@@ -5,9 +5,9 @@ import com.manydesigns.portofino.dispatcher.ResourceResolver;
 import com.manydesigns.portofino.modules.Module;
 import org.springframework.web.context.ContextLoaderListener;
 
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.annotation.HandlesTypes;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.annotation.HandlesTypes;
 import java.util.Set;
 import java.util.stream.Collectors;
 

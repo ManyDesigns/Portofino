@@ -2,7 +2,7 @@ package com.manydesigns.portofino.shiro;
 
 import org.apache.shiro.web.servlet.ShiroFilter;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 public class SelfRegisteringShiroFilter extends ShiroFilter {
 

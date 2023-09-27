@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.resourceactions.m2m
 
-import javax.servlet.*
+import jakarta.servlet.*
 
 import com.manydesigns.elements.messages.*
 import com.manydesigns.elements.reflection.*

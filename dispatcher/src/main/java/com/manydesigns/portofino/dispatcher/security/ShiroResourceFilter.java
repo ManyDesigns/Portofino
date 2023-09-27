@@ -26,7 +26,7 @@ import org.apache.shiro.authz.aop.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.ConstrainedTo;
 import jakarta.ws.rs.RuntimeType;
 import jakarta.ws.rs.container.ContainerRequestContext;

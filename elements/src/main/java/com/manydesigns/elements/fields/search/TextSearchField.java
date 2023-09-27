@@ -26,7 +26,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

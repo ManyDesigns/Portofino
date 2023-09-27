@@ -2,8 +2,8 @@ package com.manydesigns.portofino.dispatcher.security.jwt;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Created by alessio on 7/6/16.

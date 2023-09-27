@@ -25,7 +25,7 @@ import com.manydesigns.elements.blobs.BlobManager;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;

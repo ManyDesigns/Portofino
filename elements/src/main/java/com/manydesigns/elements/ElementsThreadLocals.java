@@ -30,9 +30,9 @@ import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Thread-local store of common Elements services.
