@@ -1,6 +1,6 @@
 ManyDesigns Portofino includes other software as detailed below.
 
-This product includes software developed by the Apache Software 
+This product includes software developed by the Apache Software
 Foundation (http://www.apache.org/).
 
 This software contains unmodified binary redistributions for H2 database engine (http://www.h2database.com/),
@@ -15,27 +15,14 @@ Site: http://www.antlr.org/
 File: antlr-2.7.7.jar
 License: BSD
 
-Apache Batik
-Site: http://xmlgraphics.apache.org/batik/
-Files: batik-anim-1.8.jar, batik-awt-util-1.8.jar, batik-bridge-1.8.jar, batik-css-1.8.jar, batik-dom-1.8.jar,
-       batik-ext-1.8.jar, batik-extension-1.8.jar, batik-gvt-1.8.jar, batik-parser-1.8.jar,
-       batik-script-1.8.jar, batik-svg-dom-1.8.jar, batik-svggen-1.8.jar, batik-transcoder-1.8.jar,
-       batik-util-1.8.jar, batik-xml-1.8.jar
-License: Apache License v2.0
-
 Apache Commons OGNL
 Site: https://commons.apache.org/proper/commons-ognl/
 File: ognl-3.2.10.jar
 License: Apache License v2.0
 
-Apache Commons Text
-Site: https://commons.apache.org/proper/commons-text/
-File: commons-text-1.6.jar
-License: Apache License v2.0
-
 Apache Commons VFS
 Site: http://commons.apache.org/proper/commons-vfs/
-File: commons-vfs2-2.2.jar
+File: commons-vfs2-2.8.0.jar
 License: Apache License v2.0
 
 Apache FOP
@@ -159,9 +146,9 @@ File: javassist-3.24.0-GA.jar
 License: Apache License
 
 JAXB
-Site: https://javaee.github.io/jaxb-v2/
-Files: jaxb-api-2.3.1.jar, jaxb-core-2.3.0.1.jar, jaxb-impl-2.3.2.jar
-License: GPL 2.0 with Class-path Exception
+Site: https://eclipse-ee4j.github.io/jaxb-ri/
+Files: jaxb-impl-4.0.3.jar
+License: Eclipse Distribution License 1.0 (BSD)
 
 Jersey
 Site: https://jersey.java.net/

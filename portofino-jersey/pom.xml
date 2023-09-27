@@ -36,7 +36,7 @@
             <artifactId>jersey-container-servlet</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.validation</groupId>
+                    <groupId>jakarta.validation</groupId>
                     <artifactId>validation-api</artifactId>
                 </exclusion>
             </exclusions>
