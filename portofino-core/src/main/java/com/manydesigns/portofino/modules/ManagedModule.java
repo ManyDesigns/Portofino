@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.beans.IntrospectionException;
 import java.io.IOException;
 

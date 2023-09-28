@@ -145,11 +145,6 @@ Site: http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/
 File: javassist-3.24.0-GA.jar
 License: Apache License
 
-JAXB
-Site: https://eclipse-ee4j.github.io/jaxb-ri/
-Files: jaxb-impl-4.0.3.jar
-License: Eclipse Distribution License 1.0 (BSD)
-
 Jersey
 Site: https://jersey.java.net/
 Files:

@@ -15,8 +15,7 @@ import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertEquals;
 
 public class TestRESTWeb extends JerseyTestNg.ContainerPerClassTest {
 
@@ -24,7 +23,7 @@ public class TestRESTWeb extends JerseyTestNg.ContainerPerClassTest {
     protected ResourceConfig configure() {
         return new ResourceConfig(ApplicationRoot.class).register(JacksonFeature.class).register(ShiroResourceFilter.class);
     }
-    
+
     @Override
     protected TestContainerFactory getTestContainerFactory() {
         return new GrizzlyWebTestContainerFactory();
@@ -42,7 +41,7 @@ public class TestRESTWeb extends JerseyTestNg.ContainerPerClassTest {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Test
     public void resource() {
         String result = target("b/1").request().get(String.class);

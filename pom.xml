@@ -93,8 +93,8 @@
         <groovy.version>4.0.3</groovy.version>
         <guava.version>31.0.1-jre</guava.version>
         <hibernate.version>6.1.7.Final</hibernate.version>
-        <jackson.version>2.13.4</jackson.version>
-        <jackson.databind.version>2.13.4.2</jackson.databind.version>
+        <jackson.version>2.15.2</jackson.version>
+        <jackson.databind.version>2.15.2</jackson.databind.version>
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depended on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
@@ -116,7 +116,7 @@
         <logback.version>1.2.8</logback.version>
         <ognl.version>3.2.10</ognl.version>
         <quartz.version>2.3.2</quartz.version>
-        <resteasy.version>4.6.1.Final</resteasy.version>
+        <resteasy.version>6.2.5.Final</resteasy.version>
         <servlet.api.version>6.0.0</servlet.api.version>
         <shiro.version>1.11.0</shiro.version>
         <slf4j.version>1.7.32</slf4j.version>
@@ -240,7 +240,7 @@
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-jaxb-annotations</artifactId>
+                <artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
@@ -359,11 +359,32 @@
                 <artifactId>groovy</artifactId>
                 <version>${groovy.version}</version>
             </dependency>
+            <!-- Jakarta EE -->
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>2.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>4.0.2</version>
+            </dependency>
             <!-- Test dependencies -->
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.14.3</version>
+                <version>7.5.1</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -373,22 +394,18 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
-            <version>1.3.5</version>
         </dependency>
         <dependency>
             <groupId>jakarta.activation</groupId>
             <artifactId>jakarta.activation-api</artifactId>
-            <version>1.2.2</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>4.0.3</version>
         </dependency>
 
         <!-- Test dependencies -->

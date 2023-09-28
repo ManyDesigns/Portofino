@@ -9,7 +9,7 @@ import org.apache.commons.vfs2.FileObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletContext;
 import java.util.HashSet;
 import java.util.Set;

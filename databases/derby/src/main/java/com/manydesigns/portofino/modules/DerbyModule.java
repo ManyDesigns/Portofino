@@ -22,13 +22,12 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.database.platforms.ApacheDerbyDatabasePlatform;
 import com.manydesigns.portofino.database.model.platforms.DatabasePlatformsRegistry;
-import org.apache.commons.configuration2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
