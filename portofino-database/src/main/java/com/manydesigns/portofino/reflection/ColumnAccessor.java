@@ -24,13 +24,12 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.annotations.impl.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.model.Column;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
 import java.lang.reflect.Modifier;
-import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

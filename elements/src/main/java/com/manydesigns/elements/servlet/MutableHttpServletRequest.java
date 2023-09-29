@@ -24,7 +24,8 @@ import com.manydesigns.elements.blobs.FileBean;
 import com.manydesigns.elements.blobs.FileUploadLimitExceededException;
 import com.manydesigns.elements.blobs.MultipartWrapper;
 import com.manydesigns.elements.blobs.StreamingCommonsMultipartWrapper;
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileItemInput;
 import org.apache.commons.lang.ArrayUtils;
 
 import jakarta.servlet.*;
@@ -34,11 +35,12 @@ import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.*;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+/**
+ * Mock HTTP Servlet Request for testing.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class MutableHttpServletRequest implements HttpServletRequest, MultipartWrapper {
     public static final String copyright =
@@ -194,7 +196,7 @@ public class MutableHttpServletRequest implements HttpServletRequest, MultipartW
                 }
 
                 @Override
-                public void delete() {
+                public void delete() throws IOException {
                     item.delete();
                 }
             };
@@ -514,4 +516,20 @@ public class MutableHttpServletRequest implements HttpServletRequest, MultipartW
         return null;
     }
 
+    //Servlet API 6.0 methods
+
+    @Override
+    public String getRequestId() {
+        return null;
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        return null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return null;
+    }
 }

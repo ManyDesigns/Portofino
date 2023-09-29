@@ -85,8 +85,8 @@
         <commons.configuration.version>2.8.0</commons.configuration.version>
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
-        <commons.fileupload.version>1.5</commons.fileupload.version>
-        <commons.io.version>2.7</commons.io.version>
+        <commons.fileupload.version>2.0.0-M1</commons.fileupload.version>
+        <commons.io.version>2.13.0</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <commons.vfs.version>2.8.0</commons.vfs.version>
         <fop.version>2.8</fop.version>

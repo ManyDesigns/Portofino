@@ -30,12 +30,10 @@ import com.manydesigns.elements.blobs.SimpleBlobManager;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.util.RandomUtil;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Ignore;
-import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -84,10 +82,13 @@ public class FileBlobFieldTest extends AbstractElementsTest {
         InputStream is =
                 new ByteArrayInputStream(sampleContent.getBytes());
 
-        FileItem fileItem =
-                new DiskFileItem(field.getInputName(), "text/plain",
-                        false, sampleFilename, 0,
-                        RandomUtil.getTempDir());
+        FileItem<DiskFileItem> fileItem = DiskFileItem.builder()
+                .setFieldName(field.getInputName())
+                .setContentType("text/plain")
+                .setFormField(false)
+                .setFileName(sampleFilename)
+                .setPath(RandomUtil.getTempDir().toPath())
+                .get();
         OutputStream os = fileItem.getOutputStream();
         IOUtils.copy(is, os);
 

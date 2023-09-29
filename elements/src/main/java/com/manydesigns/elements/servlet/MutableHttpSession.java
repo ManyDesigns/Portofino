@@ -2,7 +2,6 @@ package com.manydesigns.elements.servlet;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionContext;
 import java.util.Enumeration;
 
 /**
@@ -47,17 +46,7 @@ public class MutableHttpSession implements HttpSession {
     }
 
     @Override
-    public HttpSessionContext getSessionContext() {
-        return null;
-    }
-
-    @Override
     public Object getAttribute(String s) {
-        return null;
-    }
-
-    @Override
-    public Object getValue(String s) {
         return null;
     }
 
@@ -67,19 +56,7 @@ public class MutableHttpSession implements HttpSession {
     }
 
     @Override
-    public String[] getValueNames() {
-        return new String[0];
-    }
-
-    @Override
-    public void setAttribute(String s, Object o) {
-
-    }
-
-    @Override
-    public void putValue(String s, Object o) {
-
-    }
+    public void setAttribute(String s, Object o) {}
 
     @Override
     public void removeAttribute(String s) {
@@ -87,14 +64,7 @@ public class MutableHttpSession implements HttpSession {
     }
 
     @Override
-    public void removeValue(String s) {
-
-    }
-
-    @Override
-    public void invalidate() {
-
-    }
+    public void invalidate() {}
 
     @Override
     public boolean isNew() {

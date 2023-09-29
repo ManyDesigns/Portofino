@@ -35,12 +35,13 @@ import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * {@link Filter} to set up the Elements context.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class ElementsFilter implements Filter {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";

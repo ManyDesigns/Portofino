@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 /**
+ * Mock HTTP Servlet Response for testing.
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -86,16 +87,6 @@ public class MutableHttpServletResponse implements HttpServletResponse {
     @Override
     public String encodeRedirectURL(String s) {
         return s;
-    }
-
-    @Override
-    public String encodeUrl(String s) {
-        return encodeURL(s);
-    }
-
-    @Override
-    public String encodeRedirectUrl(String s) {
-        return encodeRedirectURL(s);
     }
 
     @Override
@@ -147,13 +138,6 @@ public class MutableHttpServletResponse implements HttpServletResponse {
     public void setStatus(int i) {
         logger.debug("Setting status to: {}", i);
         status = i;
-    }
-
-    @Override
-    public void setStatus(int i, String s) {
-        logger.debug("Setting status and message to: {} - {}", i, s);
-        status = i;
-        statusMessage = s;
     }
 
     @Override

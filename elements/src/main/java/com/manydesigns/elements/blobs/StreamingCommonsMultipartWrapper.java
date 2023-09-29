@@ -20,12 +20,8 @@
 
 package com.manydesigns.elements.blobs;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.*;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,17 +87,16 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
             throws IOException, FileUploadLimitExceededException {
         try {
             this.charset = request.getCharacterEncoding();
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            factory.setRepository(tempDir);
-            ServletFileUpload upload = new ServletFileUpload(factory);
+            DiskFileItemFactory factory = DiskFileItemFactory.builder().setPath(tempDir.toPath()).get();
+            JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
             upload.setSizeMax(maxPostSize);
-            FileItemIterator iterator = upload.getItemIterator(request);
+            FileItemInputIterator iterator = upload.getItemIterator(request);
 
             Map<String,List<String>> params = new HashMap<String, List<String>>();
 
             while (iterator.hasNext()) {
-                FileItemStream item = iterator.next();
-                try(InputStream stream = item.openStream()) {
+                FileItemInput item = iterator.next();
+                try(InputStream stream = item.getInputStream()) {
                     // If it's a form field, add the string value to the list
                     if (item.isFormField()) {
                         List<String> values = params.computeIfAbsent(item.getFieldName(), k -> new ArrayList<>());
@@ -121,11 +116,9 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
                 List<String> values = entry.getValue();
                 this.parameters.put(entry.getKey(), values.toArray(new String[0]));
             }
-        }
-        catch (FileUploadBase.SizeLimitExceededException slee) {
-            throw new FileUploadLimitExceededException(maxPostSize, slee.getActualSize());
-        }
-        catch (FileUploadException fue) {
+        } catch (FileUploadSizeException fuse) {
+            throw new FileUploadLimitExceededException(maxPostSize, fuse.getActualSize());
+        } catch (FileUploadException fue) {
             throw new IOException("Could not parse and cache file upload data.", fue);
         }
 

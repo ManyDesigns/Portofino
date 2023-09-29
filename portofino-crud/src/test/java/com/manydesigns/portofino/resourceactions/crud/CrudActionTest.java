@@ -56,7 +56,7 @@ import com.manydesigns.portofino.resourceactions.crud.export.JSONExporter;
 import com.manydesigns.portofino.rest.messagebodywriters.FormMessageBodyWriter;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -299,15 +299,12 @@ public class CrudActionTest extends JerseyTest {
         assertTrue(descnField instanceof FileBlobField);
 
         File tmpFile = File.createTempFile("blob", "blob");
-        DiskFileItem fileItem =
-                new DiskFileItem(
-                        "descn", "application/octet-stream", false,
-                        tmpFile.getName(), 0, tmpFile.getParentFile()) {
-                    @Override
-                    public void delete() {
-                        //Do nothing as we want to reuse this
-                    }
-                };
+        DiskFileItem fileItem = DiskFileItem.builder()
+                .setFieldName("descn")
+                .setContentType("application/octet-stream")
+                .setFormField(false)
+                .setFileName(tmpFile.getName())
+                .get();
         OutputStream os = fileItem.getOutputStream();
         IOUtils.write("some test data", os, req.getCharacterEncoding());
         req.addFileItem("descn", fileItem);

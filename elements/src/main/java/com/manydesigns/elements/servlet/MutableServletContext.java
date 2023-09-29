@@ -1,16 +1,42 @@
+/*
+ * Copyright (C) 2005-2023 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.elements.servlet;
 
 import jakarta.servlet.*;
 import jakarta.servlet.descriptor.JspConfigDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
 /**
- * Created by alessio on 10/31/17.
+ * Mock Servlet Context for testing.
+ * @author Alessio Stalla – alessiostalla@gmail.com
  */
 public class MutableServletContext implements ServletContext {
+
+    private static final Logger logger = LoggerFactory.getLogger(MutableServletContext.class);
 
     public final Map<String, String> initParameters = new HashMap<>();
 
@@ -75,33 +101,13 @@ public class MutableServletContext implements ServletContext {
     }
 
     @Override
-    public Servlet getServlet(String s) throws ServletException {
-        return null;
-    }
-
-    @Override
-    public Enumeration<Servlet> getServlets() {
-        return null;
-    }
-
-    @Override
-    public Enumeration<String> getServletNames() {
-        return null;
-    }
-
-    @Override
     public void log(String s) {
-
-    }
-
-    @Override
-    public void log(Exception e, String s) {
-
+        logger.info(s);
     }
 
     @Override
     public void log(String s, Throwable throwable) {
-
+        logger.error(s, throwable);
     }
 
     @Override
