@@ -17,16 +17,17 @@ import org.hibernate.jdbc.Work;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Response;
+
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -53,7 +54,7 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 @EnableAutoConfiguration(exclude = { ErrorMvcAutoConfiguration.class, GroovyTemplateAutoConfiguration.class })
 class PortofinoBootSupportTest {
 
-	@LocalServerPort
+	@Value("${local.server.port}")
 	public int port;
 
 	@Autowired

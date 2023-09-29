@@ -14,7 +14,7 @@
 	<name>portofino-spring-boot</name>
 	<description>Use Portofino as a library in a Spring Boot application</description>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 	</properties>
 	<distributionManagement>
 		<snapshotRepository>
@@ -139,13 +139,11 @@
 		<dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
-			<version>3.0.0</version> <!-- Same version as Hibernate -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.transaction</groupId>
 			<artifactId>jakarta.transaction-api</artifactId>
-			<version>2.0.0</version> <!-- Same version as Hibernate -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -307,7 +305,7 @@
 								<configuration>
 									<rules>
 										<enforceBytecodeVersion>
-											<maxJdkVersion>1.8</maxJdkVersion>
+											<maxJdkVersion>11</maxJdkVersion>
 										</enforceBytecodeVersion>
 										<!--<dependencyConvergence/>-->
 									</rules>

@@ -22,7 +22,7 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.database.model.ConnectionProvider;
 import com.manydesigns.portofino.database.model.platforms.AbstractDatabasePlatform;
-import org.hibernate.dialect.DerbyTenFiveDialect;
+import org.hibernate.dialect.DerbyDialect;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,7 +43,7 @@ public class ApacheDerbyDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public ApacheDerbyDatabasePlatform() {
-        super(DerbyTenFiveDialect.class.getName(), "jdbc:derby:<databaseName>");
+        super(DerbyDialect.class.getName(), "jdbc:derby:<databaseName>");
     }
 
     //**************************************************************************
