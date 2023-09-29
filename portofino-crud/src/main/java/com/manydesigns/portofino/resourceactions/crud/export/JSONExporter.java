@@ -6,7 +6,7 @@ import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
 import org.json.JSONStringer;
 import org.springframework.http.MediaType;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 public class JSONExporter implements CrudExporter {
 
@@ -18,7 +18,7 @@ public class JSONExporter implements CrudExporter {
     @Override
     public Response.ResponseBuilder exportObject(AbstractCrudAction<?> action) {
         String jsonText = FormUtil.writeToJson(action.getForm());
-        return Response.ok(jsonText).type(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8");
+        return Response.ok(jsonText).type(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8");
     }
 
     @Override
@@ -46,7 +46,7 @@ public class JSONExporter implements CrudExporter {
         js.endObject();
         String jsonText = js.toString();
         Response.ResponseBuilder builder =
-                Response.ok(jsonText).type(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8");
+                Response.ok(jsonText).type(jakarta.ws.rs.core.MediaType.APPLICATION_JSON_TYPE).encoding("UTF-8");
         Integer rowsPerPage = action.getCrudConfiguration().getRowsPerPage();
         if(rowsPerPage != null && totalRecords > rowsPerPage) {
             int firstResult = action.getFirstResult() != null ? action.getFirstResult() : 1;

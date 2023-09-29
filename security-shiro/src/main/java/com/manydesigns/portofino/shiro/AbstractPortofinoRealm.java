@@ -27,6 +27,7 @@ import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.security.SecurityLogic;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -53,10 +54,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.security.Key;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

@@ -27,7 +27,6 @@ import com.manydesigns.elements.crypto.KeyManager;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.config.ConfigurationSource;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

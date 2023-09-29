@@ -41,13 +41,13 @@ public class TestJavaResourceResolver {
         Class<?> c = javaResourceResolver.resolve(root, Class.class); //A.java
         assertEquals("A", c.getName());
         Field string = c.getField("string");
-        Object a = c.newInstance();
+        Object a = c.getConstructor().newInstance();
         assertEquals("class A", string.get(a));
 
         c = javaResourceResolver.resolve(root.resolveFile("b"), Class.class); //B.java
         assertEquals("B", c.getName());
         string = c.getField("string");
-        Object b = c.newInstance();
+        Object b = c.getConstructor().newInstance();
         assertEquals("class B", string.get(b));
     }
 
@@ -62,11 +62,11 @@ public class TestJavaResourceResolver {
         c = resourceResolver.resolve(root.resolveFile("pkg2"), Class.class);
         assertEquals("some.pkg.Cls", c.getName());
     }
-    
+
     protected ResourceResolver getResourceResolver() {
         return new JavaResourceResolver();
     }
-    
+
     protected ResourceResolver getResourceResolver(CodeBase codeBase) {
             return new JavaResourceResolver(codeBase);
         }
@@ -96,7 +96,7 @@ public class TestJavaResourceResolver {
         Class<?> c3 = javaResourceResolver.resolve(root, Class.class);
         assertFalse(c1.equals(c3));
     }
-    
+
     @Test
     public void testCodebase() throws Exception {
         ResourceResolver resourceResolver = getResourceResolver(new JavaCodeBase(VFS.getManager().resolveFile("res:java-codebase")));

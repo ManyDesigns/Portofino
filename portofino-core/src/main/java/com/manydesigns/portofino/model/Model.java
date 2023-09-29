@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.ecore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;

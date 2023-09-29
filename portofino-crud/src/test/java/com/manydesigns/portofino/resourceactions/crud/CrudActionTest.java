@@ -79,10 +79,10 @@ import org.hibernate.query.Query;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.*;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.client.Entity;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;

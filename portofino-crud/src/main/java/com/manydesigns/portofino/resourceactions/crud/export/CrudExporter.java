@@ -3,7 +3,7 @@ package com.manydesigns.portofino.resourceactions.crud.export;
 import com.manydesigns.portofino.resourceactions.crud.AbstractCrudAction;
 import org.springframework.http.MediaType;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 public interface CrudExporter {
 
