@@ -22,7 +22,7 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.database.model.ConnectionProvider;
 import com.manydesigns.portofino.database.model.platforms.AbstractDatabasePlatform;
-import org.hibernate.dialect.Oracle9iDialect;
+import org.hibernate.dialect.OracleDialect;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -47,7 +47,7 @@ public class OracleDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public OracleDatabasePlatform() {
-        super(Oracle9iDialect.class.getName(), "jdbc:oracle:thin:@//<host>:<port, default 1521>:<sid>");
+        super(OracleDialect.class.getName(), "jdbc:oracle:thin:@//<host>:<port, default 1521>:<sid>");
     }
 
     //**************************************************************************
