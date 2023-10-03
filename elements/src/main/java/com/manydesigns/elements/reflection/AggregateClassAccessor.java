@@ -92,7 +92,7 @@ public class AggregateClassAccessor implements ClassAccessor {
     }
 
     protected void computeProperties() {
-        List<PropertyAccessor> allProperties = new ArrayList<PropertyAccessor>();
+        List<PropertyAccessor> allProperties = new ArrayList<>();
         int index = 0;
         for(ClassAccessor accessor : getAccessors()) {
             String alias = aliases.get(index);
@@ -278,7 +278,7 @@ public class AggregateClassAccessor implements ClassAccessor {
         }
     }
 
-    public class AliasPropertyAccessor implements PropertyAccessor {
+    public static class AliasPropertyAccessor implements PropertyAccessor {
 
         protected final String name;
         protected final int index;

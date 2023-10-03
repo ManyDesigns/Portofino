@@ -13,4 +13,6 @@ public interface KeyValueAccessor {
     Object get(String name);
     void set(String name, Object value);
     boolean has(String name);
+
+    KeyValueAccessor inner(Object value);
 }

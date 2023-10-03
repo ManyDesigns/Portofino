@@ -22,13 +22,14 @@ package com.manydesigns.elements.reflection;
 
 import java.lang.reflect.AnnotatedElement;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public interface PropertyAccessor<OBJ, TYPE> extends AnnotatedElement {
+/**
+ * Describes and allows access to a property of an object.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public interface PropertyAccessor extends AnnotatedElement {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -38,15 +39,15 @@ public interface PropertyAccessor<OBJ, TYPE> extends AnnotatedElement {
     //**************************************************************************
 
     String getName();
-    Class<TYPE> getType();
+    Class<?> getType();
     int getModifiers();
 
     //**************************************************************************
     // Accessors
     //**************************************************************************
 
-    Object get(OBJ obj);
-    void set(OBJ obj, TYPE value);
+    Object get(Object obj);
+    void set(Object obj, Object value);
 
     default boolean isWritable() {
         return true;

@@ -31,6 +31,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.reflection.factories.ClassAccessorFactories;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.util.*;
@@ -63,8 +64,8 @@ public class FormBuilder extends AbstractFormBuilder {
     // Constructors
     //**************************************************************************
 
-    public FormBuilder(Class aClass) {
-        this(JavaClassAccessor.getClassAccessor(aClass));
+    public FormBuilder(Class<?> aClass) {
+        this(ClassAccessorFactories.get(aClass));
     }
 
     public FormBuilder(ClassAccessor classAccessor) {
@@ -140,8 +141,8 @@ public class FormBuilder extends AbstractFormBuilder {
     public FormBuilder configReflectiveFields() {
         logger.debug("configReflectiveFields");
 
-        groupedPropertyAccessors = new ArrayList<ArrayList<PropertyAccessor>>();
-        fieldSetNames = new ArrayList<String>();
+        groupedPropertyAccessors = new ArrayList<>();
+        fieldSetNames = new ArrayList<>();
 
         ArrayList<PropertyAccessor> currentGroup = null;
         String currentGroupName = null;

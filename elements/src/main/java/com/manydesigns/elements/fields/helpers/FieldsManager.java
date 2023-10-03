@@ -75,7 +75,7 @@ public class FieldsManager implements FieldHelper {
                 elementsConfiguration.getString(
                         ElementsProperties.FIELDS_MANAGER);
         InstanceBuilder<FieldsManager> builder =
-                new InstanceBuilder<FieldsManager>(
+                new InstanceBuilder<>(
                         FieldsManager.class,
                         FieldsManager.class,
                         logger);

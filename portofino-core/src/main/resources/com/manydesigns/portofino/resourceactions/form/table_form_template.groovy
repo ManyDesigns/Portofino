@@ -7,7 +7,7 @@ import com.manydesigns.elements.annotations.RegExp
 import com.manydesigns.elements.forms.TableForm
 import com.manydesigns.elements.forms.TableFormBuilder
 import com.manydesigns.elements.reflection.ClassAccessor
-import com.manydesigns.elements.reflection.GroovyClassAccessor
+import com.manydesigns.portofino.groovy.GroovyClassAccessor
 
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions

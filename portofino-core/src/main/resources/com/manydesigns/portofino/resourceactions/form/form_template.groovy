@@ -5,7 +5,7 @@ import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.elements.options.DefaultSelectionProvider
 import com.manydesigns.elements.reflection.ClassAccessor
-import com.manydesigns.elements.reflection.GroovyClassAccessor
+import com.manydesigns.portofino.groovy.GroovyClassAccessor
 
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions

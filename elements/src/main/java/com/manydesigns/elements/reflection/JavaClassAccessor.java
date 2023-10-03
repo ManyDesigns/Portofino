@@ -40,7 +40,7 @@ import java.util.*;
 
 /**
  * A {@link ClassAccessor} targeting Java classes. Use {@link GroovyClassAccessor} for Groovy classes instead.
- * 
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -76,7 +76,7 @@ public class JavaClassAccessor implements ClassAccessor {
         classAccessorCache = CacheBuilder.newBuilder().weakKeys().build();
     }
 
-    public static JavaClassAccessor getClassAccessor(Class javaClass) {
+    public static JavaClassAccessor getClassAccessor(Class<?> javaClass) {
         JavaClassAccessor cachedResult = classAccessorCache.getIfPresent(javaClass);
         if (cachedResult == null) {
             logger.debug("Cache miss for: {}", javaClass);
@@ -211,7 +211,7 @@ public class JavaClassAccessor implements ClassAccessor {
         return false;
     }
 
-    
+
     //**************************************************************************
     // ClassAccessor implementation
     //**************************************************************************

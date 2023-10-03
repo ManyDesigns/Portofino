@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.groovy;
 
+import com.manydesigns.elements.reflection.factories.ClassAccessorFactories;
 import com.manydesigns.portofino.code.AbstractCodeBase;
 import com.manydesigns.portofino.code.CodeBase;
 import groovy.util.GroovyScriptEngine;
@@ -40,10 +41,14 @@ import static com.manydesigns.portofino.code.JavaCodeBase.classNameToPath;
  * CodeBase that knows how to load Groovy classes.
  */
 public class GroovyCodeBase extends AbstractCodeBase {
-    
+
+    static {
+        ClassAccessorFactories.LIST.add(new GroovyClassAccessorFactory());
+    }
+
     protected GroovyScriptEngine groovyScriptEngine;
     private static final Logger logger = LoggerFactory.getLogger(GroovyCodeBase.class);
-    
+
     public GroovyCodeBase(FileObject root) throws IOException {
         this(root, null, null);
     }

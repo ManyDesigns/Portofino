@@ -27,4 +27,9 @@ public class FormParametersAccessor implements KeyValueAccessor {
     public boolean has(String name) {
         return formParameters.containsKey(name);
     }
+
+    @Override
+    public KeyValueAccessor inner(Object value) {
+        throw new UnsupportedOperationException();
+    }
 }

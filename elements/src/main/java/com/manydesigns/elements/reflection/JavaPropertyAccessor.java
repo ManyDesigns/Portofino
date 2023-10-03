@@ -38,7 +38,7 @@ import java.lang.reflect.Method;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class JavaPropertyAccessor<T> extends AbstractAnnotatedAccessor implements PropertyAccessor<Object, T> {
+public class JavaPropertyAccessor extends AbstractAnnotatedAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 

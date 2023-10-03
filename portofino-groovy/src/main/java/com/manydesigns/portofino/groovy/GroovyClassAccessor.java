@@ -18,16 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.elements.reflection;
+package com.manydesigns.portofino.groovy;
 
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import org.apache.commons.lang.ArrayUtils;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * {@link com.manydesigns.elements.reflection.ClassAccessor} for Groovy classes, that doesn't cache them as {@link JavaClassAccessor} does.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class GroovyClassAccessor extends JavaClassAccessor {
 
     public final static String[] PROPERTY_NAME_BLACKLIST = {"metaClass"};

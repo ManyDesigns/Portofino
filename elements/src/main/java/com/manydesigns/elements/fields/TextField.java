@@ -85,7 +85,7 @@ public class TextField extends AbstractTextField<String> {
             logger.debug("RichText annotation present with value: {}",
                     richText);
         }
-        
+
         if (accessor.isAnnotationPresent(Status.class)) {
             Status annotation = accessor.getAnnotation(Status.class);
             red = annotation.red();
@@ -123,7 +123,7 @@ public class TextField extends AbstractTextField<String> {
         if (obj == null) {
             stringValue = null;
         } else {
-            stringValue = (String)accessor.get(obj);
+            stringValue = (String) accessor.get(obj);
         }
     }
 

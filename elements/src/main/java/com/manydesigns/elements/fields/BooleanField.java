@@ -108,7 +108,7 @@ public class BooleanField extends AbstractField<Boolean> {
         if (obj == null) {
             booleanValue = null;
         } else {
-            booleanValue = (Boolean)accessor.get(obj);
+            booleanValue = (Boolean) accessor.get(obj);
         }
     }
 

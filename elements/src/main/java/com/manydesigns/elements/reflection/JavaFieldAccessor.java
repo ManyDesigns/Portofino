@@ -33,7 +33,7 @@ import java.lang.reflect.Field;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class JavaFieldAccessor<T> implements PropertyAccessor<Object, T> {
+public class JavaFieldAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 

@@ -24,4 +24,9 @@ public class MapKeyValueAccessor implements KeyValueAccessor {
     public boolean has(String name) {
         return map.containsKey(name);
     }
+
+    @Override
+    public KeyValueAccessor inner(Object value) {
+        return new MapKeyValueAccessor((Map<String, Object>) value);
+    }
 }

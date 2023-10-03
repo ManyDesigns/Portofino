@@ -15,6 +15,11 @@
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
+            <artifactId>elements</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-dispatcher</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -28,13 +28,14 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Properties;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class MapEntryAccessor<T> implements PropertyAccessor<Map, T> {
+/**
+ * {@link PropertyAccessor} for {@link Map} entries.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class MapEntryAccessor implements PropertyAccessor {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
@@ -80,11 +81,11 @@ public class MapEntryAccessor<T> implements PropertyAccessor<Map, T> {
         return getAnnotations();
     }
 
-    public String get(Map obj) {
-        return OgnlUtils.convertValueToString(obj.get(name));
+    public String get(Object obj) {
+        return OgnlUtils.convertValueToString(((Map) obj).get(name));
     }
 
-    public void set(Map obj, Object value) {
-        obj.put(name, value);
+    public void set(Object obj, Object value) {
+        ((Map) obj).put(name, value);
     }
 }

@@ -22,12 +22,13 @@ package com.manydesigns.elements.reflection;
 
 import java.lang.reflect.AnnotatedElement;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Describes the structure of a homogeneous group of objects, and allows accessing their properties.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public interface ClassAccessor extends AnnotatedElement {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
