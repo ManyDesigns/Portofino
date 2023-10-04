@@ -71,7 +71,11 @@ public class ObjectField extends AbstractField<Object> {
     @Override
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
+        if (mode.isView(insertable, updatable)) {
+            return;
+        }
         form.readFromRequest(req);
+        setValueFromForm();
     }
 
     @Override
@@ -97,10 +101,17 @@ public class ObjectField extends AbstractField<Object> {
         if (value == null) {
             setValue(null);
         } else {
-            Object object = classAccessor.newInstance();
             form.readFrom(keyValueAccessor.inner(value));
-            form.writeToObject(object);
-            this.value = object;
+            setValueFromForm();
         }
+    }
+
+    protected void setValueFromForm() {
+        Object object = classAccessor.newInstance();
+        if (object == null) {
+            throw new IllegalStateException("Could not create an instance using " + classAccessor);
+        }
+        form.writeToObject(object);
+        this.value = object;
     }
 }

@@ -86,43 +86,43 @@ public class ObjectFieldTest extends AbstractElementsTest {
                 text);
     }
 
+    public void testRequiredReadFromRequest() {
+        var field = new ObjectField(myPropertyAccessor, Mode.EDIT);
+
+        field.setRequired(true);
+        assertTrue(field.isRequired());
+
+        MutableHttpServletRequest req = new MutableHttpServletRequest();
+
+        NestedBean n1 = new NestedBean("n1", true);
+        field.setValue(n1);
+        assertEquals(n1, field.getValue());
+
+        req.setParameter("nested.flag", "");
+        field.readFromRequest(req);
+        assertFalse(((NestedBean) field.getValue()).flag);
+
+        req.setParameter("nested.flag", "true");
+        field.readFromRequest(req);
+        assertTrue(((NestedBean) field.getValue()).flag);
+
+        req.setParameter("nested.flag", "false");
+        field.readFromRequest(req);
+        assertFalse(((NestedBean) field.getValue()).flag);
+
+        req.setParameter("nested.flag", (String) null);
+        req.setParameter("nested." + BooleanField.CHECK_PREFIX + "flag", "true");
+        field.readFromRequest(req);
+        assertFalse(((NestedBean) field.getValue()).flag);
+
+        field.setValue(n1);
+        req.setParameter("nested.flag", (String) null);
+        req.setParameter("nested." + BooleanField.CHECK_PREFIX + "flag", (String) null);
+        field.readFromRequest(req);
+        assertTrue(((NestedBean) field.getValue()).flag);
+    }
+
     /*
-        public void testRequiredReadFromRequest() {
-            booleanField = new BooleanField(myPropertyAccessor, Mode.EDIT);
-
-            booleanField.setRequired(true);
-            assertTrue(booleanField.isRequired());
-
-            MutableHttpServletRequest req = new MutableHttpServletRequest();
-
-            booleanField.setValue(true);
-            assertTrue(booleanField.getValue());
-
-            req.setParameter("myBoolean", "");
-            booleanField.readFromRequest(req);
-            assertFalse(booleanField.getValue());
-
-            req.setParameter("myBoolean", "true");
-            booleanField.readFromRequest(req);
-            assertTrue(booleanField.getValue());
-
-            req.setParameter("myBoolean", "false");
-            booleanField.readFromRequest(req);
-            assertFalse(booleanField.getValue());
-
-            req.setParameter("myBoolean", (String) null);
-            req.setParameter(BooleanField.CHECK_PREFIX + "myBoolean", "true");
-            booleanField.readFromRequest(req);
-            assertFalse(booleanField.getValue());
-
-            booleanField.setValue(true);
-            req.setParameter("myBoolean", (String) null);
-            req.setParameter(BooleanField.CHECK_PREFIX + "myBoolean", (String) null);
-            booleanField.readFromRequest(req);
-            assertTrue(booleanField.getValue());
-        }
-
-
         //--------------------------------------------------------------------------
         // Not required
         //--------------------------------------------------------------------------
@@ -228,6 +228,8 @@ public class ObjectFieldTest extends AbstractElementsTest {
     public static class NestedBean {
         public String name;
         public boolean flag;
+
+        public NestedBean() {}
 
         public NestedBean(String name, boolean flag) {
             this.name = name;
