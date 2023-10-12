@@ -148,10 +148,6 @@ public class RangeSearchField extends AbstractSearchField {
         }
     }
 
-    public boolean validate() {
-        return true;
-    }
-
     public void toSearchString(StringBuilder sb, String encoding) {
         if (minStringValue != null) {
             appendToSearchString(sb, minInputName, minStringValue, encoding);
@@ -180,7 +176,7 @@ public class RangeSearchField extends AbstractSearchField {
             return false;
         }
     }
-    
+
     //**************************************************************************
     // Getters/setters
     //**************************************************************************

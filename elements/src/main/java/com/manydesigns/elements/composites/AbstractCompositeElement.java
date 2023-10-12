@@ -68,6 +68,16 @@ public abstract class AbstractCompositeElement<T extends Element>
         return result;
     }
 
+
+    public boolean isValid() {
+        for (T current : this) {
+            if (!current.isValid()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void readFromObject(Object obj) {
         for (T current : this) {
             current.readFromObject(obj);
@@ -118,5 +128,4 @@ public abstract class AbstractCompositeElement<T extends Element>
         }
         return fields;
     }
-
 }

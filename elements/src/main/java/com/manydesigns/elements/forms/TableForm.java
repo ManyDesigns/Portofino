@@ -169,6 +169,16 @@ public class TableForm implements Element {
         return result;
     }
 
+    @Override
+    public boolean isValid() {
+        for (Row row : rows) {
+            if (!row.isValid()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void readFromObject(Object obj) {
         Class clazz = obj.getClass();
         if (clazz.isArray()) { // Tratta obj come un array

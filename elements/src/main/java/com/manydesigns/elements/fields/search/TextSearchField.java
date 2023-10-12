@@ -111,10 +111,6 @@ public class TextSearchField extends AbstractSearchField {
         }
     }
 
-    public boolean validate() {
-        return true;
-    }
-
     public void toSearchString(StringBuilder sb, String encoding) {
         if (value != null) {
             appendToSearchString(sb, inputName, value, encoding);

@@ -34,7 +34,17 @@ public class ObjectField extends AbstractField<Object> {
 
     @Override
     public boolean validate() {
+        errors.clear();
+        if (isRequired() && value == null) {
+            errors.add(getText("elements.error.field.required"));
+            return false;
+        }
         return form.validate();
+    }
+
+    @Override
+    public boolean isValid() {
+        return super.isValid() && form.isValid();
     }
 
     @Override
@@ -94,6 +104,7 @@ public class ObjectField extends AbstractField<Object> {
             return;
         }
         if(!keyValueAccessor.has(accessor.getName())) {
+            setValue(null);
             return;
         }
         bulkChecked = true;

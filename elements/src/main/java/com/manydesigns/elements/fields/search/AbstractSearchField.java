@@ -150,4 +150,13 @@ public abstract class AbstractSearchField implements SearchField {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean validate() {
+        return true;
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 }

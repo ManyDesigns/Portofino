@@ -102,10 +102,6 @@ public class BooleanSearchField extends AbstractSearchField {
         }
     }
 
-    public boolean validate() {
-        return true;
-    }
-
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("div");
         xb.addAttribute("class", "form-group boolean-search-field");

@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,8 +55,9 @@ public class EncryptedTextSearchField extends TextSearchField {
 
         try {
             Class<?> clazz = Class.forName(classPath);
-            encrypter = (FieldEncrypter)clazz.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            encrypter = (FieldEncrypter)clazz.getConstructor().newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException | NoSuchMethodException e) {
             logger.error(e.getMessage(),e);
         }
     }

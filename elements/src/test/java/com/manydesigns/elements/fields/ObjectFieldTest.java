@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2023 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -22,11 +22,14 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.json.JsonKeyValueAccessor;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.util.Util;
+import org.json.JSONObject;
+import org.json.JSONWriter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -42,7 +45,7 @@ import static org.testng.AssertJUnit.assertEquals;
 @Test
 public class ObjectFieldTest extends AbstractElementsTest {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2023, ManyDesigns srl";
 
     ClassAccessor classAccessor;
     PropertyAccessor myPropertyAccessor;
@@ -57,10 +60,39 @@ public class ObjectFieldTest extends AbstractElementsTest {
         myPropertyAccessor = classAccessor.getProperty("nested");
     }
 
+    public void testReadFromJSON() {
+        var field = new ObjectField(myPropertyAccessor, Mode.EDIT);
 
-    //--------------------------------------------------------------------------
-    // Required
-    //--------------------------------------------------------------------------
+        field.setRequired(true);
+        assertTrue(field.isRequired());
+
+        NestedBean n1 = new NestedBean("n1", true);
+        field.setValue(n1);
+        assertEquals(n1, field.getValue());
+
+        JSONObject jsonObject = new JSONObject();
+        JsonKeyValueAccessor keyValueAccessor = new JsonKeyValueAccessor(jsonObject);
+        field.readFrom(keyValueAccessor);
+        field.validate();
+        assertFalse(field.isValid());
+        assertNull(field.getValue());
+
+        jsonObject.put("nested", new JSONObject());
+        field.readFrom(keyValueAccessor);
+        field.validate();
+        assertTrue(field.isValid());
+        assertFalse(((NestedBean) field.getValue()).flag);
+
+        jsonObject.getJSONObject("nested").put("flag", true);
+        field.readFrom(keyValueAccessor);
+        field.validate();
+        assertTrue(field.isValid());
+        assertTrue(((NestedBean) field.getValue()).flag);
+
+        jsonObject.getJSONObject("nested").put("flag", false);
+        field.readFrom(keyValueAccessor);
+        assertFalse(((NestedBean) field.getValue()).flag);
+    }
 
     public void testRequiredEdit() {
         var field = new ObjectField(myPropertyAccessor, Mode.EDIT);
@@ -92,18 +124,25 @@ public class ObjectFieldTest extends AbstractElementsTest {
         field.setRequired(true);
         assertTrue(field.isRequired());
 
-        MutableHttpServletRequest req = new MutableHttpServletRequest();
-
         NestedBean n1 = new NestedBean("n1", true);
         field.setValue(n1);
         assertEquals(n1, field.getValue());
 
+        field.readFromRequest(req);
+        field.validate();
+        assertTrue(field.isValid());
+        assertTrue(((NestedBean) field.getValue()).flag);
+
         req.setParameter("nested.flag", "");
         field.readFromRequest(req);
+        field.validate();
+        assertTrue(field.isValid());
         assertFalse(((NestedBean) field.getValue()).flag);
 
         req.setParameter("nested.flag", "true");
         field.readFromRequest(req);
+        field.validate();
+        assertTrue(field.isValid());
         assertTrue(((NestedBean) field.getValue()).flag);
 
         req.setParameter("nested.flag", "false");
@@ -122,64 +161,33 @@ public class ObjectFieldTest extends AbstractElementsTest {
         assertTrue(((NestedBean) field.getValue()).flag);
     }
 
+    public void testNotRequiredEdit() {
+        var field = new ObjectField(myPropertyAccessor, Mode.EDIT);
+        assertEquals(Mode.EDIT, field.getMode());
+
+        field.setRequired(false);
+        assertFalse(field.isRequired());
+
+        assertNull(field.getValue());
+        String text = Util.elementToString(field);
+
+        assertEquals("<div class=\"form-group readwrite no-value\"><label for=\"nested\" class=\"control-label\">Nested</label><div><fieldset class=\"mde-columns-1\"><div class=\"row\"><div class=\"col-md-12 mde-colspan-1\"><div class=\"form-group readwrite no-value\"><label for=\"nested.name\" class=\"control-label\">Name</label><div><input id=\"nested.name\" type=\"text\" name=\"nested.name\" class=\"form-control\" /></div></div></div></div><div class=\"row\"><div class=\"col-md-12 mde-colspan-1\"><div class=\"form-group readwrite no-value required\"><label for=\"nested.flag\" class=\"control-label\">Flag</label><div><div class=\"checkbox\"><input id=\"nested.flag\" type=\"checkbox\" name=\"nested.flag\" value=\"true\" /><label for=\"nested.flag\"></label><input type=\"hidden\" name=\"__checkbox_nested.flag\" value=\"true\" /></div></div></div></div></div></fieldset></div></div>", text);
+
+        NestedBean n1 = new NestedBean("n1", false);
+        field.setValue(n1);
+        assertEquals(n1, field.getValue());
+        text = Util.elementToString(field);
+
+        assertEquals("<div class=\"form-group readwrite no-value\"><label for=\"nested\" class=\"control-label\">Nested</label><div><fieldset class=\"mde-columns-1\"><div class=\"row\"><div class=\"col-md-12 mde-colspan-1\"><div class=\"form-group readwrite\"><label for=\"nested.name\" class=\"control-label\">Name</label><div><input id=\"nested.name\" type=\"text\" name=\"nested.name\" value=\"n1\" class=\"form-control\" /></div></div></div></div><div class=\"row\"><div class=\"col-md-12 mde-colspan-1\"><div class=\"form-group readwrite required\"><label for=\"nested.flag\" class=\"control-label\">Flag</label><div><div class=\"checkbox\"><input id=\"nested.flag\" type=\"checkbox\" name=\"nested.flag\" value=\"true\" /><label for=\"nested.flag\"></label><input type=\"hidden\" name=\"__checkbox_nested.flag\" value=\"true\" /></div></div></div></div></div></fieldset></div></div>", text);
+
+        n1 = new NestedBean("n1", true);
+        field.setValue(n1);
+        assertEquals(n1, field.getValue());
+        text = Util.elementToString(field);
+
+        assertEquals("<div class=\"form-group readwrite no-value\"><label for=\"nested\" class=\"control-label\">Nested</label><div><fieldset class=\"mde-columns-1\"><div class=\"row\"><div class=\"col-md-12 mde-colspan-1\"><div class=\"form-group readwrite\"><label for=\"nested.name\" class=\"control-label\">Name</label><div><input id=\"nested.name\" type=\"text\" name=\"nested.name\" value=\"n1\" class=\"form-control\" /></div></div></div></div><div class=\"row\"><div class=\"col-md-12 mde-colspan-1\"><div class=\"form-group readwrite required\"><label for=\"nested.flag\" class=\"control-label\">Flag</label><div><div class=\"checkbox\"><input id=\"nested.flag\" type=\"checkbox\" name=\"nested.flag\" value=\"true\" checked=\"checked\" /><label for=\"nested.flag\"></label><input type=\"hidden\" name=\"__checkbox_nested.flag\" value=\"true\" /></div></div></div></div></div></fieldset></div></div>", text);
+    }
     /*
-        //--------------------------------------------------------------------------
-        // Not required
-        //--------------------------------------------------------------------------
-
-        public void testNotRequiredEdit() {
-            booleanField = new BooleanField(myPropertyAccessor, Mode.EDIT);
-            assertEquals(Mode.EDIT, booleanField.getMode());
-
-            booleanField.setRequired(false);
-            assertFalse(booleanField.isRequired());
-
-            assertNull(booleanField.getValue());
-            String text = Util.elementToString(booleanField);
-
-            assertEquals("<div class=\"form-group readwrite no-value\">" +
-                    "<label for=\"myBoolean\" class=\"control-label\">My boolean</label>" +
-                    "<div>" +
-                    "<select id=\"myBoolean\" class=\"form-control\" name=\"myBoolean\">" +
-                    "<option selected=\"selected\"></option>" +
-                    "<option value=\"true\">Yes</option>" +
-                    "<option value=\"false\">No</option>" +
-                    "</select>" +
-                    "</div>" +
-                    "</div>", text);
-
-            booleanField.setValue(false);
-            assertFalse(booleanField.getValue());
-            text = Util.elementToString(booleanField);
-
-            assertEquals("<div class=\"form-group readwrite\">" +
-                    "<label for=\"myBoolean\" class=\"control-label\">My boolean</label>" +
-                    "<div>" +
-                    "<select id=\"myBoolean\" class=\"form-control\" name=\"myBoolean\">" +
-                    "<option></option>" +
-                    "<option value=\"true\">Yes</option>" +
-                    "<option value=\"false\" selected=\"selected\">No</option>" +
-                    "</select>" +
-                    "</div>" +
-                    "</div>", text);
-
-
-            booleanField.setValue(true);
-            assertTrue(booleanField.getValue());
-            text = Util.elementToString(booleanField);
-
-            assertEquals("<div class=\"form-group readwrite\">" +
-                    "<label for=\"myBoolean\" class=\"control-label\">My boolean</label>" +
-                    "<div>" +
-                    "<select id=\"myBoolean\" class=\"form-control\" name=\"myBoolean\">" +
-                    "<option></option>" +
-                    "<option value=\"true\" selected=\"selected\">Yes</option>" +
-                    "<option value=\"false\">No</option>" +
-                    "</select>" +
-                    "</div>" +
-                    "</div>", text);
-
-        }
 
         public void testNotRequiredPreview() {
             booleanField = new BooleanField(myPropertyAccessor, Mode.PREVIEW);
@@ -196,8 +204,6 @@ public class ObjectFieldTest extends AbstractElementsTest {
 
             booleanField.setRequired(false);
             assertFalse(booleanField.isRequired());
-
-            MutableHttpServletRequest req = new MutableHttpServletRequest();
 
             booleanField.setValue(true);
             assertTrue(booleanField.getValue());

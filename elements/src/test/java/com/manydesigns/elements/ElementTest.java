@@ -101,11 +101,15 @@ public class ElementTest extends AbstractElementsTest {
         public void toXhtml(@NotNull XhtmlBuffer xb) {
         }
 
+        @Override
+        public boolean isValid() {
+            return true;
+        }
+
         public Mode getMode() {
             return null;
         }
 
-        public void setMode(Mode mode) {
-        }
+        public void setMode(Mode mode) {}
     }
 }

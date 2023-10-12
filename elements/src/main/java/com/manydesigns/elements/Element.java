@@ -34,8 +34,9 @@ public interface Element extends XhtmlFragment {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public void    readFromRequest(HttpServletRequest req);
-    public boolean validate();
-    public void    readFromObject(Object obj);
-    public void    writeToObject(Object obj);
+    void    readFromRequest(HttpServletRequest req);
+    boolean validate();
+    boolean isValid();
+    void    readFromObject(Object obj);
+    void    writeToObject(Object obj);
 }
