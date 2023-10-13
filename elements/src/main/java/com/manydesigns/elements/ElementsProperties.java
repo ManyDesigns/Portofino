@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2020 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2023 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -40,7 +40,7 @@ import java.util.Map;
 */
 public final class ElementsProperties {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2023 ManyDesigns srl";
 
     //**************************************************************************
     // Default and custom properties location
@@ -84,29 +84,32 @@ public final class ElementsProperties {
 
     static {
         configuration = new CompositeConfiguration();
-        addConfiguration(CUSTOM_PROPERTIES_RESOURCE);
-        addConfiguration(PROPERTIES_RESOURCE);
+        addConfiguration(CUSTOM_PROPERTIES_RESOURCE, false);
+        addConfiguration(PROPERTIES_RESOURCE, true);
     }
 
     public static void addConfiguration(String resource) {
+        addConfiguration(resource, true);
+    }
+
+    public static void addConfiguration(String resource, boolean warnOnFail) {
         try {
             Configurations configurations = new Configurations();
             BuilderParameters parameters =
                     new Parameters().properties().setListDelimiterHandler(new DefaultListDelimiterHandler(',')).setFileName(resource);
             configuration.addConfiguration(configurations.propertiesBuilder(resource).configure(parameters).getConfiguration());
         } catch (Exception e) {
-            logger.warn(String.format(
-                    "Error loading properties from: %s", resource), e);
+            if (warnOnFail) {
+                logger.warn(String.format("Error loading properties from: %s", resource), e);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug(String.format("Error loading properties from: %s", resource), e);
+            }
         }
     }
 
     public static Configuration getConfiguration() {
         return configuration;
     }
-
-    //**************************************************************************
-    // Dummy constructor
-    //**************************************************************************
 
     private ElementsProperties() {}
 

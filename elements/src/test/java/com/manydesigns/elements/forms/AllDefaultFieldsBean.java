@@ -81,6 +81,10 @@ public class AllDefaultFieldsBean {
     @FileBlob
     public String aBlob;
 
+    public AnnotatedBean1 anObject;
+
+    public AllDefaultFieldsBean aSelfReference;
+
     // none of the following fields should be detected due to their modifiers
 
     static int aStaticInt;

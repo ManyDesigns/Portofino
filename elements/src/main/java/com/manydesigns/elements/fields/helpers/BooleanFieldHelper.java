@@ -38,12 +38,12 @@ public class BooleanFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
-    public Field tryToInstantiateField(ClassAccessor classAccessor,
+    public BooleanField tryToInstantiateField(ClassAccessor classAccessor,
                                   PropertyAccessor propertyAccessor,
                                   Mode mode,
                                   String prefix) {
-        Field result;
-        Class type = propertyAccessor.getType();
+        BooleanField result;
+        Class<?> type = propertyAccessor.getType();
         if (type == Boolean.class || type == Boolean.TYPE) {
             result = new BooleanField(propertyAccessor, mode, prefix);
         } else {
@@ -56,7 +56,7 @@ public class BooleanFieldHelper implements FieldHelper {
                                                    PropertyAccessor propertyAccessor,
                                                    String prefix) {
         SearchField result;
-        Class type = propertyAccessor.getType();
+        Class<?> type = propertyAccessor.getType();
         if (type == Boolean.class || type == Boolean.TYPE) {
             result = new BooleanSearchField(propertyAccessor, prefix);
         } else {

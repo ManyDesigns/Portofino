@@ -17,15 +17,23 @@ import javax.servlet.http.HttpServletRequest;
 public class ObjectField extends AbstractField<Object> {
 
     protected final ClassAccessor classAccessor;
-    protected final Form form;
+    protected final String prefix;
     protected Object value;
+    private Form form;
 
     public ObjectField(@NotNull PropertyAccessor accessor, @NotNull Mode mode, @Nullable String prefix) {
         super(accessor, mode, prefix);
+        this.prefix = prefix;
         classAccessor = ClassAccessorFactories.get(accessor.getType());
-        form = new FormBuilder(classAccessor)
-                .configPrefix(StringUtils.defaultString(prefix) + accessor.getName() + ".")
-                .build();
+    }
+
+    protected Form ensureForm() {
+        if (form == null) {
+            form = new FormBuilder(classAccessor)
+                    .configPrefix(StringUtils.defaultString(prefix) + accessor.getName() + ".")
+                    .build();
+        }
+        return form;
     }
 
     public ObjectField(@NotNull PropertyAccessor accessor, @NotNull Mode mode) {
@@ -39,22 +47,22 @@ public class ObjectField extends AbstractField<Object> {
             errors.add(getText("elements.error.field.required"));
             return false;
         }
-        return form.validate();
+        return ensureForm().validate();
     }
 
     @Override
     public boolean isValid() {
-        return super.isValid() && form.isValid();
+        return super.isValid() && ensureForm().isValid();
     }
 
     @Override
     public void writeToObject(Object obj) {
-        form.writeToObject(accessor.get(obj));
+        ensureForm().writeToObject(accessor.get(obj));
     }
 
     @Override
     public void valueToXhtml(XhtmlBuffer xb) {
-        form.toXhtml(xb);
+        ensureForm().toXhtml(xb);
     }
 
     @Override
@@ -75,7 +83,7 @@ public class ObjectField extends AbstractField<Object> {
     @Override
     public void setValue(Object value) {
         this.value = value;
-        form.readFromObject(value);
+        ensureForm().readFromObject(value);
     }
 
     @Override
@@ -84,7 +92,7 @@ public class ObjectField extends AbstractField<Object> {
         if (mode.isView(insertable, updatable)) {
             return;
         }
-        form.readFromRequest(req);
+        ensureForm().readFromRequest(req);
         setValueFromForm();
     }
 
@@ -112,7 +120,7 @@ public class ObjectField extends AbstractField<Object> {
         if (value == null) {
             setValue(null);
         } else {
-            form.readFrom(keyValueAccessor.inner(value));
+            ensureForm().readFrom(keyValueAccessor.inner(value));
             setValueFromForm();
         }
     }
@@ -122,7 +130,7 @@ public class ObjectField extends AbstractField<Object> {
         if (object == null) {
             throw new IllegalStateException("Could not create an instance using " + classAccessor);
         }
-        form.writeToObject(object);
+        ensureForm().writeToObject(object);
         this.value = object;
     }
 }

@@ -57,14 +57,14 @@ public class FormBuilderTest extends AbstractElementsTest {
 
     public void testRegistry() {
         FieldsManager fieldsManager = FieldsManager.getManager();
-        assertEquals(15, fieldsManager.getHelperList().size());
+        assertEquals(16, fieldsManager.getHelperList().size());
 
         Form form = formBuilder1.build();
 
         assertEquals(1, form.size());
 
         FieldSet fieldSet = form.get(0);
-        assertEquals(16, fieldSet.size());
+        assertEquals(18, fieldSet.size());
 
         Field field = (Field) fieldSet.get(0);
         assertEquals("A private int", field.getLabel());
@@ -145,6 +145,16 @@ public class FormBuilderTest extends AbstractElementsTest {
         assertEquals("a blob", field.getLabel());
         assertFalse(field.isRequired());
         assertEquals(FileBlobField.class, field.getClass());
+
+        field = (Field) fieldSet.get(16);
+        assertEquals("an object", field.getLabel());
+        assertFalse(field.isRequired());
+        assertEquals(ObjectField.class, field.getClass());
+
+        field = (Field) fieldSet.get(17);
+        assertEquals("a self reference", field.getLabel());
+        assertFalse(field.isRequired());
+        assertEquals(ObjectField.class, field.getClass());
     }
 
     public void testConfigFields() throws NoSuchFieldException {

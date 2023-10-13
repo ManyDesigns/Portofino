@@ -21,7 +21,9 @@
 package com.manydesigns.elements.fields.helpers;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.BooleanField;
+import com.manydesigns.elements.fields.ObjectField;
+import com.manydesigns.elements.fields.search.BooleanSearchField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -32,16 +34,20 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public interface FieldHelper {
+public class ObjectFieldHelper implements FieldHelper {
     public static final String copyright =
-            "Copyright (C) 2005-2020 ManyDesigns srl";
+            "Copyright (C) 2005-2023 ManyDesigns srl";
 
-    Field<?> tryToInstantiateField(ClassAccessor classAccessor,
-                           PropertyAccessor propertyAccessor,
-                           Mode mode,
-                           String prefix);
+    public ObjectField tryToInstantiateField(ClassAccessor classAccessor,
+                                             PropertyAccessor propertyAccessor,
+                                             Mode mode,
+                                             String prefix) {
+        return new ObjectField(propertyAccessor, mode, prefix);
+    }
 
-    SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
-                           PropertyAccessor propertyAccessor,
-                           String prefix);
+    public SearchField tryToInstantiateSearchField(ClassAccessor classAccessor,
+                                                   PropertyAccessor propertyAccessor,
+                                                   String prefix) {
+        return null; // TODO
+    }
 }
