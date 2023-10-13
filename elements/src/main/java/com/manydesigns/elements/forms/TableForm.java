@@ -22,6 +22,7 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Element;
 import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.annotations.Help;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.Field;
@@ -36,9 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,7 +52,7 @@ public class TableForm implements Element {
     protected String selectInputName = "select";
 
     protected final Column[] columns;
-    protected final Row[] rows;
+    protected final List<Row> rows = new ArrayList<>();
 
     protected String prefix;
 
@@ -70,14 +69,8 @@ public class TableForm implements Element {
     // Costruttori
     //**************************************************************************
 
-    public TableForm(int nRows, PropertyAccessor... propertyAccessors) {
-        rows = new Row[nRows];
+    public TableForm(PropertyAccessor... propertyAccessors) {
         columns = new Column[propertyAccessors.length];
-
-        for (int i = 0; i < nRows; i++) {
-            rows[i] = new Row(i);
-        }
-
         for (int i = 0; i < columns.length; i++) {
             columns[i] = new Column(propertyAccessors[i]);
         }
@@ -144,7 +137,7 @@ public class TableForm implements Element {
         xb.closeElement("tr");
         xb.closeElement("thead");
 
-        if(rows.length > 0) {
+        if(!rows.isEmpty()) {
             xb.openElement("tbody");
             for (Row row : rows) {
                 row.toXhtml(xb);
@@ -158,6 +151,19 @@ public class TableForm implements Element {
     public void readFromRequest(HttpServletRequest req) {
         for (Row row : rows) {
             row.readFromRequest(req);
+        }
+    }
+
+    @Override
+    public void readFrom(KeyValueAccessor keyValueAccessor) {
+        Object object = keyValueAccessor.get();
+        if (object instanceof Iterable) {
+            Iterator<?> iterator = ((Iterable<?>) object).iterator();
+            for (Row row : rows) {
+                if (iterator.hasNext()) {
+                    row.readFrom(keyValueAccessor.inner(iterator.next()));
+                }
+            }
         }
     }
 
@@ -221,7 +227,7 @@ public class TableForm implements Element {
             final int arrayLength = Array.getLength(obj);
             for (int i = 0; i < arrayLength; i++) {
                 Object currentObj = Array.get(obj, i);
-                rows[i].writeToObject(currentObj);
+                rows.get(i).writeToObject(currentObj);
             }
         } else if (Collection.class.isAssignableFrom(clazz)) {
             // Tratta obj come collection
@@ -229,7 +235,7 @@ public class TableForm implements Element {
 
             int i = 0;
             for (Object currentObj : collection) {
-                rows[i].writeToObject(currentObj);
+                rows.get(i).writeToObject(currentObj);
                 i++;
             }
         }
@@ -267,8 +273,8 @@ public class TableForm implements Element {
         return columns;
     }
 
-    public Row[] getRows() {
-        return rows;
+    public List<Row> getRows() {
+        return Collections.unmodifiableList(rows);
     }
 
     public String getPrefix() {
@@ -354,6 +360,13 @@ public class TableForm implements Element {
         public void readFromRequest(HttpServletRequest req) {
             for (Field current : this) {
                 current.readFromRequest(req);
+            }
+        }
+
+        @Override
+        public void readFrom(KeyValueAccessor keyValueAccessor) {
+            for (Field current : this) {
+                current.readFrom(keyValueAccessor);
             }
         }
 

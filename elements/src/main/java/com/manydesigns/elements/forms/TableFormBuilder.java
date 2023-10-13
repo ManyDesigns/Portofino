@@ -30,8 +30,8 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +58,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
     protected final Map<String, TextFormat> titleTextFormats;
 
     protected List<PropertyAccessor> propertyAccessors;
-    protected int nRows = DEFAULT_N_ROWS;
-    protected final List<Map<String[], SelectionProvider>> rowSelectionProviders;
 
     public static final Logger logger =
             LoggerFactory.getLogger(TableFormBuilder.class);
@@ -76,10 +74,9 @@ public class TableFormBuilder extends AbstractFormBuilder {
     public TableFormBuilder(ClassAccessor classAccessor) {
         super(classAccessor);
 
-        headerTextFormats = new HashMap<String, TextFormat>();
-        hrefTextFormats = new HashMap<String, TextFormat>();
-        titleTextFormats = new HashMap<String, TextFormat>();
-        rowSelectionProviders = new ArrayList<Map<String[], SelectionProvider>>(nRows);
+        headerTextFormats = new HashMap<>();
+        hrefTextFormats = new HashMap<>();
+        titleTextFormats = new HashMap<>();
     }
 
 
@@ -106,14 +103,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
         return this;
     }
 
-    public TableFormBuilder configNRows(int nRows) {
-        this.nRows = nRows;
-        while(rowSelectionProviders.size() < nRows) {
-            rowSelectionProviders.add(new HashMap<String[], SelectionProvider>());
-        }
-        return this;
-    }
-
     public TableFormBuilder configMode(Mode mode) {
         this.mode = mode;
         return this;
@@ -125,14 +114,8 @@ public class TableFormBuilder extends AbstractFormBuilder {
         return this;
     }
 
-    public TableFormBuilder configSelectionProvider(int row, SelectionProvider selectionProvider,
-                                                    String... fieldNames) {
-        rowSelectionProviders.get(row).put(fieldNames, selectionProvider);
-        return this;
-    }
-
     public void configReflectiveFields() {
-        propertyAccessors = new ArrayList<PropertyAccessor>();
+        propertyAccessors = new ArrayList<>();
         for (PropertyAccessor current : classAccessor.getProperties()) {
             if (!isPropertyVisible(current)) {
                 continue;
@@ -193,9 +176,9 @@ public class TableFormBuilder extends AbstractFormBuilder {
                 new PropertyAccessor[propertyAccessors.size()];
         propertyAccessors.toArray(propertyAccessorsArray);
 
-        TableForm tableForm = new TableForm(nRows, propertyAccessorsArray);
+        TableForm tableForm = new TableForm(propertyAccessorsArray);
 
-        if (null!=prefix && prefix.length()>0) {
+        if (StringUtils.isNotBlank(prefix)) {
             tableForm.setPrefix(prefix);
         }
 
@@ -238,11 +221,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
             // handle cascaded select fields
             for (Map.Entry<String[], SelectionProvider> current :
                     selectionProviders.entrySet()) {
-                setupSelectionProvidersForRow(tableForm, row, current);
-            }
-
-            for (Map.Entry<String[], SelectionProvider> current :
-                    rowSelectionProviders.get(index).entrySet()) {
                 setupSelectionProvidersForRow(tableForm, row, current);
             }
 
