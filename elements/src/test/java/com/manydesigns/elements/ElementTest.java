@@ -85,8 +85,10 @@ public class ElementTest extends AbstractElementsTest {
             return null;
         }
 
-        public void readFromRequest(HttpServletRequest req) {
-        }
+        public void readFromRequest(HttpServletRequest req) {}
+
+        @Override
+        public void readFrom(KeyValueAccessor keyValueAccessor) {}
 
         public boolean validate() {
             return false;
