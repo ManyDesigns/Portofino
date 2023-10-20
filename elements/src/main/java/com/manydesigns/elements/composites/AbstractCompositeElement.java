@@ -60,6 +60,13 @@ public abstract class AbstractCompositeElement<T extends Element>
         }
     }
 
+    @Override
+    public void readFrom(KeyValueAccessor keyValueAccessor) {
+        for (T current : this) {
+            current.readFrom(keyValueAccessor);
+        }
+    }
+
     public boolean validate() {
         boolean result = true;
         for (T current : this) {

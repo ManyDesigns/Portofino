@@ -13,3 +13,4 @@ oneclick/local.*
 oneclick/build/*
 #Created by portofino-spring-boot
 /portofino-application/
+/.vscode/

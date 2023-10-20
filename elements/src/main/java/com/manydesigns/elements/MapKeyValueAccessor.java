@@ -26,7 +26,8 @@ public class MapKeyValueAccessor implements KeyValueAccessor {
     }
 
     @Override
-    public KeyValueAccessor inner(Object value) {
-        return new MapKeyValueAccessor((Map<String, Object>) value);
+    public KeyValueAccessor object(String name) {
+        Map<String, Object> inner = (Map<String, Object>) get(name);
+        return inner != null ? new MapKeyValueAccessor(inner) : null;
     }
 }

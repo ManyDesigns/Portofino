@@ -1,5 +1,7 @@
 package com.manydesigns.elements;
 
+import java.util.List;
+
 /**
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -14,5 +16,6 @@ public interface KeyValueAccessor {
     void set(String name, Object value);
     boolean has(String name);
 
-    KeyValueAccessor inner(Object value);
+    KeyValueAccessor object(String name);
+    List<KeyValueAccessor> list(String name);
 }

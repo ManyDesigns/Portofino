@@ -70,7 +70,4 @@ public class SearchForm extends AbstractCompositeElement<SearchField> {
         }
         return null;
     }
-
-
-
 }

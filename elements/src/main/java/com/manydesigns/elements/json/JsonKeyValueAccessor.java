@@ -38,7 +38,10 @@ public class JsonKeyValueAccessor implements KeyValueAccessor {
     }
 
     @Override
-    public KeyValueAccessor inner(Object value) {
-        return new JsonKeyValueAccessor((JSONObject) value);
+    public KeyValueAccessor object(String name) {
+        if (jsonObject.isNull(name)) {
+            return null;
+        }
+        return new JsonKeyValueAccessor(jsonObject.getJSONObject(name));
     }
 }

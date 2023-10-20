@@ -21,6 +21,7 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.annotations.Id;
 import com.manydesigns.elements.annotations.InputName;
 import com.manydesigns.elements.annotations.Required;
@@ -104,6 +105,11 @@ public abstract class AbstractSearchField implements SearchField {
     }
 
     public void writeToObject(Object obj) {
+    }
+
+    @Override
+    public void readFrom(KeyValueAccessor keyValueAccessor) {
+        throw new UnsupportedOperationException("TODO");
     }
 
     //**************************************************************************

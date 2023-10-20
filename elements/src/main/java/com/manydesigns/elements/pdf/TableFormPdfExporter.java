@@ -165,7 +165,7 @@ public class TableFormPdfExporter {
             int i = 0;
             for (Field field : row) {
                 int size = StringUtils.length(field.getStringValue());
-                double relativeSize = ((double) size) / form.getRows().length;
+                double relativeSize = ((double) size) / form.getRows().size();
                 columnSizes[i++] += relativeSize;
             }
         }

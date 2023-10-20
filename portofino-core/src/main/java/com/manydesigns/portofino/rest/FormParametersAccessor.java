@@ -29,7 +29,7 @@ public class FormParametersAccessor implements KeyValueAccessor {
     }
 
     @Override
-    public KeyValueAccessor inner(Object value) {
+    public KeyValueAccessor object(String name) {
         throw new UnsupportedOperationException();
     }
 }

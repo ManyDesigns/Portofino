@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.util.*;
 
-/*
+/** A form with multiple rows, where a row is a collection of fields. Every row has the same fields.
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -52,7 +52,7 @@ public class TableForm implements Element {
     protected String selectInputName = "select";
 
     protected final Column[] columns;
-    protected final List<Row> rows = new ArrayList<>();
+    protected List<Row> rows = new ArrayList<>();
 
     protected String prefix;
 
@@ -187,33 +187,25 @@ public class TableForm implements Element {
 
     public void readFromObject(Object obj) {
         Class clazz = obj.getClass();
-        if (clazz.isArray()) { // Tratta obj come un array
-            // Scorre tutti gli ellementi dell'array obj,
-            // indipendentemente da quante righe ci sono nell table form.
-            // Eventualmente lancia Eccezione.
+        if (clazz.isArray()) {
             final int arrayLength = Array.getLength(obj);
+            rows = new ArrayList<>(arrayLength);
             for (int i = 0; i < arrayLength; i++) {
                 Object currentObj = Array.get(obj, i);
-                rows[i].readFromObject(currentObj);
-            }
-
-            // Scorre le rimanenti righe del table form,
-            // passano null come ottetto di bind.
-            for (int i = arrayLength; i < rows.length; i++) {
-                rows[i].readFromObject(null);
+                Row row = new Row(i);
+                rows.add(row);
+                row.readFromObject(currentObj);
             }
         } else if (Collection.class.isAssignableFrom(clazz)) {
             // Tratta obj come collection
-            Collection collection = (Collection)obj;
-
+            Collection collection = (Collection) obj;
+            rows = new ArrayList<>(collection.size());
             int i = 0;
             for (Object currentObj : collection) {
-                rows[i].readFromObject(currentObj);
+                Row row = new Row(i);
+                rows.add(row);
+                row.readFromObject(currentObj);
                 i++;
-            }
-
-            for (; i < rows.length; i++) {
-                rows[i].readFromObject(null);
             }
         }
     }

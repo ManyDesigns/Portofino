@@ -35,7 +35,7 @@ public interface Element extends XhtmlFragment {
             "Copyright (C) 2005-2020 ManyDesigns srl";
 
     void    readFromRequest(HttpServletRequest req);
-    void readFrom(KeyValueAccessor keyValueAccessor);
+    void    readFrom(KeyValueAccessor keyValueAccessor);
     boolean validate();
     boolean isValid();
     void    readFromObject(Object obj);
