@@ -209,11 +209,11 @@ class Security extends AbstractPortofinoRealm {
         def (criteria, cb, root) = QueryUtils.createCriteria(session, "users")
         List users = session.createQuery(criteria).list()
 
-        Map result = new HashMap();
+        Map result = new HashMap()
         for (Serializable user : users) {
-            long id = user.id;
-            String prettyName = getUserPrettyName(user);
-            result.put(id, prettyName);
+            long id = user.id
+            String prettyName = getUserPrettyName(user)
+            result.put(id, prettyName)
         }
 
         return result;
@@ -222,20 +222,20 @@ class Security extends AbstractPortofinoRealm {
     @Override
     Set<String> getGroups() {
         Set<String> result = super.getGroups();
-        result.add(ADMIN_GROUP_NAME);
-        result.add(PROJECT_MANAGER_GROUP_NAME);
-        return result;
+        result.add(ADMIN_GROUP_NAME)
+        result.add(PROJECT_MANAGER_GROUP_NAME)
+        return result
     }
 
     @Override
     Serializable getUserById(String encodedUserId) {
-        Session session = persistence.getSession("tt");
-        return (Serializable) session.get("users", Long.parseLong(encodedUserId));
+        Session session = persistence.getSession("tt")
+        return (Serializable) session.get("users", Long.parseLong(encodedUserId))
     }
 
     @Override
     Serializable getUserByEmail(String email) {
-        Session session = persistence.getSession("tt");
+        Session session = persistence.getSession("tt")
         def (CriteriaQuery criteria, CriteriaBuilder builder, Root root) =
             QueryUtils.createCriteria(session, "users")
         criteria.where(builder.equal(builder.upper(root.<String>get('email')), email?.toUpperCase()))

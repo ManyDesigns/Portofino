@@ -24,6 +24,9 @@ public class ApiInfo extends Resource {
         return info;
     }
 
+    // Note: the following getApiRootUri methods are duplicated in AbstractResourceAction, part of portofino-core.
+    // However, the ui-support module doesn't depend on portofino-core, because, in a scenario where the UI
+    // is deployed separately from the API backend, we don't want to bring half of Portofino into the UI deployment.
     public static String getApiRootUri(ServletContext servletContext, UriInfo uriInfo) {
         return getApiRootUri(servletContext, uriInfo.getBaseUri());
     }

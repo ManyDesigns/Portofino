@@ -234,7 +234,14 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
      * @return the URI of the REST API root.
      */
     public String getApiRootUri() {
-        ServletContext servletContext = getContext().getServletContext();
+        return getApiRootUri(getContext().getServletContext(), uriInfo);
+    }
+
+    public static String getApiRootUri(ServletContext servletContext, UriInfo uriInfo) {
+        return getApiRootUri(servletContext, uriInfo.getBaseUri());
+    }
+
+    public static String getApiRootUri(ServletContext servletContext, URI baseUri) {
         String apiRoot = servletContext.getInitParameter("portofino.api.root");
         if (apiRoot == null) {
             apiRoot = "";
@@ -245,8 +252,11 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
             apiRoot = servletContext.getContextPath() + "/" + apiRoot;
         }
         if (!apiRoot.contains("://")) {
-            URI baseUri = uriInfo.getBaseUri();
-            apiRoot = baseUri.getScheme() + "://" + baseUri.getAuthority() + apiRoot;
+            String baseAddress = baseUri.getScheme() + "://" + baseUri.getAuthority();
+            if (!apiRoot.startsWith("/")) {
+                baseAddress += servletContext.getContextPath();
+            }
+            apiRoot = baseAddress + "/" + apiRoot;
         }
         if (!apiRoot.endsWith("/")) {
             apiRoot += "/";
