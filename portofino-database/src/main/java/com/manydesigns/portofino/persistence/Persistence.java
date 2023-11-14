@@ -64,6 +64,7 @@ import org.eclipse.emf.ecore.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -245,9 +246,40 @@ public class Persistence {
 
     protected Database setupDatabase(Domain domain) {
         logger.info("Setting up database " + domain.getQualifiedName());
+        ConnectionProvider connectionProvider = setupConnectionProvider(domain);
+        if(connectionProvider != null) {
+            Database database = DatabaseLogic.findDatabaseByName(databases, domain.getName());
+            boolean alreadyExists = database != null;
+            if (alreadyExists) {
+                logger.debug("Database " + database.getName() + " already exists");
+            } else {
+                database = new Database(domain);
+                databases.add(database);
+            }
+            //Can't use getJavaAnnotation as they've not yet been resolved
+            EAnnotation ann = domain.getEAnnotation(
+                    com.manydesigns.portofino.database.model.annotations.Database.class.getName()
+            );
+            if(ann != null) {
+                database.setEntityMode(ann.getDetails().get("entityMode"));
+            }
+            connectionProvider.setDatabase(database);
+            database.setConnectionProvider(connectionProvider);
+            if (!alreadyExists) { // TODO check – should we also refresh the schemas here?
+                Database db = database;
+                domain.getSubdomains().forEach(subd -> setupSchema(db, subd));
+            }
+            return database;
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    protected ConnectionProvider setupConnectionProvider(Domain domain) {
+        ConnectionProvider connectionProvider = null;
         //Can't use getJavaAnnotation as they've not yet been resolved
         EAnnotation ann = domain.getEAnnotation(JDBCConnection.class.getName());
-        ConnectionProvider connectionProvider = null;
         if(ann != null) {
             JdbcConnectionProvider cp = new JdbcConnectionProvider();
             cp.setUrl(ann.getDetails().get("url"));
@@ -263,21 +295,7 @@ public class Persistence {
                 connectionProvider = cp;
             }
         }
-        if(connectionProvider != null) {
-            Database database = new Database(domain);
-            Database existing = DatabaseLogic.findDatabaseByName(databases, database.getName());
-            if (existing != null) {
-                logger.debug("Database " + database.getName() + " already exists");
-                return existing;
-            }
-            databases.add(database);
-            connectionProvider.setDatabase(database);
-            database.setConnectionProvider(connectionProvider);
-            domain.getSubdomains().forEach(subd -> setupSchema(database, subd));
-            return database;
-        } else {
-            return null;
-        }
+        return connectionProvider;
     }
 
     protected Schema setupSchema(Database database, Domain domain) {
