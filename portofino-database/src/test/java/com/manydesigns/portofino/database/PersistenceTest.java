@@ -81,6 +81,10 @@ public class PersistenceTest {
 
     protected void setup(FileObject appDir) throws Exception {
         Configuration configuration = new PropertiesConfiguration();
+        // Don't save generated classes. Doing so would leave them in the test classpath, and subsequent runs
+        // of the test suite would fail because the generated classes' package names don't match with the directory
+        // they're saved in.
+        configuration.setProperty(DatabaseModule.SAVE_GENERATED_CLASSES_PROPERTY, "never");
         final DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
         databaseModule = new DatabaseModule() {

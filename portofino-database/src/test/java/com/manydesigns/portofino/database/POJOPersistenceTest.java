@@ -13,8 +13,7 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 @Test
 public class POJOPersistenceTest extends PersistenceTest {
@@ -27,22 +26,6 @@ public class POJOPersistenceTest extends PersistenceTest {
             d.setEntityMode(EntityMode.POJO.name());
         });
         persistence.initModel();
-    }
-
-    @Test
-    public void testGeneratedClasses() throws FileSystemException {
-        FileObject genClassesDir = modelService.getApplicationDirectory().resolveFile(
-                DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
-        assertTrue(genClassesDir.exists());
-        FileObject jpetstoreDir = genClassesDir.resolveFile("jpetstore");
-        assertTrue(jpetstoreDir.exists());
-        Database jpetstore = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore");
-        jpetstore.setEntityMode(EntityMode.MAP.name());
-        persistence.initModel();
-        assertFalse(jpetstoreDir.exists());
-        jpetstore.setEntityMode(EntityMode.POJO.name());
-        persistence.initModel();
-        assertTrue(jpetstoreDir.exists());
     }
 
     @Override
