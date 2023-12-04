@@ -115,9 +115,8 @@ public class PortofinoDrivenBootApplication {
 			if (main.isFolder()) {
 				FileObject javaActionsDir =
 						main.resolveFile("java").resolveFile("portofino").resolveFile("actions");
-				if(javaActionsDir.isFolder()) {
-					logger.error("--dev does not work with Java actions since the compiled version is in the build directory");
-					System.exit(1);
+				if (javaActionsDir.isFolder()) {
+					logger.error("--dev does not work with Java actions since the compiled version is in the build directory.");
 				} else {
 					FileObject appDir = main.resolveFile("resources").resolveFile("portofino");
 					if (appDir.isFolder()) {
@@ -128,6 +127,8 @@ public class PortofinoDrivenBootApplication {
 						return appDir;
 					}
 				}
+			} else {
+				logger.error("--dev requires the following path to refer to a directory: " + main.getName().getPath());
 			}
 		}
 		if(new File("portofino.properties").isFile()) {

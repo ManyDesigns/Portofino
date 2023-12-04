@@ -451,9 +451,7 @@ public class Persistence {
     }
 
     protected boolean initDatabase(Database database) {
-        new ResetVisitor().visit(database);
-        new InitVisitor(databases, configuration.getProperties()).visit(database);
-        new LinkVisitor(databases, configuration.getProperties()).visit(database);
+        initModelObject(database);
         Boolean enabled = database.getJavaAnnotation(Enabled.class).map(Enabled::value).orElse(true);
         if(enabled) {
             initConnectionProvider(database);
@@ -462,6 +460,12 @@ public class Persistence {
             logger.info("Skipping disabled database " + database.getQualifiedName());
             return false;
         }
+    }
+
+    public void initModelObject(ModelObject modelObject) {
+        new ResetVisitor().visit(modelObject);
+        new InitVisitor(databases, configuration.getProperties()).visit(modelObject);
+        new LinkVisitor(databases, configuration.getProperties()).visit(modelObject);
     }
 
     protected void initConnectionProvider(Database database) {
