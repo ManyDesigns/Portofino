@@ -262,7 +262,7 @@ public class CrudActionTest extends JerseyTest {
         req.setParameter("name", "name");
         req.setParameter("productid", "1");
         req.setParameter("category", "BIRDS");
-        crudAction.httpPostMultipart();
+        crudAction.httpPostMultipart().close();
         assertTrue(crudAction.form.validate());
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());
@@ -276,7 +276,7 @@ public class CrudActionTest extends JerseyTest {
             fail("The blob was not saved");
         }
 
-        crudAction.httpPutMultipart();
+        crudAction.httpPutMultipart().close();
         assertTrue(crudAction.form.validate());
         blobField = (FileBlobField) crudAction.form.findFieldByPropertyName("descn");
         assertNotNull(blobField.getValue());

@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Possibility to specify the project root with --dev for PortofinoDrivenBootApplication
 - Notes on how to connect using JNDI in `hibernate.properties`
 
+### Changed
+- Rationalized how the API root URI is computed across the codebase
+
 ### Fixed
 - Search field disabled for foreign keys [#618](https://github.com/ManyDesigns/Portofino/issues/618)
 - Several security vulnerabilities in dependencies

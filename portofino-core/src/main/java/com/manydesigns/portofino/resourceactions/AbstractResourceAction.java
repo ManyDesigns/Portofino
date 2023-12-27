@@ -238,7 +238,7 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
     }
 
     public static String getApiRootUri(ServletContext servletContext, UriInfo uriInfo) {
-        return getApiRootUri(servletContext, uriInfo.getBaseUri());
+        return getApiRootUri(servletContext, uriInfo != null ? uriInfo.getBaseUri() : null);
     }
 
     public static String getApiRootUri(ServletContext servletContext, URI baseUri) {
@@ -246,12 +246,13 @@ public abstract class AbstractResourceAction extends AbstractResourceWithParamet
         if (apiRoot == null) {
             apiRoot = "";
         }
-        if (apiRoot.contains("://")) {
-            //Keep as is
-        } else if (!apiRoot.startsWith("/")) {
+        if (!apiRoot.contains("://") && !apiRoot.startsWith("/")) {
             apiRoot = servletContext.getContextPath() + "/" + apiRoot;
         }
         if (!apiRoot.contains("://")) {
+            if (baseUri == null) {
+                throw new IllegalArgumentException("baseUri cannot be null when apiRoot is not absolute (" + apiRoot + ")");
+            }
             String baseAddress = baseUri.getScheme() + "://" + baseUri.getAuthority();
             if (!apiRoot.startsWith("/")) {
                 baseAddress += servletContext.getContextPath();
