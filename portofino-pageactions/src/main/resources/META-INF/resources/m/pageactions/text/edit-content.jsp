@@ -15,8 +15,8 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/4.5.3/full/ckeditor.js"/>"></script>
-        <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/4.5.3/full/adapters/jquery.js"/>"></script>
+        <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/4.19.0/full/ckeditor.js"/>"></script>
+        <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/4.19.0/full/adapters/jquery.js"/>"></script>
         <script type="text/javascript">
             $(function() {
                 portofino.setupRichTextEditors({

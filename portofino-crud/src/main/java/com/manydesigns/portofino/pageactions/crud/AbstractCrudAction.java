@@ -80,10 +80,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
@@ -519,7 +518,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             String stringValue = (String) propertyAccessor.get(object);
             String cleanText;
             try {
-                Whitelist whitelist = getWhitelist();
+                Safelist whitelist = getWhitelist();
                 cleanText = Jsoup.clean(stringValue, whitelist);
             } catch (Throwable t) {
                 logger.error("Could not clean HTML, falling back to escaped text", t);
@@ -531,10 +530,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     /**
      * Returns the JSoup whitelist used to clean user-provided HTML in rich-text fields.
-     * @return the default implementation returns the "basic" whitelist ({@link Whitelist#basic()}).
+     * @return the default implementation returns the "basic" whitelist ({@link Safelist#basic()}).
      */
-    protected Whitelist getWhitelist() {
-        return Whitelist.basic();
+    protected Safelist getWhitelist() {
+        return Safelist.basic();
     }
 
     //**************************************************************************
@@ -2413,7 +2412,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Handles object creation with attachments via REST. See <a href="http://portofino.manydesigns.com/en/docs/reference/page-types/crud/rest">the CRUD action REST API documentation.</a>
      * @since 4.2.1
      * @return the created object as JSON (in a JAX-RS Response).
-     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug. 
+     * @throws Exception only to make the compiler happy. Nothing should be thrown in normal operation. If this method throws, it is probably a bug.
      */
     @POST
     @RequiresPermissions(permissions = PERMISSION_CREATE)

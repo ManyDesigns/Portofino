@@ -97,9 +97,10 @@
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
-        <jsqlparser.version>0.9.7</jsqlparser.version>
-        <json.version>20230618</json.version>
-        <jsoup.version>1.14.3</jsoup.version> <!-- verify compatibility with  1.16.1 -->
+        <!-- 0.9.7 rompe compatibilita con Hibernate 4? -->
+        <jsqlparser.version>0.9.6</jsqlparser.version>
+        <json.version>20231013</json.version>
+        <jsoup.version>1.15.4</jsoup.version> <!-- verify compatibility with  1.16.1 -->
         <jstl.version>1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>4.23.1</liquibase.version>
@@ -108,7 +109,7 @@
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>3.15.3.Final</resteasy.version>
         <servlet.api.version>3.1.0</servlet.api.version>
-        <shiro.version>1.12.0</shiro.version>
+        <shiro.version>1.13.0</shiro.version>
         <slf4j.version>1.7.25</slf4j.version>
         <stax.version>1.2.0</stax.version>
         <stripes.version>1.6.0</stripes.version>
@@ -259,7 +260,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.8.0</version>
+                <version>7.9.0</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

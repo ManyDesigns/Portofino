@@ -29,46 +29,64 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>respond</artifactId>
-            <version>1.4.2</version>
+            <version>1.4.2-1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>html5shiv</artifactId>
-            <version>3.7.3</version>
+            <version>3.7.3-1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>es5-shim</artifactId>
-            <version>4.0.6</version>
+            <version>4.5.9</version>
         </dependency>
         <!-- jQuery -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
-            <version>3.6.0</version>
+            <version>3.7.1</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery-ui</artifactId>
-            <version>1.13.0</version>
+            <version>1.13.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.webjars</groupId>
+                    <artifactId>jquery</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Bootstrap -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
             <version>3.4.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.webjars</groupId>
+                    <artifactId>jquery</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Twitter Typeahead -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>typeaheadjs</artifactId>
             <version>0.11.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.webjars</groupId>
+                    <artifactId>jquery</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- Bootstrap-datetimepicker -->
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>momentjs</artifactId>
-            <version>2.29.1</version>
+            <version>2.29.4</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -79,11 +97,17 @@
             <groupId>org.webjars</groupId>
             <artifactId>Eonasdan-bootstrap-datetimepicker</artifactId>
             <version>4.17.49</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.webjars</groupId>
+                    <artifactId>bootstrap</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.webjars.bower</groupId>
             <artifactId>bootstrap-fileinput</artifactId>
-            <version>4.2.7</version>
+            <version>5.5.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.webjars.bower</groupId>

@@ -3,7 +3,7 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><c:if test="${empty version}">
-    <c:set var="version" value="4.5.3" scope="page" />
+    <c:set var="version" value="4.19.0" scope="page" />
 </c:if>
 <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/${version}/full/ckeditor.js"/>"></script>
 <script type="text/javascript" src="<stripes:url value="/webjars/ckeditor/${version}/full/adapters/jquery.js"/>"></script>
