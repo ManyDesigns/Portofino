@@ -389,7 +389,7 @@ public class DatabaseLogic {
     //**************************************************************************
     public static String normalizeName(String name) {
         name = StringUtils.replaceChars(name, ".", "_");
-        String firstLetter = name.substring(0,1);
+        String firstLetter = name.substring(0, 1);
         String others = name.substring(1);
 
         StringBuilder result = new StringBuilder();
