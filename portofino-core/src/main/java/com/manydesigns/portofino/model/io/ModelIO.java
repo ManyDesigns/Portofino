@@ -155,12 +155,9 @@ public class ModelIO {
                 } finally {
                     toLinkQueue.clear();
                 }
-            } else {
-                return null;
             }
-        } else {
-            throw new IOException("Not a directory: " + parentDirectory.getName().getPath());
         }
+        return null;
     }
 
     protected Domain loadDomainDirectory(Model model, Domain parent, FileObject domainDir) throws IOException {

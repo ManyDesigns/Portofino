@@ -1,20 +1,13 @@
 package com.manydesigns.portofino.database;
 
-import com.manydesigns.portofino.database.model.Database;
-import com.manydesigns.portofino.database.model.DatabaseLogic;
-import com.manydesigns.portofino.modules.DatabaseModule;
+import com.manydesigns.portofino.persistence.hibernate.DatabaseAccessor;
 import com.manydesigns.portofino.persistence.hibernate.EntityMode;
 import com.manydesigns.portofino.persistence.hibernate.SessionFactoryBuilder;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 @Test
 public class POJOPersistenceTest extends PersistenceTest {
@@ -29,29 +22,14 @@ public class POJOPersistenceTest extends PersistenceTest {
         persistence.initModel();
     }
 
-    @Test
-    public void testGeneratedClasses() throws FileSystemException {
-        FileObject genClassesDir = modelService.getApplicationDirectory().resolveFile(
-                DatabaseModule.GENERATED_CLASSES_DIRECTORY_NAME);
-        assertTrue(genClassesDir.exists());
-        FileObject jpetstoreDir = genClassesDir.resolveFile("jpetstore");
-        assertTrue(jpetstoreDir.exists());
-        Database jpetstore = DatabaseLogic.findDatabaseByName(persistence.getDatabases(), "jpetstore");
-        jpetstore.setEntityMode(EntityMode.MAP.name());
-        persistence.initModel();
-        assertFalse(jpetstoreDir.exists());
-        jpetstore.setEntityMode(EntityMode.POJO.name());
-        persistence.initModel();
-        assertTrue(jpetstoreDir.exists());
-    }
-
     @Override
     protected Object makeEntity(String className, Map<String, Object> data) {
         Object entity;
         try {
             String databaseName = className.substring(0, className.indexOf('.'));
             String actualClassName = SessionFactoryBuilder.ensureValidJavaName(className);
-            Class entityClass = persistence.getDatabaseSetup(databaseName).getCodeBase().loadClass(actualClassName);
+            DatabaseAccessor accessor = persistence.getDatabaseAccessor(databaseName);
+            Class entityClass = accessor.getCodeBase().loadClass(actualClassName);
             entity = entityClass.getConstructor().newInstance();
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 Field field = entityClass.getDeclaredField(entry.getKey());

@@ -430,6 +430,7 @@ public class ConnectionsAction extends AbstractResourceAction {
         schema.setSchemaName(schemaName);
         schema.setActualSchemaName(StringUtils.trimToNull(actualSchemaName));
         database.addSchema(schema);
+        persistence.initModelObject(schema);
         persistence.saveDatabase(database);
         return Response.created(uriInfo.getRequestUri()).build();
     }

@@ -403,8 +403,10 @@ public class DatabaseSyncer {
             if(sourceTable == null) {
                 logger.debug("Added new table: {}", tableName);
                 sourceTable = new Table();
+                sourceTable.setTableName(tableName);
             }
             Table targetTable = new Table(targetSchema);
+            copyAnnotations(sourceTable, targetTable);
             targetSchema.getTables().add(targetTable);
 
             targetTable.setTableName(tableName);
@@ -413,7 +415,6 @@ public class DatabaseSyncer {
             targetTable.setEntityName(sourceTable.getEntityName());
             targetTable.setJavaClass(sourceTable.getJavaClass());
             targetTable.setShortName(sourceTable.getShortName());
-            copyAnnotations(sourceTable, targetTable);
 
             syncColumns(liquibaseTable, sourceTable, targetTable);
 
@@ -438,20 +439,19 @@ public class DatabaseSyncer {
                 //tryToDeterminePrimaryKey(liquibaseView);
             }
             View targetView = new View(targetSchema);
+            copyAnnotations(sourceTable, targetView);
             if(sourceTable instanceof View) {
                 View sourceView = (View) sourceTable;
                 targetView.setInsertable(sourceView.isInsertable());
                 targetView.setUpdatable(sourceView.isUpdatable());
             }
             targetSchema.getTables().add(targetView);
-
             targetView.setTableName(viewName);
 
             logger.debug("Merging view attributes and annotations");
             targetView.setEntityName(sourceTable.getEntityName());
             targetView.setJavaClass(sourceTable.getJavaClass());
             targetView.setShortName(sourceTable.getShortName());
-            copyAnnotations(sourceTable, targetView);
 
             syncColumns(liquibaseView, sourceTable, targetView);
 
@@ -538,7 +538,13 @@ public class DatabaseSyncer {
         for(liquibase.structure.core.Column liquibaseColumn : relation.getColumns()) {
             logger.debug("Processing column: {}", liquibaseColumn.getName());
 
+            Column sourceColumn = DatabaseLogic.findColumnByNameIgnoreCase(sourceTable, liquibaseColumn.getName());
             Column targetColumn = new Column(targetTable);
+            if(sourceColumn != null) {
+                copyAnnotations(sourceColumn, targetColumn);
+                targetColumn.setPropertyName(sourceColumn.getPropertyName());
+                targetColumn.setJavaType(sourceColumn.getJavaType());
+            }
 
             targetColumn.setColumnName(liquibaseColumn.getName());
 
@@ -586,14 +592,7 @@ public class DatabaseSyncer {
             targetColumn.setScale(liquibaseColumn.getType().getDecimalDigits());
             //TODO liquibaseColumn.getLengthSemantics()
 
-            Column sourceColumn = DatabaseLogic.findColumnByNameIgnoreCase(sourceTable, liquibaseColumn.getName());
-            if(sourceColumn != null) {
-                targetColumn.setPropertyName(sourceColumn.getPropertyName());
-                targetColumn.setJavaType(sourceColumn.getJavaType());
-                copyAnnotations(sourceColumn, targetColumn);
-            }
-
-            logger.debug("Column creation successfull. Adding column to table.");
+            logger.debug("Column creation successful. Adding column to table.");
             targetTable.getColumns().add(targetColumn);
         }
 
@@ -628,12 +627,11 @@ public class DatabaseSyncer {
 
     protected void copyAnnotations(Annotated source, Annotated target) {
         for(Annotation ann : source.getAnnotations()) {
-            Annotation annCopy = new Annotation();
-            annCopy.setParent(target);
-            annCopy.setType(ann.getType());
+            // Note: we use ensureAnnotation because we add some annotations automatically and we want to overwrite,
+            // not duplicate those
+            Annotation annCopy = target.ensureAnnotation(ann.getType());
             annCopy.setValues(ann.getValues());
             annCopy.setProperties(ann.getProperties());
-            target.getAnnotations().add(annCopy);
         }
     }
 

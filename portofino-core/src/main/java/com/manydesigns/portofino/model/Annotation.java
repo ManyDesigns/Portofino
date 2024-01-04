@@ -167,8 +167,8 @@ public class Annotation implements ModelObject, Unmarshallable {
                 }
             }
         }
-        //Make sure the ECore annotation has the correct details. New ArrayList because otherwise the list is
-        //modified in place, losing properties before they can be added back.
+        // Make sure the ECore annotation has the correct details. New ArrayList because otherwise the list is
+        // modified in place, losing properties before they can be added back.
         setProperties(new ArrayList<>(properties));
         if(javaAnnotation == null) {
             Map<String, Object> valueMap = new HashMap<>();

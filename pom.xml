@@ -328,6 +328,12 @@
                 <artifactId>commons-vfs2</artifactId>
                 <version>${commons.vfs.version}</version>
             </dependency>
+            <!-- Database drivers -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.5.1</version>
+            </dependency>
             <!-- Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>

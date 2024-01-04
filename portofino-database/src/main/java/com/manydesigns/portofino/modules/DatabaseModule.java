@@ -33,6 +33,7 @@ import com.manydesigns.portofino.spring.PortofinoSpringConfiguration;
 import io.reactivex.disposables.Disposable;
 import org.apache.commons.vfs2.AllFileSelector;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
     public static final String GENERATED_CLASSES_DIRECTORY_NAME = "classes-generated";
+    public static final String SAVE_GENERATED_CLASSES_PROPERTY = "portofino.database.saveGeneratedClasses";
 
     @Autowired
     public ServletContext servletContext;
@@ -134,9 +136,26 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             applicationContext.getAutowireCapableBeanFactory().autowireBean(persistence);
         }
 
+        configureGeneratedClassesVisibility(persistence);
+        this.persistence = persistence;
+        return persistence;
+    }
+
+    private void configureGeneratedClassesVisibility(Persistence persistence) throws FileSystemException {
         FileObject generatedClassesRoot = applicationDirectory.resolveFile(GENERATED_CLASSES_DIRECTORY_NAME);
         generatedClassesRoot.createFolder();
         AllFileSelector allFileSelector = new AllFileSelector();
+        String saveGeneratedClasses = configuration.getProperties().getString(
+                SAVE_GENERATED_CLASSES_PROPERTY, "pojo"
+        );
+        boolean alwaysSave = saveGeneratedClasses.equalsIgnoreCase("always") || saveGeneratedClasses.equalsIgnoreCase("true");
+        boolean neverSave = saveGeneratedClasses.equalsIgnoreCase("never") || saveGeneratedClasses.equalsIgnoreCase("false");
+        ;
+        if (!alwaysSave && !neverSave && !saveGeneratedClasses.equalsIgnoreCase("pojo")) {
+            logger.warn(
+                    "Invalid setting for " + SAVE_GENERATED_CLASSES_PROPERTY + ": " + saveGeneratedClasses + "; " +
+                    "the application will default to saving only classes with POJO entity mode.");
+        }
         //When the entity mode is POJO:
         // - make generated classes visible to shared classes and actions;
         // - write them in the application directory so the user's IDE and tools can know about them.
@@ -148,7 +167,7 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
             switch (e.type) {
                 case Persistence.DatabaseSetupEvent.ADDED:
                     persistenceCodeBase.add(e.accessor.getCodeBase());
-                    if(e.accessor.getEntityMode() == EntityMode.POJO) {
+                    if(alwaysSave || (!neverSave && e.accessor.getEntityMode() == EntityMode.POJO)) {
                         externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
                     }
                     break;
@@ -160,14 +179,12 @@ public class DatabaseModule implements Module, ApplicationContextAware, Applicat
                 case Persistence.DatabaseSetupEvent.REPLACED:
                     persistenceCodeBase.replace(e.oldAccessor.getCodeBase(), e.accessor.getCodeBase());
                     externalDatabaseDir.deleteAll();
-                    if(e.accessor.getEntityMode() == EntityMode.POJO) {
+                    if(alwaysSave || (!neverSave && e.accessor.getEntityMode() == EntityMode.POJO)) {
                         externalDatabaseDir.copyFrom(inMemoryDatabaseDir, allFileSelector);
                     }
                     break;
             }
         });
-        this.persistence = persistence;
-        return persistence;
     }
 
     @PreDestroy
