@@ -23,6 +23,7 @@ package com.manydesigns.portofino.security;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.resourceactions.*;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,6 +144,14 @@ public class SecurityLogic {
 
     public static String getAdministratorsGroup(Configuration conf) {
         return conf.getString(GROUP_ADMINISTRATORS, GROUP_ADMINISTRATORS_DEFAULT);
+    }
+
+    public static void setAdministratorsGroup(Configuration conf, String group) {
+        if (StringUtils.isBlank(group)) {
+            conf.clearProperty(GROUP_ADMINISTRATORS);
+        } else {
+            conf.setProperty(GROUP_ADMINISTRATORS, group);
+        }
     }
 
     public static String getAllGroup(Configuration conf) {

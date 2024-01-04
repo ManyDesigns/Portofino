@@ -116,13 +116,9 @@ public abstract class AbstractOgnlFormat {
         return result;
     }
 
-    protected void evaluateOneOgnlExpression(Object root,
-                                           Map ognlContext,
-                                           Object[] result,
-                                           int i) {
+    protected void evaluateOneOgnlExpression(Object root, Map ognlContext, Object[] result, int i) {
         Object parsedOgnlExpression = parsedOgnlExpressions[i];
-        Object ognlResult = OgnlUtils.getValueQuietly(
-                parsedOgnlExpression, ognlContext, root);
+        Object ognlResult = OgnlUtils.getValueQuietly(parsedOgnlExpression, ognlContext, root);
         result[i] = ognlResult;
     }
 

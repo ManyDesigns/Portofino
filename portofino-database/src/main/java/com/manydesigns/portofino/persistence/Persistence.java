@@ -521,15 +521,19 @@ public class Persistence {
     }
 
     public void retryFailedConnections() {
-        Status currentStatus = status.getValue();
-        if(currentStatus != Status.STARTED) {
-            throw new IllegalStateException("Persistence not started: " + currentStatus);
-        }
+        checkStarted();
         for (Database database : databases) {
             if (!ConnectionProvider.STATUS_CONNECTED.equals(database.getConnectionProvider().getStatus())) {
                 logger.info("Retrying failed connection to database " + database.getDatabaseName());
                 initConnectionProvider(database);
             }
+        }
+    }
+
+    public void checkStarted() {
+        Status currentStatus = status.getValue();
+        if(currentStatus != Status.STARTED) {
+            throw new PersistenceNotStartedException(currentStatus);
         }
     }
 

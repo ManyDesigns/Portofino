@@ -70,4 +70,13 @@ public class SecurityUtilsBean {
         return ShiroUtils.getPrincipal(getSubject(), index);
     }
 
+    public Object getUserProperties() {
+        Object principal = getPrimaryPrincipal();
+        if (principal instanceof ModelBasedRealm.User) {
+            return ((ModelBasedRealm.User) principal).properties;
+        } else {
+            return null;
+        }
+    }
+
 }

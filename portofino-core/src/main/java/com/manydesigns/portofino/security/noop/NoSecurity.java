@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.security.noop;
 
+import com.manydesigns.portofino.config.ConfigurationSource;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.resourceactions.ActionInstance;
 import com.manydesigns.portofino.resourceactions.ResourceAction;
@@ -81,7 +83,10 @@ public class NoSecurity extends SecurityFacade {
     }
 
     @Override
-    public void setup(FileObject appDir, String adminGroupName, String encryptionAlgorithm) {}
+    public void setup(
+            FileObject appDir, ConfigurationSource portofinoConfiguration, ModelService modelService,
+            String adminGroupName, String encryptionAlgorithm
+    ) {}
 
     @Override
     public boolean isUserAuthenticated() {

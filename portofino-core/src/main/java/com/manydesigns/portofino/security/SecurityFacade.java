@@ -1,6 +1,7 @@
 package com.manydesigns.portofino.security;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.portofino.model.service.ModelService;
 import com.manydesigns.portofino.resourceactions.Permissions;
 import com.manydesigns.portofino.config.ConfigurationSource;
 import com.manydesigns.portofino.operations.Operation;
@@ -130,7 +131,10 @@ public abstract class SecurityFacade {
      */
     public abstract Set<String> getGroups();
 
-    public abstract void setup(FileObject appDirectory, String adminGroupName, String encryptionAlgorithm) throws IOException;
+    public abstract void setup(
+            FileObject appDirectory, ConfigurationSource portofinoConfiguration, ModelService modelService,
+            String adminGroupName, String encryptionAlgorithm
+    ) throws IOException;
 
     public abstract boolean isUserAuthenticated();
 

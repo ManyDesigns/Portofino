@@ -106,7 +106,7 @@ class Security extends AbstractPortofinoRealm {
         } else {
             logger.debug("Updating access fields.");
             updateAccess(principal, new Date());
-            session.update("users", (Object)principal);
+            session.merge("users", (Object)principal);
             session.getTransaction().commit();
         }
 
@@ -149,9 +149,8 @@ class Security extends AbstractPortofinoRealm {
         return info;
     }
 
-    public AuthenticationInfo loadAuthenticationInfo(
-            SignUpToken signUpToken) {
-        String token = signUpToken.token;
+    public AuthenticationInfo loadAuthenticationInfo(SignUpToken signUpToken) {
+        String token = signUpToken.token
 
         Session session = persistence.getSession("tt")
         def (CriteriaQuery criteria, CriteriaBuilder builder, Root root) =
@@ -168,7 +167,7 @@ class Security extends AbstractPortofinoRealm {
             updateAccess(principal, now);
             principal.token = null;
             principal.validated = now;
-            session.update("users", (Object)principal);
+            session.merge("users", (Object)principal);
             session.getTransaction().commit();
         }
 
@@ -184,7 +183,6 @@ class Security extends AbstractPortofinoRealm {
         principal.last_access_ip = request.getRemoteAddr()
     }
 
-    @Override
     protected Object cleanUserPrincipal(principal) {
         Map cleanUser = new HashMap()
         //user.properties.each { k, v -> //use this for POJO persistence

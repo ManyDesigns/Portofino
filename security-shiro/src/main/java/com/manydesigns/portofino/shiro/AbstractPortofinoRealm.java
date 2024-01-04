@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.code.CodeBase;
@@ -28,6 +29,7 @@ import com.manydesigns.portofino.security.SecurityLogic;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -38,7 +40,6 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.codec.Base64;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.HashService;
 import org.apache.shiro.crypto.hash.format.Base64Format;
@@ -56,10 +57,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.security.Key;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Default implementation of PortofinoRealm. Provides convenient implementations of the interface methods.
@@ -74,6 +73,10 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     public static final String JWT_EXPIRATION_PROPERTY = "jwt.expiration";
     public static final String JWT_SECRET_PROPERTY = "jwt.secret";
+    public static final String HASH_ALGORITHM = "auth.hash.algorithm";
+    public static final String HASH_FORMAT = "auth.hash.format";
+    public static final String HASH_ITERATIONS = "auth.hash.iterations";
+    public static final String PLAINTEXT = "plaintext";
 
     @Autowired
     protected ConfigurationSource configuration;
@@ -90,11 +93,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     @PostConstruct
     public void setup() {
         Configuration conf = configuration.getProperties();
-        String hashAlgorithm = conf.getString("auth.hash.algorithm", null);
+        String hashAlgorithm = conf.getString(HASH_ALGORITHM, null);
         if (hashAlgorithm != null) {
-            if (!"plaintext".equals(hashAlgorithm)) {
+            if (!PLAINTEXT.equalsIgnoreCase(hashAlgorithm)) {
                 DefaultHashService hashService = new DefaultHashService();
-                hashService.setHashIterations(conf.getInt("auth.hash.iterations", 1));
+                hashService.setHashIterations(conf.getInt(HASH_ITERATIONS, 1));
                 hashService.setHashAlgorithmName(hashAlgorithm);
                 boolean generatePublicSalt = false; //TODO read from configuration
                 HashFormat hashFormat;
@@ -115,9 +118,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     }
 
     protected HashFormat getHashFormatFromConfiguration() {
-        String formatSpec = configuration.getProperties().getString("auth.hash.format", null);
-        if (formatSpec == null) {
+        String formatSpec = configuration.getProperties().getString(HASH_FORMAT, null);
+        if (StringUtils.isBlank(formatSpec)) {
             return null;
+        } else {
+            formatSpec = formatSpec.toLowerCase();
         }
         switch (formatSpec) {
             case "plaintext":
@@ -158,48 +163,23 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
             throw new AuthenticationException(e);
         }
         String credentials = legacyHashing ? token.getCredentials() : encryptPassword(token.getCredentials());
-        Object principal = extractPrincipalFromWebToken(jwt);
-        return new SimpleAuthenticationInfo(principal, credentials, getName());
+        String userId = extractUserIdFromWebToken(jwt);
+        return new SimpleAuthenticationInfo(getPrincipal(userId), credentials, getName());
     }
 
-    protected Object extractPrincipalFromWebToken(Jws<Claims> jwt) {
+    protected Object getPrincipal(String userId) {
+        return userId;
+    }
+
+    protected String extractUserIdFromWebToken(Jws<Claims> jwt) {
         Map<String, Object> body = jwt.getBody();
-        String base64Principal = (String) body.get("serialized-principal");
-        byte[] serializedPrincipal = Base64.decode(base64Principal);
-        Object principal;
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(codeBase.asClassLoader()); //In case the serialized principal is a POJO entity
-            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedPrincipal)) {
-                @Override
-                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-                    return codeBase.loadClass(desc.getName());
-                }
-            };
-            principal = objectInputStream.readObject();
-            objectInputStream.close();
-        } catch (Exception e) {
-            throw new AuthenticationException(e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(loader);
-        }
-        return principal;
+        return (String) body.get("userId");
     }
 
     public String generateWebToken(Object principal) {
         Key key = getJWTKey();
         Map<String, Object> claims = new HashMap<>();
-        claims.put("principal", getPrincipalForWebToken(principal));
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream;
-        try {
-            objectOutputStream = new ObjectOutputStream(bytes);
-            objectOutputStream.writeObject(principal);
-            objectOutputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        claims.put("serialized-principal", bytes.toByteArray());
+        fillClaims(principal, claims);
         int expireAfterMinutes = configuration.getProperties().getInt(JWT_EXPIRATION_PROPERTY, 30);
         return Jwts.builder().
                 setClaims(claims).
@@ -208,36 +188,8 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
                 compact();
     }
 
-    protected Object getPrincipalForWebToken(Object principal) {
-        return cleanUserPrincipal(principal);
-    }
-
-    /**
-     * Clean the user principal making it suitable for JSON serialization. For example, if it is a map, remove
-     * circular references.
-     * @param principal the principal.
-     * @return
-     */
-    protected Object cleanUserPrincipal(Object principal) {
-        if(principal instanceof Map) {
-            Map cleanUser = new HashMap();
-            AtomicBoolean skipped = new AtomicBoolean(false);
-            ((Map<?, ?>) principal).forEach((k, v) -> {
-                if (v instanceof List || v instanceof Map) {
-                    logger.debug("Skipping {}", k);
-                    skipped.set(true);
-                } else {
-                    cleanUser.put(k, v);
-                }
-            });
-            if(skipped.get()) {
-                logger.debug("The user entity has potential self-references that make it unusable as a principal, because it must be serializable to JSON. Returning a non-persistent map with no references.");
-                return cleanUser;
-            } else {
-                return principal;
-            }
-        }
-        return principal;
+    protected void fillClaims(Object principal, Map<String, Object> claims) {
+        claims.put("userId", OgnlUtils.convertValueToString(getUserId(principal)));
     }
 
     @NotNull
@@ -336,7 +288,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     @Override
     public ClassAccessor getSelfRegisteredUserClassAccessor() {
-        return JavaClassAccessor.getClassAccessor(User.class);
+        return JavaClassAccessor.getClassAccessor(UserRegistration.class);
     }
 
     @Override
