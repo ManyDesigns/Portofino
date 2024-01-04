@@ -32,4 +32,19 @@ public class FormParametersAccessor implements KeyValueAccessor {
     public KeyValueAccessor object(String name) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public KeyValueAccessor list(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public KeyValueAccessor atIndex(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int length() {
+        return 0;
+    }
 }

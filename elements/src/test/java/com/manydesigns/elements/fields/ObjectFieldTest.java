@@ -22,14 +22,12 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.json.JsonKeyValueAccessor;
+import com.manydesigns.elements.json.JSONObjectAccessor;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.util.Util;
 import org.json.JSONObject;
-import org.json.JSONWriter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -71,7 +69,7 @@ public class ObjectFieldTest extends AbstractElementsTest {
         assertEquals(n1, field.getValue());
 
         JSONObject jsonObject = new JSONObject();
-        JsonKeyValueAccessor keyValueAccessor = new JsonKeyValueAccessor(jsonObject);
+        JSONObjectAccessor keyValueAccessor = new JSONObjectAccessor(jsonObject);
         field.readFrom(keyValueAccessor);
         field.validate();
         assertFalse(field.isValid());

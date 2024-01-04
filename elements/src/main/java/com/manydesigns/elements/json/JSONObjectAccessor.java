@@ -9,11 +9,11 @@ import org.json.JSONObject;
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class JsonKeyValueAccessor implements KeyValueAccessor {
+public class JSONObjectAccessor implements KeyValueAccessor {
 
     private final JSONObject jsonObject;
 
-    public JsonKeyValueAccessor(JSONObject jsonObject) {
+    public JSONObjectAccessor(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
     }
 
@@ -42,6 +42,24 @@ public class JsonKeyValueAccessor implements KeyValueAccessor {
         if (jsonObject.isNull(name)) {
             return null;
         }
-        return new JsonKeyValueAccessor(jsonObject.getJSONObject(name));
+        return new JSONObjectAccessor(jsonObject.getJSONObject(name));
+    }
+
+    @Override
+    public KeyValueAccessor list(String name) {
+        if (jsonObject.isNull(name)) {
+            return null;
+        }
+        return new JSONArrayAccessor(jsonObject.getJSONArray(name));
+    }
+
+    @Override
+    public KeyValueAccessor atIndex(int index) {
+        throw new UnsupportedOperationException("Not a list");
+    }
+
+    @Override
+    public int length() {
+        return 0;
     }
 }

@@ -30,4 +30,19 @@ public class MapKeyValueAccessor implements KeyValueAccessor {
         Map<String, Object> inner = (Map<String, Object>) get(name);
         return inner != null ? new MapKeyValueAccessor(inner) : null;
     }
+
+    @Override
+    public KeyValueAccessor list(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public KeyValueAccessor atIndex(int index) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int length() {
+        return 0;
+    }
 }

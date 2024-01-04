@@ -36,13 +36,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Builder for {@link TableForm}s.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class TableFormBuilder extends AbstractFormBuilder {
     public static final String copyright =
             "Copyright (C) 2005-2020 ManyDesigns srl";
@@ -63,10 +68,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
             LoggerFactory.getLogger(TableFormBuilder.class);
 
 
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-
     public TableFormBuilder(Class aClass) {
         this(JavaClassAccessor.getClassAccessor(aClass));
     }
@@ -85,11 +86,10 @@ public class TableFormBuilder extends AbstractFormBuilder {
     //**************************************************************************
 
     public TableFormBuilder configFields(String... fieldNames) {
-        propertyAccessors = new ArrayList<PropertyAccessor>();
+        propertyAccessors = new ArrayList<>();
         for (String currentField : fieldNames) {
             try {
-                PropertyAccessor accessor =
-                        classAccessor.getProperty(currentField);
+                PropertyAccessor accessor = classAccessor.getProperty(currentField);
                 propertyAccessors.add(accessor);
             } catch (NoSuchFieldException e) {
                 logger.warn("Field not found: {}", currentField);
@@ -176,7 +176,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
                 new PropertyAccessor[propertyAccessors.size()];
         propertyAccessors.toArray(propertyAccessorsArray);
 
-        TableForm tableForm = new TableForm(propertyAccessorsArray);
+        TableForm tableForm = new TableForm(rowBuilder(), propertyAccessorsArray);
 
         if (StringUtils.isNotBlank(prefix)) {
             tableForm.setPrefix(prefix);
@@ -184,9 +184,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
 
         // set up the columns
         setupColumns(tableForm);
-
-        // set up the rows
-        setupRows(tableForm);
 
         return tableForm;
     }
@@ -202,9 +199,10 @@ public class TableFormBuilder extends AbstractFormBuilder {
         }
     }
 
-    protected void setupRows(TableForm tableForm) {
-        int index = 0;
-        for (TableForm.Row row : tableForm.getRows()) {
+    protected BiFunction<TableForm, Integer, TableForm.Row> rowBuilder() {
+        return (tableForm, index) -> {
+            TableForm.Row row = tableForm.newRow(index);
+
             String rowPrefix =
                     StringUtils.join(new Object[]{prefix, "row", index, "_"});
 
@@ -224,8 +222,8 @@ public class TableFormBuilder extends AbstractFormBuilder {
                 setupSelectionProvidersForRow(tableForm, row, current);
             }
 
-            index++;
-        }
+            return row;
+        };
     }
 
     protected void setupSelectionProvidersForRow(TableForm tableForm, TableForm.Row row,

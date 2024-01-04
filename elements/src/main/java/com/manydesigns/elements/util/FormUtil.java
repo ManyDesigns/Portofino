@@ -35,7 +35,7 @@ import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.json.JsonKeyValueAccessor;
+import com.manydesigns.elements.json.JSONObjectAccessor;
 import org.apache.commons.lang.ObjectUtils;
 import org.joda.time.DateTime;
 import org.json.JSONException;
@@ -146,7 +146,7 @@ public class FormUtil {
     }
 
     public static Form readFromJson(Form form, JSONObject jsonObject) {
-        JsonKeyValueAccessor kv = new JsonKeyValueAccessor(jsonObject) {
+        JSONObjectAccessor kv = new JSONObjectAccessor(jsonObject) {
             @Override
             public Object get(String name) {
                 Object o = super.get(name);
@@ -155,7 +155,7 @@ public class FormUtil {
                     if(subObj.has(JSON_TYPE)) {
                         return null; //TODO blobs - how to handle?
                     } else {
-                        return new JsonKeyValueAccessor(subObj).get(JSON_VALUE);
+                        return new JSONObjectAccessor(subObj).get(JSON_VALUE);
                     }
                 } else {
                     return o;
@@ -166,7 +166,7 @@ public class FormUtil {
             public void set(String name, Object value) {
                 Object o = super.get(name);
                 if(o instanceof JSONObject) {
-                    new JsonKeyValueAccessor((JSONObject) o).set(JSON_VALUE, value);
+                    new JSONObjectAccessor((JSONObject) o).set(JSON_VALUE, value);
                 } else {
                     super.set(name, value);
                 }

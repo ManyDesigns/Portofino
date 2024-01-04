@@ -116,11 +116,11 @@ public class ObjectField extends AbstractField<Object> {
             return;
         }
         bulkChecked = true;
-        Object value = keyValueAccessor.get(accessor.getName());
-        if (value == null) {
+        KeyValueAccessor inner = keyValueAccessor.object(accessor.getName());
+        if (inner == null) {
             setValue(null);
         } else {
-            ensureForm().readFrom(keyValueAccessor.inner(value));
+            ensureForm().readFrom(inner);
             setValueFromForm();
         }
     }

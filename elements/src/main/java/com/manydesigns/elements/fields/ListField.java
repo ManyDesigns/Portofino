@@ -118,11 +118,11 @@ public class ListField extends AbstractField<Object> {
             return;
         }
         bulkChecked = true;
-        Object value = keyValueAccessor.get(accessor.getName());
-        if (value == null) {
+        KeyValueAccessor inner = keyValueAccessor.list(accessor.getName());
+        if (inner == null) {
             setValue(null);
         } else {
-            ensureForm().readFrom(keyValueAccessor.inner(value));
+            ensureForm().readFrom(inner);
             setValueFromForm();
         }
     }

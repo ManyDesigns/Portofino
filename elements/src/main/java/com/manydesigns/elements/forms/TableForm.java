@@ -38,6 +38,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 /** A form with multiple rows, where a row is a collection of fields. Every row has the same fields.
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,22 +65,17 @@ public class TableForm implements Element {
     protected boolean condensed = false;
     protected boolean striped = true;
 
+    protected final BiFunction<TableForm, Integer, Row> rowBuilder;
+
     private static final String SELECTION_CELL_CLASS = "selection-cell";
 
-    //**************************************************************************
-    // Costruttori
-    //**************************************************************************
-
-    public TableForm(PropertyAccessor... propertyAccessors) {
+    public TableForm(BiFunction<TableForm, Integer, Row> rowBuilder, PropertyAccessor... propertyAccessors) {
+        this.rowBuilder = rowBuilder;
         columns = new Column[propertyAccessors.length];
         for (int i = 0; i < columns.length; i++) {
             columns[i] = new Column(propertyAccessors[i]);
         }
     }
-
-    //**************************************************************************
-    // Implementazione di Element
-    //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("table");
@@ -156,14 +153,12 @@ public class TableForm implements Element {
 
     @Override
     public void readFrom(KeyValueAccessor keyValueAccessor) {
-        Object object = keyValueAccessor.get();
-        if (object instanceof Iterable) {
-            Iterator<?> iterator = ((Iterable<?>) object).iterator();
-            for (Row row : rows) {
-                if (iterator.hasNext()) {
-                    row.readFrom(keyValueAccessor.inner(iterator.next()));
-                }
-            }
+        rows.clear();
+        for (int i = 0; i < keyValueAccessor.length(); i++) {
+            KeyValueAccessor inner = keyValueAccessor.atIndex(i);
+            Row row = rowBuilder.apply(this, i);
+            row.readFrom(inner);
+            rows.add(row);
         }
     }
 
@@ -405,6 +400,10 @@ public class TableForm implements Element {
         public int getIndex() {
             return index;
         }
+    }
+
+    public Row newRow(int index) {
+        return new Row(index);
     }
 
     //**************************************************************************
