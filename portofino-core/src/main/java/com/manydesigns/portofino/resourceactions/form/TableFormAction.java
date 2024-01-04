@@ -84,14 +84,8 @@ public abstract class TableFormAction extends AbstractResourceAction {
 
     protected void setupTableForm(Mode mode) {
         List<?> objects = getObjects();
-        int nRows;
-        if (objects == null) {
-            nRows = 0;
-        } else {
-            nRows = objects.size();
-        }
         TableFormBuilder tableFormBuilder = createTableFormBuilder();
-        configureTableFormBuilder(tableFormBuilder, mode, nRows);
+        configureTableFormBuilder(tableFormBuilder, mode);
         form = buildTableForm(tableFormBuilder);
     }
 
@@ -99,8 +93,8 @@ public abstract class TableFormAction extends AbstractResourceAction {
         return new TableFormBuilder(getClassAccessor());
     }
 
-    protected TableFormBuilder configureTableFormBuilder(TableFormBuilder formBuilder, Mode mode, int nRows) {
-        return formBuilder.configMode(mode).configNRows(nRows);
+    protected TableFormBuilder configureTableFormBuilder(TableFormBuilder formBuilder, Mode mode) {
+        return formBuilder.configMode(mode);
     }
 
     protected TableForm buildTableForm(TableFormBuilder formBuilder) {
