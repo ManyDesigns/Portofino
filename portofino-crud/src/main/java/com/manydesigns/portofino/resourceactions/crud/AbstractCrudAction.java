@@ -755,7 +755,7 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
             nRows = objects.size();
         }
         TableFormBuilder tableFormBuilder = createTableFormBuilder();
-        configureTableFormBuilder(tableFormBuilder, mode, nRows);
+        configureTableFormBuilder(tableFormBuilder, mode);
         tableForm = buildTableForm(tableFormBuilder);
 
         if (objects != null) {
@@ -880,12 +880,11 @@ public abstract class AbstractCrudAction<T> extends AbstractResourceAction {
      * based on some runtime condition, etc.).
      * @param tableFormBuilder the table form builder.
      * @param mode the mode of the form.
-     * @param nRows number of rows to display.
      * @return the table form builder.
      */
-    protected TableFormBuilder configureTableFormBuilder(TableFormBuilder tableFormBuilder, Mode mode, int nRows) {
+    protected TableFormBuilder configureTableFormBuilder(TableFormBuilder tableFormBuilder, Mode mode) {
         configureTableFormSelectionProviders(tableFormBuilder);
-        tableFormBuilder.configPrefix(prefix).configNRows(nRows).configMode(mode);
+        tableFormBuilder.configPrefix(prefix).configMode(mode);
         if(tableFormBuilder.getPropertyAccessors() == null) {
             tableFormBuilder.configReflectiveFields();
         }
