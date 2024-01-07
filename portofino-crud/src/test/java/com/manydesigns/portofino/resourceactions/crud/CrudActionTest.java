@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -234,31 +234,31 @@ public class CrudActionTest extends JerseyTest {
 
         crudAction.executeSearch();
         assertEquals(16, crudAction.getTotalSearchRecords());
-        assertEquals(16, crudAction.getTableForm().getRows().length);
+        assertEquals(16, crudAction.getTableForm().getRows().size());
 
         //Category is not searchable, so this is ignored
         crudAction.searchString = "search_category=none";
         crudAction.executeSearch();
         assertEquals(16, crudAction.getTotalSearchRecords());
-        assertEquals(16, crudAction.getTableForm().getRows().length);
+        assertEquals(16, crudAction.getTableForm().getRows().size());
         crudAction.collection.getCriteria().clear();
 
         crudAction.searchString = "search_productid=none";
         crudAction.executeSearch();
         assertEquals(0, crudAction.getTotalSearchRecords());
-        assertEquals(0, crudAction.getTableForm().getRows().length);
+        assertEquals(0, crudAction.getTableForm().getRows().size());
         crudAction.collection.getCriteria().clear();
 
         crudAction.searchString = "search_productid=FI-SW-01";
         crudAction.executeSearch();
         assertEquals(1, crudAction.getTotalSearchRecords());
-        assertEquals(1, crudAction.getTableForm().getRows().length);
+        assertEquals(1, crudAction.getTableForm().getRows().size());
         crudAction.collection.getCriteria().clear();
 
         crudAction.searchString = "search_productid=FI-SW,search_productid_mode=STARTS";
         crudAction.executeSearch();
         assertEquals(2, crudAction.getTotalSearchRecords());
-        assertEquals(2, crudAction.getTableForm().getRows().length);
+        assertEquals(2, crudAction.getTableForm().getRows().size());
         crudAction.collection.getCriteria().clear();
     }
 
