@@ -1,4 +1,7 @@
+DROP TABLE IF EXISTS public.item;
+DROP TABLE IF EXISTS public.product;
 DROP TABLE IF EXISTS public.supplier;
+
 create table public.supplier (
     suppid int not null,
     name varchar(80) null,
@@ -110,7 +113,6 @@ create table public.category (
 	constraint pk_category primary key (catid)
 );
 
-DROP TABLE IF EXISTS public.product;
 create table public.product (
     productid varchar(10) not null,
     category varchar(10) not null,
@@ -124,7 +126,7 @@ create table public.product (
 create index productCat on public.product (category);
 create index productName on public.product (name);
 
-DROP TABLE IF EXISTS public.item;
+
 create table public.item (
     itemid varchar(10) not null,
     productid varchar(10) not null,

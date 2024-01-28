@@ -318,6 +318,7 @@ public class PersistenceTest {
         Object object = makeEntity("hibernatetest.public.Table1", testItemData);
         session.persist("table1", object);
         session.getTransaction().commit();
+        session.getTransaction().begin();
         session.remove(object);
         session.getTransaction().commit();
     }
