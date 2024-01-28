@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS comune;
 CREATE TABLE comune (
     regione character varying(30) NOT NULL,
     provincia character varying(30) NOT NULL,
-    comune character varying(30) NOT NULL,
+    comune character varying(30) NOT NULL UNIQUE,
     CONSTRAINT comune_pkey PRIMARY KEY (regione, provincia, comune)
 );
 
@@ -112,9 +112,9 @@ INSERT INTO public.domanda VALUES ('0002', 'Pippo', 'liguria', 'genova', 'rapall
 -- Data for Name: table1; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.table1 VALUES (1, 'esempio');
-INSERT INTO public.table1 VALUES (2, 'esempio');
-INSERT INTO public.table1 VALUES (3, 'esempio');
+INSERT INTO public.table1 VALUES (10, 'esempio');
+INSERT INTO public.table1 VALUES (20, 'esempio');
+INSERT INTO public.table1 VALUES (30, 'esempio');
 INSERT INTO public.table1 VALUES (64, 'esempio');
 INSERT INTO public.table1 VALUES (65, 'esempio');
 INSERT INTO public.table1 VALUES (66, 'esempio');
@@ -137,8 +137,8 @@ INSERT INTO public.table2 VALUES ('AbA', 'ABB', 'Miao');
 -- Data for Name: table3; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.table3 VALUES (2, 'AAA', 'AAA', 1, 2);
-INSERT INTO public.table3 VALUES (1, 'AAA', 'AAA', 2, 2);
+INSERT INTO public.table3 VALUES (2, 'AAA', 'AAA', 1, 20);
+INSERT INTO public.table3 VALUES (1, 'AAA', 'AAA', 2, 20);
 
 
 --

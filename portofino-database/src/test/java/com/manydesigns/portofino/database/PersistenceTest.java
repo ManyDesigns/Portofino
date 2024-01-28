@@ -311,11 +311,14 @@ public class PersistenceTest {
         persistence.closeSessions();
     }
 
-    public void testSaveTestElement() throws Exception {
+    public void testSaveTestElement() {
         Map<String, Object> testItemData = new HashMap<>();
         testItemData.put("testo", "esempio");
         Session session = persistence.getSession("hibernatetest");
-        session.persist("table1", makeEntity("hibernatetest.public.Table1", testItemData));
+        Object object = makeEntity("hibernatetest.public.Table1", testItemData);
+        session.persist("table1", object);
+        session.getTransaction().commit();
+        session.remove(object);
         session.getTransaction().commit();
     }
 

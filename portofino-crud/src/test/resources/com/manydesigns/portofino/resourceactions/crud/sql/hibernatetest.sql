@@ -1,6 +1,6 @@
 
-DROP TABLE IF EXISTS comune;
-CREATE TABLE comune (
+DROP TABLE IF EXISTS public.comune;
+CREATE TABLE public.comune (
     regione character varying(30) NOT NULL,
     provincia character varying(30) NOT NULL,
     comune character varying(30) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE comune (
 
 
 --
--- Name: domanda; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: domanda; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.domanda;
 CREATE TABLE public.domanda (
@@ -24,7 +24,7 @@ CREATE TABLE public.domanda (
 
 
 --
--- Name: table1; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table1; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table1;
 CREATE TABLE public.table1 (
@@ -34,7 +34,7 @@ CREATE TABLE public.table1 (
 
 
 --
--- Name: table2; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table2; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table2;
 CREATE TABLE public.table2 (
@@ -46,7 +46,7 @@ CREATE TABLE public.table2 (
 
 
 --
--- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP VIEW IF EXISTS public.test_view_1; --view depends on this table
 DROP TABLE IF EXISTS public.table3;
@@ -60,7 +60,7 @@ CREATE TABLE public.table3 (
 
 
 --
--- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table4;
 CREATE TABLE public.table4 (
@@ -79,7 +79,7 @@ CREATE TABLE public.delibera (
     regione character varying(30) NOT NULL,
     provincia character varying(30) NOT NULL,
     comune character varying(30) NOT NULL,
-    catid varchar(10) not null   
+    catid varchar(10) not null
 );
 
 
@@ -150,21 +150,18 @@ INSERT INTO public.table4 VALUES (2, 'B');
 INSERT INTO public.table4 VALUES (3, 'C');
 
 --
--- Name: domanda_regione_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: domanda_comune_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE  public.domanda
-    ADD CONSTRAINT domanda_regione_fkey FOREIGN KEY (regione, provincia, comune) REFERENCES comune(regione, provincia, comune);
-
-ALTER TABLE  public.domanda
-    ADD CONSTRAINT domanda_comune_fkey FOREIGN KEY (comune) REFERENCES comune(comune);
+    ADD CONSTRAINT domanda_comune_fkey FOREIGN KEY (regione, provincia, comune) REFERENCES public.comune(regione, provincia, comune);
 
 --
 -- Name: table3_t2_id1_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE  public.table3
-    ADD CONSTRAINT table3_t2_id1_fkey FOREIGN KEY (t2_id1, t2_id2) REFERENCES table2(id1, id2);
+    ADD CONSTRAINT table3_t2_id1_fkey FOREIGN KEY (t2_id1, t2_id2) REFERENCES public.table2(id1, id2);
 
 
 --
