@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [5.3.5] – Not yet released
 
 ### Added
-- Possibility to specify the project root with --dev for PortofinoDrivenBootApplication
+- Possibility to specify the project root with --dev for `PortofinoDrivenBootApplication`
 - Notes on how to connect using JNDI in `hibernate.properties`
 
 ### Changed
