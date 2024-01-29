@@ -1,17 +1,17 @@
-
+DROP TABLE IF EXISTS public.domanda;
 DROP TABLE IF EXISTS comune;
+
 CREATE TABLE comune (
     regione character varying(30) NOT NULL,
     provincia character varying(30) NOT NULL,
-    comune character varying(30) NOT NULL,
+    comune character varying(30) NOT NULL UNIQUE,
     CONSTRAINT comune_pkey PRIMARY KEY (regione, provincia, comune)
 );
 
 
 --
--- Name: domanda; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: domanda; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
-DROP TABLE IF EXISTS public.domanda;
 CREATE TABLE public.domanda (
     protocollo character varying(20) NOT NULL,
     richiedente character varying(50) NOT NULL,
@@ -24,8 +24,10 @@ CREATE TABLE public.domanda (
 
 
 --
--- Name: table1; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table1; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
+DROP VIEW IF EXISTS public.test_view_1; --view depends on this table
+DROP TABLE IF EXISTS public.table3; --table depends on this table
 DROP TABLE IF EXISTS public.table1;
 CREATE TABLE public.table1 (
     id IDENTITY NOT NULL,
@@ -34,7 +36,7 @@ CREATE TABLE public.table1 (
 
 
 --
--- Name: table2; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table2; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table2;
 CREATE TABLE public.table2 (
@@ -46,10 +48,8 @@ CREATE TABLE public.table2 (
 
 
 --
--- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table3; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
-DROP VIEW IF EXISTS public.test_view_1; --view depends on this table
-DROP TABLE IF EXISTS public.table3;
 CREATE TABLE public.table3 (
     id IDENTITY NOT NULL,
     t2_id1 character varying(3) NOT NULL,
@@ -60,7 +60,7 @@ CREATE TABLE public.table3 (
 
 
 --
--- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: table4; Type: TABLE; Schema: public; Owner: -; Tablespace:
 --
 DROP TABLE IF EXISTS public.table4;
 CREATE TABLE public.table4 (
@@ -79,7 +79,7 @@ CREATE TABLE public.delibera (
     regione character varying(30) NOT NULL,
     provincia character varying(30) NOT NULL,
     comune character varying(30) NOT NULL,
-    catid varchar(10) not null   
+    catid varchar(10) not null
 );
 
 
@@ -112,9 +112,9 @@ INSERT INTO public.domanda VALUES ('0002', 'Pippo', 'liguria', 'genova', 'rapall
 -- Data for Name: table1; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.table1 VALUES (1, 'esempio');
-INSERT INTO public.table1 VALUES (2, 'esempio');
-INSERT INTO public.table1 VALUES (3, 'esempio');
+INSERT INTO public.table1 VALUES (10, 'esempio');
+INSERT INTO public.table1 VALUES (20, 'esempio');
+INSERT INTO public.table1 VALUES (30, 'esempio');
 INSERT INTO public.table1 VALUES (64, 'esempio');
 INSERT INTO public.table1 VALUES (65, 'esempio');
 INSERT INTO public.table1 VALUES (66, 'esempio');
@@ -137,8 +137,8 @@ INSERT INTO public.table2 VALUES ('AbA', 'ABB', 'Miao');
 -- Data for Name: table3; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.table3 VALUES (2, 'AAA', 'AAA', 1, 2);
-INSERT INTO public.table3 VALUES (1, 'AAA', 'AAA', 2, 2);
+INSERT INTO public.table3 VALUES (2, 'AAA', 'AAA', 1, 20);
+INSERT INTO public.table3 VALUES (1, 'AAA', 'AAA', 2, 20);
 
 
 --
