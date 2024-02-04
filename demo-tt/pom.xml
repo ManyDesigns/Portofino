@@ -191,6 +191,12 @@
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
+                            <directory>src/main/frontend/.angular</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </fileset>
+                        <fileset>
                             <directory>src/main/frontend</directory>
                             <includes>
                                 <include>package-lock.json</include>
