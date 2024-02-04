@@ -100,18 +100,19 @@ export class PortofinoService {
     //Avoid refreshing the token on startup as this might hit the wrong login action
     const headers = {};
     headers[NO_REFRESH_TOKEN_HEADER] = true;
+    const portofino = this;
     this.http.get<ApiInfo>(this.localApiPath, { headers: headers }).subscribe({
       next(response) {
-        this.apiRoot = this.sanitizeApiRoot(response.apiRoot);
-        this.injector.get(AuthenticationStrategy).init({
-          apiRoot: this.apiRoot
+        portofino.apiRoot = portofino.sanitizeApiRoot(response.apiRoot);
+        portofino.injector.get(AuthenticationStrategy).init({
+          apiRoot: portofino.apiRoot
         });
         if (response.disableAdministration) {
-          this.localApiPath = null; //Disable local API
+          portofino.localApiPath = null; //Disable local API
         }
       },
       error() {
-        this.fallbackInit();
+        portofino.fallbackInit();
       }
     });
   }
