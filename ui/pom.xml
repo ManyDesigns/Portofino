@@ -31,6 +31,12 @@
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
+                        <fileset>
+                            <directory>.angular</directory>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </fileset>
                     </filesets>
                 </configuration>
             </plugin>
