@@ -11,7 +11,7 @@
     <artifactId>portofino-model</artifactId>
     <packaging>jar</packaging>
 
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>

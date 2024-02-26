@@ -10,7 +10,7 @@
     </parent>
     <artifactId>portofino-pageactions</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -40,7 +40,7 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>${commons.fileupload.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
@@ -70,7 +70,7 @@
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client</artifactId>
-            <version>1.20.0</version>
+            <version>1.35.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-codec</groupId>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client-jackson2</artifactId>
-            <version>1.20.0</version>
+            <version>2.3.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>

@@ -10,7 +10,7 @@
     </parent>
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com</url>
     <properties>
         <portofino.application.directory>${serverInfo:realPath}/WEB-INF</portofino.application.directory>
     </properties>
@@ -90,13 +90,13 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.12</version>
+            <version>1.4.14</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.4.12</version>
+            <version>1.4.14</version>
             <scope>compile</scope>
         </dependency>
         <!-- mail -->
@@ -114,7 +114,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.6.0</version>
+            <version>42.7.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

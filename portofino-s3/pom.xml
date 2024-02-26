@@ -10,7 +10,7 @@
     </parent>
     <artifactId>portofino-s3</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com</url>
     <dependencies>
 
         <dependency>
@@ -37,13 +37,8 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.543</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.12.662</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

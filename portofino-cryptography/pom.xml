@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>portofino-cryptography</artifactId>
     <packaging>jar</packaging>
-    <url>http://www.manydesigns.com/</url>
+    <url>https://www.manydesigns.com</url>
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>

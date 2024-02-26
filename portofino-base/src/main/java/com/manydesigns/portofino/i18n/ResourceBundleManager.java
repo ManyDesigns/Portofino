@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
- * http://www.manydesigns.com/
+ * https://www.manydesigns.com
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -125,7 +125,7 @@ public class ResourceBundleManager {
             logger.debug("Not adding search path: {}", searchPath);
             return;
         }
-        logger.info("Adding search path: {}", searchPath);
+        logger.debug("Adding search path: {}", searchPath);
         LinkedList<String> newSearchPaths = new LinkedList<String>(searchPaths);
         newSearchPaths.add(searchPath);
         searchPaths = newSearchPaths;
