@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -27,8 +27,8 @@ import java.util.List;
 
 /**
  * A ClassAccessor that restricts another accessor to certain properties. It can be created either with a whitelist of
- * properties to include or a blacklist of properties to exclude. 
- * 
+ * properties to include or a blacklist of properties to exclude.
+ *
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
@@ -64,7 +64,7 @@ public class FilteredClassAccessor extends AbstractAnnotatedAccessor implements 
         this.properties = propertiesList.toArray(new PropertyAccessor[propertiesList.size()]);
         this.keyProperties = keyPropertiesList.toArray(new PropertyAccessor[keyPropertiesList.size()]);
     }
-    
+
     public String getName() {
         return delegate.getName();
     }
@@ -93,11 +93,11 @@ public class FilteredClassAccessor extends AbstractAnnotatedAccessor implements 
     public Object newInstance() {
         return delegate.newInstance();
     }
-    
+
     public static FilteredClassAccessor exclude(ClassAccessor classAccessor, String... properties) {
         return new FilteredClassAccessor(classAccessor, false, properties);
     }
-    
+
     public static FilteredClassAccessor include(ClassAccessor classAccessor, String... properties) {
         return new FilteredClassAccessor(classAccessor, true, properties);
     }

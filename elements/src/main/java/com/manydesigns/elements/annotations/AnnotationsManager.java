@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import java.util.*;
 
 /**
  * A central registry that knows about all annotation implementations in Elements (listed in elements.properties).
- * 
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -39,7 +39,7 @@ import java.util.*;
  **/
 public class AnnotationsManager {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     //**************************************************************************
     // Static fields

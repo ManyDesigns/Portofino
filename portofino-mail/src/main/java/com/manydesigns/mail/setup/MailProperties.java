@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -28,7 +28,7 @@ package com.manydesigns.mail.setup;
  */
 public class MailProperties {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     public static final String MAIL_ENABLED = "mail.enabled";
     public static final String MAIL_SMTP_HOST = "mail.smtp.host";

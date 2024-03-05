@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -73,7 +73,7 @@ import java.io.Serializable;
 @PageActionName("Login")
 public class DefaultLoginAction extends LoginAction implements PageAction {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -203,7 +203,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     public String getPageTemplate() {
         return pageInstance.getLayout().getTemplate();
     }
-    
+
     @Override
     public PageAction getParent() {
         return pageInstance.getParent().getActionBean();

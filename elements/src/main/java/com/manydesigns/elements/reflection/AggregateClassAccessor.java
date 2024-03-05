@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class AggregateClassAccessor implements ClassAccessor {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     protected final List<ClassAccessor> accessors;
     protected final List<String> aliases;

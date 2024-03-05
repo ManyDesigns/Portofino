@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marks a handler method or an action class as accessible only by the administrator(s).
- * 
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -37,5 +37,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequiresAdministrator {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 }

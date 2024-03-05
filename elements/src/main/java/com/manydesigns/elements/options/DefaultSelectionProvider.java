@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,7 +37,7 @@ import java.util.*;
 */
 public class DefaultSelectionProvider implements SelectionProvider {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
     public static final Comparator<OptionProvider.Option> OPTION_COMPARATOR_BY_LABEL = (r1, r2) -> {
         for (int i = 0; i < r1.labels.length; i++) {
             int comp = Util.compare(r1.getLabels()[i], r2.getLabels()[i]);
@@ -203,7 +203,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     class DefaultSelectionModel implements SelectionModel {
         public static final String copyright =
-                "Copyright (C) 2005-2021 ManyDesigns srl";
+                "Copyright (C) 2005-2024 ManyDesigns srl";
 
         private final Object[] values;
         private final String[] labelSearches;

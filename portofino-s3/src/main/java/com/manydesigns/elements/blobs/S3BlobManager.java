@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -96,7 +96,7 @@ public class S3BlobManager implements BlobManager{
                 .withEndpointConfiguration( endpointConfiguration )
                 .withPathStyleAccessEnabled(true)
                 .build();
-    }                                                                              
+    }
 
     //**************************************************************************
     // Methods
@@ -201,7 +201,7 @@ public class S3BlobManager implements BlobManager{
             logger.warn("Cound not delete meta file", e);
             success = false;
         }
-        
+
         return success;
     }
 

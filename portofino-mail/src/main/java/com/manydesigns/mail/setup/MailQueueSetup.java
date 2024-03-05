@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -41,7 +41,7 @@ import java.io.File;
  */
 public class MailQueueSetup {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(MailQueueSetup.class);
 
@@ -77,7 +77,7 @@ public class MailQueueSetup {
                         MailProperties.MAIL_SMTP_LOGIN);
                 String password = mailConfiguration.getString(
                         MailProperties.MAIL_SMTP_PASSWORD);
-                
+
                 mailSender = new DefaultMailSender(mailQueue);
                 mailSender.setServer(mailHost);
                 mailSender.setLogin(login);

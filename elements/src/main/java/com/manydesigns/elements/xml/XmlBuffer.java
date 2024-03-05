@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,8 +37,8 @@ import java.util.Stack;
  */
 public class XmlBuffer {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
-    
+            "Copyright (C) 2005-2024 ManyDesigns srl";
+
     private static final int TEXT = 3;
     private static final int START = 0;
     private static final int OPEN = 2;

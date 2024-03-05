@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -45,7 +45,7 @@ import java.text.MessageFormat;
 */
 public abstract class AbstractDateField<T> extends AbstractTextField<T> {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -220,7 +220,7 @@ public abstract class AbstractDateField<T> extends AbstractTextField<T> {
     }
 
     protected abstract T toDate(@NotNull Number millisSince1970);
-    
+
     protected abstract T toDate(@NotNull DateTime dateTime);
 
     protected abstract DateTime fromDate(@NotNull T dateValue);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -43,7 +43,7 @@ public abstract class POP3Client {
     protected static final String DELIVERY_STATUS_NOTIFICATION =
             "delivery status notification";
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
     protected final String host;
     protected final String protocol;
     protected final int port;

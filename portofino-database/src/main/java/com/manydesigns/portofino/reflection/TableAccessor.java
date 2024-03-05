@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -45,7 +45,7 @@ import java.util.Map;
 */
 public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAccessor {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -155,7 +155,7 @@ public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAcc
         throw new NoSuchFieldException(propertyName);
     }
 
-    
+
     public PropertyAccessor[] getProperties() {
         return columnAccessors.clone();
     }

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -42,7 +42,7 @@ import java.util.Locale;
  */
 public class LocalePicker extends DefaultLocalePicker {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     @Override
     public void init(Configuration configuration) throws Exception {

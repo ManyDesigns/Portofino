@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -72,7 +72,7 @@ import java.util.Locale;
  */
 public abstract class LoginAction extends AbstractActionBean {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     //**************************************************************************
     // Injections
@@ -320,7 +320,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 logger.warn("Forgot password request for nonexistent email");
             }
 
-            //This is by design, for better security. Always give the successful message even if no mail was sent. 
+            //This is by design, for better security. Always give the successful message even if no mail was sent.
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));
         } catch (Exception e) {
             logger.error("Error during password reset", e);

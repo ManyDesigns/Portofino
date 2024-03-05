@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 */
 public class DatabaseBlobFieldHelper implements FieldHelper {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseBlobFieldHelper.class);
 

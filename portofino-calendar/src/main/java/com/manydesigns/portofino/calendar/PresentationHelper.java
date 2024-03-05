@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -30,7 +30,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class PresentationHelper {
-    
+
     public static void writeDialogCloseButtonInFooter(XhtmlBuffer xhtmlBuffer) {
         xhtmlBuffer.openElement("button");
         xhtmlBuffer.addAttribute("class", "btn btn-primary");
@@ -72,5 +72,5 @@ public class PresentationHelper {
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("class", "modal-content");
     }
-    
+
 }

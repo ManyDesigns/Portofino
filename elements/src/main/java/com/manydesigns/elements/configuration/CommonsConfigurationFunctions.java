@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,36 +33,36 @@ import java.math.BigInteger;
  */
 public class CommonsConfigurationFunctions {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
-    
+            "Copyright (C) 2005-2024 ManyDesigns srl";
+
     public static String getString(Configuration configuration, String key) {
         return configuration.getString(key);
     }
-    
+
     public static int getInt(Configuration configuration, String key) {
         return configuration.getInt(key);
     }
-    
+
     public static String[] getStringArray(Configuration configuration, String key) {
         return configuration.getStringArray(key);
     }
-    
+
     public static BigDecimal getBigDecimal(Configuration configuration, String key) {
         return configuration.getBigDecimal(key);
     }
-    
+
     public static BigInteger getBigInteger(Configuration configuration, String key) {
         return configuration.getBigInteger(key);
     }
-    
+
     public static boolean getBoolean(Configuration configuration, String key) {
         return configuration.getBoolean(key);
     }
-    
+
     public static byte getByte(Configuration configuration, String key) {
         return configuration.getByte(key);
     }
-    
+
     public static double getDouble(Configuration configuration, String key) {
         return configuration.getDouble(key);
     }

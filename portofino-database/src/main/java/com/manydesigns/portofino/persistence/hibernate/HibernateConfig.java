@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -222,7 +222,7 @@ public class HibernateConfig {
         for(com.manydesigns.portofino.model.database.Column modelColumn : aTable.getColumns()) {
             int jdbcType = modelColumn.getJdbcType();
             Class javaType = modelColumn.getActualJavaType();
-            
+
             //First param = null ==> doesn't really set anything, just check
             boolean hibernateTypeOk =
                     setHibernateType(null, modelColumn);
@@ -413,7 +413,7 @@ public class HibernateConfig {
         id.setNullValue("undefined");
 
         tab.getPrimaryKey().addColumn(col);
-        
+
         Property prop = createProperty(column, id);
         clazz.addProperty(prop);
         prop.setPropertyAccessorName(mappings.getDefaultAccess());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -40,7 +40,7 @@ public class ColumnParameterType implements DynamicParameterizedType.ParameterTy
     public ColumnParameterType(Column column) {
         this(column, column.getActualJavaType());
     }
-    
+
     public ColumnParameterType(Column column, Class returnedClass) {
         this.column = column;
         this.returnedClass = returnedClass;

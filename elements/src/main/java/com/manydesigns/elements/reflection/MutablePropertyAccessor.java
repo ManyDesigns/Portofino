@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -29,7 +29,7 @@ import java.lang.annotation.Annotation;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class MutablePropertyAccessor extends AbstractAnnotatedAccessor implements PropertyAccessor {
-    
+
     protected String name;
     protected Class type;
     protected int modifiers;
@@ -75,10 +75,10 @@ public class MutablePropertyAccessor extends AbstractAnnotatedAccessor implement
     public void set(Object obj, Object value) {
         throw new UnsupportedOperationException();
     }
-    
+
     public MutablePropertyAccessor configureAnnotation(Annotation annotation) {
         annotations.put(annotation.annotationType(), annotation);
         return this;
     }
-    
+
 }

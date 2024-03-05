@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -40,7 +40,7 @@ import java.util.*;
 
 /**
  * A {@link ClassAccessor} targeting Java classes. Use {@link GroovyClassAccessor} for Groovy classes instead.
- * 
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -48,7 +48,7 @@ import java.util.*;
 */
 public class JavaClassAccessor implements ClassAccessor {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     //**************************************************************************
     // Constants
@@ -213,7 +213,7 @@ public class JavaClassAccessor implements ClassAccessor {
         return false;
     }
 
-    
+
     //**************************************************************************
     // ClassAccessor implementation
     //**************************************************************************

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HttpBasicAuthenticationFilter extends PathMatchingFilter {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     private static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
 
@@ -35,7 +35,7 @@ public class HttpBasicAuthenticationFilter extends PathMatchingFilter {
      * HTTP Authorization header, equal to <code>Authorization</code>
      */
     protected static final String AUTHORIZATION_HEADER = "Authorization";
-    
+
     @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         Subject subject = SecurityUtils.getSubject();

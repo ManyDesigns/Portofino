@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,7 +33,7 @@ import java.lang.annotation.Annotation;
 @SuppressWarnings({"ClassExplicitlyAnnotation"})
 public class RegExpImpl implements RegExp {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     private final String value;
     private final String errorMessage;
@@ -50,7 +50,7 @@ public class RegExpImpl implements RegExp {
     public String errorMessage() {
         return errorMessage;
     }
-    
+
     public Class<? extends Annotation> annotationType() {
         return RegExp.class;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2021 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -38,10 +38,10 @@ import java.util.Map;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class ColumnAccessor
-        extends AbstractAnnotatedAccessor 
+        extends AbstractAnnotatedAccessor
         implements PropertyAccessor {
     public static final String copyright =
-            "Copyright (C) 2005-2021 ManyDesigns srl";
+            "Copyright (C) 2005-2024 ManyDesigns srl";
 
     //**************************************************************************
     // Fields
