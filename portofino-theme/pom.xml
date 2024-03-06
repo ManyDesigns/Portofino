@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.11-SNAPSHOT</version>
+        <version>4.2.11</version>
     </parent>
     <artifactId>portofino-theme</artifactId>
     <packaging>jar</packaging>
@@ -89,9 +89,9 @@
             <version>2.29.4</version>
         </dependency>
         <dependency>
-            <groupId>org.webjars</groupId>
+            <groupId>org.webjars.npm</groupId>
             <artifactId>moment-timezone</artifactId>
-            <version>0.5.5</version>
+            <version>0.5.45</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
@@ -101,6 +101,10 @@
                 <exclusion>
                     <groupId>org.webjars</groupId>
                     <artifactId>bootstrap</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.webjars</groupId>
+                    <artifactId>momentjs</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

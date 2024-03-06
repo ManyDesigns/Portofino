@@ -9,7 +9,7 @@
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.11-SNAPSHOT</version>
+    <version>4.2.11</version>
     <name>manydesigns-portofino</name>
     <description>
         Portofino is a web application framework written in Java and
@@ -89,11 +89,11 @@
         <groovy.version>3.0.21</groovy.version>
         <guava.version>33.0.0-jre</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.11.Final</hibernate.version>
-        <jackson.version>2.16.1</jackson.version> <!-- >=2.8.10 for current jersey version -->
-        <javassist.version>3.18.2-GA</javassist.version> <!-- Hibernate -->
+        <jackson.version>2.15.3</jackson.version> <!-- >=2.8.10 for current jersey version -->
+        <javassist.version>3.24.1-GA</javassist.version> <!-- Hibernate -->
         <jakarta.mail.version>1.6.7</jakarta.mail.version> <!-- Differs from commons-email but the interface is unchanged-->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
-        <jersey.version>2.27</jersey.version>
+        <jersey.version>2.41</jersey.version>
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
@@ -104,7 +104,7 @@
         <jstl.version>1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
         <liquibase.version>4.26.0</liquibase.version>
-        <logback.version>1.4.14</logback.version>
+        <logback.version>1.3.14</logback.version>
         <ognl.version>3.2.21</ognl.version>
         <quartz.version>2.3.2</quartz.version>
         <resteasy.version>3.15.6.Final</resteasy.version>
@@ -123,7 +123,6 @@
         <module>portofino-cryptography</module>
         <module>portofino-stripes</module>
         <module>portofino-jersey</module>
-        <module>portofino-resteasy</module>
         <module>portofino-model</module>
         <!-- Database persistence -->
         <module>portofino-database</module>
@@ -433,7 +432,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>1.4.1</version>
+                        <version>3.3.0</version>
                         <executions>
                             <execution>
                                 <id>enforce-bytecode-version</id>
@@ -445,6 +444,9 @@
                                         <dependencyConvergence/>
                                         <enforceBytecodeVersion>
                                             <maxJdkVersion>1.8</maxJdkVersion>
+                                            <excludes>
+                                                <exclude>org.testng:testng</exclude>
+                                            </excludes>
                                         </enforceBytecodeVersion>
                                     </rules>
                                     <fail>true</fail>
@@ -455,7 +457,7 @@
                             <dependency>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>extra-enforcer-rules</artifactId>
-                                <version>1.0-beta-9</version>
+                                <version>1.7.0</version>
                             </dependency>
                         </dependencies>
                     </plugin>

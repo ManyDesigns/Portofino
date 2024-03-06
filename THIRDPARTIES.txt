@@ -96,7 +96,7 @@ License: Apache License v2
 
 Commons Codec
 Site: http://commons.apache.org/codec/
-File: commons-codec-1.3.jar
+File: commons-codec-1.15.jar
 License: Apache License v2
 
 Commons Collections
@@ -252,7 +252,7 @@ License: Apache License v2.0
 
 LOGBack
 Site: http://logback.qos.ch/
-Files: logback-classic-1.4.14.jar, logback-core-1.4.14.jar
+Files: logback-classic-1.3.14.jar, logback-core-1.3.14.jar
 License: Eclipse Public License v1.0
 
 NekoHTML

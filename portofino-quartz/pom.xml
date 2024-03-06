@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.11-SNAPSHOT</version>
+        <version>4.2.11</version>
     </parent>
     <artifactId>portofino-quartz</artifactId>
     <packaging>jar</packaging>
@@ -36,15 +36,19 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>c3p0</groupId>
+                    <groupId>com.mchange</groupId>
                     <artifactId>c3p0</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.mchange</groupId>
+                    <artifactId>mchange-commons-java</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
       <dependency>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino-mail</artifactId>
-        <version>4.2.11-SNAPSHOT</version>
+        <version>4.2.11</version>
         <scope>compile</scope>
       </dependency>
     </dependencies>
