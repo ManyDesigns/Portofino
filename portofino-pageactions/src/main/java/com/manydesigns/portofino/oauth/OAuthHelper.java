@@ -26,7 +26,7 @@ import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -40,7 +40,6 @@ import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Collection;
@@ -66,7 +65,7 @@ public class OAuthHelper {
     protected HttpTransport httpTransport = new NetHttpTransport();
     protected Credential.AccessMethod accessMethod = BearerToken.authorizationHeaderAccessMethod();
 
-    protected static final JsonFactory JSON_FACTORY = new JacksonFactory();
+    protected static final JsonFactory JSON_FACTORY = new GsonFactory();
 
     protected final ActionBeanContext actionBeanContext;
     protected final String tokenServerUrl;

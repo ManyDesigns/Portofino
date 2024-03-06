@@ -1,6 +1,6 @@
 ManyDesigns Portofino includes other software as detailed below.
 
-This product includes software developed by the Apache Software 
+This product includes software developed by the Apache Software
 Foundation (http://www.apache.org/).
 
 This product includes software developed by the
@@ -16,9 +16,9 @@ An original copy of the license agreement can be found at: http://www.h2database
 
 All trademarks belong to their respective owners.
 
-Ace (Ajax.org Cloud9 Editor) version 1.2.0
+Ace (Ajax.org Cloud9 Editor) version 1.2.9
 Site: https://github.com/ajaxorg/ace/
-Files: ace-1.2.0.jar
+Files: ace-1.2.9.jar
 License: Mozilla Public License
 
 ANTLR Parser Generator
@@ -41,12 +41,12 @@ License: Apache License v2.0
 
 Apache FOP
 Site: http://xmlgraphics.apache.org/fop/
-File: fop-2.1.jar
+File: fop-2.9.jar
 License: Apache License v2.0
 
 Apache Shiro
 Site: http://shiro.apache.org
-Files: shiro-core-1.8.0.jar, shiro-web-1.8.0.jar
+Files: shiro-core-1.13.0.jar, shiro-web-1.13.0.jar
 License: Apache License v2.0
 
 Apache XML-commons
@@ -86,7 +86,7 @@ License: LGPL
 
 CKEditor - web text editor
 Site: http://ckeditor.com/
-File: ckeditor-4.5.3.jar
+File: ckeditor-4.19.0.jar
 License: LGPL
 
 Commons BeanUtils
@@ -116,12 +116,12 @@ License: Apache License v2
 
 Commons Email
 Site: http://commons.apache.org/email/
-File: commons-email-1.4.jar
+File: commons-email-1.6.0.jar
 License: Apache License v2
 
 Commons FileUpload
 Site: http://commons.apache.org/fileupload/
-File: commons-fileupload-1.3.2.jar
+File: commons-fileupload-1.5.jar
 License: Apache License v2
 
 Commons IO
@@ -161,7 +161,7 @@ License: Apache License v2
 
 Groovy
 Site: http://groovy.codehaus.org/
-File: groovy-2.4.7.jar, groovy-json-2.4.7.jar, groovy-templates-2.4.7.jar
+File: groovy-3.0.21.jar, groovy-json-3.0.21.jar, groovy-templates-3.0.21.jar
 License: Apache License v2
 
 Hibernate ORM
@@ -192,9 +192,9 @@ Site: http://www.oracle.com/technetwork/java/javase/downloads/index-135046.html
 File: activation-1.1.jar
 License: Oracle Binary Code License Agreement for Java SE
 
-JavaMail API 1.4.1
+JakartaMail API 1.4.1
 http://java.sun.com/products/javamail/
-File: mail-1.4.1.jar
+File: mail-1.6.7.jar
 License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
 
 Javassist
@@ -237,7 +237,7 @@ License: JSON License (http://www.json.org/license.html)
 
 JSoup
 Site: http://jsoup.org/
-File: jsoup-1.9.2.jar
+File: jsoup-1.17.2.jar
 License: MIT
 
 JSqlParser
@@ -247,12 +247,12 @@ License: LGPL
 
 Liquibase
 Site: http://www.liquibase.org/
-File: liquibase-core-4.8.0.jar
+File: liquibase-core-4.26.0.jar
 License: Apache License v2.0
 
 LOGBack
 Site: http://logback.qos.ch/
-Files: logback-classic-1.1.7.jar, logback-core-1.1.7.jar
+Files: logback-classic-1.4.14.jar, logback-core-1.4.14.jar
 License: Eclipse Public License v1.0
 
 NekoHTML
@@ -282,7 +282,7 @@ License: Apache License v2.0
 
 Simple Logging Facade for Java
 Site: http://www.slf4j.org/
-Files: slf4j-api-1.7.21.jar, slf4j-nop-1.7.21.jar, jcl-over-slf4j-1.7.21.jar, log4j-over-slf4j-1.7.21.jar
+Files: slf4j-api-1.7.36.jar, slf4j-nop-1.7.36.jar, jcl-over-slf4j-1.7.36.jar, log4j-over-slf4j-1.7.36.jar
 License: MIT
 
 Stripes

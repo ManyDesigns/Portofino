@@ -42,6 +42,7 @@ import java.io.IOException;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@Deprecated
 public class DatabaseCredentialStore implements CredentialStore {
     public static final String copyright =
             "Copyright (C) 2005-2024 ManyDesigns srl";

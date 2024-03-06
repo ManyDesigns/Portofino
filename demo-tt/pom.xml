@@ -79,12 +79,26 @@
         <!-- logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -102,7 +116,8 @@
         <!-- mail -->
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>${jakarta.mail.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -123,6 +138,14 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+
+
+        <dependency>
+            <groupId>net.sourceforge.jexcelapi</groupId>
+            <artifactId>jxl</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -134,6 +157,31 @@
                 <configuration>
                     <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <port>8088</port>
+                    <path>/</path>
+                    <!--<systemProperties>-->
+                    <!--<org.jboss.logging.provider>slf4j</org.jboss.logging.provider>-->
+                    <!--<logback-access.debug>true</logback-access.debug>-->
+                    <!--</systemProperties>-->
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>42.7.2</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>javax.servlet-api</artifactId>
+                        <version>${servlet.api.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

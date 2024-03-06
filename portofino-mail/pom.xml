@@ -31,7 +31,7 @@
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
+            <artifactId>jakarta.mail</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -41,8 +41,8 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>jakarta.mail</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
