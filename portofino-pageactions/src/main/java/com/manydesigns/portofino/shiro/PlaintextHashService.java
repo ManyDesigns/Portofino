@@ -17,10 +17,19 @@ public class PlaintextHashService implements HashService {
 
     @Override
     public Hash computeHash(HashRequest request) {
-        SimpleHash result = new SimpleHash(request.getAlgorithmName());
-        result.setSalt(request.getSalt());
-        result.setIterations(request.getIterations());
-        result.setBytes(request.getSource().getBytes());
-        return result;
+        if(  request.getAlgorithmName().isPresent() && request.getSalt().isPresent() ){
+            SimpleHash result = new SimpleHash(request.getAlgorithmName().get());
+            result.setSalt(request.getSalt().get());
+            //result.setIterations(request); //TODO
+            result.setBytes(request.getSource().getBytes());
+            return result;
+        }
+
+        return null; //TODO
+    }
+
+    @Override
+    public String getDefaultAlgorithmName() {
+        return null;
     }
 }

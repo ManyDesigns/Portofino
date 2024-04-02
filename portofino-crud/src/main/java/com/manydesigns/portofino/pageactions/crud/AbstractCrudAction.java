@@ -83,12 +83,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -1205,7 +1205,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Populates the search form from request parameters.
      * <ul>
      *     <li>If <code>searchString</code> is blank, then the form is read from the request
-     *     (by {@link SearchForm#readFromRequest(javax.servlet.http.HttpServletRequest)}) and <code>searchString</code>
+     *     (by {@link SearchForm#readFromRequest(jakarta.servlet.http.HttpServletRequest)}) and <code>searchString</code>
      *     is generated accordingly.</li>
      *     <li>Else, <code>searchString</code> is interpreted as a query string and the form is populated from it.</li>
      * </ul>

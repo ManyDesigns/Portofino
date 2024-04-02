@@ -22,7 +22,7 @@ package com.manydesigns.mail.pop3;
 
 import com.sun.mail.pop3.POP3SSLStore;
 
-import javax.mail.*;
+import jakarta.mail.*;
 import java.util.Set;
 
 /*

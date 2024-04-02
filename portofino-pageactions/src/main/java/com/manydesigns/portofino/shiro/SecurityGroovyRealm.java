@@ -31,13 +31,13 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.lang.util.Destroyable;
+import org.apache.shiro.lang.util.LifecycleUtils;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.util.Destroyable;
-import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.io.Serializable;
 import java.util.*;
 

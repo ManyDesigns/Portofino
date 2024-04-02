@@ -4,7 +4,7 @@ import com.manydesigns.portofino.pageactions.rest.APIRoot;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.ws.rs.ApplicationPath;
+import jakarta.ws.rs.ApplicationPath;
 
 @ApplicationPath(APIRoot.PATH_PREFIX)
 public class PortofinoApplication extends ResourceConfig {

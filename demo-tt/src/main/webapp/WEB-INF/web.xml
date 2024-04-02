@@ -35,4 +35,9 @@
         for development on your own machine. The generated war WILL NOT WORK on other machines.
          -->
     </context-param>
+
+    <context-param>
+        <param-name>org.apache.shiro.ee.disabled</param-name>
+        <param-value>true</param-value>
+    </context-param>
 </web-app>

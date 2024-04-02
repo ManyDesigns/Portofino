@@ -29,8 +29,8 @@ import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import org.apache.commons.configuration.Configuration;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 
 /**

@@ -41,7 +41,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.ArrayList;
@@ -152,7 +152,7 @@ public class DispatcherLogic {
 
     /**
      * Persists a page to the file system.
-     * @param pageInstance the live PageInstance containing the Page to save. 
+     * @param pageInstance the live PageInstance containing the Page to save.
      * @return the file where the page was saved.
      * @throws Exception in case the save fails.
      */
@@ -170,7 +170,7 @@ public class DispatcherLogic {
     public static File savePage(File directory, Page page) throws Exception {
         File pageFile = getPageFile(directory);
         Marshaller marshaller = pagesJaxbContext.createMarshaller();
-        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setProperty(jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.marshal(page, pageFile);
         pageCache.invalidate(pageFile);
         return pageFile;
@@ -379,7 +379,7 @@ public class DispatcherLogic {
         String configurationPackage = configuration.getClass().getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setProperty(jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         File configurationFile = new File(directory, "configuration.xml");
         marshaller.marshal(configuration, configurationFile);
         configurationCache.invalidate(configurationFile);

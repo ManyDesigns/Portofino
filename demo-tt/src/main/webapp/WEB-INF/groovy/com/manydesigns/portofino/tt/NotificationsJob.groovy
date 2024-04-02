@@ -45,8 +45,8 @@ import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.modules.MailModule
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
 import com.manydesigns.portofino.persistence.Persistence
-import javax.servlet.RequestDispatcher
-import javax.servlet.ServletContext
+import jakarta.servlet.RequestDispatcher
+import jakarta.servlet.ServletContext
 import org.apache.commons.configuration.Configuration
 import org.hibernate.Criteria
 import org.hibernate.Session

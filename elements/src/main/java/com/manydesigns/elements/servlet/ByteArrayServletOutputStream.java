@@ -32,9 +32,9 @@ package com.manydesigns.elements.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-//import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+//import jakarta.servlet.WriteListener;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 

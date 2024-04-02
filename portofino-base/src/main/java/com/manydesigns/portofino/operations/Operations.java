@@ -31,7 +31,7 @@ import com.manydesigns.portofino.buttons.annotations.Guards;
 import ognl.OgnlContext;
 import org.jetbrains.annotations.Nullable;
 
-import javax.ws.rs.*;
+import jakarta.ws.rs.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;

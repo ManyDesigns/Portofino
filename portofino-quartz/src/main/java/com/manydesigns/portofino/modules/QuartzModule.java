@@ -30,7 +30,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

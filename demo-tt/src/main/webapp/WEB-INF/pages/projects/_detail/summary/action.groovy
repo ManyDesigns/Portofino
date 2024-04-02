@@ -7,9 +7,9 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import javax.ws.rs.GET
+import jakarta.ws.rs.GET
 import net.sourceforge.stripes.action.*
-import javax.ws.rs.Produces
+import jakarta.ws.rs.Produces
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectSummaryAction extends CustomAction {

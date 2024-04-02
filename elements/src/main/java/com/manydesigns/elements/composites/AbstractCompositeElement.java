@@ -25,7 +25,7 @@ import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

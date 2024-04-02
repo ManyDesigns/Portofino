@@ -22,7 +22,7 @@ package com.manydesigns.portofino.pageactions.text.configuration;
 
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 

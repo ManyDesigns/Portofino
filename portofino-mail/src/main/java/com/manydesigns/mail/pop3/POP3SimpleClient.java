@@ -20,7 +20,7 @@
 
 package com.manydesigns.mail.pop3;
 
-import javax.mail.*;
+import jakarta.mail.*;
 import java.util.Set;
 
 /*

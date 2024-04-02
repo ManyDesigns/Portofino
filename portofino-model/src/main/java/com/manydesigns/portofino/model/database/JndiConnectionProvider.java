@@ -25,9 +25,9 @@ import org.apache.commons.dbutils.DbUtils;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
 import java.sql.Connection;
 import java.text.MessageFormat;
 

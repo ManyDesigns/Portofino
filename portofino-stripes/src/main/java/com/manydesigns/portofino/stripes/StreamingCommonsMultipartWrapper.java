@@ -25,15 +25,11 @@ import com.manydesigns.portofino.files.TempFileService;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.controller.FileUploadLimitExceededException;
 import net.sourceforge.stripes.controller.multipart.MultipartWrapper;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.IOUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.fileupload2.core.*;
+import org.apache.commons.fileupload2.jakarta.servlet5.JakartaServletFileUpload;
+import org.apache.commons.io.IOUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,17 +91,16 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
             throws IOException, FileUploadLimitExceededException {
         try {
             this.charset = request.getCharacterEncoding();
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            factory.setRepository(tempDir);
-            ServletFileUpload upload = new ServletFileUpload(factory);
+            DiskFileItemFactory factory =  (new DiskFileItemFactory.Builder()).setPath(tempDir.toPath()).get();
+            JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
             upload.setSizeMax(maxPostSize);
-            FileItemIterator iterator = upload.getItemIterator(request);
+            FileItemInputIterator iterator = upload.getItemIterator(request);
 
             Map<String,List<String>> params = new HashMap<String, List<String>>();
 
             while (iterator.hasNext()) {
-                FileItemStream item = iterator.next();
-                InputStream stream = item.openStream();
+                FileItemInput item = iterator.next();
+                InputStream stream = item.getInputStream();
 
                 // If it's a form field, add the string value to the list
                 if (item.isFormField()) {
@@ -130,8 +125,7 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
                 List<String> values = entry.getValue();
                 this.parameters.put(entry.getKey(), values.toArray(new String[values.size()]));
             }
-        }
-        catch (FileUploadBase.SizeLimitExceededException slee) {
+        } catch (FileUploadSizeException slee) {
             throw new FileUploadLimitExceededException(maxPostSize, slee.getActualSize());
         }
         catch (FileUploadException fue) {

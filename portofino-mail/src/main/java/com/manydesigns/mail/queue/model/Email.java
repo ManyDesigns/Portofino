@@ -20,7 +20,7 @@
 
 package com.manydesigns.mail.queue.model;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 

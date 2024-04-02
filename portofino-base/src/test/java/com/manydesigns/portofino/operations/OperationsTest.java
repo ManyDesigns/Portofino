@@ -2,9 +2,9 @@ package com.manydesigns.portofino.operations;
 
 import org.testng.annotations.Test;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;

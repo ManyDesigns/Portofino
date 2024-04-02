@@ -24,8 +24,8 @@ import com.manydesigns.portofino.dispatcher.DispatcherUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -87,7 +87,7 @@ public class DispatcherFilter implements Filter {
             savedAttributes.put(attrName, attrValue);
         }
         for(String attrName : savedAttributes.keySet()) {
-            if(attrName.startsWith("javax.servlet")) {
+            if(attrName.startsWith("jakarta.servlet")) {
                 continue;
             }
             if(attrName.equals("returnUrl")) {

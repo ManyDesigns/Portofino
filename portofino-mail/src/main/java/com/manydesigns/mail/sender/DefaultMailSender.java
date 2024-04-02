@@ -30,12 +30,12 @@ import org.apache.commons.mail.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.activation.FileDataSource;
-import javax.mail.IllegalWriteException;
-import javax.mail.MessagingException;
-import javax.mail.MethodNotSupportedException;
-import javax.mail.SendFailedException;
-import javax.mail.internet.ParseException;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.IllegalWriteException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.MethodNotSupportedException;
+import jakarta.mail.SendFailedException;
+import jakarta.mail.internet.ParseException;
 import java.io.File;
 import java.util.List;
 import java.util.Set;

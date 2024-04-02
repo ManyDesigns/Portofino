@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.model;
 
 import org.apache.commons.configuration.Configuration;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.Unmarshaller;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

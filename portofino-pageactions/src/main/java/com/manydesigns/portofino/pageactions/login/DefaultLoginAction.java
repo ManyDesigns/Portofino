@@ -57,10 +57,10 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.json.JSONStringer;
 import org.jsoup.Jsoup;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import java.io.Serializable;
 
 /**

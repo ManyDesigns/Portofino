@@ -5,7 +5,7 @@
     <parent>
         <artifactId>portofino</artifactId>
         <groupId>com.manydesigns</groupId>
-        <version>4.2.11</version>
+        <version>4.2.12-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>portofino-cryptography</artifactId>
@@ -13,8 +13,8 @@
     <url>https://www.manydesigns.com</url>
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <!-- To avoid Groovy compilation error in IDEA -->

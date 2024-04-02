@@ -31,7 +31,7 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.portofino.i18n.I18nUtils;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 import java.io.IOException;
 
 /**

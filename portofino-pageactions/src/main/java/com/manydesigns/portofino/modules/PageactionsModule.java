@@ -38,15 +38,15 @@ import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
+import org.apache.shiro.lang.util.LifecycleUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.SimpleAccountRealm;
-import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.io.File;
 import java.util.UUID;
 

@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.servlets;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 import java.io.IOException;
 
 /**

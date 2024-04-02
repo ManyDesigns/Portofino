@@ -25,7 +25,7 @@ import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

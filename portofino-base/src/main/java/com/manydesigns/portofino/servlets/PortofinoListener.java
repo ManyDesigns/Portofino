@@ -45,14 +45,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -83,7 +83,7 @@ public class PortofinoListener
     public static final String SEPARATOR =
             "----------------------------------------" +
                     "----------------------------------------";
-    
+
     public static final String PORTOFINO_MESSAGES_FILE_NAME = "portofino-messages.properties";
 
     //**************************************************************************

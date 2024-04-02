@@ -23,7 +23,7 @@ package com.manydesigns.elements.fields.search;
 import com.manydesigns.elements.FieldEncrypter;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import org.apache.commons.lang.StringUtils;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /*
  * @author Emanuele Poggi     - emanuele.poggi@manydesigns.com

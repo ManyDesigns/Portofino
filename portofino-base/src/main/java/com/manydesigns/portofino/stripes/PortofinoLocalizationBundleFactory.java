@@ -27,7 +27,7 @@ import net.sourceforge.stripes.localization.LocalizationBundleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;

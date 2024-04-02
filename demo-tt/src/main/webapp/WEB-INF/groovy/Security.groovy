@@ -14,8 +14,7 @@ import com.manydesigns.portofino.shiro.ExistingUserException
 import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
 import com.manydesigns.portofino.shiro.google.GoogleToken
-import org.apache.commons.lang.StringUtils
-import org.apache.shiro.crypto.hash.Sha1Hash
+import org.apache.shiro.crypto.hash.Sha512Hash
 import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
@@ -208,7 +207,7 @@ class Security extends AbstractPortofinoRealm {
     }
 
     String encryptPassword(String plainText) {
-        Sha1Hash sha1Hash = new Sha1Hash(plainText);
+        Sha512Hash sha1Hash = new Sha512Hash(plainText);
         String encrypted = sha1Hash.toHex();
         return encrypted;
     }

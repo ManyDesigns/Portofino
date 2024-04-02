@@ -23,9 +23,9 @@ package com.manydesigns.mail.pop3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.BodyPart;
-import javax.mail.Multipart;
-import javax.mail.Part;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;

@@ -21,7 +21,6 @@
 package com.manydesigns.elements.servlet;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
-
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 import java.util.List;

@@ -32,8 +32,8 @@ package com.manydesigns.elements.stripes;
 import com.manydesigns.elements.servlet.ServletUtils;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

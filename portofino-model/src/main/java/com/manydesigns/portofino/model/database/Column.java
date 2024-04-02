@@ -27,8 +27,8 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.annotation.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -271,7 +271,7 @@ public class Column implements ModelObject, Annotated {
         return annotations;
     }
 
-        
+
     @Override
     public String toString() {
         return MessageFormat.format("column {0} {1}({2},{3}){4}",

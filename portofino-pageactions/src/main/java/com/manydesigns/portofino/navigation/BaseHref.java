@@ -34,7 +34,7 @@ import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.controller.StripesConstants;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
 

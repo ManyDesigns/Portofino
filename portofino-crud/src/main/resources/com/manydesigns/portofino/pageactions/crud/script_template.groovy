@@ -1,4 +1,4 @@
-import javax.servlet.*
+import jakarta.servlet.*
 
 import com.manydesigns.elements.forms.*
 import com.manydesigns.elements.messages.*

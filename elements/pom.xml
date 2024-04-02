@@ -6,21 +6,21 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.11</version>
+        <version>4.2.12-SNAPSHOT</version>
     </parent>
     <artifactId>elements</artifactId>
     <packaging>jar</packaging>
     <url>https://www.manydesigns.com</url>
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>javax.servlet.jsp-api</artifactId>
-            <version>${jsp.api.version}</version>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>2.3.6</version>
             <scope>provided</scope>
         </dependency>
         <!-- Apache Commons -->
@@ -37,8 +37,8 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-fileupload2-jakarta-servlet5</artifactId>
             <version>${commons.fileupload.version}</version>
             <scope>compile</scope>
         </dependency>

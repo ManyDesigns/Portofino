@@ -23,9 +23,9 @@ package com.manydesigns.elements;
 import com.manydesigns.elements.i18n.TextProvider;
 import ognl.OgnlContext;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
