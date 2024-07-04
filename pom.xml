@@ -96,7 +96,7 @@
         <javassist.version>3.24.0-GA</javassist.version> <!-- Hibernate 5 depends on this version, Jersey depends on 3.18.1-GA, Swagger depends on 3.22.0-GA -->
         <javax.mail.version>1.6.2</javax.mail.version> <!-- Differs from commons-email but the interface is unchanged -->
         <javax.ws.rs.api.version>2.1</javax.ws.rs.api.version>
-        <jersey.version>2.34</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
+        <jersey.version>2.43</jersey.version> <!-- Must be aligned with spring-boot-starter-jersey's version -->
         <jjwt.version>0.10.7</jjwt.version>
         <joda-time.version>2.9.1</joda-time.version>
         <jsp.api.version>2.3.0</jsp.api.version>
