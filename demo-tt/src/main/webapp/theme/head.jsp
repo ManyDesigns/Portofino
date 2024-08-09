@@ -21,7 +21,7 @@
     <script src="<stripes:url value='/webjars/excanvas/3/excanvas.compiled.js' />"></script>
 <![endif]-->
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap/3.4.1/css/bootstrap.min.css' />">
-<link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap/3.4.1//css/bootstrap-theme.min.css' />">
+<link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap/3.4.1/css/bootstrap-theme.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/Eonasdan-bootstrap-datetimepicker/4.17.49/css/bootstrap-datetimepicker.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap-fileinput/5.5.2/css/fileinput.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/jquery-ui/1.13.2/jquery-ui.structure.min.css' />">
@@ -30,7 +30,7 @@
 <script type="text/javascript" src="<stripes:url value='/webjars/momentjs/2.29.4/min/moment-with-locales.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/webjars/bootstrap/3.4.1/js/bootstrap.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/webjars/Eonasdan-bootstrap-datetimepicker/4.17.49/js/bootstrap-datetimepicker.min.js' />" ></script>
-<script type="text/javascript" src="<stripes:url value='/webjars/typeaheadjs/0.11.1/typeahead.bundle.min.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/webjars/typeaheadjs/0.10.5/typeahead.bundle.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/webjars/bootstrap-fileinput/5.5.2/js/fileinput.min.js' />" ></script>
 
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/portofino.css' />">

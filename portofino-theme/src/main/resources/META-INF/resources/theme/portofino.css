@@ -1355,3 +1355,25 @@ TEST MOBILE
 .fancytree-plain.fancytree-container span.fancytree-node.fancytree-active {
     color: gray;
 }
+
+/**************
+Fileupload icons compatibility Bootstrap 3
+ */
+
+.bi-folder2-open,.bi-trash{
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: "Glyphicons Halflings";
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.bi-trash:before{
+    content: "\e014";
+}
+
+.bi-folder2-open:before{
+    content: "\e027";
+}
