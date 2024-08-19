@@ -27,6 +27,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.util.SecurityUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -631,21 +632,13 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     protected Resolution redirectToReturnUrl(String returnUrl) {
-        boolean prependContext = true;
-        if (StringUtils.isEmpty(returnUrl)) {
+        boolean prependContext = true; //TODO da valutare
+        if (StringUtils.isEmpty(returnUrl) || !SecurityUtil.isValidUrl(context,returnUrl)) {
             returnUrl = "/";
-        } else try {
-            URL url = new URL(returnUrl);
-            if (!isValidReturnUrl(url)) {
-                logger.warn("Forbidding suspicious return URL: " + url);
-                return new RedirectResolution("/");
-            }
-            prependContext = false;
-        } catch (MalformedURLException e) {
-            //Ok, if it is not a full URL there's no risk of XSS attacks with returnUrl=http://www.evil.com/hack
+            return new RedirectResolution(returnUrl, true);
         }
         logger.debug("Redirecting to: {}", returnUrl);
-        return new RedirectResolution(returnUrl, prependContext);
+        return new RedirectResolution(returnUrl, false);
     }
 
     protected boolean isValidReturnUrl(URL url) {
@@ -663,7 +656,8 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     public void setReturnUrl(String returnUrl) {
-        this.returnUrl = returnUrl;
+        if(SecurityUtil.isValidUrl(context,returnUrl))
+            this.returnUrl = returnUrl;
     }
 
     public String getCancelReturnUrl() {
@@ -671,7 +665,8 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     public void setCancelReturnUrl(String cancelReturnUrl) {
-        this.cancelReturnUrl = cancelReturnUrl;
+        if(SecurityUtil.isValidUrl(context,cancelReturnUrl))
+            this.cancelReturnUrl = cancelReturnUrl;
     }
 
     public Configuration getPortofinoConfiguration() {
