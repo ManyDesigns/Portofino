@@ -85,7 +85,7 @@
         <commons.dbutils.version>1.7</commons.dbutils.version>
         <commons.email.version>1.5</commons.email.version>
         <commons.fileupload.version>1.5</commons.fileupload.version>
-        <commons.io.version>2.7</commons.io.version>
+        <commons.io.version>2.14.0</commons.io.version>
         <commons.lang.version>2.5</commons.lang.version>
         <fop.version>2.9</fop.version>
         <groovy.version>3.0.8</groovy.version>
