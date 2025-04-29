@@ -1,0 +1,32 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %-40logger{40} %X{userId} %X{req.requestURI} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <logger name="org.hibernate" additivity="false" level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="org.hibernate.connection.C3P0ConnectionProvider" additivity="false" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="com.manydesigns.portofino.i18n.ResourceBundleManager" additivity="false" level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="com.manydesigns.portofino.servlets.PortofinoListener" additivity="false" level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="com.manydesigns.portofino.tt.TtUtils" additivity="false" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+</configuration>

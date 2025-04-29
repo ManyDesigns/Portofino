@@ -29,6 +29,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.SecurityUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.ButtonInfo;
 import com.manydesigns.portofino.buttons.ButtonsLogic;
@@ -421,7 +422,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     public void setReturnUrl(String returnUrl) {
-        this.returnUrl = returnUrl;
+        if(SecurityUtil.isValidUrl(context,returnUrl))
+            this.returnUrl = returnUrl;
     }
 
     //--------------------------------------------------------------------------

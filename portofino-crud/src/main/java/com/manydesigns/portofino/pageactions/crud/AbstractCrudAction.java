@@ -511,6 +511,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * to the {@link #getWhitelist() whitelist}.
      */
     protected void writeFormToObject() {
+
+        // TODO clean all text fields?
+
         form.writeToObject(object);
         for(TextField textField : FormUtil.collectEditableRichTextFields(form)) {
             //TODO in bulk edit mode, the field should be skipped altogether if the checkbox is not checked.
