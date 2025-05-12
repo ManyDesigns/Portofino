@@ -106,7 +106,9 @@ public class PageActionLogic {
     }
 
     public static boolean isEmbedded(PageAction pageAction) {
-        PageInstance parent = pageAction.getPageInstance().getParent();
+
+        return pageAction.isEmbedded() != null && pageAction.isEmbedded();
+        /*PageInstance parent = pageAction.getPageInstance().getParent();
         if(parent == null) {
             return false; //Root page
         }
@@ -116,6 +118,6 @@ public class PageActionLogic {
         }
         String parentPath = parentActionBean.getContext().getActionPath();
         String myPath = pageAction.getContext().getActionPath();
-        return !StringUtils.equals(parentPath, myPath);
+        return !StringUtils.equals(parentPath, myPath);*/
     }
 }

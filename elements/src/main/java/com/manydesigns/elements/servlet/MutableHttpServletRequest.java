@@ -471,6 +471,21 @@ public class MutableHttpServletRequest implements HttpServletRequest {
         return null;
     }
 
+    @Override
+    public String getRequestId() {
+        return null;
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        return null;
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
+        return null;
+    }
+
     //Servlet API 3.1 methods
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {

@@ -4,8 +4,8 @@
 %><%@ attribute name="cssClass" required="false"
 %><%@ attribute name="anchor" required="false" type="java.lang.Boolean"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
+%><%@ taglib prefix="c" uri="jakarta.tags.core"
 %><%@ tag import="org.slf4j.LoggerFactory"
 %><%@ tag import="com.manydesigns.portofino.dispatcher.PageAction" %>
 <c:if test="${empty returnUrl}">
@@ -16,24 +16,22 @@
 <c:if test="${(empty anchor) or anchor}">
     <a name="<c:out value='${id}' />"></a>
 </c:if>
+
+
 <div id="embeddedPageAction_${id}" class="${cssClass}">
-    <% try {%>
-        <jsp:include page="${path}" flush="false">
-            <jsp:param name="returnUrl" value="${returnUrl}" />
-            <jsp:param name="__portofino_quiet_auth_failure" value="true" />
-        </jsp:include>
-    <%} catch (Throwable t) {
-        LoggerFactory.getLogger(PageAction.class).error("Error in included page", t);
-    %>
-        <div class="alert alert-danger">
-            <button data-dismiss="alert" class="close" type="button">&times;</button>
-            <ul class="errorMessages">
-                <li>
-                    <fmt:message key="this.page.has.thrown.an.exception.during.rendering">
-                        <fmt:param value="${path}" />
-                    </fmt:message>
-                </li>
-            </ul>
-        </div>
-    <%}%>
+
 </div>
+
+    <script>
+        {
+        const container = document.getElementById("embeddedPageAction_<c:out value='${id}' />");
+        const returnUrl = "<c:out value='${returnUrl}' />";
+
+        fetch("<c:out value='${path}' />?__portofino_quiet_auth_failure=true&embedded=true&returnUrl=" + encodeURIComponent(returnUrl))
+            .then(res => res.text())
+            .then(html => container.innerHTML = html)
+            .catch(err => container.innerHTML = "Errore nel caricamento");
+        }
+    </script>
+
+

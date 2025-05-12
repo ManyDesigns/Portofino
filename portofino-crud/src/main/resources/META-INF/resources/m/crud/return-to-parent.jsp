@@ -1,5 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+<%@ taglib prefix="c" uri="jakarta.tags.core"
+%><%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
 %><%@ page import="net.sourceforge.stripes.util.UrlBuilder"

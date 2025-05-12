@@ -1,7 +1,7 @@
 <%@ page import="com.manydesigns.portofino.menu.*"
 %><%@ page import="org.apache.commons.lang.StringUtils"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="c" uri="jakarta.tags.core"
 %><%
     MenuBuilder menuBuilder = (MenuBuilder) application.getAttribute(request.getAttribute("menu").toString());
     Menu menu = menuBuilder.build();

@@ -1,4 +1,4 @@
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page import="com.manydesigns.portofino.pages.ChildPage" %>
@@ -41,7 +41,7 @@
     private void displayPageChildrenAsList(Page page, XhtmlBuffer buf) {
         List<ChildPage> childPages = page.getLayout().getChildPages();
         List<ChildPage> detailChildPages = page.getDetailLayout().getChildPages();
-        
+
         if(!childPages.isEmpty() || !detailChildPages.isEmpty()) {
             buf.openElement("ul");
             for(ChildPage childPage : childPages) {

@@ -4,7 +4,7 @@
         <database databaseName="tt">
             <jdbcConnection driver="org.postgresql.Driver"/>
             <schemas>
-                <schema schemaName="tt" />
+                <schema schemaName="tt" schema="tt" catalogName="tt"  catalog="tt"/>
             </schemas>
         </database>
     </databases>

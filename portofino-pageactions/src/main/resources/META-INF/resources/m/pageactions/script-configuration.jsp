@@ -6,7 +6,7 @@
 <%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page import="org.apache.shiro.subject.Subject" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%
     AbstractPageAction theActionBean = (AbstractPageAction) request.getAttribute("actionBean");
     Subject subject = SecurityUtils.getSubject();

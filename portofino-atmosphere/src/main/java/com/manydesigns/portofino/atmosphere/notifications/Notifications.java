@@ -1,8 +1,6 @@
 package com.manydesigns.portofino.atmosphere.notifications;
 
-import com.manydesigns.portofino.interceptors.ShiroInterceptor;
 import com.manydesigns.portofino.modules.AtmosphereModule;
-import org.apache.shiro.cdi.ShiroSecurityInterceptor;
 import org.atmosphere.config.service.ManagedService;
 import org.atmosphere.config.service.PathParam;
 import org.atmosphere.config.service.Ready;
@@ -10,11 +8,9 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceFactory;
 import org.atmosphere.cpr.BroadcasterFactory;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
-
 import org.atmosphere.interceptor.SuspendTrackerInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 

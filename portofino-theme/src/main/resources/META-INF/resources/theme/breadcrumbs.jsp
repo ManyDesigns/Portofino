@@ -1,5 +1,5 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
-        taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
+<%@ taglib prefix="c" uri="jakarta.tags.core" %><%@
+        taglib prefix="fmt" uri="jakarta.tags.fmt" %><%@
         page import="com.manydesigns.portofino.breadcrumbs.BreadcrumbItem" %><%@
         page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %><%@
         page import="com.manydesigns.portofino.dispatcher.Dispatch" %><%@

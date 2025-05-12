@@ -1,8 +1,8 @@
 <%@ attribute name="list" required="true"
 %><%@ attribute name="cssClass" required="false"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
+%><%@ taglib prefix="c" uri="jakarta.tags.core"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.PageAction"/>
 <div class="${cssClass} embeddedPageActions" data-page-action-list="${list}">

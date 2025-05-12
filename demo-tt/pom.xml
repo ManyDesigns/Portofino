@@ -49,6 +49,7 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jersey</artifactId>
             <version>${project.version}</version>
+
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -68,12 +69,14 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-quartz</artifactId>
             <version>${project.parent.version}</version>
+
             <scope>compile</scope>
         </dependency>
         <!-- Servlet API. -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- logging -->
@@ -135,7 +138,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.2</version>
+            <version>42.7.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

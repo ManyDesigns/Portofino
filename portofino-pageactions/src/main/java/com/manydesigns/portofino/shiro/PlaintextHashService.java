@@ -17,6 +17,7 @@ public class PlaintextHashService implements HashService {
 
     @Override
     public Hash computeHash(HashRequest request) {
+
         if(  request.getAlgorithmName().isPresent() && request.getSalt().isPresent() ){
             SimpleHash result = new SimpleHash(request.getAlgorithmName().get());
             result.setSalt(request.getSalt().get());
@@ -25,7 +26,10 @@ public class PlaintextHashService implements HashService {
             return result;
         }
 
-        return null; //TODO
+        SimpleHash result = new SimpleHash("plaintext");
+        result.setBytes(request.getSource().getBytes());
+
+        return result; //TODO
     }
 
     @Override

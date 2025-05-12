@@ -1,7 +1,7 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer"
 %><%@ page import="com.manydesigns.portofino.navigation.BaseHref"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="c" uri="jakarta.tags.core"
 %><%@ page import="com.manydesigns.portofino.PortofinoProperties"
 %><%@ page import="org.apache.commons.lang.StringUtils"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"

@@ -3,7 +3,7 @@
 <%@ page import="com.manydesigns.portofino.PortofinoProperties" %>
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="activityItem" scope="request" type="com.manydesigns.portofino.pageactions.activitystream.ActivityItem"/>
 <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>

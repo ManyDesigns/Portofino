@@ -27,7 +27,7 @@ import net.sourceforge.stripes.controller.FileUploadLimitExceededException;
 import net.sourceforge.stripes.controller.multipart.MultipartWrapper;
 
 import org.apache.commons.fileupload2.core.*;
-import org.apache.commons.fileupload2.jakarta.servlet5.JakartaServletFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;

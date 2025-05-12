@@ -3,9 +3,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.manydesigns.portofino.pageactions.gallery.Image" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.gallery.GalleryAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
 <stripes:layout-component name="pageTitle">

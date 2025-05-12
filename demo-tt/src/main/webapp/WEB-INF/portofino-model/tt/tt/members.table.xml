@@ -48,13 +48,13 @@
     </primaryKey>
     <selectionProviders>
         <query toDatabase="tt"
-               sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id and m.project = %{#project.id}"
+               sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is null&#xD;&#xA;from tt.users u&#xD;&#xA;left join tt.members m on m.user_ = u.id and m.project = %{#project.id}"
                name="available_members" hql="">
             <references>
                 <reference fromColumn="user_"/>
             </references>
         </query>
-        <query toDatabase="tt" sql="select id, role from roles order by id asc" name="sorted_roles" hql="">
+        <query toDatabase="tt" sql="select id, role from tt.roles order by id asc" name="sorted_roles" hql="">
             <references>
                 <reference fromColumn="role"/>
             </references>

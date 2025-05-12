@@ -150,6 +150,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * The URL the user cakeme from within the application.
      */
     public String returnUrl;
+    public Boolean embedded;
 
     //**************************************************************************
     // Scripting
@@ -658,6 +659,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         } else {
             return getPageInstance().getLayout().getTemplate();
         }
+    }
+
+    @Override
+    public Boolean isEmbedded() {
+        return embedded;
     }
 
     public void setPageTemplate(String pageTemplate) {

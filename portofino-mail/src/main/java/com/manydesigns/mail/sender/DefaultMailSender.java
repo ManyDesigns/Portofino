@@ -26,7 +26,8 @@ import com.manydesigns.mail.queue.model.Attachment;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import com.sun.mail.smtp.SMTPAddressFailedException;
-import org.apache.commons.mail.*;
+import org.apache.commons.mail2.core.EmailException;
+import org.apache.commons.mail2.jakarta.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,7 +147,7 @@ public class DefaultMailSender implements MailSender {
 
     protected void send(Email emailBean) throws EmailException {
         logger.debug("Entering send(Email)");
-        org.apache.commons.mail.Email email;
+        org.apache.commons.mail2.jakarta.Email email;
         String textBody = emailBean.getTextBody();
         String htmlBody = emailBean.getHtmlBody();
         if(null == htmlBody) {

@@ -1,8 +1,8 @@
 <%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>

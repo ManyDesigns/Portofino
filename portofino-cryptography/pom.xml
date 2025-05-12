@@ -15,6 +15,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- To avoid Groovy compilation error in IDEA -->

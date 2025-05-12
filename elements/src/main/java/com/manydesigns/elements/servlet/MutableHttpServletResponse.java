@@ -88,15 +88,6 @@ public class MutableHttpServletResponse implements HttpServletResponse {
         return s;
     }
 
-    @Override
-    public String encodeUrl(String s) {
-        return encodeURL(s);
-    }
-
-    @Override
-    public String encodeRedirectUrl(String s) {
-        return encodeRedirectURL(s);
-    }
 
     @Override
     public void sendError(int i, String s) throws IOException {
@@ -147,13 +138,6 @@ public class MutableHttpServletResponse implements HttpServletResponse {
     public void setStatus(int i) {
         logger.debug("Setting status to: {}", i);
         status = i;
-    }
-
-    @Override
-    public void setStatus(int i, String s) {
-        logger.debug("Setting status and message to: {} - {}", i, s);
-        status = i;
-        statusMessage = s;
     }
 
     @Override

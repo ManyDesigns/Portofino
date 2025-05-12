@@ -115,7 +115,7 @@ public class NotificationsJob implements Job {
                 long activityId = current[TtUtils.ACTIVITY_SQL_ACTIVITY_ID];
                 logger.debug("Notifying activity #{}", activityId);
 
-                request.setAttribute("activityItem", activityItems.get(i));
+                /*request.setAttribute("activityItem", activityItems.get(i));
 
                 ByteArrayServletOutputStream stream =
                     new ByteArrayServletOutputStream();
@@ -127,8 +127,8 @@ public class NotificationsJob implements Job {
                 requestDispatcher.include(request, response);
                 response.flushBuffer();
 
-                ByteArrayOutputStream baos = stream.getByteArrayOutputStream();
-                String htmlBody = baos.toString(response.getCharacterEncoding());
+                ByteArrayOutputStream baos = stream.getByteArrayOutputStream();*/
+                String htmlBody = "" ;//baos.toString(response.getCharacterEncoding());
                 logger.debug("Html body: {}", htmlBody);
 
                 String subject;

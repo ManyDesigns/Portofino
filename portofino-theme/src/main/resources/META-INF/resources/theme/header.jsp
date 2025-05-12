@@ -2,8 +2,8 @@
 %><%@ page import="com.manydesigns.portofino.PortofinoProperties"
 %><%@ page import="com.manydesigns.portofino.modules.BaseModule"
 %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+<%@ taglib prefix="c" uri="jakarta.tags.core"
+%><%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"

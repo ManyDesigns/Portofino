@@ -21,18 +21,26 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- JAX-RS annotations for the Login action -->
-        <dependency>
+       <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
+           <version>${jakarta.ws.rs.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+            <version>3.0.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -49,41 +57,11 @@
         <!-- SHIRO -->
         <dependency>
             <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-jakarta-ee</artifactId>
-            <version>2.0.0</version>
-            <classifier>jakarta</classifier>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>shiro-web</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-cdi</artifactId>
-            <version>2.0.0</version>
+            <artifactId>shiro-web</artifactId>
+            <version>2.0.4</version>
             <classifier>jakarta</classifier>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
-            <version>2.0.0</version>
-            <classifier>jakarta</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-web</artifactId>
-            <version>2.0.0</version>
-            <classifier>jakarta</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.omnifaces</groupId>
-            <artifactId>omnifaces</artifactId>
-            <!-- replace LATEST with a version number -->
-            <version>4.3</version>
-        </dependency>
         <!-- JSON Web Tokens -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

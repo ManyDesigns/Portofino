@@ -68,4 +68,6 @@ public interface PageAction extends ActionBean, DispatchElement {
     String getReturnUrl();
 
     String getPageTemplate();
+
+    Boolean isEmbedded();
 }

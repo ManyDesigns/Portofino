@@ -20,7 +20,7 @@
 %><%@ attribute name="list" required="true"
 %><%@ attribute name="cssClass" required="false"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%
+%><%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %><%
     Logger logger = LoggerFactory.getLogger("buttons.tag");
     logger.debug("Button list: {}", list);
     ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");

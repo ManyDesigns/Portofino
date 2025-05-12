@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-fileupload2-jakarta-servlet5</artifactId>
+            <artifactId>commons-fileupload2-jakarta-servlet6</artifactId>
             <version>${commons.fileupload.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -51,6 +51,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- To avoid Groovy compilation error in IDEA -->
@@ -61,9 +62,10 @@
             <scope>provided</scope>
         </dependency>
         <!-- JAX-RS annotations for PageActions -->
-        <dependency>
+       <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
+           <version>${jakarta.ws.rs.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- Google OAuth client -->

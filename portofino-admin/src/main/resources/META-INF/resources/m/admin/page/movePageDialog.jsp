@@ -1,5 +1,5 @@
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
 <div class="dialog-move-page modal" tabindex="-1" role="dialog" aria-hidden="true">

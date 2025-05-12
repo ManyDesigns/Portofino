@@ -6,8 +6,8 @@
 %><%@ page import="org.apache.shiro.SecurityUtils"
 %><%@ page import="org.apache.shiro.subject.Subject"
 %><%@ page import="org.apache.commons.lang.StringUtils"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib prefix="c" uri="jakarta.tags.core"
+%><%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
 %><%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"%>

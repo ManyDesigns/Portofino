@@ -1,7 +1,7 @@
 <%@ attribute name="version" required="false"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib prefix="c" uri="jakarta.tags.core"
+%><%@ taglib prefix="fmt" uri="jakarta.tags.fmt"
 %><c:if test="${empty version}">
     <c:set var="version" value="4.19.0" scope="page" />
 </c:if>

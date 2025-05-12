@@ -1,6 +1,6 @@
 <%@ page import="com.manydesigns.portofino.modules.ModuleRegistry" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>

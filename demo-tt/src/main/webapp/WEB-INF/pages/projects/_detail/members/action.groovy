@@ -62,7 +62,7 @@ class ProjectMembersAction extends CrudAction {
     @Button(list = "crud-create", key = "save", order = 1d, type = Button.TYPE_PRIMARY)
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution save() {
-        return super.save() 
+        return super.save()
     }
 
     protected void createSetup(Object object) {

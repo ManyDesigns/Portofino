@@ -142,7 +142,7 @@
                 <reference fromColumn="state"/>
             </references>
         </query>
-        <query name="ticket_assignee" toDatabase="tt" hql="" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name">
+        <query name="ticket_assignee" toDatabase="tt" hql="" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from tt.users u&#xD;&#xA;left join tt.members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name">
             <references>
                 <reference fromColumn="assignee"/>
             </references>
@@ -157,7 +157,7 @@
                 <reference fromColumn="affected_version"/>
             </references>
         </query>
-        <query name="ticket_created_by" toDatabase="tt" hql="" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name">
+        <query name="ticket_created_by" toDatabase="tt" hql="" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from tt.users u&#xD;&#xA;left join tt.members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name">
             <references>
                 <reference fromColumn="created_by"/>
             </references>

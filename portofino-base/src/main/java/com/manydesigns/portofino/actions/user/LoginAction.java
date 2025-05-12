@@ -103,6 +103,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     protected Form signUpForm;
     public String returnUrl;
+    public Boolean embedded;
     public String cancelReturnUrl;
 
     //**************************************************************************
@@ -735,5 +736,9 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public boolean isCaptchaValidationFailed() {
         return captchaValidationFailed;
+    }
+
+    public Boolean isEmbedded() {
+        return embedded;
     }
 }
