@@ -113,7 +113,7 @@
         <shiro.version>1.13.0</shiro.version>
         <slf4j.version>2.0.7</slf4j.version>
         <stax.version>1.2.0</stax.version>
-        <stripes.version>1.6.0-JakartaEE10</stripes.version>
+        <stripes.version>1.6.1-JakartaEE10</stripes.version>
         <aws.version>1.12.783</aws.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <allowIncompleteProjects>true</allowIncompleteProjects>
