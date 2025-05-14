@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2025 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -36,14 +36,14 @@ import java.lang.annotation.Annotation;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class OGNLPropertyAccessor extends AbstractAnnotatedAccessor implements PropertyAccessor {
-    
+
     protected final String name;
     protected final Class type;
     protected final String expression;
     protected final Object parsedExpression;
     protected OgnlContext ognlContext;
     protected int modifiers;
-    
+
     public OGNLPropertyAccessor(String name, Class type, String expression, OgnlContext ognlContext) throws OgnlException {
         this.name = name;
         this.type = type;
@@ -51,7 +51,7 @@ public class OGNLPropertyAccessor extends AbstractAnnotatedAccessor implements P
         this.parsedExpression = Ognl.parseExpression(expression);
         this.ognlContext = ognlContext;
     }
-    
+
     public OGNLPropertyAccessor(String name, Class type, String expression) throws OgnlException {
         this(name, type, expression, null);
     }
@@ -114,5 +114,5 @@ public class OGNLPropertyAccessor extends AbstractAnnotatedAccessor implements P
         annotations.put(annotation.annotationType(), annotation);
         return this;
     }
-    
+
 }

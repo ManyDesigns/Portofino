@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class NotInUseCaseResolution implements Resolution {
 
     public static final String copyright =
-            "Copyright (C) 2005-2024 ManyDesigns srl";
+            "Copyright (C) 2005-2025 ManyDesigns srl";
 
     private String key;
 

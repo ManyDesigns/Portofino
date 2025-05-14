@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2025 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -37,11 +37,11 @@ import java.util.List;
  */
 public class AgendaView {
     public static final String copyright =
-            "Copyright (C) 2005-2024 ManyDesigns srl";
+            "Copyright (C) 2005-2025 ManyDesigns srl";
 
     protected LocalDate firstDay;
     protected final List<EventDay> events = new LinkedList<EventDay>();
-    
+
     public AgendaView(DateTime referenceDateTime) {
         firstDay = referenceDateTime.toLocalDate();
     }
@@ -58,7 +58,7 @@ public class AgendaView {
         }
         return added;
     }
-    
+
     @Deprecated
     protected boolean addEvent(DateMidnight date, Event event) {
         return addEvent(date.toLocalDate(), event);

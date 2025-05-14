@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class HttpBasicAuthenticationFilter extends PathMatchingFilter {
     public static final String copyright =
-            "Copyright (C) 2005-2024 ManyDesigns srl";
+            "Copyright (C) 2005-2025 ManyDesigns srl";
 
     private static final Logger logger = LoggerFactory.getLogger(HttpBasicAuthenticationFilter.class);
 

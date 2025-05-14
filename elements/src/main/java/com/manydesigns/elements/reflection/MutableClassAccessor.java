@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2024 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2025 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,12 +31,12 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class MutableClassAccessor extends AbstractAnnotatedAccessor implements ClassAccessor {
-    
+
     protected String name;
     protected Class<?> type;
     protected final List<PropertyAccessor> properties = new ArrayList<>();
     protected final List<PropertyAccessor> keyProperties = new ArrayList<>();
-    
+
     @Override
     public String getName() {
         return name;
@@ -79,24 +79,24 @@ public class MutableClassAccessor extends AbstractAnnotatedAccessor implements C
     public Object newInstance() {
         throw new UnsupportedOperationException();
     }
-    
+
     public void addProperty(PropertyAccessor propertyAccessor) {
         properties.add(propertyAccessor);
     }
-    
+
     public void addKeyProperty(PropertyAccessor propertyAccessor) {
         addProperty(propertyAccessor);
         keyProperties.add(propertyAccessor);
     }
-    
+
     public List<PropertyAccessor> getMutableProperties() {
         return properties;
     }
-    
+
     public List<PropertyAccessor> getMutableKeyProperties() {
         return keyProperties;
     }
-    
+
     public MutableClassAccessor configureAnnotation(Annotation annotation) {
         annotations.put(annotation.annotationType(), annotation);
         return this;
