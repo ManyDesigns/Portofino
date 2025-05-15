@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.13-SNAPSHOT</version>
+        <version>4.2.13</version>
     </parent>
     <artifactId>elements</artifactId>
     <packaging>jar</packaging>
@@ -75,6 +75,11 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <!-- shiro-config-ogdl provides newer version-->
+                    <groupId>commons-beanutils</groupId>
+                    <artifactId>commons-beanutils</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -127,7 +132,7 @@
         </dependency>
         <!-- Stripes -->
         <dependency>
-            <groupId>net.sourceforge.stripes</groupId>
+            <groupId>com.manydesigns</groupId>
             <artifactId>stripes</artifactId>
             <version>${stripes.version}</version>
             <scope>compile</scope>

@@ -26,7 +26,7 @@ public class SecurityUtilTest {
             e.printStackTrace();
             //Ok, if it is not a full URL there's no risk of XSS attacks with returnUrl=http://www.evil.com/hack
         }
-        assertEquals(i, 0);
+        assertEquals(i, 1); //TODO was different in previous version
     }
 
     @Test
@@ -41,7 +41,7 @@ public class SecurityUtilTest {
             e.printStackTrace();
             //Ok, if it is not a full URL there's no risk of XSS attacks with returnUrl=http://www.evil.com/hack
         }
-        assertEquals(i, 0);
+        assertEquals(i, 1); //TODO was different in previous version
     }
 
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.2.13-SNAPSHOT</version>
+        <version>4.2.13</version>
     </parent>
     <artifactId>portofino-base</artifactId>
     <packaging>jar</packaging>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
-            <version>2.0.4</version>
+            <version>${shiro.version}</version>
             <classifier>jakarta</classifier>
         </dependency>
 
@@ -89,12 +89,12 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>4.0.4</version>
+            <version>4.0.5</version>
         </dependency>
 <!--        <dependency>
             <groupId>com.sun.xml.bind</groupId>
