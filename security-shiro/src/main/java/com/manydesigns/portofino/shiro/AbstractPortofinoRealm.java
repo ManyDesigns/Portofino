@@ -37,7 +37,6 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.codec.Base64;
 import org.apache.shiro.crypto.hash.HashService;
 import org.apache.shiro.crypto.hash.format.HashFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -49,7 +48,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
+
+import java.io.Serializable;
 import java.security.Key;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -67,6 +67,12 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     public static final String JWT_EXPIRATION_PROPERTY = "jwt.expiration";
     public static final String JWT_SECRET_PROPERTY = "jwt.secret";
+
+    /**
+     * Load a user principal by its identifier extracted from a JWT.
+     */
+    protected abstract Object loadPrincipalById(String principalId);
+
 
     @Autowired
     protected Configuration portofinoConfiguration;
@@ -109,50 +115,29 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     }
 
     protected Object extractPrincipalFromWebToken(Jws<Claims> jwt) {
-        Map<String, Object> body = jwt.getBody();
-        String base64Principal = (String) body.get("serialized-principal");
-        byte[] serializedPrincipal = Base64.decode(base64Principal);
-        Object principal;
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(codeBase.asClassLoader()); //In case the serialized principal is a POJO entity
-            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(serializedPrincipal)) {
-                @Override
-                protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-                    return codeBase.loadClass(desc.getName());
-                }
-            };
-            principal = objectInputStream.readObject();
-            objectInputStream.close();
-        } catch (Exception e) {
-            throw new AuthenticationException(e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(loader);
+        String principalId = jwt.getBody().get("principalId", String.class);
+        if (principalId == null) {
+            throw new AuthenticationException("Missing principalId in JWT");
         }
-        return principal;
+        return loadPrincipalById(principalId);
     }
+
 
     public String generateWebToken(Object principal) {
         Key key = getJWTKey();
         Map<String, Object> claims = new HashMap<>();
-        claims.put("principal", getPrincipalForWebToken(principal));
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream;
-        try {
-            objectOutputStream = new ObjectOutputStream(bytes);
-            objectOutputStream.writeObject(principal);
-            objectOutputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        claims.put("serialized-principal", bytes.toByteArray());
+
+        // Best practice: store only identifier
+        claims.put("principalId", principal.toString());
+
         int expireAfterMinutes = portofinoConfiguration.getInt(JWT_EXPIRATION_PROPERTY, 30);
-        return Jwts.builder().
-                setClaims(claims).
-                setExpiration(new DateTime().plusMinutes(expireAfterMinutes).toDate()).
-                signWith(key, SignatureAlgorithm.HS512).
-                compact();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setExpiration(new DateTime().plusMinutes(expireAfterMinutes).toDate())
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
     }
+
 
     protected Object getPrincipalForWebToken(Object principal) {
         return cleanUserPrincipal(principal);
